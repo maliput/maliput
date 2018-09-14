@@ -190,7 +190,8 @@ GTEST_TEST(MultilaneBuilderTest, ParameterConstructor) {
   const ComputationPolicy kComputationPolicy{
     ComputationPolicy::kPreferAccuracy};
   Builder builder(kLaneWidth, kElevationBounds, kLinearTolerance,
-                  kAngularTolerance, kScaleLength, kComputationPolicy);
+                  kAngularTolerance, kScaleLength, kComputationPolicy,
+                  std::make_unique<GroupFactory>());
   EXPECT_EQ(builder.get_lane_width(), kLaneWidth);
   EXPECT_TRUE(api::test::IsHBoundsClose(builder.get_elevation_bounds(),
                                         kElevationBounds, 0.));
@@ -212,7 +213,8 @@ GTEST_TEST(MultilaneBuilderTest, ProperConnections) {
   constexpr ComputationPolicy kComputationPolicy{
     ComputationPolicy::kPreferAccuracy};
   Builder builder(kLaneWidth, kElevationBounds, kLinearTolerance,
-                  kAngularTolerance, kScaleLength, kComputationPolicy);
+                  kAngularTolerance, kScaleLength, kComputationPolicy,
+                  std::make_unique<GroupFactory>());
 
   const double kLeftShoulder = 2.;
   const double kRightShoulder = 2.;
@@ -274,9 +276,8 @@ GTEST_TEST(MultilaneBuilderTest, Fig8) {
   const double kScaleLength = 1.0;
   const ComputationPolicy kComputationPolicy{
     ComputationPolicy::kPreferAccuracy};
-  Builder b(kLaneWidth, kElevationBounds,
-            kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+  Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   const double kLeftShoulder = 2.;
   const double kRightShoulder = 2.;
@@ -399,9 +400,8 @@ GTEST_TEST(MultilaneBuilderTest, QuadRing) {
   const double kScaleLength = 1.0;
   const ComputationPolicy kComputationPolicy{
     ComputationPolicy::kPreferAccuracy};
-  Builder b(kLaneWidth, kElevationBounds,
-            kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+  Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   const double kLeftShoulder = 2.;
   const double kRightShoulder = 2.;
@@ -563,7 +563,7 @@ class MultilaneBuilderReferenceCurvePrimitivesTest : public ::testing::Test {
 // Checks that a multi-lane line segment is correctly created.
 TEST_F(MultilaneBuilderReferenceCurvePrimitivesTest, LineSegment) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   const LineOffset kLineOffset(50.);
   b.Connect("c0", kLaneLayout, StartReference().at(kStart, Direction::kForward),
@@ -616,7 +616,7 @@ TEST_F(MultilaneBuilderReferenceCurvePrimitivesTest, LineSegment) {
 // Checks that a multi-lane arc segment is correctly created.
 TEST_F(MultilaneBuilderReferenceCurvePrimitivesTest, ArcSegment) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   const double kRadius = 30.;
   const double kDTheta = 0.5 * M_PI;
@@ -712,7 +712,7 @@ class MultilaneBuilderPrimitiveContinuityConstraintTest
 // to zero always because of infinite curvature radius of a line.
 TEST_F(MultilaneBuilderPrimitiveContinuityConstraintTest, MonolaneLineSegment) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
   const LineOffset kLineOffset(50.);
   auto c0 =
       b.Connect("c0", kLaneLayout,
@@ -734,7 +734,7 @@ TEST_F(MultilaneBuilderPrimitiveContinuityConstraintTest, MonolaneLineSegment) {
 // on curvature and angular displacement.
 TEST_F(MultilaneBuilderPrimitiveContinuityConstraintTest, MonolaneArcSegment) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
   const double kRadius = 30.;
   const double kDTheta = 0.5 * M_PI;
   auto counter_clockwise_conn =
@@ -798,7 +798,7 @@ class MultilaneBuilderLaneToLanePrimitivesTest : public ::testing::Test {
 // Checks that a multi-lane line segment is correctly created.
 TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, FlatLineSegment) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   const LineOffset kLineOffset(50.);
   b.Connect("c0", kLaneLayout,
@@ -853,7 +853,7 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, FlatLineSegment) {
 // Checks that a multi-lane line segment is correctly created.
 TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ElevatedEndLineSegment) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   const double kLength{50.};
   const LineOffset kLineOffset(kLength);
@@ -920,7 +920,7 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ElevatedEndLineSegment) {
 // Checks that a multi-lane arc segment is correctly created.
 TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ArcSegment) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   const double kRadius = 30.;
   const double kDTheta = 0.5 * M_PI;
@@ -977,7 +977,7 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ArcSegment) {
 // Checks that a multi-lane arc segment is correctly created.
 TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ElevatedEndArcSegment) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   const double kRadius = 30.;
   const double kDTheta = 0.5 * M_PI;
@@ -1245,7 +1245,7 @@ class MultilaneBuilderMultilaneCrossTest : public ::testing::Test {
 
 TEST_F(MultilaneBuilderMultilaneCrossTest, MultilaneRefCurveToRefCurve) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
   // Creates connections.
   b.Connect(
       "c1",
@@ -1300,7 +1300,7 @@ TEST_F(MultilaneBuilderMultilaneCrossTest, MultilaneRefCurveToRefCurve) {
 
 TEST_F(MultilaneBuilderMultilaneCrossTest, MultilaneLaneCurveToLaneCurve) {
   Builder b(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-            kScaleLength, kComputationPolicy);
+            kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
 
   // Creates connections.
   auto c1 = b.Connect(
