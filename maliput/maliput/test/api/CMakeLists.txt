@@ -1,0 +1,49 @@
+ament_add_gtest(lane_data_test lane_data_test.cc)
+ament_add_gtest(maliput_test maliput_test.cc)
+ament_add_gtest(phase_ring_test phase_ring_test.cc)
+ament_add_gtest(phase_test phase_test.cc)
+ament_add_gtest(road_network_test road_network_test.cc)
+ament_add_gtest(rule_state_provider_test rule_state_provider_test.cc)
+ament_add_gtest(rules_direction_usage_test rules_direction_usage_test.cc)
+ament_add_gtest(rules_regions_test rules_regions_test.cc)
+ament_add_gtest(rules_right_of_way_test rules_right_of_way_test.cc)
+ament_add_gtest(rules_road_rulebook_test rules_road_rulebook_test.cc)
+ament_add_gtest(rules_speed_limit_test rules_speed_limit_test.cc)
+ament_add_gtest(traffic_lights_test traffic_lights_test.cc)
+ament_add_gtest(type_specific_identifier_test type_specific_identifier_test.cc)
+
+macro(add_dependencies_to_test target)
+    if (TARGET ${target})
+
+      target_include_directories(${target}
+        PRIVATE
+          ${PROJECT_SOURCE_DIR}/include
+          ${CMAKE_CURRENT_SOURCE_DIR}
+          ${PROJECT_SOURCE_DIR}/test
+      )
+
+      ament_target_dependencies(${target}
+          "drake"
+      )
+
+      target_link_libraries(${target}
+          api
+          test_utilities
+          drake::drake)
+
+    endif()
+endmacro()
+
+add_dependencies_to_test(lane_data_test)
+add_dependencies_to_test(maliput_test)
+add_dependencies_to_test(phase_ring_test)
+add_dependencies_to_test(phase_test)
+add_dependencies_to_test(road_network_test)
+add_dependencies_to_test(rule_state_provider_test)
+add_dependencies_to_test(rules_direction_usage_test)
+add_dependencies_to_test(rules_regions_test)
+add_dependencies_to_test(rules_right_of_way_test)
+add_dependencies_to_test(rules_road_rulebook_test)
+add_dependencies_to_test(rules_speed_limit_test)
+add_dependencies_to_test(traffic_lights_test)
+add_dependencies_to_test(type_specific_identifier_test)
