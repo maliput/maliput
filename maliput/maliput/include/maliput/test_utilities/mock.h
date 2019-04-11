@@ -2,17 +2,19 @@
 
 #include <memory>
 
-#include "maliput/api/intersection.h"
-#include "maliput/api/road_geometry.h"
-#include "maliput/api/rules/direction_usage_rule.h"
-#include "maliput/api/rules/phase_provider.h"
-#include "maliput/api/rules/phase_ring.h"
-#include "maliput/api/rules/phase_ring_book.h"
-#include "maliput/api/rules/regions.h"
-#include "maliput/api/rules/right_of_way_rule.h"
-#include "maliput/api/rules/road_rulebook.h"
-#include "maliput/api/rules/rule_state_provider.h"
+#include "drake/automotive/maliput/api/intersection.h"
+#include "drake/automotive/maliput/api/road_geometry.h"
+#include "drake/automotive/maliput/api/rules/direction_usage_rule.h"
+#include "drake/automotive/maliput/api/rules/phase_provider.h"
+#include "drake/automotive/maliput/api/rules/phase_ring.h"
+#include "drake/automotive/maliput/api/rules/phase_ring_book.h"
+#include "drake/automotive/maliput/api/rules/regions.h"
+#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
+#include "drake/automotive/maliput/api/rules/road_rulebook.h"
+#include "drake/automotive/maliput/api/rules/rule_state_provider.h"
+#include "drake/automotive/maliput/api/rules/traffic_light_book.h"
 
+namespace drake {
 namespace maliput {
 namespace api {
 namespace test {
@@ -47,6 +49,9 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry();
 /// Returns an arbitrary rules::RoadRulebook.
 std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook();
 
+/// Returns an arbitrary rules::TrafficLightBook.
+std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook();
+
 /// Returns an arbitrary rules::PhaseRingBook.
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook();
 
@@ -63,3 +68,4 @@ std::unique_ptr<Intersection> CreateIntersection(
 }  // namespace test
 }  // namespace api
 }  // namespace maliput
+}  // namespace drake
