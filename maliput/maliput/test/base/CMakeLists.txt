@@ -1,0 +1,40 @@
+ament_add_gtest(intersection_test intersection_test.cc)
+ament_add_gtest(manual_phase_provider_test manual_phase_provider_test.cc)
+ament_add_gtest(manual_rule_state_provider_test manual_rule_state_provider_test)
+ament_add_gtest(phase_based_rule_state_provider_test phase_based_rule_state_provider_test.cc)
+ament_add_gtest(simple_phase_ring_book_test simple_phase_ring_book_test.cc)
+ament_add_gtest(simple_rulebook_test simple_rulebook_test.cc)
+ament_add_gtest(traffic_light_book_test traffic_light_book_test.cc)
+ament_add_gtest(yaml_io_test yaml_io_test.cc)
+
+macro(add_dependencies_to_test target)
+    if (TARGET ${target})
+
+      target_include_directories(${target}
+        PRIVATE
+          ${PROJECT_SOURCE_DIR}/include
+          ${CMAKE_CURRENT_SOURCE_DIR}
+          ${PROJECT_SOURCE_DIR}/test
+      )
+
+      ament_target_dependencies(${target}
+          "drake"
+      )
+
+      target_link_libraries(${target}
+          api
+          base
+          test_utilities
+          drake::drake)
+
+    endif()
+endmacro()
+
+add_dependencies_to_test(intersection_test)
+add_dependencies_to_test(manual_phase_provider_test)
+add_dependencies_to_test(manual_rule_state_provider_test)
+add_dependencies_to_test(phase_based_rule_state_provider_test)
+add_dependencies_to_test(simple_phase_ring_book_test)
+add_dependencies_to_test(simple_rulebook_test)
+add_dependencies_to_test(traffic_light_book_test)
+add_dependencies_to_test(yaml_io_test)

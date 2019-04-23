@@ -1,0 +1,39 @@
+##############################################################################
+# Sources
+##############################################################################
+set(SOURCES
+    branch_point.cc
+    junction.cc
+    lane.cc
+    road_geometry.cc
+    segment.cc)
+
+add_library(geometry_base ${SOURCES})
+
+target_include_directories(geometry_base
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+target_link_libraries(geometry_base
+  PUBLIC
+    api
+    drake::drake)
+
+##############################################################################
+# Tests
+##############################################################################
+
+##############################################################################
+# Export
+##############################################################################
+
+install(
+    TARGETS geometry_base
+    EXPORT ${PROJECT_NAME}-targets
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+ament_export_libraries(geometry_base)

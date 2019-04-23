@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>maliput-integration-test</name>
+  <version>0.6.2</version>
+  <description>Maliput integration tests.</description>
+  <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
+  <license>TODO</license>
+
+
+  <build_depend>maliput</build_depend>
+  <build_depend>multilane</build_depend>
+  <build_export_depend>maliput</build_export_depend>
+  <build_export_depend>multilane</build_export_depend>
+  <build_export_depend>drake</build_export_depend>
+  <exec_depend>ament_cmake</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+  <test_depend>ament_cmake_gtest</test_depend>
+</package>

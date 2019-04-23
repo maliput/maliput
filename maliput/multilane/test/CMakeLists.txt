@@ -1,0 +1,4 @@
+find_package(ament_cmake_gtest REQUIRED)
+find_package(ament_cmake_gmock REQUIRED)
+add_subdirectory(test_utilities)
+add_subdirectory(multilane)
