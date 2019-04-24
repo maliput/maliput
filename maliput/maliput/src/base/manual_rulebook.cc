@@ -1,4 +1,4 @@
-#include "drake/automotive/maliput/base/manual_rulebook.h"
+#include "maliput/base/manual_rulebook.h"
 
 #include <algorithm>
 #include <sstream>
@@ -9,7 +9,6 @@
 #include "drake/common/drake_optional.h"
 #include "drake/common/hash.h"
 
-namespace drake {
 namespace maliput {
 
 using api::LaneId;
@@ -298,4 +297,3 @@ DirectionUsageRule ManualRulebook::DoGetRule(
 }
 
 }  // namespace maliput
-}  // namespace drake

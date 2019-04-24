@@ -9,9 +9,11 @@ set(API_SOURCES
   lane_data.cc
   road_geometry.cc
   road_network.cc
+  rules/direction_usage_rule.cc
   rules/phase.cc
   rules/phase_ring.cc
-  rules/traffic_lights.cc)
+  rules/traffic_lights.cc
+  )
 
 add_library(api ${API_SOURCES})
 

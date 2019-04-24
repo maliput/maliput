@@ -4,16 +4,17 @@
 
 set(BASE_SOURCES
   intersection.cc
+  intersection_book.cc
   manual_phase_provider.cc
   manual_rule_state_provider.cc
   phase_based_rule_state_provider.cc
   phase_ring_book_loader.cc
   road_rulebook_loader.cc
-  simple_phase_ring_book.cc
-  simple_rulebook.cc
+  manual_phase_ring_book.cc
+  manual_rulebook.cc
   traffic_light_book.cc
   traffic_light_book_loader.cc
-  yaml_io.cc)
+  )
 
 add_library(base ${BASE_SOURCES})
 target_include_directories(base

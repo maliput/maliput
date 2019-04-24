@@ -102,9 +102,9 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
   MockTrafficLightBook() {}
 
  private:
-  optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id&) const
+  drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id&) const
       override {
-    return nullopt;
+    return drake::nullopt;
   }
 };
 

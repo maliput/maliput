@@ -367,7 +367,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
                                           const char* b_expression,
                                           const PhaseRing::NextPhase& a,
                                           const PhaseRing::NextPhase& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id, b.id));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.duration_until, b.duration_until));
@@ -380,7 +380,7 @@ inline ::testing::AssertionResult IsEqual(
     const char* a_expression, const char* b_expression,
     const std::vector<PhaseRing::NextPhase>& a,
     const std::vector<PhaseRing::NextPhase>& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   if (a.size() == b.size()) {

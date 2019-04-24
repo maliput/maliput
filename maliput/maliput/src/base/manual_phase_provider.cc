@@ -20,8 +20,8 @@ class ManualPhaseProvider::Impl {
   ~Impl() {}
 
   void AddPhaseRing(const PhaseRing::Id& id, const Phase::Id& initial_phase,
-                    const optional<Phase::Id>& initial_next_phase,
-                    const optional<double>& initial_duration_until) {
+                    const drake::optional<Phase::Id>& initial_next_phase,
+                    const drake::optional<double>& initial_duration_until) {
     if (initial_duration_until.has_value() && !initial_next_phase.has_value()) {
       throw std::logic_error(
           "Initial duration-until specified when initial next phase is "
@@ -38,8 +38,8 @@ class ManualPhaseProvider::Impl {
   }
 
   void SetPhase(const PhaseRing::Id& id, const Phase::Id& phase,
-                const optional<Phase::Id>& next_phase,
-                const optional<double>& duration_until) {
+                const drake::optional<Phase::Id>& next_phase,
+                const drake::optional<double>& duration_until) {
     if (duration_until.has_value() && !next_phase.has_value()) {
       throw std::logic_error(
           "Duration-until specified when next phase is unspecified.");
@@ -48,19 +48,19 @@ class ManualPhaseProvider::Impl {
         PhaseProvider::Result{phase, ComputeNext(next_phase, duration_until)};
   }
 
-  optional<PhaseProvider::Result> DoGetPhase(const PhaseRing::Id& id) const {
+  drake::optional<PhaseProvider::Result> DoGetPhase(const PhaseRing::Id& id) const {
     auto it = phases_.find(id);
     if (it == phases_.end()) {
-      return nullopt;
+      return drake::nullopt;
     }
     return it->second;
   }
 
  private:
-  optional<PhaseProvider::Result::Next> ComputeNext(
-      const optional<Phase::Id>& next_phase,
-      const optional<double>& duration_until) const {
-    optional<PhaseProvider::Result::Next> result = nullopt;
+  drake::optional<PhaseProvider::Result::Next> ComputeNext(
+      const drake::optional<Phase::Id>& next_phase,
+      const drake::optional<double>& duration_until) const {
+    drake::optional<PhaseProvider::Result::Next> result = drake::nullopt;
     if (next_phase.has_value()) {
       result = PhaseProvider::Result::Next{*next_phase, duration_until};
     }
@@ -76,16 +76,16 @@ ManualPhaseProvider::~ManualPhaseProvider() = default;
 
 void ManualPhaseProvider::AddPhaseRing(
     const PhaseRing::Id& id, const Phase::Id& initial_phase,
-    const optional<Phase::Id>& initial_next_phase,
-    const optional<double>& initial_duration_until) {
+    const drake::optional<Phase::Id>& initial_next_phase,
+    const drake::optional<double>& initial_duration_until) {
   impl_->AddPhaseRing(id, initial_phase, initial_next_phase,
                       initial_duration_until);
 }
 
 void ManualPhaseProvider::SetPhase(const PhaseRing::Id& id,
                                    const Phase::Id& phase,
-                                   const optional<Phase::Id>& next_phase,
-                                   const optional<double>& duration_until) {
+                                   const drake::optional<Phase::Id>& next_phase,
+                                   const drake::optional<double>& duration_until) {
   impl_->SetPhase(id, phase, next_phase, duration_until);
 }
 

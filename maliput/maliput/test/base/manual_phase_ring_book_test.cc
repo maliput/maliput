@@ -1,15 +1,14 @@
-#include "drake/automotive/maliput/base/manual_phase_ring_book.h"
+#include "maliput/base/manual_phase_ring_book.h"
 
 #include <stdexcept>
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/rules/phase.h"
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/phase.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/right_of_way_rule.h"
 #include "drake/common/drake_optional.h"
 
-namespace drake {
 namespace maliput {
 namespace {
 
@@ -37,23 +36,23 @@ struct ManualPhaseRingBookTest : public ::testing::Test {
 TEST_F(ManualPhaseRingBookTest, BasicTest) {
   ManualPhaseRingBook dut;
   EXPECT_NO_THROW(dut.AddPhaseRing(ring));
-  optional<PhaseRing> result = dut.GetPhaseRing(ring_id);
+  drake::optional<PhaseRing> result = dut.GetPhaseRing(ring_id);
   EXPECT_TRUE(result.has_value());
   EXPECT_EQ(result->id(), ring_id);
   const PhaseRing::Id unknown_ring_id("unknown ring");
-  EXPECT_EQ(dut.GetPhaseRing(unknown_ring_id), nullopt);
+  EXPECT_EQ(dut.GetPhaseRing(unknown_ring_id), drake::nullopt);
   for (const auto rule_id : {rule_id_a, rule_id_b}) {
     result = dut.FindPhaseRing(rule_id);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->id(), ring_id);
   }
   const RightOfWayRule::Id unknown_rule_id("unknown rule");
-  EXPECT_EQ(dut.FindPhaseRing(unknown_rule_id), nullopt);
+  EXPECT_EQ(dut.FindPhaseRing(unknown_rule_id), drake::nullopt);
   EXPECT_THROW(dut.RemovePhaseRing(unknown_ring_id), std::logic_error);
   EXPECT_NO_THROW(dut.RemovePhaseRing(ring_id));
-  EXPECT_EQ(dut.GetPhaseRing(ring_id), nullopt);
+  EXPECT_EQ(dut.GetPhaseRing(ring_id), drake::nullopt);
   for (const auto rule_id : {rule_id_a, rule_id_b}) {
-    EXPECT_EQ(dut.FindPhaseRing(rule_id), nullopt);
+    EXPECT_EQ(dut.FindPhaseRing(rule_id), drake::nullopt);
   }
 }
 
@@ -86,4 +85,3 @@ TEST_F(ManualPhaseRingBookTest, RingWithOverlappingRule) {
 
 }  // namespace
 }  // namespace maliput
-}  // namespace drake

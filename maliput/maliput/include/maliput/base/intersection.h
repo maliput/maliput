@@ -36,8 +36,7 @@ class Intersection : public api::Intersection {
 
   virtual ~Intersection() = default;
 
-  const optional<api::rules::PhaseProvider::Result> Phase() const override;
-  const drake::optional<api::rules::PhaseProvider::Result> Phase() const;
+  const drake::optional<api::rules::PhaseProvider::Result> Phase() const override;
 
   /// Sets the current phase.
   void SetPhase(const api::rules::Phase::Id& phase_id) override;

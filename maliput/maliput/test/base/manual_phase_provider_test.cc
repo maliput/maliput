@@ -41,7 +41,7 @@ TEST_F(ManualPhaseProviderTest, EmptyProvider) {
 // phase is not when adding a PhaseRing.
 TEST_F(ManualPhaseProviderTest, AddPhaseRingDurationSpecifiedOnly) {
   EXPECT_THROW(dut.AddPhaseRing(phase_ring_id, phase_id_1,
-                                nullopt /* next phase */, kDurationUntil),
+                                drake::nullopt /* next phase */, kDurationUntil),
                std::logic_error);
 }
 
@@ -49,7 +49,7 @@ TEST_F(ManualPhaseProviderTest, AddPhaseRingDurationSpecifiedOnly) {
 // phase is not when setting the phase of a PhaseRing.
 TEST_F(ManualPhaseProviderTest, SetPhaseRingDurationSpecifiedOnly) {
   EXPECT_NO_THROW(dut.AddPhaseRing(phase_ring_id, phase_id_1));
-  EXPECT_THROW(dut.SetPhase(phase_ring_id, phase_id_1, nullopt /* next phase */,
+  EXPECT_THROW(dut.SetPhase(phase_ring_id, phase_id_1, drake::nullopt /* next phase */,
                             kDurationUntil),
                std::logic_error);
 }
@@ -75,14 +75,14 @@ TEST_F(ManualPhaseProviderTest, CurrentAndNextPhases) {
   drake::optional<PhaseProvider::Result> returned_phase =
       dut.GetPhase(phase_ring_id);
   EXPECT_EQ(returned_phase->id, phase_id_1);
-  EXPECT_NE(returned_phase->next, nullopt);
+  EXPECT_NE(returned_phase->next, drake::nullopt);
   EXPECT_EQ(returned_phase->next->id, phase_id_2);
   EXPECT_EQ(*returned_phase->next->duration_until, kDurationUntil);
   EXPECT_NO_THROW(
       dut.SetPhase(phase_ring_id, phase_id_2, phase_id_1, 2 * kDurationUntil));
   returned_phase = dut.GetPhase(phase_ring_id);
   EXPECT_EQ(returned_phase->id, phase_id_2);
-  EXPECT_NE(returned_phase->next, nullopt);
+  EXPECT_NE(returned_phase->next, drake::nullopt);
   EXPECT_EQ(returned_phase->next->id, phase_id_1);
   EXPECT_EQ(*returned_phase->next->duration_until, 2 * kDurationUntil);
 }

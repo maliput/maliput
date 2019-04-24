@@ -230,7 +230,7 @@ class TestLoading2x2IntersectionPhasebook : public ::testing::Test {
         expected_next_phases_({{Phase::Id("NorthSouthPhase"),
                                 {{Phase::Id("EastWestPhase"), 45.0}}},
                                {Phase::Id("EastWestPhase"),
-                                {{Phase::Id("NorthSouthPhase"), nullopt}}}}) {}
+                                {{Phase::Id("NorthSouthPhase"), drake::nullopt}}}}) {}
 
   const std::string filepath_;
   const std::unique_ptr<const RoadGeometry> road_geometry_;

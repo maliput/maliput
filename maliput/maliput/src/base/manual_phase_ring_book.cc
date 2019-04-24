@@ -1,4 +1,4 @@
-#include "drake/automotive/maliput/base/manual_phase_ring_book.h"
+#include "maliput/base/manual_phase_ring_book.h"
 
 #include <stdexcept>
 #include <string>
@@ -7,7 +7,6 @@
 
 #include "drake/common/drake_throw.h"
 
-namespace drake {
 namespace maliput {
 
 using api::rules::Phase;
@@ -39,8 +38,8 @@ class ManualPhaseRingBook::Impl {
   }
 
   void RemovePhaseRing(const PhaseRing::Id& ring_id) {
-    const optional<PhaseRing> ring = DoGetPhaseRing(ring_id);
-    if (ring == nullopt) {
+    const drake::optional<PhaseRing> ring = DoGetPhaseRing(ring_id);
+    if (ring == drake::nullopt) {
       throw std::logic_error("Attempted to remove unknown PhaseRing with ID " +
                              ring_id.string());
     }
@@ -51,18 +50,18 @@ class ManualPhaseRingBook::Impl {
     }
   }
 
-  optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
+  drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
     auto it = ring_book_.find(ring_id);
     if (it == ring_book_.end()) {
-      return nullopt;
+      return drake::nullopt;
     }
     return it->second;
   }
 
-  optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
+  drake::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
     auto it = rule_book_.find(rule_id);
     if (it == rule_book_.end()) {
-      return nullopt;
+      return drake::nullopt;
     }
     return ring_book_.at(it->second);
   }
@@ -85,15 +84,14 @@ void ManualPhaseRingBook::RemovePhaseRing(const PhaseRing::Id& ring_id) {
   impl_->RemovePhaseRing(ring_id);
 }
 
-optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(
+drake::optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(
     const PhaseRing::Id& ring_id) const {
   return impl_->DoGetPhaseRing(ring_id);
 }
 
-optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(
+drake::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(
     const RightOfWayRule::Id& rule_id) const {
   return impl_->DoFindPhaseRing(rule_id);
 }
 
 }  // namespace maliput
-}  // namespace drake

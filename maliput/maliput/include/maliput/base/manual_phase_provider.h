@@ -28,8 +28,8 @@ class ManualPhaseProvider : public api::rules::PhaseProvider {
   void AddPhaseRing(
       const api::rules::PhaseRing::Id& id,
       const api::rules::Phase::Id& initial_phase,
-      const optional<api::rules::Phase::Id>& initial_next_phase = nullopt,
-      const optional<double>& initial_duration_until = nullopt);
+      const drake::optional<api::rules::Phase::Id>& initial_next_phase = drake::nullopt,
+      const drake::optional<double>& initial_duration_until = drake::nullopt);
 
   /// Sets the current phase of a PhaseRing.
   ///
@@ -38,8 +38,8 @@ class ManualPhaseProvider : public api::rules::PhaseProvider {
   /// undefined.
   void SetPhase(const api::rules::PhaseRing::Id& id,
                 const api::rules::Phase::Id& phase,
-                const optional<api::rules::Phase::Id>& next_phase = nullopt,
-                const optional<double>& duration_until = nullopt);
+                const drake::optional<api::rules::Phase::Id>& next_phase = drake::nullopt,
+                const drake::optional<double>& duration_until = drake::nullopt);
 
  private:
   drake::optional<api::rules::PhaseProvider::Result> DoGetPhase(

@@ -3,14 +3,13 @@
 #include <memory>
 #include <vector>
 
-#include "drake/automotive/maliput/api/rules/direction_usage_rule.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
-#include "drake/automotive/maliput/api/rules/road_rulebook.h"
-#include "drake/automotive/maliput/api/rules/speed_limit_rule.h"
+#include "maliput/api/rules/direction_usage_rule.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/road_rulebook.h"
+#include "maliput/api/rules/speed_limit_rule.h"
 #include "drake/common/drake_copyable.h"
 
-namespace drake {
 namespace maliput {
 
 /// ManualRulebook is a simple concrete implementation of the
@@ -76,4 +75,3 @@ class ManualRulebook : public api::rules::RoadRulebook {
 };
 
 }  // namespace maliput
-}  // namespace drake
