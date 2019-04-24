@@ -132,15 +132,15 @@ RoadCurve::RoadCurve(double linear_tolerance, double scale_length,
   // accuracy balance). However, for the time being, the following
   // constants (considering 0.0 <= p <= 1.0) work well as a heuristic
   // approximation to appropriate step sizes.
-  drake::systems::IntegratorBase<double>* s_from_p_integrator =
+  drake::systems::IntegratorBase<double>& s_from_p_integrator =
       s_from_p_func_->get_mutable_integrator();
-  s_from_p_integrator->request_initial_step_size_target(0.1);
-  s_from_p_integrator->set_maximum_step_size(1.0);
+  s_from_p_integrator.request_initial_step_size_target(0.1);
+  s_from_p_integrator.set_maximum_step_size(1.0);
   // Note: Setting this tolerance is necessary to satisfy the
   // road geometry invariants (i.e., CheckInvariants()) in Builder::Build().
   // Consider modifying this accuracy if other tolerances are modified
   // elsewhere.
-  s_from_p_integrator->set_target_accuracy(relative_tolerance_ * 1e-2);
+  s_from_p_integrator.set_target_accuracy(relative_tolerance_ * 1e-2);
 
   // Sets `p_from_s`'s integration accuracy and step sizes. Said steps
   // should not be too large, because that could make accuracy control
@@ -149,11 +149,11 @@ RoadCurve::RoadCurve(double linear_tolerance, double scale_length,
   // optimal step sizes (in terms of their efficiency vs. accuracy balance).
   // However, for the time being, the following proportions of the scale
   // length work well as a heuristic approximation to appropriate step sizes.
-  drake::systems::IntegratorBase<double>* p_from_s_integrator =
+  drake::systems::IntegratorBase<double>& p_from_s_integrator =
       p_from_s_ivp_->get_mutable_integrator();
-  p_from_s_integrator->request_initial_step_size_target(0.1 * scale_length);
-  p_from_s_integrator->set_maximum_step_size(scale_length);
-  p_from_s_integrator->set_target_accuracy(relative_tolerance_);
+  p_from_s_integrator.request_initial_step_size_target(0.1 * scale_length);
+  p_from_s_integrator.set_maximum_step_size(scale_length);
+  p_from_s_integrator.set_target_accuracy(relative_tolerance_);
 }
 
 bool RoadCurve::AreFastComputationsAccurate(double r) const {
