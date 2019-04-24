@@ -159,6 +159,8 @@ class MockIntersection final : public Intersection {
   const drake::optional<rules::PhaseProvider::Result> Phase() const override {
     return drake::nullopt;
   }
+
+  void SetPhase(const api::rules::Phase::Id&) override {}
 };
 
 }  // namespace
