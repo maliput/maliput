@@ -36,7 +36,7 @@ class PhaseProvider {
 
   /// Gets the phase within a specified PhaseRing. Returns drake::nullopt if
   /// @p id is unrecognized.
-  const drake::optional<Result> GetPhase(const PhaseRing::Id& id) const {
+  optional<Result> GetPhase(const PhaseRing::Id& id) const {
     return DoGetPhase(id);
   }
 
