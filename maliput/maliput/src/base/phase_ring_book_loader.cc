@@ -6,12 +6,12 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/automotive/maliput/api/rules/phase.h"
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
-#include "drake/automotive/maliput/api/rules/traffic_lights.h"
-#include "drake/automotive/maliput/base/manual_phase_ring_book.h"
+#include "maliput/api/rules/phase.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/traffic_lights.h"
+#include "maliput/base/manual_phase_ring_book.h"
 
 #include "drake/common/drake_assert.h"
 #include "drake/common/drake_throw.h"
@@ -19,10 +19,10 @@
 namespace YAML {
 
 template <>
-struct convert<drake::maliput::api::rules::BulbState> {
-  static Node encode(const drake::maliput::api::rules::BulbState& rhs) {
+struct convert<maliput::api::rules::BulbState> {
+  static Node encode(const maliput::api::rules::BulbState& rhs) {
     Node node;
-    node.push_back(drake::maliput::api::rules::BulbStateMapper().at(rhs));
+    node.push_back(maliput::api::rules::BulbStateMapper().at(rhs));
     return node;
   }
 
@@ -30,10 +30,10 @@ struct convert<drake::maliput::api::rules::BulbState> {
   // https://github.com/jbeder/yaml-cpp/wiki/Tutorial#converting-tofrom-native-data-types
   static bool decode(const Node& node,
                      // NOLINTNEXTLINE(runtime/references).
-                     drake::maliput::api::rules::BulbState& rhs) {
+                     maliput::api::rules::BulbState& rhs) {
     const std::string color = node.as<std::string>();
     bool result = false;
-    for (const auto& it : drake::maliput::api::rules::BulbStateMapper()) {
+    for (const auto& it : maliput::api::rules::BulbStateMapper()) {
       if (it.second == color) {
         rhs = it.first;
         result = true;
@@ -45,7 +45,6 @@ struct convert<drake::maliput::api::rules::BulbState> {
 
 }  // namespace YAML
 
-namespace drake {
 namespace maliput {
 namespace {
 
@@ -124,13 +123,13 @@ void ConfirmBulbsExist(const BulbGroup& bulb_group,
                        const YAML::Node& bulbs_node) {
   for (const auto& bulb_group_pair : bulbs_node) {
     const Bulb::Id bulb_id(bulb_group_pair.first.as<std::string>());
-    DRAKE_THROW_UNLESS(bulb_group.GetBulb(bulb_id) != nullopt);
+    DRAKE_THROW_UNLESS(bulb_group.GetBulb(bulb_id) != drake::nullopt);
   }
 }
 
-optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_book,
+drake::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_book,
                                     const YAML::Node& phase_node) {
-  optional<BulbStates> result;
+  drake::optional<BulbStates> result;
   const YAML::Node& traffic_light_states_node =
       phase_node["TrafficLightStates"];
   if (traffic_light_states_node.IsDefined()) {
@@ -139,7 +138,7 @@ optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_book,
     for (const auto& traffic_light_pair : traffic_light_states_node) {
       const TrafficLight::Id traffic_light_id(
           traffic_light_pair.first.as<std::string>());
-      const optional<TrafficLight> traffic_light =
+      const drake::optional<TrafficLight> traffic_light =
           traffic_light_book->GetTrafficLight(traffic_light_id);
       DRAKE_THROW_UNLESS(traffic_light.has_value());
       const YAML::Node& bulb_group_node = traffic_light_pair.second;
@@ -148,7 +147,7 @@ optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_book,
       for (const auto& bulb_group_pair : bulb_group_node) {
         const BulbGroup::Id bulb_group_id(
             bulb_group_pair.first.as<std::string>());
-        const optional<BulbGroup> bulb_group =
+        const drake::optional<BulbGroup> bulb_group =
             traffic_light->GetBulbGroup(bulb_group_id);
         DRAKE_THROW_UNLESS(bulb_group.has_value());
         const YAML::Node& bulbs_node = bulb_group_pair.second;
@@ -179,12 +178,12 @@ void VerifyPhaseExists(const std::vector<Phase>& phases,
   DRAKE_DEMAND(it != phases.end());
 }
 
-optional<const std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>>>
+drake::optional<const std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>>>
 BuildNextPhases(const std::vector<Phase>& phases,
                 const YAML::Node& phase_ring_node) {
   const YAML::Node& graph_node = phase_ring_node["PhaseTransitionGraph"];
   if (!graph_node.IsDefined()) {
-    return nullopt;
+    return drake::nullopt;
   }
   std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>> result;
   DRAKE_DEMAND(phase_ring_node.IsMap());
@@ -199,7 +198,7 @@ BuildNextPhases(const std::vector<Phase>& phases,
       DRAKE_THROW_UNLESS(next_phase_node["ID"].IsDefined());
       const Phase::Id next_phase_id(next_phase_node["ID"].as<std::string>());
       VerifyPhaseExists(phases, next_phase_id);
-      optional<double> duration_until = nullopt;
+      drake::optional<double> duration_until = drake::nullopt;
       if (next_phase_node["duration_until"].IsDefined()) {
         duration_until = next_phase_node["duration_until"].as<double>();
       }
@@ -243,7 +242,7 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook,
       DRAKE_THROW_UNLESS(rule_states.find(rule_id) != rule_states.end());
       rule_states.at(rule_id) = state_id;
     }
-    optional<BulbStates> bulb_states =
+    drake::optional<BulbStates> bulb_states =
         LoadBulbStates(traffic_light_book, phase_node);
     phases.push_back(Phase(phase_id, rule_states, bulb_states));
   }

@@ -1,26 +1,26 @@
-#include "drake/automotive/maliput/base/intersection_book_loader.h"
+#include "maliput/base/intersection_book_loader.h"
 
 #include <memory>
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/intersection_book.h"
-#include "drake/automotive/maliput/api/road_geometry.h"
-#include "drake/automotive/maliput/api/rules/phase.h"
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/phase_ring_book.h"
-#include "drake/automotive/maliput/api/rules/road_rulebook.h"
-#include "drake/automotive/maliput/api/rules/traffic_light_book.h"
-#include "drake/automotive/maliput/base/manual_phase_provider.h"
-#include "drake/automotive/maliput/base/phase_ring_book_loader.h"
-#include "drake/automotive/maliput/base/road_rulebook_loader.h"
-#include "drake/automotive/maliput/base/traffic_light_book_loader.h"
-#include "drake/automotive/maliput/multilane/builder.h"
-#include "drake/automotive/maliput/multilane/loader.h"
-#include "drake/common/find_resource.h"
+#include "maliput/api/intersection_book.h"
+#include "maliput/api/road_geometry.h"
+#include "maliput/api/rules/phase.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/phase_ring_book.h"
+#include "maliput/api/rules/road_rulebook.h"
+#include "maliput/api/rules/traffic_light_book.h"
+#include "maliput/base/manual_phase_provider.h"
+#include "maliput/base/phase_ring_book_loader.h"
+#include "maliput/base/road_rulebook_loader.h"
+#include "maliput/base/traffic_light_book_loader.h"
+#include "maliput/common/filesystem.h"
+#include "multilane/builder.h"
+#include "multilane/loader.h"
 
-namespace drake {
+
 namespace maliput {
 namespace {
 
@@ -33,11 +33,14 @@ using api::rules::PhaseRingBook;
 using api::rules::RoadRulebook;
 using api::rules::TrafficLightBook;
 
+constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
+
 class TestLoading2x2IntersectionIntersectionBook : public ::testing::Test {
  protected:
   TestLoading2x2IntersectionIntersectionBook()
-      : filepath_(FindResourceOrThrow(
-            "drake/automotive/maliput/multilane/2x2_intersection.yaml")),
+      : filepath_(
+            maliput::common::Filesystem::get_env_path(
+              MULTILANE_RESOURCE_VAR) + "/2x2_intersection.yaml"),
         road_geometry_(
             multilane::LoadFile(multilane::BuilderFactory(), filepath_)),
         rulebook_(LoadRoadRulebookFromFile(road_geometry_.get(), filepath_)),
@@ -54,7 +57,7 @@ class TestLoading2x2IntersectionIntersectionBook : public ::testing::Test {
 
 TEST_F(TestLoading2x2IntersectionIntersectionBook, LoadFromFile) {
   const PhaseRing::Id ring_id("2x2Intersection");
-  const optional<PhaseRing> ring =
+  const drake::optional<PhaseRing> ring =
       ring_book_->GetPhaseRing(PhaseRing::Id(ring_id));
   EXPECT_TRUE(ring.has_value());
 
@@ -78,4 +81,3 @@ TEST_F(TestLoading2x2IntersectionIntersectionBook, LoadFromFile) {
 
 }  // namespace
 }  // namespace maliput
-}  // namespace drake

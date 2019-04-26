@@ -1,11 +1,10 @@
-#include "drake/automotive/maliput/api/rules/direction_usage_rule.h"
+#include "maliput/api/rules/direction_usage_rule.h"
 
-namespace drake {
 namespace maliput {
 namespace api {
 namespace rules {
 
-std::unordered_map<DirectionUsageRule::State::Type, const char*, DefaultHash>
+std::unordered_map<DirectionUsageRule::State::Type, const char*, drake::DefaultHash>
 DirectionUsageRule::StateTypeMapper() {
   return {{DirectionUsageRule::State::Type::kWithS, "WithS"},
           {DirectionUsageRule::State::Type::kAgainstS, "AgainstS"},
@@ -19,4 +18,3 @@ DirectionUsageRule::StateTypeMapper() {
 }  // namespace rules
 }  // namespace api
 }  // namespace maliput
-}  // namespace drake

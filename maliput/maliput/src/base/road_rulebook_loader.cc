@@ -6,23 +6,23 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/api/rules/direction_usage_rule.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
-#include "drake/automotive/maliput/base/manual_rulebook.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/rules/direction_usage_rule.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/base/manual_rulebook.h"
 
 #include "drake/common/drake_assert.h"
 #include "drake/common/drake_throw.h"
 #include "drake/common/text_logging.h"
 
-using drake::maliput::api::Lane;
-using drake::maliput::api::LaneId;
-using drake::maliput::api::rules::DirectionUsageRule;
-using drake::maliput::api::rules::LaneSRange;
-using drake::maliput::api::rules::LaneSRoute;
-using drake::maliput::api::rules::RightOfWayRule;
-using drake::maliput::api::rules::SRange;
+using maliput::api::Lane;
+using maliput::api::LaneId;
+using maliput::api::rules::DirectionUsageRule;
+using maliput::api::rules::LaneSRange;
+using maliput::api::rules::LaneSRoute;
+using maliput::api::rules::RightOfWayRule;
+using maliput::api::rules::SRange;
 
 namespace YAML {
 

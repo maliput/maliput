@@ -1,16 +1,15 @@
-#include "drake/automotive/maliput/base/manual_rulebook.h"
+#include "maliput/base/manual_rulebook.h"
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
-#include "drake/automotive/maliput/api/rules/speed_limit_rule.h"
-#include "drake/automotive/maliput/api/test_utilities/rules_direction_usage_compare.h"
-#include "drake/automotive/maliput/api/test_utilities/rules_right_of_way_compare.h"
-#include "drake/automotive/maliput/api/test_utilities/rules_speed_limit_compare.h"
-#include "drake/automotive/maliput/api/test_utilities/rules_test_utilities.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/speed_limit_rule.h"
+#include "maliput/test_utilities/rules_direction_usage_compare.h"
+#include "maliput/test_utilities/rules_right_of_way_compare.h"
+#include "maliput/test_utilities/rules_speed_limit_compare.h"
+#include "maliput/test_utilities/rules_test_utilities.h"
 
-namespace drake {
 namespace maliput {
 namespace {
 
@@ -173,4 +172,3 @@ TEST_F(ManualRulebookTest, FindRules) {
 
 }  // namespace
 }  // namespace maliput
-}  // namespace drake

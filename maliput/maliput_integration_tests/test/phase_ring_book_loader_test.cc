@@ -6,16 +6,17 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/road_geometry.h"
-#include "drake/automotive/maliput/api/rules/phase.h"
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
-#include "drake/automotive/maliput/api/test_utilities/rules_test_utilities.h"
-#include "drake/automotive/maliput/base/manual_rulebook.h"
-#include "drake/automotive/maliput/base/road_rulebook_loader.h"
-#include "drake/automotive/maliput/base/traffic_light_book_loader.h"
-#include "drake/automotive/maliput/multilane/builder.h"
-#include "drake/automotive/maliput/multilane/loader.h"
+#include "maliput/api/road_geometry.h"
+#include "maliput/api/rules/phase.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/base/manual_rulebook.h"
+#include "maliput/base/road_rulebook_loader.h"
+#include "maliput/base/traffic_light_book_loader.h"
+#include "maliput/common/filesystem.h"
+#include "maliput/test_utilities/rules_test_utilities.h"
+#include "multilane/builder.h"
+#include "multilane/loader.h"
 
 #include "drake/common/drake_optional.h"
 #include "drake/common/find_resource.h"
@@ -230,7 +231,7 @@ class TestLoading2x2IntersectionPhasebook : public ::testing::Test {
         expected_next_phases_({{Phase::Id("NorthSouthPhase"),
                                 {{Phase::Id("EastWestPhase"), 45.0}}},
                                {Phase::Id("EastWestPhase"),
-                                {{Phase::Id("NorthSouthPhase"), nullopt}}}}) {}
+                                {{Phase::Id("NorthSouthPhase"), drake::nullopt}}}}) {}
 
   const std::string filepath_;
   const std::unique_ptr<const RoadGeometry> road_geometry_;

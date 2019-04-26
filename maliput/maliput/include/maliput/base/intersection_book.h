@@ -2,11 +2,10 @@
 
 #include <memory>
 
-#include "drake/automotive/maliput/api/intersection.h"
-#include "drake/automotive/maliput/api/intersection_book.h"
+#include "maliput/api/intersection.h"
+#include "maliput/api/intersection_book.h"
 #include "drake/common/drake_copyable.h"
 
-namespace drake {
 namespace maliput {
 
 /// A concrete implementation of the api::IntersectionBook abstract interface.
@@ -33,4 +32,3 @@ class IntersectionBook : public api::IntersectionBook {
 };
 
 }  // namespace maliput
-}  // namespace drake

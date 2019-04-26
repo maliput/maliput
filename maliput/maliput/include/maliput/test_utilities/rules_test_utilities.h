@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/rules/phase.h"
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/traffic_lights.h"
+#include "maliput/api/rules/phase.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/traffic_lights.h"
 
 #include "drake/common/unused.h"
 
@@ -122,7 +122,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 inline ::testing::AssertionResult IsEqual(const char* a_expression,
                                           const char* b_expression,
                                           const SRange& a, const SRange& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s0(), b.s0()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s1(), b.s1()));
@@ -134,7 +134,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
                                           const char* b_expression,
                                           const LaneSRange& a,
                                           const LaneSRange& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.lane_id(), b.lane_id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s_range(), b.s_range()));
@@ -146,7 +146,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
                                           const char* b_expression,
                                           const std::vector<LaneSRange>& a,
                                           const std::vector<LaneSRange>& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   const int smallest = std::min(a.size(), b.size());
@@ -161,7 +161,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
                                           const char* b_expression,
                                           const LaneSRoute& a,
                                           const LaneSRoute& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.ranges(), b.ranges()));
   return c.result();
@@ -348,7 +348,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 inline ::testing::AssertionResult IsEqual(const char* a_expression,
                                           const char* b_expression,
                                           const Phase& a, const Phase& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.rule_states(), b.rule_states()));
@@ -361,7 +361,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
                                           const char* b_expression,
                                           const PhaseRing::NextPhase& a,
                                           const PhaseRing::NextPhase& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id, b.id));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.duration_until, b.duration_until));
@@ -374,7 +374,7 @@ inline ::testing::AssertionResult IsEqual(
     const char* a_expression, const char* b_expression,
     const std::vector<PhaseRing::NextPhase>& a,
     const std::vector<PhaseRing::NextPhase>& b) {
-  unused(a_expression, b_expression);
+  drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   if (a.size() == b.size()) {

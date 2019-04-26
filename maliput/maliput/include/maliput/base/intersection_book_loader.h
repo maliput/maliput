@@ -3,12 +3,11 @@
 #include <memory>
 #include <string>
 
-#include "drake/automotive/maliput/api/intersection_book.h"
-#include "drake/automotive/maliput/api/rules/phase_ring_book.h"
-#include "drake/automotive/maliput/api/rules/road_rulebook.h"
-#include "drake/automotive/maliput/base/manual_phase_provider.h"
+#include "maliput/api/intersection_book.h"
+#include "maliput/api/rules/phase_ring_book.h"
+#include "maliput/api/rules/road_rulebook.h"
+#include "maliput/base/manual_phase_provider.h"
 
-namespace drake {
 namespace maliput {
 
 /// Instantiates and returns an api::IntersectionBook instance based on the
@@ -42,4 +41,3 @@ std::unique_ptr<api::IntersectionBook> LoadIntersectionBookFromFile(
     ManualPhaseProvider* phase_provider);
 
 }  // namespace maliput
-}  // namespace drake

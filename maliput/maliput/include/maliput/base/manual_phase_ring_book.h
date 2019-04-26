@@ -2,13 +2,12 @@
 
 #include <memory>
 
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/phase_ring_book.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/phase_ring_book.h"
+#include "maliput/api/rules/right_of_way_rule.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 
-namespace drake {
 namespace maliput {
 
 /// A simple concrete implementation of the api::rules::PhaseRingBook abstract
@@ -37,10 +36,10 @@ class ManualPhaseRingBook : public api::rules::PhaseRingBook {
   void RemovePhaseRing(const api::rules::PhaseRing::Id& ring_id);
 
  private:
-  optional<api::rules::PhaseRing> DoGetPhaseRing(
+  drake::optional<api::rules::PhaseRing> DoGetPhaseRing(
       const api::rules::PhaseRing::Id& ring_id) const override;
 
-  optional<api::rules::PhaseRing> DoFindPhaseRing(
+  drake::optional<api::rules::PhaseRing> DoFindPhaseRing(
       const api::rules::RightOfWayRule::Id& rule_id) const override;
 
   class Impl;
@@ -48,4 +47,3 @@ class ManualPhaseRingBook : public api::rules::PhaseRingBook {
 };
 
 }  // namespace maliput
-}  // namespace drake

@@ -1,4 +1,4 @@
-#include "drake/automotive/maliput/base/intersection_book.h"
+#include "maliput/base/intersection_book.h"
 
 #include <stdexcept>
 #include <string>
@@ -7,7 +7,6 @@
 
 #include "drake/common/drake_throw.h"
 
-namespace drake {
 namespace maliput {
 
 using api::Intersection;
@@ -55,4 +54,3 @@ Intersection* IntersectionBook::DoGetIntersection(const Intersection::Id& id) {
 }
 
 }  // namespace maliput
-}  // namespace drake

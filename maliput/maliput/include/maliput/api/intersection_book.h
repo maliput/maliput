@@ -1,9 +1,8 @@
 #pragma once
 
-#include "drake/automotive/maliput/api/intersection.h"
+#include "maliput/api/intersection.h"
 #include "drake/common/drake_copyable.h"
 
-namespace drake {
 namespace maliput {
 namespace api {
 
@@ -31,4 +30,3 @@ class IntersectionBook {
 
 }  // namespace api
 }  // namespace maliput
-}  // namespace drake

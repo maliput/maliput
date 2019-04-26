@@ -41,7 +41,7 @@ class Intersection {
   const Id& id() const { return id_; }
 
   /// Returns the current phase.
-  virtual optional<rules::PhaseProvider::Result> Phase() const = 0;
+  virtual drake::optional<rules::PhaseProvider::Result> Phase() const = 0;
 
   virtual void SetPhase(const api::rules::Phase::Id& phase_id) = 0;
 

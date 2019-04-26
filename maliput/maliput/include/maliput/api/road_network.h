@@ -4,15 +4,15 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/automotive/maliput/api/intersection.h"
-#include "drake/automotive/maliput/api/road_geometry.h"
-#include "drake/automotive/maliput/api/rules/direction_usage_rule.h"
-#include "drake/automotive/maliput/api/rules/phase_provider.h"
-#include "drake/automotive/maliput/api/rules/phase_ring_book.h"
-#include "drake/automotive/maliput/api/rules/road_rulebook.h"
-#include "drake/automotive/maliput/api/rules/rule_state_provider.h"
-#include "drake/automotive/maliput/api/rules/speed_limit_rule.h"
-#include "drake/automotive/maliput/api/rules/traffic_light_book.h"
+#include "maliput/api/intersection.h"
+#include "maliput/api/road_geometry.h"
+#include "maliput/api/rules/direction_usage_rule.h"
+#include "maliput/api/rules/phase_provider.h"
+#include "maliput/api/rules/phase_ring_book.h"
+#include "maliput/api/rules/road_rulebook.h"
+#include "maliput/api/rules/rule_state_provider.h"
+#include "maliput/api/rules/speed_limit_rule.h"
+#include "maliput/api/rules/traffic_light_book.h"
 
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"

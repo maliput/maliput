@@ -1,4 +1,4 @@
-#include "drake/automotive/maliput/base/intersection_book.h"
+#include "maliput/base/intersection_book.h"
 
 #include <exception>
 #include <memory>
@@ -7,11 +7,10 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/base/intersection.h"
-#include "drake/automotive/maliput/base/manual_phase_provider.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/base/intersection.h"
+#include "maliput/base/manual_phase_provider.h"
 
-namespace drake {
 namespace maliput {
 namespace {
 
@@ -33,4 +32,3 @@ GTEST_TEST(IntersectionBookTest, BasicTest) {
 
 }  // namespace
 }  // namespace maliput
-}  // namespace drake

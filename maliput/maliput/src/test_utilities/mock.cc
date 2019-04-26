@@ -102,9 +102,9 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
   MockTrafficLightBook() {}
 
  private:
-  optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id&) const
+  drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id&) const
       override {
-    return nullopt;
+    return drake::nullopt;
   }
 };
 
@@ -156,8 +156,8 @@ class MockIntersection final : public Intersection {
       : Intersection(id, {}, ring_id) {}
 
  private:
-  optional<rules::PhaseProvider::Result> Phase() const override {
-    return nullopt;
+  drake::optional<rules::PhaseProvider::Result> Phase() const override {
+    return drake::nullopt;
   }
 
   void SetPhase(const api::rules::Phase::Id&) override {}

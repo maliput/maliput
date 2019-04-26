@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/base/manual_phase_provider.h"
-#include "drake/automotive/maliput/base/manual_phase_ring_book.h"
+#include "maliput/base/manual_phase_provider.h"
+#include "maliput/base/manual_phase_ring_book.h"
 
 namespace maliput {
 namespace {

@@ -3,9 +3,9 @@
 #include <memory>
 #include <string>
 
-#include "drake/automotive/maliput/api/rules/phase_ring_book.h"
-#include "drake/automotive/maliput/api/rules/road_rulebook.h"
-#include "drake/automotive/maliput/api/rules/traffic_light_book.h"
+#include "maliput/api/rules/phase_ring_book.h"
+#include "maliput/api/rules/road_rulebook.h"
+#include "maliput/api/rules/traffic_light_book.h"
 
 namespace maliput {
 

@@ -1,26 +1,25 @@
-#include "drake/automotive/maliput/base/intersection_book_loader.h"
+#include "maliput/base/intersection_book_loader.h"
 
 #include <vector>
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/automotive/maliput/api/rules/phase.h"
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
-#include "drake/automotive/maliput/base/intersection.h"
-#include "drake/automotive/maliput/base/intersection_book.h"
+#include "maliput/api/rules/phase.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/base/intersection.h"
+#include "maliput/base/intersection_book.h"
 #include "drake/common/drake_optional.h"
 
-using drake::maliput::api::rules::LaneSRange;
-using drake::maliput::api::rules::LaneSRoute;
-using drake::maliput::api::rules::Phase;
-using drake::maliput::api::rules::PhaseRing;
-using drake::maliput::api::rules::PhaseRingBook;
-using drake::maliput::api::rules::RightOfWayRule;
-using drake::maliput::api::rules::RoadRulebook;
+using maliput::api::rules::LaneSRange;
+using maliput::api::rules::LaneSRoute;
+using maliput::api::rules::Phase;
+using maliput::api::rules::PhaseRing;
+using maliput::api::rules::PhaseRingBook;
+using maliput::api::rules::RightOfWayRule;
+using maliput::api::rules::RoadRulebook;
 
-namespace drake {
 namespace maliput {
 namespace {
 
@@ -48,11 +47,11 @@ std::unique_ptr<api::Intersection> BuildIntersection(
   const Intersection::Id id(intersection_node["ID"].as<std::string>());
   const PhaseRing::Id ring_id(intersection_node["PhaseRing"].as<std::string>());
   const Phase::Id phase_id(intersection_node["InitialPhase"].as<std::string>());
-  optional<PhaseRing> ring = phase_ring_book.GetPhaseRing(ring_id);
+  drake::optional<PhaseRing> ring = phase_ring_book.GetPhaseRing(ring_id);
   DRAKE_THROW_UNLESS(ring.has_value());
   DRAKE_THROW_UNLESS(ring->phases().size() > 0);
-  optional<api::rules::Phase::Id> next_phase_id = nullopt;
-  optional<double> duration_until = nullopt;
+  drake::optional<api::rules::Phase::Id> next_phase_id = drake::nullopt;
+  drake::optional<double> duration_until = drake::nullopt;
   std::vector<PhaseRing::NextPhase> next_phases =
       ring->next_phases().at(phase_id);
   if (next_phases.size() > 0) {
@@ -105,4 +104,3 @@ std::unique_ptr<api::IntersectionBook> LoadIntersectionBookFromFile(
 }
 
 }  // namespace maliput
-}  // namespace drake
