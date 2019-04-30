@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(maliput-integration-test LANGUAGES C CXX VERSION 3.0.0)
+project(maliput-integration-tests LANGUAGES C CXX VERSION 3.0.0)
 option(BUILD_TESTS "Build test" OFF)
 
 ##############################################################################
