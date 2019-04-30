@@ -7,7 +7,7 @@
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
   <license>TODO</license>
 
-
+  <build_depend>yaml-cpp</build_depend>
   <build_depend>maliput</build_depend>
   <build_depend>multilane</build_depend>
   <build_export_depend>maliput</build_export_depend>

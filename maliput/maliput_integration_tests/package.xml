@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
-  <name>maliput-integration-test</name>
+  <name>maliput-integration-tests</name>
   <version>0.6.2</version>
   <description>Maliput integration tests.</description>
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
@@ -10,6 +10,7 @@
 
   <build_depend>maliput</build_depend>
   <build_depend>multilane</build_depend>
+  <build_depend>yaml-cpp</build_depend>
   <build_export_depend>maliput</build_export_depend>
   <build_export_depend>multilane</build_export_depend>
   <build_export_depend>drake</build_export_depend>
