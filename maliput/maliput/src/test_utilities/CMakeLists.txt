@@ -11,29 +11,29 @@ set(TEST_UTILS_SOURCES
   rules_speed_limit_compare.cc
   mock.cc)
 
-add_library(test_utilities ${TEST_UTILS_SOURCES})
+add_library(maliput_test_utilities ${TEST_UTILS_SOURCES})
 
 target_include_directories(
-  test_utilities
+  maliput_test_utilities
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-ament_target_dependencies(test_utilities
+ament_target_dependencies(maliput_test_utilities
   "drake"
 )
 
-target_link_libraries(test_utilities
+target_link_libraries(maliput_test_utilities
   api
   geometry_base
   drake::drake)
 
 install(
-    TARGETS test_utilities EXPORT ${PROJECT_NAME}-targets
+    TARGETS maliput_test_utilities EXPORT ${PROJECT_NAME}-targets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-ament_export_libraries(test_utilities)
+ament_export_libraries(maliput_test_utilities)
