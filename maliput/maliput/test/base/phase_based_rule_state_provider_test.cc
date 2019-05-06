@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "maliput/base/manual_phase_provider.h"
-#include "maliput/base/simple_phase_ring_book.h"
+#include "maliput/base/manual_phase_ring_book.h"
 
 namespace maliput {
 namespace {
@@ -30,7 +30,7 @@ GTEST_TEST(PhaseBasedRuleStateProviderTest, BasicTest) {
   const PhaseRing::Id ring_id("ring");
   const PhaseRing ring(ring_id, {phase1, phase2});
 
-  SimplePhaseRingBook phase_ring_book;
+  ManualPhaseRingBook phase_ring_book;
   phase_ring_book.AddPhaseRing(ring);
 
   ManualPhaseProvider phase_provider;

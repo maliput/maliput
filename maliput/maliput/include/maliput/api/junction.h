@@ -30,7 +30,7 @@ class Junction {
   virtual ~Junction() = default;
 
   /// Returns the persistent identifier.
-  const JunctionId id() const { return do_id(); }
+  JunctionId id() const { return do_id(); }
 
   /// Returns the RoadGeometry to which this Junction belongs.
   const RoadGeometry* road_geometry() const { return do_road_geometry(); }
@@ -53,7 +53,7 @@ class Junction {
   /// These must satisfy the constraint/invariants of the
   /// corresponding public methods.
   ///@{
-  virtual const JunctionId do_id() const = 0;
+  virtual JunctionId do_id() const = 0;
 
   virtual const RoadGeometry* do_road_geometry() const = 0;
 

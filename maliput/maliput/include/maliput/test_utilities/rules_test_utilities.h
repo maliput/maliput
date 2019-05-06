@@ -7,8 +7,10 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/phase.h"
+#include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/traffic_lights.h"
+
 #include "drake/common/unused.h"
 
 namespace maliput {
@@ -47,11 +49,10 @@ class AssertionResultCollector {
     ++count_;
     if (!result) {
       ++failed_;
-      failure_message_ = failure_message_ +
-          filename + ":" + std::to_string(line) +
-          ": Failure #" + std::to_string(failed_) + ":\n" +
-          "Expression '" + expression + "' failed:\n" +
-          result.message() + "\n";
+      failure_message_ = failure_message_ + filename + ":" +
+                         std::to_string(line) + ": Failure #" +
+                         std::to_string(failed_) + ":\n" + "Expression '" +
+                         expression + "' failed:\n" + result.message() + "\n";
     }
   }
 
@@ -60,11 +61,11 @@ class AssertionResultCollector {
   ::testing::AssertionResult result() {
     if (failed_) {
       return ::testing::AssertionFailure()
-          << failed_ << " of " << count_ << " expressions failed:\n"
-          << failure_message_;
+             << failed_ << " of " << count_ << " expressions failed:\n"
+             << failure_message_;
     } else {
       return ::testing::AssertionSuccess()
-          << count_ << " expressions all succeeded.";
+             << count_ << " expressions all succeeded.";
     }
   }
 
@@ -80,11 +81,10 @@ class AssertionResultCollector {
   std::string failure_message_;
 };
 
-
 /// Adds AssertionResult `result` to AssertionResultCollector `collector`.
 /// The location of the invocation and the literal expression of `result`
 /// will be recorded by the collector.
-#define MALIPUT_ADD_RESULT(collector, result)                        \
+#define MALIPUT_ADD_RESULT(collector, result) \
   collector.AddResult(__FILE__, __LINE__, #result, result)
 
 /// Returns an AssertionResult which is successful if `e1` equals `e2`
@@ -92,7 +92,6 @@ class AssertionResultCollector {
 /// literal expressions for `e1` and `e2` will be provided to `IsEqual()`.
 #define MALIPUT_IS_EQUAL(e1, e2) \
   ::maliput::api::rules::test::IsEqual(#e1, #e2, e1, e2)
-
 
 // TODO(maddog@tri.global)  Create macros (like below) as an alternative
 //                          to EXPECT_PRED_FORMAT*()/etc, which simply returns
@@ -110,21 +109,19 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
-
 /// Predicate-formatter which tests equality of TypeSpecificIdentifier<T>.
 template <class T>
-inline ::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    const TypeSpecificIdentifier<T>& a,
-    const TypeSpecificIdentifier<T>& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression,
+                                          const char* b_expression,
+                                          const TypeSpecificIdentifier<T>& a,
+                                          const TypeSpecificIdentifier<T>& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
-
 /// Predicate-formatter which tests equality of SRange.
-inline ::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    const SRange& a, const SRange& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression,
+                                          const char* b_expression,
+                                          const SRange& a, const SRange& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s0(), b.s0()));
@@ -132,11 +129,11 @@ inline ::testing::AssertionResult IsEqual(
   return c.result();
 }
 
-
 /// Predicate-formatter which tests equality of LaneSRange.
-inline ::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    const LaneSRange& a, const LaneSRange& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression,
+                                          const char* b_expression,
+                                          const LaneSRange& a,
+                                          const LaneSRange& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.lane_id(), b.lane_id()));
@@ -144,11 +141,11 @@ inline ::testing::AssertionResult IsEqual(
   return c.result();
 }
 
-
 /// Predicate-formatter which tests equality of std::vector<LaneSRange>.
-inline ::testing::AssertionResult IsEqual(
-     const char* a_expression, const char* b_expression,
-     const std::vector<LaneSRange>& a, const std::vector<LaneSRange>& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression,
+                                          const char* b_expression,
+                                          const std::vector<LaneSRange>& a,
+                                          const std::vector<LaneSRange>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
@@ -159,11 +156,11 @@ inline ::testing::AssertionResult IsEqual(
   return c.result();
 }
 
-
 /// Predicate-formatter which tests equality of LaneSRoute.
-inline ::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    const LaneSRoute& a, const LaneSRoute& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression,
+                                          const char* b_expression,
+                                          const LaneSRoute& a,
+                                          const LaneSRoute& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.ranges(), b.ranges()));
@@ -350,13 +347,41 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 /// Predicate-formatter which tests equality of Phase.
 inline ::testing::AssertionResult IsEqual(const char* a_expression,
                                           const char* b_expression,
-                                          const Phase& a,
-                                          const Phase& b) {
+                                          const Phase& a, const Phase& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.rule_states(), b.rule_states()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.bulb_states(), b.bulb_states()));
+  return c.result();
+}
+
+/// Predicate-formatter which tests equality of PhaseRing::NextPhase.
+inline ::testing::AssertionResult IsEqual(const char* a_expression,
+                                          const char* b_expression,
+                                          const PhaseRing::NextPhase& a,
+                                          const PhaseRing::NextPhase& b) {
+  drake::unused(a_expression, b_expression);
+  AssertionResultCollector c;
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id, b.id));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.duration_until, b.duration_until));
+  return c.result();
+}
+
+/// Predicate-formatter which tests equality of
+/// std::vector<PhaseRing::NextPhase>.
+inline ::testing::AssertionResult IsEqual(
+    const char* a_expression, const char* b_expression,
+    const std::vector<PhaseRing::NextPhase>& a,
+    const std::vector<PhaseRing::NextPhase>& b) {
+  drake::unused(a_expression, b_expression);
+  AssertionResultCollector c;
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
+  if (a.size() == b.size()) {
+    for (size_t i = 0; i < a.size(); ++i) {
+      MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.at(i), b.at(i)));
+    }
+  }
   return c.result();
 }
 

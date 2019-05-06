@@ -3,12 +3,14 @@
 #include <unordered_map>
 #include <vector>
 
-#include "maliput/api/branch_point.h"
-#include "maliput/api/junction.h"
-#include "maliput/api/lane.h"
-#include "maliput/api/rules/phase_ring.h"
-#include "maliput/api/rules/regions.h"
-#include "maliput/api/segment.h"
+#include "drake/automotive/maliput/api/branch_point.h"
+#include "drake/automotive/maliput/api/junction.h"
+#include "drake/automotive/maliput/api/lane.h"
+#include "drake/automotive/maliput/api/rules/phase_ring.h"
+#include "drake/automotive/maliput/api/rules/regions.h"
+#include "drake/automotive/maliput/api/rules/traffic_lights.h"
+#include "drake/automotive/maliput/api/segment.h"
+
 #include "drake/common/drake_optional.h"
 
 namespace maliput {
@@ -19,6 +21,7 @@ namespace {
 using rules::DirectionUsageRule;
 using rules::RightOfWayRule;
 using rules::SpeedLimitRule;
+using rules::TrafficLight;
 
 class MockIdIndex final : public RoadGeometry::IdIndex {
  public:
@@ -51,7 +54,7 @@ class MockRoadGeometry final : public RoadGeometry {
   MockRoadGeometry() {}
 
  private:
-  const RoadGeometryId do_id() const override { return RoadGeometryId("mock"); }
+  RoadGeometryId do_id() const override { return RoadGeometryId("mock"); }
   int do_num_junctions() const override { return 1; }
   const Junction* do_junction(int) const override { return nullptr; };
   int do_num_branch_points() const override { return 1; }
@@ -90,6 +93,18 @@ class MockRoadRulebook final : public rules::RoadRulebook {
 
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override {
     return CreateDirectionUsageRule();
+  }
+};
+
+class MockTrafficLightBook final : public rules::TrafficLightBook {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockTrafficLightBook)
+  MockTrafficLightBook() {}
+
+ private:
+  drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id&) const
+      override {
+    return drake::nullopt;
   }
 };
 
@@ -141,9 +156,11 @@ class MockIntersection final : public Intersection {
       : Intersection(id, {}, ring_id) {}
 
  private:
-  const drake::optional<rules::PhaseProvider::Result> Phase() const override {
+  drake::optional<rules::PhaseProvider::Result> Phase() const override {
     return drake::nullopt;
   }
+
+  void SetPhase(const api::rules::Phase::Id&) override {}
 };
 
 }  // namespace
@@ -198,6 +215,10 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
 
 std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook() {
   return std::make_unique<MockRoadRulebook>();
+}
+
+std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() {
+  return std::make_unique<MockTrafficLightBook>();
 }
 
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook() {

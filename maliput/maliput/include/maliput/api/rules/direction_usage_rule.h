@@ -134,6 +134,10 @@ class DirectionUsageRule final {
     return states_.begin()->second;
   }
 
+  /// Maps DirectionUsageRule::State::Type enums to string representations.
+  static std::unordered_map<State::Type, const char*, drake::DefaultHash>
+  StateTypeMapper();
+
  private:
   Id id_;
   LaneSRange zone_;

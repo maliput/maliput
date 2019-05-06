@@ -5,11 +5,11 @@
 set(TEST_UTILS_SOURCES
   check_id_indexing.cc
   maliput_types_compare.cc
+  mock.cc
   mock_geometry.cc
   rules_direction_usage_compare.cc
   rules_right_of_way_compare.cc
-  rules_speed_limit_compare.cc
-  mock.cc)
+  rules_speed_limit_compare.cc)
 
 add_library(maliput_test_utilities ${TEST_UTILS_SOURCES})
 

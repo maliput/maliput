@@ -72,7 +72,7 @@ class Lane : public api::Lane {
   ~Lane() override = default;
 
  private:
-  const api::LaneId do_id() const override;
+  api::LaneId do_id() const override;
 
   const api::Segment* do_segment() const override;
 

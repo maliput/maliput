@@ -12,10 +12,7 @@
 
 namespace maliput {
 
-/// A convenience data structure for aggregating information about an
-/// intersection. Its primary purpose is to serve as a single source of this
-/// information and to remove the need to query numerous disparate data
-/// structures and state providers.
+/// A concrete implementation of the api::Intersection abstract interface.
 class Intersection : public api::Intersection {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Intersection)
@@ -40,14 +37,11 @@ class Intersection : public api::Intersection {
   virtual ~Intersection() = default;
 
   /// Returns the current phase.
-  const drake::optional<api::rules::PhaseProvider::Result> Phase() const;
+  drake::optional<api::rules::PhaseProvider::Result> Phase() const override;
 
   /// Sets the current phase.
-  void SetPhase(const api::rules::Phase::Id& phase_id);
+  void SetPhase(const api::rules::Phase::Id& phase_id) override;
 
-  // TODO(liang.fok) Add method for obtaining the current bulb states
-
-  // TODO(liang.fok) Add method for obtaining the intersection's bounding box.
  private:
   ManualPhaseProvider* phase_provider_{};
 };
