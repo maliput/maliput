@@ -10,7 +10,7 @@ macro(add_dependencies_to_test target)
       target_link_libraries(${target}
         multilane::multilane
         maliput::api
-        maliput::test_utilities
+        maliput::maliput_test_utilities
         maliput::base
         maliput::common
         drake::drake)

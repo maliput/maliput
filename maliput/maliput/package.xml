@@ -7,7 +7,7 @@
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
   <license>TODO</license>
 
-
+  <build_depend>yaml-cpp</build_depend>
   <build_export_depend>drake</build_export_depend>
   <exec_depend>ament_cmake</exec_depend>
 
