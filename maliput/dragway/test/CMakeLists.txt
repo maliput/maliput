@@ -1,4 +1,5 @@
 find_package(ament_cmake_gtest REQUIRED)
+find_package(ament_cmake_pytest REQUIRED)
 
 ament_add_gtest(dragway_test dragway_test.cc)
 
@@ -23,3 +24,9 @@ macro(add_dependencies_to_test target)
 endmacro()
 
 add_dependencies_to_test(dragway_test)
+
+ament_add_pytest_test(dragway_pytest
+  dragway_test.py
+  # Avoid pytest from importing the module stub
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
