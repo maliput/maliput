@@ -11,13 +11,6 @@ set(SOURCES
 
 add_library(dragway ${SOURCES})
 
-# Put library on a subdirectory agnostic location for C extensions
-# to find it during testing.
-# set_target_properties(dragway PROPERTIES
-#  LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${PROJECT_NAME}"
-#  RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${PROJECT_NAME}"
-# )
-
 target_include_directories(dragway
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

@@ -38,10 +38,6 @@ add_subdirectory(src)
 ##############################################################################
 # Tests
 ##############################################################################
-# # enables using the Python extensions from the build space for testing
-# file(COPY "${PROJECT_NAME}/__init__.py"
-#   DESTINATION "${PROJECT_BINARY_DIR}/${PROJECT_NAME}"
-# )
 
 if(BUILD_TESTING)
   enable_testing()
