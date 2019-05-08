@@ -5,7 +5,8 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/test_utilities/mock.h"
+#include "drake/automotive/maliput/api/intersection.h"
+#include "drake/automotive/maliput/api/test/mock.h"
 
 namespace maliput {
 namespace api {
@@ -115,6 +116,23 @@ TEST_F(RoadNetworkTest, InstantiateAndUseAccessors) {
   EXPECT_EQ(dut.phase_ring_book(), phase_ring_book_ptr_);
   EXPECT_EQ(dut.rule_state_provider(), rule_state_provider_ptr_);
   EXPECT_EQ(dut.phase_provider(), phase_provider_ptr_);
+}
+TEST_F(RoadNetworkTest, TestMemberMethodAccess) {
+  RoadNetwork dut(std::move(road_geometry_), std::move(road_rulebook_),
+                  std::move(traffic_light_book_), std::move(intersection_book_),
+                  std::move(phase_ring_book_), std::move(rule_state_provider_),
+                  std::move(phase_provider_));
+
+  auto intersection =
+      dut.intersection_book()->GetIntersection(Intersection::Id("Mock"));
+  EXPECT_NE(intersection, nullptr);
+  intersection->SetPhase(rules::Phase::Id("Mock"));
+
+  dut.rulebook()->GetRule(rules::RightOfWayRule::Id("Mock"));
+  dut.traffic_light_book()->GetTrafficLight(rules::TrafficLight::Id("Mock"));
+  dut.phase_ring_book()->GetPhaseRing(rules::PhaseRing::Id("Mock"));
+  dut.rule_state_provider()->GetState(rules::RightOfWayRule::Id("Mock"));
+  dut.phase_provider()->GetPhase(rules::PhaseRing::Id("Mock"));
 }
 
 }  // namespace
