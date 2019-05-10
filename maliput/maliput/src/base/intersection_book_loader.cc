@@ -11,6 +11,7 @@
 #include "maliput/base/intersection.h"
 #include "maliput/base/intersection_book.h"
 #include "drake/common/drake_optional.h"
+#include "drake/common/drake_throw.h"
 
 using maliput::api::rules::LaneSRange;
 using maliput::api::rules::LaneSRoute;
@@ -40,7 +41,7 @@ std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook,
 std::unique_ptr<api::Intersection> BuildIntersection(
     const YAML::Node& intersection_node, const RoadRulebook& road_rulebook,
     const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
-  DRAKE_DEMAND(intersection_node.IsMap());
+  DRAKE_THROW_UNLESS(intersection_node.IsMap());
   DRAKE_THROW_UNLESS(intersection_node["ID"].IsDefined());
   DRAKE_THROW_UNLESS(intersection_node["PhaseRing"].IsDefined());
   DRAKE_THROW_UNLESS(intersection_node["InitialPhase"].IsDefined());
@@ -79,13 +80,13 @@ std::unique_ptr<api::Intersection> BuildIntersection(
 std::unique_ptr<api::IntersectionBook> BuildFrom(
     const YAML::Node& root_node, const RoadRulebook& road_rulebook,
     const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
-  DRAKE_DEMAND(root_node.IsMap());
+  DRAKE_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& intersections_node = root_node["Intersections"];
   auto result = std::make_unique<IntersectionBook>();
   if (!intersections_node.IsDefined()) {
     return result;
   }
-  DRAKE_DEMAND(intersections_node.IsSequence());
+  DRAKE_THROW_UNLESS(intersections_node.IsSequence());
   for (const YAML::Node& intersection_node : intersections_node) {
     result->AddIntersection(BuildIntersection(intersection_node, road_rulebook,
                                               phase_ring_book, phase_provider));
