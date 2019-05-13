@@ -7,15 +7,16 @@
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
   <license>TODO</license>
 
-  <build_depend>maliput</build_depend>
-  <build_depend>maliput-utilities</build_depend>
-  <build_export_depend>maliput</build_export_depend>
-  <build_export_depend>maliput-utilities</build_export_depend>
-  <build_export_depend>drake</build_export_depend>
-  <exec_depend>ament_cmake</exec_depend>
+  <depend>pybind11</depend>
+
+  <depend>maliput</depend>
+  <depend>maliput-utilities</depend>
+  <depend>drake</depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
   </export>
-  <test_depend>ament_cmake_gtest</test_depend>
 </package>
