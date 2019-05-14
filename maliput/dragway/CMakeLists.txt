@@ -13,7 +13,7 @@ message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
 find_package(ament_cmake REQUIRED)
 
-find_package(drake REQUIRED)
+find_package(drake_vendor REQUIRED)
 find_package(maliput REQUIRED)
 find_package(maliput-utilities REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
