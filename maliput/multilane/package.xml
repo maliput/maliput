@@ -7,15 +7,15 @@
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
   <license>TODO</license>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>yaml-cpp</build_depend>
-  <build_depend>maliput</build_depend>
-  <build_export_depend>maliput</build_export_depend>
-  <build_export_depend>drake</build_export_depend>
-  <exec_depend>ament_cmake</exec_depend>
+  <depend>drake_vendor</depend>
+  <depend>maliput</depend>
+  <depend>yaml-cpp</depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
   </export>
-  <test_depend>ament_cmake_gtest</test_depend>
 </package>
