@@ -3,14 +3,14 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/automotive/maliput/api/branch_point.h"
-#include "drake/automotive/maliput/api/intersection.h"
-#include "drake/automotive/maliput/api/junction.h"
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/traffic_lights.h"
-#include "drake/automotive/maliput/api/segment.h"
+#include "maliput/api/branch_point.h"
+#include "maliput/api/intersection.h"
+#include "maliput/api/junction.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/traffic_lights.h"
+#include "maliput/api/segment.h"
 
 #include "drake/common/drake_optional.h"
 
@@ -101,9 +101,9 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
   MockTrafficLightBook() {}
 
  private:
-  optional<TrafficLight> DoGetTrafficLight(
+  drake::optional<TrafficLight> DoGetTrafficLight(
       const TrafficLight::Id&) const override {
-    return nullopt;
+    return drake::nullopt;
   }
 };
 
@@ -117,14 +117,14 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
     return std::vector<rules::PhaseRing::Id>();
   }
 
-  optional<rules::PhaseRing> DoGetPhaseRing(
+  drake::optional<rules::PhaseRing> DoGetPhaseRing(
       const rules::PhaseRing::Id&) const override {
-    return nullopt;
+    return drake::nullopt;
   }
 
-  optional<rules::PhaseRing> DoFindPhaseRing(
+  drake::optional<rules::PhaseRing> DoFindPhaseRing(
       const rules::RightOfWayRule::Id&) const override {
-    return nullopt;
+    return drake::nullopt;
   }
 };
 
@@ -136,7 +136,7 @@ class MockRuleStateProvider final : public rules::RuleStateProvider {
  private:
   drake::optional<RightOfWayResult> DoGetState(
       const RightOfWayRule::Id&) const override {
-    return nullopt;
+    return drake::nullopt;
   }
 };
 
@@ -159,8 +159,8 @@ class MockIntersection final : public Intersection {
       : Intersection(id, {}, ring_id) {}
 
  private:
-  optional<rules::PhaseProvider::Result> Phase() const override {
-    return nullopt;
+  drake::optional<rules::PhaseProvider::Result> Phase() const override {
+    return drake::nullopt;
   }
 
   void SetPhase(const api::rules::Phase::Id&) override {}

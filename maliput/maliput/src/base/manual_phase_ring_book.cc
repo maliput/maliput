@@ -59,7 +59,7 @@ class ManualPhaseRingBook::Impl {
     return result;
   }
 
-  optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
+  drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
     auto it = ring_book_.find(ring_id);
     if (it == ring_book_.end()) {
       return drake::nullopt;
@@ -97,7 +97,7 @@ std::vector<PhaseRing::Id> ManualPhaseRingBook::DoGetPhaseRings() const {
   return impl_->DoGetPhaseRings();
 }
 
-optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(
+drake::optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(
     const PhaseRing::Id& ring_id) const {
   return impl_->DoGetPhaseRing(ring_id);
 }

@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/rules/regions.h"
 
 #include "drake/common/drake_throw.h"
 

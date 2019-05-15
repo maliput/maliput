@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/right_of_way_rule.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 
@@ -24,7 +24,7 @@ class PhaseRingBook {
     return DoGetPhaseRings();
   }
 
-  /// Gets the specified PhaseRing. Returns nullopt if @p ring_id is
+  /// Gets the specified PhaseRing. Returns drake::nullopt if @p ring_id is
   /// unrecognized.
   drake::optional<PhaseRing> GetPhaseRing(const PhaseRing::Id& ring_id) const {
     return DoGetPhaseRing(ring_id);
@@ -42,7 +42,7 @@ class PhaseRingBook {
  private:
   virtual std::vector<PhaseRing::Id> DoGetPhaseRings() const = 0;
 
-  virtual optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id)
+  virtual drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id)
       const = 0;
 
   virtual drake::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id)

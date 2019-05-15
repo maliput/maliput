@@ -33,7 +33,7 @@ struct ManualPhaseProviderTest : public ::testing::Test {
 };
 
 TEST_F(ManualPhaseProviderTest, EmptyProvider) {
-  EXPECT_EQ(dut.GetPhase(phase_ring_id), nullopt);
+  EXPECT_EQ(dut.GetPhase(phase_ring_id), drake::nullopt);
   EXPECT_THROW(dut.SetPhase(phase_ring_id, phase_id_1), std::exception);
 }
 

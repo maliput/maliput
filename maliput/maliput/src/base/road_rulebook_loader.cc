@@ -6,11 +6,11 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/api/rules/direction_usage_rule.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
-#include "drake/automotive/maliput/base/manual_rulebook.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/rules/direction_usage_rule.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/base/manual_rulebook.h"
 #include "drake/common/drake_throw.h"
 #include "drake/common/text_logging.h"
 

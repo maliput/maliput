@@ -6,10 +6,10 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/automotive/maliput/api/lane_data.h"
-#include "drake/automotive/maliput/api/rules/traffic_light_book.h"
-#include "drake/automotive/maliput/api/rules/traffic_lights.h"
-#include "drake/automotive/maliput/base/traffic_light_book.h"
+#include "maliput/api/lane_data.h"
+#include "maliput/api/rules/traffic_light_book.h"
+#include "maliput/api/rules/traffic_lights.h"
+#include "maliput/base/traffic_light_book.h"
 #include "drake/common/drake_throw.h"
 #include "drake/common/eigen_types.h"
 #include "drake/math/quaternion.h"

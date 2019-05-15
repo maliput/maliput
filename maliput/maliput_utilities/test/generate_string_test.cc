@@ -1,26 +1,33 @@
-#include "drake/automotive/maliput/utility/generate_string.h"
+#include "maliput-utilities/generate_string.h"
 
 #include <memory>
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/road_geometry.h"
-#include "drake/automotive/maliput/multilane/builder.h"
-#include "drake/automotive/maliput/multilane/loader.h"
+#include "maliput/api/road_geometry.h"
+#include "maliput/common/filesystem.h"
+#include "multilane/builder.h"
+#include "multilane/loader.h"
 #include "drake/common/find_resource.h"
 
-namespace drake {
 namespace maliput {
 namespace utility {
+
+static constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 
 class GenerateStringTest : public ::testing::Test {
  protected:
   GenerateStringTest()
-      : filepath_(FindResourceOrThrow(
-            "drake/automotive/maliput/multilane/2x2_intersection.yaml")),
-        road_geometry_(
-            multilane::LoadFile(multilane::BuilderFactory(), filepath_)) {}
+        {
+          static const char* const kFileName = "/2x2_intersection.yaml";
+          const std::string env_path = 
+            maliput::common::Filesystem::get_env_path(MULTILANE_RESOURCE_VAR);
+          EXPECT_TRUE(!env_path.empty());
+          filepath_ = env_path + kFileName;
+          road_geometry_ = std::move(
+            multilane::LoadFile(multilane::BuilderFactory(), filepath_));
+        }
 
   // Spot checks @p s for the existence of various details based on options_.
   void CheckResults(const std::string& s) {
@@ -48,8 +55,8 @@ class GenerateStringTest : public ::testing::Test {
     }
   }
 
-  const std::string filepath_;
-  const std::unique_ptr<const api::RoadGeometry> road_geometry_;
+  std::string filepath_;
+  std::unique_ptr<const api::RoadGeometry> road_geometry_;
   GenerateStringOptions options_;
 };
 
@@ -108,4 +115,3 @@ TEST_F(GenerateStringTest, WithLabels) {
 
 }  // namespace utility
 }  // namespace maliput
-}  // namespace drake

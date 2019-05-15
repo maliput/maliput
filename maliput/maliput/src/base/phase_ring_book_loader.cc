@@ -6,12 +6,12 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/automotive/maliput/api/rules/phase.h"
-#include "drake/automotive/maliput/api/rules/phase_ring.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/api/rules/right_of_way_rule.h"
-#include "drake/automotive/maliput/api/rules/traffic_lights.h"
-#include "drake/automotive/maliput/base/manual_phase_ring_book.h"
+#include "maliput/api/rules/phase.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/traffic_lights.h"
+#include "maliput/base/manual_phase_ring_book.h"
 
 #include "drake/common/drake_throw.h"
 

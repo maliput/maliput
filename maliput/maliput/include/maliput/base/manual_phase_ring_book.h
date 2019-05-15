@@ -39,7 +39,7 @@ class ManualPhaseRingBook : public api::rules::PhaseRingBook {
  private:
   std::vector<api::rules::PhaseRing::Id> DoGetPhaseRings() const override;
 
-  optional<api::rules::PhaseRing> DoGetPhaseRing(
+  drake::optional<api::rules::PhaseRing> DoGetPhaseRing(
       const api::rules::PhaseRing::Id& ring_id) const override;
 
   drake::optional<api::rules::PhaseRing> DoFindPhaseRing(

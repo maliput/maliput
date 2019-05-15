@@ -4,6 +4,7 @@
 
 set(SOURCES
   generate_obj.cc
+  generate_string.cc
   generate_urdf.cc
   mesh_simplification.cc
   segment_analysis.cc

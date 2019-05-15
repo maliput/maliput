@@ -2,9 +2,8 @@
 
 #include <string>
 
-#include "drake/automotive/maliput/api/road_geometry.h"
+#include "maliput/api/road_geometry.h"
 
-namespace drake {
 namespace maliput {
 namespace utility {
 
@@ -34,4 +33,3 @@ std::string GenerateString(const api::RoadGeometry& road_geometry,
 
 }  // namespace utility
 }  // namespace maliput
-}  // namespace drake

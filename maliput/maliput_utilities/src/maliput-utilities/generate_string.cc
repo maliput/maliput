@@ -1,13 +1,12 @@
-#include "drake/automotive/maliput/utility/generate_string.h"
+#include "maliput-utilities/generate_string.h"
 
 #include <sstream>
 
-#include "drake/automotive/maliput/api/junction.h"
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/api/lane_data.h"
-#include "drake/automotive/maliput/api/segment.h"
+#include "maliput/api/junction.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/lane_data.h"
+#include "maliput/api/segment.h"
 
-namespace drake {
 namespace maliput {
 namespace utility {
 namespace {
@@ -111,4 +110,3 @@ std::string GenerateString(const api::RoadGeometry& road_geometry,
 
 }  // namespace utility
 }  // namespace maliput
-}  // namespace drake

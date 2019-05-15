@@ -5,8 +5,8 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/intersection.h"
-#include "drake/automotive/maliput/api/test/mock.h"
+#include "maliput/api/intersection.h"
+#include "maliput/test_utilities/mock.h"
 
 namespace maliput {
 namespace api {
