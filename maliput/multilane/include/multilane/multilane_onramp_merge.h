@@ -7,6 +7,8 @@
 #include "multilane/builder.h"
 #include "multilane/road_curve.h"
 
+#include "drake/common/drake_copyable.h"
+
 namespace maliput {
 namespace multilane {
 
