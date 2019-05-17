@@ -12,6 +12,7 @@ set(MULTILANE_SOURCES
   lane.cc
   line_road_curve.cc
   loader.cc
+  multilane_onramp_merge.cc
   road_curve.cc
   road_geometry.cc
   segment.cc)
