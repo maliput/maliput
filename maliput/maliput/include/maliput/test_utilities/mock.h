@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "maliput/api/intersection.h"
+#include "maliput/api/intersection_book.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/phase_provider.h"
@@ -60,9 +60,8 @@ std::unique_ptr<rules::RuleStateProvider> CreateRuleStateProvider();
 /// Returns an arbitrary rules::PhaseProvider.
 std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider();
 
-/// Returns an arbitrary Intersection.
-std::unique_ptr<Intersection> CreateIntersection(
-    const Intersection::Id& id, const rules::PhaseRing::Id& ring_id);
+/// Returns an arbitrary IntersectionBook.
+std::unique_ptr<IntersectionBook> CreateIntersectionBook();
 
 }  // namespace test
 }  // namespace api

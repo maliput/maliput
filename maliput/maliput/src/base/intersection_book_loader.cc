@@ -11,6 +11,7 @@
 #include "maliput/base/intersection.h"
 #include "maliput/base/intersection_book.h"
 #include "drake/common/drake_optional.h"
+#include "drake/common/drake_throw.h"
 
 using maliput::api::rules::LaneSRange;
 using maliput::api::rules::LaneSRoute;
@@ -40,7 +41,7 @@ std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook,
 std::unique_ptr<api::Intersection> BuildIntersection(
     const YAML::Node& intersection_node, const RoadRulebook& road_rulebook,
     const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
-  DRAKE_DEMAND(intersection_node.IsMap());
+  DRAKE_THROW_UNLESS(intersection_node.IsMap());
   DRAKE_THROW_UNLESS(intersection_node["ID"].IsDefined());
   DRAKE_THROW_UNLESS(intersection_node["PhaseRing"].IsDefined());
   DRAKE_THROW_UNLESS(intersection_node["InitialPhase"].IsDefined());
@@ -50,6 +51,7 @@ std::unique_ptr<api::Intersection> BuildIntersection(
   drake::optional<PhaseRing> ring = phase_ring_book.GetPhaseRing(ring_id);
   DRAKE_THROW_UNLESS(ring.has_value());
   DRAKE_THROW_UNLESS(ring->phases().size() > 0);
+  DRAKE_THROW_UNLESS(ring->phases().find(phase_id) != ring->phases().end());
   drake::optional<api::rules::Phase::Id> next_phase_id = drake::nullopt;
   drake::optional<double> duration_until = drake::nullopt;
   std::vector<PhaseRing::NextPhase> next_phases =
@@ -61,7 +63,12 @@ std::unique_ptr<api::Intersection> BuildIntersection(
     next_phase_id = n.id;
     duration_until = n.duration_until;
   }
-  phase_provider->SetPhase(ring_id, phase_id, next_phase_id, duration_until);
+  if (!phase_provider->GetPhase(ring_id).has_value()) {
+    phase_provider->AddPhaseRing(ring_id, phase_id, next_phase_id,
+                                 duration_until);
+  } else {
+    phase_provider->SetPhase(ring_id, phase_id, next_phase_id, duration_until);
+  }
   // The following arbitrarily uses the first phase within the PhaseRing. This
   // is acceptable since a PhaseRing guarantees that all Phases within it share
   // the same domain.
@@ -73,13 +80,13 @@ std::unique_ptr<api::Intersection> BuildIntersection(
 std::unique_ptr<api::IntersectionBook> BuildFrom(
     const YAML::Node& root_node, const RoadRulebook& road_rulebook,
     const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
-  DRAKE_DEMAND(root_node.IsMap());
+  DRAKE_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& intersections_node = root_node["Intersections"];
   auto result = std::make_unique<IntersectionBook>();
   if (!intersections_node.IsDefined()) {
     return result;
   }
-  DRAKE_DEMAND(intersections_node.IsSequence());
+  DRAKE_THROW_UNLESS(intersections_node.IsSequence());
   for (const YAML::Node& intersection_node : intersections_node) {
     result->AddIntersection(BuildIntersection(intersection_node, road_rulebook,
                                               phase_ring_book, phase_provider));

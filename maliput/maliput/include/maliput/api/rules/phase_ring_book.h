@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "drake/common/drake_copyable.h"
@@ -17,6 +19,11 @@ class PhaseRingBook {
 
   virtual ~PhaseRingBook() = default;
 
+  /// Gets a list of all PhaseRings within this book.
+  std::vector<PhaseRing::Id> GetPhaseRings() const {
+    return DoGetPhaseRings();
+  }
+
   /// Gets the specified PhaseRing. Returns drake::nullopt if @p ring_id is
   /// unrecognized.
   drake::optional<PhaseRing> GetPhaseRing(const PhaseRing::Id& ring_id) const {
@@ -33,6 +40,8 @@ class PhaseRingBook {
   PhaseRingBook() = default;
 
  private:
+  virtual std::vector<PhaseRing::Id> DoGetPhaseRings() const = 0;
+
   virtual drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id)
       const = 0;
 
