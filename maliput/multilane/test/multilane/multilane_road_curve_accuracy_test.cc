@@ -13,7 +13,7 @@
 #include "multilane/arc_road_curve.h"
 #include "multilane/cubic_polynomial.h"
 #include "multilane/line_road_curve.h"
-#include "../test_utilities/multilane_brute_force_integral.h"
+#include "multilane_test_utilities/multilane_brute_force_integral.h"
 
 namespace maliput {
 namespace multilane {

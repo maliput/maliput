@@ -1,12 +1,11 @@
-#include "drake/automotive/maliput/routing/derive_lane_s_routes.h"
+#include "maliput/routing/derive_lane_s_routes.h"
 
-#include "drake/automotive/maliput/api/branch_point.h"
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/routing/find_lane_sequences.h"
+#include "maliput/api/branch_point.h"
+#include "maliput/api/lane.h"
+#include "maliput/routing/find_lane_sequences.h"
 #include "drake/common/drake_assert.h"
 #include "drake/common/drake_optional.h"
 
-namespace drake {
 namespace maliput {
 namespace routing {
 namespace {
@@ -23,7 +22,7 @@ bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane* lane) {
 }
 
 // Returns the S coordinate in @p lane that is on the border with @p next_lane.
-optional<double> DetermineEdgeS(const api::Lane* lane,
+drake::optional<double> DetermineEdgeS(const api::Lane* lane,
                                 const api::Lane* next_lane) {
   DRAKE_ASSERT(lane != nullptr);
   DRAKE_ASSERT(next_lane != nullptr);
@@ -35,7 +34,7 @@ optional<double> DetermineEdgeS(const api::Lane* lane,
                       next_lane)) {
     return 0.;
   }
-  return nullopt;
+  return drake::nullopt;
 }
 
 }  // namespace
@@ -71,7 +70,7 @@ std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
       DRAKE_ASSERT(lane != nullptr);
       if (i == 0) {
         DRAKE_ASSERT(lane->id() == start.lane->id());
-        const optional<double> first_end_s =
+        const drake::optional<double> first_end_s =
             DetermineEdgeS(lane, lane_sequence.at(1));
         DRAKE_ASSERT(first_end_s.has_value());
         ranges.emplace_back(lane->id(),
@@ -79,15 +78,15 @@ std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
       } else if (i + 1 == lane_sequence.size()) {
         DRAKE_ASSERT(lane->id() == end.lane->id());
         DRAKE_ASSERT(i > 0);
-        const optional<double> last_start_s =
+        const drake::optional<double> last_start_s =
             DetermineEdgeS(lane, lane_sequence.at(i - 1));
         DRAKE_ASSERT(last_start_s.has_value());
         ranges.emplace_back(lane->id(),
                             api::rules::SRange(last_start_s.value(), end_s));
       } else {
-        const optional<double> middle_start_s =
+        const drake::optional<double> middle_start_s =
             DetermineEdgeS(lane, lane_sequence.at(i - 1));
-        const optional<double> middle_end_s =
+        const drake::optional<double> middle_end_s =
             DetermineEdgeS(lane, lane_sequence.at(i + 1));
         DRAKE_ASSERT(middle_start_s && middle_end_s);
         ranges.emplace_back(
@@ -101,4 +100,3 @@ std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
 }
 }  // namespace routing
 }  // namespace maliput
-}  // namespace drake

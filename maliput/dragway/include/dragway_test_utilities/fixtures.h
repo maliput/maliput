@@ -2,10 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/dragway/road_geometry.h"
+#include "maliput/api/lane.h"
+#include "dragway/road_geometry.h"
 
-namespace drake {
 namespace maliput {
 namespace dragway {
 
@@ -33,4 +32,3 @@ class DragwayBasedTest : public ::testing::Test {
 
 }  // namespace dragway
 }  // namespace maliput
-}  // namespace drake

@@ -1,4 +1,4 @@
-#include "drake/automotive/maliput/routing/find_lane_sequences.h"
+#include "maliput/routing/find_lane_sequences.h"
 
 #include <memory>
 #include <string>
@@ -7,24 +7,26 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/api/road_geometry.h"
-#include "drake/automotive/maliput/dragway/test_utilities/fixtures.h"
-#include "drake/automotive/maliput/multilane/builder.h"
-#include "drake/automotive/maliput/multilane/loader.h"
-#include "drake/automotive/maliput/multilane/test_utilities/fixtures.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/road_geometry.h"
+#include "maliput/common/filesystem.h"
+#include "dragway_test_utilities/fixtures.h"
+#include "multilane/builder.h"
+#include "multilane/loader.h"
+#include "multilane_test_utilities/fixtures.h"
 
-namespace drake {
+constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
+
 namespace maliput {
 namespace routing {
 
-using drake::maliput::api::Lane;
-using drake::maliput::api::LaneId;
-using drake::maliput::api::RoadGeometry;
-using drake::maliput::dragway::DragwayBasedTest;
-using drake::maliput::multilane::BranchAndMergeBasedTest;
-using drake::maliput::multilane::LoopBasedTest;
-using drake::maliput::multilane::MultiBranchBasedTest;
+using maliput::api::Lane;
+using maliput::api::LaneId;
+using maliput::api::RoadGeometry;
+using maliput::dragway::DragwayBasedTest;
+using maliput::multilane::BranchAndMergeBasedTest;
+using maliput::multilane::LoopBasedTest;
+using maliput::multilane::MultiBranchBasedTest;
 
 namespace {
 
@@ -142,9 +144,10 @@ TEST_F(MultiBranchBasedTest, FindLaneSequencesTest) {
 
 GTEST_TEST(FindLaneSequencesTest, NoRouteToEndLane) {
   std::unique_ptr<const RoadGeometry> road =
-      drake::maliput::multilane::LoadFile(
-          drake::maliput::multilane::BuilderFactory(),
-          "automotive/maliput/multilane/dual_non_intersecting_lanes.yaml");
+      maliput::multilane::LoadFile(
+          maliput::multilane::BuilderFactory(),
+          maliput::common::Filesystem::get_env_path(MULTILANE_RESOURCE_VAR) +
+          "/dual_non_intersecting_lanes.yaml");
   const Lane* start_lane = road->junction(0)->segment(0)->lane(0);
   const Lane* end_lane = road->junction(1)->segment(0)->lane(0);
   ASSERT_EQ(FindLaneSequences(start_lane, end_lane,
@@ -155,9 +158,10 @@ GTEST_TEST(FindLaneSequencesTest, NoRouteToEndLane) {
 
 GTEST_TEST(FindLaneSequencesTest, MaxLengthOmitsStartAndEndLanes) {
   std::unique_ptr<const RoadGeometry> road =
-      drake::maliput::multilane::LoadFile(
-          drake::maliput::multilane::BuilderFactory(),
-          "automotive/maliput/multilane/long_start_and_end_lanes.yaml");
+      maliput::multilane::LoadFile(
+          maliput::multilane::BuilderFactory(),
+          maliput::common::Filesystem::get_env_path(MULTILANE_RESOURCE_VAR) +
+          "/long_start_and_end_lanes.yaml");
   const RoadGeometry::IdIndex& index = road->ById();
   const Lane* start_lane = index.GetLane(LaneId("l:0_0"));
   const Lane* middle_lane = index.GetLane(LaneId("l:1_0"));
@@ -174,4 +178,3 @@ GTEST_TEST(FindLaneSequencesTest, MaxLengthOmitsStartAndEndLanes) {
 
 }  // namespace routing
 }  // namespace maliput
-}  // namespace drake

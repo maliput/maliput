@@ -2,9 +2,8 @@
 
 #include <vector>
 
-#include "drake/automotive/maliput/api/lane.h"
+#include "maliput/api/lane.h"
 
-namespace drake {
 namespace maliput {
 namespace routing {
 
@@ -24,10 +23,9 @@ namespace routing {
 /// @return A vector of lane sequences in which the first lane is @p start and
 /// the last lane is @p end. An empty vector is returned if no sequences are
 /// found.
-std::vector<std::vector<const drake::maliput::api::Lane*>> FindLaneSequences(
-    const drake::maliput::api::Lane* start,
-    const drake::maliput::api::Lane* end, double max_length_m);
+std::vector<std::vector<const maliput::api::Lane*>> FindLaneSequences(
+    const maliput::api::Lane* start,
+    const maliput::api::Lane* end, double max_length_m);
 
 }  // namespace routing
 }  // namespace maliput
-}  // namespace drake

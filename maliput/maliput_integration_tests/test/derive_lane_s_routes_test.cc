@@ -1,17 +1,16 @@
-#include "drake/automotive/maliput/routing/derive_lane_s_routes.h"
+#include "maliput/routing/derive_lane_s_routes.h"
 
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "drake/automotive/maliput/api/lane.h"
-#include "drake/automotive/maliput/api/lane_data.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
-#include "drake/automotive/maliput/dragway/test_utilities/fixtures.h"
-#include "drake/automotive/maliput/multilane/test_utilities/fixtures.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/lane_data.h"
+#include "maliput/api/rules/regions.h"
+#include "dragway_test_utilities/fixtures.h"
+#include "multilane_test_utilities/fixtures.h"
 
-namespace drake {
 namespace maliput {
 namespace routing {
 
@@ -223,4 +222,3 @@ TEST_F(MultiBranchBasedTest, DeriveLaneSRoutesTest) {
 
 }  // namespace routing
 }  // namespace maliput
-}  // namespace drake

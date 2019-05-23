@@ -1,13 +1,12 @@
-#include "drake/automotive/maliput/dragway/test_utilities/fixtures.h"
+#include "dragway_test_utilities/fixtures.h"
 
 #include <limits>
 
-#include "drake/automotive/maliput/dragway/road_geometry.h"
+#include "dragway/road_geometry.h"
 
-using drake::maliput::api::GeoPosition;
-using drake::maliput::api::RoadGeometryId;
+using maliput::api::GeoPosition;
+using maliput::api::RoadGeometryId;
 
-namespace drake {
 namespace maliput {
 namespace dragway {
 
@@ -38,4 +37,3 @@ void DragwayBasedTest::SetUp() {
 
 }  // namespace dragway
 }  // namespace maliput
-}  // namespace drake

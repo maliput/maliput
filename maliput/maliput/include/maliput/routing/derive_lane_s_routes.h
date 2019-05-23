@@ -2,10 +2,9 @@
 
 #include <vector>
 
-#include "drake/automotive/maliput/api/lane_data.h"
-#include "drake/automotive/maliput/api/rules/regions.h"
+#include "maliput/api/lane_data.h"
+#include "maliput/api/rules/regions.h"
 
-namespace drake {
 namespace maliput {
 namespace routing {
 
@@ -21,4 +20,3 @@ std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
 
 }  // namespace routing
 }  // namespace maliput
-}  // namespace drake

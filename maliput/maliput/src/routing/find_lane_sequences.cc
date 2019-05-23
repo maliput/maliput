@@ -1,13 +1,12 @@
-#include "drake/automotive/maliput/routing/find_lane_sequences.h"
+#include "maliput/routing/find_lane_sequences.h"
 
-#include "drake/automotive/maliput/api/branch_point.h"
-#include "drake/automotive/maliput/api/lane_data.h"
+#include "maliput/api/branch_point.h"
+#include "maliput/api/lane_data.h"
 
-using drake::maliput::api::Lane;
-using drake::maliput::api::LaneEnd;
-using drake::maliput::api::LaneEndSet;
+using maliput::api::Lane;
+using maliput::api::LaneEnd;
+using maliput::api::LaneEndSet;
 
-namespace drake {
 namespace maliput {
 namespace routing {
 namespace {
@@ -69,4 +68,3 @@ std::vector<std::vector<const Lane*>> FindLaneSequences(const Lane* start,
 
 }  // namespace routing
 }  // namespace maliput
-}  // namespace drake
