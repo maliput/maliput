@@ -21,7 +21,7 @@
 #include "maliput/test_utilities/maliput_types_compare.h"
 #include "multilane/builder.h"
 #include "multilane/connection.h"
-#include "../test_utilities/multilane_types_compare.h"
+#include "multilane_test_utilities/multilane_types_compare.h"
 
 using ::testing::_;
 using ::testing::An;

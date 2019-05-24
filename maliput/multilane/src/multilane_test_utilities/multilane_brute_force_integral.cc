@@ -1,4 +1,4 @@
-#include "multilane_brute_force_integral.h"
+#include "multilane_test_utilities/multilane_brute_force_integral.h"
 
 #include <algorithm>
 #include <cmath>

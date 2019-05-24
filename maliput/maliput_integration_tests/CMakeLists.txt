@@ -16,6 +16,7 @@ find_package(ament_cmake REQUIRED)
 find_package(drake_vendor REQUIRED)
 find_package(maliput REQUIRED)
 find_package(multilane REQUIRED)
+find_package(dragway REQUIRED)
 
 ##############################################################################
 # Tests

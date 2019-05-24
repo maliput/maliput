@@ -11,7 +11,7 @@
 #include "multilane/arc_road_curve.h"
 #include "multilane/cubic_polynomial.h"
 #include "multilane/line_road_curve.h"
-#include "../test_utilities/multilane_types_compare.h"
+#include "multilane_test_utilities/multilane_types_compare.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 
 namespace maliput {

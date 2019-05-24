@@ -13,7 +13,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/test_utilities/check_id_indexing.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
-#include "../test_utilities/multilane_types_compare.h"
+#include "multilane_test_utilities/multilane_types_compare.h"
 #include "drake/common/drake_copyable.h"
 
 namespace maliput {
