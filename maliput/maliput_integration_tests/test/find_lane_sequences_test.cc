@@ -15,8 +15,6 @@
 #include "multilane/loader.h"
 #include "multilane_test_utilities/fixtures.h"
 
-constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
-
 namespace maliput {
 namespace routing {
 
@@ -56,6 +54,8 @@ void CheckSequences(const std::vector<std::vector<const Lane*>>& sequences,
 }
 
 }  // namespace
+
+constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 
 TEST_F(DragwayBasedTest, FindLaneSequencesChangeLanes) {
   CheckSequences(FindLaneSequences(center_lane_, left_lane_, kLength), {});

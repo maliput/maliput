@@ -1,10 +1,11 @@
 #include "maliput/routing/derive_lane_s_routes.h"
 
+#include "drake/common/drake_assert.h"
+#include "drake/common/drake_optional.h"
+
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/routing/find_lane_sequences.h"
-#include "drake/common/drake_assert.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace routing {

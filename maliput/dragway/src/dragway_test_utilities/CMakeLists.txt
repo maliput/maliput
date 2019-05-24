@@ -20,7 +20,6 @@ install(
     EXPORT ${PROJECT_NAME}-targets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
-    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 ament_export_libraries(dragway_test_utilities)

@@ -12,10 +12,10 @@ using maliput::api::LaneId;
 using maliput::multilane::BuilderFactory;
 using maliput::multilane::LoadFile;
 
-constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
-
 namespace maliput {
 namespace multilane {
+
+constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 
 BranchAndMergeBasedTest::BranchAndMergeBasedTest()
     : road_geometry_(
