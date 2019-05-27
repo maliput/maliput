@@ -299,14 +299,21 @@ void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
 
 
 // Calculates an appropriate grid-unit size for @p lane.
-double PickGridUnit(const api::Lane* lane,
-                    double max_size, double min_resolution) {
+double PickGridUnit(const api::Lane* lane, double max_size,
+                    double min_resolution, double linear_tolerance) {
   double result = max_size;
+
   const api::RBounds rb0 = lane->lane_bounds(0.);
+  const double width0 = std::max(rb0.max() - rb0.min(), linear_tolerance);
+
   const api::RBounds rb1 = lane->lane_bounds(lane->length());
-  result = std::min(result, (rb0.max() - rb0.min()) / min_resolution);
-  result = std::min(result, (rb1.max() - rb1.min()) / min_resolution);
-  result = std::min(result, lane->length() / min_resolution);
+  const double width1 = std::max(rb1.max() - rb1.min(), linear_tolerance);
+
+  const double length = std::max(lane->length(), linear_tolerance);
+
+  result = std::min(result, width0 / min_resolution);
+  result = std::min(result, width1 / min_resolution);
+  result = std::min(result, length / min_resolution);
   return result;
 }
 
@@ -464,9 +471,12 @@ void RenderSegment(const api::Segment* segment,
                    GeoMesh* lane_mesh,
                    GeoMesh* marker_mesh,
                    GeoMesh* h_bounds_mesh) {
+  const double linear_tolerance =
+      segment->junction()->road_geometry()->linear_tolerance();
+
   const double base_grid_unit = PickGridUnit(
-      segment->lane(0), features.max_grid_unit,
-      features.min_grid_resolution);
+      segment->lane(0), features.max_grid_unit, features.min_grid_resolution,
+      linear_tolerance);
   {
     // Lane 0 should be as good as any other for driveable-bounds.
     GeoMesh driveable_mesh;
@@ -498,9 +508,9 @@ void RenderSegment(const api::Segment* segment,
   }
   for (int li = 0; li < segment->num_lanes(); ++li) {
     const api::Lane* lane = segment->lane(li);
-    const double grid_unit = PickGridUnit(lane,
-                                          features.max_grid_unit,
-                                          features.min_grid_resolution);
+    const double grid_unit = PickGridUnit(
+        lane, features.max_grid_unit, features.min_grid_resolution,
+        linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
       CoverLaneWithQuads(&haze_mesh, lane, grid_unit,
