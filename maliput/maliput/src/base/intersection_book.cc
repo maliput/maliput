@@ -28,6 +28,16 @@ class IntersectionBook::Impl {
     }
   }
 
+  std::vector<Intersection*> DoGetIntersections() const {
+    std::vector<Intersection*> intersections;
+    auto it = book_.begin();
+    while(it != book_.end()) {
+      intersections.push_back(it->second.get());
+      it++;
+    }
+    return intersections;
+  }
+
   Intersection* DoGetIntersection(const Intersection::Id& id) const {
     auto it = book_.find(id);
     if (it == book_.end()) {
@@ -47,6 +57,10 @@ IntersectionBook::~IntersectionBook() = default;
 void IntersectionBook::AddIntersection(
     std::unique_ptr<api::Intersection> intersection) {
   impl_->AddIntersection(std::move(intersection));
+}
+
+std::vector<Intersection*> IntersectionBook::DoGetIntersections() {
+  return impl_->DoGetIntersections();
 }
 
 Intersection* IntersectionBook::DoGetIntersection(const Intersection::Id& id) {
