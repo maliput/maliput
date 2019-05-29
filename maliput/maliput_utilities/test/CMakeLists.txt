@@ -1,4 +1,5 @@
 find_package(ament_cmake_gtest REQUIRED)
+find_package(ament_cmake_pytest REQUIRED)
 
 set(TEST_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -7,6 +8,7 @@ ament_add_gtest(generate_string_test generate_string_test.cc WORKING_DIRECTORY $
 ament_add_gtest(generate_urdf_test generate_urdf_test.cc WORKING_DIRECTORY ${TEST_PATH})
 ament_add_gtest(mesh_simplification_test mesh_simplification_test.cc WORKING_DIRECTORY ${TEST_PATH})
 ament_add_gtest(segment_analysis_test segment_analysis_test.cc WORKING_DIRECTORY ${TEST_PATH})
+ament_add_pytest_test(yaml_to_obj_test yaml_to_obj_test.py WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin TIMEOUT 360)
 
 macro(add_dependencies_to_test target)
     if (TARGET ${target})

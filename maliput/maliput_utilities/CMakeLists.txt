@@ -16,6 +16,8 @@ find_package(ament_cmake REQUIRED)
 find_package(drake_vendor REQUIRED)
 find_package(maliput REQUIRED)
 find_package(multilane REQUIRED)
+find_package(yaml-cpp REQUIRED)
+find_package(gflags REQUIRED)
 
 ##############################################################################
 # Project Configuration
@@ -57,5 +59,6 @@ ament_export_dependencies(ament_cmake)
 ament_export_dependencies(drake)
 ament_export_dependencies(maliput)
 ament_export_dependencies(multilane)
+ament_export_dependencies(yaml-cpp)
 ament_export_interfaces(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 ament_package()

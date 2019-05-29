@@ -7,8 +7,7 @@ set(SOURCES
   generate_string.cc
   generate_urdf.cc
   mesh_simplification.cc
-  segment_analysis.cc
-  yaml_to_obj.cc)
+  segment_analysis.cc)
 
 add_library(maliput-utilities ${SOURCES})
 
@@ -24,9 +23,20 @@ ament_target_dependencies(maliput-utilities
 )
 
 target_link_libraries(maliput-utilities
-    gflags
     multilane::multilane
     maliput::api
+    drake::drake
+)
+
+add_executable(yaml_to_obj
+  yaml_to_obj.cc)
+
+target_link_libraries(yaml_to_obj
+  PRIVATE
+    yaml-cpp
+    gflags
+    multilane::multilane
+    maliput-utilities
     drake::drake
 )
 
@@ -40,6 +50,12 @@ install(
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+install(TARGETS yaml_to_obj
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
 )
 
 ament_export_libraries(maliput-utilities)

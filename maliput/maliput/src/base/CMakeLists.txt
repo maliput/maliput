@@ -26,7 +26,8 @@ target_include_directories(base
 target_link_libraries(base
   PUBLIC
     api
-    drake::drake)
+    drake::drake
+    yaml-cpp)
 
 ##############################################################################
 # Tests

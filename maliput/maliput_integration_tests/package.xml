@@ -13,7 +13,6 @@
   <depend>maliput</depend>
   <depend>multilane</depend>
   <depend>dragway</depend>
-  <depend>yaml-cpp</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
