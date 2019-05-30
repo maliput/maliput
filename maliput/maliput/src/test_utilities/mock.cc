@@ -174,6 +174,11 @@ class MockIntersectionBook final : public IntersectionBook {
                       rules::PhaseRing::Id("MockRing")) {}
 
  private:
+  std::vector<api::Intersection*> DoGetIntersections() {
+    std::vector<api::Intersection*> result(1, &intersection_);
+    return result;
+  }
+
   api::Intersection* DoGetIntersection(const api::Intersection::Id& id) {
     if (id == intersection_.id()) {
       return &intersection_;

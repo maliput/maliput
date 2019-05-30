@@ -24,6 +24,8 @@ class IntersectionBook : public api::IntersectionBook {
   void AddIntersection(std::unique_ptr<api::Intersection> intersection);
 
  private:
+  std::vector<api::Intersection*> DoGetIntersections() override;
+
   api::Intersection* DoGetIntersection(const api::Intersection::Id& id)
       override;
 

@@ -65,6 +65,7 @@ TEST_F(TestLoading2x2IntersectionIntersectionBook, LoadFromFile) {
   std::unique_ptr<api::IntersectionBook> book = LoadIntersectionBookFromFile(
       filepath_, *rulebook_, *ring_book_, &phase_provider);
   EXPECT_NE(book, nullptr);
+  EXPECT_EQ(int(book->GetIntersections().size()), 1);
   EXPECT_EQ(book->GetIntersection(Intersection::Id("unknown")), nullptr);
   Intersection* intersection =
       book->GetIntersection(Intersection::Id("2x2Intersection"));
