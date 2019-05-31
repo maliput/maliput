@@ -1,6 +1,6 @@
 #!/bin/sh
 # The setup script for Multilane.
-INSTALL_PREFIX=/home/brian/test_stuff/install/multilane
+INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@
 
 # A function to add a new item (needle) to the passed environment variable, only
 # if the new item is not already in the environment variable.  The function
