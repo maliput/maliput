@@ -8,6 +8,7 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/speed_limit_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "drake/common/drake_copyable.h"
 
 namespace maliput {
@@ -59,6 +60,28 @@ class ManualRulebook : public api::rules::RoadRulebook {
   /// @throws std::runtime_error if no such rule exists.
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id);
 
+  /// Adds a new RuleBase.
+  ///
+  /// @throws std::runtime_error if a rule with the same ID already exists
+  /// in the ManualRulebook.
+  void AddRule(std::unique_ptr<api::rules::RuleBase> rule);
+
+  /// Removes the RuleBase labeled by `id`.
+  ///
+  /// @throws std::runtime_error if no such rule exists.
+  void RemoveRule(const api::rules::RuleBase::Id& id);
+
+  /// Adds a new RuleGroup.
+  ///
+  /// @throws std::runtime_error if a rule group with the same ID already exists
+  /// in the ManualRulebook.
+  void AddRuleGroup(std::unique_ptr<api::rules::RuleGroup> rule_group);
+
+  /// Removes the RuleGroup labeled by `id`.
+  ///
+  /// @throws std::runtime_error if no such rule group exists.
+  void RemoveRuleGroup(const api::rules::RuleGroup::Id& id);
+
  private:
   api::rules::RoadRulebook::QueryResults DoFindRules(
       const std::vector<api::rules::LaneSRange>& ranges,
@@ -69,6 +92,11 @@ class ManualRulebook : public api::rules::RoadRulebook {
       const api::rules::SpeedLimitRule::Id& id) const override;
   api::rules::DirectionUsageRule DoGetRule(
       const api::rules::DirectionUsageRule::Id& id) const override;
+
+  api::rules::RuleBase* DoGetRule(
+      const api::rules::RuleBase::Id& id) const override;
+  api::rules::RuleGroup* DoGetRuleGroup(
+      const api::rules::RuleGroup::Id& id) const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

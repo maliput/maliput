@@ -6,6 +6,7 @@
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_throw.h"
 
@@ -33,6 +34,8 @@ class RoadRulebook {
     std::vector<RightOfWayRule> right_of_way;
     std::vector<SpeedLimitRule> speed_limit;
     std::vector<rules::DirectionUsageRule> direction_usage;
+    std::vector<rules::RuleBase*> rule;
+    std::vector<rules::RuleGroup*> rule_group;
   };
 
   /// Returns a QueryResults structure which contains any rules which are
@@ -72,6 +75,21 @@ class RoadRulebook {
     return DoGetRule(id);
   }
 
+  /// Returns the RuleBase with the specified `id`.
+  ///
+  /// @throws std::out_of_range if `id` is unknown.
+  RuleBase* GetRule(const RuleBase::Id& id) const {
+    return DoGetRule(id);
+  }
+
+
+  /// Returns the RuleGroup with the specified `id`.
+  ///
+  /// @throws std::out_of_range if `id` is unknown.
+  RuleGroup* GetRuleGroup(const RuleGroup::Id& id) const {
+    return DoGetRuleGroup(id);
+  }
+
  protected:
   RoadRulebook() = default;
 
@@ -86,6 +104,9 @@ class RoadRulebook {
   virtual SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const = 0;
   virtual DirectionUsageRule DoGetRule(
     const DirectionUsageRule::Id& id) const = 0;
+
+  virtual RuleBase* DoGetRule(const RuleBase::Id& id) const = 0;
+  virtual RuleGroup* DoGetRuleGroup(const RuleGroup::Id& id) const = 0;
   //@}
 };
 

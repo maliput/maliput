@@ -3,12 +3,17 @@
 /* clang-format on */
 // TODO(maddog@tri.global) Satisfy clang-format via rules tests directory reorg.
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "drake/common/drake_throw.h"
 
 namespace maliput {
@@ -18,8 +23,51 @@ namespace {
 
 // This class does not provide any semblance of useful functionality.
 // It merely exercises the RoadRulebook abstract interface.
+class MockRuleStateType : public RuleStateType {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRuleStateType)
+
+  const int kMockValue{123};
+  const static std::string kMockString;
+
+  static std::unique_ptr<MockRuleStateType> Mock();
+
+ private:
+  MockRuleStateType() : RuleStateType(kMockValue, kMockString) {}
+};
+
+const std::string MockRuleStateType::kMockString{"mock_rule_state_type"};
+
+std::unique_ptr<MockRuleStateType> MockRuleStateType::Mock() {
+  return std::unique_ptr<MockRuleStateType>(new MockRuleStateType());
+}
+
+// This class does not provide any semblance of useful functionality.
+// It merely exercises the RoadRulebook abstract interface.
 class MockRulebook : public RoadRulebook {
  public:
+  MockRulebook() : RoadRulebook() {
+    std::vector<std::unique_ptr<RuleState>> states;
+    states.push_back(std::make_unique<RuleState>(
+        RuleState::Id("rs_id"), RuleState::Severity::kPreferred,
+        MockRuleStateType::Mock()));
+
+    mock_rule = std::make_unique<RuleBase>(
+        RuleBase::Id("r_id"), kZone, RuleBase::RuleTypeId("r_type"),
+        std::move(states));
+
+    std::vector<std::unique_ptr<RuleBase>> rules;
+    states.clear();
+    states.push_back(std::make_unique<RuleState>(
+        RuleState::Id("rs_id"), RuleState::Severity::kPreferred,
+        MockRuleStateType::Mock()));
+    rules.push_back(std::make_unique<RuleBase>(
+        RuleBase::Id("r_id"), kZone, RuleBase::RuleTypeId("r_type"),
+        std::move(states)));
+    mock_rule_group =
+        std::make_unique<RuleGroup>(RuleGroup::Id("rg_id"), std::move(rules));
+  }
+
   const LaneSRange kZone{LaneId("some_lane"), {10., 20.}};
   const RightOfWayRule kRightOfWay{
     RightOfWayRule::Id("rowr_id"),
@@ -38,6 +86,9 @@ class MockRulebook : public RoadRulebook {
       DirectionUsageRule::State::Id("dur_state"),
       DirectionUsageRule::State::Type::kWithS,
       DirectionUsageRule::State::Severity::kPreferred)}};
+
+  std::unique_ptr<RuleBase> mock_rule;
+  std::unique_ptr<RuleGroup> mock_rule_group;
 
  private:
   virtual QueryResults DoFindRules(
@@ -74,6 +125,20 @@ class MockRulebook : public RoadRulebook {
     }
     return kDirectionUsage;
   }
+
+  virtual RuleBase* DoGetRule(const RuleBase::Id& id) const {
+    if (id != mock_rule->id()) {
+      throw std::out_of_range("");
+    }
+    return mock_rule.get();
+  }
+
+  virtual RuleGroup* DoGetRuleGroup(const RuleGroup::Id& id) const {
+    if (id != mock_rule_group->id()) {
+      throw std::out_of_range("");
+    }
+    return mock_rule_group.get();
+  }
 };
 
 
@@ -106,6 +171,12 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
                         dut.kDirectionUsage.id());
   EXPECT_THROW(dut.GetRule(DirectionUsageRule::Id("xxx")),
                            std::out_of_range);
+
+  EXPECT_EQ(dut.GetRule(dut.mock_rule->id())->id(), dut.mock_rule->id());
+  EXPECT_THROW(dut.GetRule(RuleBase::Id("xxx")), std::out_of_range);
+  EXPECT_EQ(dut.GetRuleGroup(dut.mock_rule_group->id())->id(),
+            dut.mock_rule_group->id());
+  EXPECT_THROW(dut.GetRuleGroup(RuleGroup::Id("xxx")), std::out_of_range);
 }
 
 

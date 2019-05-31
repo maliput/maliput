@@ -1,6 +1,7 @@
 #include "maliput/test_utilities/mock.h"
 
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "maliput/api/branch_point.h"
@@ -25,6 +26,10 @@ using rules::PhaseRing;
 using rules::RightOfWayRule;
 using rules::SpeedLimitRule;
 using rules::TrafficLight;
+using rules::RuleBase;
+using rules::RuleGroup;
+using rules::RuleState;
+using rules::RuleStateType;
 
 class MockIdIndex final : public RoadGeometry::IdIndex {
  public:
@@ -196,17 +201,29 @@ class MockRoadRulebook final : public rules::RoadRulebook {
     return {{}, {}};
   }
   RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override {
-    return Rule();
+    return MockRule();
   }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override {
     return SpeedLimitRule(rules::SpeedLimitRule::Id("some_id"),
                           CreateLaneSRange(),
                           rules::SpeedLimitRule::Severity::kStrict, 33., 77.);
   }
-
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override {
     return CreateDirectionUsageRule();
   }
+  RuleBase* DoGetRule(const RuleBase::Id&) const override {
+    auto rule = CreateCustomRule();
+    rules_.push_back(std::move(rule));
+    return rules_.back().get();
+  }
+  RuleGroup* DoGetRuleGroup(const RuleGroup::Id&) const override {
+    auto rule_group = CreateCustomRuleGroup();
+    rule_groups_.push_back(std::move(rule_group));
+    return rule_groups_.back().get();
+  }
+
+  mutable std::vector<std::unique_ptr<RuleBase>> rules_;
+  mutable std::vector<std::unique_ptr<RuleGroup>> rule_groups_;
 };
 
 class MockTrafficLightBook final : public rules::TrafficLightBook {
@@ -332,7 +349,7 @@ RightOfWayRule::State YieldState() {
                                RightOfWayRule::State::Type::kGo, YieldGroup2());
 }
 
-RightOfWayRule Rule() {
+RightOfWayRule MockRule() {
   return RightOfWayRule(RightOfWayRule::Id("mock_id"), CreateLaneSRoute(),
                         RightOfWayRule::ZoneType::kStopExcluded,
                         {NoYieldState(), YieldState()});
@@ -349,6 +366,58 @@ DirectionUsageRule CreateDirectionUsageRule() {
   return DirectionUsageRule(DirectionUsageRule::Id("dur_id"),
                             CreateLaneSRange(),
                             {CreateDirectionUsageRuleState()});
+}
+
+namespace {
+
+class MockRuleStateType : public RuleStateType {
+ public:
+  const int kMockValue{123};
+  const std::string kMockSting{"mock_rule_state_type"};
+
+  static std::unique_ptr<RuleStateType> Mock();
+
+ private:
+  MockRuleStateType() : RuleStateType(kMockValue, kMockSting) {}
+};
+
+std::unique_ptr<RuleStateType> MockRuleStateType::Mock() {
+  return std::unique_ptr<RuleStateType>(new MockRuleStateType());
+}
+
+} // namespace
+
+std::unique_ptr<RuleState> CreateCustomRuleState() {
+  return std::make_unique<RuleState>(
+      RuleState::Id("us_id"), RuleState::Severity::kStrict,
+      MockRuleStateType::Mock());
+}
+
+std::unique_ptr<RuleBase> CreateCustomRule() {
+  std::vector<std::unique_ptr<RuleState>> states;
+  states.push_back(CreateCustomRuleState());
+
+  return std::make_unique<RuleBase>(
+      RuleBase::Id("ru_id"), CreateLaneSRange(),
+      RuleBase::RuleTypeId("ru_type"), std::move(states));
+}
+
+std::unique_ptr<RuleGroup> CreateCustomRuleGroup() {
+  std::vector<std::unique_ptr<RuleBase>> rules;
+
+  std::vector<std::unique_ptr<RuleState>> states;
+  states.push_back(CreateCustomRuleState());
+  rules.push_back(std::make_unique<RuleBase>(
+      RuleBase::Id("ru_id_a"), CreateLaneSRange(),
+      RuleBase::RuleTypeId("ru_type_a"), std::move(states)));
+
+  states.clear();
+  states.push_back(CreateCustomRuleState());
+  rules.push_back(std::make_unique<RuleBase>(
+      RuleBase::Id("ru_id_b"), CreateLaneSRange(),
+      RuleBase::RuleTypeId("ru_type_b"), std::move(states)));
+
+  return std::make_unique<RuleGroup>(RuleGroup::Id("rg_id"), std::move(rules));
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {

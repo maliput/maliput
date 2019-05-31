@@ -11,8 +11,10 @@
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/rule_state_provider.h"
 #include "maliput/api/rules/traffic_light_book.h"
+
 
 namespace maliput {
 namespace api {
@@ -34,13 +36,22 @@ rules::RightOfWayRule::State NoYieldState();
 rules::RightOfWayRule::State YieldState();
 
 /// Returns a rules::RightOfWayRule containing arbitrary state.
-rules::RightOfWayRule Rule();
+rules::RightOfWayRule MockRule();
 
 /// Returns a rules::DirectionUsageRule::State containing an arbitrary state.
 rules::DirectionUsageRule::State CreateDirectionUsageRuleState();
 
 /// Returns a rules::DirectionUsageRule containing an arbitrary state.
 rules::DirectionUsageRule CreateDirectionUsageRule();
+
+/// Returns a rules::RuleState containing an arbitrary state.
+std::unique_ptr<rules::RuleState> CreateCustomRuleState();
+
+/// Returns a rules::Rule containing an arbitrary state.
+std::unique_ptr<rules::RuleBase> CreateCustomRule();
+
+/// Returns a rules::RuleGroup containing an arbitrary couple of rules.
+std::unique_ptr<rules::RuleGroup> CreateCustomRuleGroup();
 
 /// Returns an arbitrary RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateRoadGeometry();
