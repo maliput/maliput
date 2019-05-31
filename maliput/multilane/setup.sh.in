@@ -47,3 +47,6 @@ EOF
 # Path to various resources used by shell/python scripts and demos
 #   e.g. configuration files, protos, road geometries
 add_if_not_in_var MULTILANE_RESOURCE_ROOT $INSTALL_PREFIX/share/multilane
+
+echo ">>>>>>>>>> SOURCING MULTILANE"
+echo | printenv
