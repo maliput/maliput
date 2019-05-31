@@ -29,6 +29,12 @@ ament_target_dependencies(multilane
   "drake"
 )
 
+target_link_libraries(multilane
+  maliput::api
+  drake::drake
+  yaml-cpp
+)
+
 ##############################################################################
 # Export
 ##############################################################################
