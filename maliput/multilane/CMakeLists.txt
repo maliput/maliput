@@ -4,7 +4,6 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(multilane LANGUAGES C CXX VERSION 3.0.0)
-option(BUILD_TESTS "Build test programs" OFF)
 
 ##############################################################################
 # Find 3rd Party Packages
@@ -33,7 +32,7 @@ add_subdirectory(resources)
 # Tests
 ##############################################################################
 
-if(BUILD_TESTS)
+if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(test)
 endif()
@@ -42,7 +41,7 @@ endif()
 # Export
 ##############################################################################
 
-ament_environment_hooks(setup.bash.in)
+ament_environment_hooks(setup.sh.in)
 
 install(
   DIRECTORY include/

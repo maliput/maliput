@@ -4,7 +4,6 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(maliput-utilities LANGUAGES C CXX VERSION 3.0.0)
-option(BUILD_TESTS "Build test programs" OFF)
 
 ##############################################################################
 # Find 3rd Party Packages
@@ -39,7 +38,7 @@ add_subdirectory(src)
 ##############################################################################
 
 # We always enable tests (that might change in the future)
-if(BUILD_TESTS)
+if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(test)
 endif()

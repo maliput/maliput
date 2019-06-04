@@ -15,7 +15,7 @@ node('delphyne-linux-bionic-unprovisioned') {
         stage('checkout_index') {
           sh 'src/maliput/ci/jenkins/checkout_index'
         }
-        withEnv(['COLCON_BUILD_EXTRA_ARGS=--cmake-args -DBUILD_TESTS=ON --packages-up-to dragway maliput-integration-tests',
+        withEnv(['COLCON_BUILD_EXTRA_ARGS=--packages-up-to dragway maliput-integration-tests',
                  'COLCON_TEST_EXTRA_ARGS=--packages-up-to dragway maliput-integration-tests']) {
           load './index/ci/jenkins/pipeline.groovy'
         }
