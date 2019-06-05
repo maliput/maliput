@@ -183,6 +183,7 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
   const int num_units = std::max(max_num_s_units,
                                  std::max(max_num_rl_units,
                                           max_num_rr_units));
+
   DRAKE_DEMAND(num_units >= 1);
   const double s_unit = s_size / num_units;
   const double rl_unit = rl_size / num_units;
@@ -269,6 +270,9 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
 // Marks the start and finish ends of @p lane with arrows, rendered into
 // @p mesh.
 //
+// When the arrow length is smaller than the linear tolerance or it starts /
+// ends outside lane boundaries, it is omitted.
+//
 // @param mesh  the GeoMesh which will receive the arrows
 // @param lane  the api::Lane to provide the surface
 // @param grid_unit  size of each quad (length of edge in s and r dimensions)
@@ -290,11 +294,17 @@ void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
   const double finish_s_size = std::min(max_length,
                                         (finish_rb.max() - finish_rb.min()));
 
-  DrawLaneArrow(mesh, lane, grid_unit,
-                0. + nudge, start_s_size, h_offset);
-  DrawLaneArrow(mesh, lane, grid_unit,
-                lane->length() - finish_s_size - nudge, finish_s_size,
-                h_offset);
+  // Avoid drawing the arrows when its length is shorter than nudge or it would
+  // start / end outside lane boundaries.
+  if (nudge + start_s_size < lane->length() && start_s_size > nudge) {
+    DrawLaneArrow(mesh, lane, grid_unit,
+                  0. + nudge, start_s_size, h_offset);
+  }
+  if (lane->length() - nudge - finish_s_size > 0. && finish_s_size > nudge) {
+    DrawLaneArrow(mesh, lane, grid_unit,
+                  lane->length() - finish_s_size - nudge, finish_s_size,
+                  h_offset);
+  }
 }
 
 
