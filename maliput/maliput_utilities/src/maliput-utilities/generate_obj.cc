@@ -309,6 +309,15 @@ void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
 
 
 // Calculates an appropriate grid-unit size for @p lane.
+//
+// Grid size will be the smaller between:
+// - Initial lane width divided by @p min_resolution.
+// - Final lane width divided by @p min_resolution.
+// - @p lane's length divided by @p min_resolution.
+//
+// However, the returned grid will never be smaller than @p linear_tolerance.
+// Note that @p max_size would be the maximum possible grid unit every time it
+// it is bigger than @p linear_tolerance.
 double PickGridUnit(const api::Lane* lane, double max_size,
                     double min_resolution, double linear_tolerance) {
   double result = max_size;
@@ -324,6 +333,9 @@ double PickGridUnit(const api::Lane* lane, double max_size,
   result = std::min(result, width0 / min_resolution);
   result = std::min(result, width1 / min_resolution);
   result = std::min(result, length / min_resolution);
+  // Grid unit should not be less than linear_tolerance.
+  result = std::max(result, linear_tolerance);
+
   return result;
 }
 
@@ -576,6 +588,9 @@ void GenerateObjFile(const api::RoadGeometry* rg,
   GeoMesh grayed_asphalt_mesh;
   GeoMesh grayed_lane_mesh;
   GeoMesh grayed_marker_mesh;
+
+  // TODO(agalbachicar)   Check features with respect to rg tolerance
+  //                      properties.
 
   // Walk the network.
   for (int ji = 0; ji < rg->num_junctions(); ++ji) {
