@@ -329,7 +329,7 @@ GTEST_TEST(UniqueBulbIdTest, Usage) {
   const BulbGroup::Id bulb_group_id(bulb_group_name);
   const Bulb::Id bulb_id(bulb_name);
 
-  const UniqueBulbId dut{traffic_light_id, bulb_group_id, bulb_id};
+  const UniqueBulbId dut(traffic_light_id, bulb_group_id, bulb_id);
 
   // A mismatch of just one internal ID results in the UniqueBulbId no longer
   // matching.
