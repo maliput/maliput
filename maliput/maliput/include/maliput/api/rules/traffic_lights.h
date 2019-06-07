@@ -302,6 +302,16 @@ class TrafficLight final {
 /// of the bulb's ID, the ID of the bulb group that contains the bulb, and the
 /// the ID of the traffic light that contains the bulb group.
 struct UniqueBulbId {
+
+  /// Constructs a UniqueBulbId.
+  UniqueBulbId(const TrafficLight::Id& traffic_light_id_in,
+               const BulbGroup::Id& bulb_group_id_in,
+               const Bulb::Id& bulb_id_in)
+      : traffic_light_id(traffic_light_id_in),
+        bulb_group_id(bulb_group_id_in),
+        bulb_id(bulb_id_in) {
+  }
+
   /// Returns the string representation of the %TypeSpecificIdentifier.
   const std::string to_string() const {
     return traffic_light_id.string() + "-" + bulb_group_id.string() + "-" +
