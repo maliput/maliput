@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e pipefail
+
+source prereqs.lib
+
+prereqs.init 'The Maliput source distribution prerequisite setup script'
+
+declare -A DISTRO_MAP
+DISTRO_MAP[bionic]=crystal
+DISTRO_MAP[xenial]=bouncy
+DISTRO=${DISTRO_MAP[$(lsb_release -sc)]}
+
+ASSERT_MSG="Unknown ROS distro, maybe not on an Ubuntu box?" prereqs.assert [ ! -z "$DISTRO" ]
+
+if prereqs.tag_applies "default|all"; then
+    prereqs.assert_sudo
+
+    prereqs.install_apt_repo ros2-latest
+
+    prereqs.apt update
+
+    prereqs.apt install --no-install-recommends \
+                ros-$DISTRO-ament-cmake \
+                libpython3-dev
+
+    if ! grep -q "^source /opt/ros/$DISTRO/setup.bash" ~/.bashrc; then
+        cat >> ~/.bashrc <<< "source /opt/ros/$DISTRO/setup.bash"
+    fi
+    if ! grep -q "^export ROS_DISTRO=" ~/.bashrc; then
+        cat >> ~/.bashrc <<< "export ROS_DISTRO=$DISTRO"
+    fi
+fi
+
+prereqs.done
