@@ -32,19 +32,6 @@ RoadNetwork::RoadNetwork(
   DRAKE_THROW_UNLESS(phase_ring_book_.get() != nullptr);
   DRAKE_THROW_UNLESS(rule_state_provider_.get() != nullptr);
   DRAKE_THROW_UNLESS(phase_provider_.get() != nullptr);
-
-  // Confirms full DirectionUsageRule coverage. Currently, this is determined by
-  // verifying that each Lane within the RoadGeometry has an associated
-  // DirectionUsageRule. In the future, this check could be made even more
-  // rigorous by confirming that the union of all DirectionUsageRule zones
-  // covers the whole RoadGeometry.
-  const auto& lanes_map = road_geometry_->ById().GetLanes();
-  for (const auto& lane_map : lanes_map) {
-    const LaneId lane_id = lane_map.first;
-    const auto results =
-        rulebook_->FindRules({{lane_id, {0.0, lane_map.second->length()}}}, 0);
-    DRAKE_THROW_UNLESS(results.direction_usage.size() > 0);
-  }
 }
 
 }  // namespace api

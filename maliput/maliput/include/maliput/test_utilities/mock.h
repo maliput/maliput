@@ -45,6 +45,9 @@ rules::DirectionUsageRule CreateDirectionUsageRule();
 /// Returns an arbitrary RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateRoadGeometry();
 
+/// Returns an arbitrary one-lane RoadGeometry.
+std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry();
+
 /// Returns an arbitrary rules::RoadRulebook.
 std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook();
 
