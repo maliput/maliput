@@ -49,6 +49,96 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
   const std::unordered_map<LaneId, const Lane*> lane_map_;
 };
 
+class MockLane final : public Lane {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
+  MockLane() {}
+
+ private:
+  LaneId do_id() const override { return LaneId("mock"); };
+
+  const Segment* do_segment() const override { return nullptr; };
+
+  int do_index() const override { return 0; };
+
+  const Lane* do_to_left() const override { return nullptr; };
+
+  const Lane* do_to_right() const override { return nullptr; };
+
+  double do_length() const override { return 100; };
+
+  RBounds do_lane_bounds(double) const override { return RBounds(-1, 1); };
+
+  RBounds do_driveable_bounds(double) const override { return RBounds(-1, 1); };
+
+  HBounds do_elevation_bounds(double, double) const override {
+    return HBounds(0, 10);
+  };
+
+  GeoPosition DoToGeoPosition(const LanePosition&) const override {
+    return GeoPosition(0, 0, 0);
+  }
+
+  LanePosition DoToLanePosition(const GeoPosition&, GeoPosition*,
+                                double*) const override {
+    return LanePosition(0, 0, 0);
+  }
+
+  Rotation DoGetOrientation(const LanePosition&) const override {
+    return Rotation();
+  }
+
+  LanePosition DoEvalMotionDerivatives(const LanePosition&,
+                                       const IsoLaneVelocity&) const override {
+    return LanePosition(0, 0, 0);
+  }
+
+  const BranchPoint* DoGetBranchPoint(const LaneEnd::Which) const override {
+    return nullptr;
+  };
+
+  const LaneEndSet* DoGetConfluentBranches(
+      const LaneEnd::Which) const override {
+    return nullptr;
+  };
+
+  const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override {
+    return nullptr;
+  };
+
+  drake::optional<LaneEnd> DoGetDefaultBranch(
+      const LaneEnd::Which) const override {
+    return drake::nullopt;
+  };
+};
+
+class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockOneLaneIdIndex);
+  MockOneLaneIdIndex() {}
+
+ private:
+  const Lane* DoGetLane(const LaneId&) const override { &mock_lane_; }
+
+  const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override {
+    return lane_map_;
+  }
+
+  const Segment* DoGetSegment(const SegmentId&) const override {
+    return nullptr;
+  };
+  const Junction* DoGetJunction(const JunctionId&) const override {
+    return nullptr;
+  };
+  const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override {
+    return nullptr;
+  }
+
+  const MockLane mock_lane_;
+  const std::unordered_map<LaneId, const Lane*> lane_map_{
+      {LaneId("mock"), &mock_lane_}};
+};
+
 class MockRoadGeometry final : public RoadGeometry {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry)
@@ -69,6 +159,28 @@ class MockRoadGeometry final : public RoadGeometry {
   double do_angular_tolerance() const override { return 0; }
   double do_scale_length() const override { return 0; }
   MockIdIndex mock_id_index_;
+};
+
+class MockOneLaneRoadGeometry final : public RoadGeometry {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockOneLaneRoadGeometry)
+  MockOneLaneRoadGeometry() {}
+
+ private:
+  RoadGeometryId do_id() const override { return RoadGeometryId("mock"); }
+  int do_num_junctions() const override { return 1; }
+  const Junction* do_junction(int) const override { return nullptr; };
+  int do_num_branch_points() const override { return 1; }
+  const BranchPoint* do_branch_point(int) const override { return nullptr; }
+  const IdIndex& DoById() const override { return mock_id_index_; }
+  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*,
+                                GeoPosition*, double*) const override {
+    return RoadPosition();
+  }
+  double do_linear_tolerance() const override { return 0; }
+  double do_angular_tolerance() const override { return 0; }
+  double do_scale_length() const override { return 0; }
+  MockOneLaneIdIndex mock_id_index_;
 };
 
 class MockRoadRulebook final : public rules::RoadRulebook {
@@ -235,6 +347,10 @@ DirectionUsageRule CreateDirectionUsageRule() {
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
   return std::make_unique<MockRoadGeometry>();
+}
+
+std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry() {
+  return std::make_unique<MockOneLaneRoadGeometry>();
 }
 
 std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook() {

@@ -25,8 +25,9 @@ class RoadNetwork {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadNetwork)
 
-  /// Constructs an RoadNetwork instance. All parameters are required.
-  /// @p direction_usage_rules must cover the whole @p road_geometry.
+  /// Constructs a RoadNetwork instance. After creation, you are encouraged to
+  /// validate it using ValidateRoadNetwork(), which is defined in
+  /// maliput/api/road_network_validator.h.
   RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
               std::unique_ptr<const rules::RoadRulebook> rulebook,
               std::unique_ptr<const rules::TrafficLightBook> traffic_light_book,
