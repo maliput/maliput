@@ -2,8 +2,10 @@
 
 #include <vector>
 
+#include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "drake/common/drake_copyable.h"
@@ -32,8 +34,12 @@ class Intersection {
   ///
   /// @param ring_id The ID of the ring that defines the phases within the
   /// intersection.
+  ///
+  /// @param phase_ring_book The PhaseRingBook from which the PhaseRing with
+  /// ID @p ring_id can be obtained.
   Intersection(const Id& id, const std::vector<rules::LaneSRange>& region,
-               const rules::PhaseRing::Id& ring_id);
+               const rules::PhaseRing::Id& ring_id,
+               const rules::PhaseRingBook* phase_ring_book);
 
   virtual ~Intersection() = default;
 
@@ -52,13 +58,15 @@ class Intersection {
   /// this intersection. See constructor parameter @p ring_id for more details.
   const rules::PhaseRing::Id& ring_id() const { return ring_id_; }
 
-  // TODO(liang.fok) Add method for obtaining the current bulb states
+  /// Returns the current bulb states within the intersection.
+  const drake::optional<rules::BulbStates>& bulb_states() const;
 
   // TODO(liang.fok) Add method for obtaining the intersection's bounding box.
  private:
   const Id id_;
   const std::vector<rules::LaneSRange> region_;
   const rules::PhaseRing::Id ring_id_;
+  const rules::PhaseRingBook* phase_ring_book_{};
 };
 
 }  // namespace api
