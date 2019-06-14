@@ -36,7 +36,7 @@ class IntersectionTest : public ::testing::Test {
 TEST_F(IntersectionTest, BasicTest) {
   const Intersection::Id intersection_id("foo");
   ManualPhaseProvider phase_provider;
-  Intersection dut(intersection_id, ranges_, dummy_ring_.id(), &phase_provider);
+  Intersection dut(intersection_id, ranges_, dummy_ring_, &phase_provider);
   EXPECT_EQ(dut.id(), intersection_id);
   EXPECT_EQ(dut.Phase(), drake::nullopt);
   phase_provider.AddPhaseRing(dummy_ring_.id(), dummy_phase_1_.id());
@@ -46,6 +46,7 @@ TEST_F(IntersectionTest, BasicTest) {
   EXPECT_EQ(dut.region().size(), ranges_.size());
   EXPECT_EQ(dut.region().at(0).lane_id(), ranges_.at(0).lane_id());
   EXPECT_EQ(dut.ring_id(), dummy_ring_.id());
+  EXPECT_EQ(dut.bulb_states(), drake::nullopt);
 }
 
 }  // namespace

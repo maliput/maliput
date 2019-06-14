@@ -24,14 +24,13 @@ class Intersection : public api::Intersection {
   /// @param region The region of the road network that is part of the
   /// intersection.
   ///
-  /// @param ring_id The ID of the ring that defines the phases within the
-  /// intersection.
+  /// @param ring The PhaseRing that defines the phases within the intersection.
   ///
   /// @param phase_provider Enables the current phase within an
   /// api::rules::PhaseRing with ID @p ring_id to be specified and obtained. The
   /// pointer must remain valid throughout this class instance's lifetime.
   Intersection(const Id& id, const std::vector<api::rules::LaneSRange>& region,
-               const api::rules::PhaseRing::Id& ring_id,
+               const api::rules::PhaseRing& ring,
                ManualPhaseProvider* phase_provider);
 
   virtual ~Intersection() = default;
