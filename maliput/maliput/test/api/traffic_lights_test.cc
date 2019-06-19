@@ -320,6 +320,13 @@ TEST_F(TrafficLightTest, Assignment) {
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, traffic_light_));
 }
 
+GTEST_TEST(UniqueBulbIdTest, DefaultConstructor) {
+  const UniqueBulbId dut;
+  EXPECT_EQ(dut.traffic_light_id, TrafficLight::Id("default"));
+  EXPECT_EQ(dut.bulb_group_id, BulbGroup::Id("default"));
+  EXPECT_EQ(dut.bulb_id, Bulb::Id("default"));
+}
+
 GTEST_TEST(UniqueBulbIdTest, Usage) {
   const std::string traffic_light_name{"MyTrafficLight"};
   const std::string bulb_group_name{"MyBulbGroup"};
