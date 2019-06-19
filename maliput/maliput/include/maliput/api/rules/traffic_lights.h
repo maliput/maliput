@@ -302,6 +302,12 @@ class TrafficLight final {
 /// of the bulb's ID, the ID of the bulb group that contains the bulb, and the
 /// the ID of the traffic light that contains the bulb group.
 struct UniqueBulbId {
+  /// A default constructor. This was originally intended for use by
+  /// boost::python bindings in downstream projects.
+  UniqueBulbId()
+      : traffic_light_id(TrafficLight::Id("default")),
+        bulb_group_id(BulbGroup::Id("default")),
+        bulb_id(Bulb::Id("default")) {};
 
   /// Constructs a UniqueBulbId.
   UniqueBulbId(const TrafficLight::Id& traffic_light_id_in,
