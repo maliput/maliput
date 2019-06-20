@@ -258,7 +258,8 @@ class MockPhaseProvider final : public rules::PhaseProvider {
   MockPhaseProvider() {}
 
  private:
-  drake::optional<Result> DoGetPhase(const rules::PhaseRing::Id&) const override {
+  drake::optional<Result> DoGetPhase(
+      const rules::PhaseRing::Id&) const override {
     return drake::nullopt;
   }
 };
