@@ -8,10 +8,10 @@
 
 #include <gtest/gtest.h>
 
+#include "drake/common/drake_throw.h"
 
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/rule.h"
-#include "drake/common/drake_throw.h"
 
 using maliput::api::LaneId;
 using maliput::api::rules::LaneSRange;
@@ -29,12 +29,15 @@ namespace {
 
 // VehicleUsageType construction test.
 GTEST_TEST(VehicleUsageTypeTest, ConstructionTest) {
+  const std::string kVehiclesAllowed("kVehiclesAllowed");
+  const std::string kVehiclesNotAllowed("kVehiclesNotAllowed");
+
   auto vehicles_allowed_type = VehicleUsageType::VehiclesAllowed();
   auto vehicles_not_allowed_type = VehicleUsageType::VehiclesNotAllowed();
 
   EXPECT_NE(vehicles_allowed_type->value(), vehicles_not_allowed_type->value());
-  EXPECT_EQ(vehicles_allowed_type->string(), "kVehiclesAllowed");
-  EXPECT_EQ(vehicles_not_allowed_type->string(), "kVehiclesNotAllowed");
+  EXPECT_EQ(vehicles_allowed_type->string(), kVehiclesAllowed);
+  EXPECT_EQ(vehicles_not_allowed_type->string(), kVehiclesNotAllowed);
 }
 
 // VehicleUsageState construction test.

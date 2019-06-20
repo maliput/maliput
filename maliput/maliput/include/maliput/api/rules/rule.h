@@ -5,9 +5,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/type_specific_identifier.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -176,8 +177,7 @@ class RuleGroup {
   ///
   /// @param id is the unique ID of this group (in the RoadRulebook)
   /// @param rules is a non-empty vector with related rules.
-  /// @throws std::runtime_error when rules is empty, any rule is nullptr or it
-  ///         it cannot be
+  /// @throws std::runtime_error when `rules` is empty or any rule is nullptr.
   RuleGroup(const Id& id, std::vector<std::unique_ptr<RuleBase>> rules) :
       id_(id), rules_(std::move(rules)) {
     DRAKE_THROW_UNLESS(!rules_.empty());

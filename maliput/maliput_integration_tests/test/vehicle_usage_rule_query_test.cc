@@ -6,15 +6,12 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/lane.h"
+#include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/vehicle_motorization_rule.h"
 #include "maliput/api/rules/vehicle_usage_rule.h"
-
-#include "maliput/api/lane.h"
-#include "maliput/api/road_geometry.h"
-
 #include "maliput/base/manual_rulebook.h"
 
 #include "multilane/builder.h"
@@ -113,29 +110,27 @@ std::unique_ptr<RuleGroup> BuildBikeLaneRoadRuleGroupFor(
   DRAKE_DEMAND(rg != nullptr);
 
   std::vector<std::unique_ptr<RuleBase>> rules;
-  {
-    std::vector<std::unique_ptr<RuleState>> states;
-    states.push_back(std::make_unique<VehicleUsageState>(
-        RuleState::Id(std::string("vurs_") + lane_id.string()),
-        RuleState::Severity::kStrict,
-        VehicleUsageType::VehiclesAllowed()));
+  std::vector<std::unique_ptr<RuleState>> states;
 
-    rules.push_back(std::make_unique<VehicleUsageRule>(
-        RuleBase::Id(std::string("vur_") + lane_id.string()),
-        BuildLaneRangeFor(rg, lane_id),
-        std::move(states)));
-  }
-  {
-    std::vector<std::unique_ptr<RuleState>> states;
-    states.push_back(std::make_unique<VehicleMotorizationState>(
-        RuleState::Id(std::string("vmrs_") + lane_id.string()),
-        RuleState::Severity::kStrict,
-        VehicleMotorizationType::NonMotorizedVehicles()));
-    rules.push_back(std::make_unique<VehicleMotorizationRule>(
-        RuleBase::Id(std::string("vmr_") + lane_id.string()),
-        BuildLaneRangeFor(rg, lane_id),
-        std::move(states)));
-  }
+  states.push_back(std::make_unique<VehicleUsageState>(
+      RuleState::Id(std::string("vurs_") + lane_id.string()),
+      RuleState::Severity::kStrict,
+      VehicleUsageType::VehiclesAllowed()));
+
+  rules.push_back(std::make_unique<VehicleUsageRule>(
+      RuleBase::Id(std::string("vur_") + lane_id.string()),
+      BuildLaneRangeFor(rg, lane_id),
+      std::move(states)));
+
+  states.clear();
+  states.push_back(std::make_unique<VehicleMotorizationState>(
+      RuleState::Id(std::string("vmrs_") + lane_id.string()),
+      RuleState::Severity::kStrict,
+      VehicleMotorizationType::NonMotorizedVehicles()));
+  rules.push_back(std::make_unique<VehicleMotorizationRule>(
+      RuleBase::Id(std::string("vmr_") + lane_id.string()),
+      BuildLaneRangeFor(rg, lane_id),
+      std::move(states)));
 
   return std::make_unique<RuleGroup>(
       RuleGroup::Id(std::string("rg_") + lane_id.string()), std::move(rules));
@@ -150,29 +145,27 @@ std::unique_ptr<RuleGroup> BuildMotorizedLaneRoadRuleGroupFor(
   DRAKE_DEMAND(rg != nullptr);
 
   std::vector<std::unique_ptr<RuleBase>> rules;
-  {
-    std::vector<std::unique_ptr<RuleState>> states;
-    states.push_back(std::make_unique<VehicleUsageState>(
-        RuleState::Id(std::string("vurs_") + lane_id.string()),
-        RuleState::Severity::kStrict,
-        VehicleUsageType::VehiclesAllowed()));
+  std::vector<std::unique_ptr<RuleState>> states;
 
-    rules.push_back(std::make_unique<VehicleUsageRule>(
-        RuleBase::Id(std::string("vur_") + lane_id.string()),
-        BuildLaneRangeFor(rg, lane_id),
-        std::move(states)));
-  }
-  {
-    std::vector<std::unique_ptr<RuleState>> states;
-    states.push_back(std::make_unique<VehicleMotorizationState>(
-        RuleState::Id(std::string("vmrs_") + lane_id.string()),
-        RuleState::Severity::kStrict,
-        VehicleMotorizationType::MotorizedVehicles()));
-    rules.push_back(std::make_unique<VehicleMotorizationRule>(
-        RuleBase::Id(std::string("vmr_") + lane_id.string()),
-        BuildLaneRangeFor(rg, lane_id),
-        std::move(states)));
-  }
+  states.push_back(std::make_unique<VehicleUsageState>(
+      RuleState::Id(std::string("vurs_") + lane_id.string()),
+      RuleState::Severity::kStrict,
+      VehicleUsageType::VehiclesAllowed()));
+
+  rules.push_back(std::make_unique<VehicleUsageRule>(
+      RuleBase::Id(std::string("vur_") + lane_id.string()),
+      BuildLaneRangeFor(rg, lane_id),
+      std::move(states)));
+
+  states.clear();
+  states.push_back(std::make_unique<VehicleMotorizationState>(
+      RuleState::Id(std::string("vmrs_") + lane_id.string()),
+      RuleState::Severity::kStrict,
+      VehicleMotorizationType::MotorizedVehicles()));
+  rules.push_back(std::make_unique<VehicleMotorizationRule>(
+      RuleBase::Id(std::string("vmr_") + lane_id.string()),
+      BuildLaneRangeFor(rg, lane_id),
+      std::move(states)));
 
   return std::make_unique<RuleGroup>(
       RuleGroup::Id(std::string("rg_") + lane_id.string()), std::move(rules));

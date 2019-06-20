@@ -4,6 +4,8 @@
 #include <utility>
 #include <vector>
 
+#include "drake/common/drake_optional.h"
+
 #include "maliput/api/branch_point.h"
 #include "maliput/api/intersection.h"
 #include "maliput/api/junction.h"
@@ -12,8 +14,6 @@
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/segment.h"
-
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace api {

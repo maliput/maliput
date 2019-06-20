@@ -8,10 +8,10 @@
 
 #include <gtest/gtest.h>
 
+#include "drake/common/drake_throw.h"
 
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/rule.h"
-#include "drake/common/drake_throw.h"
 
 using maliput::api::LaneId;
 using maliput::api::rules::LaneSRange;
@@ -29,6 +29,10 @@ namespace {
 
 // VehicleMotorizationType construction test.
 GTEST_TEST(VehicleMotorizationTypeTest, ConstructionTest) {
+  const std::string kMotorizedVehicles("kMotorizedVehicles");
+  const std::string kNonMotorizedVehicles("kNonMotorizedVehicles");
+  const std::string kUnrestrictedVehicles("kUnrestrictedVehicles");
+
   auto motorized_vehicles_type = VehicleMotorizationType::MotorizedVehicles();
   auto non_motorized_vehicles_type =
       VehicleMotorizationType::NonMotorizedVehicles();
@@ -42,9 +46,9 @@ GTEST_TEST(VehicleMotorizationTypeTest, ConstructionTest) {
   EXPECT_NE(non_motorized_vehicles_type->value(),
             unrestricted_vehicles_type->value());
 
-  EXPECT_EQ(motorized_vehicles_type->string(), "kMotorizedVehicles");
-  EXPECT_EQ(non_motorized_vehicles_type->string(), "kNonMotorizedVehicles");
-  EXPECT_EQ(unrestricted_vehicles_type->string(), "kUnrestrictedVehicles");
+  EXPECT_EQ(motorized_vehicles_type->string(), kMotorizedVehicles);
+  EXPECT_EQ(non_motorized_vehicles_type->string(), kNonMotorizedVehicles);
+  EXPECT_EQ(unrestricted_vehicles_type->string(), kUnrestrictedVehicles);
 }
 
 // VehicleMotorizationState construction test
