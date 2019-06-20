@@ -244,7 +244,8 @@ GeoPositionT<T> operator*(const GeoPositionT<T>& lhs,
 /// A 3-dimensional position in a `Lane`-frame, consisting of three components:
 ///
 /// * s is longitudinal position, as arc-length along a Lane's reference line.
-/// * r is lateral position, perpendicular to the reference line at s.
+/// * r is lateral position, perpendicular to the reference line at s. +r is to
+///   to the left when traveling in the direction of +s.
 /// * h is height above the road surface.
 ///
 /// Instantiated templates for the following kinds of T's are provided:
