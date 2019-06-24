@@ -74,7 +74,8 @@ std::unique_ptr<api::Intersection> BuildIntersection(
   // the same domain.
   const std::vector<LaneSRange> region =
       GetRegion(road_rulebook, ring->phases().begin()->second);
-  return std::make_unique<Intersection>(id, region, ring_id, phase_provider);
+  return std::make_unique<Intersection>(id, region, ring.value(),
+                                        phase_provider);
 }
 
 std::unique_ptr<api::IntersectionBook> BuildFrom(

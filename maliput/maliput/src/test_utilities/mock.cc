@@ -7,7 +7,7 @@
 #include "maliput/api/intersection.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
-#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/segment.h"
@@ -20,6 +20,8 @@ namespace test {
 namespace {
 
 using rules::DirectionUsageRule;
+using rules::Phase;
+using rules::PhaseRing;
 using rules::RightOfWayRule;
 using rules::SpeedLimitRule;
 using rules::TrafficLight;
@@ -267,9 +269,8 @@ class MockPhaseProvider final : public rules::PhaseProvider {
 class MockIntersection final : public Intersection {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIntersection)
-  explicit MockIntersection(const Intersection::Id& id,
-                            const rules::PhaseRing::Id& ring_id)
-      : Intersection(id, {}, ring_id) {}
+  MockIntersection(const Intersection::Id& id, const rules::PhaseRing& ring)
+      : Intersection(id, {}, ring) {}
 
  private:
   drake::optional<rules::PhaseProvider::Result> Phase() const override {
@@ -279,12 +280,15 @@ class MockIntersection final : public Intersection {
   void SetPhase(const api::rules::Phase::Id&) override {}
 };
 
+PhaseRing CreatePhaseRing() {
+  return PhaseRing(PhaseRing::Id("mock"), {Phase(Phase::Id("mock"), {})});
+}
+
 class MockIntersectionBook final : public IntersectionBook {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIntersectionBook);
   MockIntersectionBook()
-      : intersection_(Intersection::Id("Mock"),
-                      rules::PhaseRing::Id("MockRing")) {}
+      : intersection_(Intersection::Id("Mock"), CreatePhaseRing()) {}
 
  private:
   std::vector<api::Intersection*> DoGetIntersections() {
@@ -298,6 +302,7 @@ class MockIntersectionBook final : public IntersectionBook {
     }
     return nullptr;
   }
+
   MockIntersection intersection_;
 };
 
