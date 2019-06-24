@@ -30,7 +30,7 @@ class RoadGeometry {
  public:
   class IdIndex;
 
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry);
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry)
 
   virtual ~RoadGeometry() = default;
 
@@ -176,7 +176,7 @@ class RoadGeometry {
 /// BranchPoints) by their unique id's.
 class RoadGeometry::IdIndex {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(IdIndex);
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(IdIndex)
   virtual ~IdIndex() = default;
 
   /// Returns the Lane identified by @p id, or `nullptr` if @p id is unknown.
