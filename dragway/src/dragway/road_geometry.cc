@@ -203,9 +203,31 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
 std::vector<api::RoadPositionResult>
 RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
                                   double radius) const {
-  drake::unused(geo_position);
-  drake::unused(radius);
-  DRAKE_ASSERT(false);
+  DRAKE_ASSERT(radius >= 0.);
+
+  DRAKE_ASSERT(junction_.num_segments() > 0);
+  const api::Segment* segment = junction_.segment(0);
+  DRAKE_ASSERT(segment != nullptr);
+  DRAKE_ASSERT(segment->num_lanes() > 0);
+
+  std::vector<api::RoadPositionResult> road_position_results;
+
+  for (int i = 0; i < segment->num_lanes(); ++i) {
+    const api::Lane* lane = segment->lane(i);
+    DRAKE_ASSERT(lane != nullptr);
+
+    double distance{};
+    api::GeoPosition nearest_position;
+    const api::LanePosition lane_position =
+        lane->ToLanePosition(geo_position, &nearest_position, &distance);
+
+    if (distance < radius) {
+      road_position_results.push_back(
+          {api::RoadPosition(lane, lane_position), nearest_position, distance});
+    }
+  }
+
+  return road_position_results;
 }
 
 }  // namespace dragway

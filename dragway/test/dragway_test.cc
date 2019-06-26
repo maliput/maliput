@@ -949,6 +949,119 @@ TEST_F(MaliputDragwayLaneTest, ToGeoPositionSymbolic) {
   EXPECT_EQ(symbolic_gp.z().Evaluate(env), gp.z());
 }
 
+
+// Evaluates RoadGeometry::FindRoadPositions() for single lane Dragway with
+// different radii.
+TEST_F(MaliputDragwayLaneTest, FindRoadPositionsWithOneLane) {
+  MakeDragway(1 /* num lanes */);
+
+  const api::GeoPosition kInertialPosition(10., 20., 30.);
+
+  std::vector<api::RoadPositionResult> road_position_results;
+
+  // First try is far away, no match is expected.
+  road_position_results =
+      road_geometry_->FindRoadPositions(kInertialPosition, 10. /* radius */);
+  EXPECT_TRUE(road_position_results.empty());
+
+  // Radius is increased so allows the mapping the the top.
+  const api::LanePosition kExpectedLanePosition(
+      10., lane_width_ / 2. + shoulder_width_, maximum_height_);
+  const api::GeoPosition kExpectedGeoPosition(
+      10., lane_width_ / 2. + shoulder_width_, maximum_height_);
+
+  road_position_results =
+      road_geometry_->FindRoadPositions(kInertialPosition, 30. /* radius */);
+  EXPECT_EQ(road_position_results.size(), 1);
+  EXPECT_EQ(road_position_results[0].road_position.lane->id(), lane_->id());
+  EXPECT_TRUE(api::test::IsLanePositionClose(
+      road_position_results[0].road_position.pos, kExpectedLanePosition,
+      kLinearTolerance));
+  EXPECT_TRUE(api::test::IsGeoPositionClose(
+      road_position_results[0].nearest_position, kExpectedGeoPosition,
+      kLinearTolerance));
+  EXPECT_NEAR(
+      road_position_results[0].distance, 29.95413160150032, kLinearTolerance);
+
+  // Radius is increased so the sphere contains the whole RoadGeometry volume.
+  // Still, only one lane is expected.
+  road_position_results =
+      road_geometry_->FindRoadPositions(kInertialPosition, 1000. /* radius */);
+  EXPECT_EQ(road_position_results.size(), 1);
+  EXPECT_EQ(road_position_results[0].road_position.lane->id(), lane_->id());
+  EXPECT_TRUE(api::test::IsLanePositionClose(
+      road_position_results[0].road_position.pos, kExpectedLanePosition,
+      kLinearTolerance));
+  EXPECT_TRUE(api::test::IsGeoPositionClose(
+      road_position_results[0].nearest_position, kExpectedGeoPosition,
+      kLinearTolerance));
+  EXPECT_NEAR(
+      road_position_results[0].distance, 29.95413160150032, kLinearTolerance);
+}
+
+// Evaluates RoadGeometry::FindRoadPositions() for a three lane Dragway with
+// different radii.
+TEST_F(MaliputDragwayLaneTest, FindRoadPositionsWithMultipleLanes) {
+  MakeDragway(3 /* num lanes */);
+
+  const api::GeoPosition kInertialPosition(10., 20., 30.);
+
+  std::vector<api::RoadPositionResult> road_position_results;
+
+  // First try is far away, no match is expected.
+  road_position_results =
+      road_geometry_->FindRoadPositions(kInertialPosition, 10. /* radius */);
+  EXPECT_TRUE(road_position_results.empty());
+
+
+  const std::map<api::LaneId,
+                 std::tuple<api::LanePosition, api::GeoPosition, double>>
+      kExpectedResults{
+    {api::LaneId("Dragway_Lane_0"),
+     std::make_tuple(api::LanePosition(10., 15.5, 5.),
+                     api::GeoPosition(10., 9.5, 5.),
+                     27.115493725912497)},
+    {api::LaneId("Dragway_Lane_1"),
+     std::make_tuple(api::LanePosition(10., 9.5, 5.),
+                     api::GeoPosition(10., 9.5, 5.),
+                     27.115493725912497)},
+    {api::LaneId("Dragway_Lane_2"),
+     std::make_tuple(api::LanePosition(10., 3.5, 5.),
+                     api::GeoPosition(10., 9.5, 5.),
+                     27.115493725912497)},
+  };
+
+  // Radius is increased to match the left most lane. With that, the others can
+  // get a mapping.
+  road_position_results =
+      road_geometry_->FindRoadPositions(kInertialPosition, 28. /* radius */);
+  EXPECT_EQ(road_position_results.size(), 3);
+  // Evaluates RoadPosition matching.
+  for (const api::RoadPositionResult dut : road_position_results) {
+    EXPECT_TRUE(kExpectedResults.find(dut.road_position.lane->id()) !=
+                kExpectedResults.end());
+    EXPECT_TRUE(api::test::IsLanePositionClose(
+        dut.road_position.pos,
+        std::get<0>(kExpectedResults.at(dut.road_position.lane->id())),
+        kLinearTolerance));
+    EXPECT_TRUE(api::test::IsGeoPositionClose(
+        dut.nearest_position,
+        std::get<1>(kExpectedResults.at(dut.road_position.lane->id())),
+        kLinearTolerance));
+    EXPECT_NEAR(
+        dut.distance,
+        std::get<2>(kExpectedResults.at(dut.road_position.lane->id())),
+        kLinearTolerance);
+  }
+  // Checks that all the LaneIDs are different.
+  EXPECT_NE(road_position_results[0].road_position.lane->id(),
+            road_position_results[1].road_position.lane->id());
+  EXPECT_NE(road_position_results[1].road_position.lane->id(),
+            road_position_results[2].road_position.lane->id());
+  EXPECT_NE(road_position_results[0].road_position.lane->id(),
+            road_position_results[2].road_position.lane->id());
+}
+
 }  // namespace
 }  // namespace dragway
 }  // namespace maliput

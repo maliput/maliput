@@ -77,7 +77,8 @@ class RoadGeometry final : public api::RoadGeometry {
       api::GeoPosition* nearest_position,
       double* distance) const final;
 
-  // TODO(agalbachicar) Needs implementation.
+  // This implementation exhaustively calls `ToLanePosition()` on all lanes and
+  // checks _distance_ with `radius`.
   std::vector<api::RoadPositionResult> DoFindRoadPositions(
       const api::GeoPosition& geo_position, double radius) const final;
 
