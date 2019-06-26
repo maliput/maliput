@@ -415,6 +415,7 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, UnimplementedMethods) {
   // Ensure that the not-actually-implemented methods throw an exception.
   EXPECT_THROW(dut.ToRoadPosition(
       api::GeoPosition(), nullptr, nullptr, nullptr), std::exception);
+  EXPECT_THROW(dut.FindRoadPositions(api::GeoPosition(), 1.), std::exception);
 }
 
 }  // namespace

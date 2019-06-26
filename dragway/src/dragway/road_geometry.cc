@@ -1,6 +1,7 @@
 #include "dragway/road_geometry.h"
 
 #include <cmath>
+#include <exception>
 #include <memory>
 
 #include "dragway/branch_point.h"
@@ -198,6 +199,13 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
       closest_position.y() - closest_lane->y_offset()  /* r */,
       closest_position.z()                             /* h */);
   return api::RoadPosition(closest_lane, closest_lane_position);
+}
+
+std::vector<api::RoadPosition> RoadGeometry::DoFindRoadPositions(
+      const api::GeoPosition& geo_position, double radius) const {
+  drake::unused(geo_position);
+  drake::unused(radius);
+  throw std::runtime_error("Unimplemented method.");
 }
 
 }  // namespace dragway
