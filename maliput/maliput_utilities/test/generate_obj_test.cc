@@ -128,6 +128,94 @@ TEST_F(GenerateObjTest, NoEpsilonSampling) {
   paths_to_cleanup_.push_back(actual_mtl_path);
 }
 
+// Tests grid sample rate computation with Lanes whose dimensions are smaller
+// than linear tolerance.
+TEST_F(GenerateObjTest, NarrowAndShortSegments) {
+  const double kLinearTolerance{0.01};
+  const double kAngularTolerance{0.01 * M_PI};
+  const double kScaleLength{1.};
+  const double kLaneWidth{kLinearTolerance / 2.};
+  const maliput::multilane::ComputationPolicy kComputationPolicy{
+      maliput::multilane::ComputationPolicy::kPreferSpeed};
+  const maliput::api::HBounds kElevationBounds{0., 5.2};
+
+  auto rb = multi::BuilderFactory().Make(kLaneWidth, kElevationBounds,
+                                         kLinearTolerance, kAngularTolerance,
+                                         kScaleLength, kComputationPolicy);
+
+  // Initialize roads lane layouts.
+  // Reference lane from which the reference curve of the segment is placed (at
+  // kRefR0 lateral distance).
+  const int kRefLane = 0;
+  // Distance between the reference curve and kRefLane lane curve.
+  const double kRefR0 = 0.;
+  const double kLeftShoulder{2.};
+  const double kRightShoulder{2.};
+  const int kLaneNumber{1};
+  const multi::LaneLayout lane_layout(kLeftShoulder, kRightShoulder,
+                                      kLaneNumber, kRefLane, kRefR0);
+
+  // Initialize the road from the origin.
+  const multi::EndpointXy kOriginXy{0., 0., 0.};
+  const multi::EndpointZ kFlatZ{0., 0., 0., {}};
+  const multi::Endpoint kRoadOrigin{kOriginXy, kFlatZ};
+
+  // Construct a road a shorter and thinner than linear_tolerance road.
+  // No arrows should be added to Lane ends because of being a narrow and
+  // short road.
+  const double kArcLength1 = kLinearTolerance / 3.;
+  const double kArcRadius1 = 40.;
+  const auto street1 = rb->Connect(
+      "street1", lane_layout,
+      multi::StartReference().at(kRoadOrigin, multi::Direction::kForward),
+      multi::ArcOffset(kArcRadius1, -kArcLength1 / kArcRadius1),
+      multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
+
+  // Construct a road a thinner than linear_tolerance but equally long to
+  // linear_tolerance road.
+  // No arrows should be added to Lane ends because of being a narrow and
+  // short road.
+  const double kArcLength2 = kLinearTolerance;
+  const double kArcRadius2 = 80.;
+  const auto street2 = rb->Connect(
+      "street2", lane_layout,
+      multi::StartReference().at(*street1, api::LaneEnd::kFinish,
+                                 multi::Direction::kForward),
+      multi::ArcOffset(kArcRadius2, kArcLength2 / kArcRadius2),
+      multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
+
+  // Construct a road a longer but thinner than linear_tolerance road.
+  // No arrows should be added to Lane ends because of being a narrow road.
+  const double kArcLength3 = 5. * kLinearTolerance;
+  const double kArcRadius3 = 100.;
+  rb->Connect(
+      "street3", lane_layout,
+      multi::StartReference().at(*street2, api::LaneEnd::kFinish,
+                                 multi::Direction::kForward),
+      multi::ArcOffset(kArcRadius3, -kArcLength3 / kArcRadius3),
+      multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
+
+  const std::unique_ptr<const api::RoadGeometry> dut =
+      rb->Build(maliput::api::RoadGeometryId{"narrow-and-short-segments-dut"});
+
+  ObjFeatures features;
+  features.min_grid_resolution = 5.0;
+  features.simplify_mesh_threshold = 0.01;
+  const std::string basename{"NarrowAndShortSegments"};
+  GenerateObjFile(dut.get(), directory_.get_path(), basename, features);
+
+  common::Path actual_obj_path(directory_);
+  actual_obj_path.append(basename + ".obj");
+  EXPECT_TRUE(actual_obj_path.is_file());
+
+  common::Path actual_mtl_path(directory_);
+  actual_mtl_path.append(basename + ".mtl");
+  EXPECT_TRUE(actual_mtl_path.is_file());
+
+  paths_to_cleanup_.push_back(actual_obj_path);
+  paths_to_cleanup_.push_back(actual_mtl_path);
+}
+
 
 class GenerateObjBasicDutTest : public GenerateObjTest {
  protected:

@@ -183,6 +183,7 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
   const int num_units = std::max(max_num_s_units,
                                  std::max(max_num_rl_units,
                                           max_num_rr_units));
+
   DRAKE_DEMAND(num_units >= 1);
   const double s_unit = s_size / num_units;
   const double rl_unit = rl_size / num_units;
@@ -269,6 +270,9 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
 // Marks the start and finish ends of @p lane with arrows, rendered into
 // @p mesh.
 //
+// When the arrow length is smaller than the linear tolerance or it starts /
+// ends outside lane boundaries, it is omitted.
+//
 // @param mesh  the GeoMesh which will receive the arrows
 // @param lane  the api::Lane to provide the surface
 // @param grid_unit  size of each quad (length of edge in s and r dimensions)
@@ -290,23 +294,48 @@ void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
   const double finish_s_size = std::min(max_length,
                                         (finish_rb.max() - finish_rb.min()));
 
-  DrawLaneArrow(mesh, lane, grid_unit,
-                0. + nudge, start_s_size, h_offset);
-  DrawLaneArrow(mesh, lane, grid_unit,
-                lane->length() - finish_s_size - nudge, finish_s_size,
-                h_offset);
+  // Avoid drawing the arrows when its length is shorter than nudge or it would
+  // start / end outside lane boundaries.
+  if (nudge + start_s_size < lane->length() && start_s_size > nudge) {
+    DrawLaneArrow(mesh, lane, grid_unit,
+                  0. + nudge, start_s_size, h_offset);
+  }
+  if (lane->length() - nudge - finish_s_size > 0. && finish_s_size > nudge) {
+    DrawLaneArrow(mesh, lane, grid_unit,
+                  lane->length() - finish_s_size - nudge, finish_s_size,
+                  h_offset);
+  }
 }
 
 
 // Calculates an appropriate grid-unit size for @p lane.
-double PickGridUnit(const api::Lane* lane,
-                    double max_size, double min_resolution) {
+//
+// Grid size will be the smaller between:
+// - Initial lane width divided by @p min_resolution.
+// - Final lane width divided by @p min_resolution.
+// - @p lane's length divided by @p min_resolution.
+//
+// However, the returned grid will never be smaller than @p linear_tolerance.
+// Note that @p max_size would be the maximum possible grid unit every time it
+// it is bigger than @p linear_tolerance.
+double PickGridUnit(const api::Lane* lane, double max_size,
+                    double min_resolution, double linear_tolerance) {
   double result = max_size;
+
   const api::RBounds rb0 = lane->lane_bounds(0.);
+  const double width0 = std::max(rb0.max() - rb0.min(), linear_tolerance);
+
   const api::RBounds rb1 = lane->lane_bounds(lane->length());
-  result = std::min(result, (rb0.max() - rb0.min()) / min_resolution);
-  result = std::min(result, (rb1.max() - rb1.min()) / min_resolution);
-  result = std::min(result, lane->length() / min_resolution);
+  const double width1 = std::max(rb1.max() - rb1.min(), linear_tolerance);
+
+  const double length = std::max(lane->length(), linear_tolerance);
+
+  result = std::min(result, width0 / min_resolution);
+  result = std::min(result, width1 / min_resolution);
+  result = std::min(result, length / min_resolution);
+  // Grid unit should not be less than linear_tolerance.
+  result = std::max(result, linear_tolerance);
+
   return result;
 }
 
@@ -464,9 +493,12 @@ void RenderSegment(const api::Segment* segment,
                    GeoMesh* lane_mesh,
                    GeoMesh* marker_mesh,
                    GeoMesh* h_bounds_mesh) {
+  const double linear_tolerance =
+      segment->junction()->road_geometry()->linear_tolerance();
+
   const double base_grid_unit = PickGridUnit(
-      segment->lane(0), features.max_grid_unit,
-      features.min_grid_resolution);
+      segment->lane(0), features.max_grid_unit, features.min_grid_resolution,
+      linear_tolerance);
   {
     // Lane 0 should be as good as any other for driveable-bounds.
     GeoMesh driveable_mesh;
@@ -498,9 +530,9 @@ void RenderSegment(const api::Segment* segment,
   }
   for (int li = 0; li < segment->num_lanes(); ++li) {
     const api::Lane* lane = segment->lane(li);
-    const double grid_unit = PickGridUnit(lane,
-                                          features.max_grid_unit,
-                                          features.min_grid_resolution);
+    const double grid_unit = PickGridUnit(
+        lane, features.max_grid_unit, features.min_grid_resolution,
+        linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
       CoverLaneWithQuads(&haze_mesh, lane, grid_unit,
@@ -556,6 +588,9 @@ void GenerateObjFile(const api::RoadGeometry* rg,
   GeoMesh grayed_asphalt_mesh;
   GeoMesh grayed_lane_mesh;
   GeoMesh grayed_marker_mesh;
+
+  // TODO(agalbachicar)   Check features with respect to rg tolerance
+  //                      properties.
 
   // Walk the network.
   for (int ji = 0; ji < rg->num_junctions(); ++ji) {
