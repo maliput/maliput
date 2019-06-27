@@ -1,7 +1,5 @@
 #include "multilane/road_geometry.h"
 
-#include <exception>
-
 #include "drake/common/drake_assert.h"
 #include "drake/common/unused.h"
 
@@ -186,11 +184,12 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
   return road_position;
 }
 
-std::vector<api::RoadPosition> RoadGeometry::DoFindRoadPositions(
-    const api::GeoPosition& geo_position, double radius) const {
+std::vector<api::RoadGeometry::RoadPositionResult>
+RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
+                                  double radius) const {
   drake::unused(geo_position);
   drake::unused(radius);
-  throw std::runtime_error("Unimplemented method.");
+  DRAKE_ASSERT(false);
 }
 
 }  // namespace multilane

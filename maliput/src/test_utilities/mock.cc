@@ -157,9 +157,9 @@ class MockRoadGeometry final : public RoadGeometry {
                                 GeoPosition*, double*) const override {
     return RoadPosition();
   }
-  std::vector<RoadPosition> DoFindRoadPositions(
+  std::vector<RoadGeometry::RoadPositionResult> DoFindRoadPositions(
       const GeoPosition&, double) const override {
-    return {RoadPosition()};
+    return {{RoadPosition(), GeoPosition(), 0.}};
   }
   double do_linear_tolerance() const override { return 0; }
   double do_angular_tolerance() const override { return 0; }
@@ -183,9 +183,9 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
                                 GeoPosition*, double*) const override {
     return RoadPosition();
   }
-  std::vector<RoadPosition> DoFindRoadPositions(
+  std::vector<RoadGeometry::RoadPositionResult> DoFindRoadPositions(
       const GeoPosition&, double) const override {
-    return {RoadPosition()};
+    return {{RoadPosition(), GeoPosition(), 0.}};
   }
   double do_linear_tolerance() const override { return 0; }
   double do_angular_tolerance() const override { return 0; }

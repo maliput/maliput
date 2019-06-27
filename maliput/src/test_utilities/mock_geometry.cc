@@ -15,8 +15,8 @@ api::RoadPosition MockRoadGeometry::DoToRoadPosition(
   DRAKE_UNREACHABLE();
 }
 
-std::vector<api::RoadPosition> MockRoadGeometry::DoFindRoadPositions(
-    const api::GeoPosition&, double) const {
+std::vector<api::RoadGeometry::RoadPositionResult>
+MockRoadGeometry::DoFindRoadPositions(const api::GeoPosition&, double) const {
   DRAKE_THROW_UNLESS(false);
   DRAKE_UNREACHABLE();
 }

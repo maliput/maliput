@@ -54,7 +54,7 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
                                      api::GeoPosition* nearest_position,
                                      double* distance) const override;
 
-  std::vector<api::RoadPosition> DoFindRoadPositions(
+  std::vector<RoadPositionResult> DoFindRoadPositions(
       const api::GeoPosition& geo_position, double radius) const override;
 };
 

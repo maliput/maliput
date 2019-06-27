@@ -68,7 +68,7 @@ class RoadGeometry : public api::RoadGeometry {
       double* distance) const override;
 
   // TODO(agalbachicar) Needs implementation.
-  std::vector<api::RoadPosition> DoFindRoadPositions(
+  std::vector<RoadGeometry::RoadPositionResult> DoFindRoadPositions(
       const api::GeoPosition& geo_position, double radius) const override;
 
   double do_linear_tolerance() const override { return linear_tolerance_; }

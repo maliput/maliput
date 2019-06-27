@@ -115,12 +115,22 @@ class RoadGeometry {
     return DoToRoadPosition(geo_position, hint, nearest_position, distance);
   }
 
+  /// Included in the return result of RoadGeometry::FindRoadPositions().
+  struct RoadPositionResult {
+    /// The candidate RoadPosition.
+    RoadPosition road_position;
+    /// The position that exactly corresponds to `road_position`.
+    GeoPosition nearest_position;
+    /// The distance between `nearest_position` and the `geo_position` supplied
+    /// to RoadGeometry::FindRoadPositions().
+    double distance{};
+  };
 
   /// Obtains all RoadPositions within @p radius of @p geo_position. Only Lanes
   /// whose driveable regions include points that are within @p radius of
   /// @p geo_position are included in the search. For each of these Lanes,
   /// include the RoadPosition or RoadPositions with the minimum distance to
-  /// @p geo_position.
+  /// @p geo_position in the returned result.
   ///
   /// @param geo_position The geo position to convert into one or more
   ///        RoadPositions.
@@ -130,8 +140,8 @@ class RoadGeometry {
   /// Note that derivative implementations may choose to violate the above
   /// semantics for performance reasons. See docstrings of derivative
   /// implementations for details.
-  std::vector<RoadPosition> FindRoadPositions(const GeoPosition& geo_position,
-                                              double radius) const {
+  std::vector<RoadPositionResult> FindRoadPositions(
+      const GeoPosition& geo_position, double radius) const {
     return DoFindRoadPositions(geo_position, radius);
   }
 
@@ -182,7 +192,7 @@ class RoadGeometry {
                                         GeoPosition* nearest_position,
                                         double* distance) const = 0;
 
-  virtual std::vector<RoadPosition> DoFindRoadPositions(
+  virtual std::vector<RoadPositionResult> DoFindRoadPositions(
       const GeoPosition& geo_position, double radius) const = 0;
 
   virtual double do_linear_tolerance() const = 0;
