@@ -1,6 +1,4 @@
 #!/bin/sh
-# The setup script for Multilane.
-INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@
 
 # A function to add a new item (needle) to the passed environment variable, only
 # if the new item is not already in the environment variable.  The function
@@ -54,4 +52,4 @@ add_if_not_in_var() {
 
 # Path to various resources used by shell/python scripts and demos
 #   e.g. configuration files, protos, road geometries
-add_if_not_in_var MULTILANE_RESOURCE_ROOT $INSTALL_PREFIX/share/multilane
+add_if_not_in_var MULTILANE_RESOURCE_ROOT $AMENT_CURRENT_PREFIX/share/multilane
