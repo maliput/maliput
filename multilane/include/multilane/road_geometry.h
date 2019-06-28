@@ -6,6 +6,7 @@
 #include "maliput/api/basic_id_index.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
+#include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
 #include "multilane/branch_point.h"
 #include "multilane/junction.h"
@@ -68,7 +69,7 @@ class RoadGeometry : public api::RoadGeometry {
       double* distance) const override;
 
   // TODO(agalbachicar) Needs implementation.
-  std::vector<RoadGeometry::RoadPositionResult> DoFindRoadPositions(
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(
       const api::GeoPosition& geo_position, double radius) const override;
 
   double do_linear_tolerance() const override { return linear_tolerance_; }

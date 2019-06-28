@@ -200,7 +200,7 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
   return api::RoadPosition(closest_lane, closest_lane_position);
 }
 
-std::vector<api::RoadGeometry::RoadPositionResult>
+std::vector<api::RoadPositionResult>
 RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
                                   double radius) const {
   drake::unused(geo_position);

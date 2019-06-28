@@ -115,17 +115,6 @@ class RoadGeometry {
     return DoToRoadPosition(geo_position, hint, nearest_position, distance);
   }
 
-  /// Included in the return result of RoadGeometry::FindRoadPositions().
-  struct RoadPositionResult {
-    /// The candidate RoadPosition.
-    RoadPosition road_position;
-    /// The position that exactly corresponds to `road_position`.
-    GeoPosition nearest_position;
-    /// The distance between `nearest_position` and the `geo_position` supplied
-    /// to RoadGeometry::FindRoadPositions().
-    double distance{};
-  };
-
   /// Obtains all RoadPositions within @p radius of @p geo_position. Only Lanes
   /// whose driveable regions include points that are within @p radius of
   /// @p geo_position are included in the search. For each of these Lanes,
@@ -135,7 +124,8 @@ class RoadGeometry {
   /// @param geo_position The geo position to convert into one or more
   ///        RoadPositions.
   /// @param radius The maximum distance from @p geo_position to search.
-  /// @return The possible RoadPositions.
+  /// @return A vector of RoadPositionResults representing the possible
+  ///         RoadPositions.
   ///
   /// Note that derivative implementations may choose to violate the above
   /// semantics for performance reasons. See docstrings of derivative
