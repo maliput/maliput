@@ -177,14 +177,19 @@ class RuleGroup {
   ///
   /// @param id is the unique ID of this group (in the RoadRulebook)
   /// @param rules is a non-empty vector with related rules.
-  /// @throws std::runtime_error when `rules` is empty or any rule is nullptr.
+  /// @throws std::runtime_error when `rules` is empty, any rule is nullptr or
+  ///         rules' zones are different.
   RuleGroup(const Id& id, std::vector<std::unique_ptr<RuleBase>> rules) :
       id_(id), rules_(std::move(rules)) {
     DRAKE_THROW_UNLESS(!rules_.empty());
     for (int i = 0; i < rules_.size(); ++i) {
       DRAKE_THROW_UNLESS(rules_.at(i) != nullptr);
     }
-    // TODO(agalbachicar)   Assert RuleBase::zone() are the same for all rules.
+    const LaneSRange lane_s_range_0 = rules_.at(0)->zone();
+    for (int i = 1; i < rules_.size(); ++i) {
+      DRAKE_THROW_UNLESS(
+          AreLaneSRangesEqual(lane_s_range_0, rules_.at(1)->zone()));
+    }
   }
 
   /// Returns the ID.
@@ -202,6 +207,18 @@ class RuleGroup {
   }
 
  private:
+  // Compares two LaneSRanges.
+  //
+  // @param lane_s_range_0 a LaneSRange.
+  // @param lane_s_range_1 a LaneSRange.
+  // @return true When `lane_s_range_0` is equal to `lane_s_range_1`.
+  bool AreLaneSRangesEqual(const LaneSRange& lane_s_range_0,
+                          const LaneSRange& lane_s_range_1) const {
+    return lane_s_range_0.lane_id() == lane_s_range_1.lane_id() &&
+           lane_s_range_0.s_range().s0() == lane_s_range_1.s_range().s0() &&
+           lane_s_range_0.s_range().s1() == lane_s_range_1.s_range().s1();
+  }
+
   Id id_;
   std::vector<std::unique_ptr<RuleBase>> rules_;
 };
