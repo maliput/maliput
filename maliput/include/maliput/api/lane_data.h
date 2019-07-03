@@ -351,6 +351,18 @@ struct RoadPosition {
 };
 
 
+/// Included in the return result of RoadGeometry::FindRoadPositions().
+struct RoadPositionResult {
+  /// The candidate RoadPosition.
+  RoadPosition road_position;
+  /// The position that exactly corresponds to `road_position`.
+  GeoPosition nearest_position;
+  /// The distance between `nearest_position` and the `geo_position` supplied
+  /// to RoadGeometry::FindRoadPositions().
+  double distance{};
+};
+
+
 /// Bounds in the lateral dimension (r component) of a `Lane`-frame, consisting
 /// of a pair of minimum and maximum r value.  The bounds must straddle r = 0,
 /// i.e., the minimum must be <= 0 and the maximum must be >= 0.

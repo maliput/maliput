@@ -77,6 +77,10 @@ class RoadGeometry final : public api::RoadGeometry {
       api::GeoPosition* nearest_position,
       double* distance) const final;
 
+  // TODO(agalbachicar) Needs implementation.
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(
+      const api::GeoPosition& geo_position, double radius) const final;
+
   double do_linear_tolerance() const final { return linear_tolerance_; }
 
   double do_angular_tolerance() const final { return angular_tolerance_; }

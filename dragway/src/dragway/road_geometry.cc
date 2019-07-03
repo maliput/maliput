@@ -200,5 +200,13 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
   return api::RoadPosition(closest_lane, closest_lane_position);
 }
 
+std::vector<api::RoadPositionResult>
+RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
+                                  double radius) const {
+  drake::unused(geo_position);
+  drake::unused(radius);
+  DRAKE_ASSERT(false);
+}
+
 }  // namespace dragway
 }  // namespace maliput
