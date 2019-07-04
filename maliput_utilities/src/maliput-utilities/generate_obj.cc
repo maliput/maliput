@@ -574,11 +574,9 @@ bool IsSegmentRenderedNormally(const api::SegmentId& id,
 
 }  // namespace
 
-
-void GenerateObjFile(const api::RoadGeometry* rg,
-                     const std::string& dirpath,
-                     const std::string& fileroot,
-                     const ObjFeatures& features) {
+std::unordered_map<std::string, GeoMesh> BuildMeshes(
+                                           const api::RoadGeometry* rg,
+                                           const ObjFeatures& features) {
   GeoMesh asphalt_mesh;
   GeoMesh lane_mesh;
   GeoMesh marker_mesh;
@@ -621,6 +619,33 @@ void GenerateObjFile(const api::RoadGeometry* rg,
                         &rendered_centers);
     }
   }
+
+  std::unordered_map<std::string, GeoMesh> meshes;
+  meshes["asphalt"] = std::move(asphalt_mesh);
+  meshes["lane"] = std::move(lane_mesh);
+  meshes["marker"] = std::move(marker_mesh);
+  meshes["h_bounds"] = std::move(h_bounds_mesh);
+  meshes["branch_point"] = std::move(branch_point_mesh);
+  meshes["grayed_asphalt"] = std::move(grayed_asphalt_mesh);
+  meshes["grayed_lane"] = std::move(grayed_lane_mesh);
+  meshes["grayed_marker"] = std::move(grayed_marker_mesh);
+  return meshes;
+}
+
+void GenerateObjFile(const api::RoadGeometry* rg,
+                     const std::string& dirpath,
+                     const std::string& fileroot,
+                     const ObjFeatures& features) {
+
+  std::unordered_map<std::string, GeoMesh> meshes = std::move(BuildMeshes(rg, features));
+  const GeoMesh& asphalt_mesh = meshes["asphalt"];
+  const GeoMesh& lane_mesh = meshes["lane"];
+  const GeoMesh& marker_mesh = meshes["marker"];
+  const GeoMesh& h_bounds_mesh = meshes["h_bounds"];
+  const GeoMesh& branch_point_mesh = meshes["branch_point"];
+  const GeoMesh& grayed_asphalt_mesh = meshes["grayed_asphalt"];
+  const GeoMesh& grayed_lane_mesh = meshes["grayed_lane"];
+  const GeoMesh& grayed_marker_mesh = meshes["grayed_marker"];
 
   const std::string kLaneHaze("lane_haze");
   const std::string kMarkerPaint("marker_paint");
@@ -780,6 +805,26 @@ d 0.20
                kGrayedMarkerPaint, kGrayedBlandAsphalt, kGrayedLaneHaze,
                kHBoundsHaze);
   }
+}
+
+// This map holds the properties of different materials. Those properties were
+// taken from the original .mtl description that lives in GenerateObjFile().
+const std::unordered_map<std::string, Material> kMaterial{
+  {"asphalt",  {{0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0}},
+  {"lane",     {{0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8}},
+  {"marker",   {{0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5}},
+  {"h_bounds", {{0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8}},
+  {"branch_point", {{0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9}},
+  {"grayed_asphalt", {{0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9}},
+  {"grayed_lane", {{0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9}},
+  {"grayed_marker", {{0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}}
+};
+
+std::unique_ptr<Material> GetMaterialByName(const std::string& material_name) {
+  if (kMaterial.find(material_name) == kMaterial.end()) {
+    return nullptr;
+  }
+  return std::make_unique<Material>(kMaterial.at(material_name));
 }
 
 

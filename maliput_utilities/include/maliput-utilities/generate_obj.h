@@ -5,6 +5,7 @@
 
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput-utilities/mesh.h"
 
 namespace maliput {
 namespace utility {
@@ -56,6 +57,33 @@ struct ObjFeatures {
   std::vector<api::SegmentId> highlighted_segments;
 };
 
+/// Material information for built meshes.
+struct Material {
+  drake::Vector3<double> diffuse;  /// Kd
+  drake::Vector3<double> ambient;  /// Ka
+  drake::Vector3<double> specular;  /// Ks
+  double shinines;  /// Ns
+  double transparency;  /// 1.0 - d
+};
+
+/// Builds a map of meshes based on `features` properties and the RoadGeometry.
+///
+/// @param road_geometry  the api::RoadGeometry to model.
+/// @param features  parameters for constructing the mesh.
+/// @return A map with the meshes. Keys will be std::string objects in the
+/// following list:
+///   - asphalt
+///   - lane
+///   - marker
+///   - h_bounds
+///   - branch_point
+///   - grayed_asphalt
+///   - grayed_lane
+///   - grayed_marker
+std::unordered_map<std::string, mesh::GeoMesh> BuildMeshes(
+                                                 const api::RoadGeometry* rg,
+                                                 const ObjFeatures& features);
+
 /// Generates a Wavefront OBJ model of the road surface of an api::RoadGeometry.
 ///
 /// @param road_geometry  the api::RoadGeometry to model
@@ -75,6 +103,23 @@ void GenerateObjFile(const api::RoadGeometry* road_geometry,
                      const std::string& dirpath,
                      const std::string& fileroot,
                      const ObjFeatures& features);
+
+/// Gets a Material based on `material_name` key.
+///
+/// Possible `material_name` values may be any of the following:
+///   - asphalt
+///   - lane
+///   - marker
+///   - h_bounds
+///   - branch_point
+///   - grayed_asphalt
+///   - grayed_lane
+///   - grayed_marker
+///
+/// @param material_name The key to get the material.
+/// @return A std::unique_ptr<Material> with a filled Material structure. It
+/// will be nullptr when `material_name` is not any of the previous options.
+std::unique_ptr<Material> GetMaterialByName(const std::string& material_name);
 
 }  // namespace utility
 }  // namespace maliput
