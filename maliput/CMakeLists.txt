@@ -49,6 +49,11 @@ endif()
 ##############################################################################
 
 install(
+  PROGRAMS prereqs
+  DESTINATION share
+)
+
+install(
   DIRECTORY include/
   DESTINATION include
 )
