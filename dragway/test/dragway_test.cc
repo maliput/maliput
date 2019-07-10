@@ -1,5 +1,6 @@
 #include <cmath>
 #include <limits>
+#include <map>
 
 #include <gtest/gtest.h>
 
@@ -950,11 +951,14 @@ TEST_F(MaliputDragwayLaneTest, ToGeoPositionSymbolic) {
 }
 
 
-// Evaluates RoadGeometry::FindRoadPositions() for single lane Dragway with
+// Evaluates RoadGeometry::FindRoadPositions() using a single-lane Dragway with
 // different radii.
 TEST_F(MaliputDragwayLaneTest, FindRoadPositionsWithOneLane) {
   MakeDragway(1 /* num lanes */);
 
+  // Inertial Frame position is placed outside the road volume on purpose,
+  // expecting the method to derive the right LanePosition for each coordinate
+  // (s, r, and h), not only a mapping to the ground.
   const api::GeoPosition kInertialPosition(10., 20., 30.);
 
   std::vector<api::RoadPositionResult> road_position_results;
@@ -964,46 +968,39 @@ TEST_F(MaliputDragwayLaneTest, FindRoadPositionsWithOneLane) {
       road_geometry_->FindRoadPositions(kInertialPosition, 10. /* radius */);
   EXPECT_TRUE(road_position_results.empty());
 
-  // Radius is increased so allows the mapping the the top.
+  // Radius is increased to map the top of the road volume.
   const api::LanePosition kExpectedLanePosition(
       10., lane_width_ / 2. + shoulder_width_, maximum_height_);
   const api::GeoPosition kExpectedGeoPosition(
       10., lane_width_ / 2. + shoulder_width_, maximum_height_);
 
-  road_position_results =
-      road_geometry_->FindRoadPositions(kInertialPosition, 30. /* radius */);
-  EXPECT_EQ(road_position_results.size(), 1);
-  EXPECT_EQ(road_position_results[0].road_position.lane->id(), lane_->id());
-  EXPECT_TRUE(api::test::IsLanePositionClose(
-      road_position_results[0].road_position.pos, kExpectedLanePosition,
-      kLinearTolerance));
-  EXPECT_TRUE(api::test::IsGeoPositionClose(
-      road_position_results[0].nearest_position, kExpectedGeoPosition,
-      kLinearTolerance));
-  EXPECT_NEAR(
-      road_position_results[0].distance, 29.95413160150032, kLinearTolerance);
-
-  // Radius is increased so the sphere contains the whole RoadGeometry volume.
-  // Still, only one lane is expected.
-  road_position_results =
-      road_geometry_->FindRoadPositions(kInertialPosition, 1000. /* radius */);
-  EXPECT_EQ(road_position_results.size(), 1);
-  EXPECT_EQ(road_position_results[0].road_position.lane->id(), lane_->id());
-  EXPECT_TRUE(api::test::IsLanePositionClose(
-      road_position_results[0].road_position.pos, kExpectedLanePosition,
-      kLinearTolerance));
-  EXPECT_TRUE(api::test::IsGeoPositionClose(
-      road_position_results[0].nearest_position, kExpectedGeoPosition,
-      kLinearTolerance));
-  EXPECT_NEAR(
-      road_position_results[0].distance, 29.95413160150032, kLinearTolerance);
+  // Two radii are used. 30. meters radius will intersect a piece of the road
+  // volume. 1000.m radius will intersect the whole road volume. For both cases,
+  // the same result is expected.
+  for (double radius : {30., 1000.}) {
+    road_position_results =
+        road_geometry_->FindRoadPositions(kInertialPosition, radius);
+    EXPECT_EQ(road_position_results.size(), 1);
+    EXPECT_EQ(road_position_results[0].road_position.lane->id(), lane_->id());
+    EXPECT_TRUE(api::test::IsLanePositionClose(
+        road_position_results[0].road_position.pos, kExpectedLanePosition,
+        kLinearTolerance));
+    EXPECT_TRUE(api::test::IsGeoPositionClose(
+        road_position_results[0].nearest_position, kExpectedGeoPosition,
+        kLinearTolerance));
+    EXPECT_NEAR(
+        road_position_results[0].distance, 29.95413160150032, kLinearTolerance);
+  }
 }
 
-// Evaluates RoadGeometry::FindRoadPositions() for a three lane Dragway with
+// Evaluates RoadGeometry::FindRoadPositions() using a three-lane Dragway with
 // different radii.
 TEST_F(MaliputDragwayLaneTest, FindRoadPositionsWithMultipleLanes) {
   MakeDragway(3 /* num lanes */);
 
+  // Inertial Frame position is placed outside the road volume on purpose,
+  // expecting the method to derive the right LanePosition for each coordinate
+  // (s, r, and h), not only a mapping to the ground.
   const api::GeoPosition kInertialPosition(10., 20., 30.);
 
   std::vector<api::RoadPositionResult> road_position_results;
@@ -1015,6 +1012,8 @@ TEST_F(MaliputDragwayLaneTest, FindRoadPositionsWithMultipleLanes) {
 
 
   const std::map<api::LaneId,
+                 /* <LanePosition of the RoadPosition, nearest GeoPosition,
+                     distance from nearest GeoPosition to kInertialPosition> */
                  std::tuple<api::LanePosition, api::GeoPosition, double>>
       kExpectedResults{
     {api::LaneId("Dragway_Lane_0"),
@@ -1032,7 +1031,7 @@ TEST_F(MaliputDragwayLaneTest, FindRoadPositionsWithMultipleLanes) {
   };
 
   // Radius is increased to match the left most lane. With that, the others can
-  // get a mapping.
+  // get a mapping since all of the lanes share the same driveable region.
   road_position_results =
       road_geometry_->FindRoadPositions(kInertialPosition, 28. /* radius */);
   EXPECT_EQ(road_position_results.size(), 3);
