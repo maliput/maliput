@@ -10,10 +10,10 @@ namespace maliput {
 namespace geometry_base {
 
 std::vector<maliput::api::RoadPositionResult>
-BruteForceFindRoadPositionsStrategy::operator()(
+BruteForceFindRoadPositionsStrategy(
     const maliput::api::RoadGeometry* rg,
     const maliput::api::GeoPosition& geo_position,
-    double radius) const {
+    double radius) {
   DRAKE_THROW_UNLESS(rg != nullptr);
   DRAKE_THROW_UNLESS(radius >= 0.);
 

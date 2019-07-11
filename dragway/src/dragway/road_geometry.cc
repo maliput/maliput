@@ -206,7 +206,7 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
 std::vector<api::RoadPositionResult>
 RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
                                   double radius) const {
-  return maliput::geometry_base::BruteForceFindRoadPositionsStrategy()(
+  return maliput::geometry_base::BruteForceFindRoadPositionsStrategy(
       this, geo_position, radius);
 }
 
