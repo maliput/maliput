@@ -77,7 +77,8 @@ class RoadGeometry final : public api::RoadGeometry {
       api::GeoPosition* nearest_position,
       double* distance) const final;
 
-  // TODO(agalbachicar) Needs implementation.
+  // Forwards the call to
+  // maliput::geometry_base::BruteForceFindRoadPositionsStrategy().
   std::vector<api::RoadPositionResult> DoFindRoadPositions(
       const api::GeoPosition& geo_position, double radius) const final;
 

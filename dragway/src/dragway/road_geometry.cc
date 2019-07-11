@@ -5,10 +5,13 @@
 
 #include "dragway/branch_point.h"
 #include "dragway/junction.h"
+
 #include "drake/common/drake_assert.h"
 #include "drake/common/text_logging.h"
 #include "drake/common/unused.h"
 #include "drake/math/saturate.h"
+
+#include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
 
 using std::make_unique;
 
@@ -203,9 +206,8 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
 std::vector<api::RoadPositionResult>
 RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
                                   double radius) const {
-  drake::unused(geo_position);
-  drake::unused(radius);
-  DRAKE_ASSERT(false);
+  return maliput::geometry_base::BruteForceFindRoadPositionsStrategy(
+      this, geo_position, radius);
 }
 
 }  // namespace dragway
