@@ -77,8 +77,8 @@ class RoadGeometry final : public api::RoadGeometry {
       api::GeoPosition* nearest_position,
       double* distance) const final;
 
-  // This implementation exhaustively calls `ToLanePosition()` on all lanes and
-  // checks _distance_ with `radius`.
+  // Forwards the call to
+  // maliput::geometry_base::BruteForceFindRoadPositionsStrategy().
   std::vector<api::RoadPositionResult> DoFindRoadPositions(
       const api::GeoPosition& geo_position, double radius) const final;
 

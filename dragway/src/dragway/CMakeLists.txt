@@ -44,6 +44,7 @@ target_link_libraries(dragway_to_urdf
     gflags
     maliput-utilities::maliput-utilities
     maliput::common
+    maliput::geometry_base
 )
 
 install(TARGETS dragway_to_urdf

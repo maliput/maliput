@@ -3,6 +3,7 @@
 ##############################################################################
 set(SOURCES
     branch_point.cc
+    brute_force_find_road_positions_strategy.cc
     junction.cc
     lane.cc
     road_geometry.cc
