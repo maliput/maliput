@@ -30,6 +30,50 @@ using mesh::SimplifyMeshFaces;
 
 namespace {
 
+// This map holds the properties of different materials. Those properties were
+// taken from the original .mtl description that lives in GenerateObjFile().
+const std::unordered_map<std::string, Material> kMaterial{
+  {"asphalt",
+    {{0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0}},
+  {"lane",
+    {{0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8}},
+  {"marker",
+    {{0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5}},
+  {"h_bounds",
+    {{0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8}},
+  {"branch_point",
+    {{0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9}},
+  {"grayed_asphalt",
+    {{0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9}},
+  {"grayed_lane",
+    {{0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9}},
+  {"grayed_marker",
+    {{0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}}
+};
+
+std::string FormatDrakeVector3AsRow(const drake::Vector3<double> &vec)
+{
+  return fmt::format("{} {} {}", std::to_string(vec.x()),
+                                 std::to_string(vec.y()),
+                                 std::to_string(vec.z())
+                     );
+}
+
+std::string FormatMaterial(const Material& mat, const std::string matName)
+{
+  return fmt::format("newmtl {}\n"
+                      "Ka {}\n"
+                      "Kd {}\n"
+                      "Ks {}\n"
+                      "Ns {}\n"
+                      "illum 2\n"
+                      "d {}\n",
+                      matName, FormatDrakeVector3AsRow(mat.ambient),
+                      FormatDrakeVector3AsRow(mat.diffuse),
+                      FormatDrakeVector3AsRow(mat.specular),
+                      mat.shinines, 1.0 - mat.transparency);
+}
+
 // Traverses @p lane, generating a cover of the surface with with quads
 // (4-vertex faces) which are added to @p mesh.  The quads are squares in
 // the (s,r) space of the lane.
@@ -738,87 +782,32 @@ mtllib {}
 #
 # DON'T BE A HERO.  Do not edit by hand.
 
-newmtl {}
-Ka 0.8 0.8 0.0
-Kd 1.0 1.0 0.0
-Ks 1.0 1.0 0.5
-Ns 10.0
-illum 2
-d 0.5
+{}
 
-newmtl {}
-Ka 0.1 0.1 0.1
-Kd 0.2 0.2 0.2
-Ks 0.3 0.3 0.3
-Ns 10.0
-illum 2
+{}
 
-newmtl {}
-Ka 0.9 0.9 0.9
-Kd 0.9 0.9 0.9
-Ks 0.9 0.9 0.9
-Ns 10.0
-illum 2
-d 0.20
+{}
 
-newmtl {}
-Ka 0.0 0.0 1.0
-Kd 0.0 0.0 1.0
-Ks 0.0 0.0 1.0
-Ns 10.0
-illum 2
-d 0.80
+{}
 
-newmtl {}
-Ka 0.8 0.8 0.0
-Kd 1.0 1.0 0.0
-Ks 1.0 1.0 0.5
-Ns 10.0
-illum 2
-d 0.1
+{}
 
-newmtl {}
-Ka 0.1 0.1 0.1
-Kd 0.2 0.2 0.2
-Ks 0.3 0.3 0.3
-Ns 10.0
-illum 2
-d 0.10
+{}
 
-newmtl {}
-Ka 0.9 0.9 0.9
-Kd 0.9 0.9 0.9
-Ks 0.9 0.9 0.9
-Ns 10.0
-illum 2
-d 0.10
+{}
 
-newmtl {}
-Ka 0.0 0.0 1.0
-Kd 0.0 0.0 1.0
-Ks 0.0 0.0 1.0
-Ns 10.0
-illum 2
-d 0.20
+{}
 )X",
-               kMarkerPaint, kBlandAsphalt, kLaneHaze, kBranchPointGlow,
-               kGrayedMarkerPaint, kGrayedBlandAsphalt, kGrayedLaneHaze,
-               kHBoundsHaze);
+     FormatMaterial(kMaterial.at("marker"), kMarkerPaint),
+     FormatMaterial(kMaterial.at("asphalt"), kBlandAsphalt),
+     FormatMaterial(kMaterial.at("lane"), kLaneHaze),
+     FormatMaterial(kMaterial.at("branch_point"), kBranchPointGlow),
+     FormatMaterial(kMaterial.at("grayed_marker"), kGrayedMarkerPaint),
+     FormatMaterial(kMaterial.at("grayed_asphalt"), kGrayedBlandAsphalt),
+     FormatMaterial(kMaterial.at("grayed_lane"), kGrayedLaneHaze),
+     FormatMaterial(kMaterial.at("h_bounds"), kHBoundsHaze));
   }
 }
-
-// This map holds the properties of different materials. Those properties were
-// taken from the original .mtl description that lives in GenerateObjFile().
-const std::unordered_map<std::string, Material> kMaterial{
-  {"asphalt",  {{0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0}},
-  {"lane",     {{0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8}},
-  {"marker",   {{0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5}},
-  {"h_bounds", {{0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8}},
-  {"branch_point", {{0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9}},
-  {"grayed_asphalt", {{0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9}},
-  {"grayed_lane", {{0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9}},
-  {"grayed_marker", {{0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}}
-};
 
 std::unique_ptr<Material> GetMaterialByName(const std::string& material_name) {
   if (kMaterial.find(material_name) == kMaterial.end()) {
