@@ -16,6 +16,12 @@ target_include_directories(dragway
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
+target_link_libraries(dragway
+  maliput::api
+  maliput::geometry_base
+  drake::drake
+)
+
 ament_target_dependencies(dragway
     "maliput-utilities"
     "maliput"
