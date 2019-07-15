@@ -117,9 +117,9 @@ void GenerateObjFile(const api::RoadGeometry* road_geometry,
 ///   - grayed_marker
 ///
 /// @param material_name The key to get the material.
-/// @return A std::unique_ptr<Material> with a filled Material structure. It
-/// will be nullptr when `material_name` is not any of the previous options.
-std::unique_ptr<Material> GetMaterialByName(const std::string& material_name);
+/// @return A const Material&
+/// @throws std::out_of_range if key is not found.
+const Material& GetMaterialByName(const std::string& material_name);
 
 }  // namespace utility
 }  // namespace maliput
