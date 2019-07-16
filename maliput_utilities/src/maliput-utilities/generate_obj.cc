@@ -7,7 +7,7 @@
 #include <functional>
 #include <initializer_list>
 #include <tuple>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "fmt/ostream.h"
@@ -41,7 +41,7 @@ const std::string kGrayedMarkerPaint("grayed_marker_paint");
 
 // This map holds the properties of different materials. Those properties were
 // taken from the original .mtl description that lives in GenerateObjFile().
-const std::unordered_map<std::string, Material> kMaterial{
+const std::map<std::string, Material> kMaterial{
   {kBlandAsphalt,
     {{0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0}},
   {kLaneHaze,
@@ -76,7 +76,7 @@ std::string FormatMaterial(const Material& mat, const std::string &matName)
                       "Ks {}\n"
                       "Ns {}\n"
                       "illum 2\n"
-                      "d {}\n\n",
+                      "d {}\n",
                       matName, FormatDrakeVector3AsRow(mat.ambient),
                       FormatDrakeVector3AsRow(mat.diffuse),
                       FormatDrakeVector3AsRow(mat.specular),
@@ -627,8 +627,7 @@ bool IsSegmentRenderedNormally(const api::SegmentId& id,
 
 }  // namespace
 
-std::unordered_map<std::string, GeoMesh> BuildMeshes(
-                                           const api::RoadGeometry* rg,
+std::map<std::string, GeoMesh> BuildMeshes(const api::RoadGeometry* rg,
                                            const ObjFeatures& features) {
   GeoMesh asphalt_mesh;
   GeoMesh lane_mesh;
@@ -673,7 +672,7 @@ std::unordered_map<std::string, GeoMesh> BuildMeshes(
     }
   }
 
-  std::unordered_map<std::string, GeoMesh> meshes;
+  std::map<std::string, GeoMesh> meshes;
   meshes[kBlandAsphalt] = std::move(asphalt_mesh);
   meshes[kLaneHaze] = std::move(lane_mesh);
   meshes[kMarkerPaint] = std::move(marker_mesh);
@@ -690,7 +689,7 @@ void GenerateObjFile(const api::RoadGeometry* rg,
                      const std::string& fileroot,
                      const ObjFeatures& features) {
 
-  std::unordered_map<std::string, GeoMesh> meshes = BuildMeshes(rg, features);
+  std::map<std::string, GeoMesh> meshes = BuildMeshes(rg, features);
   const GeoMesh& asphalt_mesh = meshes[kBlandAsphalt];
   const GeoMesh& lane_mesh = meshes[kLaneHaze];
   const GeoMesh& marker_mesh = meshes[kMarkerPaint];

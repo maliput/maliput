@@ -80,8 +80,7 @@ struct Material {
 ///   - grayed_asphalt
 ///   - grayed_lane
 ///   - grayed_marker
-std::unordered_map<std::string, mesh::GeoMesh> BuildMeshes(
-                                                 const api::RoadGeometry* rg,
+std::map<std::string, mesh::GeoMesh> BuildMeshes(const api::RoadGeometry* rg,
                                                  const ObjFeatures& features);
 
 /// Generates a Wavefront OBJ model of the road surface of an api::RoadGeometry.
