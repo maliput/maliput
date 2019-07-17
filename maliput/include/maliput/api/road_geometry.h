@@ -4,13 +4,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_throw.h"
+
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
 #include "maliput/api/type_specific_identifier.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -123,15 +125,21 @@ class RoadGeometry {
   ///
   /// @param geo_position The geo position to convert into one or more
   ///        RoadPositions.
-  /// @param radius The maximum distance from @p geo_position to search.
+  /// @param radius The maximum distance from @p geo_position to search. It must
+  ///        not be negative.
   /// @return A vector of RoadPositionResults representing the possible
-  ///         RoadPositions.
+  ///         RoadPositions. When @p radius is zero, the vector contains results
+  ///         that are only within the matched road volumes. When @p radius is
+  ///         infinity, the query should return the closest point for each lane.
+  ///
+  /// @throws std::runtime_error When @p radius is negative.
   ///
   /// Note that derivative implementations may choose to violate the above
   /// semantics for performance reasons. See docstrings of derivative
   /// implementations for details.
   std::vector<RoadPositionResult> FindRoadPositions(
       const GeoPosition& geo_position, double radius) const {
+    DRAKE_THROW_UNLESS(radius >= 0.);
     return DoFindRoadPositions(geo_position, radius);
   }
 
