@@ -59,11 +59,20 @@ struct ObjFeatures {
 
 /// Material information for built meshes.
 struct Material {
+  std::string name;
   drake::Vector3<double> diffuse;  /// Kd
   drake::Vector3<double> ambient;  /// Ka
   drake::Vector3<double> specular;  /// Ks
   double shinines;  /// Ns
   double transparency;  /// 1.0 - d
+
+  friend bool operator==(const Material& matA, const Material& matB) {
+    return matA.name == matB.name;
+  }
+
+  friend bool operator==(const Material& matA, const std::string &name) {
+    return matA.name == name;
+  }
 };
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
@@ -80,8 +89,9 @@ struct Material {
 ///   - grayed_asphalt
 ///   - grayed_lane
 ///   - grayed_marker
-std::map<std::string, mesh::GeoMesh> BuildMeshes(const api::RoadGeometry* rg,
-                                                 const ObjFeatures& features);
+std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(
+  const api::RoadGeometry* rg,
+  const ObjFeatures& features);
 
 /// Generates a Wavefront OBJ model of the road surface of an api::RoadGeometry.
 ///

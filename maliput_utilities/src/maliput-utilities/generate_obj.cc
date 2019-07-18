@@ -41,23 +41,23 @@ const std::string kGrayedMarkerPaint("grayed_marker_paint");
 
 // This map holds the properties of different materials. Those properties were
 // taken from the original .mtl description that lives in GenerateObjFile().
-const std::map<std::string, Material> kMaterial{
+const std::vector<Material> kMaterial{
   {kBlandAsphalt,
-    {{0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0}},
+    {0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0},
   {kLaneHaze,
-    {{0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8}},
+    {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8},
   {kMarkerPaint,
-    {{0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5}},
+    {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5},
   {kHBoundsHaze,
-    {{0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8}},
+    {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8},
   {kBranchPointGlow,
-    {{0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9}},
+    {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9},
   {kGrayedBlandAsphalt,
-    {{0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9}},
+    {0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9},
   {kGrayedLaneHaze,
-    {{0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9}},
+    {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9},
   {kGrayedMarkerPaint,
-    {{0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}}
+    {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}
 };
 
 std::string FormatDrakeVector3AsRow(const drake::Vector3<double> &vec)
@@ -68,7 +68,7 @@ std::string FormatDrakeVector3AsRow(const drake::Vector3<double> &vec)
                      );
 }
 
-std::string FormatMaterial(const Material& mat, const std::string &matName)
+std::string FormatMaterial(const Material& mat)
 {
   return fmt::format("newmtl {}\n"
                       "Ka {}\n"
@@ -77,7 +77,7 @@ std::string FormatMaterial(const Material& mat, const std::string &matName)
                       "Ns {}\n"
                       "illum 2\n"
                       "d {}\n",
-                      matName, FormatDrakeVector3AsRow(mat.ambient),
+                      mat.name, FormatDrakeVector3AsRow(mat.ambient),
                       FormatDrakeVector3AsRow(mat.diffuse),
                       FormatDrakeVector3AsRow(mat.specular),
                       mat.shinines, 1.0 - mat.transparency);
@@ -627,7 +627,8 @@ bool IsSegmentRenderedNormally(const api::SegmentId& id,
 
 }  // namespace
 
-std::map<std::string, GeoMesh> BuildMeshes(const api::RoadGeometry* rg,
+std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(
+                                           const api::RoadGeometry* rg,
                                            const ObjFeatures& features) {
   GeoMesh asphalt_mesh;
   GeoMesh lane_mesh;
@@ -672,15 +673,23 @@ std::map<std::string, GeoMesh> BuildMeshes(const api::RoadGeometry* rg,
     }
   }
 
-  std::map<std::string, GeoMesh> meshes;
-  meshes[kBlandAsphalt] = std::move(asphalt_mesh);
-  meshes[kLaneHaze] = std::move(lane_mesh);
-  meshes[kMarkerPaint] = std::move(marker_mesh);
-  meshes[kHBoundsHaze] = std::move(h_bounds_mesh);
-  meshes[kBranchPointGlow] = std::move(branch_point_mesh);
-  meshes[kGrayedBlandAsphalt] = std::move(grayed_asphalt_mesh);
-  meshes[kGrayedLaneHaze] = std::move(grayed_lane_mesh);
-  meshes[kGrayedMarkerPaint] = std::move(grayed_marker_mesh);
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes;
+  meshes["asphalt"] = std::make_pair(std::move(asphalt_mesh),
+                                  GetMaterialByName(kBlandAsphalt));
+  meshes["lane"] = std::make_pair(std::move(lane_mesh),
+                                  GetMaterialByName(kLaneHaze));
+  meshes["marker"] = std::make_pair(std::move(marker_mesh),
+                                  GetMaterialByName(kMarkerPaint));
+  meshes["h_bounds"] = std::make_pair(std::move(h_bounds_mesh),
+                                  GetMaterialByName(kHBoundsHaze));
+  meshes["branch_point"] = std::make_pair(std::move(branch_point_mesh),
+                                  GetMaterialByName(kBranchPointGlow));
+  meshes["grayed_asphalt"] = std::make_pair(std::move(grayed_asphalt_mesh),
+                                  GetMaterialByName(kGrayedBlandAsphalt));
+  meshes["grayed_lane"] = std::make_pair(std::move(grayed_lane_mesh),
+                                  GetMaterialByName(kGrayedLaneHaze));
+  meshes["grayed_marker"] = std::make_pair(std::move(grayed_marker_mesh),
+                                  GetMaterialByName(kGrayedMarkerPaint));
   return meshes;
 }
 
@@ -689,15 +698,16 @@ void GenerateObjFile(const api::RoadGeometry* rg,
                      const std::string& fileroot,
                      const ObjFeatures& features) {
 
-  std::map<std::string, GeoMesh> meshes = BuildMeshes(rg, features);
-  const GeoMesh& asphalt_mesh = meshes[kBlandAsphalt];
-  const GeoMesh& lane_mesh = meshes[kLaneHaze];
-  const GeoMesh& marker_mesh = meshes[kMarkerPaint];
-  const GeoMesh& h_bounds_mesh = meshes[kHBoundsHaze];
-  const GeoMesh& branch_point_mesh = meshes[kBranchPointGlow];
-  const GeoMesh& grayed_asphalt_mesh = meshes[kGrayedBlandAsphalt];
-  const GeoMesh& grayed_lane_mesh = meshes[kGrayedLaneHaze];
-  const GeoMesh& grayed_marker_mesh = meshes[kGrayedMarkerPaint];
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes =
+    BuildMeshes(rg, features);
+  const GeoMesh& asphalt_mesh = meshes["asphalt"].first;
+  const GeoMesh& lane_mesh = meshes["lane"].first;
+  const GeoMesh& marker_mesh = meshes["marker"].first;
+  const GeoMesh& h_bounds_mesh = meshes["h_bounds"].first;
+  const GeoMesh& branch_point_mesh = meshes["branch_point"].first;
+  const GeoMesh& grayed_asphalt_mesh = meshes["grayed_asphalt"].first;
+  const GeoMesh& grayed_lane_mesh = meshes["grayed_lane"].first;
+  const GeoMesh& grayed_marker_mesh = meshes["grayed_marker"].first;
 
   const std::string obj_filename = fileroot + ".obj";
   const std::string mtl_filename = fileroot + ".mtl";
@@ -779,15 +789,17 @@ mtllib {}
        << "# DON'T BE A HERO.  Do not edit by hand.\n\n";
     for (const auto &matPair : meshes)
     {
-      const std::string &material_name = matPair.first;
-      os << FormatMaterial(GetMaterialByName(material_name),
-                                             material_name);
+      const Material& mat = matPair.second.second;
+      os << FormatMaterial(mat);
     }
   }
 }
 
 const Material& GetMaterialByName(const std::string& material_name) {
-  return kMaterial.at(material_name);
+  auto material = std::find(kMaterial.cbegin(), kMaterial.cend(),
+    material_name);
+  DRAKE_DEMAND(material != kMaterial.cend());
+  return *material;
 }
 
 
