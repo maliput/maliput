@@ -1,5 +1,7 @@
 #include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
 
+#include <limits>
+
 #include "drake/common/drake_throw.h"
 
 #include "maliput/api/junction.h"
@@ -33,7 +35,8 @@ BruteForceFindRoadPositionsStrategy(
         const maliput::api::LanePosition lane_position =
             lane->ToLanePosition(geo_position, &nearest_position, &distance);
 
-        if (distance <= radius) {
+        if (radius == std::numeric_limits<double>::infinity() ||
+            distance <= radius) {
           road_position_results.push_back({
               api::RoadPosition(lane, lane_position),
               nearest_position,
