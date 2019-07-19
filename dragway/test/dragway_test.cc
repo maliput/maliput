@@ -1029,7 +1029,7 @@ std::vector<FindRoadPositionsTestParameters>
     // right LanePosition for each coordinate (s, r, and h), not only a mapping
     // to the ground.
 
-    // { Single-lane Dragway tests cases
+    // { Single-lane Dragway tests cases.
     // Point is outside the RoadGeometry volume with zero radius, no possible
     // match.
     {1, 0., api::GeoPosition(10., 20., 30.), {}},
@@ -1063,9 +1063,9 @@ std::vector<FindRoadPositionsTestParameters>
         29.95413160150032}},
       },
     },
-    // } Single-lane Dragway tests cases
+    // } Single-lane Dragway tests cases.
 
-    // { Multiple-lane Dragway test cases
+    // { Multiple-lane Dragway test cases.
     // Point is outside the RoadGeometry volume with zero radius, no possible
     // match.
     {3, 0., api::GeoPosition(10., 20., 30.), {}},
@@ -1140,7 +1140,7 @@ std::vector<FindRoadPositionsTestParameters>
         0.}},
       },
     },
-    // } Multiple-lane Dragway test cases
+    // } Multiple-lane Dragway test cases.
   };
 }
 

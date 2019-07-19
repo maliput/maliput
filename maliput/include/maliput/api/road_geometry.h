@@ -129,8 +129,9 @@ class RoadGeometry {
   ///        not be negative.
   /// @return A vector of RoadPositionResults representing the possible
   ///         RoadPositions. When @p radius is zero, the vector contains results
-  ///         that are only within the matched road volumes. When @p radius is
-  ///         infinity, the query should return the closest point for each lane.
+  ///         with distance parameter being less or equal to linear_tolerance.
+  ///         When @p radius is infinity, the query should return the closest
+  ///         point for each lane.
   ///
   /// @throws std::runtime_error When @p radius is negative.
   ///
