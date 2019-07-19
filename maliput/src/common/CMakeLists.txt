@@ -3,7 +3,8 @@
 ##############################################################################
 
 set(COMMON_SOURCES
-  filesystem.cc)
+  filesystem.cc
+  maliput_abort_and_throw.cc)
 
 add_library(common ${COMMON_SOURCES})
 
