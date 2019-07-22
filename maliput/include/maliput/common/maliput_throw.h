@@ -18,7 +18,7 @@ void Throw(const char* condition, const char* func, const char* file, int line);
 /// and line.
 #define MALIPUT_THROW_UNLESS(condition)                                       \
   do {                                                                        \
-    if (!condition) {                                                         \
+    if (!(condition)) {                                                       \
       ::maliput::common::internal::Throw(                                     \
           #condition, __func__, __FILE__, __LINE__);                          \
     }                                                                         \

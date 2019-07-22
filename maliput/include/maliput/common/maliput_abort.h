@@ -8,6 +8,11 @@ namespace internal {
 __attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
 void Abort(const char* condition, const char* func, const char* file, int line);
 
+// Abort the program with an error message and accepts @p extra_details.
+__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
+void Abort(const char* condition, const char* func, const char* file, int line,
+           const char* extra_details);
+
 }  // namespace internal
 }  // namespace common
 }  // namespace maliput
@@ -18,9 +23,16 @@ void Abort(const char* condition, const char* func, const char* file, int line);
 /// line.
 #define MALIPUT_DEMAND(condition)                                             \
   do {                                                                        \
-    if (!condition) {                                                         \
+    if (!(condition)) {                                                       \
       ::maliput::common::internal::Abort(                                     \
           #condition, __func__, __FILE__, __LINE__);                          \
     }                                                                         \
   } while (0)
 
+/// Triggers an abortion with a message showing at least the condition text,
+/// function name, file, line and @p msg.
+#define MALIPUT_ABORT_MESSAGE(msg)                                            \
+  do {                                                                        \
+    ::maliput::common::internal::Abort(                                       \
+        "", __func__, __FILE__, __LINE__, #msg);                              \
+  } while (0)

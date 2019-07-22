@@ -35,6 +35,15 @@ void Abort(const char* condition, const char* func, const char* file,
   std::abort();
 }
 
+// Declared in maliput_abort.h.
+void Abort(const char* condition, const char* func, const char* file,
+           int line, const char* extra_details) {
+  std::cerr << "abort: ";
+  PrintFailureDetailTo(&std::cerr, condition, func, file, line);
+  std::cerr << " Details: " << extra_details << std::endl;
+  std::abort();
+}
+
 // Declared in maliput_throw.h.
 void Throw(const char* condition, const char* func, const char* file,
            int line) {
