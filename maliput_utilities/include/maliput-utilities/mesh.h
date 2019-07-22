@@ -277,6 +277,11 @@ class GeoMesh {
 
   const std::vector<IndexFace>& faces() const { return faces_; }
 
+  int num_vertices() const { return vertices_.vector().size(); }
+  int num_normals() const { return normals_.vector().size(); }
+  const GeoVertex& get_vertex(int vi) const { return *vertices_.vector()[vi]; }
+  const GeoNormal& get_normal(int ni) const { return *normals_.vector()[ni]; }
+
  private:
   UniqueIndexer<GeoVertex, GeoVertex::Hash, GeoVertex::Equiv> vertices_;
   UniqueIndexer<GeoNormal, GeoNormal::Hash, GeoNormal::Equiv> normals_;

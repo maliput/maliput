@@ -7,7 +7,7 @@
 #include <functional>
 #include <initializer_list>
 #include <tuple>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "fmt/ostream.h"
@@ -29,6 +29,59 @@ using mesh::SrhFace;
 using mesh::SimplifyMeshFaces;
 
 namespace {
+
+const std::string kBlandAsphalt("bland_asphalt");
+const std::string kLaneHaze("lane_haze");
+const std::string kMarkerPaint("marker_paint");
+const std::string kHBoundsHaze("h_bounds_haze");
+const std::string kBranchPointGlow("branch_point_glow");
+const std::string kGrayedBlandAsphalt("grayed_bland_asphalt");
+const std::string kGrayedLaneHaze("grayed_lane_haze");
+const std::string kGrayedMarkerPaint("grayed_marker_paint");
+
+// This map holds the properties of different materials. Those properties were
+// taken from the original .mtl description that lives in GenerateObjFile().
+const std::vector<Material> kMaterial{
+  {kBlandAsphalt,
+    {0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0},
+  {kLaneHaze,
+    {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8},
+  {kMarkerPaint,
+    {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5},
+  {kHBoundsHaze,
+    {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8},
+  {kBranchPointGlow,
+    {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9},
+  {kGrayedBlandAsphalt,
+    {0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9},
+  {kGrayedLaneHaze,
+    {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9},
+  {kGrayedMarkerPaint,
+    {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}
+};
+
+std::string FormatDrakeVector3AsRow(const drake::Vector3<double> &vec)
+{
+  return fmt::format("{} {} {}", std::to_string(vec.x()),
+                                 std::to_string(vec.y()),
+                                 std::to_string(vec.z())
+                     );
+}
+
+std::string FormatMaterial(const Material& mat)
+{
+  return fmt::format("newmtl {}\n"
+                      "Ka {}\n"
+                      "Kd {}\n"
+                      "Ks {}\n"
+                      "Ns {}\n"
+                      "illum 2\n"
+                      "d {}\n",
+                      mat.name, FormatDrakeVector3AsRow(mat.ambient),
+                      FormatDrakeVector3AsRow(mat.diffuse),
+                      FormatDrakeVector3AsRow(mat.specular),
+                      mat.shinines, 1.0 - mat.transparency);
+}
 
 // Traverses @p lane, generating a cover of the surface with with quads
 // (4-vertex faces) which are added to @p mesh.  The quads are squares in
@@ -574,11 +627,9 @@ bool IsSegmentRenderedNormally(const api::SegmentId& id,
 
 }  // namespace
 
-
-void GenerateObjFile(const api::RoadGeometry* rg,
-                     const std::string& dirpath,
-                     const std::string& fileroot,
-                     const ObjFeatures& features) {
+std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(
+                                           const api::RoadGeometry* rg,
+                                           const ObjFeatures& features) {
   GeoMesh asphalt_mesh;
   GeoMesh lane_mesh;
   GeoMesh marker_mesh;
@@ -622,15 +673,41 @@ void GenerateObjFile(const api::RoadGeometry* rg,
     }
   }
 
-  const std::string kLaneHaze("lane_haze");
-  const std::string kMarkerPaint("marker_paint");
-  const std::string kBlandAsphalt("bland_asphalt");
-  const std::string kBranchPointGlow("branch_point_glow");
-  const std::string kHBoundsHaze("h_bounds_haze");
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes;
+  meshes["asphalt"] = std::make_pair(std::move(asphalt_mesh),
+                                  GetMaterialByName(kBlandAsphalt));
+  meshes["lane"] = std::make_pair(std::move(lane_mesh),
+                                  GetMaterialByName(kLaneHaze));
+  meshes["marker"] = std::make_pair(std::move(marker_mesh),
+                                  GetMaterialByName(kMarkerPaint));
+  meshes["h_bounds"] = std::make_pair(std::move(h_bounds_mesh),
+                                  GetMaterialByName(kHBoundsHaze));
+  meshes["branch_point"] = std::make_pair(std::move(branch_point_mesh),
+                                  GetMaterialByName(kBranchPointGlow));
+  meshes["grayed_asphalt"] = std::make_pair(std::move(grayed_asphalt_mesh),
+                                  GetMaterialByName(kGrayedBlandAsphalt));
+  meshes["grayed_lane"] = std::make_pair(std::move(grayed_lane_mesh),
+                                  GetMaterialByName(kGrayedLaneHaze));
+  meshes["grayed_marker"] = std::make_pair(std::move(grayed_marker_mesh),
+                                  GetMaterialByName(kGrayedMarkerPaint));
+  return meshes;
+}
 
-  const std::string kGrayedLaneHaze("grayed_lane_haze");
-  const std::string kGrayedMarkerPaint("grayed_marker_paint");
-  const std::string kGrayedBlandAsphalt("grayed_bland_asphalt");
+void GenerateObjFile(const api::RoadGeometry* rg,
+                     const std::string& dirpath,
+                     const std::string& fileroot,
+                     const ObjFeatures& features) {
+
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes =
+    BuildMeshes(rg, features);
+  const GeoMesh& asphalt_mesh = meshes["asphalt"].first;
+  const GeoMesh& lane_mesh = meshes["lane"].first;
+  const GeoMesh& marker_mesh = meshes["marker"].first;
+  const GeoMesh& h_bounds_mesh = meshes["h_bounds"].first;
+  const GeoMesh& branch_point_mesh = meshes["branch_point"].first;
+  const GeoMesh& grayed_asphalt_mesh = meshes["grayed_asphalt"].first;
+  const GeoMesh& grayed_lane_mesh = meshes["grayed_lane"].first;
+  const GeoMesh& grayed_marker_mesh = meshes["grayed_marker"].first;
 
   const std::string obj_filename = fileroot + ".obj";
   const std::string mtl_filename = fileroot + ".mtl";
@@ -708,78 +785,21 @@ mtllib {}
   // Create the MTL file referenced by the OBJ file.
   {
     std::ofstream os(dirpath + "/" + mtl_filename, std::ios::binary);
-    fmt::print(os,
-               R"X(# GENERATED BY maliput::utility::GenerateObjFile()
-#
-# DON'T BE A HERO.  Do not edit by hand.
-
-newmtl {}
-Ka 0.8 0.8 0.0
-Kd 1.0 1.0 0.0
-Ks 1.0 1.0 0.5
-Ns 10.0
-illum 2
-d 0.5
-
-newmtl {}
-Ka 0.1 0.1 0.1
-Kd 0.2 0.2 0.2
-Ks 0.3 0.3 0.3
-Ns 10.0
-illum 2
-
-newmtl {}
-Ka 0.9 0.9 0.9
-Kd 0.9 0.9 0.9
-Ks 0.9 0.9 0.9
-Ns 10.0
-illum 2
-d 0.20
-
-newmtl {}
-Ka 0.0 0.0 1.0
-Kd 0.0 0.0 1.0
-Ks 0.0 0.0 1.0
-Ns 10.0
-illum 2
-d 0.80
-
-newmtl {}
-Ka 0.8 0.8 0.0
-Kd 1.0 1.0 0.0
-Ks 1.0 1.0 0.5
-Ns 10.0
-illum 2
-d 0.1
-
-newmtl {}
-Ka 0.1 0.1 0.1
-Kd 0.2 0.2 0.2
-Ks 0.3 0.3 0.3
-Ns 10.0
-illum 2
-d 0.10
-
-newmtl {}
-Ka 0.9 0.9 0.9
-Kd 0.9 0.9 0.9
-Ks 0.9 0.9 0.9
-Ns 10.0
-illum 2
-d 0.10
-
-newmtl {}
-Ka 0.0 0.0 1.0
-Kd 0.0 0.0 1.0
-Ks 0.0 0.0 1.0
-Ns 10.0
-illum 2
-d 0.20
-)X",
-               kMarkerPaint, kBlandAsphalt, kLaneHaze, kBranchPointGlow,
-               kGrayedMarkerPaint, kGrayedBlandAsphalt, kGrayedLaneHaze,
-               kHBoundsHaze);
+    os << "# GENERATED BY maliput::utility::GenerateObjFile()\n"
+       << "# DON'T BE A HERO.  Do not edit by hand.\n\n";
+    for (const auto &matPair : meshes)
+    {
+      const Material& mat = matPair.second.second;
+      os << FormatMaterial(mat);
+    }
   }
+}
+
+const Material& GetMaterialByName(const std::string& material_name) {
+  auto material = std::find(kMaterial.cbegin(), kMaterial.cend(),
+    material_name);
+  DRAKE_DEMAND(material != kMaterial.cend());
+  return *material;
 }
 
 
