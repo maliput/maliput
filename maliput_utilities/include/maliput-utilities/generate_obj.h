@@ -29,6 +29,10 @@ struct ObjFeatures {
   bool draw_branch_points{true};
   /// Draw highlighting of elevation_bounds of each lane?
   bool draw_elevation_bounds{true};
+  /// Reduce the amount of vertices from the road. This could reduce
+  /// the accuracy of the arcs. Change to false if you desire
+  /// the full road generated.
+  bool improve_mesh_generation{true};
   /// Tolerance for mesh simplification, or the distance from a vertex to an
   /// edge line or to a face plane at which said vertex is considered redundant
   /// (i.e. it is not necessary to further define those geometrical entities),
