@@ -84,7 +84,7 @@ std::string FormatMaterial(const Material& mat)
                       mat.shinines, 1.0 - mat.transparency);
 }
 
-double ComputeSampleStepForCenterLane(
+double ComputeSampleStep(
       const maliput::api::Lane* lane, double s0, double grid_unit) {
   DRAKE_DEMAND(lane != nullptr);
 
@@ -92,35 +92,45 @@ double ComputeSampleStepForCenterLane(
   const double min_step = std::min(grid_unit, length - s0);
 
   const maliput::api::GeoPosition prev_pos =
-      lane->ToGeoPosition({s0, 0., 0.});
+        lane->ToGeoPosition({s0, 0., 0.});
 
   // Start from minimum step.
   double step_best = min_step;
-  double distance_best = grid_unit;
 
   while (true) {
     // Make step in travel_with_s direction.
     const double step_proposed = std::min(step_best * 2., length - s0);
     const auto s_proposed = s0 + step_proposed;
-    const maliput::api::GeoPosition proposed_pos =
-        lane->ToGeoPosition({s_proposed, 0., 0.});
+    const maliput::api::RBounds lane_bounds = lane->lane_bounds(s_proposed);
 
-    // Calculate distance between geo positions.
-    const double distance = (prev_pos.xyz() - proposed_pos.xyz()).norm();
+    const maliput::api::GeoPosition proposed_pos_center_lane =
+        lane->ToGeoPosition({s_proposed, 0., 0.});
+    const maliput::api::GeoPosition proposed_pos_left_lane =
+        lane->ToGeoPosition({s_proposed, lane_bounds.max(), 0.});
+    const maliput::api::GeoPosition proposed_pos_right_lane =
+        lane->ToGeoPosition({s_proposed, lane_bounds.min(), 0.});
+
+    // Calculate distance between geo positions for every lane.
+    const double distance_from_center =
+        (prev_pos.xyz() - proposed_pos_center_lane.xyz()).norm();
+    const double distance_from_left =
+        (prev_pos.xyz() - proposed_pos_left_lane.xyz()).norm();
+    const double distance_from_right =
+        (prev_pos.xyz() - proposed_pos_right_lane.xyz()).norm();
 
     // Check if distance between geo position and local path length ( delta s ) is small enough.
-    if (std::fabs(distance - step_proposed) > grid_unit) {
+    if (std::fabs(distance_from_center - step_proposed) > grid_unit ||
+        std::fabs(distance_from_left - step_proposed) > grid_unit ||
+        std::fabs(distance_from_right - step_proposed) > grid_unit) {
       // Tolerance is violated, can't increase step.
       break;
     }
     if (std::fabs(s_proposed - length) < grid_unit) {
-      step_best = step_proposed;
-      distance_best = distance;
+      step_best = std::max(std::min(0.0, step_proposed), length);
       break;
     }
     // Tolerance is satisfied - increase step 2X in the next iteration and try again.
     step_best = step_proposed;
-    distance_best = distance;
   }
 
   step_best = std::min(step_best, length - s0);
@@ -148,11 +158,10 @@ void CoverLaneWithQuads(
     lane->segment()->junction()->road_geometry()->linear_tolerance();
   for (double s0 = 0, s1; s0 < s_max; s0 = s1) {
     // The smaller the grid_unit is, the better quality we get for the road.
-    const double step_increment = ComputeSampleStepForCenterLane(lane,
-                                                                 s0,
-                                                                 grid_unit);
+    const double step_increment = ComputeSampleStep(lane,
+                                                    s0,
+                                                    grid_unit);
     s1 = s0 + step_increment;
-    if (s1 > s_max - linear_tolerance) { s1 = s_max; }
 
     const api::RBounds rb0 = use_driveable_bounds ?
         lane->driveable_bounds(s0) : lane->lane_bounds(s0);
@@ -571,15 +580,11 @@ void RenderSegment(const api::Segment* segment,
   const double base_grid_unit = PickGridUnit(
       segment->lane(0), features.max_grid_unit, features.min_grid_resolution,
       linear_tolerance);
-  // TODO: Find a way to get a proper grid_unit for lanes rendering based
-  // on the lane length. We have good results in terms of speed and vertex
-  // amount using this value.
-  const double grid_unit_for_lanes = 0.01;
   {
     // Lane 0 should be as good as any other for driveable-bounds.
     GeoMesh driveable_mesh;
     CoverLaneWithQuads(&driveable_mesh, segment->lane(0),
-                       grid_unit_for_lanes,
+                       base_grid_unit,
                        true /*use_driveable_bounds*/,
                        [](double, double) { return 0.; });
     asphalt_mesh->AddFacesFrom(SimplifyMesh(driveable_mesh, features));
@@ -590,14 +595,14 @@ void RenderSegment(const api::Segment* segment,
     CoverLaneWithQuads(
         &upper_h_bounds_mesh,
         segment->lane(0),
-        grid_unit_for_lanes,
+        base_grid_unit,
         true /*use_driveable_bounds*/,
         [&segment](double s, double r) {
           return segment->lane(0)->elevation_bounds(s, r).max(); });
     CoverLaneWithQuads(
         &lower_h_bounds_mesh,
         segment->lane(0),
-        grid_unit_for_lanes,
+        base_grid_unit,
         true /*use_driveable_bounds*/,
         [&segment](double s, double r) {
           return segment->lane(0)->elevation_bounds(s, r).min(); });
@@ -611,7 +616,7 @@ void RenderSegment(const api::Segment* segment,
         linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
-      CoverLaneWithQuads(&haze_mesh, lane, grid_unit_for_lanes,
+      CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit,
                          false /*use_driveable_bounds*/,
                          [&features](double, double) {
                            return features.lane_haze_elevation;
