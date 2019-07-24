@@ -20,9 +20,9 @@ GTEST_TEST(MaliputDemandDeathTest, DemandTest) {
 GTEST_TEST(MaliputAbortDeathTest, AbortMsgTest) {
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";
   ASSERT_DEATH(
-      { MALIPUT_ABORT_MESSAGE("I'm gonna die!"); },
+      { MALIPUT_ABORT_MESSAGE("This code will abort."); },
       "abort: Failure at .*maliput_abort_test.cc:.. in TestBody..: "
-      "condition '' failed. Details: \"I'm gonna die!\"");
+      "condition '' failed. Details: \"This code will abort.\"");
 }
 
 }  // namespace
