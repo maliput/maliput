@@ -1,7 +1,7 @@
 #pragma once
 
 /// @file maliput_throw.h
-/// Code in this file is inspired by
+/// Code in this file is inspired by:
 /// https://github.com/RobotLocomotion/drake/blob/master/common/drake_throw.h
 ///
 /// Drake's license follows:

@@ -1,7 +1,7 @@
 #pragma once
 
 /// @file assertion_error.h
-/// Code in this file is inspired by
+/// Code in this file is inspired by:
 /// https://github.com/RobotLocomotion/drake/blob/master/common/drake_assertion_error.h
 ///
 /// Drake's license follows:

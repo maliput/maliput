@@ -1,5 +1,5 @@
 /// @file maliput_abort_and_throw.cc
-/// Code in this file is inspired by
+/// Code in this file is inspired by:
 /// https://github.com/RobotLocomotion/drake/blob/master/common/drake_abort_and_throw.cc
 ///
 /// Drake's license follows:
