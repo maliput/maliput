@@ -84,6 +84,13 @@ std::string FormatMaterial(const Material& mat)
                       mat.shinines, 1.0 - mat.transparency);
 }
 
+// Let `step_s` be a step in arc-length s-coordinate, `s0` an s-coordinate in
+// `lane` and grid_unit` the minimum step in s-coordinate to take. It increases
+// `step_s`,  from the minimum of `grid_unit` and the arc-length distance to the
+// lane end, until the distance of the Inertial frame positions in the center of
+// `lane`, left most and right most of the driveable surface to the respective
+// points at `s0 + step_s` is bigger than `grid_unit` or we reach the end of
+// the `lane`. 
 double ComputeSampleStep(
       const maliput::api::Lane* lane, double s0, double grid_unit) {
   DRAKE_DEMAND(lane != nullptr);
@@ -105,7 +112,7 @@ double ComputeSampleStep(
   while (true) {
     // Make step in travel_with_s direction.
     const double step_proposed = std::min(step_best * 2., length - s0);
-    const auto s_proposed = s0 + step_proposed;
+    const double s_proposed = s0 + step_proposed;
     const maliput::api::RBounds lane_bounds = lane->lane_bounds(s_proposed);
 
     const maliput::api::GeoPosition proposed_pos_center_lane =
@@ -131,6 +138,9 @@ double ComputeSampleStep(
       break;
     }
     if (std::fabs(s_proposed - length) < grid_unit) {
+      // Clamp the s coordinate since nothing
+      // ensures that s_proposed is not negative
+      // or a little bit bigger than the lane length.
       step_best = std::max(std::min(0.0, step_proposed), length);
       break;
     }
@@ -142,6 +152,10 @@ double ComputeSampleStep(
   return step_best;
 }
 
+// Iterate trough the s-coordinate of the road and generate two triangles
+// covering the left and right side of the road, considering the grid_unit
+// as a tolerance between patches. Bigger tolerance, worst quality but less
+// vertices.
 void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane,
     double grid_unit, bool use_driveable_bounds,
     const std::function<double(double, double)>& elevation) {
@@ -663,7 +677,7 @@ void RenderSegment(const api::Segment* segment,
   const double linear_tolerance =
       segment->junction()->road_geometry()->linear_tolerance();
   const double base_grid_unit =
-    features.improve_mesh_generation ? linear_tolerance : PickGridUnit(
+    features.off_grid_mesh_generation ? linear_tolerance : PickGridUnit(
         segment->lane(0), features.max_grid_unit, features.min_grid_resolution,
         linear_tolerance);
   {
@@ -673,7 +687,7 @@ void RenderSegment(const api::Segment* segment,
                        base_grid_unit,
                        true /*use_driveable_bounds*/,
                        [](double, double) { return 0.; },
-                       features.improve_mesh_generation);
+                       features.off_grid_mesh_generation);
     asphalt_mesh->AddFacesFrom(SimplifyMesh(driveable_mesh, features));
   }
 
@@ -686,7 +700,7 @@ void RenderSegment(const api::Segment* segment,
         true /*use_driveable_bounds*/,
         [&segment](double s, double r) {
           return segment->lane(0)->elevation_bounds(s, r).max(); },
-        features.improve_mesh_generation);
+        features.off_grid_mesh_generation);
     CoverLaneWithQuads(
         &lower_h_bounds_mesh,
         segment->lane(0),
@@ -694,7 +708,7 @@ void RenderSegment(const api::Segment* segment,
         true /*use_driveable_bounds*/,
         [&segment](double s, double r) {
           return segment->lane(0)->elevation_bounds(s, r).min(); },
-        features.improve_mesh_generation);
+        features.off_grid_mesh_generation);
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
   }
@@ -710,7 +724,7 @@ void RenderSegment(const api::Segment* segment,
                          [&features](double, double) {
                            return features.lane_haze_elevation;
                          },
-                         features.improve_mesh_generation);
+                         features.off_grid_mesh_generation);
       lane_mesh->AddFacesFrom(SimplifyMesh(haze_mesh, features));
     }
     if (features.draw_stripes) {
