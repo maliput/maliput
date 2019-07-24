@@ -5,7 +5,6 @@
 #include "fmt/ostream.h"
 
 #include "maliput-utilities/generate_obj.h"
-#include "drake/common/drake_assert.h"
 
 namespace maliput {
 namespace utility {

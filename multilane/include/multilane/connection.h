@@ -7,10 +7,12 @@
 #include <unordered_set>
 #include <vector>
 
-#include "multilane/road_curve.h"
-#include "drake/common/drake_assert.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+
+#include "maliput/common/maliput_abort.h"
+#include "multilane/road_curve.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -157,7 +159,7 @@ class LineOffset {
   LineOffset() = default;
 
   explicit LineOffset(double length) : length_(length) {
-    DRAKE_DEMAND(length_ >= 0.);
+    MALIPUT_DEMAND(length_ >= 0.);
   }
 
   double length() const { return length_; }
@@ -186,7 +188,7 @@ class ArcOffset {
 
   ArcOffset(double radius, double d_theta)
       : radius_(radius), d_theta_(d_theta) {
-    DRAKE_DEMAND(radius_ > 0.);
+    MALIPUT_DEMAND(radius_ > 0.);
   }
 
   double radius() const { return radius_; }
@@ -300,19 +302,19 @@ class Connection {
 
   /// Returns the length of the line (for line connections only).
   double line_length() const {
-    DRAKE_DEMAND(type_ == kLine);
+    MALIPUT_DEMAND(type_ == kLine);
     return line_length_;
   }
 
   /// Returns the radius of the arc (for arc connections only).
   double radius() const {
-    DRAKE_DEMAND(type_ == kArc);
+    MALIPUT_DEMAND(type_ == kArc);
     return radius_;
   }
 
   /// Returns the angle of the arc (for arc connections only).
   double d_theta() const {
-    DRAKE_DEMAND(type_ == kArc);
+    MALIPUT_DEMAND(type_ == kArc);
     return d_theta_;
   }
 
@@ -337,7 +339,7 @@ class Connection {
   /// `lane_index` must be non-negative and smaller than the number of lanes of
   /// this connection.
   double lane_offset(int lane_index) const {
-    DRAKE_DEMAND(lane_index >= 0 && lane_index < num_lanes_);
+    MALIPUT_DEMAND(lane_index >= 0 && lane_index < num_lanes_);
     return r0_ + lane_width_ * static_cast<double>(lane_index);
   }
 
@@ -478,7 +480,7 @@ class GroupFactory : public GroupFactoryBase {
     // `connection` must not already be added.
     void Add(const Connection* connection) override {
       auto result = connection_set_.insert(connection);
-      DRAKE_DEMAND(result.second);
+      MALIPUT_DEMAND(result.second);
       connection_vector_.push_back(connection);
     }
 

@@ -17,9 +17,9 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_abort.h"
 #include "maliput-utilities/mesh.h"
 #include "maliput-utilities/mesh_simplification.h"
-#include "drake/common/drake_assert.h"
 
 namespace maliput {
 namespace utility {
@@ -220,8 +220,8 @@ void StripeLaneBounds(GeoMesh* mesh, const api::Lane* lane,
 // @param h_offset  h value of each vertex (height above road surface)
 void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
                    double s_offset, double s_size, double h_offset) {
-  DRAKE_DEMAND(s_offset >= 0.);
-  DRAKE_DEMAND((s_offset + s_size) <= lane->length());
+  MALIPUT_DEMAND(s_offset >= 0.);
+  MALIPUT_DEMAND((s_offset + s_size) <= lane->length());
   const double kRelativeWidth = 0.8;
 
   const api::RBounds rb0 = lane->lane_bounds(s_offset);
@@ -237,7 +237,7 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
                                  std::max(max_num_rl_units,
                                           max_num_rr_units));
 
-  DRAKE_DEMAND(num_units >= 1);
+  MALIPUT_DEMAND(num_units >= 1);
   const double s_unit = s_size / num_units;
   const double rl_unit = rl_size / num_units;
   const double rr_unit = rr_size / num_units;
@@ -730,7 +730,7 @@ void GenerateObjFile(const api::RoadGeometry* rg,
     // The bound on error due to rounding to `n` places is `0.5 * 10^(-n)`,
     // so we want `n` such that `0.5 * 10^(-n) < ε / (sqrt(3) * 10)`.
     // This yields:  `n > log10(sqrt(3) * 5) - log10(ε)`.
-    DRAKE_DEMAND(rg->linear_tolerance() > 0.);
+    MALIPUT_DEMAND(rg->linear_tolerance() > 0.);
     const int precision =
         std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) -
                                std::log10(rg->linear_tolerance())));
@@ -798,7 +798,7 @@ mtllib {}
 const Material& GetMaterialByName(const std::string& material_name) {
   auto material = std::find(kMaterial.cbegin(), kMaterial.cend(),
     material_name);
-  DRAKE_DEMAND(material != kMaterial.cend());
+  MALIPUT_DEMAND(material != kMaterial.cend());
   return *material;
 }
 

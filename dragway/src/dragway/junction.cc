@@ -16,7 +16,7 @@ Junction::Junction(RoadGeometry* road_geometry,
     road_geometry_(road_geometry),
     segment_(this, num_lanes, length, lane_width, shoulder_width,
              maximum_height) {
-  DRAKE_DEMAND(road_geometry != nullptr);
+  MALIPUT_DEMAND(road_geometry != nullptr);
 }
 
 const api::RoadGeometry* Junction::do_road_geometry() const {

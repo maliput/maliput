@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <utility>
 
-#include "drake/common/drake_assert.h"
 #include "drake/common/drake_throw.h"
+
+#include "maliput/common/maliput_abort.h"
 
 namespace maliput {
 namespace api {
@@ -64,7 +65,7 @@ BulbState Bulb::GetDefaultState() const {
       return bulb_state;
     }
   }
-  DRAKE_UNREACHABLE();
+  MALIPUT_ABORT_MESSAGE("bulb_state is not valid.");
 }
 
 bool Bulb::IsValidState(const BulbState& bulb_state) const {

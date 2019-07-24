@@ -10,7 +10,7 @@
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/segment.h"
-#include "drake/common/drake_assert.h"
+#include "maliput/common/maliput_abort.h"
 
 namespace maliput {
 namespace api {
@@ -56,7 +56,8 @@ Rotation OrientationOutFromLane(const LaneEnd& lane_end) {
       return lane_end.lane->GetOrientation({lane_end.lane->length(), 0., 0.});
     }
   }
-  DRAKE_UNREACHABLE();
+  MALIPUT_ABORT_MESSAGE(
+      "lane_end is neither LaneEnd::kStart nor LaneEnd::kFinish");
 }
 
 

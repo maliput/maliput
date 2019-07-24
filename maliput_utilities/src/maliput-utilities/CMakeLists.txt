@@ -25,6 +25,7 @@ ament_target_dependencies(maliput-utilities
 target_link_libraries(maliput-utilities
     multilane::multilane
     maliput::api
+    maliput::common
     drake::drake
 )
 

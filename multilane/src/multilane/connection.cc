@@ -55,16 +55,16 @@ Connection::Connection(const std::string& id, const Endpoint& start,
       scale_length_(scale_length),
       computation_policy_(computation_policy),
       line_length_(line_offset.length()) {
-  DRAKE_DEMAND(num_lanes_ > 0);
-  DRAKE_DEMAND(lane_width_ >= 0);
-  DRAKE_DEMAND(left_shoulder_ >= 0);
-  DRAKE_DEMAND(right_shoulder_ >= 0);
-  DRAKE_DEMAND(r_max_ >= r_min_);
-  DRAKE_DEMAND(linear_tolerance_ > 0.);
-  DRAKE_DEMAND(scale_length_ > 0.);
-  DRAKE_DEMAND(line_length_ > 0.);
-  DRAKE_DEMAND(start.z().theta_dot().has_value());
-  DRAKE_DEMAND(end_z.theta_dot().has_value());
+  MALIPUT_DEMAND(num_lanes_ > 0);
+  MALIPUT_DEMAND(lane_width_ >= 0);
+  MALIPUT_DEMAND(left_shoulder_ >= 0);
+  MALIPUT_DEMAND(right_shoulder_ >= 0);
+  MALIPUT_DEMAND(r_max_ >= r_min_);
+  MALIPUT_DEMAND(linear_tolerance_ > 0.);
+  MALIPUT_DEMAND(scale_length_ > 0.);
+  MALIPUT_DEMAND(line_length_ > 0.);
+  MALIPUT_DEMAND(start.z().theta_dot().has_value());
+  MALIPUT_DEMAND(end_z.theta_dot().has_value());
   // Computes end Endpoint and RoadCurve.
   end_ = Endpoint(
       {start_.xy().x() + line_length_ * std::cos(start_.xy().heading()),
@@ -75,7 +75,7 @@ Connection::Connection(const std::string& id, const Endpoint& start,
   // TODO(agalbachicar)  Modify Connection API to provide support for HBounds
   //                     once RoadCurve's children are capable of computing
   //                     singularities with it.
-  DRAKE_DEMAND(road_curve_->IsValid(r_min_, r_max_, {0., 0.}));
+  MALIPUT_DEMAND(road_curve_->IsValid(r_min_, r_max_, {0., 0.}));
 }
 
 Connection::Connection(const std::string& id, const Endpoint& start,
@@ -100,16 +100,16 @@ Connection::Connection(const std::string& id, const Endpoint& start,
       computation_policy_(computation_policy),
       radius_(arc_offset.radius()),
       d_theta_(arc_offset.d_theta()) {
-  DRAKE_DEMAND(num_lanes_ > 0);
-  DRAKE_DEMAND(lane_width_ >= 0);
-  DRAKE_DEMAND(left_shoulder_ >= 0);
-  DRAKE_DEMAND(right_shoulder_ >= 0);
-  DRAKE_DEMAND(r_max_ >= r_min_);
-  DRAKE_DEMAND(linear_tolerance_ > 0.);
-  DRAKE_DEMAND(scale_length_ > 0.);
-  DRAKE_DEMAND(radius_ > 0);
-  DRAKE_DEMAND(start.z().theta_dot().has_value());
-  DRAKE_DEMAND(end_z.theta_dot().has_value());
+  MALIPUT_DEMAND(num_lanes_ > 0);
+  MALIPUT_DEMAND(lane_width_ >= 0);
+  MALIPUT_DEMAND(left_shoulder_ >= 0);
+  MALIPUT_DEMAND(right_shoulder_ >= 0);
+  MALIPUT_DEMAND(r_max_ >= r_min_);
+  MALIPUT_DEMAND(linear_tolerance_ > 0.);
+  MALIPUT_DEMAND(scale_length_ > 0.);
+  MALIPUT_DEMAND(radius_ > 0);
+  MALIPUT_DEMAND(start.z().theta_dot().has_value());
+  MALIPUT_DEMAND(end_z.theta_dot().has_value());
   // Fills arc related parameters, computes end Endpoint and creates the
   // RoadCurve.
   theta0_ = start_.xy().heading() - std::copysign(M_PI / 2., d_theta_);
@@ -124,11 +124,11 @@ Connection::Connection(const std::string& id, const Endpoint& start,
   // TODO(agalbachicar)  Modify Connection API to provide support for HBounds
   //                     once RoadCurve's children are capable of computing
   //                     singularities with it.
-  DRAKE_DEMAND(road_curve_->IsValid(r_min_, r_max_, {0., 0.}));
+  MALIPUT_DEMAND(road_curve_->IsValid(r_min_, r_max_, {0., 0.}));
 }
 
 Endpoint Connection::LaneStart(int lane_index) const {
-  DRAKE_DEMAND(lane_index >= 0 && lane_index < num_lanes_);
+  MALIPUT_DEMAND(lane_index >= 0 && lane_index < num_lanes_);
   const double r = lane_offset(lane_index);
   const drake::Vector3<double> position = road_curve_->W_of_prh(0., r, 0.);
   const Rot3 rotation = road_curve_->Orientation(0., r, 0.);
@@ -168,7 +168,7 @@ Endpoint Connection::LaneStart(int lane_index) const {
 }
 
 Endpoint Connection::LaneEnd(int lane_index) const {
-  DRAKE_DEMAND(lane_index >= 0 && lane_index < num_lanes_);
+  MALIPUT_DEMAND(lane_index >= 0 && lane_index < num_lanes_);
   const double r = lane_offset(lane_index);
   const drake::Vector3<double> position = road_curve_->W_of_prh(1., r, 0.);
   const Rot3 rotation = road_curve_->Orientation(1., r, 0.);
@@ -262,7 +262,8 @@ std::unique_ptr<RoadCurve> Connection::CreateRoadCurve() const {
           linear_tolerance_, scale_length_, computation_policy_);
     };
   }
-  DRAKE_UNREACHABLE();
+  MALIPUT_ABORT_MESSAGE(
+      "type_ is neither Connection::kArc nor Connection::kLine.");
 }
 
 }  // namespace multilane

@@ -6,11 +6,14 @@
 #include <memory>
 #include <string>
 
+#include "drake/math/saturate.h"
+
+#include "maliput/common/maliput_abort.h"
+
 #include "dragway/branch_point.h"
 #include "dragway/road_geometry.h"
 #include "dragway/segment.h"
-#include "drake/common/drake_assert.h"
-#include "drake/math/saturate.h"
+
 
 using std::make_unique;
 
@@ -29,9 +32,9 @@ Lane::Lane(const Segment* segment, const api::LaneId& id,  int index,
       lane_bounds_(lane_bounds),
       driveable_bounds_(driveable_bounds),
       elevation_bounds_(elevation_bounds) {
-  DRAKE_DEMAND(segment != nullptr);
-  DRAKE_DEMAND(lane_bounds_.min() >= driveable_bounds_.min());
-  DRAKE_DEMAND(lane_bounds_.max() <= driveable_bounds_.max());
+  MALIPUT_DEMAND(segment != nullptr);
+  MALIPUT_DEMAND(lane_bounds_.min() >= driveable_bounds_.min());
+  MALIPUT_DEMAND(lane_bounds_.max() <= driveable_bounds_.max());
   // TODO(liang.fok) Consider initializing this variable in the constructor's
   // initializer list so branch_point_ can be declared `const`.
   branch_point_ = make_unique<BranchPoint>(

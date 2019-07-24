@@ -5,11 +5,15 @@
 
 #include <gflags/gflags.h>
 
-#include "dragway/road_geometry.h"
-#include "maliput/common/filesystem.h"
-#include "maliput-utilities/generate_urdf.h"
 #include "drake/common/text_logging.h"
 #include "drake/common/text_logging_gflags.h"
+
+#include "maliput/common/filesystem.h"
+#include "maliput/common/maliput_abort.h"
+#include "maliput-utilities/generate_urdf.h"
+
+#include "dragway/road_geometry.h"
+
 
 DEFINE_int32(num_lanes, 2, "The number of lanes.");
 DEFINE_double(length, 10, "The length of the dragway in meters.");
@@ -59,7 +63,7 @@ int exec(int argc, char* argv[]) {
   if (!directory.exists()) {
     maliput::common::Filesystem::create_directory_recursive(directory);
   }
-  DRAKE_DEMAND(directory.exists());
+  MALIPUT_DEMAND(directory.exists());
 
   // The following is necessary for users to know where to find the resulting
   // files when this program is executed in a sandbox. This occurs, for example

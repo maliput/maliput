@@ -4,13 +4,16 @@
 #include <limits>
 #include <utility>
 
-#include "maliput/api/lane_data.h"
-#include "multilane/road_curve.h"
-#include "drake/common/drake_assert.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_throw.h"
 #include "drake/common/eigen_types.h"
 #include "drake/common/unused.h"
+
+#include "maliput/common/maliput_abort.h"
+
+#include "maliput/api/lane_data.h"
+#include "multilane/road_curve.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -50,7 +53,7 @@ class LineRoadCurve : public RoadCurve {
                   elevation, superelevation,
                   computation_policy),
         p0_(xy0), dp_(dxy), heading_(std::atan2(dxy.y(), dxy.x())) {
-    DRAKE_DEMAND(dxy.norm() > kMinimumNorm);
+    MALIPUT_DEMAND(dxy.norm() > kMinimumNorm);
   }
 
   ~LineRoadCurve() override = default;

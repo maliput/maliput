@@ -22,9 +22,19 @@ target_include_directories(api
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-ament_target_dependencies(api
-  "drake"
+target_link_libraries(api
+  PUBLIC
+    common
+    drake::drake
 )
+target_link_libraries(api
+  PUBLIC
+    common
+    drake::drake)
+
+# ament_target_dependencies(api
+#   "drake"
+# )
 
 ##############################################################################
 # Export
