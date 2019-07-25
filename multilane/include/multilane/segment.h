@@ -5,15 +5,18 @@
 #include <utility>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_abort.h"
+
 #include "multilane/cubic_polynomial.h"
 #include "multilane/lane.h"
 #include "multilane/road_curve.h"
-#include "drake/common/drake_assert.h"
-#include "drake/common/drake_copyable.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -55,11 +58,11 @@ class Segment : public api::Segment {
         r_min_(r_min),
         r_max_(r_max),
         elevation_bounds_(elevation_bounds) {
-    DRAKE_DEMAND(road_curve_.get() != nullptr);
-    DRAKE_DEMAND(r_min <= r_max);
-    DRAKE_DEMAND(road_curve_->IsValid(r_min_, r_max_, elevation_bounds_));
-    DRAKE_DEMAND(junction_->road_geometry()->linear_tolerance() ==
-                 road_curve_->linear_tolerance());
+    MALIPUT_DEMAND(road_curve_.get() != nullptr);
+    MALIPUT_DEMAND(r_min <= r_max);
+    MALIPUT_DEMAND(road_curve_->IsValid(r_min_, r_max_, elevation_bounds_));
+    MALIPUT_DEMAND(junction_->road_geometry()->linear_tolerance() ==
+                   road_curve_->linear_tolerance());
   }
 
   /// Creates a new Lane object.

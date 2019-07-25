@@ -5,13 +5,18 @@
 #include <string>
 
 #include <gflags/gflags.h>
-#include "yaml-cpp/yaml.h"
+
+#include "drake/common/text_logging.h"
+#include "drake/common/text_logging_gflags.h"
+
+#include "maliput/common/maliput_abort.h"
+
+#include "maliput-utilities/generate_obj.h"
 
 #include "multilane/builder.h"
 #include "multilane/loader.h"
-#include "maliput-utilities/generate_obj.h"
-#include "drake/common/text_logging.h"
-#include "drake/common/text_logging_gflags.h"
+
+#include "yaml-cpp/yaml.h"
 
 DEFINE_string(yaml_file, "",
               "yaml input file defining a multilane road geometry");
@@ -50,7 +55,7 @@ enum class MaliputImplementation {
 // MaliputImplementation::kUnknown is returned.
 MaliputImplementation GetMaliputImplementation(const std::string& filename) {
   const YAML::Node yaml_file = YAML::LoadFile(filename);
-  DRAKE_DEMAND(yaml_file.IsMap());
+  MALIPUT_DEMAND(yaml_file.IsMap());
   if (yaml_file["maliput_multilane_builder"]) {
     return MaliputImplementation::kMultilane;
   }

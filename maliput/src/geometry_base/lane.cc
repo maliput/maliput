@@ -1,8 +1,10 @@
 #include "maliput/geometry_base/lane.h"
 
-#include "maliput/geometry_base/branch_point.h"
-#include "drake/common/drake_assert.h"
 #include "drake/common/drake_throw.h"
+
+#include "maliput/common/maliput_abort.h"
+#include "maliput/geometry_base/branch_point.h"
+
 
 namespace maliput {
 namespace geometry_base {
@@ -69,7 +71,8 @@ const api::BranchPoint* Lane::DoGetBranchPoint(
     case api::LaneEnd::kStart:  { return start_branch_point_; }
     case api::LaneEnd::kFinish: { return finish_branch_point_; }
   }
-  DRAKE_UNREACHABLE();
+  MALIPUT_ABORT_MESSAGE(
+      "which_end is neither LaneEnd::kStart nor LaneEnd::kFinish.");
 }
 
 const api::LaneEndSet* Lane::DoGetConfluentBranches(

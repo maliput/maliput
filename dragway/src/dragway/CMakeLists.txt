@@ -18,6 +18,7 @@ target_include_directories(dragway
 
 target_link_libraries(dragway
   maliput::api
+  maliput::common
   maliput::geometry_base
   drake::drake
 )

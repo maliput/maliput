@@ -1,10 +1,10 @@
 #include "maliput/routing/derive_lane_s_routes.h"
 
-#include "drake/common/drake_assert.h"
 #include "drake/common/drake_optional.h"
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
+#include "maliput/common/maliput_abort.h"
 #include "maliput/routing/find_lane_sequences.h"
 
 namespace maliput {
@@ -13,7 +13,7 @@ namespace {
 
 // Returns true iff @p lane is in @p set.
 bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane* lane) {
-  DRAKE_ASSERT(set != nullptr);
+  MALIPUT_DEMAND(set != nullptr);
   for (int i = 0; i < set->size(); ++i) {
     if (set->get(i).lane == lane) {
       return true;
@@ -25,8 +25,8 @@ bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane* lane) {
 // Returns the S coordinate in @p lane that is on the border with @p next_lane.
 drake::optional<double> DetermineEdgeS(const api::Lane* lane,
                                 const api::Lane* next_lane) {
-  DRAKE_ASSERT(lane != nullptr);
-  DRAKE_ASSERT(next_lane != nullptr);
+  MALIPUT_DEMAND(lane != nullptr);
+  MALIPUT_DEMAND(next_lane != nullptr);
   if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kFinish),
                       next_lane)) {
     return lane->length();
@@ -43,21 +43,21 @@ drake::optional<double> DetermineEdgeS(const api::Lane* lane,
 std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
     const api::RoadPosition& start, const api::RoadPosition& end,
     double max_length_m) {
-  DRAKE_ASSERT(start.lane != nullptr);
-  DRAKE_ASSERT(end.lane != nullptr);
+  MALIPUT_DEMAND(start.lane != nullptr);
+  MALIPUT_DEMAND(end.lane != nullptr);
   const double start_s = start.pos.s();
   const double end_s = end.pos.s();
   std::vector<api::rules::LaneSRoute> result;
 
   for (const auto& lane_sequence :
        FindLaneSequences(start.lane, end.lane, max_length_m)) {
-    DRAKE_ASSERT(!lane_sequence.empty());
+    MALIPUT_DEMAND(!lane_sequence.empty());
     std::vector<api::rules::LaneSRange> ranges;
 
     // Handles the case when lane_sequence has a length of 1. This occurs when
     // start and end are in the same lane.
     if (lane_sequence.size() == 1) {
-      DRAKE_ASSERT(start.lane == end.lane);
+      MALIPUT_DEMAND(start.lane == end.lane);
       const std::vector<api::rules::LaneSRange> lane_s_ranges = {
           api::rules::LaneSRange(start.lane->id(),
                                  api::rules::SRange(start_s, end_s))};
@@ -68,20 +68,20 @@ std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
     // Handles the case when lane_sequence has a length greater than 1.
     for (size_t i = 0; i < lane_sequence.size(); ++i) {
       const api::Lane* lane = lane_sequence.at(i);
-      DRAKE_ASSERT(lane != nullptr);
+      MALIPUT_DEMAND(lane != nullptr);
       if (i == 0) {
-        DRAKE_ASSERT(lane->id() == start.lane->id());
+        MALIPUT_DEMAND(lane->id() == start.lane->id());
         const drake::optional<double> first_end_s =
             DetermineEdgeS(lane, lane_sequence.at(1));
-        DRAKE_ASSERT(first_end_s.has_value());
+        MALIPUT_DEMAND(first_end_s.has_value());
         ranges.emplace_back(lane->id(),
                             api::rules::SRange(start_s, first_end_s.value()));
       } else if (i + 1 == lane_sequence.size()) {
-        DRAKE_ASSERT(lane->id() == end.lane->id());
-        DRAKE_ASSERT(i > 0);
+        MALIPUT_DEMAND(lane->id() == end.lane->id());
+        MALIPUT_DEMAND(i > 0);
         const drake::optional<double> last_start_s =
             DetermineEdgeS(lane, lane_sequence.at(i - 1));
-        DRAKE_ASSERT(last_start_s.has_value());
+        MALIPUT_DEMAND(last_start_s.has_value());
         ranges.emplace_back(lane->id(),
                             api::rules::SRange(last_start_s.value(), end_s));
       } else {
@@ -89,7 +89,7 @@ std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
             DetermineEdgeS(lane, lane_sequence.at(i - 1));
         const drake::optional<double> middle_end_s =
             DetermineEdgeS(lane, lane_sequence.at(i + 1));
-        DRAKE_ASSERT(middle_start_s && middle_end_s);
+        MALIPUT_DEMAND(middle_start_s && middle_end_s);
         ranges.emplace_back(
             lane->id(),
             api::rules::SRange(middle_start_s.value(), middle_end_s.value()));

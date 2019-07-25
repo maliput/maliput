@@ -8,11 +8,14 @@
 #include <tuple>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/lane_data.h"
+#include "maliput/common/maliput_abort.h"
+
 #include "multilane/connection.h"
 #include "multilane/junction.h"
-#include "drake/common/drake_assert.h"
-#include "drake/common/drake_copyable.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -116,7 +119,7 @@ class StartLane {
   ///
   /// `start_lane` must be non-negative.
   explicit StartLane(int start_lane) : start_lane_(start_lane) {
-    DRAKE_DEMAND(start_lane_ >= 0);
+    MALIPUT_DEMAND(start_lane_ >= 0);
   }
 
   /// Builds a Spec at `endpoint` with `direction` direction. When
@@ -124,7 +127,7 @@ class StartLane {
   /// Additionally, `endpoint`'s theta_dot must be drake::nullopt. Otherwise
   /// the Builder is unable to match road continuity constraints.
   Spec at(const Endpoint& endpoint, Direction direction) const {
-    DRAKE_DEMAND(!endpoint.z().theta_dot().has_value());
+    MALIPUT_DEMAND(!endpoint.z().theta_dot().has_value());
     return direction == Direction::kForward
                ? Spec(endpoint, start_lane_)
                : Spec(endpoint.reverse(), start_lane_);
@@ -139,7 +142,7 @@ class StartLane {
   /// lanes.
   Spec at(const Connection& connection, int lane_id, api::LaneEnd::Which end,
           Direction direction) const {
-    DRAKE_DEMAND(lane_id >= 0 && lane_id < connection.num_lanes());
+    MALIPUT_DEMAND(lane_id >= 0 && lane_id < connection.num_lanes());
     Endpoint endpoint = end == api::LaneEnd::Which::kStart
                             ? connection.LaneStart(lane_id)
                             : connection.LaneEnd(lane_id);
@@ -253,7 +256,7 @@ class EndLane {
   ///
   /// `end_lane` must be non-negative.
   explicit EndLane(int end_lane) : end_lane_(end_lane) {
-    DRAKE_DEMAND(end_lane_ >= 0);
+    MALIPUT_DEMAND(end_lane_ >= 0);
   }
 
   /// Builds a Spec at `connection`'s `end` side with `direction` direction.
@@ -265,7 +268,7 @@ class EndLane {
   /// lanes.
   Spec z_at(const Connection& connection, int lane_id, api::LaneEnd::Which end,
             Direction direction) const {
-    DRAKE_DEMAND(lane_id >= 0 && lane_id < connection.num_lanes());
+    MALIPUT_DEMAND(lane_id >= 0 && lane_id < connection.num_lanes());
     EndpointZ endpoint_z = end == api::LaneEnd::Which::kStart
                                ? connection.LaneStart(lane_id).z()
                                : connection.LaneEnd(lane_id).z();
@@ -280,7 +283,7 @@ class EndLane {
   /// Additionally, `endpoint`'s theta_dot must be drake::nullopt. Otherwise
   /// the Builder is unable to match road continuity constraints.
   Spec z_at(const EndpointZ& endpoint_z, Direction direction) const {
-    DRAKE_DEMAND(!endpoint_z.theta_dot().has_value());
+    MALIPUT_DEMAND(!endpoint_z.theta_dot().has_value());
     return direction == Direction::kForward
                ? Spec(endpoint_z, end_lane_)
                : Spec(endpoint_z.reverse(), end_lane_);
@@ -320,10 +323,10 @@ class LaneLayout {
         num_lanes_(num_lanes),
         ref_lane_(ref_lane),
         ref_r0_(ref_r0) {
-    DRAKE_DEMAND(left_shoulder_ >= 0.);
-    DRAKE_DEMAND(right_shoulder_ >= 0.);
-    DRAKE_DEMAND(num_lanes_ > 0);
-    DRAKE_DEMAND(ref_lane_ >= 0 && ref_lane_ < num_lanes_);
+    MALIPUT_DEMAND(left_shoulder_ >= 0.);
+    MALIPUT_DEMAND(right_shoulder_ >= 0.);
+    MALIPUT_DEMAND(num_lanes_ > 0);
+    MALIPUT_DEMAND(ref_lane_ >= 0 && ref_lane_ < num_lanes_);
   }
 
   double left_shoulder() const { return left_shoulder_; }
@@ -470,8 +473,8 @@ class BuilderBase {
       const std::vector<const Connection*>& connections) = 0;
 
   /// Produces a RoadGeometry, with the ID `id`.
-  /// @throws std::runtime_error if unable to produce a valid
-  ///                            (i.e. G1) RoadGeometry.
+  /// @throws maliput::common::assertion_error if unable to produce a valid
+  ///         (i.e. G1) RoadGeometry.
   virtual std::unique_ptr<const api::RoadGeometry> Build(
       const api::RoadGeometryId& id) const = 0;
 };
