@@ -5,8 +5,10 @@
 #include <utility>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
 #include "drake/common/hash.h"
+
+#include "maliput/common/maliput_throw.h"
+
 
 namespace maliput {
 namespace api {
@@ -44,10 +46,10 @@ class TypeSpecificIdentifier {
 
   /// Constructs a %TypeSpecificIdentifier from the given `string`.
   ///
-  /// @throws std::runtime_error if `string` is empty.
+  /// @throws maliput::common::assertion_error if `string` is empty.
   explicit TypeSpecificIdentifier(std::string string)
       : string_(std::move(string)) {
-    DRAKE_THROW_UNLESS(!string_.empty());
+    MALIPUT_THROW_UNLESS(!string_.empty());
   }
 
   /// Returns the string representation of the %TypeSpecificIdentifier.

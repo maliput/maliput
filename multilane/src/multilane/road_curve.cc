@@ -3,12 +3,12 @@
 #include <algorithm>
 #include <memory>
 
-#include "drake/common/drake_throw.h"
 #include "drake/common/eigen_types.h"
 #include "drake/systems/analysis/integrator_base.h"
 #include "drake/systems/analysis/scalar_dense_output.h"
 
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_throw.h"
 
 
 namespace maliput {
@@ -96,8 +96,8 @@ RoadCurve::RoadCurve(double linear_tolerance, double scale_length,
       superelevation_(superelevation),
       computation_policy_(computation_policy) {
   // Enforces preconditions.
-  DRAKE_THROW_UNLESS(scale_length > 0.);
-  DRAKE_THROW_UNLESS(linear_tolerance > 0.);
+  MALIPUT_THROW_UNLESS(scale_length > 0.);
+  MALIPUT_THROW_UNLESS(linear_tolerance > 0.);
   // Sets default parameter value at the beginning of the
   // curve to 0 by default.
   const double initial_p_value = 0.0;
@@ -168,7 +168,7 @@ bool RoadCurve::AreFastComputationsAccurate(double r) const {
 }
 
 std::function<double(double)> RoadCurve::OptimizeCalcSFromP(double r) const {
-  DRAKE_THROW_UNLESS(CalcMinimumRadiusAtOffset(r) > 0.0);
+  MALIPUT_THROW_UNLESS(CalcMinimumRadiusAtOffset(r) > 0.0);
   const double absolute_tolerance = relative_tolerance_ * 1.;
   if (computation_policy() == ComputationPolicy::kPreferAccuracy
       && !AreFastComputationsAccurate(r)) {
@@ -184,14 +184,14 @@ std::function<double(double)> RoadCurve::OptimizeCalcSFromP(double r) const {
     return [dense_output, absolute_tolerance] (double p) -> double {
       // Saturates p to lie within the [0., 1.] interval.
       const double saturated_p = std::min(std::max(p, 0.), 1.);
-      DRAKE_THROW_UNLESS(std::abs(saturated_p - p) < absolute_tolerance);
+      MALIPUT_THROW_UNLESS(std::abs(saturated_p - p) < absolute_tolerance);
       return dense_output->EvaluateScalar(saturated_p);
     };
   }
   return [this, r, absolute_tolerance] (double p) {
     // Saturates p to lie within the [0., 1.] interval.
     const double saturated_p = std::min(std::max(p, 0.), 1.);
-    DRAKE_THROW_UNLESS(std::abs(saturated_p - p) < absolute_tolerance);
+    MALIPUT_THROW_UNLESS(std::abs(saturated_p - p) < absolute_tolerance);
     return this->FastCalcSFromP(p, r);
   };
 }
@@ -204,7 +204,7 @@ double RoadCurve::CalcSFromP(double p, double r) const {
 }
 
 std::function<double(double)> RoadCurve::OptimizeCalcPFromS(double r) const {
-  DRAKE_THROW_UNLESS(CalcMinimumRadiusAtOffset(r) > 0.0);
+  MALIPUT_THROW_UNLESS(CalcMinimumRadiusAtOffset(r) > 0.0);
   const double full_length = CalcSFromP(1., r);
   const double absolute_tolerance = relative_tolerance_ * full_length;
   if (computation_policy() == ComputationPolicy::kPreferAccuracy
@@ -222,14 +222,14 @@ std::function<double(double)> RoadCurve::OptimizeCalcPFromS(double r) const {
             absolute_tolerance] (double s) -> double {
       // Saturates s to lie within the [0., full_length] interval.
       const double saturated_s = std::min(std::max(s, 0.), full_length);
-      DRAKE_THROW_UNLESS(std::abs(saturated_s - s) < absolute_tolerance);
+      MALIPUT_THROW_UNLESS(std::abs(saturated_s - s) < absolute_tolerance);
       return dense_output->EvaluateScalar(saturated_s);
     };
   }
   return [this, r, full_length, absolute_tolerance] (double s) {
     // Saturates s to lie within the [0., full_length] interval.
     const double saturated_s = std::min(std::max(s, 0.), full_length);
-    DRAKE_THROW_UNLESS(std::abs(saturated_s - s) < absolute_tolerance);
+    MALIPUT_THROW_UNLESS(std::abs(saturated_s - s) < absolute_tolerance);
     return this->FastCalcPFromS(s, r);
   };
 }

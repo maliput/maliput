@@ -6,12 +6,13 @@
 
 #include "drake/common/default_scalars.h"
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
 #include "drake/common/eigen_types.h"
 #include "drake/common/extract_double.h"
 #include "drake/math/quaternion.h"
 #include "drake/math/roll_pitch_yaw.h"
 #include "drake/math/rotation_matrix.h"
+
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace api {
@@ -374,11 +375,11 @@ class RBounds {
   RBounds() = default;
 
   /// Fully parameterized constructor.
-  /// @throws std::runtime_error When @p min is greater than 0.
-  /// @throws std::runtime_error When @p max is smaller than 0.
+  /// @throws maliput::common::assertion_error When @p min is greater than 0.
+  /// @throws maliput::common::assertion_error When @p max is smaller than 0.
   RBounds(double min, double max) : min_(min), max_(max) {
-    DRAKE_THROW_UNLESS(min <= 0.);
-    DRAKE_THROW_UNLESS(max >= 0.);
+    MALIPUT_THROW_UNLESS(min <= 0.);
+    MALIPUT_THROW_UNLESS(max >= 0.);
   }
 
   /// @name Getters and Setters
@@ -386,17 +387,17 @@ class RBounds {
   /// Gets minimum bound.
   double min() const { return min_; }
   /// Sets minimum bound.
-  /// @throws std::runtime_error When @p min is greater than 0.
+  /// @throws maliput::common::assertion_error When @p min is greater than 0.
   void set_min(double min) {
-    DRAKE_THROW_UNLESS(min <= 0.);
+    MALIPUT_THROW_UNLESS(min <= 0.);
     min_ = min;
   }
   /// Gets maximum bound.
   double max() const { return max_; }
   /// Sets maximum bound.
-  /// @throws std::runtime_error When @p max is smaller than 0.
+  /// @throws maliput::common::assertion_error When @p max is smaller than 0.
   void set_max(double max) {
-    DRAKE_THROW_UNLESS(max >= 0.);
+    MALIPUT_THROW_UNLESS(max >= 0.);
     max_ = max;
   }
   //@}
@@ -419,11 +420,11 @@ class HBounds {
   HBounds() = default;
 
   /// Fully parameterized constructor.
-  /// @throws std::runtime_error When @p min is greater than 0.
-  /// @throws std::runtime_error When @p max is smaller than 0.
+  /// @throws maliput::common::assertion_error When @p min is greater than 0.
+  /// @throws maliput::common::assertion_error When @p max is smaller than 0.
   HBounds(double min, double max) : min_(min), max_(max) {
-    DRAKE_THROW_UNLESS(min <= 0.);
-    DRAKE_THROW_UNLESS(max >= 0.);
+    MALIPUT_THROW_UNLESS(min <= 0.);
+    MALIPUT_THROW_UNLESS(max >= 0.);
   }
 
   /// @name Getters and Setters
@@ -431,17 +432,17 @@ class HBounds {
   /// Gets minimum bound.
   double min() const { return min_; }
   /// Sets minimum bound.
-  /// @throws std::runtime_error When @p min is greater than 0.
+  /// @throws maliput::common::assertion_error When @p min is greater than 0.
   void set_min(double min) {
-    DRAKE_THROW_UNLESS(min <= 0.);
+    MALIPUT_THROW_UNLESS(min <= 0.);
     min_ = min;
   }
   /// Gets maximum bound.
   double max() const { return max_; }
   /// Sets maximum bound.
-  /// @throws std::runtime_error When @p max is smaller than 0.
+  /// @throws maliput::common::assertion_error When @p max is smaller than 0.
   void set_max(double max) {
-    DRAKE_THROW_UNLESS(max >= 0.);
+    MALIPUT_THROW_UNLESS(max >= 0.);
     max_ = max;
   }
   //@}

@@ -2,12 +2,14 @@
 
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
+
 
 namespace maliput {
 namespace api {
@@ -44,10 +46,10 @@ class RoadRulebook {
   /// `tolerance` does not permit matching across BranchPoints (past the
   /// s-bounds of a Lane).
   ///
-  /// @throws std::runtime_error if `tolerance` is negative.
+  /// @throws maliput::common::assertion_error if `tolerance` is negative.
   QueryResults FindRules(
       const std::vector<LaneSRange>& ranges, double tolerance) const {
-    DRAKE_THROW_UNLESS(tolerance >= 0.);
+    MALIPUT_THROW_UNLESS(tolerance >= 0.);
     return DoFindRules(ranges, tolerance);
   }
 

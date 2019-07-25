@@ -13,8 +13,7 @@
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/manual_phase_ring_book.h"
 #include "maliput/common/maliput_abort.h"
-
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace YAML {
 
@@ -69,7 +68,7 @@ using api::rules::UniqueBulbId;
 // in @p rules_node.
 std::unordered_map<RightOfWayRule::Id, RightOfWayRule> GetRules(
     const RoadRulebook* rulebook, const YAML::Node& rules_node) {
-  DRAKE_THROW_UNLESS(rules_node.IsSequence());
+  MALIPUT_THROW_UNLESS(rules_node.IsSequence());
   std::unordered_map<RightOfWayRule::Id, RightOfWayRule> result;
   for (const YAML::Node& rule_node : rules_node) {
     const RightOfWayRule::Id rule_id(rule_node.as<std::string>());
@@ -122,7 +121,7 @@ void ConfirmBulbsExist(const BulbGroup& bulb_group,
                        const YAML::Node& bulbs_node) {
   for (const auto& bulb_group_pair : bulbs_node) {
     const Bulb::Id bulb_id(bulb_group_pair.first.as<std::string>());
-    DRAKE_THROW_UNLESS(bulb_group.GetBulb(bulb_id) != drake::nullopt);
+    MALIPUT_THROW_UNLESS(bulb_group.GetBulb(bulb_id) != drake::nullopt);
   }
 }
 
@@ -132,26 +131,26 @@ drake::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light
   const YAML::Node& traffic_light_states_node =
       phase_node["TrafficLightStates"];
   if (traffic_light_states_node.IsDefined()) {
-    DRAKE_THROW_UNLESS(traffic_light_states_node.IsMap());
+    MALIPUT_THROW_UNLESS(traffic_light_states_node.IsMap());
     result = BulbStates();
     for (const auto& traffic_light_pair : traffic_light_states_node) {
       const TrafficLight::Id traffic_light_id(
           traffic_light_pair.first.as<std::string>());
       const drake::optional<TrafficLight> traffic_light =
           traffic_light_book->GetTrafficLight(traffic_light_id);
-      DRAKE_THROW_UNLESS(traffic_light.has_value());
+      MALIPUT_THROW_UNLESS(traffic_light.has_value());
       const YAML::Node& bulb_group_node = traffic_light_pair.second;
-      DRAKE_THROW_UNLESS(bulb_group_node.IsDefined());
-      DRAKE_THROW_UNLESS(bulb_group_node.IsMap());
+      MALIPUT_THROW_UNLESS(bulb_group_node.IsDefined());
+      MALIPUT_THROW_UNLESS(bulb_group_node.IsMap());
       for (const auto& bulb_group_pair : bulb_group_node) {
         const BulbGroup::Id bulb_group_id(
             bulb_group_pair.first.as<std::string>());
         const drake::optional<BulbGroup> bulb_group =
             traffic_light->GetBulbGroup(bulb_group_id);
-        DRAKE_THROW_UNLESS(bulb_group.has_value());
+        MALIPUT_THROW_UNLESS(bulb_group.has_value());
         const YAML::Node& bulbs_node = bulb_group_pair.second;
-        DRAKE_THROW_UNLESS(bulbs_node.IsDefined());
-        DRAKE_THROW_UNLESS(bulbs_node.IsMap());
+        MALIPUT_THROW_UNLESS(bulbs_node.IsDefined());
+        MALIPUT_THROW_UNLESS(bulbs_node.IsMap());
         ConfirmBulbsExist(*bulb_group, bulbs_node);
         for (const auto& bulb : bulb_group->bulbs()) {
           BulbState bulb_state = bulb.GetDefaultState();
@@ -174,7 +173,7 @@ void VerifyPhaseExists(const std::vector<Phase>& phases,
   const auto it =
       std::find_if(phases.begin(), phases.end(),
                    [&](const Phase& p) -> bool { return p.id() == phase_id; });
-  DRAKE_THROW_UNLESS(it != phases.end());
+  MALIPUT_THROW_UNLESS(it != phases.end());
 }
 
 drake::optional<const std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>>>
@@ -185,16 +184,16 @@ BuildNextPhases(const std::vector<Phase>& phases,
     return drake::nullopt;
   }
   std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>> result;
-  DRAKE_THROW_UNLESS(phase_ring_node.IsMap());
+  MALIPUT_THROW_UNLESS(phase_ring_node.IsMap());
   for (const auto& graph_node_it : graph_node) {
     const Phase::Id phase_id(graph_node_it.first.as<std::string>());
     VerifyPhaseExists(phases, phase_id);
     const YAML::Node& next_phases_node = graph_node_it.second;
-    DRAKE_THROW_UNLESS(next_phases_node.IsSequence());
+    MALIPUT_THROW_UNLESS(next_phases_node.IsSequence());
     std::vector<PhaseRing::NextPhase> next_phases;
     for (const YAML::Node& next_phase_node : next_phases_node) {
-      DRAKE_THROW_UNLESS(next_phase_node.IsMap());
-      DRAKE_THROW_UNLESS(next_phase_node["ID"].IsDefined());
+      MALIPUT_THROW_UNLESS(next_phase_node.IsMap());
+      MALIPUT_THROW_UNLESS(next_phase_node["ID"].IsDefined());
       const Phase::Id next_phase_id(next_phase_node["ID"].as<std::string>());
       VerifyPhaseExists(phases, next_phase_id);
       drake::optional<double> duration_until = drake::nullopt;
@@ -213,32 +212,32 @@ BuildNextPhases(const std::vector<Phase>& phases,
 PhaseRing BuildPhaseRing(const RoadRulebook* rulebook,
                          const TrafficLightBook* traffic_light_book,
                          const YAML::Node& phase_ring_node) {
-  DRAKE_THROW_UNLESS(phase_ring_node.IsMap());
-  DRAKE_THROW_UNLESS(phase_ring_node["ID"].IsDefined());
+  MALIPUT_THROW_UNLESS(phase_ring_node.IsMap());
+  MALIPUT_THROW_UNLESS(phase_ring_node["ID"].IsDefined());
   const PhaseRing::Id ring_id(phase_ring_node["ID"].as<std::string>());
   const std::unordered_map<RightOfWayRule::Id, RightOfWayRule> rules =
       GetRules(rulebook, phase_ring_node["Rules"]);
 
   const YAML::Node& phases_node = phase_ring_node["Phases"];
-  DRAKE_THROW_UNLESS(phases_node.IsDefined());
-  DRAKE_THROW_UNLESS(phases_node.IsSequence());
+  MALIPUT_THROW_UNLESS(phases_node.IsDefined());
+  MALIPUT_THROW_UNLESS(phases_node.IsSequence());
   std::vector<Phase> phases;
   for (const YAML::Node& phase_node : phases_node) {
-    DRAKE_THROW_UNLESS(phase_node.IsMap());
-    DRAKE_THROW_UNLESS(phase_node["ID"].IsDefined());
+    MALIPUT_THROW_UNLESS(phase_node.IsMap());
+    MALIPUT_THROW_UNLESS(phase_node["ID"].IsDefined());
     const Phase::Id phase_id(phase_node["ID"].as<std::string>());
     // First get a RuleStates object populated with default states of all rules.
     // Then, override the defaults with the states specified in the YAML
     // document.
     RuleStates rule_states = CreateDefaultRuleStates(rules);
     const YAML::Node& rule_states_node = phase_node["RightOfWayRuleStates"];
-    DRAKE_THROW_UNLESS(rule_states_node.IsDefined());
-    DRAKE_THROW_UNLESS(rule_states_node.IsMap());
+    MALIPUT_THROW_UNLESS(rule_states_node.IsDefined());
+    MALIPUT_THROW_UNLESS(rule_states_node.IsMap());
     for (const auto& rule_state_it : rule_states_node) {
       RightOfWayRule::Id rule_id(rule_state_it.first.as<std::string>());
       RightOfWayRule::State::Id state_id(
           rule_state_it.second.as<std::string>());
-      DRAKE_THROW_UNLESS(rule_states.find(rule_id) != rule_states.end());
+      MALIPUT_THROW_UNLESS(rule_states.find(rule_id) != rule_states.end());
       rule_states.at(rule_id) = state_id;
     }
     drake::optional<BulbStates> bulb_states =
@@ -253,10 +252,10 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook,
 std::unique_ptr<api::rules::PhaseRingBook> BuildFrom(
     const RoadRulebook* rulebook, const TrafficLightBook* traffic_light_book,
     const YAML::Node& root_node) {
-  DRAKE_THROW_UNLESS(root_node.IsMap());
+  MALIPUT_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& phase_rings_node = root_node["PhaseRings"];
-  DRAKE_THROW_UNLESS(phase_rings_node.IsDefined());
-  DRAKE_THROW_UNLESS(phase_rings_node.IsSequence());
+  MALIPUT_THROW_UNLESS(phase_rings_node.IsDefined());
+  MALIPUT_THROW_UNLESS(phase_rings_node.IsSequence());
   auto result = std::make_unique<ManualPhaseRingBook>();
   for (const YAML::Node& phase_ring_node : phase_rings_node) {
     result->AddPhaseRing(

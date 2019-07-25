@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
@@ -13,6 +12,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace api {
@@ -133,14 +133,14 @@ class RoadGeometry {
   ///         When @p radius is infinity, the query should return the closest
   ///         point for each lane.
   ///
-  /// @throws std::runtime_error When @p radius is negative.
+  /// @throws maliput::common::assertion_error When @p radius is negative.
   ///
   /// Note that derivative implementations may choose to violate the above
   /// semantics for performance reasons. See docstrings of derivative
   /// implementations for details.
   std::vector<RoadPositionResult> FindRoadPositions(
       const GeoPosition& geo_position, double radius) const {
-    DRAKE_THROW_UNLESS(radius >= 0.);
+    MALIPUT_THROW_UNLESS(radius >= 0.);
     return DoFindRoadPositions(geo_position, radius);
   }
 

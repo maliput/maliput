@@ -3,9 +3,12 @@
 #include <unordered_map>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/type_specific_identifier.h"
-#include "drake/common/drake_copyable.h"
+#include "maliput/common/maliput_throw.h"
+
 
 namespace maliput {
 namespace api {
@@ -99,15 +102,16 @@ class DirectionUsageRule final {
   /// @param id the unique ID of this rule (in the RoadRulebook)
   /// @param zone LaneSRange to which this rule applies
   /// @param states a vector of valid states for the rule
-  /// @throws std::exception if size of states is not exactly 1.
+  /// @throws maliput::common::assertion_error if size of states is not exactly
+  ///         1.
   DirectionUsageRule(const Id& id, const LaneSRange& zone,
                      std::vector<State> states)
       : id_(id), zone_(zone) {
-    DRAKE_THROW_UNLESS(states.size() == 1);
+    MALIPUT_THROW_UNLESS(states.size() == 1);
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
-      DRAKE_THROW_UNLESS(result.second);
+      MALIPUT_THROW_UNLESS(result.second);
     }
   }
 
@@ -128,9 +132,9 @@ class DirectionUsageRule final {
   ///
   /// This is a convenience function for returning a static rule's single state.
   ///
-  /// @throws std::exception if `is_static()` is false.
+  /// @throws maliput::common::assertion_error if `is_static()` is false.
   const State& static_state() const {
-    DRAKE_THROW_UNLESS(is_static());
+    MALIPUT_THROW_UNLESS(is_static());
     return states_.begin()->second;
   }
 

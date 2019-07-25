@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 
@@ -43,10 +43,10 @@ class ManualPhaseRingBook::Impl {
       throw std::logic_error("Attempted to remove unknown PhaseRing with ID " +
                              ring_id.string());
     }
-    DRAKE_THROW_UNLESS(ring_book_.erase(ring_id) == 1);
+    MALIPUT_THROW_UNLESS(ring_book_.erase(ring_id) == 1);
     const Phase& phase = ring->phases().begin()->second;
     for (const auto& element : phase.rule_states()) {
-      DRAKE_THROW_UNLESS(rule_book_.erase(element.first) == 1);
+      MALIPUT_THROW_UNLESS(rule_book_.erase(element.first) == 1);
     }
   }
 

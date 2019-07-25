@@ -10,11 +10,13 @@
 
 #include <gtest/gtest.h>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/lane_data.h"
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/check_id_indexing.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 #include "multilane_test_utilities/multilane_types_compare.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace multilane {
@@ -1383,7 +1385,7 @@ TEST_P(MultilaneDiscontinuousBuildProcedureTest, ThrowingUponBuild) {
       const std::unique_ptr<const api::RoadGeometry> road_geometry =
           builder.Build(api::RoadGeometryId{"bad_road"});
     },
-    std::runtime_error);
+    maliput::common::assertion_error);
 }
 
 // Returns a collection of BuildProcedure instances that make use

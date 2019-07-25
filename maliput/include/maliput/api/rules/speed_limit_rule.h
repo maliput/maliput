@@ -1,8 +1,11 @@
 #pragma once
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/type_specific_identifier.h"
-#include "drake/common/drake_copyable.h"
+#include "maliput/common/maliput_throw.h"
+
 
 namespace maliput {
 namespace api {
@@ -40,13 +43,13 @@ class SpeedLimitRule {
   /// @param max maximum speed
   ///
   /// `min` and `max` must be non-negative, and `min` must be less than
-  /// or equal to `max`, otherwise a std::runtime_error is thrown.
+  /// or equal to `max`, otherwise a maliput::common::assertion_error is thrown.
   SpeedLimitRule(const Id& id, const LaneSRange& zone, Severity severity,
                  double min, double max)
       : id_(id), zone_(zone), severity_(severity), min_(min), max_(max) {
-    DRAKE_THROW_UNLESS(min >= 0.);
-    DRAKE_THROW_UNLESS(max >= 0.);
-    DRAKE_THROW_UNLESS(min <= max);
+    MALIPUT_THROW_UNLESS(min >= 0.);
+    MALIPUT_THROW_UNLESS(max >= 0.);
+    MALIPUT_THROW_UNLESS(min <= max);
   }
 
   /// Returns the persistent identifier.

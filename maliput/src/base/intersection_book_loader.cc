@@ -4,14 +4,15 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "drake/common/drake_optional.h"
+
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/intersection.h"
 #include "maliput/base/intersection_book.h"
-#include "drake/common/drake_optional.h"
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
 
 using maliput::api::rules::LaneSRange;
 using maliput::api::rules::LaneSRoute;
@@ -41,17 +42,17 @@ std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook,
 std::unique_ptr<api::Intersection> BuildIntersection(
     const YAML::Node& intersection_node, const RoadRulebook& road_rulebook,
     const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
-  DRAKE_THROW_UNLESS(intersection_node.IsMap());
-  DRAKE_THROW_UNLESS(intersection_node["ID"].IsDefined());
-  DRAKE_THROW_UNLESS(intersection_node["PhaseRing"].IsDefined());
-  DRAKE_THROW_UNLESS(intersection_node["InitialPhase"].IsDefined());
+  MALIPUT_THROW_UNLESS(intersection_node.IsMap());
+  MALIPUT_THROW_UNLESS(intersection_node["ID"].IsDefined());
+  MALIPUT_THROW_UNLESS(intersection_node["PhaseRing"].IsDefined());
+  MALIPUT_THROW_UNLESS(intersection_node["InitialPhase"].IsDefined());
   const Intersection::Id id(intersection_node["ID"].as<std::string>());
   const PhaseRing::Id ring_id(intersection_node["PhaseRing"].as<std::string>());
   const Phase::Id phase_id(intersection_node["InitialPhase"].as<std::string>());
   drake::optional<PhaseRing> ring = phase_ring_book.GetPhaseRing(ring_id);
-  DRAKE_THROW_UNLESS(ring.has_value());
-  DRAKE_THROW_UNLESS(ring->phases().size() > 0);
-  DRAKE_THROW_UNLESS(ring->phases().find(phase_id) != ring->phases().end());
+  MALIPUT_THROW_UNLESS(ring.has_value());
+  MALIPUT_THROW_UNLESS(ring->phases().size() > 0);
+  MALIPUT_THROW_UNLESS(ring->phases().find(phase_id) != ring->phases().end());
   drake::optional<api::rules::Phase::Id> next_phase_id = drake::nullopt;
   drake::optional<double> duration_until = drake::nullopt;
   std::vector<PhaseRing::NextPhase> next_phases =
@@ -81,13 +82,13 @@ std::unique_ptr<api::Intersection> BuildIntersection(
 std::unique_ptr<api::IntersectionBook> BuildFrom(
     const YAML::Node& root_node, const RoadRulebook& road_rulebook,
     const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
-  DRAKE_THROW_UNLESS(root_node.IsMap());
+  MALIPUT_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& intersections_node = root_node["Intersections"];
   auto result = std::make_unique<IntersectionBook>();
   if (!intersections_node.IsDefined()) {
     return result;
   }
-  DRAKE_THROW_UNLESS(intersections_node.IsSequence());
+  MALIPUT_THROW_UNLESS(intersections_node.IsSequence());
   for (const YAML::Node& intersection_node : intersections_node) {
     result->AddIntersection(BuildIntersection(intersection_node, road_rulebook,
                                               phase_ring_book, phase_provider));

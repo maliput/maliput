@@ -222,7 +222,7 @@ class ManualRulebook::Impl {
     // Add to map.
     auto map_result = map->emplace(rule.id(), rule);
     // Throw if the id was already present.
-    DRAKE_THROW_UNLESS(map_result.second);
+    MALIPUT_THROW_UNLESS(map_result.second);
     // Add to index.
     index_->AddRule(rule);
   }
@@ -234,12 +234,12 @@ class ManualRulebook::Impl {
 
   template <class T>
   void RemoveAnyRule(const typename T::Id& id, IdIndex<T>* map) {
-    DRAKE_THROW_UNLESS(map->count(id) == 1);
+    MALIPUT_THROW_UNLESS(map->count(id) == 1);
     // Remove from index.
     index_->RemoveRule(map->at(id));
     // Remove from map.
     auto map_result = map->erase(id);
-    DRAKE_THROW_UNLESS(map_result > 0);
+    MALIPUT_THROW_UNLESS(map_result > 0);
   }
 
   std::unique_ptr<RangeIndex> index_;

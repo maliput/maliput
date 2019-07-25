@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <utility>
 
-#include "drake/common/drake_throw.h"
-
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_throw.h"
+
 
 namespace maliput {
 namespace api {
@@ -46,10 +46,10 @@ Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group,
       type_(type),
       arrow_orientation_rad_(arrow_orientation_rad),
       bounding_box_(std::move(bounding_box)) {
-  DRAKE_THROW_UNLESS(type_ != BulbType::kArrow ||
+  MALIPUT_THROW_UNLESS(type_ != BulbType::kArrow ||
                      arrow_orientation_rad_ != drake::nullopt);
   if (type_ != BulbType::kArrow) {
-    DRAKE_THROW_UNLESS(arrow_orientation_rad_ == drake::nullopt);
+    MALIPUT_THROW_UNLESS(arrow_orientation_rad_ == drake::nullopt);
   }
   if (states == drake::nullopt || states->size() == 0) {
     states_ = {BulbState::kOff, BulbState::kOn};
@@ -80,7 +80,7 @@ BulbGroup::BulbGroup(const BulbGroup::Id& id,
       position_traffic_light_(position_traffic_light),
       orientation_traffic_light_(orientation_traffic_light),
       bulbs_(bulbs) {
-  DRAKE_THROW_UNLESS(bulbs_.size() > 0);
+  MALIPUT_THROW_UNLESS(bulbs_.size() > 0);
 }
 
 drake::optional<Bulb> BulbGroup::GetBulb(const Bulb::Id& id) const {

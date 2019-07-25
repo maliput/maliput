@@ -2,11 +2,10 @@
 
 #include <limits>
 
-#include "drake/common/drake_throw.h"
-
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -16,20 +15,20 @@ BruteForceFindRoadPositionsStrategy(
     const maliput::api::RoadGeometry* rg,
     const maliput::api::GeoPosition& geo_position,
     double radius) {
-  DRAKE_THROW_UNLESS(rg != nullptr);
-  DRAKE_THROW_UNLESS(radius >= 0.);
+  MALIPUT_THROW_UNLESS(rg != nullptr);
+  MALIPUT_THROW_UNLESS(radius >= 0.);
 
   std::vector<maliput::api::RoadPositionResult> road_position_results;
 
   for (int i = 0; i < rg->num_junctions(); ++i) {
     const maliput::api::Junction* junction = rg->junction(i);
-    DRAKE_THROW_UNLESS(junction != nullptr);
+    MALIPUT_THROW_UNLESS(junction != nullptr);
     for (int j = 0; j < junction->num_segments(); ++j) {
       const maliput::api::Segment* segment = junction->segment(j);
-      DRAKE_THROW_UNLESS(segment != nullptr);
+      MALIPUT_THROW_UNLESS(segment != nullptr);
       for (int k = 0; k < segment->num_lanes(); ++k) {
         const api::Lane* lane = segment->lane(k);
-        DRAKE_THROW_UNLESS(lane != nullptr);
+        MALIPUT_THROW_UNLESS(lane != nullptr);
         double distance{};
         maliput::api::GeoPosition nearest_position;
         const maliput::api::LanePosition lane_position =

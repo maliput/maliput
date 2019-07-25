@@ -1,10 +1,8 @@
 #include "maliput/geometry_base/lane.h"
 
-#include "drake/common/drake_throw.h"
-
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_throw.h"
 #include "maliput/geometry_base/branch_point.h"
-
 
 namespace maliput {
 namespace geometry_base {
@@ -12,11 +10,11 @@ namespace geometry_base {
 void Lane::AttachToSegment(Passkey<Segment>,
                            const api::Segment* segment, int index) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(segment != nullptr);
-  DRAKE_THROW_UNLESS(index >= 0);
+  MALIPUT_THROW_UNLESS(segment != nullptr);
+  MALIPUT_THROW_UNLESS(index >= 0);
   // Preconditions
-  DRAKE_THROW_UNLESS(segment_ == nullptr);
-  DRAKE_THROW_UNLESS(index_ == -1);
+  MALIPUT_THROW_UNLESS(segment_ == nullptr);
+  MALIPUT_THROW_UNLESS(index_ == -1);
 
   segment_ = segment;
   index_ = index;
@@ -25,9 +23,9 @@ void Lane::AttachToSegment(Passkey<Segment>,
 void Lane::SetStartBranchPoint(Passkey<BranchPoint>,
                                BranchPoint* branch_point) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(branch_point != nullptr);
+  MALIPUT_THROW_UNLESS(branch_point != nullptr);
   // Preconditions
-  DRAKE_THROW_UNLESS(start_branch_point_ == nullptr);
+  MALIPUT_THROW_UNLESS(start_branch_point_ == nullptr);
 
   start_branch_point_ = branch_point;
 }
@@ -35,9 +33,9 @@ void Lane::SetStartBranchPoint(Passkey<BranchPoint>,
 void Lane::SetFinishBranchPoint(Passkey<BranchPoint>,
                                 BranchPoint* branch_point) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(branch_point != nullptr);
+  MALIPUT_THROW_UNLESS(branch_point != nullptr);
   // Preconditions
-  DRAKE_THROW_UNLESS(finish_branch_point_ == nullptr);
+  MALIPUT_THROW_UNLESS(finish_branch_point_ == nullptr);
 
   finish_branch_point_ = branch_point;
 }

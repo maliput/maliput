@@ -28,35 +28,35 @@ class ManualRulebook : public api::rules::RoadRulebook {
 
   /// Adds a new RightOfWayRule.
   ///
-  /// @throws std::runtime_error if a rule with the same ID already exists
-  /// in the ManualRulebook.
+  /// @throws maliput::common::assertion_error if a rule with the same ID
+  /// already exists in the ManualRulebook.
   void AddRule(const api::rules::RightOfWayRule& rule);
 
   /// Removes the RightOfWayRule labeled by `id`.
   ///
-  /// @throws std::runtime_error if no such rule exists.
+  /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::RightOfWayRule::Id& id);
 
   /// Adds a new SpeedLimitRule.
   ///
-  /// @throws std::runtime_error if a rule with the same ID already exists
-  /// in the ManualRulebook.
+  /// @throws maliput::common::assertion_error if a rule with the same ID
+  /// already exists in the ManualRulebook.
   void AddRule(const api::rules::SpeedLimitRule& rule);
 
   /// Removes the SpeedLimitRule labeled by `id`.
   ///
-  /// @throws std::runtime_error if no such rule exists.
+  /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::SpeedLimitRule::Id& id);
 
   /// Adds a new DirectionUsageRule.
   ///
-  /// @throws std::runtime_error if a rule with the same ID already exists
-  /// in the ManualRulebook.
+  /// @throws maliput::common::assertion_error if a rule with the same ID
+  /// already exists in the ManualRulebook.
   void AddRule(const api::rules::DirectionUsageRule& rule);
 
   /// Removes the DirectionUsageRule labeled by `id`.
   ///
-  /// @throws std::runtime_error if no such rule exists.
+  /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id);
 
  private:

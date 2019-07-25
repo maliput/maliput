@@ -2,9 +2,10 @@
 
 #include <unordered_map>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule_state_provider.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 
@@ -22,7 +23,8 @@ class ManualRuleStateProvider final : public api::rules::RuleStateProvider {
   ///
   /// @throws std::logic_error if a RightOfWayRule with an ID of @p id
   /// already exists in this provider.
-  /// @throws std::runtime_error if the dynamic state failed to be added.
+  /// @throws maliput::common::assertion_error if the dynamic state failed to be
+  /// added.
   void AddState(
       const api::rules::RightOfWayRule::Id& id,
       const api::rules::RightOfWayRule::State::Id& initial_state);

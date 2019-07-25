@@ -1,6 +1,6 @@
 #include "maliput/geometry_base/junction.h"
 
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -11,13 +11,13 @@ void Junction::AttachToRoadGeometry(
     const std::function<void(const api::Segment*)>& segment_indexing_callback,
     const std::function<void(const api::Lane*)>& lane_indexing_callback) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(road_geometry != nullptr);
-  DRAKE_THROW_UNLESS(!!segment_indexing_callback);
-  DRAKE_THROW_UNLESS(!!lane_indexing_callback);
+  MALIPUT_THROW_UNLESS(road_geometry != nullptr);
+  MALIPUT_THROW_UNLESS(!!segment_indexing_callback);
+  MALIPUT_THROW_UNLESS(!!lane_indexing_callback);
   // Preconditions
-  DRAKE_THROW_UNLESS(road_geometry_ == nullptr);
-  DRAKE_THROW_UNLESS(!segment_indexing_callback_);
-  DRAKE_THROW_UNLESS(!lane_indexing_callback_);
+  MALIPUT_THROW_UNLESS(road_geometry_ == nullptr);
+  MALIPUT_THROW_UNLESS(!segment_indexing_callback_);
+  MALIPUT_THROW_UNLESS(!lane_indexing_callback_);
 
   road_geometry_ = road_geometry;
   // Store the indexing callbacks for future use.
@@ -34,7 +34,7 @@ void Junction::AttachToRoadGeometry(
 
 void Junction::AddSegmentPrivate(std::unique_ptr<Segment> segment) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(segment.get() != nullptr);
+  MALIPUT_THROW_UNLESS(segment.get() != nullptr);
   segments_.emplace_back(std::move(segment));
   Segment* const raw_segment = segments_.back().get();
 
