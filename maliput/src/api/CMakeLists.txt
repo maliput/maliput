@@ -13,6 +13,7 @@ set(API_SOURCES
   rules/direction_usage_rule.cc
   rules/phase.cc
   rules/phase_ring.cc
+  rules/rule_registry.cc
   rules/traffic_lights.cc)
 
 add_library(api ${API_SOURCES})
@@ -22,8 +23,9 @@ target_include_directories(api
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-ament_target_dependencies(api
-  "drake"
+target_link_libraries(api
+  common
+  drake::drake
 )
 
 ##############################################################################
