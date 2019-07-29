@@ -1,7 +1,6 @@
 #include "dragway/branch_point.h"
 
 #include "dragway/lane.h"
-#include "drake/common/drake_assert.h"
 
 namespace maliput {
 namespace dragway {

@@ -26,6 +26,7 @@ ament_target_dependencies(maliput_test_utilities
 
 target_link_libraries(maliput_test_utilities
   api
+  common
   geometry_base
   drake::drake)
 

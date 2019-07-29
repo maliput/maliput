@@ -4,9 +4,11 @@
 #include <utility>
 
 #include "maliput/api/lane.h"
+#include "maliput/common/maliput_abort.h"
+
 #include "dragway/junction.h"
 #include "dragway/lane.h"
-#include "drake/common/drake_assert.h"
+
 
 namespace maliput {
 namespace dragway {
@@ -66,7 +68,7 @@ const api::Junction* Segment::do_junction() const {
 }
 
 const api::Lane* Segment::do_lane(int index) const {
-  DRAKE_DEMAND(index < num_lanes());
+  MALIPUT_DEMAND(index < num_lanes());
   return lanes_.at(index).get();
 }
 

@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <queue>
 
+#include "maliput/common/maliput_abort.h"
+
 namespace maliput {
 namespace utility {
 namespace mesh {
@@ -21,7 +23,7 @@ InverseFaceEdgeMap ComputeInverseFaceEdgeMap(
       const DirectedEdgeIndex global_edge{
           face_vertices[start_vertex_index].vertex_index,
           face_vertices[end_vertex_index].vertex_index};
-      DRAKE_DEMAND(inverse_face_edge_map.count(global_edge) == 0);
+      MALIPUT_DEMAND(inverse_face_edge_map.count(global_edge) == 0);
       inverse_face_edge_map[global_edge] = {face_index, start_vertex_index};
     }
   }
@@ -70,9 +72,9 @@ bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face,
 
 bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face,
                       double tolerance, Hyperplane3<double>* plane) {
-  DRAKE_DEMAND(plane != nullptr);
+  MALIPUT_DEMAND(plane != nullptr);
   const std::vector<IndexFace::Vertex>& face_vertices = face.vertices();
-  DRAKE_DEMAND(face_vertices.size() >= 3);
+  MALIPUT_DEMAND(face_vertices.size() >= 3);
   const drake::Vector3<double>& x0 = GetMeshFaceVertexPosition(mesh, face_vertices[0]);
   const drake::Vector3<double>& n0 = GetMeshFaceVertexNormal(mesh, face_vertices[0]);
   *plane = Hyperplane3<double>(n0.normalized(), x0);
@@ -84,12 +86,12 @@ std::set<int> AggregateAdjacentCoplanarMeshFaces(
     const GeoMesh& mesh, int start_face_index,
     const FaceAdjacencyMap& adjacent_faces_map, double tolerance,
     std::set<int>* visited_faces_indices) {
-  DRAKE_DEMAND(0 <= start_face_index);
+  MALIPUT_DEMAND(0 <= start_face_index);
   const std::vector<IndexFace>& faces = mesh.faces();
-  DRAKE_DEMAND(start_face_index < static_cast<int>(faces.size()));
-  DRAKE_DEMAND(tolerance > 0.);
-  DRAKE_DEMAND(visited_faces_indices != nullptr);
-  DRAKE_DEMAND(visited_faces_indices->count(start_face_index) == 0);
+  MALIPUT_DEMAND(start_face_index < static_cast<int>(faces.size()));
+  MALIPUT_DEMAND(tolerance > 0.);
+  MALIPUT_DEMAND(visited_faces_indices != nullptr);
+  MALIPUT_DEMAND(visited_faces_indices->count(start_face_index) == 0);
 
   // Traverse adjacent faces, collecting coplanar ones.
   std::set<int> mergeable_faces_indices{start_face_index};
@@ -157,7 +159,7 @@ std::vector<FaceVertexIndex> ComputeMeshFacesContour(
   // Finds first outer edge index for the given simply connected region.
   const FaceEdgeIndex first_outer_face_edge_index = FindOuterFaceEdgeIndex(
       simply_connected_faces_indices, adjacent_faces_map);
-  DRAKE_DEMAND(simply_connected_faces_indices.count(
+  MALIPUT_DEMAND(simply_connected_faces_indices.count(
                    first_outer_face_edge_index.face_index) > 0);
 
   // Follows simply connected region contour by crawling through

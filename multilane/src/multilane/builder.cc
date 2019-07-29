@@ -3,14 +3,17 @@
 #include <cmath>
 #include <utility>
 
+#include "drake/common/text_logging.h"
+
+#include "maliput/common/maliput_abort.h"
+
 #include "multilane/arc_road_curve.h"
 #include "multilane/branch_point.h"
 #include "multilane/cubic_polynomial.h"
 #include "multilane/junction.h"
 #include "multilane/line_road_curve.h"
 #include "multilane/road_geometry.h"
-#include "drake/common/drake_assert.h"
-#include "drake/common/text_logging.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -54,10 +57,10 @@ Builder::Builder(double lane_width, const api::HBounds& elevation_bounds,
       scale_length_(scale_length),
       computation_policy_(computation_policy),
       group_factory_(std::move(group_factory)) {
-  DRAKE_DEMAND(lane_width_ >= 0.);
-  DRAKE_DEMAND(linear_tolerance_ >= 0.);
-  DRAKE_DEMAND(angular_tolerance_ >= 0.);
-  DRAKE_DEMAND(group_factory_ != nullptr);
+  MALIPUT_DEMAND(lane_width_ >= 0.);
+  MALIPUT_DEMAND(linear_tolerance_ >= 0.);
+  MALIPUT_DEMAND(angular_tolerance_ >= 0.);
+  MALIPUT_DEMAND(group_factory_ != nullptr);
 }
 
 namespace {
@@ -77,7 +80,7 @@ namespace {
 //
 // theta_dot = K * sin(-atan(z_dot))
 void ComputeContinuityConstraint(double curvature, EndpointZ* endpointz) {
-  DRAKE_DEMAND(endpointz != nullptr);
+  MALIPUT_DEMAND(endpointz != nullptr);
   endpointz->get_mutable_theta_dot() =
       curvature * std::sin(-std::atan(endpointz->z_dot()));
 }
@@ -92,7 +95,7 @@ const Connection* Builder::Connect(const std::string& id,
   //                       should be used to call the appropriate Builder
   //                       methods, r_ref will refer to any lane and will not be
   //                       r0.
-  DRAKE_DEMAND(lane_layout.ref_lane() == 0);
+  MALIPUT_DEMAND(lane_layout.ref_lane() == 0);
 
   const double curvature{0.};
   Endpoint start_endpoint = start_spec.endpoint();
@@ -120,7 +123,7 @@ const Connection* Builder::Connect(const std::string& id,
   //                       should be used to call the appropriate Builder
   //                       methods, r_ref will refer to any lane and will not be
   //                       r0.
-  DRAKE_DEMAND(lane_layout.ref_lane() == 0);
+  MALIPUT_DEMAND(lane_layout.ref_lane() == 0);
 
   const double curvature =
       std::copysign(1., arc_offset.d_theta()) / arc_offset.radius();
@@ -154,9 +157,9 @@ const Connection* Builder::Connect(const std::string& id,
                                    const StartLane::Spec& start_spec,
                                    const LineOffset& line_offset,
                                    const EndLane::Spec& end_spec) {
-  DRAKE_DEMAND(start_spec.lane_id() >= 0 &&
+  MALIPUT_DEMAND(start_spec.lane_id() >= 0 &&
                start_spec.lane_id() < lane_layout.num_lanes());
-  DRAKE_DEMAND(end_spec.lane_id() >= 0 &&
+  MALIPUT_DEMAND(end_spec.lane_id() >= 0 &&
                end_spec.lane_id() < lane_layout.num_lanes());
 
   const double curvature{0.};
@@ -216,9 +219,9 @@ const Connection* Builder::Connect(const std::string& id,
                                    const StartLane::Spec& start_spec,
                                    const ArcOffset& arc_offset,
                                    const EndLane::Spec& end_spec) {
-  DRAKE_DEMAND(start_spec.lane_id() >= 0 &&
+  MALIPUT_DEMAND(start_spec.lane_id() >= 0 &&
                start_spec.lane_id() < lane_layout.num_lanes());
-  DRAKE_DEMAND(end_spec.lane_id() >= 0 &&
+  MALIPUT_DEMAND(end_spec.lane_id() >= 0 &&
                end_spec.lane_id() < lane_layout.num_lanes());
 
   const double curvature =
@@ -326,7 +329,7 @@ drake::Vector3<double> DirectionOutFromLane(const api::Lane* const lane,
              s_hat;
     }
   }
-  DRAKE_UNREACHABLE();
+  MALIPUT_ABORT_MESSAGE("end is neither LaneEnd::kStart nor LaneEnd::KFinish.");
 }
 
 
@@ -337,7 +340,7 @@ drake::Vector3<double> DirectionOutFromLane(const api::Lane* const lane,
 bool AreLanesDirectionsWithinTolerance(
     const drake::Vector3<double>& direction_at_r_offset, double r_offset,
     const api::LaneEndSet* set, double angular_tolerance) {
-  DRAKE_DEMAND(set != nullptr);
+  MALIPUT_DEMAND(set != nullptr);
 
   for (int i = 0; i < set->size(); ++i) {
     const api::LaneEnd& le = set->get(i);
@@ -364,9 +367,9 @@ bool IsLaneContinuousAtBranchPointAlongROffset(
     const api::LaneEndSet* parallel_set,
     const api::LaneEndSet* antiparallel_set,
     double r_offset, double angular_tolerance) {
-  DRAKE_DEMAND(lane != nullptr);
-  DRAKE_DEMAND(parallel_set != nullptr);
-  DRAKE_DEMAND(antiparallel_set != nullptr);
+  MALIPUT_DEMAND(lane != nullptr);
+  MALIPUT_DEMAND(parallel_set != nullptr);
+  MALIPUT_DEMAND(antiparallel_set != nullptr);
 
   const drake::Vector3<double> direction =
       DirectionOutFromLane(lane, end, r_offset);
@@ -390,9 +393,9 @@ bool IsLaneContinuousAtBranchPoint(
     const api::LaneEndSet* parallel_set,
     const api::LaneEndSet* antiparallel_set,
     double angular_tolerance) {
-  DRAKE_DEMAND(lane != nullptr);
-  DRAKE_DEMAND(parallel_set != nullptr);
-  DRAKE_DEMAND(antiparallel_set != nullptr);
+  MALIPUT_DEMAND(lane != nullptr);
+  MALIPUT_DEMAND(parallel_set != nullptr);
+  MALIPUT_DEMAND(antiparallel_set != nullptr);
 
   constexpr double kZeroROffset{0.};
   const double s_at_branch_point =
@@ -425,7 +428,7 @@ BranchPoint* Builder::FindOrCreateBranchPoint(
       api::BranchPointId{
         "bp:" + std::to_string(road_geometry->num_branch_points())});
   auto result = bp_map->emplace(point, bp);
-  DRAKE_DEMAND(result.second);
+  MALIPUT_DEMAND(result.second);
   return bp;
 }
 
@@ -436,7 +439,7 @@ void Builder::AttachBranchPoint(
     std::map<Endpoint, BranchPoint*, EndpointFuzzyOrder>* bp_map) const {
   BranchPoint* bp = FindOrCreateBranchPoint(point, road_geometry, bp_map);
   // Tell the lane about its branch-point.
-  DRAKE_DEMAND((end == api::LaneEnd::kStart) || (end == api::LaneEnd::kFinish));
+  MALIPUT_DEMAND((end == api::LaneEnd::kStart) || (end == api::LaneEnd::kFinish));
   switch (end) {
     case api::LaneEnd::kStart: {
       lane->SetStartBp(bp);
@@ -526,7 +529,7 @@ std::unique_ptr<const api::RoadGeometry> Builder::Build(
     drake::log()->debug("junction: {}", junction->id().string());
     for (auto& connection : group->connections()) {
       drake::log()->debug("connection: {}", connection->id());
-      DRAKE_DEMAND(!connection_was_built[connection]);
+      MALIPUT_DEMAND(!connection_was_built[connection]);
       lane_map[connection] = BuildConnection(
           connection, junction, road_geometry.get(), &bp_map);
       connection_was_built[connection] = true;
@@ -550,7 +553,7 @@ std::unique_ptr<const api::RoadGeometry> Builder::Build(
   for (const DefaultBranch& def : default_branches_) {
     Lane* in_lane = lane_map[def.in][def.in_lane_index];
     Lane* out_lane = lane_map[def.out][def.out_lane_index];
-    DRAKE_DEMAND((def.in_end == api::LaneEnd::kStart) ||
+    MALIPUT_DEMAND((def.in_end == api::LaneEnd::kStart) ||
                  (def.in_end == api::LaneEnd::kFinish));
     ((def.in_end == api::LaneEnd::kStart) ?
      in_lane->start_bp() : in_lane->end_bp())
@@ -563,7 +566,7 @@ std::unique_ptr<const api::RoadGeometry> Builder::Build(
   for (const auto& s : failures) {
     drake::log()->error(s);
   }
-  DRAKE_DEMAND(failures.size() == 0);
+  MALIPUT_DEMAND(failures.size() == 0);
 
   return std::move(road_geometry);
 }

@@ -2,8 +2,10 @@
 
 #include <cmath>
 
+#include "maliput/common/maliput_abort.h"
+
 #include "multilane/branch_point.h"
-#include "drake/common/drake_assert.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -16,7 +18,8 @@ const api::BranchPoint* Lane::DoGetBranchPoint(
     case api::LaneEnd::kStart:  { return start_bp_; }
     case api::LaneEnd::kFinish: { return end_bp_; }
   }
-  DRAKE_UNREACHABLE();
+  MALIPUT_ABORT_MESSAGE(
+      "which_end is neither LaneEnd::kStart nor LaneEnd::kFinish.");
 }
 
 const api::LaneEndSet* Lane::DoGetConfluentBranches(

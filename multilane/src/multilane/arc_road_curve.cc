@@ -6,6 +6,9 @@
 #include "drake/common/unused.h"
 #include "drake/math/saturate.h"
 
+#include "maliput/common/maliput_abort.h"
+
+
 namespace maliput {
 namespace multilane {
 
@@ -49,9 +52,9 @@ double wrap(double theta) {
 // within.
 double saturate_on_wrapped_bounds(double theta, double theta_min,
                                   double theta_max) {
-  DRAKE_DEMAND(-M_PI <= theta);
-  DRAKE_DEMAND(theta <= M_PI);
-  DRAKE_DEMAND(theta_min <= theta_max);
+  MALIPUT_DEMAND(-M_PI <= theta);
+  MALIPUT_DEMAND(theta <= M_PI);
+  MALIPUT_DEMAND(theta_min <= theta_max);
 
   if (theta_max >= theta_min + 2. * M_PI) return theta;
 
@@ -82,11 +85,11 @@ drake::Vector3<double> ArcRoadCurve::ToCurveFrame(
     const drake::Vector3<double>& geo_coordinate,
     double r_min, double r_max,
     const api::HBounds& height_bounds) const {
-  DRAKE_DEMAND(r_min <= r_max);
+  MALIPUT_DEMAND(r_min <= r_max);
   // TODO(jadecastro): Lift the zero superelevation and zero elevation gradient
   // restriction.
   const drake::Vector2<double> q(geo_coordinate.x(), geo_coordinate.y());
-  DRAKE_DEMAND(q != center_);
+  MALIPUT_DEMAND(q != center_);
 
   // Define a vector from q to the center of the arc.
   const drake::Vector2<double> v = q - center_;
@@ -135,7 +138,7 @@ bool ArcRoadCurve::IsValid(double r_min, double r_max,
   // TODO(maddog@tri.global)  Check for self-intersecting volumes (e.g., when
   //                          arc angle >= 2π).
   drake::unused(height_bounds);
-  DRAKE_DEMAND(r_min <= r_max);
+  MALIPUT_DEMAND(r_min <= r_max);
   // Whether or not user code pays attention to driveable_bounds, at least
   // ensure that bounds are sane.  Given the singularity at the center of
   // the arc, it is not well-defined to consider parallel curves offset

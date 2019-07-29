@@ -12,6 +12,7 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/manual_phase_ring_book.h"
+#include "maliput/common/maliput_abort.h"
 
 #include "drake/common/drake_throw.h"
 
@@ -101,8 +102,7 @@ RightOfWayRule::State GetDefaultState(
       return state.second;
     }
   }
-  DRAKE_UNREACHABLE();  // This would imply that the rule has no states, which
-                        // should never happen.
+  MALIPUT_ABORT_MESSAGE("The rule has no states.");
 }
 
 // Given a set of rules, determine default states for each rule and return them
