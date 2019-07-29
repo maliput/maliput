@@ -11,16 +11,19 @@
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/manual_rulebook.h"
+#include "maliput/common/maliput_throw.h"
 #include "drake/common/drake_throw.h"
 #include "drake/common/text_logging.h"
 
 using maliput::api::Lane;
 using maliput::api::LaneId;
+using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
 using maliput::api::rules::LaneSRange;
 using maliput::api::rules::LaneSRoute;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::SRange;
+using maliput::api::rules::TrafficLight;
 
 namespace YAML {
 
@@ -247,6 +250,33 @@ RightOfWayRule::ZoneType BuildRightOfWayZoneType(const YAML::Node& rule_node) {
   }
 }
 
+std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
+    BuildRightOfWayBulbGroups(const YAML::Node& rule_node) {
+  if (rule_node["BulbGroups"]) {
+    MALIPUT_THROW_UNLESS(rule_node["BulbGroups"].IsMap());
+
+    std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
+        bulb_group_ids;
+    for (const auto& traffic_light_bulb_group :
+         rule_node["BulbGroups"]) {
+      const TrafficLight::Id traffic_light_id(
+          traffic_light_bulb_group.first.as<std::string>());
+
+      std::set<BulbGroup::Id> bulb_groups;
+      for (int i = 0; i < traffic_light_bulb_group.second.size(); ++i) {
+        MALIPUT_THROW_UNLESS(
+            bulb_groups.emplace(traffic_light_bulb_group.second[i].as<std::string>())
+                .second);
+      }
+
+      MALIPUT_THROW_UNLESS(
+          bulb_group_ids.emplace(traffic_light_id, bulb_groups).second);
+    }
+    return bulb_group_ids;
+  }
+  return {};
+}
+
 RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
                                    const YAML::Node& rule_node) {
   DRAKE_THROW_UNLESS(rule_node.IsMap());
@@ -263,7 +293,7 @@ RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
   const LaneSRoute zone = BuildLaneSRoute(road_geometry, zone_node);
 
   return RightOfWayRule(rule_id, zone, BuildRightOfWayZoneType(rule_node),
-                        states);
+                        states, BuildRightOfWayBulbGroups(rule_node));
 }
 }  // namespace
 

@@ -2,8 +2,11 @@
 
 #include <iterator>
 #include <memory>
+#include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
+
 
 #include <gtest/gtest.h>
 
@@ -11,6 +14,7 @@
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
@@ -27,11 +31,13 @@ namespace {
 constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 
 using maliput::api::LaneId;
+using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
 using maliput::api::rules::LaneSRange;
 using maliput::api::rules::LaneSRoute;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::SRange;
+using maliput::api::rules::TrafficLight;
 
 class TestLoading2x2IntersectionRules : public ::testing::Test {
  protected:
@@ -63,7 +69,8 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
           {RightOfWayRule::State(RightOfWayRule::State::Id("Go"),
                                  RightOfWayRule::State::Type::kGo, {}),
            RightOfWayRule::State(RightOfWayRule::State::Id("Stop"),
-                                 RightOfWayRule::State::Type::kStop, {})}));
+                                 RightOfWayRule::State::Type::kStop, {})},
+          kBulbGroups));
     }
     return result;
   }
@@ -98,7 +105,8 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
            RightOfWayRule::State(RightOfWayRule::State::Id("StopThenGo"),
                                  RightOfWayRule::State::Type::kStopThenGo,
                                  {RightOfWayRule::Id(test_case.yield_1),
-                                  RightOfWayRule::Id(test_case.yield_2)})}));
+                                  RightOfWayRule::Id(test_case.yield_2)})},
+          kBulbGroups));
     }
     return result;
   }
@@ -126,7 +134,8 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
                                  RightOfWayRule::State::Type::kGo,
                                  {RightOfWayRule::Id(test_case.yield)}),
            RightOfWayRule::State(RightOfWayRule::State::Id("Stop"),
-                                 RightOfWayRule::State::Type::kStop, {})}));
+                                 RightOfWayRule::State::Type::kStop, {})},
+          kBulbGroups));
     }
     return result;
   }
@@ -214,6 +223,13 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
     return result;
   }
 
+  const std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
+    kBulbGroups{
+      {TrafficLight::Id("SouthFacing"), {BulbGroup::Id("SouthFacingBulbs")}},
+      {TrafficLight::Id("NorthFacing"), {BulbGroup::Id("NorthFacingBulbs")}},
+      {TrafficLight::Id("EastFacing"), {BulbGroup::Id("EastFacingBulbs")}},
+      {TrafficLight::Id("WestFacing"), {BulbGroup::Id("WestFacingBulbs")}},
+  };
   const std::string filepath_;
   const std::unique_ptr<const api::RoadGeometry> road_geometry_;
 };
