@@ -24,6 +24,7 @@ void RuleRegistry::RegisterDiscreteValueRule(
       range_rule_types_.find(type_id) == range_rule_types_.end());
   MALIPUT_THROW_UNLESS(
       discrete_rule_types_.find(type_id) == discrete_rule_types_.end());
+  MALIPUT_THROW_UNLESS(!all_possible_value_states.empty());
 
   MALIPUT_THROW_UNLESS(
       discrete_rule_types_.emplace(type_id, all_possible_value_states).second);
@@ -72,6 +73,12 @@ DiscreteValueRule RuleRegistry::BuildDiscreteValueRule(
     const std::set<std::string>& value_states) const {
   MALIPUT_THROW_UNLESS(
       discrete_rule_types_.find(type_id) != discrete_rule_types_.end());
+  const auto discrete_rule_type = discrete_rule_types_.find(type_id);
+  for (const std::string& value_state : value_states) {
+    MALIPUT_THROW_UNLESS(
+        discrete_rule_type->second.find(value_state) !=
+        discrete_rule_type->second.end());
+  }
 
   return DiscreteValueRule(id, type_id, zone, related_rules, value_states);
 }
