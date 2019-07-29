@@ -2,15 +2,19 @@
 
 #include <memory>
 
-#include "maliput/api/branch_point.h"
-#include "maliput/api/lane.h"
-#include "maliput/api/segment.h"
-#include "multilane/cubic_polynomial.h"
-#include "multilane/road_curve.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 #include "drake/common/eigen_types.h"
 #include "drake/common/unused.h"
+
+#include "maliput/api/branch_point.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/segment.h"
+#include "maliput/common/maliput_abort.h"
+
+#include "multilane/cubic_polynomial.h"
+#include "multilane/road_curve.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -59,10 +63,10 @@ class Lane : public api::Lane {
         elevation_bounds_(elevation_bounds),
         road_curve_(road_curve),
         r0_(r0) {
-    DRAKE_DEMAND(index_ >= 0);
-    DRAKE_DEMAND(lane_bounds_.min() >= driveable_bounds_.min());
-    DRAKE_DEMAND(lane_bounds_.max() <= driveable_bounds_.max());
-    DRAKE_DEMAND(road_curve != nullptr);
+    MALIPUT_DEMAND(index_ >= 0);
+    MALIPUT_DEMAND(lane_bounds_.min() >= driveable_bounds_.min());
+    MALIPUT_DEMAND(lane_bounds_.max() <= driveable_bounds_.max());
+    MALIPUT_DEMAND(road_curve != nullptr);
     s_from_p_at_r0_ = road_curve_->OptimizeCalcSFromP(r0_);
     p_from_s_at_r0_ = road_curve_->OptimizeCalcPFromS(r0_);
     lane_length_ = s_from_p_at_r0_(1.0);

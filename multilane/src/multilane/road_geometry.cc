@@ -1,12 +1,13 @@
 #include "multilane/road_geometry.h"
 
-#include "drake/common/drake_assert.h"
 #include "drake/common/unused.h"
 
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_abort.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -38,9 +39,9 @@ void GetPositionIfSmallerDistance(const api::GeoPosition& geo_position,
                                   api::RoadPosition* const road_position,
                                   double* const distance,
                                   api::GeoPosition* const nearest_position) {
-  DRAKE_DEMAND(lane != nullptr);
-  DRAKE_DEMAND(road_position != nullptr);
-  DRAKE_DEMAND(distance != nullptr);
+  MALIPUT_DEMAND(lane != nullptr);
+  MALIPUT_DEMAND(road_position != nullptr);
+  MALIPUT_DEMAND(distance != nullptr);
 
   double new_distance{};
   api::GeoPosition new_nearest_position{};
@@ -138,7 +139,7 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
   // Note that this can be made more robust by extending this with a search that
   // extends beyond only adjacent lanes.
   if (hint != nullptr) {
-    DRAKE_DEMAND(hint->lane != nullptr);
+    MALIPUT_DEMAND(hint->lane != nullptr);
     road_position = {hint->lane,
                      hint->lane->ToLanePosition(geo_position, nearest_position,
                                                 &min_distance)};
@@ -161,9 +162,9 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
     // No `hint` supplied.  Search exhaustively through all of the lanes to find
     // the position associated with the first found containing lane or the
     // distance-minimizing position.
-    DRAKE_DEMAND(num_junctions() > 0);
-    DRAKE_DEMAND(junction(0)->num_segments() > 0);
-    DRAKE_DEMAND(junction(0)->segment(0)->num_lanes() > 0);
+    MALIPUT_DEMAND(num_junctions() > 0);
+    MALIPUT_DEMAND(junction(0)->num_segments() > 0);
+    MALIPUT_DEMAND(junction(0)->segment(0)->num_lanes() > 0);
     const api::Lane* lane = this->junction(0)->segment(0)->lane(0);
     road_position = {lane, lane->ToLanePosition(geo_position, nearest_position,
                                                 &min_distance)};
@@ -189,7 +190,7 @@ RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
                                   double radius) const {
   drake::unused(geo_position);
   drake::unused(radius);
-  DRAKE_ASSERT(false);
+  MALIPUT_ABORT_MESSAGE("Unimplemented method.");
 }
 
 }  // namespace multilane

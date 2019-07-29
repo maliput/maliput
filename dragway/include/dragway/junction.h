@@ -3,12 +3,16 @@
 #include <memory>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/junction.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_abort.h"
+
 #include "dragway/segment.h"
-#include "drake/common/drake_copyable.h"
+
 
 namespace maliput {
 namespace dragway {
@@ -42,7 +46,7 @@ class Junction final : public api::Junction {
   int do_num_segments() const final { return 1; }
 
   const api::Segment* do_segment(int index) const final {
-    DRAKE_DEMAND(index < num_segments());
+    MALIPUT_DEMAND(index < num_segments());
     return &segment_;
   }
 

@@ -24,9 +24,14 @@ target_include_directories(api
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 target_link_libraries(api
-  common
-  drake::drake
+  PUBLIC
+    common
+    drake::drake
 )
+target_link_libraries(api
+  PUBLIC
+    common
+    drake::drake)
 
 ##############################################################################
 # Export

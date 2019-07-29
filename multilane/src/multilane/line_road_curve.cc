@@ -22,7 +22,7 @@ drake::Vector3<double> LineRoadCurve::ToCurveFrame(
     const drake::Vector3<double>& geo_coordinate,
     double r_min, double r_max,
     const api::HBounds& height_bounds) const {
-  DRAKE_DEMAND(r_min <= r_max);
+  MALIPUT_DEMAND(r_min <= r_max);
   // TODO(jadecastro): Lift the zero superelevation and zero elevation gradient
   // restriction.
   const drake::Vector2<double> s_unit_vector = dp_ / dp_.norm();

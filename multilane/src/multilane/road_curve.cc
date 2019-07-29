@@ -8,6 +8,9 @@
 #include "drake/systems/analysis/integrator_base.h"
 #include "drake/systems/analysis/scalar_dense_output.h"
 
+#include "maliput/common/maliput_abort.h"
+
+
 namespace maliput {
 namespace multilane {
 
@@ -176,8 +179,8 @@ std::function<double(double)> RoadCurve::OptimizeCalcSFromP(double r) const {
     // instances only take copyable callables.
     const std::shared_ptr<drake::systems::ScalarDenseOutput<double>> dense_output{
       s_from_p_func_->MakeDenseEvalFunction(1.0, values)};
-    DRAKE_DEMAND(dense_output->start_time() <= 0.);
-    DRAKE_DEMAND(dense_output->end_time() >= 1.);
+    MALIPUT_DEMAND(dense_output->start_time() <= 0.);
+    MALIPUT_DEMAND(dense_output->end_time() >= 1.);
     return [dense_output, absolute_tolerance] (double p) -> double {
       // Saturates p to lie within the [0., 1.] interval.
       const double saturated_p = std::min(std::max(p, 0.), 1.);
@@ -213,8 +216,8 @@ std::function<double(double)> RoadCurve::OptimizeCalcPFromS(double r) const {
     // instances only take copyable callables.
     const std::shared_ptr<drake::systems::ScalarDenseOutput<double>> dense_output{
       p_from_s_ivp_->DenseSolve(full_length, values)};
-    DRAKE_DEMAND(dense_output->start_time() <= 0.);
-    DRAKE_DEMAND(dense_output->end_time() >= full_length);
+    MALIPUT_DEMAND(dense_output->start_time() <= 0.);
+    MALIPUT_DEMAND(dense_output->end_time() >= full_length);
     return [dense_output, full_length,
             absolute_tolerance] (double s) -> double {
       // Saturates s to lie within the [0., full_length] interval.

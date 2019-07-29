@@ -8,11 +8,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include "drake/common/hash.h"
+
 #include "fmt/ostream.h"
 
 #include "maliput/api/lane.h"
-#include "drake/common/drake_assert.h"
-#include "drake/common/hash.h"
+#include "maliput/common/maliput_abort.h"
+
 
 namespace maliput {
 namespace utility {
@@ -133,7 +135,7 @@ class GeoFace {
   GeoFace(const std::vector<GeoVertex>& vertices,
           const std::vector<GeoNormal>& normals)
       : vertices_(vertices), normals_(normals) {
-    DRAKE_DEMAND(vertices.size() == normals.size());
+    MALIPUT_DEMAND(vertices.size() == normals.size());
   }
 
   void push_vn(const GeoVertex& vertex, const GeoNormal& normal) {

@@ -18,6 +18,7 @@ set(BASE_SOURCES
   )
 
 add_library(base ${BASE_SOURCES})
+
 target_include_directories(base
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -26,6 +27,7 @@ target_include_directories(base
 target_link_libraries(base
   PUBLIC
     api
+    common
     drake::drake
     yaml-cpp)
 

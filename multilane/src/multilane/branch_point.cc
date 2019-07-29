@@ -1,6 +1,6 @@
 #include "multilane/branch_point.h"
 
-#include "drake/common/drake_assert.h"
+#include "maliput/common/maliput_abort.h"
 
 namespace maliput {
 namespace multilane {
@@ -31,8 +31,9 @@ drake::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(
 }
 
 const api::LaneEnd& BranchPoint::AddABranch(const api::LaneEnd& lane_end) {
-  DRAKE_DEMAND(confluent_branches_.find(lane_end) == confluent_branches_.end());
-  DRAKE_DEMAND(ongoing_branches_.find(lane_end) == ongoing_branches_.end());
+  MALIPUT_DEMAND(
+      confluent_branches_.find(lane_end) == confluent_branches_.end());
+  MALIPUT_DEMAND(ongoing_branches_.find(lane_end) == ongoing_branches_.end());
   a_side_.add(lane_end);
   confluent_branches_[lane_end] = &a_side_;
   ongoing_branches_[lane_end] = &b_side_;
@@ -40,8 +41,9 @@ const api::LaneEnd& BranchPoint::AddABranch(const api::LaneEnd& lane_end) {
 }
 
 const api::LaneEnd& BranchPoint::AddBBranch(const api::LaneEnd& lane_end) {
-  DRAKE_DEMAND(confluent_branches_.find(lane_end) == confluent_branches_.end());
-  DRAKE_DEMAND(ongoing_branches_.find(lane_end) == ongoing_branches_.end());
+  MALIPUT_DEMAND(
+      confluent_branches_.find(lane_end) == confluent_branches_.end());
+  MALIPUT_DEMAND(ongoing_branches_.find(lane_end) == ongoing_branches_.end());
   b_side_.add(lane_end);
   confluent_branches_[lane_end] = &b_side_;
   ongoing_branches_[lane_end] = &a_side_;
@@ -53,11 +55,11 @@ void BranchPoint::SetDefault(const api::LaneEnd& lane_end,
   const auto& le_ongoing = ongoing_branches_.find(lane_end);
   const auto& db_confluent = confluent_branches_.find(default_branch);
   // Verify that lane_end belongs to this BranchPoint.
-  DRAKE_DEMAND(le_ongoing != ongoing_branches_.end());
+  MALIPUT_DEMAND(le_ongoing != ongoing_branches_.end());
   // Verify that default_branch belongs to this BranchPoint.
-  DRAKE_DEMAND(db_confluent != confluent_branches_.end());
+  MALIPUT_DEMAND(db_confluent != confluent_branches_.end());
   // Verify that default_branch is an ongoing lane for lane_end.
-  DRAKE_DEMAND(db_confluent->second == le_ongoing->second);
+  MALIPUT_DEMAND(db_confluent->second == le_ongoing->second);
 
   defaults_[lane_end] = default_branch;
 }

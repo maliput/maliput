@@ -10,11 +10,14 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "multilane/builder.h"
-#include "multilane/connection.h"
-#include "drake/common/drake_assert.h"
 #include "drake/common/drake_optional.h"
 #include "drake/common/text_logging.h"
+
+#include "maliput/common/maliput_abort.h"
+
+#include "multilane/builder.h"
+#include "multilane/connection.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -83,8 +86,8 @@ double deg_to_rad(double degrees) { return degrees * M_PI / 180.; }
 // `node` must be a sequence and have two doubles. First item will be minimum
 // height and the second item will be the maximum height.
 api::HBounds ParseHBounds(const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsSequence());
-  DRAKE_DEMAND(node.size() == 2);
+  MALIPUT_DEMAND(node.IsSequence());
+  MALIPUT_DEMAND(node.size() == 2);
   return api::HBounds(node[0].as<double>(), node[1].as<double>());
 }
 
@@ -93,8 +96,8 @@ api::HBounds ParseHBounds(const YAML::Node& node) {
 // second item will be y coordinate and the third item will be heading angle in
 // degrees.
 EndpointXy ParseEndpointXy(const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsSequence());
-  DRAKE_DEMAND(node.size() == 3);
+  MALIPUT_DEMAND(node.IsSequence());
+  MALIPUT_DEMAND(node.size() == 3);
   return EndpointXy(node[0].as<double>(), node[1].as<double>(),
                     deg_to_rad(node[2].as<double>()));
 }
@@ -107,8 +110,8 @@ EndpointXy ParseEndpointXy(const YAML::Node& node) {
 // theta_dot is optional since, in general, its value must be derived from other
 // endpoint/connection parameters in order to preserve continuity.
 EndpointZ ParseEndpointZ(const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsSequence());
-  DRAKE_DEMAND(node.size() == 3 || node.size() == 4);
+  MALIPUT_DEMAND(node.IsSequence());
+  MALIPUT_DEMAND(node.size() == 3 || node.size() == 4);
   return EndpointZ(node[0].as<double>(), node[1].as<double>(),
                    deg_to_rad(node[2].as<double>()),
                    node.size() == 4
@@ -121,7 +124,7 @@ EndpointZ ParseEndpointZ(const YAML::Node& node) {
 // represents and EndpointXY as well as another sequence node named "zpoint"
 // that represents an EndpointZ.
 Endpoint ParseEndpoint(const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsMap());
+  MALIPUT_DEMAND(node.IsMap());
   return Endpoint(ParseEndpointXy(node["xypoint"]),
                   ParseEndpointZ(node["zpoint"]));
 }
@@ -132,22 +135,22 @@ Endpoint ParseEndpoint(const YAML::Node& node) {
 // reference lane and the third item will be the distance from the reference
 // lane to the reference curve.
 std::tuple<int, int, double> ParseLanes(const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsSequence());
-  DRAKE_DEMAND(node.size() == 3);
+  MALIPUT_DEMAND(node.IsSequence());
+  MALIPUT_DEMAND(node.size() == 3);
   const int num_lanes = node[0].as<int>();
   const int ref_lane = node[1].as<int>();
   const double r_ref = node[2].as<double>();
   // Checks that the number of lanes is bigger than 0.
-  DRAKE_DEMAND(num_lanes > 0);
+  MALIPUT_DEMAND(num_lanes > 0);
   // Checks that the reference lane is within lanes range.
-  DRAKE_DEMAND(ref_lane >= 0 && ref_lane < num_lanes);
+  MALIPUT_DEMAND(ref_lane >= 0 && ref_lane < num_lanes);
   return std::make_tuple(num_lanes, ref_lane, r_ref);
 }
 
 // Parses a YAML `node` and returns a LineOffset object from it.
 // `node` must be a double scalar.
 LineOffset ParseLineOffset(const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsScalar());
+  MALIPUT_DEMAND(node.IsScalar());
   return LineOffset(node.as<double>());
 }
 
@@ -155,8 +158,8 @@ LineOffset ParseLineOffset(const YAML::Node& node) {
 // `node` must be a sequence of two doubles. The first item will be the radius
 // and the second item will be the angle span in degrees.
 ArcOffset ParseArcOffset(const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsSequence());
-  DRAKE_DEMAND(node.size() == 2);
+  MALIPUT_DEMAND(node.IsSequence());
+  MALIPUT_DEMAND(node.size() == 2);
   return ArcOffset(node[0].as<double>(), deg_to_rad(node[1].as<double>()));
 }
 
@@ -164,7 +167,7 @@ ArcOffset ParseArcOffset(const YAML::Node& node) {
 // `node` must be a string scalar, with one of the following
 // values: "prefer-accuracy", "prefer-speed".
 ComputationPolicy ParseComputationPolicy(const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsScalar());
+  MALIPUT_DEMAND(node.IsScalar());
   const std::string& policy = node.Scalar();
   if (policy == "prefer-accuracy") {
     return ComputationPolicy::kPreferAccuracy;
@@ -297,12 +300,12 @@ ParsedAnchorPoint ParseAnchorPoint(const std::string anchor_key) {
     return {AnchorPointType::kReference, {}};
   }
   const auto it = anchor_key.find("lane.");
-  DRAKE_DEMAND(it != std::string::npos && it == 0);
+  MALIPUT_DEMAND(it != std::string::npos && it == 0);
   const std::string lane_str =
       anchor_key.substr(std::strlen("lane."),
                         anchor_key.length() - std::strlen("lane."));
   // Checks that lane_str only contains digits but no other character.
-  DRAKE_DEMAND(lane_str.find_first_not_of("0123456789") == std::string::npos);
+  MALIPUT_DEMAND(lane_str.find_first_not_of("0123456789") == std::string::npos);
   const int lane_id = std::stoi(lane_str);
   return {AnchorPointType::kLane, {lane_id}};
 }
@@ -318,9 +321,9 @@ drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
     const YAML::Node& node,
     const std::map<std::string, Endpoint>& point_catalog,
     const std::map<std::string, const Connection*>& connection_catalog) {
-  DRAKE_DEMAND(node.IsSequence());
-  DRAKE_DEMAND(node.size() == 2);
-  DRAKE_DEMAND(node[1].IsScalar());
+  MALIPUT_DEMAND(node.IsSequence());
+  MALIPUT_DEMAND(node.size() == 2);
+  MALIPUT_DEMAND(node[1].IsScalar());
 
   const ParsedAnchorPoint parsed_anchor_point =
       ParseAnchorPoint(node[0].as<std::string>());
@@ -333,7 +336,7 @@ drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
   if (parsed_reference.type == ReferenceType::kPoint) {
     drake::optional<Endpoint> endpoint =
         FindEndpointInCatalog(parsed_reference.id, point_catalog);
-    DRAKE_DEMAND(endpoint.has_value());
+    MALIPUT_DEMAND(endpoint.has_value());
     if (parsed_anchor_point.type == AnchorPointType::kReference) {
       spec.ref_spec =
           StartReference().at(endpoint.value(), parsed_reference.direction);
@@ -349,12 +352,12 @@ drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
       return drake::nullopt;
     }
     if (parsed_anchor_point.type == AnchorPointType::kReference) {
-      DRAKE_DEMAND(!parsed_reference.lane_id.has_value());
+      MALIPUT_DEMAND(!parsed_reference.lane_id.has_value());
       spec.ref_spec = StartReference().at(*connection.value(),
                                           parsed_reference.end.value(),
                                           parsed_reference.direction);
     } else {
-      DRAKE_DEMAND(parsed_reference.lane_id.has_value());
+      MALIPUT_DEMAND(parsed_reference.lane_id.has_value());
       spec.lane_spec = StartLane(parsed_anchor_point.lane_id.value()).at(
           *connection.value(), parsed_reference.lane_id.value(),
           parsed_reference.end.value(), parsed_reference.direction);
@@ -380,8 +383,8 @@ drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
     const YAML::Node& node,
     const std::map<std::string, Endpoint>& point_catalog,
     const std::map<std::string, const Connection*>& connection_catalog) {
-  DRAKE_DEMAND(node.IsSequence());
-  DRAKE_DEMAND(node.size() == 2);
+  MALIPUT_DEMAND(node.IsSequence());
+  MALIPUT_DEMAND(node.size() == 2);
 
   const ParsedAnchorPoint parsed_anchor_point =
       ParseAnchorPoint(node[0].as<std::string>());
@@ -404,7 +407,7 @@ drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
     if (parsed_reference.type == ReferenceType::kPoint) {
       drake::optional<Endpoint> endpoint =
           FindEndpointInCatalog(parsed_reference.id, point_catalog);
-      DRAKE_DEMAND(endpoint.has_value());
+      MALIPUT_DEMAND(endpoint.has_value());
       if (parsed_anchor_point.type == AnchorPointType::kReference) {
         spec.ref_spec =
             EndReference().z_at(endpoint.value().z(),
@@ -421,12 +424,12 @@ drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
         return drake::nullopt;
       }
       if (parsed_anchor_point.type == AnchorPointType::kReference) {
-        DRAKE_DEMAND(!parsed_reference.lane_id.has_value());
+        MALIPUT_DEMAND(!parsed_reference.lane_id.has_value());
         spec.ref_spec = EndReference().z_at(*connection.value(),
                                             parsed_reference.end.value(),
                                             parsed_reference.direction);
       } else {
-        DRAKE_DEMAND(parsed_reference.lane_id.has_value());
+        MALIPUT_DEMAND(parsed_reference.lane_id.has_value());
         spec.lane_spec = EndLane(parsed_anchor_point.lane_id.value()).z_at(
             *connection.value(), parsed_reference.lane_id.value(),
             parsed_reference.end.value(), parsed_reference.direction);
@@ -446,8 +449,8 @@ drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
 // `point_catalog` must not be nullptr.
 void ParseEndpointsFromPoints(const YAML::Node& points,
                               std::map<std::string, Endpoint>* point_catalog) {
-  DRAKE_DEMAND(points.IsMap());
-  DRAKE_DEMAND(point_catalog != nullptr);
+  MALIPUT_DEMAND(points.IsMap());
+  MALIPUT_DEMAND(point_catalog != nullptr);
   for (const auto& p : points) {
     (*point_catalog)[p.first.as<std::string>()] = ParseEndpoint(p.second);
   }
@@ -462,18 +465,18 @@ const Connection* MaybeMakeConnection(
     const std::map<std::string, const Connection*>& connection_catalog,
     BuilderBase* builder, double default_left_shoulder,
     double default_right_shoulder) {
-  DRAKE_DEMAND(node.IsMap());
-  DRAKE_DEMAND(builder != nullptr);
+  MALIPUT_DEMAND(node.IsMap());
+  MALIPUT_DEMAND(builder != nullptr);
   // "lanes" is required.
-  DRAKE_DEMAND(node["lanes"]);
+  MALIPUT_DEMAND(node["lanes"]);
   // "start" required.
-  DRAKE_DEMAND(node["start"]);
+  MALIPUT_DEMAND(node["start"]);
   // "arc" or "length" (but not both) required.
-  DRAKE_DEMAND(node["arc"] || node["length"]);
-  DRAKE_DEMAND(!(node["arc"] && node["length"]));
+  MALIPUT_DEMAND(node["arc"] || node["length"]);
+  MALIPUT_DEMAND(!(node["arc"] && node["length"]));
   // "z_end" or "explicit_end" (but not both) required.
-  DRAKE_DEMAND(node["z_end"] || node["explicit_end"]);
-  DRAKE_DEMAND(!(node["z_end"] && node["explicit_end"]));
+  MALIPUT_DEMAND(node["z_end"] || node["explicit_end"]);
+  MALIPUT_DEMAND(!(node["z_end"] && node["explicit_end"]));
 
   // Create lane layout.
   const LaneLayout lane_layout =
@@ -503,7 +506,7 @@ const Connection* MaybeMakeConnection(
   }  // "Try to resolve later."
 
   // Both ends must be of the same type.
-  DRAKE_DEMAND(start_spec->first.type == end_spec->first.type);
+  MALIPUT_DEMAND(start_spec->first.type == end_spec->first.type);
 
   switch ((*start_spec).first.type) {
     case AnchorPointType::kReference: {
@@ -521,7 +524,8 @@ const Connection* MaybeMakeConnection(
                                   *(end_spec->second.ref_spec));
         }
       }
-      DRAKE_UNREACHABLE();
+      MALIPUT_ABORT_MESSAGE("connection type of the start_spec is neither "
+                            "Connection::kArc nor Connection::kLine");
     }
     case AnchorPointType::kLane: {
       switch (geometry_type) {
@@ -538,10 +542,12 @@ const Connection* MaybeMakeConnection(
                                   *(end_spec->second.lane_spec));
         }
       }
-      DRAKE_UNREACHABLE();
+      MALIPUT_ABORT_MESSAGE("connection type of the start_spec is neither "
+                            "Connection::kArc nor Connection::kLine");
     }
   }
-  DRAKE_UNREACHABLE();
+  MALIPUT_ABORT_MESSAGE("connection type of the start_spec is neither "
+                      "Connection::kArc nor Connection::kLine");
 }
 
 // Parses a YAML `node` that represents a RoadGeometry.
@@ -554,31 +560,31 @@ const Connection* MaybeMakeConnection(
 // map node will contain sequences of Groups to join Connections.
 std::unique_ptr<const api::RoadGeometry> BuildFrom(
     const BuilderFactoryBase& builder_factory, const YAML::Node& node) {
-  DRAKE_DEMAND(node.IsMap());
+  MALIPUT_DEMAND(node.IsMap());
   YAML::Node mmb = node["maliput_multilane_builder"];
-  DRAKE_DEMAND(mmb.IsMap());
+  MALIPUT_DEMAND(mmb.IsMap());
 
   const double default_left_shoulder = mmb["left_shoulder"].as<double>();
-  DRAKE_DEMAND(default_left_shoulder >= 0.);
+  MALIPUT_DEMAND(default_left_shoulder >= 0.);
   const double default_right_shoulder = mmb["right_shoulder"].as<double>();
-  DRAKE_DEMAND(default_right_shoulder >= 0.);
+  MALIPUT_DEMAND(default_right_shoulder >= 0.);
 
   const double lane_width = mmb["lane_width"].as<double>();
-  DRAKE_DEMAND(lane_width >= 0.);
+  MALIPUT_DEMAND(lane_width >= 0.);
   const double linear_tolerance = mmb["linear_tolerance"].as<double>();
-  DRAKE_DEMAND(linear_tolerance >= 0.);
+  MALIPUT_DEMAND(linear_tolerance >= 0.);
   const double angular_tolerance =
       deg_to_rad(mmb["angular_tolerance"].as<double>());
-  DRAKE_DEMAND(angular_tolerance >= 0.);
+  MALIPUT_DEMAND(angular_tolerance >= 0.);
   const double scale_length = mmb["scale_length"].as<double>();
-  DRAKE_DEMAND(scale_length > 0.);
+  MALIPUT_DEMAND(scale_length > 0.);
   const ComputationPolicy computation_policy =
       ParseComputationPolicy(mmb["computation_policy"]);
 
   auto builder = builder_factory.Make(
       lane_width, ParseHBounds(mmb["elevation_bounds"]), linear_tolerance,
       angular_tolerance, scale_length, computation_policy);
-  DRAKE_DEMAND(builder != nullptr);
+  MALIPUT_DEMAND(builder != nullptr);
 
   DRAKE_SPDLOG_DEBUG(drake::log(), "loading points !");
   std::map<std::string, Endpoint> point_catalog;
@@ -586,7 +592,7 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
 
   DRAKE_SPDLOG_DEBUG(drake::log(), "loading raw connections !");
   YAML::Node connections = mmb["connections"];
-  DRAKE_DEMAND(connections.IsMap());
+  MALIPUT_DEMAND(connections.IsMap());
   std::map<std::string, YAML::Node> raw_connections;
   for (const auto& c : connections) {
     raw_connections[c.first.as<std::string>()] = c.second;
@@ -610,7 +616,7 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
       DRAKE_SPDLOG_DEBUG(drake::log(), "...cooked '{}'", id);
       cooked_connections[id] = conn;
     }
-    DRAKE_DEMAND(cooked_connections.size() > cooked_before_this_pass);
+    MALIPUT_DEMAND(cooked_connections.size() > cooked_before_this_pass);
     for (const auto& c : cooked_connections) {
       raw_connections.erase(c.first);
     }
@@ -619,14 +625,14 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
   if (mmb["groups"]) {
     DRAKE_SPDLOG_DEBUG(drake::log(), "grouping connections !");
     YAML::Node groups = mmb["groups"];
-    DRAKE_DEMAND(groups.IsMap());
+    MALIPUT_DEMAND(groups.IsMap());
     std::map<std::string, const Group*> cooked_groups;
     for (const auto& g : groups) {
       const std::string gid = g.first.as<std::string>();
       DRAKE_SPDLOG_DEBUG(drake::log(), "   create group '{}'", gid);
       Group* group = builder->MakeGroup(gid);
       YAML::Node cids_node = g.second;
-      DRAKE_DEMAND(cids_node.IsSequence());
+      MALIPUT_DEMAND(cids_node.IsSequence());
       for (const YAML::Node& cid_node : cids_node) {
         const std::string cid = cid_node.as<std::string>();
         DRAKE_SPDLOG_DEBUG(drake::log(), "      add cnx '{}'", cid);

@@ -2,7 +2,7 @@
 
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
-#include "drake/common/drake_assert.h"
+#include "maliput/common/maliput_abort.h"
 
 namespace maliput {
 
@@ -16,7 +16,7 @@ using api::rules::RuleStateProvider;
 PhaseBasedRuleStateProvider::PhaseBasedRuleStateProvider(
     const PhaseRingBook* phase_ring_book, const PhaseProvider* phase_provider)
     : phase_ring_book_(phase_ring_book), phase_provider_(phase_provider) {
-  DRAKE_DEMAND(phase_ring_book_ != nullptr && phase_provider != nullptr);
+  MALIPUT_DEMAND(phase_ring_book_ != nullptr && phase_provider != nullptr);
 }
 
 drake::optional<RuleStateProvider::RightOfWayResult>

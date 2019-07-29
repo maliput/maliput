@@ -9,7 +9,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/maliput_abort.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
+
 #include "multilane/builder.h"
 
 namespace maliput {
@@ -28,8 +30,8 @@ const double kHeight{5.};  // Elevation bound.
 const api::Lane* GetLaneByJunctionId(const api::RoadGeometry& rg,
                                      const std::string& junction_id,
                                      int segment_index, int lane_index) {
-  DRAKE_DEMAND(segment_index >= 0);
-  DRAKE_DEMAND(lane_index >= 0);
+  MALIPUT_DEMAND(segment_index >= 0);
+  MALIPUT_DEMAND(lane_index >= 0);
 
   for (int i = 0; i < rg.num_junctions(); ++i) {
     if (rg.junction(i)->id() == api::JunctionId(junction_id)) {
