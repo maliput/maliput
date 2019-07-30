@@ -84,13 +84,17 @@ std::string FormatMaterial(const Material& mat)
                       mat.shinines, 1.0 - mat.transparency);
 }
 
-// Let `step_s` be a step in arc-length s-coordinate, `s0` an s-coordinate in
-// `lane` and grid_unit` the minimum step in s-coordinate to take. It increases
-// `step_s`,  from the minimum of `grid_unit` and the arc-length distance to the
-// lane end, until the distance of the Inertial frame positions in the center of
-// `lane`, left most and right most of the driveable surface to the respective
-// points at `s0 + step_s` is bigger than `grid_unit` or we reach the end of
-// the `lane`. 
+// Compute the maximum step in s-coordinates that can approximate the distance 
+// between its ends in world's inertial frame coordinates up to the given
+// `grid_unit` (taken as an absolute tolerance).
+//
+// Let `step_s` be a step in s-coordinates, `s0` a valid s-coordinate in
+// `lane` and `grid_unit` the minimum step in s-coordinates to take.
+// Starting at the minimum of `grid_unit` and the distance in s-coordinates i.e.
+// arc-length, to the `lane`'s end along the center line, increase `step_s`
+// until the distance between its ends in world's coordinates along the center,
+// left most and right most lines of the `lane`'s driveable
+// surface is bigger than `grid_unit` or the end of the `lane` is reached. 
 double ComputeSampleStep(
       const maliput::api::Lane* lane, double s0, double grid_unit) {
   DRAKE_DEMAND(lane != nullptr);
@@ -261,8 +265,8 @@ void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane,
   }
 }
 
-// Traverses @p lane, generating a cover of the surface with with quads
-// (4-vertex faces) which are added to @p mesh.  The quads are squares in
+// Traverses @p lane, generating a cover of the surface with quads
+// (4-vertex faces) which are added to @p mesh.  The quads are quadrilaterals in
 // the (s,r) space of the lane.
 //
 // @param mesh  the GeoMesh which will receive the quads
