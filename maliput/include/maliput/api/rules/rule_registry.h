@@ -88,7 +88,7 @@ class RuleRegistry {
   ///         registered range value rule type.
   RangeValueRule BuildRangeValueRule(
       const Rule::Id& id, const Rule::TypeId& type_id,
-      const LaneSRoute& zone, const std::vector<const Rule*>& related_rules,
+      const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
       const std::set<RangeValueRule::Range>& ranges) const;
 
   /// Builds a DiscreteValueRule whose `type_id` is registered.
@@ -100,7 +100,7 @@ class RuleRegistry {
   ///         is not a registered discrete value in `type_id`.
   DiscreteValueRule BuildDiscreteValueRule(
       const Rule::Id& id, const Rule::TypeId& type_id,
-      const LaneSRoute& zone, const std::vector<const Rule*>& related_rules,
+      const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
       const std::set<std::string>& value_states) const;
 
  private:

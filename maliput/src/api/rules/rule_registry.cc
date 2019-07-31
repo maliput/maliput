@@ -60,7 +60,7 @@ RuleRegistry::QueryResult RuleRegistry::FindRuleTypeBy(
 
 RangeValueRule RuleRegistry::BuildRangeValueRule(
     const Rule::Id& id, const Rule::TypeId& type_id,
-    const LaneSRoute& zone, const std::vector<const Rule*>& related_rules,
+    const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
     const std::set<RangeValueRule::Range>& ranges) const {
   MALIPUT_THROW_UNLESS(
       range_rule_types_.find(type_id) != range_rule_types_.end());
@@ -69,7 +69,7 @@ RangeValueRule RuleRegistry::BuildRangeValueRule(
 
 DiscreteValueRule RuleRegistry::BuildDiscreteValueRule(
     const Rule::Id& id, const Rule::TypeId& type_id,
-    const LaneSRoute& zone, const std::vector<const Rule*>& related_rules,
+    const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
     const std::set<std::string>& value_states) const {
   MALIPUT_THROW_UNLESS(
       discrete_rule_types_.find(type_id) != discrete_rule_types_.end());

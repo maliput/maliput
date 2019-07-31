@@ -147,15 +147,16 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
 // Registers range value based rules and discrete value based rules, then builds
 // rules.
 GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
-  const Rule::Id kRangeRuleId("RangeRuleId");
+  const Rule::TypeId kRangeValueRuleType("RangeValueRuleType");
+  const Rule::Id kRangeRuleId("RangeValueRuleType/RangeRuleId");
   const LaneSRoute kZone({LaneSRange(LaneId("LaneId"), SRange(10., 20.))});
   const RangeValueRule::Range kRange{"range_description", 123. /* min */,
                                      456. /* max */};
-  const Rule::Id kDiscreteValueRuleId("DiscreteValueRuleId");
 
-  const Rule::TypeId kRangeValueRuleType("RangeValueRuleType");
   const Rule::TypeId kDiscreteValueRuleType("DiscreteValueType");
+  const Rule::Id kDiscreteValueRuleId("DiscreteValueType/DiscreteValueRuleId");
   const std::set<std::string> kDiscreteValues{"Value1", "Value2", "Value3"};
+
   const Rule::TypeId kUnregisteredRuleType("UnregisteredRuleType");
 
   RuleRegistry dut;
@@ -170,7 +171,8 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
   EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
   EXPECT_EQ(range_value_rule.zone().ranges().size(), 1);
-  EXPECT_EQ(range_value_rule.zone().ranges()[0].lane_id(), kZone.ranges()[0].lane_id());
+  EXPECT_EQ(range_value_rule.zone().ranges()[0].lane_id(),
+            kZone.ranges()[0].lane_id());
   EXPECT_EQ(range_value_rule.zone().ranges()[0].s_range().s0(),
             kZone.ranges()[0].s_range().s0());
   EXPECT_EQ(range_value_rule.zone().ranges()[0].s_range().s1(),
@@ -183,7 +185,7 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
 
   // Unregistered type.
   EXPECT_THROW({
-      dut.BuildRangeValueRule(kRangeRuleId, kUnregisteredRuleType, kZone,
+      dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone,
                               {} /* related rules */, {kRange}); },
       maliput::common::assertion_error);
 
@@ -209,7 +211,7 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   }
   // Unregistered type.
   EXPECT_THROW({
-      dut.BuildDiscreteValueRule(kDiscreteValueRuleId, kUnregisteredRuleType,
+      dut.BuildDiscreteValueRule(Rule::Id("RuleId"), kUnregisteredRuleType,
                                  kZone, {} /* related rules */,
                                  {"Value1", "Value3"}); },
       maliput::common::assertion_error);

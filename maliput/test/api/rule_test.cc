@@ -17,12 +17,13 @@ namespace {
 
 // Evaluates RangeValueRule constructor and accessors.
 GTEST_TEST(RangeValueRuleTest, ConstructorAndAccessors) {
-  const Rule::Id kId("RuleId");
-  const Rule::TypeId kTypeId("RuleTypeId");
+  const Rule::TypeId kTypeId("RuleTypeIdA");
+  const Rule::Id kId("RuleTypeIdA/RuleIdA");
   const SRange kSRange(10., 20.);
   const LaneId kLaneId("LaneId");
   const LaneSRoute kZone({LaneSRange(kLaneId, kSRange)});
-  const std::vector<const Rule*> kRelatedRules{};
+  const std::vector<Rule::Id> kRelatedRules{
+      Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdC/RuleIdC")};
   const std::set<RangeValueRule::Range> kRanges{
       {"range_description_1", 123. /* min */, 456. /* max */},
       {"range_description_2", 789. /* min */, 1234. /* max */},
@@ -36,7 +37,12 @@ GTEST_TEST(RangeValueRuleTest, ConstructorAndAccessors) {
   EXPECT_EQ(dut.zone().ranges()[0].lane_id(), kLaneId);
   EXPECT_EQ(dut.zone().ranges()[0].s_range().s0(), kSRange.s0());
   EXPECT_EQ(dut.zone().ranges()[0].s_range().s1(), kSRange.s1());
-  EXPECT_EQ(dut.related_rules().size(), 0.);
+  EXPECT_EQ(dut.related_rules().size(), kRelatedRules.size());
+  for (const Rule::Id& related_rule : dut.related_rules()) {
+    EXPECT_NE(
+        std::find(kRelatedRules.begin(), kRelatedRules.end(), related_rule),
+        kRelatedRules.end());
+  }
   EXPECT_EQ(dut.ranges().size(), kRanges.size());
   for (const RangeValueRule::Range& range : dut.ranges()) {
     EXPECT_NE(kRanges.find(range), kRanges.end());
@@ -66,12 +72,13 @@ GTEST_TEST(RangeTest, LessThanOperator) {
 
 // Evaluates RangeValueRule constructor and accessors.
 GTEST_TEST(DiscreteValueRuleTest, ConstructorAndAccessors) {
-  const Rule::Id kId("RuleId");
-  const Rule::TypeId kTypeId("RuleTypeId");
+  const Rule::TypeId kTypeId("RuleTypeIdA");
+  const Rule::Id kId("RuleTypeIdA/RuleIdA");
   const SRange kSRange(10., 20.);
   const LaneId kLaneId("LaneId");
   const LaneSRoute kZone({LaneSRange(kLaneId, kSRange)});
-  const std::vector<const Rule*> kRelatedRules{};
+  const std::vector<Rule::Id> kRelatedRules{
+      Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdC/RuleIdC")};
   const std::set<std::string> kDiscreteValues{
       "rule_state_value_1", "rule_state_value_2"};
 
@@ -84,7 +91,12 @@ GTEST_TEST(DiscreteValueRuleTest, ConstructorAndAccessors) {
   EXPECT_EQ(dut.zone().ranges()[0].lane_id(), kLaneId);
   EXPECT_EQ(dut.zone().ranges()[0].s_range().s0(), kSRange.s0());
   EXPECT_EQ(dut.zone().ranges()[0].s_range().s1(), kSRange.s1());
-  EXPECT_EQ(dut.related_rules().size(), 0.);
+  EXPECT_EQ(dut.related_rules().size(), kRelatedRules.size());
+  for (const Rule::Id& related_rule : dut.related_rules()) {
+    EXPECT_NE(
+        std::find(kRelatedRules.begin(), kRelatedRules.end(), related_rule),
+        kRelatedRules.end());
+  }
   EXPECT_EQ(dut.value_states().size(), kDiscreteValues.size());
   for (const std::string& discrete_state_value : dut.value_states()) {
     EXPECT_NE(kDiscreteValues.find(discrete_state_value),

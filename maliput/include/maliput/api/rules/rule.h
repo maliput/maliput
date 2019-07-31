@@ -17,30 +17,25 @@ namespace rules {
 
 /// Describes a generic rule type.
 ///
-/// The RoadGeometry scope of a Rule is defined by a `zone` (LaneSRoute). `zone`
-/// is directed, meaning that the interpretation of the Rule must be in the +s
-/// direction of the `zone`.
+/// A Rule may have multiple states that affect agent behavior in different ways
+/// while driving through the rule's zone. The possible states of a Rule must be
+/// semantically coherent. The current state of a Rule is given by a
+/// RuleStateProvider. States can be:
 ///
-/// A rule may have multiple states which determine the behavior of agents while
-/// driving through the RoadGeometry. States can be:
+/// - range based (@see RangeValueRule).
+/// - discrete (@see DiscreteValueRule).
 ///
-/// - range based states (@see RangeValueRule).
-/// - discrete values (@see DiscreteValueRule).
-///
-/// Finally, a Rule may point to other higher priority Rules via
-/// `related_rules`. This rule _yields_ to `related_rules` to establish a
-/// hierarchy.
-///
-/// By using a rule state provider, one could get its current value. States
-/// should be semantically coherent.
+/// Finally, a Rule may point to other Rules via `related_rules`.
 class Rule {
  public:
 
-  /// Rule Type class used to specialize TypeSpecificIdentifier and define a
-  /// unique TypeId.
+  /// Used to specialize TypeSpecificIdentifier and define a unique TypeId.
   class Type;
 
-  /// Alias for the Rule's unique ID. It is a property of each Rule's instance.
+  /// Alias for the Rule's unique ID across all Rule types. It is a property of
+  /// each Rule's instance.
+  /// Backend implementations should consider the standard
+  /// "[rule_type]/[rule_id]" for rule naming.
   using Id = TypeSpecificIdentifier<class Rule>;
 
   /// Alias for the Rule's type. Several instances could share this property.
@@ -53,18 +48,11 @@ class Rule {
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
-  /// @param related_rules A vector or rules of greater or equal priority
-  ///        related to this rule. All rules must not be nullptr.
-  ///
-  /// @throws maliput::common::assertion_error When any rule within
-  ///         `related_rules` is nullptr.
+  /// @param related_rules A vector of related rules.
   Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone,
-       const std::vector<const Rule*>& related_rules) :
-      id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules) {
-    for (const Rule* rule : related_rules_) {
-      MALIPUT_THROW_UNLESS(rule != nullptr);
-    }
-  }
+       const std::vector<Id>& related_rules) :
+      id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules) {}
+
   virtual ~Rule() = default;
 
   const Id& id() const { return id_; }
@@ -73,15 +61,13 @@ class Rule {
 
   const LaneSRoute& zone() const { return zone_; }
 
-  const std::vector<const Rule*>& related_rules() const {
-    return related_rules_;
-  }
+  const std::vector<Id>& related_rules() const { return related_rules_; }
 
  private:
   Id id_;
   TypeId type_id_;
   LaneSRoute zone_;
-  std::vector<const Rule*> related_rules_;
+  std::vector<Id> related_rules_;
 };
 
 /// Describes a numeric range based constraint.
@@ -118,8 +104,7 @@ class RangeValueRule : public Rule {
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
-  /// @param related_rules A vector or rules of greater or equal priority
-  ///        related to this rule. All rules must not be nullptr.
+  /// @param related_rules A vector of related rules.
   /// @param ranges A set of ranges. It must have at least one item and all
   ///        of them should respect that min <= max.
   /// @throws maliput::common::assertion_error When `ranges` is empty.
@@ -127,7 +112,7 @@ class RangeValueRule : public Rule {
   ///         violates `min <= max` condition.
   RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id,
                  const LaneSRoute& zone,
-                 const std::vector<const Rule*> related_rules,
+                 const std::vector<Rule::Id> related_rules,
                  const std::set<Range>& ranges) :
       Rule(id, type_id, zone, related_rules), ranges_(ranges) {
     MALIPUT_THROW_UNLESS(!ranges_.empty());
@@ -156,13 +141,12 @@ class DiscreteValueRule : public Rule {
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
-  /// @param related_rules A vector or rules of greater or equal priority
-  ///        related to this rule. All rules must not be nullptr.
+  /// @param related_rules A vector of related rules.
   /// @param ranges A set of value states. It must have at least one item.
   /// @throws maliput::common::assertion_error When `value_states` is empty.
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id,
                     const LaneSRoute& zone,
-                    const std::vector<const Rule*> related_rules,
+                    const std::vector<Id> related_rules,
                     const std::set<std::string>& value_states) :
       Rule(id, type_id, zone, related_rules), value_states_(value_states) {
     MALIPUT_THROW_UNLESS(!value_states_.empty());
