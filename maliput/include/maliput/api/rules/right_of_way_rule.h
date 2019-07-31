@@ -40,8 +40,8 @@ namespace rules {
 /// and determination of the active rule State at any given time is delegated
 /// to a RuleStateProvider agent, linked by the rule's Id.
 ///
-/// Rules and BulbGroups are linked via a many-to-many relation. Those relations
-/// are stated in this entity.
+/// Rules and BulbGroups are linked via a many-to-many relationship. The
+/// Rule-to-BulbGroups relationship is stored in this class.
 class RightOfWayRule final {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RightOfWayRule);
@@ -122,23 +122,20 @@ class RightOfWayRule final {
   /// @param id the unique ID of this rule (in the RoadRulebook)
   /// @param controlled_zone LaneSRoute to which this rule applies
   /// @param type the static semantics of this rule
-  /// @param bulb_group_ids a map of related TrafficLights and their BulbGroups
-  ///        to which this rule is related.
+  /// @param related_bulb_groups The related bulb groups. All IDs present within
+  ///        the supplied map are assumed to be valid.
   ///
   /// @throws std::exception if `states` is empty or if `states` contains
   /// duplicate State::Id's.
-  // TODO(agalbachicar)   Express somewhere at the API level how
-  //                      TrafficLight::Ids and BulbGroup::Ids existence must be
-  //                      enforced.
   RightOfWayRule(
       const Id& id,
       const LaneSRoute& zone,
       ZoneType zone_type,
       const std::vector<State>& states,
       const std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>&
-          bulb_group_ids)
+          related_bulb_groups)
         : id_(id), zone_(zone), zone_type_(zone_type),
-          bulb_group_ids_(bulb_group_ids) {
+          related_bulb_groups_(related_bulb_groups_) {
     DRAKE_THROW_UNLESS(states.size() >= 1);
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
@@ -175,10 +172,10 @@ class RightOfWayRule final {
     return states_.begin()->second;
   }
 
-  /// Returns the catalog of related TrafficLight::Ids and their BulbGroup::Ids.
+  /// Returns the catalog of related bulb groups.
   const std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
-      bulb_group_ids() const {
-    return bulb_group_ids_;
+      related_bulb_groups() const {
+    return related_bulb_groups_;
   }
 
  private:
@@ -186,7 +183,8 @@ class RightOfWayRule final {
   LaneSRoute zone_;
   ZoneType zone_type_{};
   std::unordered_map<State::Id, State> states_;
-  std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>> bulb_group_ids_;
+  std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
+      related_bulb_groups_;
 };
 
 }  // namespace rules

@@ -256,7 +256,7 @@ std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
     MALIPUT_THROW_UNLESS(rule_node["BulbGroups"].IsMap());
 
     std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
-        bulb_group_ids;
+        related_bulb_groups;
     for (const auto& traffic_light_bulb_group :
          rule_node["BulbGroups"]) {
       const TrafficLight::Id traffic_light_id(
@@ -270,9 +270,9 @@ std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
       }
 
       MALIPUT_THROW_UNLESS(
-          bulb_group_ids.emplace(traffic_light_id, bulb_groups).second);
+          related_bulb_groups.emplace(traffic_light_id, bulb_groups).second);
     }
-    return bulb_group_ids;
+    return related_bulb_groups;
   }
   return {};
 }

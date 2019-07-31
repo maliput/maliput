@@ -62,11 +62,11 @@ GTEST_TEST(RightOfWayRuleTest, Construction) {
                      api::test::CreateLaneSRoute(),
                      RightOfWayRule::ZoneType::kStopExcluded,
                      {api::test::NoYieldState(), api::test::YieldState()},
-                     {} /* bulb_group_ids */));
+                     {} /* related_bulb_groups */));
   EXPECT_NO_THROW(RightOfWayRule(
       RightOfWayRule::Id("some_id"), api::test::CreateLaneSRoute(),
       RightOfWayRule::ZoneType::kStopExcluded, {api::test::NoYieldState()},
-      {} /* bulb_group_ids */));
+      {} /* related_bulb_groups */));
 
   // At least one State must be provided.
   EXPECT_THROW(
@@ -74,7 +74,7 @@ GTEST_TEST(RightOfWayRuleTest, Construction) {
                      api::test::CreateLaneSRoute(),
                      RightOfWayRule::ZoneType::kStopExcluded,
                      {} /* states */,
-                     {} /* bulb_group_ids */),
+                     {} /* related_bulb_groups */),
       std::exception);
   // At least one State::Id's must be unique.
   const RightOfWayRule::State kDupIdState(RightOfWayRule::State::Id("s1"),
@@ -84,7 +84,7 @@ GTEST_TEST(RightOfWayRuleTest, Construction) {
                      api::test::CreateLaneSRoute(),
                      RightOfWayRule::ZoneType::kStopExcluded,
                      {api::test::NoYieldState(), kDupIdState},
-                     {} /* bulb_group_ids */),
+                     {} /* related_bulb_groups */),
       std::exception);
 }
 
@@ -93,7 +93,7 @@ GTEST_TEST(RightOfWayRuleTest, Accessors) {
       RightOfWayRule::Id("dut_id"), api::test::CreateLaneSRoute(),
       RightOfWayRule::ZoneType::kStopExcluded,
       {api::test::NoYieldState(), api::test::YieldState()},
-      {} /* bulb_group_ids */);
+      {} /* related_bulb_groups */);
   EXPECT_EQ(dut.id(), RightOfWayRule::Id("dut_id"));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.zone(), api::test::CreateLaneSRoute()));
   EXPECT_EQ(dut.zone_type(), RightOfWayRule::ZoneType::kStopExcluded);
@@ -111,7 +111,7 @@ GTEST_TEST(RightOfWayRuleTest, StaticRuleOnlyAccessors) {
   const RightOfWayRule dut(
       RightOfWayRule::Id("dut_id"), api::test::CreateLaneSRoute(),
       RightOfWayRule::ZoneType::kStopExcluded, {api::test::YieldState()},
-      {} /* bulb_group_ids */);
+      {} /* related_bulb_groups */);
   EXPECT_TRUE(dut.is_static());
   EXPECT_NO_THROW(dut.static_state());
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.static_state(), api::test::YieldState()));
@@ -122,7 +122,7 @@ GTEST_TEST(RightOfWayRuleTest, Copying) {
       RightOfWayRule::Id("source_id"), api::test::CreateLaneSRoute(),
       RightOfWayRule::ZoneType::kStopExcluded,
       {api::test::NoYieldState(), api::test::YieldState()},
-      {} /* bulb_group_ids */);
+      {} /* related_bulb_groups */);
 
   const RightOfWayRule dut(source);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
@@ -133,13 +133,13 @@ GTEST_TEST(RightOfWayRuleTest, Assignment) {
       RightOfWayRule::Id("source_id"), api::test::CreateLaneSRoute(),
       RightOfWayRule::ZoneType::kStopExcluded,
       {api::test::NoYieldState(), api::test::YieldState()},
-      {} /* bulb_group_ids */);
+      {} /* related_bulb_groups */);
 
   RightOfWayRule dut(RightOfWayRule::Id("some_id"),
                      api::test::CreateLaneSRoute(),
                      RightOfWayRule::ZoneType::kStopAllowed,
                      {api::test::NoYieldState()},
-                     {} /* bulb_group_ids */);
+                     {} /* related_bulb_groups */);
 
   dut = source;
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));

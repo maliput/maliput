@@ -33,7 +33,7 @@ class ManualRulebookTest : public ::testing::Test {
       {RightOfWayRule::State{RightOfWayRule::State::Id("rowr_state_id"),
                              RightOfWayRule::State::Type::kStopThenGo,
                              {}}},
-      {} /* bulb_group_ids */};
+      {} /* related_bulb_groups */};
 
   const SpeedLimitRule kSpeedLimit{SpeedLimitRule::Id("slr_id"),
                                    kZone,

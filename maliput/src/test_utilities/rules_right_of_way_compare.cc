@@ -131,8 +131,8 @@ namespace test {
   } else {
     MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.states(), b.states()));
   }
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.bulb_group_ids(),
-                                         b.bulb_group_ids()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_bulb_groups(),
+                                         b.related_bulb_groups()));
   return c.result();
 }
 

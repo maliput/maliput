@@ -344,7 +344,7 @@ RightOfWayRule Rule() {
   return RightOfWayRule(RightOfWayRule::Id("mock_id"), CreateLaneSRoute(),
                         RightOfWayRule::ZoneType::kStopExcluded,
                         {NoYieldState(), YieldState()},
-                        {} /* bulb_group_ids */);
+                        {} /* related_bulb_group */);
 }
 
 DirectionUsageRule::State CreateDirectionUsageRuleState() {
