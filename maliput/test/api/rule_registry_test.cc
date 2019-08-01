@@ -3,7 +3,6 @@
 /* clang-format on */
 
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -48,12 +47,13 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
 
   EXPECT_TRUE(dut.DiscreteValueRuleTypes().empty());
 
-  const std::set<Rule::TypeId> range_value_rule_types =
+  const std::vector<Rule::TypeId> range_value_rule_types =
       dut.RangeValueRuleTypes();
   EXPECT_EQ(range_value_rule_types.size(), 2);
   for (const Rule::TypeId& rule_type :
        { kRangeValueRuleTypeA, kRangeValueRuleTypeB}) {
-    EXPECT_NE(range_value_rule_types.find(rule_type),
+    EXPECT_NE(std::find(range_value_rule_types.begin(),
+                        range_value_rule_types.end(), rule_type),
               range_value_rule_types.end());
   }
 
@@ -76,9 +76,10 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
 // Evaluates queries after registering discrete value based rule types.
 GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kDiscreteValueRuleTypeA("DiscreteValueTypeA");
-  const std::set<std::string> kDiscreteValuesA{"ValueA1", "ValueA2"};
+  const std::vector<std::string> kDiscreteValuesA{"ValueA1", "ValueA2"};
   const Rule::TypeId kDiscreteValueRuleTypeB("RangeValueRuleTypeB");
-  const std::set<std::string> kDiscreteValuesB{"ValueB1", "ValueB2", "ValueB3"};
+  const std::vector<std::string> kDiscreteValuesB{"ValueB1", "ValueB2",
+                                                  "ValueB3"};
 
   RuleRegistry dut;
   // Registers range value rule types.
@@ -92,18 +93,18 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
                maliput::common::assertion_error);
   EXPECT_THROW({ dut.RegisterRangeValueRule(kDiscreteValueRuleTypeB); },
                maliput::common::assertion_error);
-  // Throws because of empty set.
+  // Throws because of empty vector.
   EXPECT_THROW({ dut.RegisterDiscreteValueRule(Rule::TypeId("SomeRuleType"),
                                                {}); },
                maliput::common::assertion_error);
 
   EXPECT_TRUE(dut.RangeValueRuleTypes().empty());
 
-  const std::map<Rule::TypeId, std::set<std::string>>
+  const std::map<Rule::TypeId, std::vector<std::string>>
       discrete_value_rule_types = dut.DiscreteValueRuleTypes();
   EXPECT_EQ(discrete_value_rule_types.size(), 2);
   for (const auto& rule_values :
-       std::map<Rule::TypeId, std::set<std::string>>{
+       std::map<Rule::TypeId, std::vector<std::string>>{
            {kDiscreteValueRuleTypeA, kDiscreteValuesA},
            {kDiscreteValueRuleTypeB, kDiscreteValuesB}}) {
     const auto found_rule_values =
@@ -111,7 +112,9 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
     EXPECT_NE(found_rule_values, discrete_value_rule_types.end());
     EXPECT_EQ(found_rule_values->second.size(), rule_values.second.size());
     for (const std::string& value : found_rule_values->second) {
-      EXPECT_NE(rule_values.second.find(value), rule_values.second.end());
+      EXPECT_NE(std::find(rule_values.second.begin(), rule_values.second.end(),
+                          value),
+                rule_values.second.end());
     }
   }
 
@@ -124,7 +127,8 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   EXPECT_EQ(result.discrete_value_rule_type->second.size(),
             kDiscreteValuesA.size());
   for (const std::string& value : result.discrete_value_rule_type->second) {
-    EXPECT_NE(kDiscreteValuesA.find(value), kDiscreteValuesA.end());
+    EXPECT_NE(std::find(kDiscreteValuesA.begin(), kDiscreteValuesA.end(), value),
+              kDiscreteValuesA.end());
   }
 
 
@@ -135,7 +139,9 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   EXPECT_EQ(result.discrete_value_rule_type->second.size(),
             kDiscreteValuesB.size());
   for (const std::string& value : result.discrete_value_rule_type->second) {
-    EXPECT_NE(kDiscreteValuesB.find(value), kDiscreteValuesB.end());
+    EXPECT_NE(std::find(kDiscreteValuesB.begin(), kDiscreteValuesB.end(),
+                        value),
+              kDiscreteValuesB.end());
   }
 
 
@@ -155,7 +161,7 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
 
   const Rule::TypeId kDiscreteValueRuleType("DiscreteValueType");
   const Rule::Id kDiscreteValueRuleId("DiscreteValueType/DiscreteValueRuleId");
-  const std::set<std::string> kDiscreteValues{"Value1", "Value2", "Value3"};
+  const std::vector<std::string> kDiscreteValues{"Value1", "Value2", "Value3"};
 
   const Rule::TypeId kUnregisteredRuleType("UnregisteredRuleType");
 
@@ -206,7 +212,9 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   EXPECT_EQ(discrete_value_rule.related_rules().size(), 0.);
   EXPECT_EQ(discrete_value_rule.value_states().size(), 2);
   for (const std::string& discrete_state_value : {"Value1", "Value3"}) {
-    EXPECT_NE(discrete_value_rule.value_states().find(discrete_state_value),
+    EXPECT_NE(std::find(discrete_value_rule.value_states().begin(),
+                        discrete_value_rule.value_states().end(),
+                        discrete_state_value),
               discrete_value_rule.value_states().end());
   }
   // Unregistered type.

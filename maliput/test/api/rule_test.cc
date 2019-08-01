@@ -2,29 +2,66 @@
 #include "maliput/api/rules/rule.h"
 /* clang-format on */
 
-#include <set>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/regions.h"
+#include "maliput/common/assertion_error.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace {
 
-// Evaluates RangeValueRule constructor and accessors.
-GTEST_TEST(RangeValueRuleTest, ConstructorAndAccessors) {
-  const Rule::TypeId kTypeId("RuleTypeIdA");
-  const Rule::Id kId("RuleTypeIdA/RuleIdA");
-  const SRange kSRange(10., 20.);
-  const LaneId kLaneId("LaneId");
-  const LaneSRoute kZone({LaneSRange(kLaneId, kSRange)});
+class RuleTest : public ::testing::Test {
+ protected:
+  const Rule::TypeId kTypeId{"RuleTypeIdA"};
+  const Rule::Id kId{"RuleTypeIdA/RuleIdA"};
+  const SRange kSRange{10., 20.};
+  const LaneId kLaneId{"LaneId"};
+  const LaneSRoute kZone{{LaneSRange(kLaneId, kSRange)}};
   const std::vector<Rule::Id> kRelatedRules{
       Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdC/RuleIdC")};
-  const std::set<RangeValueRule::Range> kRanges{
+
+};
+
+// Evaluates RangeValueRule constructor.
+TEST_F(RuleTest, RangeValueRuleConstructor) {
+  const std::vector<RangeValueRule::Range> kRanges{
+      {"range_description_1", 123. /* min */, 456. /* max */},
+      {"range_description_2", 789. /* min */, 1234. /* max */},
+  };
+
+  EXPECT_NO_THROW({ RangeValueRule(kId, kTypeId, kZone, kRelatedRules,
+                                   kRanges); });
+  EXPECT_NO_THROW({ RangeValueRule(kId, kTypeId, kZone, {} /* related rules */,
+                                   kRanges); });
+
+  // Duplicated related rules.
+  const std::vector<Rule::Id> kDuplicatedRelatedRules{
+      Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdB/RuleIdB")};
+  EXPECT_THROW({ RangeValueRule(kId, kTypeId, kZone, kDuplicatedRelatedRules,
+                                kRanges); },
+               maliput::common::assertion_error);
+  // Empty ranges.
+  EXPECT_THROW({ RangeValueRule(kId, kTypeId, kZone, {} /* related rules */,
+                                {} /* ranges */); },
+               maliput::common::assertion_error);
+  // Duplicated ranges.
+  const std::vector<RangeValueRule::Range> kDuplicatedRanges{
+      {"range_description_1", 123. /* min */, 456. /* max */},
+      {"range_description_1", 123. /* min */, 456. /* max */},
+  };
+  EXPECT_THROW({ RangeValueRule(kId, kTypeId, kZone, {} /* related rules */,
+                                kDuplicatedRanges); },
+               maliput::common::assertion_error);
+}
+
+// Evaluates RangeValueRule accessors.
+TEST_F(RuleTest, RangeValueRuleAccessors) {
+  const std::vector<RangeValueRule::Range> kRanges{
       {"range_description_1", 123. /* min */, 456. /* max */},
       {"range_description_2", 789. /* min */, 1234. /* max */},
   };
@@ -45,41 +82,70 @@ GTEST_TEST(RangeValueRuleTest, ConstructorAndAccessors) {
   }
   EXPECT_EQ(dut.ranges().size(), kRanges.size());
   for (const RangeValueRule::Range& range : dut.ranges()) {
-    EXPECT_NE(kRanges.find(range), kRanges.end());
+    EXPECT_NE(std::find(kRanges.begin(), kRanges.end(), range), kRanges.end());
   }
 }
 
-// Evaluates the less than operator overload for RangeValueRule::Range
-GTEST_TEST(RangeTest, LessThanOperator) {
+// Evaluates the equal and not equal operator overloads for
+// RangeValueRule::Range.
+GTEST_TEST(RangeTest, EqualOperator) {
   const RangeValueRule::Range range_1{
       "range_description_1", 123. /* min */, 456. /* max */};
   const RangeValueRule::Range range_2{
-      "range_description_2", 456. /* min */, 789. /* max */};
+      "range_description_1", 456. /* min */, 456. /* max */};
   const RangeValueRule::Range range_3{
-      "range_description_3", 123. /* min */, 789. /* max */};
+      "range_description_1", 123. /* min */, 789. /* max */};
   const RangeValueRule::Range range_4{
       "range_description_4", 123. /* min */, 456. /* max */};
 
-  // First, `min` is compared.
-  EXPECT_TRUE(range_1 < range_2);
-  // When `min` attributes are equal, then `max` is compared.
-  EXPECT_TRUE(range_1 < range_3);
-  // When `min` and `max` attributes are equal, then `description` is compared.
-  EXPECT_TRUE(range_1 < range_4);
-  // Self-comparison must be false.
-  EXPECT_FALSE(range_1 < range_1);
+
+  EXPECT_TRUE(range_1 == range_1);
+  EXPECT_FALSE(range_1 != range_1);
+  // First, `min` is different.
+  EXPECT_TRUE(range_1 != range_2);
+  EXPECT_FALSE(range_1 == range_2);
+  // First, `max` is different.
+  EXPECT_TRUE(range_1 != range_3);
+  EXPECT_FALSE(range_1 == range_3);
+  // First, `description` is different.
+  EXPECT_TRUE(range_1 != range_4);
+  EXPECT_FALSE(range_1 == range_4);
 }
 
-// Evaluates RangeValueRule constructor and accessors.
-GTEST_TEST(DiscreteValueRuleTest, ConstructorAndAccessors) {
-  const Rule::TypeId kTypeId("RuleTypeIdA");
-  const Rule::Id kId("RuleTypeIdA/RuleIdA");
-  const SRange kSRange(10., 20.);
-  const LaneId kLaneId("LaneId");
-  const LaneSRoute kZone({LaneSRange(kLaneId, kSRange)});
-  const std::vector<Rule::Id> kRelatedRules{
-      Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdC/RuleIdC")};
-  const std::set<std::string> kDiscreteValues{
+// Evaluates DiscreteValueRule constructor.
+TEST_F(RuleTest, DiscreteValueRuleConstructor) {
+  const std::vector<std::string> kDiscreteValues{
+      "rule_state_value_1", "rule_state_value_2"};
+
+  EXPECT_NO_THROW({ DiscreteValueRule(kId, kTypeId, kZone,
+                                      {} /* related rules */,
+                                      kDiscreteValues); });
+  EXPECT_NO_THROW({ DiscreteValueRule(kId, kTypeId, kZone, kRelatedRules,
+                                      kDiscreteValues); });
+
+
+  // Duplicated related rules.
+  const std::vector<Rule::Id> kDuplicatedRelatedRules{
+      Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdB/RuleIdB")};
+  EXPECT_THROW({ DiscreteValueRule(kId, kTypeId, kZone, kDuplicatedRelatedRules,
+                                   kDiscreteValues); },
+               maliput::common::assertion_error);
+  // Empty discrete values.
+  EXPECT_THROW({ DiscreteValueRule(kId, kTypeId, kZone, kRelatedRules,
+                                   {} /* discrete_values */); },
+               maliput::common::assertion_error);
+  // Duplicated ranges.
+  const std::vector<std::string> kDuplicatedDiscreteValues{
+      "rule_state_value_1", "rule_state_value_1"};
+  EXPECT_THROW(
+      { DiscreteValueRule(kId, kTypeId, kZone, kRelatedRules,
+                          kDuplicatedDiscreteValues); },
+      maliput::common::assertion_error);
+}
+
+// Evaluates DiscreteValueRule accessors.
+TEST_F(RuleTest, DiscreteValueRuleAccessors) {
+  const std::vector<std::string> kDiscreteValues{
       "rule_state_value_1", "rule_state_value_2"};
 
   const DiscreteValueRule dut(
@@ -99,11 +165,11 @@ GTEST_TEST(DiscreteValueRuleTest, ConstructorAndAccessors) {
   }
   EXPECT_EQ(dut.value_states().size(), kDiscreteValues.size());
   for (const std::string& discrete_state_value : dut.value_states()) {
-    EXPECT_NE(kDiscreteValues.find(discrete_state_value),
+    EXPECT_NE(std::find(kDiscreteValues.begin(), kDiscreteValues.end(),
+                        discrete_state_value),
               kDiscreteValues.end());
   }
 }
-
 
 }  // namespace
 }  // namespace rules

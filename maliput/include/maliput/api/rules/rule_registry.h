@@ -1,6 +1,6 @@
 #pragma once
 
-#include <set>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -26,7 +26,6 @@ namespace rules {
 /// including both RangeValueRules and DiscreteValueRules.
 class RuleRegistry {
  public:
-
   /// Wrapper similar to std::variant to return rule type information.
   ///
   /// No more than one of the optional attributes must be assigned at the same
@@ -35,7 +34,7 @@ class RuleRegistry {
     /// Defines a range value rule type.
     drake::optional<Rule::TypeId> range_value_rule_type{};
     /// Defines a discrete value rule type.
-    drake::optional<std::pair<Rule::TypeId, std::set<std::string>>>
+    drake::optional<std::pair<Rule::TypeId, std::vector<std::string>>>
         discrete_value_rule_type{};
   };
 
@@ -54,24 +53,27 @@ class RuleRegistry {
   /// Registers a discrete value rule type.
   ///
   /// @param type_id The Rule type.
-  /// @param all_possible_value_states A set of all possible value states that
-  ///        the rule could take. It must not be empty.
+  /// @param all_possible_value_states A vector of all possible value states
+  ///        that the rule could take. It must not be empty and there must not
+  ///        be any duplicated value state.
   /// @see DiscreteValueRule.
   /// @throws maliput::common::assertion_error When `type_id` is already
   ///         registered.
   /// @throws maliput::common::assertion_error When `all_possible_value_states`
   ///         is empty.
+  /// @throws maliput::common::assertion_error When there are duplicated items
+  ///         `all_possible_value_states`.
   void RegisterDiscreteValueRule(
       const Rule::TypeId& type_id,
-      const std::set<std::string>& all_possible_value_states);
+      const std::vector<std::string>& all_possible_value_states);
 
-  /// @returns A set of Rule::TypeId with all the available range based rule
+  /// @returns A vector of Rule::TypeId with all the available range based rule
   ///          types.
-  const std::set<Rule::TypeId>& RangeValueRuleTypes() const;
+  const std::vector<Rule::TypeId>& RangeValueRuleTypes() const;
 
-  /// @returns A map of Rule::TypeId to sets of strings with all the available
+  /// @returns A map of Rule::TypeId to vector of strings with all the available
   ///          discrete value based rule types.
-  const std::map<Rule::TypeId, std::set<std::string>>&
+  const std::map<Rule::TypeId, std::vector<std::string>>&
       DiscreteValueRuleTypes() const;
 
   /// Finds a rule type by `type_id`.
@@ -89,7 +91,7 @@ class RuleRegistry {
   RangeValueRule BuildRangeValueRule(
       const Rule::Id& id, const Rule::TypeId& type_id,
       const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
-      const std::set<RangeValueRule::Range>& ranges) const;
+      const std::vector<RangeValueRule::Range>& ranges) const;
 
   /// Builds a DiscreteValueRule whose `type_id` is registered.
   ///
@@ -101,11 +103,11 @@ class RuleRegistry {
   DiscreteValueRule BuildDiscreteValueRule(
       const Rule::Id& id, const Rule::TypeId& type_id,
       const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
-      const std::set<std::string>& value_states) const;
+      const std::vector<std::string>& value_states) const;
 
  private:
-  std::set<Rule::TypeId> range_rule_types_;
-  std::map<Rule::TypeId, std::set<std::string>> discrete_rule_types_;
+  std::vector<Rule::TypeId> range_rule_types_;
+  std::map<Rule::TypeId, std::vector<std::string>> discrete_rule_types_;
 };
 
 
