@@ -250,23 +250,21 @@ RightOfWayRule::ZoneType BuildRightOfWayZoneType(const YAML::Node& rule_node) {
   }
 }
 
-std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
-    BuildRightOfWayBulbGroups(const YAML::Node& rule_node) {
-  if (rule_node["BulbGroups"]) {
-    MALIPUT_THROW_UNLESS(rule_node["BulbGroups"].IsMap());
+RightOfWayRule::RelatedBulbGroups BuildRightOfWayRelatedBulbGroups(
+      const YAML::Node& rule_node) {
+  if (rule_node["RelatedBulbGroups"]) {
+    MALIPUT_THROW_UNLESS(rule_node["RelatedBulbGroups"].IsMap());
 
-    std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>
-        related_bulb_groups;
+    RightOfWayRule::RelatedBulbGroups related_bulb_groups;
+
     for (const auto& traffic_light_bulb_group :
-         rule_node["BulbGroups"]) {
+         rule_node["RelatedBulbGroups"]) {
       const TrafficLight::Id traffic_light_id(
           traffic_light_bulb_group.first.as<std::string>());
 
-      std::set<BulbGroup::Id> bulb_groups;
-      for (int i = 0; i < traffic_light_bulb_group.second.size(); ++i) {
-        MALIPUT_THROW_UNLESS(
-            bulb_groups.emplace(traffic_light_bulb_group.second[i].as<std::string>())
-                .second);
+      std::vector<BulbGroup::Id> bulb_groups;
+      for (auto& bulb_groups_node : traffic_light_bulb_group.second) {
+        bulb_groups.emplace_back(bulb_groups_node.as<std::string>());
       }
 
       MALIPUT_THROW_UNLESS(
@@ -293,7 +291,7 @@ RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
   const LaneSRoute zone = BuildLaneSRoute(road_geometry, zone_node);
 
   return RightOfWayRule(rule_id, zone, BuildRightOfWayZoneType(rule_node),
-                        states, BuildRightOfWayBulbGroups(rule_node));
+                        states, BuildRightOfWayRelatedBulbGroups(rule_node));
 }
 }  // namespace
 

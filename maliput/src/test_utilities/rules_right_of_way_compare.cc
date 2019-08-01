@@ -86,11 +86,10 @@ namespace test {
 }
 
 
-::testing::AssertionResult IsEqual(
-    const char* a_expression,
-    const char* b_expression,
-    const std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>& a,
-    const std::unordered_map<TrafficLight::Id, std::set<BulbGroup::Id>>& b) {
+::testing::AssertionResult IsEqual(const char* a_expression,
+                                   const char* b_expression,
+                                   const RightOfWayRule::RelatedBulbGroups& a,
+                                   const RightOfWayRule::RelatedBulbGroups& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
 
@@ -104,10 +103,14 @@ namespace test {
       }
       for (const BulbGroup::Id& bulb_group_id :
            traffic_light_bulb_group.second) {
-        const auto& b_bulb_group_id_it = b_it->second.find(bulb_group_id);
+        const auto& b_bulb_group_id_it =
+            std::find(b_it->second.cbegin(), b_it->second.cend(), bulb_group_id);
         MALIPUT_ADD_RESULT(
             c, MALIPUT_IS_EQUAL((b_bulb_group_id_it != b_it->second.cend()),
-                true));
+            true));
+        if (b_bulb_group_id_it == b_it->second.cend()) {
+          break;
+        }
       }
     }
   }

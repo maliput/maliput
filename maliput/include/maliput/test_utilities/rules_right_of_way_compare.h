@@ -7,7 +7,6 @@
 
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule_state_provider.h"
-#include "maliput/api/rules/traffic_lights.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
@@ -41,11 +40,10 @@ namespace test {
 
 /// Predicate-formatter which tests equality of TrafficLight::Ids to
 /// BulbGroup::Ids catalog.
-::testing::AssertionResult IsEqual(
-    const char* a_expression,
-    const char* b_expression,
-    const std::map<TrafficLight::Id, std::set<BulbGroup::Id>>& a,
-    const std::map<TrafficLight::Id, std::set<BulbGroup::Id>>& b);
+::testing::AssertionResult IsEqual(const char* a_expression,
+                                   const char* b_expression,
+                                   const RightOfWayRule::RelatedBulbGroups& a,
+                                   const RightOfWayRule::RelatedBulbGroups& b);
 
 /// Predicate-formatter which tests equality of RightOfWayRule.
 ::testing::AssertionResult IsEqual(const char* a_expression,

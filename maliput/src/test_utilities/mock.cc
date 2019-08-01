@@ -340,11 +340,17 @@ RightOfWayRule::State YieldState() {
                                RightOfWayRule::State::Type::kGo, YieldGroup2());
 }
 
+rules::RightOfWayRule::RelatedBulbGroups RelatedBulbGroups() {
+  return rules::RightOfWayRule::RelatedBulbGroups{
+      {rules::TrafficLight::Id("TrafficLightId"),
+       {rules::BulbGroup::Id("BulbGroupId")}}};
+}
+
 RightOfWayRule Rule() {
   return RightOfWayRule(RightOfWayRule::Id("mock_id"), CreateLaneSRoute(),
                         RightOfWayRule::ZoneType::kStopExcluded,
                         {NoYieldState(), YieldState()},
-                        {} /* related_bulb_group */);
+                        RelatedBulbGroups());
 }
 
 DirectionUsageRule::State CreateDirectionUsageRuleState() {
