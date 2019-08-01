@@ -1,7 +1,6 @@
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
 
 #include <algorithm>
-#include <vector>
 
 #include <gtest/gtest.h>
 

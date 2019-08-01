@@ -4,12 +4,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_throw.h"
+
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_throw.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
 
 namespace maliput {
 namespace api {
