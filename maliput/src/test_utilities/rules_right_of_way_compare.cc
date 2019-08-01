@@ -103,7 +103,8 @@ namespace test {
       for (const BulbGroup::Id& bulb_group_id :
            traffic_light_bulb_group.second) {
         const auto& b_bulb_group_id_it =
-            std::find(b_it->second.cbegin(), b_it->second.cend(), bulb_group_id);
+            std::find(b_it->second.cbegin(), b_it->second.cend(),
+                      bulb_group_id);
         MALIPUT_ADD_RESULT(
             c, MALIPUT_IS_EQUAL((b_bulb_group_id_it != b_it->second.cend()),
             true));

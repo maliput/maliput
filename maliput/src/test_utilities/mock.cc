@@ -349,8 +349,7 @@ rules::RightOfWayRule::RelatedBulbGroups RelatedBulbGroups() {
 RightOfWayRule Rule() {
   return RightOfWayRule(RightOfWayRule::Id("mock_id"), CreateLaneSRoute(),
                         RightOfWayRule::ZoneType::kStopExcluded,
-                        {NoYieldState(), YieldState()},
-                        RelatedBulbGroups());
+                        {NoYieldState(), YieldState()}, RelatedBulbGroups());
 }
 
 DirectionUsageRule::State CreateDirectionUsageRuleState() {

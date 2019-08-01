@@ -252,7 +252,7 @@ RightOfWayRule::ZoneType BuildRightOfWayZoneType(const YAML::Node& rule_node) {
   }
 }
 
-RightOfWayRule::RelatedBulbGroups BuildRightOfWayRelatedBulbGroups(
+RightOfWayRule::RelatedBulbGroups BuildRelatedBulbGroups(
       const YAML::Node& rule_node) {
   if (rule_node["RelatedBulbGroups"]) {
     MALIPUT_THROW_UNLESS(rule_node["RelatedBulbGroups"].IsMap());
@@ -293,7 +293,7 @@ RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
   const LaneSRoute zone = BuildLaneSRoute(road_geometry, zone_node);
 
   return RightOfWayRule(rule_id, zone, BuildRightOfWayZoneType(rule_node),
-                        states, BuildRightOfWayRelatedBulbGroups(rule_node));
+                        states, BuildRelatedBulbGroups(rule_node));
 }
 }  // namespace
 

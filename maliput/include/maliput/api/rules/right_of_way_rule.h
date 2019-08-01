@@ -32,8 +32,8 @@ namespace rules {
 ///   allowed;
 /// * a catalog of one or more States, each of which indicate the possible
 ///   right-of-way semantics for a vehicle traversing the zone.
-/// * a collection of related TrafficLight::Ids and their respective
-///   BulbGroup:Ids.
+/// * a collection of related BulbGroup::Ids and their respective
+///   TrafficLight::Ids.
 ///
 /// The `zone` is directed; the rule applies to vehicles traveling forward
 /// through the `zone`.
@@ -134,8 +134,7 @@ class RightOfWayRule final {
   ///
   /// @throws std::exception if `states` is empty or if `states` contains
   /// duplicate State::Id's.
-  /// @throws maliput::common::assertion_error if any BulbGroup::Id is
-  ///         duplicated within the TrafficLight::Id's vector.
+  /// @throws common::assertion_error if any duplicate BulbGroup::Id is found.
   RightOfWayRule(
       const Id& id,
       const LaneSRoute& zone,
@@ -189,7 +188,7 @@ class RightOfWayRule final {
     return states_.begin()->second;
   }
 
-  /// Returns the catalog of related bulb groups.
+  /// Returns the related bulb groups.
   const RelatedBulbGroups& related_bulb_groups() const {
     return related_bulb_groups_;
   }

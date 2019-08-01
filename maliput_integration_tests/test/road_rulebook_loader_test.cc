@@ -2,11 +2,8 @@
 
 #include <iterator>
 #include <memory>
-#include <set>
 #include <string>
-#include <unordered_map>
 #include <vector>
-
 
 #include <gtest/gtest.h>
 
@@ -57,10 +54,14 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
       std::string bulb_group_name;
     };
     const std::vector<TestCase> test_cases = {
-        {"NorthStraight", "l:ns_intersection_segment_0", "SouthFacing", "SouthFacingBulbs"},
-        {"SouthStraight", "l:ns_intersection_segment_1", "NorthFacing", "NorthFacingBulbs"},
-        {"EastStraight", "l:ew_intersection_segment_0", "WestFacing", "WestFacingBulbs"},
-        {"WestStraight", "l:ew_intersection_segment_1", "EastFacing", "EastFacingBulbs"},
+        {"NorthStraight", "l:ns_intersection_segment_0", "SouthFacing",
+         "SouthFacingBulbs"},
+        {"SouthStraight", "l:ns_intersection_segment_1", "NorthFacing",
+         "NorthFacingBulbs"},
+        {"EastStraight", "l:ew_intersection_segment_0", "WestFacing",
+         "WestFacingBulbs"},
+        {"WestStraight", "l:ew_intersection_segment_1", "EastFacing",
+         "EastFacingBulbs"},
     };
     std::vector<RightOfWayRule> result;
     for (const auto& test_case : test_cases) {
@@ -129,10 +130,14 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
       std::string bulb_group_name;
     };
     std::vector<TestCase> test_cases = {
-        {"NorthLeftTurn", "l:north_left_turn_segment_0", "SouthStraight", "SouthFacing", "SouthFacingBulbs"},
-        {"SouthLeftTurn", "l:south_left_turn_segment_0", "NorthStraight", "NorthFacing", "NorthFacingBulbs"},
-        {"EastLeftTurn", "l:east_left_turn_segment_0", "WestStraight", "WestFacing", "WestFacingBulbs"},
-        {"WestLeftTurn", "l:west_left_turn_segment_0", "EastStraight", "EastFacing", "EastFacingBulbs"},
+        {"NorthLeftTurn", "l:north_left_turn_segment_0", "SouthStraight",
+         "SouthFacing", "SouthFacingBulbs"},
+        {"SouthLeftTurn", "l:south_left_turn_segment_0", "NorthStraight",
+         "NorthFacing", "NorthFacingBulbs"},
+        {"EastLeftTurn", "l:east_left_turn_segment_0", "WestStraight",
+         "WestFacing", "WestFacingBulbs"},
+        {"WestLeftTurn", "l:west_left_turn_segment_0", "EastStraight",
+         "EastFacing", "EastFacingBulbs"},
     };
     std::vector<RightOfWayRule> result;
     for (const auto& test_case : test_cases) {

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-#include <vector>
-
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/right_of_way_rule.h"
@@ -38,8 +35,8 @@ namespace test {
                                    const rules::RightOfWayRule::State& a,
                                    const rules::RightOfWayRule::State& b);
 
-/// Predicate-formatter which tests equality of TrafficLight::Ids to
-/// BulbGroup::Ids catalog.
+/// Predicate-formatter which tests equality of
+/// RightOfWayRule::RelatedBulbGroups.
 ::testing::AssertionResult IsEqual(const char* a_expression,
                                    const char* b_expression,
                                    const RightOfWayRule::RelatedBulbGroups& a,
