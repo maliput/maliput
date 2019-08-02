@@ -7,7 +7,7 @@ source prereqs.lib
 prereqs.init 'The Maliput source distribution prerequisite setup script'
 
 declare -A DISTRO_MAP
-DISTRO_MAP[bionic]=crystal
+DISTRO_MAP[bionic]=dashing
 DISTRO_MAP[xenial]=bouncy
 DISTRO=${DISTRO_MAP[$(lsb_release -sc)]}
 
