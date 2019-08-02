@@ -27,7 +27,8 @@ class MockRulebook : public RoadRulebook {
     {RightOfWayRule::State(
         RightOfWayRule::State::Id("green"),
         RightOfWayRule::State::Type::kGo,
-        {})}};
+        {} /* states */)},
+    {} /* related_bulb_groups */};
   const SpeedLimitRule kSpeedLimit{SpeedLimitRule::Id("slr_id"),
                                    kZone,
                                    SpeedLimitRule::Severity::kStrict,

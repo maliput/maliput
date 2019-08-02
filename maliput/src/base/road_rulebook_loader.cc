@@ -6,21 +6,26 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "drake/common/drake_throw.h"
+#include "drake/common/text_logging.h"
+
 #include "maliput/api/lane.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/manual_rulebook.h"
-#include "drake/common/drake_throw.h"
-#include "drake/common/text_logging.h"
+#include "maliput/common/maliput_throw.h"
+
 
 using maliput::api::Lane;
 using maliput::api::LaneId;
+using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
 using maliput::api::rules::LaneSRange;
 using maliput::api::rules::LaneSRoute;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::SRange;
+using maliput::api::rules::TrafficLight;
 
 namespace YAML {
 
@@ -247,6 +252,31 @@ RightOfWayRule::ZoneType BuildRightOfWayZoneType(const YAML::Node& rule_node) {
   }
 }
 
+RightOfWayRule::RelatedBulbGroups BuildRelatedBulbGroups(
+      const YAML::Node& rule_node) {
+  if (rule_node["RelatedBulbGroups"]) {
+    MALIPUT_THROW_UNLESS(rule_node["RelatedBulbGroups"].IsMap());
+
+    RightOfWayRule::RelatedBulbGroups related_bulb_groups;
+
+    for (const auto& traffic_light_bulb_group :
+         rule_node["RelatedBulbGroups"]) {
+      const TrafficLight::Id traffic_light_id(
+          traffic_light_bulb_group.first.as<std::string>());
+
+      std::vector<BulbGroup::Id> bulb_groups;
+      for (auto& bulb_groups_node : traffic_light_bulb_group.second) {
+        bulb_groups.emplace_back(bulb_groups_node.as<std::string>());
+      }
+
+      MALIPUT_THROW_UNLESS(
+          related_bulb_groups.emplace(traffic_light_id, bulb_groups).second);
+    }
+    return related_bulb_groups;
+  }
+  return {};
+}
+
 RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
                                    const YAML::Node& rule_node) {
   DRAKE_THROW_UNLESS(rule_node.IsMap());
@@ -263,7 +293,7 @@ RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
   const LaneSRoute zone = BuildLaneSRoute(road_geometry, zone_node);
 
   return RightOfWayRule(rule_id, zone, BuildRightOfWayZoneType(rule_node),
-                        states);
+                        states, BuildRelatedBulbGroups(rule_node));
 }
 }  // namespace
 
