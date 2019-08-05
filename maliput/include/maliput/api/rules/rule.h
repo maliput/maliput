@@ -1,6 +1,6 @@
 #pragma once
 
-#include <functional>
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -16,8 +16,8 @@ namespace rules {
 
 /// Describes a generic rule type.
 ///
-/// A Rule may have multiple states that affect agent behavior in different ways
-/// while driving through the rule's zone. The possible states of a Rule must be
+/// A Rule may have multiple states that affect agent behavior while it is
+/// driving through the rule's zone. The possible states of a Rule must be
 /// semantically coherent. The current state of a Rule is given by a
 /// RuleStateProvider. States can be:
 ///
@@ -81,27 +81,23 @@ class Rule {
   std::vector<Id> related_rules_;
 };
 
-/// Describes a numeric range based constraint.
+/// Describes a numeric range based rule.
 ///
 /// Ranges are closed and continuous, defined by a minimum and maximum quantity.
-/// When only one of the extremes is defined, the other should take a
-/// semantically correct value. For example, a speed limit rule may only have a
-/// positive maximum value defined, then most probably a correct minimum would
-/// be 0 to avoid traveling in -s direction.
-///
-/// Magnitudes are considered to be described in SI by default.
+/// When only one extreme is formally defined, the other should take a
+/// semantically correct value. For example, if a speed limit only specifies a
+/// maximum value, the minimum value is typically zero.
 class RangeValueRule : public Rule {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RangeValueRule);
 
-  /// Defines a range for the rule.
+  /// Defines a range for a RangeValueRule.
   struct Range {
-    /// Convenient operator overloads for range comparison.
     bool operator==(const Range& other) const {
       return min == other.min && max == other.max &&
              description == other.description;
     }
-    /// Convenient operator overloads for range comparison.
+
     bool operator!=(const Range& other) const {
       return !(*this == other);
     }
@@ -111,15 +107,17 @@ class RangeValueRule : public Rule {
     double max{};             ///< Maximum value of the range.
   };
 
-  /// Constructs a range based rule.
+  /// Constructs a range based Rule.
   ///
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
   /// @param related_rules A vector of related rules.
-  /// @param ranges A vector of ranges. It must have at least one item and all
-  ///        of them should respect that min <= max. All ranges should be
-  ///        unique.
+  /// @param ranges A vector of possible ranges that this rule could enforce.
+  ///               The actual range that's enforced at any given time is
+  ///               determined by a RangeValueRuleStateProvider. This vector
+  ///               must have at least one Range, and each Range must respect
+  ///               that its min <= max and be unique.
   /// @throws maliput::common::assertion_error When `ranges` is empty.
   /// @throws maliput::common::assertion_error When any Range within `ranges`
   ///         violates `min <= max` condition.
@@ -138,7 +136,7 @@ class RangeValueRule : public Rule {
     }
   }
 
-  const std::vector<Range> ranges() const { return ranges_; }
+  const std::vector<Range>& ranges() const { return ranges_; }
 
  private:
   std::vector<Range> ranges_;
@@ -147,40 +145,41 @@ class RangeValueRule : public Rule {
 /// Describes an arbitrary discrete and string based rule.
 ///
 /// Semantics of this rule are provided by _all_ possible values that this
-/// Rule::TypeId could have, not only the ones that an specific instance of
+/// Rule::TypeId could have, not only the ones that a specific instance of
 /// this rule provides.
 class DiscreteValueRule : public Rule {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DiscreteValueRule);
 
-  /// Constructs a discrete value based rule.
+  /// Constructs a DiscreteValueRule.
   ///
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
   /// @param related_rules A vector of related rules.
-  /// @param ranges A vector of value states. It must have at least one item and
-  ///        all must be unique.
-  /// @throws maliput::common::assertion_error When `value_states` is empty.
+  /// @param values A vector of possible discrete values that this Rule could be
+  ///               in. The actual value that's enforced at any given time is
+  ///               determined by a DiscreteValueRuleStateProvider.  It must
+  ///               have at least one value; each value must be unique.
+  /// @throws maliput::common::assertion_error When `values` is empty.
   /// @throws maliput::common::assertion_error When there are duplicated values
-  ///         in `value_states`.
+  ///         in `values`.
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id,
                     const LaneSRoute& zone,
                     const std::vector<Id> related_rules,
-                    const std::vector<std::string>& value_states) :
-      Rule(id, type_id, zone, related_rules), value_states_(value_states) {
-    MALIPUT_THROW_UNLESS(!value_states_.empty());
-    for (const std::string& value_state : value_states_) {
+                    const std::vector<std::string>& values) :
+      Rule(id, type_id, zone, related_rules), values_(values) {
+    MALIPUT_THROW_UNLESS(!values_.empty());
+    for (const std::string& value : values_) {
       MALIPUT_THROW_UNLESS(
-          std::count(value_states_.begin(), value_states_.end(), value_state) ==
-          1);
+          std::count(values_.begin(), values_.end(), value) == 1);
     }
   }
 
-  const std::vector<std::string> value_states() const { return value_states_; }
+  const std::vector<std::string>& values() const { return values_; }
 
  private:
-  std::vector<std::string> value_states_;
+  std::vector<std::string> values_;
 };
 
 }  // namespace rules

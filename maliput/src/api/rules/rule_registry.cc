@@ -30,21 +30,21 @@ void RuleRegistry::RegisterRangeValueRule(const Rule::TypeId& type_id) {
 
 void RuleRegistry::RegisterDiscreteValueRule(
     const Rule::TypeId& type_id,
-    const std::vector<std::string>& all_possible_value_states) {
+    const std::vector<std::string>& all_possible_values) {
   MALIPUT_THROW_UNLESS(!HasValue(range_rule_types_, type_id));
   MALIPUT_THROW_UNLESS(
       discrete_rule_types_.find(type_id) == discrete_rule_types_.end());
-  MALIPUT_THROW_UNLESS(!all_possible_value_states.empty());
-  for (const std::string& value_state : all_possible_value_states) {
+  MALIPUT_THROW_UNLESS(!all_possible_values.empty());
+  for (const std::string& value_state : all_possible_values) {
     MALIPUT_THROW_UNLESS(
-        std::count(all_possible_value_states.begin(),
-                   all_possible_value_states.end(),
+        std::count(all_possible_values.begin(),
+                   all_possible_values.end(),
                    value_state) ==
         1);
   }
 
   MALIPUT_THROW_UNLESS(
-      discrete_rule_types_.emplace(type_id, all_possible_value_states).second);
+      discrete_rule_types_.emplace(type_id, all_possible_values).second);
 }
 
 const std::vector<Rule::TypeId>& RuleRegistry::RangeValueRuleTypes() const {
@@ -89,15 +89,15 @@ RangeValueRule RuleRegistry::BuildRangeValueRule(
 DiscreteValueRule RuleRegistry::BuildDiscreteValueRule(
     const Rule::Id& id, const Rule::TypeId& type_id,
     const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
-    const std::vector<std::string>& value_states) const {
+    const std::vector<std::string>& values) const {
   MALIPUT_THROW_UNLESS(
       discrete_rule_types_.find(type_id) != discrete_rule_types_.end());
   const auto discrete_rule_type = discrete_rule_types_.find(type_id);
-  for (const std::string& value_state : value_states) {
+  for (const std::string& value_state : values) {
     MALIPUT_THROW_UNLESS(HasValue(discrete_rule_type->second, value_state));
   }
 
-  return DiscreteValueRule(id, type_id, zone, related_rules, value_states);
+  return DiscreteValueRule(id, type_id, zone, related_rules, values);
 }
 
 }  // namespace rules

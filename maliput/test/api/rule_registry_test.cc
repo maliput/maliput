@@ -210,12 +210,12 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
             kZone.ranges()[0].s_range().s1());
   EXPECT_EQ(discrete_value_rule.related_rules().size(), 0.);
   EXPECT_EQ(discrete_value_rule.related_rules().size(), 0.);
-  EXPECT_EQ(discrete_value_rule.value_states().size(), 2);
+  EXPECT_EQ(discrete_value_rule.values().size(), 2);
   for (const std::string& discrete_state_value : {"Value1", "Value3"}) {
-    EXPECT_NE(std::find(discrete_value_rule.value_states().begin(),
-                        discrete_value_rule.value_states().end(),
+    EXPECT_NE(std::find(discrete_value_rule.values().begin(),
+                        discrete_value_rule.values().end(),
                         discrete_state_value),
-              discrete_value_rule.value_states().end());
+              discrete_value_rule.values().end());
   }
   // Unregistered type.
   EXPECT_THROW({

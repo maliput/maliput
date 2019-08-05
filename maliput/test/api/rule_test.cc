@@ -163,8 +163,8 @@ TEST_F(RuleTest, DiscreteValueRuleAccessors) {
         std::find(kRelatedRules.begin(), kRelatedRules.end(), related_rule),
         kRelatedRules.end());
   }
-  EXPECT_EQ(dut.value_states().size(), kDiscreteValues.size());
-  for (const std::string& discrete_state_value : dut.value_states()) {
+  EXPECT_EQ(dut.values().size(), kDiscreteValues.size());
+  for (const std::string& discrete_state_value : dut.values()) {
     EXPECT_NE(std::find(kDiscreteValues.begin(), kDiscreteValues.end(),
                         discrete_state_value),
               kDiscreteValues.end());

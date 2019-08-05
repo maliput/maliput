@@ -42,7 +42,7 @@ class RuleRegistry {
   RuleRegistry() = default;
   virtual ~RuleRegistry() = default;
 
-  /// Registers a range value rule.
+  /// Registers a RangeValueRule type.
   ///
   /// @param type_id The Rule type.
   /// @see RangeValueRule
@@ -50,22 +50,22 @@ class RuleRegistry {
   ///         registered.
   void RegisterRangeValueRule(const Rule::TypeId& type_id);
 
-  /// Registers a discrete value rule type.
+  /// Registers a DiscreteValueRule type.
   ///
   /// @param type_id The Rule type.
-  /// @param all_possible_value_states A vector of all possible value states
-  ///        that the rule could take. It must not be empty and there must not
-  ///        be any duplicated value state.
+  /// @param all_possible_values A vector of all possible discrete values that
+  ///        a rule could be in. It must have at least one value; each value
+  ///        must be unique.
   /// @see DiscreteValueRule.
   /// @throws maliput::common::assertion_error When `type_id` is already
   ///         registered.
-  /// @throws maliput::common::assertion_error When `all_possible_value_states`
+  /// @throws maliput::common::assertion_error When `all_possible_valuess`
   ///         is empty.
   /// @throws maliput::common::assertion_error When there are duplicated items
-  ///         `all_possible_value_states`.
+  ///         in `all_possible_values`.
   void RegisterDiscreteValueRule(
       const Rule::TypeId& type_id,
-      const std::vector<std::string>& all_possible_value_states);
+      const std::vector<std::string>& all_possible_values);
 
   /// @returns A vector of Rule::TypeId with all the available range based rule
   ///          types.
@@ -98,12 +98,12 @@ class RuleRegistry {
   /// @see DiscreteValueRule constructor for parameter documentation.
   /// @throws maliput::common::assertion_error When `type_id` is not a
   ///         registered discrete value rule type.
-  /// @throws maliput::common::assertion_error When any value in `value_states`
-  ///         is not a registered discrete value in `type_id`.
+  /// @throws maliput::common::assertion_error When any value in `values` is not
+  ///         a registered discrete value in `type_id`.
   DiscreteValueRule BuildDiscreteValueRule(
       const Rule::Id& id, const Rule::TypeId& type_id,
       const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
-      const std::vector<std::string>& value_states) const;
+      const std::vector<std::string>& values) const;
 
  private:
   std::vector<Rule::TypeId> range_rule_types_;
