@@ -2,10 +2,13 @@
 
 #include <cmath>
 
-#include "multilane/road_curve.h"
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
 #include "drake/common/eigen_types.h"
+
+#include "maliput/common/maliput_throw.h"
+
+#include "multilane/road_curve.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -38,10 +41,12 @@ class ArcRoadCurve : public RoadCurve {
   /// @param computation_policy Policy to guide all computations. If geared
   /// towards speed, computations will make use of analytical expressions even
   /// if not actually correct for the curve as specified.
-  /// @throws std::runtime_error if @p radius is not a positive number.
-  /// @throws std::runtime_error if @p linear_tolerance is not a positive
-  /// number.
-  /// @throws std::runtime_error if @p scale_length is not a positive number.
+  /// @throws maliput::common::assertion_error if @p radius is not a positive
+  ///         number.
+  /// @throws maliput::common::assertion_error if @p linear_tolerance is not a
+  ///         positive number.
+  /// @throws maliput::common::assertion_error if @p scale_length is not a
+  ///         positive number.
   explicit ArcRoadCurve(
       const drake::Vector2<double>& center, double radius,
       double theta0, double d_theta,
@@ -53,7 +58,7 @@ class ArcRoadCurve : public RoadCurve {
                   elevation, superelevation,
                   computation_policy),
         center_(center), radius_(radius), theta0_(theta0), d_theta_(d_theta) {
-    DRAKE_THROW_UNLESS(radius > 0.0);
+    MALIPUT_THROW_UNLESS(radius > 0.0);
   }
 
   ~ArcRoadCurve() override = default;

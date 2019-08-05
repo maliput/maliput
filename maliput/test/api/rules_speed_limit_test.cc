@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/regions.h"
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/rules_speed_limit_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -32,16 +33,16 @@ GTEST_TEST(SpeedLimitRuleTest, Construction) {
   EXPECT_THROW(SpeedLimitRule(SpeedLimitRule::Id("some_id"), kZone,
                               SpeedLimitRule::Severity::kStrict,
                               90., 77.),
-               std::runtime_error);
+               maliput::common::assertion_error);
   // Negative limits are not allowed.
   EXPECT_THROW(SpeedLimitRule(SpeedLimitRule::Id("some_id"), kZone,
                               SpeedLimitRule::Severity::kStrict,
                               -8., 77.),
-               std::runtime_error);
+               maliput::common::assertion_error);
   EXPECT_THROW(SpeedLimitRule(SpeedLimitRule::Id("some_id"), kZone,
                               SpeedLimitRule::Severity::kStrict,
                               -8., -6.),
-               std::runtime_error);
+               maliput::common::assertion_error);
 }
 
 

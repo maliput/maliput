@@ -5,7 +5,10 @@
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
+
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_throw.h"
 
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/traffic_lights.h"
@@ -132,9 +135,10 @@ class RightOfWayRule final {
   /// @param related_bulb_groups The related bulb groups. All IDs present within
   ///        the supplied map are assumed to be valid.
   ///
-  /// @throws std::exception if `states` is empty or if `states` contains
-  /// duplicate State::Id's.
-  /// @throws common::assertion_error if any duplicate BulbGroup::Id is found.
+  /// @throws maliput::common::assertion_error if `states` is empty or if
+  ///         `states` contains duplicate State::Id's.
+  /// @throws maliput::common::assertion_error if any duplicate BulbGroup::Id is
+  ///         found.
   RightOfWayRule(
       const Id& id,
       const LaneSRoute& zone,
@@ -147,7 +151,7 @@ class RightOfWayRule final {
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
-      DRAKE_THROW_UNLESS(result.second);
+      MALIPUT_THROW_UNLESS(result.second);
     }
     for (const auto& traffic_light_bulb_group : related_bulb_groups) {
       for (const BulbGroup::Id& bulb_group_id :
@@ -182,9 +186,9 @@ class RightOfWayRule final {
   ///
   /// This is a convenience function for returning a static rule's single state.
   ///
-  /// @throws std::exception if `is_static()` is false.
+  /// @throws maliput::common::assertion_error if `is_static()` is false.
   const State& static_state() const {
-    DRAKE_THROW_UNLESS(is_static());
+    MALIPUT_THROW_UNLESS(is_static());
     return states_.begin()->second;
   }
 

@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 
@@ -19,7 +19,7 @@ class IntersectionBook::Impl {
   ~Impl() = default;
 
   void AddIntersection(std::unique_ptr<Intersection> intersection) {
-    DRAKE_THROW_UNLESS(intersection != nullptr);
+    MALIPUT_THROW_UNLESS(intersection != nullptr);
     auto result = book_.emplace(intersection->id(), std::move(intersection));
     if (!result.second) {
       throw std::logic_error(

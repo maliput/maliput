@@ -6,13 +6,15 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "drake/common/eigen_types.h"
+#include "drake/math/quaternion.h"
+
 #include "maliput/api/lane_data.h"
 #include "maliput/api/rules/traffic_light_book.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/traffic_light_book.h"
-#include "drake/common/drake_throw.h"
-#include "drake/common/eigen_types.h"
-#include "drake/math/quaternion.h"
+#include "maliput/common/maliput_throw.h"
+
 
 using drake::Quaternion;
 using maliput::api::GeoPosition;
@@ -219,15 +221,15 @@ namespace maliput {
 namespace {
 
 Bulb BuildBulb(const YAML::Node& bulb_node) {
-  DRAKE_THROW_UNLESS(bulb_node.IsDefined());
-  DRAKE_THROW_UNLESS(bulb_node.IsMap());
-  DRAKE_THROW_UNLESS(bulb_node["ID"].IsDefined());
+  MALIPUT_THROW_UNLESS(bulb_node.IsDefined());
+  MALIPUT_THROW_UNLESS(bulb_node.IsMap());
+  MALIPUT_THROW_UNLESS(bulb_node["ID"].IsDefined());
   const Bulb::Id id(bulb_node["ID"].as<std::string>());
   const YAML::Node& pose_node = bulb_node["Pose"];
-  DRAKE_THROW_UNLESS(pose_node.IsDefined());
-  DRAKE_THROW_UNLESS(pose_node.IsMap());
-  DRAKE_THROW_UNLESS(pose_node["position_bulb_group"].IsDefined());
-  DRAKE_THROW_UNLESS(pose_node["orientation_bulb_group"].IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node.IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node.IsMap());
+  MALIPUT_THROW_UNLESS(pose_node["position_bulb_group"].IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node["orientation_bulb_group"].IsDefined());
   const GeoPosition position_bulb_group =
       pose_node["position_bulb_group"].as<GeoPosition>();
   const Rotation orientation_bulb_group =
@@ -236,22 +238,22 @@ Bulb BuildBulb(const YAML::Node& bulb_node) {
   const YAML::Node& bounding_box_node = bulb_node["BoundingBox"];
   Bulb::BoundingBox bounding_box;
   if (bounding_box_node.IsDefined()) {
-    DRAKE_THROW_UNLESS(bounding_box_node.IsMap());
+    MALIPUT_THROW_UNLESS(bounding_box_node.IsMap());
     bounding_box = bounding_box_node.as<Bulb::BoundingBox>();
   }
 
   const YAML::Node& color_node = bulb_node["Color"];
-  DRAKE_THROW_UNLESS(color_node.IsDefined());
+  MALIPUT_THROW_UNLESS(color_node.IsDefined());
   const BulbColor color = color_node.as<BulbColor>();
 
   const YAML::Node& type_node = bulb_node["Type"];
-  DRAKE_THROW_UNLESS(type_node.IsDefined());
+  MALIPUT_THROW_UNLESS(type_node.IsDefined());
   const BulbType type = type_node.as<BulbType>();
 
   drake::optional<double> arrow_orientation_rad = drake::nullopt;
   if (type == BulbType::kArrow) {
     const YAML::Node& arrow_orientation_node = bulb_node["ArrowOrientation"];
-    DRAKE_THROW_UNLESS(arrow_orientation_node.IsDefined());
+    MALIPUT_THROW_UNLESS(arrow_orientation_node.IsDefined());
     arrow_orientation_rad = arrow_orientation_node.as<double>();
   }
 
@@ -266,22 +268,22 @@ Bulb BuildBulb(const YAML::Node& bulb_node) {
 }
 
 BulbGroup BuildBulbGroup(const YAML::Node& bulb_group_node) {
-  DRAKE_THROW_UNLESS(bulb_group_node.IsDefined());
-  DRAKE_THROW_UNLESS(bulb_group_node.IsMap());
-  DRAKE_THROW_UNLESS(bulb_group_node["ID"].IsDefined());
+  MALIPUT_THROW_UNLESS(bulb_group_node.IsDefined());
+  MALIPUT_THROW_UNLESS(bulb_group_node.IsMap());
+  MALIPUT_THROW_UNLESS(bulb_group_node["ID"].IsDefined());
   const BulbGroup::Id id(bulb_group_node["ID"].as<std::string>());
   const YAML::Node& pose_node = bulb_group_node["Pose"];
-  DRAKE_THROW_UNLESS(pose_node.IsDefined());
-  DRAKE_THROW_UNLESS(pose_node.IsMap());
-  DRAKE_THROW_UNLESS(pose_node["position_traffic_light"].IsDefined());
-  DRAKE_THROW_UNLESS(pose_node["orientation_traffic_light"].IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node.IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node.IsMap());
+  MALIPUT_THROW_UNLESS(pose_node["position_traffic_light"].IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node["orientation_traffic_light"].IsDefined());
   const GeoPosition position_traffic_light =
       pose_node["position_traffic_light"].as<GeoPosition>();
   const Rotation orientation_traffic_light =
       pose_node["orientation_traffic_light"].as<Rotation>();
   const YAML::Node& bulbs_node = bulb_group_node["Bulbs"];
-  DRAKE_THROW_UNLESS(bulbs_node.IsDefined());
-  DRAKE_THROW_UNLESS(bulbs_node.IsSequence());
+  MALIPUT_THROW_UNLESS(bulbs_node.IsDefined());
+  MALIPUT_THROW_UNLESS(bulbs_node.IsSequence());
   std::vector<Bulb> bulbs;
   for (const YAML::Node& bulb_node : bulbs_node) {
     bulbs.push_back(BuildBulb(bulb_node));
@@ -291,21 +293,21 @@ BulbGroup BuildBulbGroup(const YAML::Node& bulb_group_node) {
 }
 
 TrafficLight BuildTrafficLight(const YAML::Node& traffic_light_node) {
-  DRAKE_THROW_UNLESS(traffic_light_node.IsMap());
+  MALIPUT_THROW_UNLESS(traffic_light_node.IsMap());
   const TrafficLight::Id id(traffic_light_node["ID"].as<std::string>());
   const YAML::Node& pose_node = traffic_light_node["Pose"];
-  DRAKE_THROW_UNLESS(pose_node.IsDefined());
-  DRAKE_THROW_UNLESS(pose_node.IsMap());
-  DRAKE_THROW_UNLESS(pose_node["position_road_network"].IsDefined());
-  DRAKE_THROW_UNLESS(pose_node["orientation_road_network"].IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node.IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node.IsMap());
+  MALIPUT_THROW_UNLESS(pose_node["position_road_network"].IsDefined());
+  MALIPUT_THROW_UNLESS(pose_node["orientation_road_network"].IsDefined());
   const GeoPosition position_road_network =
       pose_node["position_road_network"].as<GeoPosition>();
   const Rotation orientation_road_network =
       pose_node["orientation_road_network"].as<Rotation>();
 
   const YAML::Node& bulb_groups_node = traffic_light_node["BulbGroups"];
-  DRAKE_THROW_UNLESS(bulb_groups_node.IsDefined());
-  DRAKE_THROW_UNLESS(bulb_groups_node.IsSequence());
+  MALIPUT_THROW_UNLESS(bulb_groups_node.IsDefined());
+  MALIPUT_THROW_UNLESS(bulb_groups_node.IsSequence());
   std::vector<BulbGroup> bulb_groups;
   for (const YAML::Node& bulb_group_node : bulb_groups_node) {
     bulb_groups.push_back(BuildBulbGroup(bulb_group_node));
@@ -316,10 +318,10 @@ TrafficLight BuildTrafficLight(const YAML::Node& traffic_light_node) {
 
 std::unique_ptr<api::rules::TrafficLightBook> BuildFrom(
     const YAML::Node& root_node) {
-  DRAKE_THROW_UNLESS(root_node.IsMap());
+  MALIPUT_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& traffic_lights_node = root_node["TrafficLights"];
-  DRAKE_THROW_UNLESS(traffic_lights_node.IsDefined());
-  DRAKE_THROW_UNLESS(traffic_lights_node.IsSequence());
+  MALIPUT_THROW_UNLESS(traffic_lights_node.IsDefined());
+  MALIPUT_THROW_UNLESS(traffic_lights_node.IsSequence());
   auto result = std::make_unique<TrafficLightBook>();
   for (const YAML::Node& traffic_light_node : traffic_lights_node) {
     result->AddTrafficLight(BuildTrafficLight(traffic_light_node));

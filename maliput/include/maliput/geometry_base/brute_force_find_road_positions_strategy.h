@@ -23,9 +23,9 @@ namespace geometry_base {
 ///        must not be negative.
 /// @return A vector of RoadPositionResults representing the possible
 ///         RoadPositions.
-/// @throws std::runtime_error If rg is nullptr, or any entity within it is
-///         nullptr.
-/// @throws std::runtime_error If radius is negative.
+/// @throws maliput::common::assertion_error If rg is nullptr, or any entity
+///         within it is nullptr.
+/// @throws maliput::common::assertion_error If radius is negative.
 std::vector<maliput::api::RoadPositionResult>
 BruteForceFindRoadPositionsStrategy(
     const maliput::api::RoadGeometry* rg,

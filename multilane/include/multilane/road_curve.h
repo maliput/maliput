@@ -130,8 +130,8 @@ class RoadCurve {
   ///         defined for all `s` values between 0 and the total path length of
   ///         the parallel curve (and throwing for any given value outside this
   ///         interval).
-  /// @throws std::runtime_error When `r` makes the radius of curvature be a non
-  ///                           positive number.
+  /// @throws maliput::common::assertion_error When `r` makes the radius of
+  ///         curvature be a non positive number.
   std::function<double(double)> OptimizeCalcPFromS(double r) const;
 
   /// Optimizes the computation of path length integral in the interval of the
@@ -141,8 +141,8 @@ class RoadCurve {
   ///         curve to longitudinal position s at the specified parallel curve,
   ///         defined for all p between 0 and 1 (and throwing for any given
   ///         value outside this interval).
-  /// @throws std::runtime_error When `r` makes the radius of curvature be a non
-  ///                           positive number.
+  /// @throws maliput::common::assertion_error When `r` makes the radius of
+  ///         curvature be a non positive number.
   std::function<double(double)> OptimizeCalcSFromP(double r) const;
 
   /// Computes the reference curve.
@@ -274,7 +274,8 @@ class RoadCurve {
   /// and accuracy. Actual behavior may vary across implementations.
   /// @pre The given @p scale_length is a positive number.
   /// @pre The given @p linear_tolerance is a positive number.
-  /// @throws std::runtime_error if any of the preconditions is not met.
+  /// @throws maliput::common::assertion_error if any of the preconditions is
+  ///         not met.
   ///
   /// @p elevation and @p superelevation are cubic-polynomial functions which
   /// define the elevation and superelevation as a function of position along
@@ -322,8 +323,8 @@ class RoadCurve {
   // curve using numerical methods.
   // @return The path length integral of the curve composed with the elevation
   // polynomial.
-  // @throws std::runtime_error When `r` makes the radius of curvature be a non
-  //                           positive number.
+  // @throws maliput::common::assertion_error When `r` makes the radius of
+  //         curvature be a non positive number.
   double CalcSFromP(double p, double r) const;
 
   // TODO(hidmic): Fast, analytical methods and the conditions in which these

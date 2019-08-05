@@ -2,9 +2,11 @@
 
 #include <vector>
 
-#include "maliput/api/lane_data.h"
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
+
+#include "maliput/api/lane_data.h"
+#include "maliput/common/maliput_throw.h"
+
 
 namespace maliput {
 namespace geometry_base {
@@ -20,10 +22,10 @@ class LaneEndSet : public api::LaneEndSet {
 
   /// Adds an api::LaneEnd to the set.
   ///
-  /// @throws std::exception if `end.lane` is nullptr.
+  /// @throws maliput::common::assertion_error if `end.lane` is nullptr.
   void Add(const api::LaneEnd& end) {
     // TODO(maddog@tri.global)  This assertion belongs in LaneEnd itself.
-    DRAKE_THROW_UNLESS(end.lane != nullptr);
+    MALIPUT_THROW_UNLESS(end.lane != nullptr);
     ends_.push_back(end);
   }
 

@@ -15,8 +15,8 @@ GeoPositionT<drake::AutoDiffXd> Lane::ToGeoPositionT<drake::AutoDiffXd>(
     const LanePositionT<drake::AutoDiffXd>& lane_pos) const {
   // Fail fast if lane_pos contains derivatives of inconsistent sizes.
   const Eigen::VectorXd deriv = lane_pos.s().derivatives();
-  DRAKE_THROW_UNLESS(deriv.size() == lane_pos.r().derivatives().size());
-  DRAKE_THROW_UNLESS(deriv.size() == lane_pos.h().derivatives().size());
+  MALIPUT_THROW_UNLESS(deriv.size() == lane_pos.r().derivatives().size());
+  MALIPUT_THROW_UNLESS(deriv.size() == lane_pos.h().derivatives().size());
 
   return DoToGeoPositionAutoDiff(lane_pos);
 }
@@ -42,8 +42,8 @@ LanePositionT<drake::AutoDiffXd> Lane::ToLanePositionT<drake::AutoDiffXd>(
     drake::AutoDiffXd* distance) const {
   // Fail fast if geo_pos contains derivatives of inconsistent sizes.
   const Eigen::VectorXd deriv = geo_pos.x().derivatives();
-  DRAKE_THROW_UNLESS(deriv.size() == geo_pos.y().derivatives().size());
-  DRAKE_THROW_UNLESS(deriv.size() == geo_pos.z().derivatives().size());
+  MALIPUT_THROW_UNLESS(deriv.size() == geo_pos.y().derivatives().size());
+  MALIPUT_THROW_UNLESS(deriv.size() == geo_pos.z().derivatives().size());
 
   LanePositionT<drake::AutoDiffXd> result =
       DoToLanePositionAutoDiff(geo_pos, nearest_point, distance);

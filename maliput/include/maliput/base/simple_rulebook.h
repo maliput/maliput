@@ -3,12 +3,13 @@
 #include <memory>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/speed_limit_rule.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 
@@ -28,35 +29,35 @@ class SimpleRulebook : public api::rules::RoadRulebook {
 
   /// Adds a new RightOfWayRule.
   ///
-  /// @throws std::runtime_error if a rule with the same ID already exists
-  /// in the SimpleRulebook.
+  /// @throws maliput::common::assertion_error if a rule with the same ID
+  /// already exists in the SimpleRulebook.
   void AddRule(const api::rules::RightOfWayRule& rule);
 
   /// Removes the RightOfWayRule labeled by `id`.
   ///
-  /// @throws std::runtime_error if no such rule exists.
+  /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::RightOfWayRule::Id& id);
 
   /// Adds a new SpeedLimitRule.
   ///
-  /// @throws std::runtime_error if a rule with the same ID already exists
-  /// in the SimpleRulebook.
+  /// @throws maliput::common::assertion_error if a rule with the same ID
+  /// already exists in the SimpleRulebook.
   void AddRule(const api::rules::SpeedLimitRule& rule);
 
   /// Removes the SpeedLimitRule labeled by `id`.
   ///
-  /// @throws std::runtime_error if no such rule exists.
+  /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::SpeedLimitRule::Id& id);
 
   /// Adds a new DirectionUsageRule.
   ///
-  /// @throws std::runtime_error if a rule with the same ID already exists
-  /// in the SimpleRulebook.
+  /// @throws maliput::common::assertion_error if a rule with the same ID
+  /// already exists in the SimpleRulebook.
   void AddRule(const api::rules::DirectionUsageRule& rule);
 
   /// Removes the DirectionUsageRule labeled by `id`.
   ///
-  /// @throws std::runtime_error if no such rule exists.
+  /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id);
 
  private:

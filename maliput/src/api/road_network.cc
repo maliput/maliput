@@ -4,8 +4,7 @@
 
 #include "maliput/api/lane.h"
 #include "maliput/api/rules/regions.h"
-
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace api {
@@ -25,13 +24,13 @@ RoadNetwork::RoadNetwork(
       phase_ring_book_(std::move(phase_ring_book)),
       rule_state_provider_(std::move(rule_state_provider)),
       phase_provider_(std::move(phase_provider)) {
-  DRAKE_THROW_UNLESS(road_geometry_.get() != nullptr);
-  DRAKE_THROW_UNLESS(rulebook_.get() != nullptr);
-  DRAKE_THROW_UNLESS(traffic_light_book_.get() != nullptr);
-  DRAKE_THROW_UNLESS(intersection_book_.get() != nullptr);
-  DRAKE_THROW_UNLESS(phase_ring_book_.get() != nullptr);
-  DRAKE_THROW_UNLESS(rule_state_provider_.get() != nullptr);
-  DRAKE_THROW_UNLESS(phase_provider_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(road_geometry_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(rulebook_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(traffic_light_book_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(intersection_book_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(phase_ring_book_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(rule_state_provider_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(phase_provider_.get() != nullptr);
 }
 
 }  // namespace api

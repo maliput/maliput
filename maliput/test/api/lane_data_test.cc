@@ -4,6 +4,8 @@
 
 #include "drake/common/autodiff.h"
 #include "drake/common/symbolic.h"
+
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 
 namespace maliput {
@@ -332,8 +334,8 @@ GTEST_TEST(RBoundsTest, ParameterizedConstructor) {
   EXPECT_EQ(dut.min(), kMin);
   EXPECT_EQ(dut.max(), kMax);
   // Checks constraints on the constructor.
-  EXPECT_THROW(RBounds(kMax, kMax), std::runtime_error);
-  EXPECT_THROW(RBounds(kMin, kMin), std::runtime_error);
+  EXPECT_THROW(RBounds(kMax, kMax), maliput::common::assertion_error);
+  EXPECT_THROW(RBounds(kMin, kMin), maliput::common::assertion_error);
 }
 
 GTEST_TEST(RBoundsTest, Setters) {
@@ -346,8 +348,8 @@ GTEST_TEST(RBoundsTest, Setters) {
   dut.set_max(2. * kMax);
   EXPECT_EQ(dut.max(), 2. * kMax);
   // Checks constraints on the setters.
-  EXPECT_THROW(dut.set_min(kMax), std::runtime_error);
-  EXPECT_THROW(dut.set_max(kMin), std::runtime_error);
+  EXPECT_THROW(dut.set_min(kMax), maliput::common::assertion_error);
+  EXPECT_THROW(dut.set_max(kMin), maliput::common::assertion_error);
 }
 
 GTEST_TEST(HBoundsTest, DefaultConstructor) {
@@ -365,8 +367,8 @@ GTEST_TEST(HBoundsTest, ParameterizedConstructor) {
   EXPECT_EQ(dut.min(), kMin);
   EXPECT_EQ(dut.max(), kMax);
   // Checks constraints on the constructor.
-  EXPECT_THROW(HBounds(kMax, kMax), std::runtime_error);
-  EXPECT_THROW(HBounds(kMin, kMin), std::runtime_error);
+  EXPECT_THROW(HBounds(kMax, kMax), maliput::common::assertion_error);
+  EXPECT_THROW(HBounds(kMin, kMin), maliput::common::assertion_error);
 }
 
 GTEST_TEST(HBoundsTest, Setters) {
@@ -379,8 +381,8 @@ GTEST_TEST(HBoundsTest, Setters) {
   dut.set_max(2. * kMax);
   EXPECT_EQ(dut.max(), 2. * kMax);
   // Checks constraints on the setters.
-  EXPECT_THROW(dut.set_min(kMax), std::runtime_error);
-  EXPECT_THROW(dut.set_max(kMin), std::runtime_error);
+  EXPECT_THROW(dut.set_min(kMax), maliput::common::assertion_error);
+  EXPECT_THROW(dut.set_max(kMin), maliput::common::assertion_error);
 }
 
 }  // namespace

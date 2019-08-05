@@ -4,8 +4,10 @@
 #include <cmath>
 #include <limits>
 
-#include "drake/common/drake_throw.h"
 #include "drake/common/eigen_types.h"
+
+#include "maliput/common/maliput_throw.h"
+
 
 namespace maliput {
 namespace multilane {
@@ -14,10 +16,10 @@ namespace test {
 double BruteForcePathLengthIntegral(const RoadCurve& rc, double p_0, double p_1,
                                     double r, double h, int k_order,
                                     double* maximum_step) {
-  DRAKE_THROW_UNLESS(0. <= p_0);
-  DRAKE_THROW_UNLESS(p_0 <= p_1);
-  DRAKE_THROW_UNLESS(p_1 <= 1.);
-  DRAKE_THROW_UNLESS(k_order >= 0);
+  MALIPUT_THROW_UNLESS(0. <= p_0);
+  MALIPUT_THROW_UNLESS(p_0 <= p_1);
+  MALIPUT_THROW_UNLESS(p_1 <= 1.);
+  MALIPUT_THROW_UNLESS(k_order >= 0);
   double length = 0.0;
   const double d_p = (p_1 - p_0);
   const int iterations = std::pow(2, k_order);
@@ -47,7 +49,7 @@ double BruteForcePathLengthIntegral(const RoadCurve& rc, double p_0, double p_1,
 double AdaptiveBruteForcePathLengthIntegral(
     const RoadCurve& rc, double p_0, double p_1, double r,
     double h, double tolerance, int* k_order_hint) {
-  DRAKE_THROW_UNLESS(tolerance > 0.);
+  MALIPUT_THROW_UNLESS(tolerance > 0.);
   const double kInfinity = std::numeric_limits<double>::infinity();
   // Zero initializes the current k order unless a hint was provided.
   int k_order = k_order_hint != nullptr ? *k_order_hint : 0;

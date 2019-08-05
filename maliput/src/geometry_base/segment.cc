@@ -13,9 +13,9 @@ const api::Junction* Segment::do_junction() const {
 void Segment::AttachToJunction(Passkey<Junction>,
                                const api::Junction* junction) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(junction != nullptr);
+  MALIPUT_THROW_UNLESS(junction != nullptr);
   // Preconditions
-  DRAKE_THROW_UNLESS(junction_ == nullptr);
+  MALIPUT_THROW_UNLESS(junction_ == nullptr);
 
   junction_ = junction;
 }
@@ -25,9 +25,9 @@ void Segment::SetLaneIndexingCallback(
     Passkey<Junction>,
     const std::function<void(const api::Lane*)>& callback) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(!!callback);
+  MALIPUT_THROW_UNLESS(!!callback);
   // Preconditions
-  DRAKE_THROW_UNLESS(!lane_indexing_callback_);
+  MALIPUT_THROW_UNLESS(!lane_indexing_callback_);
 
   lane_indexing_callback_ = callback;
   // Index any Lanes that had already been added to this Segment.
@@ -39,7 +39,7 @@ void Segment::SetLaneIndexingCallback(
 
 void Segment::AddLanePrivate(std::unique_ptr<Lane> lane) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(lane.get() != nullptr);
+  MALIPUT_THROW_UNLESS(lane.get() != nullptr);
   lanes_.emplace_back(std::move(lane));
   Lane* const raw_lane = lanes_.back().get();
 
