@@ -37,13 +37,22 @@ rules::RightOfWayRule::State YieldState();
 rules::RightOfWayRule::RelatedBulbGroups RelatedBulbGroups();
 
 /// Returns a rules::RightOfWayRule containing arbitrary state.
-rules::RightOfWayRule Rule();
+rules::RightOfWayRule CreateRightOfWayRule();
 
 /// Returns a rules::DirectionUsageRule::State containing an arbitrary state.
 rules::DirectionUsageRule::State CreateDirectionUsageRuleState();
 
 /// Returns a rules::DirectionUsageRule containing an arbitrary state.
 rules::DirectionUsageRule CreateDirectionUsageRule();
+
+/// Returns a rules::DiscreteValueRule containing an arbitrary state.
+rules::DiscreteValueRule CreateDiscreteValueRule();
+
+/// Returns a rules::RangeValueRule::Range.
+rules::RangeValueRule::Range CreateRange();
+
+/// Returns a rules::RangeValueRule containing an arbitrary state.
+rules::RangeValueRule CreateRangeValueRule();
 
 /// Returns an arbitrary RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateRoadGeometry();

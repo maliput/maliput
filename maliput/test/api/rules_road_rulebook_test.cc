@@ -5,9 +5,12 @@
 
 #include <gtest/gtest.h>
 
+#include "drake/common/drake_throw.h"
+
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
 
@@ -18,7 +21,7 @@ namespace {
 
 // This class does not provide any semblance of useful functionality.
 // It merely exercises the RoadRulebook abstract interface.
-class MockRulebook : public RoadRulebook {
+class MockRulebook final : public RoadRulebook {
  public:
   const LaneSRange kZone{LaneId("some_lane"), {10., 20.}};
   const RightOfWayRule kRightOfWay{
@@ -39,10 +42,18 @@ class MockRulebook : public RoadRulebook {
       DirectionUsageRule::State::Id("dur_state"),
       DirectionUsageRule::State::Type::kWithS,
       DirectionUsageRule::State::Severity::kPreferred)}};
+  const RangeValueRule kRangeValueRule{
+      Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}),
+      {} /* related rules */, {RangeValueRule::Range{"range_description",
+                                                     123. /* min */,
+                                                     456. /* max */}}};
+  const DiscreteValueRule kDiscreteValueRule{
+      Rule::Id("dvrt/dvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}),
+      {} /* related rules */, {"value1", "value2"}};
 
  private:
-  virtual QueryResults DoFindRules(
-      const std::vector<LaneSRange>& ranges, double) const {
+  QueryResults DoFindRules(
+      const std::vector<LaneSRange>& ranges, double) const override {
     QueryResults results;
     if ((!ranges.empty()) &&
         (ranges[0].lane_id() == kZone.lane_id()) &&
@@ -51,29 +62,45 @@ class MockRulebook : public RoadRulebook {
       results.right_of_way.push_back(kRightOfWay);
       results.speed_limit.push_back(kSpeedLimit);
       results.direction_usage.push_back(kDirectionUsage);
+      results.discrete_value_rules.push_back(kDiscreteValueRule);
+      results.range_value_rules.push_back(kRangeValueRule);
     }
     return results;
   }
 
-  virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const {
+  RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const override {
     if (id != kRightOfWay.id()) {
       throw std::out_of_range("");
     }
     return kRightOfWay;
   }
 
-  virtual SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const {
+  SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const override {
     if (id != kSpeedLimit.id()) {
       throw std::out_of_range("");
     }
     return kSpeedLimit;
   }
 
-  virtual DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const {
+  DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const override {
     if (id != kDirectionUsage.id()) {
       throw std::out_of_range("");
     }
     return kDirectionUsage;
+  }
+
+  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+    if (id != kDiscreteValueRule.id()) {
+      throw std::out_of_range("");
+    }
+    return kDiscreteValueRule;
+  }
+
+  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+    if (id != kRangeValueRule.id()) {
+      throw std::out_of_range("");
+    }
+    return kRangeValueRule;
   }
 };
 
@@ -88,10 +115,16 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   EXPECT_EQ(nonempty.right_of_way.size(), 1);
   EXPECT_EQ(nonempty.speed_limit.size(), 1);
   EXPECT_EQ(nonempty.direction_usage.size(), 1);
+  EXPECT_EQ(nonempty.discrete_value_rules.size(), 1);
+  EXPECT_EQ(nonempty.range_value_rules.size(), 1);
+
+
   RoadRulebook::QueryResults empty = dut.FindRules({}, kZeroTolerance);
   EXPECT_EQ(empty.right_of_way.size(), 0);
   EXPECT_EQ(empty.speed_limit.size(), 0);
   EXPECT_EQ(empty.direction_usage.size(), 0);
+  EXPECT_EQ(empty.discrete_value_rules.size(), 0);
+  EXPECT_EQ(empty.range_value_rules.size(), 0);
 
   const double kNegativeTolerance = -1.;
   EXPECT_THROW(dut.FindRules({}, kNegativeTolerance),

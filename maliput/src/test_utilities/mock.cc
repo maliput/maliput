@@ -20,9 +20,12 @@ namespace test {
 namespace {
 
 using rules::DirectionUsageRule;
+using rules::DiscreteValueRule;
 using rules::Phase;
 using rules::PhaseRing;
+using rules::RangeValueRule;
 using rules::RightOfWayRule;
+using rules::Rule;
 using rules::SpeedLimitRule;
 using rules::TrafficLight;
 
@@ -204,16 +207,21 @@ class MockRoadRulebook final : public rules::RoadRulebook {
     return {{}, {}};
   }
   RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override {
-    return Rule();
+    return CreateRightOfWayRule();
   }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override {
     return SpeedLimitRule(rules::SpeedLimitRule::Id("some_id"),
                           CreateLaneSRange(),
                           rules::SpeedLimitRule::Severity::kStrict, 33., 77.);
   }
-
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override {
     return CreateDirectionUsageRule();
+  }
+  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+    return CreateDiscreteValueRule();
+  }
+  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+    return CreateRangeValueRule();
   }
 };
 
@@ -346,7 +354,8 @@ rules::RightOfWayRule::RelatedBulbGroups RelatedBulbGroups() {
        {rules::BulbGroup::Id("BulbGroupId")}}};
 }
 
-RightOfWayRule Rule() {
+RightOfWayRule CreateRightOfWayRule() {
+
   return RightOfWayRule(RightOfWayRule::Id("mock_id"), CreateLaneSRoute(),
                         RightOfWayRule::ZoneType::kStopExcluded,
                         {NoYieldState(), YieldState()}, RelatedBulbGroups());
@@ -363,6 +372,22 @@ DirectionUsageRule CreateDirectionUsageRule() {
   return DirectionUsageRule(DirectionUsageRule::Id("dur_id"),
                             CreateLaneSRange(),
                             {CreateDirectionUsageRuleState()});
+}
+
+DiscreteValueRule CreateDiscreteValueRule() {
+  return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"),
+                           CreateLaneSRoute(), {} /* related rules */,
+                           {"value1", "value2"});
+}
+
+RangeValueRule::Range CreateRange() {
+  return RangeValueRule::Range{"description", 123. /* min */, 456. /* max */};
+}
+
+RangeValueRule CreateRangeValueRule() {
+  return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("dvrt"),
+                        CreateLaneSRoute(), {} /* related rules */,
+                        {CreateRange()});
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
