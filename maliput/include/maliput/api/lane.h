@@ -6,7 +6,6 @@
 #include "drake/common/autodiff.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
-#include "drake/common/eigen_autodiff_types.h"
 #include "drake/common/symbolic.h"
 
 #include "maliput/api/lane_data.h"

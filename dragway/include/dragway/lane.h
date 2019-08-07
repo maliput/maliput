@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "drake/common/drake_optional.h"
-#include "drake/common/eigen_autodiff_types.h"
+#include "drake/common/autodiff.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 
