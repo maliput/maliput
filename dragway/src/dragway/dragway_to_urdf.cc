@@ -8,12 +8,11 @@
 #include "drake/common/text_logging.h"
 #include "drake/common/text_logging_gflags.h"
 
+#include "maliput-utilities/generate_urdf.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/common/maliput_abort.h"
-#include "maliput-utilities/generate_urdf.h"
 
 #include "dragway/road_geometry.h"
-
 
 DEFINE_int32(num_lanes, 2, "The number of lanes.");
 DEFINE_double(length, 10, "The length of the dragway in meters.");
@@ -23,18 +22,17 @@ DEFINE_double(lane_width, 3.7, "The width of each lane in meters.");
 // By default, the shoulder width is 3 m (10 feet) wide, which is the standard
 // used by the U.S. interstate highway system.
 DEFINE_double(shoulder_width, 3.0,
-    "The width of the shoulders in meters. Both shoulders have the same "
-    "width.");
-DEFINE_double(maximum_height, 5.2,
-              "The maximum modelled height above the road surface (meters).");
+              "The width of the shoulders in meters. Both shoulders have the same "
+              "width.");
+DEFINE_double(maximum_height, 5.2, "The maximum modelled height above the road surface (meters).");
 DEFINE_string(dirpath, ".",
-    "The path to where the URDF and OBJ files should be saved. If this path "
-    " does not exist, it is created.");
+              "The path to where the URDF and OBJ files should be saved. If this path "
+              " does not exist, it is created.");
 DEFINE_string(file_name_root, "dragway",
-    "The root name of the files to create. For example, if the value of this "
-    "parameter is \"foo\", the following files will be created: \"foo.urdf\", "
-    "\"foo.obj\", and \"foo.mtl\". These files will be placed in the path "
-    "specified by parameter 'dirpath'.");
+              "The root name of the files to create. For example, if the value of this "
+              "parameter is \"foo\", the following files will be created: \"foo.urdf\", "
+              "\"foo.obj\", and \"foo.mtl\". These files will be placed in the path "
+              "specified by parameter 'dirpath'.");
 
 namespace maliput {
 namespace dragway {
@@ -44,16 +42,10 @@ int exec(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   drake::logging::HandleSpdlogGflags();
 
-  RoadGeometry road_geometry(
-      api::RoadGeometryId{
-        "Dragway with " + std::to_string(FLAGS_num_lanes) + " lanes."},
-      FLAGS_num_lanes,
-      FLAGS_length,
-      FLAGS_lane_width,
-      FLAGS_shoulder_width,
-      FLAGS_maximum_height,
-      std::numeric_limits<double>::epsilon(),
-      std::numeric_limits<double>::epsilon());
+  RoadGeometry road_geometry(api::RoadGeometryId{"Dragway with " + std::to_string(FLAGS_num_lanes) + " lanes."},
+                             FLAGS_num_lanes, FLAGS_length, FLAGS_lane_width, FLAGS_shoulder_width,
+                             FLAGS_maximum_height, std::numeric_limits<double>::epsilon(),
+                             std::numeric_limits<double>::epsilon());
 
   utility::ObjFeatures features;
 
@@ -71,8 +63,7 @@ int exec(int argc, char* argv[]) {
   const maliput::common::Path my_path = maliput::common::Filesystem::get_cwd();
 
   drake::log()->info("Creating Dragway URDF in {}.", my_path.get_path());
-  utility::GenerateUrdfFile(&road_geometry, directory.get_path(),
-      FLAGS_file_name_root, features);
+  utility::GenerateUrdfFile(&road_geometry, directory.get_path(), FLAGS_file_name_root, features);
   return 0;
 }
 
@@ -80,6 +71,4 @@ int exec(int argc, char* argv[]) {
 }  // namespace dragway
 }  // namespace maliput
 
-int main(int argc, char* argv[]) {
-  return maliput::dragway::exec(argc, argv);
-}
+int main(int argc, char* argv[]) { return maliput::dragway::exec(argc, argv); }

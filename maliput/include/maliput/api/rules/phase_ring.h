@@ -3,10 +3,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "maliput/api/rules/phase.h"
-#include "maliput/api/type_specific_identifier.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+#include "maliput/api/rules/phase.h"
+#include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {
 namespace api {
@@ -48,31 +48,23 @@ class PhaseRing final {
   /// Also if `next_phases` is not drake::nullopt but does not define the possible next
   /// phases of every phase in `phases` or defines the next phases of a phase
   /// that is not in `phases`.
-  PhaseRing(const Id& id, const std::vector<Phase>& phases,
-            const drake::optional<const std::unordered_map<Phase::Id,
-                                                    std::vector<NextPhase>>>&
-                    next_phases = drake::nullopt);
+  PhaseRing(
+      const Id& id, const std::vector<Phase>& phases,
+      const drake::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases = drake::nullopt);
 
   /// Returns the phase ring's identifier.
   const Id& id() const { return id_; }
 
   /// Returns the catalog of phases.
-  const std::unordered_map<Phase::Id, Phase>& phases() const {
-    return phases_;
-  }
+  const std::unordered_map<Phase::Id, Phase>& phases() const { return phases_; }
 
-  const std::unordered_map<Phase::Id, std::vector<NextPhase>>&
-  next_phases() const {
-    return next_phases_;
-  }
+  const std::unordered_map<Phase::Id, std::vector<NextPhase>>& next_phases() const { return next_phases_; }
 
   /// Returns the possible next phases given the current phase with an ID of
   /// `id`.
   ///
   /// @throws std::out_of_range if no phase with an ID of `id` exists.
-  const std::vector<NextPhase>& GetNextPhases(const Phase::Id& id) const {
-    return next_phases_.at(id);
-  }
+  const std::vector<NextPhase>& GetNextPhases(const Phase::Id& id) const { return next_phases_.at(id); }
 
  private:
   Id id_;

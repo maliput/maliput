@@ -9,33 +9,25 @@
 
 #include "maliput/common/assertion_error.h"
 
-
 namespace maliput {
 namespace api {
 namespace {
 
-
 class C {};  // some random class
 
 using CId = TypeSpecificIdentifier<C>;  // ID type specific to class C
-
 
 GTEST_TEST(TypeSpecificIdentifierTest, Construction) {
   EXPECT_NO_THROW(CId("x"));
   EXPECT_THROW(CId(""), maliput::common::assertion_error);
 }
 
-
-GTEST_TEST(TypeSpecificIdentifierTest, IdentifiedType) {
-  ::testing::StaticAssertTypeEq<CId::identified_type, C>();
-}
-
+GTEST_TEST(TypeSpecificIdentifierTest, IdentifiedType) { ::testing::StaticAssertTypeEq<CId::identified_type, C>(); }
 
 GTEST_TEST(TypeSpecificIdentifierTest, Accessors) {
   const CId dut("x");
   EXPECT_EQ(dut.string(), "x");
 }
-
 
 GTEST_TEST(TypeSpecificIdentifierTest, Equality) {
   const CId dut_x1("x");
@@ -49,7 +41,6 @@ GTEST_TEST(TypeSpecificIdentifierTest, Equality) {
   EXPECT_TRUE(dut_x1 != dut_y);
 }
 
-
 GTEST_TEST(TypeSpecificIdentifierTest, CopyingAndAssignment) {
   const CId dut1("x");
   const CId dut2(dut1);
@@ -60,13 +51,11 @@ GTEST_TEST(TypeSpecificIdentifierTest, CopyingAndAssignment) {
   EXPECT_TRUE(dut1 == dut3);
 }
 
-
 // Test usage with ordered/unordered sets.
 template <typename T>
 class TypeSpecificIdentifierSetTest : public ::testing::Test {};
 
-typedef ::testing::Types<std::set<CId>,
-                         std::unordered_set<CId>> SetTypes;
+typedef ::testing::Types<std::set<CId>, std::unordered_set<CId>> SetTypes;
 
 TYPED_TEST_CASE(TypeSpecificIdentifierSetTest, SetTypes);
 
@@ -85,13 +74,11 @@ TYPED_TEST(TypeSpecificIdentifierSetTest, SetTypes) {
   EXPECT_EQ(dut.count(CId("c")), 1);
 }
 
-
 // Test usage with ordered/unordered maps.
 template <typename T>
 class TypeSpecificIdentifierMapTest : public ::testing::Test {};
 
-typedef ::testing::Types<std::map<CId, int>,
-                         std::unordered_map<CId, int>> MapTypes;
+typedef ::testing::Types<std::map<CId, int>, std::unordered_map<CId, int>> MapTypes;
 
 TYPED_TEST_CASE(TypeSpecificIdentifierMapTest, MapTypes);
 

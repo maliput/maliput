@@ -6,7 +6,6 @@
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_throw.h"
 
-
 namespace maliput {
 namespace api {
 namespace rules {
@@ -44,8 +43,7 @@ class SpeedLimitRule {
   ///
   /// `min` and `max` must be non-negative, and `min` must be less than
   /// or equal to `max`, otherwise a maliput::common::assertion_error is thrown.
-  SpeedLimitRule(const Id& id, const LaneSRange& zone, Severity severity,
-                 double min, double max)
+  SpeedLimitRule(const Id& id, const LaneSRange& zone, Severity severity, double min, double max)
       : id_(id), zone_(zone), severity_(severity), min_(min), max_(max) {
     MALIPUT_THROW_UNLESS(min >= 0.);
     MALIPUT_THROW_UNLESS(max >= 0.);

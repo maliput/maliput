@@ -19,11 +19,8 @@ namespace {
 
 GeoPosition LaneEndGeoPosition(const LaneEnd& lane_end) {
   return lane_end.lane->ToGeoPosition(
-        LanePosition(
-            (lane_end.end == LaneEnd::kStart) ? 0. : lane_end.lane->length(),
-            0., 0.));
+      LanePosition((lane_end.end == LaneEnd::kStart) ? 0. : lane_end.lane->length(), 0., 0.));
 }
-
 
 // Given a rotation representing the orientation of a (s,r,h) frame, return
 // the rotation corresponding to "going the other way instead", i.e., the
@@ -39,11 +36,10 @@ Rotation ReverseOrientation(const Rotation& rot) {
   const double sb = std::sin(rot.pitch());
   const double cg = std::cos(rot.yaw());
   const double sg = std::sin(rot.yaw());
-  return Rotation::FromRpy(std::atan2(-sa, ca),  // roll
-                           std::atan2(-sb, cb),  // pitch
+  return Rotation::FromRpy(std::atan2(-sa, ca),    // roll
+                           std::atan2(-sb, cb),    // pitch
                            std::atan2(-sg, -cg));  // yaw
 }
-
 
 // Return the s/r/h orientation of the specified LaneEnd when travelling
 // *out from* the lane at that end.
@@ -56,16 +52,11 @@ Rotation OrientationOutFromLane(const LaneEnd& lane_end) {
       return lane_end.lane->GetOrientation({lane_end.lane->length(), 0., 0.});
     }
   }
-  MALIPUT_ABORT_MESSAGE(
-      "lane_end is neither LaneEnd::kStart nor LaneEnd::kFinish");
+  MALIPUT_ABORT_MESSAGE("lane_end is neither LaneEnd::kStart nor LaneEnd::kFinish");
 }
-
 
 // Return the Cartesian distance between two GeoPositions.
-double Distance(const GeoPosition& a, const GeoPosition& b) {
-  return (a.xyz() - b.xyz()).norm();
-}
-
+double Distance(const GeoPosition& a, const GeoPosition& b) { return (a.xyz() - b.xyz()).norm(); }
 
 // Apply a Rotation to a 3-vector (generically represented by a GeoPosition).
 // TODO(maddog@tri.global)  This should probably be a method of Rotation, and or
@@ -78,20 +69,12 @@ GeoPosition Rotate(const Rotation& rot, const GeoPosition& in) {
   const double sg = std::sin(rot.yaw());
   const double cg = std::cos(rot.yaw());
 
-  return GeoPosition(
-      ((cb * cg) * in.x()) +
-      ((-ca*sg + sa*sb*cg) * in.y()) +
-      ((sa*sg + ca*sb*cg) * in.z()),
+  return GeoPosition(((cb * cg) * in.x()) + ((-ca * sg + sa * sb * cg) * in.y()) + ((sa * sg + ca * sb * cg) * in.z()),
 
-      ((cb*sg) * in.x()) +
-      ((ca*cg + sa*sb*sg) * in.y()) +
-      ((-sa*cg + ca*sb*sg) * in.z()),
+                     ((cb * sg) * in.x()) + ((ca * cg + sa * sb * sg) * in.y()) + ((-sa * cg + ca * sb * sg) * in.z()),
 
-      ((-sb) * in.x()) +
-      ((sa*cb) * in.y()) +
-      ((ca*cb) * in.z()));
+                     ((-sb) * in.x()) + ((sa * cb) * in.y()) + ((ca * cb) * in.z()));
 }
-
 
 // Return a distance measure (in radians) for two rotations that reflects
 // the difference in frame orientations represented by the rotations.
@@ -114,7 +97,6 @@ double Distance(const Rotation& a, const Rotation& b) {
 
 }  // namespace
 
-
 std::vector<std::string> RoadGeometry::CheckInvariants() const {
   std::vector<std::string> failures;
 
@@ -123,11 +105,8 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     const BranchPoint* bp = branch_point(bpi);
     if (bp->road_geometry() != this) {
       std::stringstream ss;
-      ss << "BranchPoint " << bp->id().string() << " is owned by "
-         << this->id().string() << " (" << this
-         << ") but claims to be owned by "
-         << bp->road_geometry()->id().string() << " ("
-         << bp->road_geometry() << ").";
+      ss << "BranchPoint " << bp->id().string() << " is owned by " << this->id().string() << " (" << this
+         << ") but claims to be owned by " << bp->road_geometry()->id().string() << " (" << bp->road_geometry() << ").";
       failures.push_back(ss.str());
     }
   }
@@ -135,32 +114,25 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     const Junction* jnx = junction(ji);
     if (jnx->road_geometry() != this) {
       std::stringstream ss;
-      ss << "Junction " << jnx->id().string() << " is owned by "
-         << this->id().string()
-         << " (" << this << ") but claims to be owned by "
-         << jnx->road_geometry()->id().string() << " ("
-         << jnx->road_geometry() << ").";
+      ss << "Junction " << jnx->id().string() << " is owned by " << this->id().string() << " (" << this
+         << ") but claims to be owned by " << jnx->road_geometry()->id().string() << " (" << jnx->road_geometry()
+         << ").";
       failures.push_back(ss.str());
     }
     for (int si = 0; si < jnx->num_segments(); ++si) {
       const Segment* seg = jnx->segment(si);
       if (seg->junction() != jnx) {
         std::stringstream ss;
-        ss << "Segment " << seg->id().string() << " is owned by "
-           << jnx->id().string()
-           << " (" << jnx << ") but claims to be owned by "
-           << seg->junction()->id().string() << " (" << seg->junction() << ").";
+        ss << "Segment " << seg->id().string() << " is owned by " << jnx->id().string() << " (" << jnx
+           << ") but claims to be owned by " << seg->junction()->id().string() << " (" << seg->junction() << ").";
         failures.push_back(ss.str());
       }
       for (int li = 0; li < seg->num_lanes(); ++li) {
         const Lane* lane = seg->lane(li);
         if (lane->segment() != seg) {
           std::stringstream ss;
-          ss << "Lane " << lane->id().string() << " is owned by "
-             << seg->id().string()
-             << " (" << seg << ") but claims to be owned by "
-             << lane->segment()->id().string()
-             << " (" << lane->segment() << ").";
+          ss << "Lane " << lane->id().string() << " is owned by " << seg->id().string() << " (" << seg
+             << ") but claims to be owned by " << lane->segment()->id().string() << " (" << lane->segment() << ").";
           failures.push_back(ss.str());
         }
         // Currently, only Lane has an index() accessor, because its the only
@@ -168,8 +140,8 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
         // lanes).
         if (lane->index() != li) {
           std::stringstream ss;
-          ss << "Lane " << lane->id().string() << " has index " << li
-             << " but claims to have index " << lane->index() << ".";
+          ss << "Lane " << lane->id().string() << " has index " << li << " but claims to have index " << lane->index()
+             << ".";
           failures.push_back(ss.str());
         }
       }
@@ -187,18 +159,14 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     //     branches;
     //  - orientation *into* BranchPoint for A-side should be same as
     //     orientation *out of* BranchPoint for B-side.
-    if ((bp->GetASide()->size() == 0) &&
-        (bp->GetBSide()->size() == 0)) {
+    if ((bp->GetASide()->size() == 0) && (bp->GetBSide()->size() == 0)) {
       std::stringstream ss;
       ss << "BranchPoint " << bp->id().string() << " is empty.";
       failures.push_back(ss.str());
       continue;
     }
 
-    const LaneEnd ref_end =
-        (bp->GetASide()->size() > 0)
-        ? bp->GetASide()->get(0)
-        : bp->GetBSide()->get(0);
+    const LaneEnd ref_end = (bp->GetASide()->size() > 0) ? bp->GetASide()->get(0) : bp->GetBSide()->get(0);
     // ...test world frame position similarity.
     const GeoPosition ref_geo = LaneEndGeoPosition(ref_end);
     const auto test_geo_position = [&](const LaneEndSet& ends) {
@@ -207,8 +175,7 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
         const double d = Distance(ref_geo, LaneEndGeoPosition(le));
         if (d > linear_tolerance()) {
           std::stringstream ss;
-          ss << "Lane " << le.lane->id().string()
-             << ((le.end == LaneEnd::kStart) ? "[start]" : "[end]")
+          ss << "Lane " << le.lane->id().string() << ((le.end == LaneEnd::kStart) ? "[start]" : "[end]")
              << " position is off by " << d << ".";
           failures.push_back(ss.str());
         }
@@ -217,19 +184,16 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     test_geo_position(*(bp->GetASide()));
     test_geo_position(*(bp->GetBSide()));
     // ...test orientation similarity.
-    const Rotation ref_rot =
-        (bp->GetASide()->size() > 0)
-        ? OrientationOutFromLane(bp->GetASide()->get(0))
-        : ReverseOrientation(OrientationOutFromLane(bp->GetBSide()->get(0)));
-    const auto test_orientation = [&](const LaneEndSet& ends,
-                                      const Rotation& reference) {
+    const Rotation ref_rot = (bp->GetASide()->size() > 0)
+                                 ? OrientationOutFromLane(bp->GetASide()->get(0))
+                                 : ReverseOrientation(OrientationOutFromLane(bp->GetBSide()->get(0)));
+    const auto test_orientation = [&](const LaneEndSet& ends, const Rotation& reference) {
       for (int bi = 0; bi < ends.size(); ++bi) {
         const LaneEnd le = ends.get(bi);
         const double d = Distance(reference, OrientationOutFromLane(le));
         if (d > angular_tolerance()) {
           std::stringstream ss;
-          ss << "Lane " << le.lane->id().string()
-             << ((le.end == LaneEnd::kStart) ? "[start]" : "[end]")
+          ss << "Lane " << le.lane->id().string() << ((le.end == LaneEnd::kStart) ? "[start]" : "[end]")
              << " orientation is off by " << d << ".";
           failures.push_back(ss.str());
         }

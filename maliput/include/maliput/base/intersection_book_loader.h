@@ -20,10 +20,10 @@ namespace maliput {
 /// initial states.
 ///
 /// @return The newly created api::IntersectionBook instance.
-std::unique_ptr<api::IntersectionBook> LoadIntersectionBook(
-    const std::string& input, const api::rules::RoadRulebook& road_rulebook,
-    const api::rules::PhaseRingBook& phase_ring_book,
-    ManualPhaseProvider* phase_provider);
+std::unique_ptr<api::IntersectionBook> LoadIntersectionBook(const std::string& input,
+                                                            const api::rules::RoadRulebook& road_rulebook,
+                                                            const api::rules::PhaseRingBook& phase_ring_book,
+                                                            ManualPhaseProvider* phase_provider);
 
 /// Instantiates and returns an api::IntersectionBook instance based on the
 /// specified @p filename.
@@ -35,9 +35,9 @@ std::unique_ptr<api::IntersectionBook> LoadIntersectionBook(
 /// initial states.
 ///
 /// @return The newly created api::IntersectionBook instance.
-std::unique_ptr<api::IntersectionBook> LoadIntersectionBookFromFile(
-    const std::string& filename, const api::rules::RoadRulebook& road_rulebook,
-    const api::rules::PhaseRingBook& phase_ring_book,
-    ManualPhaseProvider* phase_provider);
+std::unique_ptr<api::IntersectionBook> LoadIntersectionBookFromFile(const std::string& filename,
+                                                                    const api::rules::RoadRulebook& road_rulebook,
+                                                                    const api::rules::PhaseRingBook& phase_ring_book,
+                                                                    ManualPhaseProvider* phase_provider);
 
 }  // namespace maliput

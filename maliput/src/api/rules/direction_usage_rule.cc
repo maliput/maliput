@@ -9,8 +9,7 @@ DirectionUsageRule::StateTypeMapper() {
   return {{DirectionUsageRule::State::Type::kWithS, "WithS"},
           {DirectionUsageRule::State::Type::kAgainstS, "AgainstS"},
           {DirectionUsageRule::State::Type::kBidirectional, "Bidirectional"},
-          {DirectionUsageRule::State::Type::kBidirectionalTurnOnly,
-           "BidirectionalTurnOnly"},
+          {DirectionUsageRule::State::Type::kBidirectionalTurnOnly, "BidirectionalTurnOnly"},
           {DirectionUsageRule::State::Type::kNoUse, "NoUse"},
           {DirectionUsageRule::State::Type::kParking, "Parking"}};
 }

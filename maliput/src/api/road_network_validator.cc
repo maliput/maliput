@@ -7,8 +7,7 @@
 namespace maliput {
 namespace api {
 
-void ValidateRoadNetwork(const RoadNetwork& road_network,
-                         const RoadNetworkValidatorOptions& options) {
+void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValidatorOptions& options) {
   if (options.check_direction_usage_rule_coverage) {
     // Confirms full DirectionUsageRule coverage. This is determined by
     // verifying that each Lane within the RoadGeometry has an associated
@@ -18,8 +17,7 @@ void ValidateRoadNetwork(const RoadNetwork& road_network,
     const auto& lanes_map = road_network.road_geometry()->ById().GetLanes();
     for (const auto& lane_map : lanes_map) {
       const LaneId lane_id = lane_map.first;
-      const auto results = road_network.rulebook()->FindRules(
-          {{lane_id, {0.0, lane_map.second->length()}}}, 0);
+      const auto results = road_network.rulebook()->FindRules({{lane_id, {0.0, lane_map.second->length()}}}, 0);
       MALIPUT_THROW_UNLESS(results.direction_usage.size() > 0);
     }
   }

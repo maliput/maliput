@@ -40,78 +40,56 @@ namespace maliput {
 namespace multilane {
 namespace {
 
-
 // Mocks a Builder object acting as a proxy for later method testing.
 class BuilderMock : public BuilderBase {
  public:
-  BuilderMock(double lane_width, const api::HBounds& elevation_bounds,
-              double linear_tolerance, double angular_tolerance,
-              double scale_length, ComputationPolicy computation_policy,
+  BuilderMock(double lane_width, const api::HBounds& elevation_bounds, double linear_tolerance,
+              double angular_tolerance, double scale_length, ComputationPolicy computation_policy,
               std::unique_ptr<GroupFactoryBase> group_factory)
-      : builder_(lane_width, elevation_bounds, linear_tolerance,
-                 angular_tolerance, scale_length, computation_policy,
+      : builder_(lane_width, elevation_bounds, linear_tolerance, angular_tolerance, scale_length, computation_policy,
                  std::move(group_factory)) {
-    ON_CALL(*this, get_lane_width())
-        .WillByDefault(Invoke(&builder_, &Builder::get_lane_width));
+    ON_CALL(*this, get_lane_width()).WillByDefault(Invoke(&builder_, &Builder::get_lane_width));
 
-    ON_CALL(*this, get_elevation_bounds())
-        .WillByDefault(Invoke(&builder_, &Builder::get_elevation_bounds));
+    ON_CALL(*this, get_elevation_bounds()).WillByDefault(Invoke(&builder_, &Builder::get_elevation_bounds));
 
-    ON_CALL(*this, get_linear_tolerance())
-        .WillByDefault(Invoke(&builder_, &Builder::get_linear_tolerance));
+    ON_CALL(*this, get_linear_tolerance()).WillByDefault(Invoke(&builder_, &Builder::get_linear_tolerance));
 
-    ON_CALL(*this, get_angular_tolerance())
-        .WillByDefault(Invoke(&builder_, &Builder::get_angular_tolerance));
+    ON_CALL(*this, get_angular_tolerance()).WillByDefault(Invoke(&builder_, &Builder::get_angular_tolerance));
 
-    ON_CALL(*this, get_scale_length())
-        .WillByDefault(Invoke(&builder_, &Builder::get_scale_length));
+    ON_CALL(*this, get_scale_length()).WillByDefault(Invoke(&builder_, &Builder::get_scale_length));
 
-    ON_CALL(*this, get_computation_policy())
-        .WillByDefault(Invoke(&builder_, &Builder::get_computation_policy));
+    ON_CALL(*this, get_computation_policy()).WillByDefault(Invoke(&builder_, &Builder::get_computation_policy));
 
-    const Connection* (Builder::*connect_line_ref)(
-        const std::string&, const LaneLayout&, const StartReference::Spec&,
-        const LineOffset&, const EndReference::Spec&) = &Builder::Connect;
+    const Connection* (Builder::*connect_line_ref)(const std::string&, const LaneLayout&, const StartReference::Spec&,
+                                                   const LineOffset&, const EndReference::Spec&) = &Builder::Connect;
     ON_CALL(*this,
-            Connect(_, _, An<const StartReference::Spec&>(),
-                    An<const LineOffset&>(), An<const EndReference::Spec&>()))
+            Connect(_, _, An<const StartReference::Spec&>(), An<const LineOffset&>(), An<const EndReference::Spec&>()))
         .WillByDefault(Invoke(&builder_, connect_line_ref));
 
-    const Connection* (Builder::*connect_arc_ref)(
-        const std::string&, const LaneLayout&, const StartReference::Spec&,
-        const ArcOffset&, const EndReference::Spec&) = &Builder::Connect;
+    const Connection* (Builder::*connect_arc_ref)(const std::string&, const LaneLayout&, const StartReference::Spec&,
+                                                  const ArcOffset&, const EndReference::Spec&) = &Builder::Connect;
     ON_CALL(*this,
-            Connect(_, _, An<const StartReference::Spec&>(),
-                    An<const ArcOffset&>(), An<const EndReference::Spec&>()))
+            Connect(_, _, An<const StartReference::Spec&>(), An<const ArcOffset&>(), An<const EndReference::Spec&>()))
         .WillByDefault(Invoke(&builder_, connect_arc_ref));
 
-    const Connection* (Builder::*connect_line_lane)(
-        const std::string&, const LaneLayout&, const StartLane::Spec&,
-        const LineOffset&, const EndLane::Spec&) = &Builder::Connect;
-    ON_CALL(*this, Connect(_, _, An<const StartLane::Spec&>(),
-                           An<const LineOffset&>(), An<const EndLane::Spec&>()))
+    const Connection* (Builder::*connect_line_lane)(const std::string&, const LaneLayout&, const StartLane::Spec&,
+                                                    const LineOffset&, const EndLane::Spec&) = &Builder::Connect;
+    ON_CALL(*this, Connect(_, _, An<const StartLane::Spec&>(), An<const LineOffset&>(), An<const EndLane::Spec&>()))
         .WillByDefault(Invoke(&builder_, connect_line_lane));
 
-    const Connection* (Builder::*connect_arc_lane)(
-        const std::string&, const LaneLayout&, const StartLane::Spec&,
-        const ArcOffset&, const EndLane::Spec&) = &Builder::Connect;
-    ON_CALL(*this, Connect(_, _, An<const StartLane::Spec&>(),
-                           An<const ArcOffset&>(), An<const EndLane::Spec&>()))
+    const Connection* (Builder::*connect_arc_lane)(const std::string&, const LaneLayout&, const StartLane::Spec&,
+                                                   const ArcOffset&, const EndLane::Spec&) = &Builder::Connect;
+    ON_CALL(*this, Connect(_, _, An<const StartLane::Spec&>(), An<const ArcOffset&>(), An<const EndLane::Spec&>()))
         .WillByDefault(Invoke(&builder_, connect_arc_lane));
 
-    ON_CALL(*this, SetDefaultBranch(_, _, _, _, _, _))
-        .WillByDefault(Invoke(&builder_, &Builder::SetDefaultBranch));
+    ON_CALL(*this, SetDefaultBranch(_, _, _, _, _, _)).WillByDefault(Invoke(&builder_, &Builder::SetDefaultBranch));
 
-    Group* (Builder::*make_empty_group)(const std::string&) =
-        &Builder::MakeGroup;
-    ON_CALL(*this, MakeGroup(_))
-        .WillByDefault(Invoke(&builder_, make_empty_group));
+    Group* (Builder::*make_empty_group)(const std::string&) = &Builder::MakeGroup;
+    ON_CALL(*this, MakeGroup(_)).WillByDefault(Invoke(&builder_, make_empty_group));
 
-    Group* (Builder::*make_filled_group)(
-        const std::string&, const std::vector<const Connection*>&) =
+    Group* (Builder::*make_filled_group)(const std::string&, const std::vector<const Connection*>&) =
         &Builder::MakeGroup;
-    ON_CALL(*this, MakeGroup(_, _))
-        .WillByDefault(Invoke(&builder_, make_filled_group));
+    ON_CALL(*this, MakeGroup(_, _)).WillByDefault(Invoke(&builder_, make_filled_group));
 
     ON_CALL(*this, Build(_)).WillByDefault(Invoke(&builder_, &Builder::Build));
   }
@@ -128,37 +106,26 @@ class BuilderMock : public BuilderBase {
 
   MOCK_CONST_METHOD0(get_computation_policy, ComputationPolicy());
 
-  MOCK_METHOD5(Connect,
-               const Connection*(const std::string&, const LaneLayout&,
-                                 const StartReference::Spec&, const LineOffset&,
-                                 const EndReference::Spec&));
+  MOCK_METHOD5(Connect, const Connection*(const std::string&, const LaneLayout&, const StartReference::Spec&,
+                                          const LineOffset&, const EndReference::Spec&));
 
-  MOCK_METHOD5(Connect,
-               const Connection*(const std::string&, const LaneLayout&,
-                                 const StartReference::Spec&, const ArcOffset&,
-                                 const EndReference::Spec&));
+  MOCK_METHOD5(Connect, const Connection*(const std::string&, const LaneLayout&, const StartReference::Spec&,
+                                          const ArcOffset&, const EndReference::Spec&));
 
-  MOCK_METHOD5(Connect,
-               const Connection*(const std::string&, const LaneLayout&,
-                                 const StartLane::Spec&, const LineOffset&,
-                                 const EndLane::Spec&));
+  MOCK_METHOD5(Connect, const Connection*(const std::string&, const LaneLayout&, const StartLane::Spec&,
+                                          const LineOffset&, const EndLane::Spec&));
 
-  MOCK_METHOD5(Connect,
-               const Connection*(const std::string&, const LaneLayout&,
-                                 const StartLane::Spec&, const ArcOffset&,
-                                 const EndLane::Spec&));
+  MOCK_METHOD5(Connect, const Connection*(const std::string&, const LaneLayout&, const StartLane::Spec&,
+                                          const ArcOffset&, const EndLane::Spec&));
 
-  MOCK_METHOD6(SetDefaultBranch,
-               void(const Connection*, int, const api::LaneEnd::Which,
-                    const Connection*, int, const api::LaneEnd::Which));
+  MOCK_METHOD6(SetDefaultBranch, void(const Connection*, int, const api::LaneEnd::Which, const Connection*, int,
+                                      const api::LaneEnd::Which));
 
   MOCK_METHOD1(MakeGroup, Group*(const std::string&));
 
-  MOCK_METHOD2(MakeGroup, Group*(const std::string&,
-                                     const std::vector<const Connection*>&));
+  MOCK_METHOD2(MakeGroup, Group*(const std::string&, const std::vector<const Connection*>&));
 
-  MOCK_CONST_METHOD1(Build, std::unique_ptr<const api::RoadGeometry>(
-                                const api::RoadGeometryId&));
+  MOCK_CONST_METHOD1(Build, std::unique_ptr<const api::RoadGeometry>(const api::RoadGeometryId&));
 
  private:
   Builder builder_;
@@ -171,18 +138,15 @@ class BuilderMock : public BuilderBase {
 // return nullptr.
 class BuilderFactoryMock : public BuilderFactoryBase {
  public:
-  explicit BuilderFactoryMock(std::unique_ptr<BuilderBase> builder_mock)
-      : builder_mock_(std::move(builder_mock)) {
-    ON_CALL(*this, Make(_, _, _, _, _, _))
-        .WillByDefault(Invoke(this, &BuilderFactoryMock::InternalMake));
+  explicit BuilderFactoryMock(std::unique_ptr<BuilderBase> builder_mock) : builder_mock_(std::move(builder_mock)) {
+    ON_CALL(*this, Make(_, _, _, _, _, _)).WillByDefault(Invoke(this, &BuilderFactoryMock::InternalMake));
   }
 
-  MOCK_CONST_METHOD6(Make, std::unique_ptr<BuilderBase>(
-      double, const api::HBounds&, double, double, double, ComputationPolicy));
+  MOCK_CONST_METHOD6(Make, std::unique_ptr<BuilderBase>(double, const api::HBounds&, double, double, double,
+                                                        ComputationPolicy));
 
   // Wraps GMock Return(value) given that std::unique_ptr is non-copiable.
-  std::unique_ptr<BuilderBase> InternalMake(double, const api::HBounds&, double,
-                                            double, double, ComputationPolicy) {
+  std::unique_ptr<BuilderBase> InternalMake(double, const api::HBounds&, double, double, double, ComputationPolicy) {
     return std::move(builder_mock_);
   }
 
@@ -200,8 +164,7 @@ class GroupMock : public Group {
   }
 
   // Creates a GroupMock whose ID is `id` and pre-filled with `connections`.
-  GroupMock(const std::string& id,
-            const std::vector<const Connection*>& connections) {
+  GroupMock(const std::string& id, const std::vector<const Connection*>& connections) {
     group_ = GroupFactory().Make(id, connections);
     Initialize();
   }
@@ -216,8 +179,7 @@ class GroupMock : public Group {
   // Initializes all mocked functions.
   void Initialize() {
     ON_CALL(*this, id()).WillByDefault(Invoke(group_.get(), &Group::id));
-    ON_CALL(*this, connections())
-        .WillByDefault(Invoke(group_.get(), &Group::connections));
+    ON_CALL(*this, connections()).WillByDefault(Invoke(group_.get(), &Group::connections));
     ON_CALL(*this, Add(_)).WillByDefault(Invoke(group_.get(), &Group::Add));
   }
 
@@ -233,38 +195,28 @@ class GroupMock : public Group {
 class GroupFactoryMock : public GroupFactoryBase {
  public:
   GroupFactoryMock() {
-    std::unique_ptr<Group> (GroupFactoryMock::*make_with_id)(
-        const std::string&) = &GroupFactoryMock::InternalMake;
-    ON_CALL(*this, Make(_))
-        .WillByDefault(Invoke(this, make_with_id));
+    std::unique_ptr<Group> (GroupFactoryMock::*make_with_id)(const std::string&) = &GroupFactoryMock::InternalMake;
+    ON_CALL(*this, Make(_)).WillByDefault(Invoke(this, make_with_id));
     std::unique_ptr<Group> (GroupFactoryMock::*make_with_id_connections)(
-        const std::string&,
-        const std::vector<const Connection*>& connections) =
-            &GroupFactoryMock::InternalMake;
-    ON_CALL(*this, Make(_, _))
-        .WillByDefault(Invoke(this, make_with_id_connections));
+        const std::string&, const std::vector<const Connection*>& connections) = &GroupFactoryMock::InternalMake;
+    ON_CALL(*this, Make(_, _)).WillByDefault(Invoke(this, make_with_id_connections));
   }
 
   MOCK_CONST_METHOD1(Make, std::unique_ptr<Group>(const std::string&));
 
-  MOCK_CONST_METHOD2(Make, std::unique_ptr<Group>(
-      const std::string&, const std::vector<const Connection*>&));
+  MOCK_CONST_METHOD2(Make, std::unique_ptr<Group>(const std::string&, const std::vector<const Connection*>&));
 
   // Returns a std::unique_ptr<Group> specialized to GroupMock whose id is
   // `id`.
   // When `id` does not refer to a previously set group, it returns nullptr.
-  std::unique_ptr<Group> InternalMake(const std::string& id) {
-    return InternalMake(id, {});
-  }
+  std::unique_ptr<Group> InternalMake(const std::string& id) { return InternalMake(id, {}); }
 
   // Returns a std::unique_ptr<Group> specialized to GroupMock whose id is
   // `id` and adds `connections` to it.
   // When `id` does not refer to a previously set group, it returns nullptr.
   // Otherwise, before the pointer is returned, a copy of the raw pointer is
   // held and can be queried later via get_group_by_id().
-  std::unique_ptr<Group> InternalMake(
-      const std::string& id,
-      const std::vector<const Connection*>& connections) {
+  std::unique_ptr<Group> InternalMake(const std::string& id, const std::vector<const Connection*>& connections) {
     auto it = group_map_.find(id);
     if (it != group_map_.end()) {
       auto group = std::move(it->second);
@@ -304,8 +256,7 @@ GTEST_TEST(MultilaneLoaderTest, MinimalCorrectYaml) {
   const double kZeroTolerance{0.};
   const double kLinearTolerance{0.01};
   const double kAngularTolerance{0.5 * M_PI / 180.};
-  const ComputationPolicy kComputationPolicy{
-    ComputationPolicy::kPreferAccuracy};
+  const ComputationPolicy kComputationPolicy{ComputationPolicy::kPreferAccuracy};
   const std::string kComputationPolicyStr{"prefer-accuracy"};
   const api::HBounds kElevationBounds{0., 5.};
   const std::string kMultilaneYaml = fmt::format(
@@ -323,20 +274,17 @@ GTEST_TEST(MultilaneLoaderTest, MinimalCorrectYaml) {
   connections: {{}}
   groups: {{}}
 )R",
-      kRoadName, kLaneWidth, kElevationBounds.min(), kElevationBounds.max(),
-      kScaleLength, kLinearTolerance, kAngularTolerance * 180. / M_PI,
-      kComputationPolicyStr);
+      kRoadName, kLaneWidth, kElevationBounds.min(), kElevationBounds.max(), kScaleLength, kLinearTolerance,
+      kAngularTolerance * 180. / M_PI, kComputationPolicyStr);
 
-  auto local_builder_mock = std::make_unique<BuilderMock>(
-      kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-      kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
+  auto local_builder_mock =
+      std::make_unique<BuilderMock>(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance, kScaleLength,
+                                    kComputationPolicy, std::make_unique<GroupFactory>());
   BuilderMock* builder_mock = local_builder_mock.get();
   BuilderFactoryMock builder_factory_mock(std::move(local_builder_mock));
 
-  EXPECT_CALL(builder_factory_mock,
-              Make(kLaneWidth, Matches(kElevationBounds, kZeroTolerance),
-                   kLinearTolerance, kAngularTolerance, kScaleLength,
-                   kComputationPolicy));
+  EXPECT_CALL(builder_factory_mock, Make(kLaneWidth, Matches(kElevationBounds, kZeroTolerance), kLinearTolerance,
+                                         kAngularTolerance, kScaleLength, kComputationPolicy));
 
   EXPECT_CALL(*builder_mock, Build(api::RoadGeometryId(kRoadName)));
 
@@ -344,8 +292,7 @@ GTEST_TEST(MultilaneLoaderTest, MinimalCorrectYaml) {
   // be called. That will transfer ownership of `builder_mock` to a local scope
   // variable inside `Load()`. As a consequence, that memory will be freed and
   // `builder_mock` must not be used anymore.
-  std::unique_ptr<const api::RoadGeometry> rg =
-      Load(builder_factory_mock, kMultilaneYaml);
+  std::unique_ptr<const api::RoadGeometry> rg = Load(builder_factory_mock, kMultilaneYaml);
   EXPECT_NE(rg, nullptr);
 }
 
@@ -387,8 +334,7 @@ GTEST_TEST(MultilaneLoaderTest, RoadCircuit) {
   const double kScaleLength{1.0};
   const double kLinearTolerance{0.01};
   const double kAngularTolerance{0.5 * M_PI / 180.};
-  const ComputationPolicy kComputationPolicy{
-      ComputationPolicy::kPreferAccuracy};
+  const ComputationPolicy kComputationPolicy{ComputationPolicy::kPreferAccuracy};
   const std::string kComputationPolicyStr{"prefer-accuracy"};
   const api::HBounds kElevationBounds{0., 5.};
   const int kRefLane{0};
@@ -493,18 +439,16 @@ GTEST_TEST(MultilaneLoaderTest, RoadCircuit) {
     g1: [s2, s5]
     g2: [s4, s8, s10]
 )R",
-      kRoadName, kLaneWidth, kDefaultLeftShoulder, kDefaultRightShoulder,
-      kElevationBounds.min(), kElevationBounds.max(), kScaleLength,
-      kLinearTolerance, kAngularTolerance * 180. / M_PI, kComputationPolicyStr,
+      kRoadName, kLaneWidth, kDefaultLeftShoulder, kDefaultRightShoulder, kElevationBounds.min(),
+      kElevationBounds.max(), kScaleLength, kLinearTolerance, kAngularTolerance * 180. / M_PI, kComputationPolicyStr,
       kCustomLeftShoulder, kCustomRightShoulder);
 
   auto local_group_factory = std::make_unique<GroupFactoryMock>();
   GroupFactoryMock* group_factory_mock = local_group_factory.get();
 
-  auto local_builder_mock = std::make_unique<BuilderMock>(
-      kLaneWidth, kElevationBounds, kLinearTolerance,
-      kAngularTolerance, kScaleLength, kComputationPolicy,
-      std::move(local_group_factory));
+  auto local_builder_mock =
+      std::make_unique<BuilderMock>(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance, kScaleLength,
+                                    kComputationPolicy, std::move(local_group_factory));
   BuilderMock* builder_mock = local_builder_mock.get();
 
   BuilderFactoryMock builder_factory_mock(std::move(local_builder_mock));
@@ -512,197 +456,147 @@ GTEST_TEST(MultilaneLoaderTest, RoadCircuit) {
   ExpectationSet prebuild_expectations;
 
   prebuild_expectations +=
-      EXPECT_CALL(builder_factory_mock,
-                  Make(kLaneWidth, Matches(kElevationBounds, kZeroTolerance),
-                       kLinearTolerance, kAngularTolerance, kScaleLength,
-                       kComputationPolicy));
+      EXPECT_CALL(builder_factory_mock, Make(kLaneWidth, Matches(kElevationBounds, kZeroTolerance), kLinearTolerance,
+                                             kAngularTolerance, kScaleLength, kComputationPolicy));
 
   // Connection expectations.
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect("s1",
-              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                 kThreeLanes, kRefLane, kZeroRRef),
+              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kThreeLanes, kRefLane, kZeroRRef),
                       kZeroTolerance),
-              Matches(StartReference().at(kEndpointA, Direction::kForward),
-                      kLinearTolerance, kAngularTolerance),
+              Matches(StartReference().at(kEndpointA, Direction::kForward), kLinearTolerance, kAngularTolerance),
               Matches(LineOffset(50), kZeroTolerance),
-              Matches(EndReference().z_at(kFlatZ, Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
+              Matches(EndReference().z_at(kFlatZ, Direction::kForward), kLinearTolerance, kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect(
-          "s2", Matches(LaneLayout(kCustomLeftShoulder, kDefaultRightShoulder,
-                                   kOneLane, kRefLane, kZeroRRef),
-                        kZeroTolerance),
-          Matches(StartLane(0).at({{50., 10., 0.}, kFlatZWithoutThetaDot},
-                                  Direction::kForward),
-                  kLinearTolerance, kAngularTolerance),
+          "s2",
+          Matches(LaneLayout(kCustomLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
+                  kZeroTolerance),
+          Matches(StartLane(0).at({{50., 10., 0.}, kFlatZWithoutThetaDot}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance),
           Matches(ArcOffset(10., M_PI), kLinearTolerance, kAngularTolerance),
-          Matches(EndLane(0).z_at(kFlatZWithoutThetaDot, Direction::kForward),
-                  kLinearTolerance, kAngularTolerance)));
+          Matches(EndLane(0).z_at(kFlatZWithoutThetaDot, Direction::kForward), kLinearTolerance, kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect(
-          "s3", Matches(LaneLayout(kDefaultLeftShoulder, kCustomRightShoulder,
-                                   kOneLane, kRefLane, kZeroRRef),
-                        kZeroTolerance),
-          Matches(StartLane(0).at({{50., 30., M_PI}, kFlatZWithoutThetaDot},
-                                  Direction::kForward),
-                  kLinearTolerance, kAngularTolerance),
+          "s3",
+          Matches(LaneLayout(kDefaultLeftShoulder, kCustomRightShoulder, kOneLane, kRefLane, kZeroRRef),
+                  kZeroTolerance),
+          Matches(StartLane(0).at({{50., 30., M_PI}, kFlatZWithoutThetaDot}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance),
           Matches(LineOffset(50), kZeroTolerance),
-          Matches(EndLane(0).z_at(kFlatZWithoutThetaDot, Direction::kForward),
-                  kLinearTolerance, kAngularTolerance)));
+          Matches(EndLane(0).z_at(kFlatZWithoutThetaDot, Direction::kForward), kLinearTolerance, kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect(
-          "s4", Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                   kOneLane, kRefLane, 10.),
-                        kZeroTolerance),
-          Matches(StartLane(0).at({{0., 30., M_PI}, kFlatZWithoutThetaDot},
-                                  Direction::kForward),
-                  kLinearTolerance, kAngularTolerance),
+          "s4",
+          Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, 10.), kZeroTolerance),
+          Matches(StartLane(0).at({{0., 30., M_PI}, kFlatZWithoutThetaDot}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance),
           Matches(ArcOffset(20., M_PI), kLinearTolerance, kAngularTolerance),
-          Matches(EndLane(0).z_at(kFlatZWithoutThetaDot, Direction::kForward),
-                  kLinearTolerance, kAngularTolerance)));
+          Matches(EndLane(0).z_at(kFlatZWithoutThetaDot, Direction::kForward), kLinearTolerance, kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect(
-          "s5", Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                   kTwoLanes, kRefLane, -5.),
-                        kZeroTolerance),
-          Matches(StartReference().at(kEndpointB, Direction::kForward),
-                  kLinearTolerance, kAngularTolerance),
+          "s5",
+          Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kTwoLanes, kRefLane, -5.), kZeroTolerance),
+          Matches(StartReference().at(kEndpointB, Direction::kForward), kLinearTolerance, kAngularTolerance),
           Matches(ArcOffset(20., -M_PI), kLinearTolerance, kAngularTolerance),
-          Matches(
-              EndReference().z_at(kFlatZWithoutThetaDot, Direction::kForward),
-              kLinearTolerance, kAngularTolerance)));
+          Matches(EndReference().z_at(kFlatZWithoutThetaDot, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect(
-          "s6", Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                   kTwoLanes, kRefLane, -5.),
-                        kZeroTolerance),
-          Matches(
-              StartReference().at({{50., -35., -M_PI}, kFlatZWithoutThetaDot},
-                                  Direction::kForward),
-              kLinearTolerance, kAngularTolerance),
+          "s6",
+          Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kTwoLanes, kRefLane, -5.), kZeroTolerance),
+          Matches(StartReference().at({{50., -35., -M_PI}, kFlatZWithoutThetaDot}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
           Matches(LineOffset(50), kZeroTolerance),
-          Matches(
-              EndReference().z_at(kFlatZWithoutThetaDot, Direction::kForward),
-              kLinearTolerance, kAngularTolerance)));
+          Matches(EndReference().z_at(kFlatZWithoutThetaDot, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect(
-          "s7", Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                   kTwoLanes, kRefLane, -5.),
-                        kZeroTolerance),
-          Matches(
-              StartReference().at({{0., -35., -M_PI}, kFlatZWithoutThetaDot},
-                                  Direction::kForward),
-              kLinearTolerance, kAngularTolerance),
-          Matches(ArcOffset(20., -M_PI), kLinearTolerance, kAngularTolerance),
-          Matches(
-              EndReference().z_at(kFlatZWithoutThetaDot, Direction::kForward),
-              kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect(
-          "s8", Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                   kOneLane, kRefLane, kZeroRRef),
-                        kZeroTolerance),
-          Matches(
-              StartLane(0).at({{0., -35., -M_PI}, kFlatZWithoutThetaDot},
-                                  Direction::kForward),
-              kLinearTolerance, kAngularTolerance),
-          Matches(ArcOffset(20., M_PI / 2.), kLinearTolerance,
-                  kAngularTolerance),
-          Matches(EndLane(0).z_at({5., 1., 0.523, {}}, Direction::kForward),
-                  kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect(
-          "s9", Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                   kOneLane, kRefLane, kZeroRRef),
-                        kZeroTolerance),
-          Matches(StartLane(0).at(
-                      {{-20., -55., -M_PI / 2.}, {5., 1., 0.523, {}}},
-                      Direction::kForward),
+          "s7",
+          Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kTwoLanes, kRefLane, -5.), kZeroTolerance),
+          Matches(StartReference().at({{0., -35., -M_PI}, kFlatZWithoutThetaDot}, Direction::kForward),
                   kLinearTolerance, kAngularTolerance),
-          Matches(ArcOffset(20., M_PI / 2.), kLinearTolerance,
-                  kAngularTolerance),
-          Matches(
-              EndLane(0).z_at({10., 0., 0.523, {}}, Direction::kForward),
-              kLinearTolerance, kAngularTolerance)));
+          Matches(ArcOffset(20., -M_PI), kLinearTolerance, kAngularTolerance),
+          Matches(EndReference().z_at(kFlatZWithoutThetaDot, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect("s8",
+              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
+                      kZeroTolerance),
+              Matches(StartLane(0).at({{0., -35., -M_PI}, kFlatZWithoutThetaDot}, Direction::kForward),
+                      kLinearTolerance, kAngularTolerance),
+              Matches(ArcOffset(20., M_PI / 2.), kLinearTolerance, kAngularTolerance),
+              Matches(EndLane(0).z_at({5., 1., 0.523, {}}, Direction::kForward), kLinearTolerance, kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect(
+          "s9",
+          Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
+                  kZeroTolerance),
+          Matches(StartLane(0).at({{-20., -55., -M_PI / 2.}, {5., 1., 0.523, {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(ArcOffset(20., M_PI / 2.), kLinearTolerance, kAngularTolerance),
+          Matches(EndLane(0).z_at({10., 0., 0.523, {}}, Direction::kForward), kLinearTolerance, kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect("s10",
-              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                 kOneLane, kRefLane, kZeroRRef),
+              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
                       kZeroTolerance),
-              Matches(StartLane(0).at({{0, -75., 0}, {10., 0., 0.523, {}}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance),
-              Matches(ArcOffset(20., M_PI / 2.), kLinearTolerance,
+              Matches(StartLane(0).at({{0, -75., 0}, {10., 0., 0.523, {}}}, Direction::kForward), kLinearTolerance,
                       kAngularTolerance),
-              Matches(EndLane(0).z_at(kElevatedZWithoutThetaDot,
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
+              Matches(ArcOffset(20., M_PI / 2.), kLinearTolerance, kAngularTolerance),
+              Matches(EndLane(0).z_at(kElevatedZWithoutThetaDot, Direction::kForward), kLinearTolerance,
+                      kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
-      Connect(
-          "s11", Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                    kOneLane, kRefLane, kZeroRRef),
-                         kZeroTolerance),
-          Matches(StartReference().at(
-                      {{20., -55., M_PI / 2.}, kElevatedZWithoutThetaDot},
-                      Direction::kForward),
-                  kLinearTolerance, kAngularTolerance),
-          Matches(ArcOffset(20., M_PI / 2.), kLinearTolerance,
-                  kAngularTolerance),
-          Matches(
-              EndReference().z_at(kFlatZWithoutThetaDot, Direction::kReverse),
-              kLinearTolerance, kAngularTolerance)));
+      Connect("s11",
+              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
+                      kZeroTolerance),
+              Matches(StartReference().at({{20., -55., M_PI / 2.}, kElevatedZWithoutThetaDot}, Direction::kForward),
+                      kLinearTolerance, kAngularTolerance),
+              Matches(ArcOffset(20., M_PI / 2.), kLinearTolerance, kAngularTolerance),
+              Matches(EndReference().z_at(kFlatZWithoutThetaDot, Direction::kReverse), kLinearTolerance,
+                      kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect("s12",
-              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                 kOneLane, kRefLane, kZeroRRef),
+              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
                       kZeroTolerance),
-              Matches(StartReference().at(
-                          {{20., -55., M_PI / 2.}, kElevatedZWithoutThetaDot},
-                          Direction::kForward),
+              Matches(StartReference().at({{20., -55., M_PI / 2.}, kElevatedZWithoutThetaDot}, Direction::kForward),
                       kLinearTolerance, kAngularTolerance),
               Matches(LineOffset(30.), kZeroTolerance),
-              Matches(EndReference().z_at(kElevatedZWithoutThetaDot,
-                                          Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
+              Matches(EndReference().z_at(kElevatedZWithoutThetaDot, Direction::kForward), kLinearTolerance,
+                      kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect(
-          "s13", Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                    kOneLane, kRefLane, kZeroRRef),
-                         kZeroTolerance),
-          Matches(StartLane(0).at(
-                      {{20., -25., M_PI / 2.}, kElevatedZWithoutThetaDot},
-                      Direction::kForward),
+          "s13",
+          Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
+                  kZeroTolerance),
+          Matches(StartLane(0).at({{20., -25., M_PI / 2.}, kElevatedZWithoutThetaDot}, Direction::kForward),
                   kLinearTolerance, kAngularTolerance),
           Matches(LineOffset(15.), kZeroTolerance),
-          Matches(
-              EndLane(0).z_at(kFlatZWithoutThetaDot, Direction::kForward),
-              kLinearTolerance, kAngularTolerance)));
+          Matches(EndLane(0).z_at(kFlatZWithoutThetaDot, Direction::kForward), kLinearTolerance, kAngularTolerance)));
 
   // Group expectations.
   prebuild_expectations += EXPECT_CALL(*builder_mock, MakeGroup("g1"));
@@ -712,36 +606,30 @@ GTEST_TEST(MultilaneLoaderTest, RoadCircuit) {
   group_factory_mock->add_group(std::make_unique<GroupMock>("g1"));
   group_factory_mock->add_group(std::make_unique<GroupMock>("g2"));
 
-  GroupMock* g1 =
-      dynamic_cast<GroupMock*>(group_factory_mock->get_group_by_id("g1"));
+  GroupMock* g1 = dynamic_cast<GroupMock*>(group_factory_mock->get_group_by_id("g1"));
   EXPECT_NE(g1, nullptr);
-  GroupMock* g2 =
-      dynamic_cast<GroupMock*>(group_factory_mock->get_group_by_id("g2"));
+  GroupMock* g2 = dynamic_cast<GroupMock*>(group_factory_mock->get_group_by_id("g2"));
   EXPECT_NE(g2, nullptr);
 
   prebuild_expectations += EXPECT_CALL(*group_factory_mock, Make("g1"));
-  prebuild_expectations +=
-      EXPECT_CALL(*g1, Add(An<const Connection*>())).Times(2);
+  prebuild_expectations += EXPECT_CALL(*g1, Add(An<const Connection*>())).Times(2);
   EXPECT_CALL(*g1, id()).Times(AtLeast(1));
   EXPECT_CALL(*g1, connections()).Times(AtLeast(1));
 
   prebuild_expectations += EXPECT_CALL(*group_factory_mock, Make("g2"));
-  prebuild_expectations +=
-      EXPECT_CALL(*g2, Add(An<const Connection*>())).Times(3);
+  prebuild_expectations += EXPECT_CALL(*g2, Add(An<const Connection*>())).Times(3);
   EXPECT_CALL(*g2, id()).Times(AtLeast(1));
   EXPECT_CALL(*g2, connections()).Times(AtLeast(1));
 
   // Build expectation.
-  EXPECT_CALL(*builder_mock, Build(api::RoadGeometryId(kRoadName)))
-      .After(prebuild_expectations);
+  EXPECT_CALL(*builder_mock, Build(api::RoadGeometryId(kRoadName))).After(prebuild_expectations);
 
   // At some point inside this function, `builder_factory_mock.Make()` will
   // be called. That will transfer ownership of `builder_mock` to a local scope
   // variable inside `Load()`. As a consequence, that memory will be freed and
   // `builder_mock` must not be used anymore. The same applies to local
   // GroupMock objects.
-  std::unique_ptr<const api::RoadGeometry> rg =
-      Load(builder_factory_mock, std::string(kMultilaneYaml));
+  std::unique_ptr<const api::RoadGeometry> rg = Load(builder_factory_mock, std::string(kMultilaneYaml));
   EXPECT_NE(rg, nullptr);
 }
 
@@ -754,8 +642,7 @@ GTEST_TEST(MultilaneLoaderTest, ContinuityConstraintOnReference) {
   const double kLinearTolerance{0.01};
   const double kAngularTolerance{0.5 * M_PI / 180.};
   const double kScaleLength{1.0};
-  const ComputationPolicy kComputationPolicy{
-      ComputationPolicy::kPreferAccuracy};
+  const ComputationPolicy kComputationPolicy{ComputationPolicy::kPreferAccuracy};
   const std::string kPreferAccuracyStr{"prefer-accuracy"};
   const api::HBounds kElevationBounds{0., 5.};
   const int kRefLane{0};
@@ -792,13 +679,12 @@ GTEST_TEST(MultilaneLoaderTest, ContinuityConstraintOnReference) {
       length: 100
       z_end: ["ref", [-7.5, -0.75, 30]]
 )R",
-      kRoadName, kLaneWidth, kDefaultLeftShoulder, kDefaultRightShoulder,
-      kElevationBounds.min(), kElevationBounds.max(), kLinearTolerance,
-      kAngularTolerance * 180 / M_PI, kScaleLength, kPreferAccuracyStr);
+      kRoadName, kLaneWidth, kDefaultLeftShoulder, kDefaultRightShoulder, kElevationBounds.min(),
+      kElevationBounds.max(), kLinearTolerance, kAngularTolerance * 180 / M_PI, kScaleLength, kPreferAccuracyStr);
 
-  auto local_builder_mock = std::make_unique<BuilderMock>(
-      kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
-      kScaleLength, kComputationPolicy, std::make_unique<GroupFactory>());
+  auto local_builder_mock =
+      std::make_unique<BuilderMock>(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance, kScaleLength,
+                                    kComputationPolicy, std::make_unique<GroupFactory>());
   BuilderMock* builder_mock = local_builder_mock.get();
 
   BuilderFactoryMock builder_factory_mock(std::move(local_builder_mock));
@@ -808,49 +694,39 @@ GTEST_TEST(MultilaneLoaderTest, ContinuityConstraintOnReference) {
   Matcher<const api::HBounds&> hbounds_matcher =
       MakeMatcher(new test::HBoundsMatcher(kElevationBounds, kZeroTolerance));
   prebuild_expectations +=
-      EXPECT_CALL(builder_factory_mock,
-                  Make(kLaneWidth, Matches(kElevationBounds, kZeroTolerance),
-                       kLinearTolerance, kAngularTolerance, kScaleLength,
-                       kComputationPolicy));
+      EXPECT_CALL(builder_factory_mock, Make(kLaneWidth, Matches(kElevationBounds, kZeroTolerance), kLinearTolerance,
+                                             kAngularTolerance, kScaleLength, kComputationPolicy));
 
   // Connection expectations.
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
       Connect("spiral",
-              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                 kOneLane, kRefLane, kZeroRRef),
+              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
                       kZeroTolerance),
-              Matches(StartReference().at(kOrigin, Direction::kForward),
-                      kLinearTolerance, kAngularTolerance),
+              Matches(StartReference().at(kOrigin, Direction::kForward), kLinearTolerance, kAngularTolerance),
               Matches(ArcOffset(10., M_PI), kZeroTolerance, kAngularTolerance),
-              Matches(EndReference().z_at(kZEndSpiral, Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
+              Matches(EndReference().z_at(kZEndSpiral, Direction::kForward), kLinearTolerance, kAngularTolerance)));
 
   // EndpointXy is reversed and EndpointZ is reversed and theta_dot cleared.
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
-      Connect("line",
-              Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder,
-                                 kOneLane, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartReference().at({kXYOrigin.reverse(),
-                                           {0., -0.75, 30. * M_PI / 180., {}}},
-                                          Direction::kForward),
-                      kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(100.), kLinearTolerance),
-              Matches(EndReference().z_at({-7.5, -0.75, 30. * M_PI / 180., {}},
-                                          Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
+      Connect(
+          "line",
+          Matches(LaneLayout(kDefaultLeftShoulder, kDefaultRightShoulder, kOneLane, kRefLane, kZeroRRef),
+                  kZeroTolerance),
+          Matches(StartReference().at({kXYOrigin.reverse(), {0., -0.75, 30. * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(LineOffset(100.), kLinearTolerance),
+          Matches(EndReference().z_at({-7.5, -0.75, 30. * M_PI / 180., {}}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
 
-  EXPECT_CALL(*builder_mock, Build(api::RoadGeometryId("spir")))
-      .After(prebuild_expectations);
+  EXPECT_CALL(*builder_mock, Build(api::RoadGeometryId("spir"))).After(prebuild_expectations);
 
   // At some point inside this function, `builder_factory_mock.Make()` will
   // be called. That will transfer ownership of `builder_mock` to a local scope
   // variable inside `Load()`. As a consequence, that memory will be freed and
   // `builder_mock` must not be used anymore.
-  std::unique_ptr<const api::RoadGeometry> rg =
-      Load(builder_factory_mock, std::string(kMultilaneYaml));
+  std::unique_ptr<const api::RoadGeometry> rg = Load(builder_factory_mock, std::string(kMultilaneYaml));
   EXPECT_NE(rg, nullptr);
 }
 
@@ -921,8 +797,7 @@ GTEST_TEST(MultilaneLoaderTest, FunkyRoadCircuit) {
   const double kScaleLength{1.0};
   const double kLinearTolerance{0.01};
   const double kAngularTolerance{0.5 * M_PI / 180.};
-  const ComputationPolicy kComputationPolicy{
-      ComputationPolicy::kPreferAccuracy};
+  const ComputationPolicy kComputationPolicy{ComputationPolicy::kPreferAccuracy};
   const std::string kComputationPolicyStr{"prefer-accuracy"};
   const api::HBounds kElevationBounds{0., 5.};
   const int kRefLane{0};
@@ -1060,17 +935,15 @@ GTEST_TEST(MultilaneLoaderTest, FunkyRoadCircuit) {
     g1: [s1, s2, s3, s4, s5, s6]
     g2: [s7, s8, s9, s10, s11, s12]
 )R",
-      kRoadName, kLaneWidth, kLeftShoulder, kRightShoulder,
-      kElevationBounds.min(), kElevationBounds.max(), kScaleLength,
-      kLinearTolerance, kAngularTolerance * 180. / M_PI, kComputationPolicyStr);
+      kRoadName, kLaneWidth, kLeftShoulder, kRightShoulder, kElevationBounds.min(), kElevationBounds.max(),
+      kScaleLength, kLinearTolerance, kAngularTolerance * 180. / M_PI, kComputationPolicyStr);
 
   auto local_group_factory = std::make_unique<GroupFactoryMock>();
   GroupFactoryMock* group_factory_mock = local_group_factory.get();
 
-  auto local_builder_mock = std::make_unique<BuilderMock>(
-      kLaneWidth, kElevationBounds, kLinearTolerance,
-      kAngularTolerance, kScaleLength, kComputationPolicy,
-      std::move(local_group_factory));
+  auto local_builder_mock =
+      std::make_unique<BuilderMock>(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance, kScaleLength,
+                                    kComputationPolicy, std::move(local_group_factory));
   BuilderMock* builder_mock = local_builder_mock.get();
 
   BuilderFactoryMock builder_factory_mock(std::move(local_builder_mock));
@@ -1078,10 +951,8 @@ GTEST_TEST(MultilaneLoaderTest, FunkyRoadCircuit) {
   ExpectationSet prebuild_expectations;
 
   prebuild_expectations +=
-      EXPECT_CALL(builder_factory_mock,
-                  Make(kLaneWidth, Matches(kElevationBounds, kZeroTolerance),
-                       kLinearTolerance, kAngularTolerance, kScaleLength,
-                       kComputationPolicy));
+      EXPECT_CALL(builder_factory_mock, Make(kLaneWidth, Matches(kElevationBounds, kZeroTolerance), kLinearTolerance,
+                                             kAngularTolerance, kScaleLength, kComputationPolicy));
 
   // Connection expectations. In the following, we check that:
   //
@@ -1097,215 +968,153 @@ GTEST_TEST(MultilaneLoaderTest, FunkyRoadCircuit) {
   //     having the same values as their yaml counterparts.
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
-      Connect("s0",
-              Matches(LaneLayout(kLeftShoulder, kRightShoulder,
-                                 kSixLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartReference().at(kEndpointA, Direction::kForward),
-                      kLinearTolerance, kAngularTolerance),
+      Connect("s0", Matches(LaneLayout(kLeftShoulder, kRightShoulder, kSixLanes, kRefLane, kZeroRRef), kZeroTolerance),
+              Matches(StartReference().at(kEndpointA, Direction::kForward), kLinearTolerance, kAngularTolerance),
               Matches(LineOffset(10.), kZeroTolerance),
-              Matches(EndReference().z_at(kFlatZWithoutThetaDot,
-                                          Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
+              Matches(EndReference().z_at(kFlatZWithoutThetaDot, Direction::kForward), kLinearTolerance,
+                      kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock, Connect("s1",
+                             Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef),
+                                     kZeroTolerance),
+                             Matches(StartLane(0).at({{10., 20., 0.}, kFlatZWithoutThetaDot}, Direction::kForward),
+                                     kLinearTolerance, kAngularTolerance),
+                             Matches(LineOffset(20.), kZeroTolerance),
+                             Matches(EndLane(0).z_at({-10., 0., 7.5 * M_PI / 180., {}}, Direction::kForward),
+                                     kLinearTolerance, kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
-      Connect("s1",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at({{10., 20., 0.}, kFlatZWithoutThetaDot},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(20.), kZeroTolerance),
-              Matches(EndLane(0).z_at({-10., 0., 7.5 * M_PI / 180., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
+      Connect(
+          "s2",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{30., 20., 0.}, {-10., 0., 7.5 * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(LineOffset(10.), kZeroTolerance),
+          Matches(EndLane(0).z_at({-10., 0., 5. * M_PI / 180., {}}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
-      Connect("s2",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{30., 20., 0.}, {-10., 0., 7.5 * M_PI / 180., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
+      Connect(
+          "s3",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{40., 20., 0.}, {-10., 0., 5. * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(ArcOffset(7.5, -90. * M_PI / 180.), kLinearTolerance, kAngularTolerance),
+          Matches(EndLane(0).z_at({-10., 0., 0., {}}, Direction::kForward), kLinearTolerance, kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect(
+          "s4",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{47.5, 12.5, -90. * M_PI / 180.}, {-10., 0., 0., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(ArcOffset(12.5, 90. * M_PI / 180.), kLinearTolerance, kAngularTolerance),
+          Matches(EndLane(0).z_at({-10., 0., -5. * M_PI / 180., {}}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect(
+          "s5",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{60., 0., 0.}, {-10., 0., -5. * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(LineOffset(10.), kLinearTolerance),
+          Matches(EndLane(0).z_at({-10., 0., -7.5 * M_PI / 180., {}}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect(
+          "s6",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{70., 0., 0.}, {-10., 0., -7.5 * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(LineOffset(20), kZeroTolerance),
+          Matches(EndLane(0).z_at({2., 0.2, 0., {}}, Direction::kReverse), kLinearTolerance, kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock, Connect("s7",
+                             Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef),
+                                     kZeroTolerance),
+                             Matches(StartLane(0).at({{10., 0., 0.}, kFlatZWithoutThetaDot}, Direction::kForward),
+                                     kLinearTolerance, kAngularTolerance),
+                             Matches(LineOffset(20.), kLinearTolerance),
+                             Matches(EndLane(0).z_at({10., 0., -7.5 * M_PI / 180., {}}, Direction::kForward),
+                                     kLinearTolerance, kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect(
+          "s8",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{30., 0., 0.}, {10., 0., -7.5 * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(LineOffset(10.), kLinearTolerance),
+          Matches(EndLane(0).z_at({10., 0., -5 * M_PI / 180., {}}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect(
+          "s9",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{40., 0., 0.}, {10., 0., -5 * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(ArcOffset(12.5, 90. * M_PI / 180.), kLinearTolerance, kAngularTolerance),
+          Matches(EndLane(0).z_at({10., 0., 0., {}}, Direction::kForward), kLinearTolerance, kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock, Connect("s10",
+                             Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef),
+                                     kZeroTolerance),
+                             Matches(StartLane(0).at({{52.5, 12.5, M_PI / 2.}, {10., 0., 0., {}}}, Direction::kForward),
+                                     kLinearTolerance, kAngularTolerance),
+                             Matches(ArcOffset(7.5, -90. * M_PI / 180.), kLinearTolerance, kAngularTolerance),
+                             Matches(EndLane(0).z_at({10., 0., 5. * M_PI / 180., {}}, Direction::kForward),
+                                     kLinearTolerance, kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect(
+          "s11",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{60., 20., 0.}, {10., 0., 5. * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(LineOffset(10.), kLinearTolerance),
+          Matches(EndLane(0).z_at({10., 0., 7.5 * M_PI / 180., {}}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect(
+          "s12",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{70., 20., 0.}, {10., 0., 7.5 * M_PI / 180., {}}}, Direction::kForward),
+                  kLinearTolerance, kAngularTolerance),
+          Matches(LineOffset(20.), kZeroTolerance),
+          Matches(EndLane(0).z_at({2., 0.2, 0., {}}, Direction::kReverse), kLinearTolerance, kAngularTolerance)));
+
+  prebuild_expectations += EXPECT_CALL(
+      *builder_mock,
+      Connect("s13", Matches(LaneLayout(kLeftShoulder, kRightShoulder, kSixLanes, kRefLane, kZeroRRef), kZeroTolerance),
+              Matches(StartLane(5).at(kEndpointB, Direction::kReverse), kLinearTolerance, kAngularTolerance),
               Matches(LineOffset(10.), kZeroTolerance),
-              Matches(EndLane(0).z_at({-10., 0., 5. * M_PI / 180., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
+              Matches(EndLane(5).z_at({2., 0.2, 0., {}}, Direction::kForward), kLinearTolerance, kAngularTolerance)));
 
   prebuild_expectations += EXPECT_CALL(
       *builder_mock,
-      Connect("s3",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{40., 20., 0.}, {-10., 0., 5. * M_PI / 180., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(ArcOffset(7.5, -90. * M_PI / 180.),
-                      kLinearTolerance, kAngularTolerance),
-              Matches(EndLane(0).z_at({-10., 0., 0., {}}, Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s4",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{47.5, 12.5, -90. * M_PI / 180.}, {-10., 0., 0., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(ArcOffset(12.5, 90. * M_PI / 180.),
-                      kLinearTolerance, kAngularTolerance),
-              Matches(EndLane(0).z_at({-10., 0., -5. * M_PI / 180., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s5",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{60., 0., 0.}, {-10., 0., -5. * M_PI / 180., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(10.), kLinearTolerance),
-              Matches(EndLane(0).z_at({-10., 0., -7.5 * M_PI / 180., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s6",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{70., 0., 0.}, {-10., 0., -7.5 * M_PI / 180., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(20), kZeroTolerance),
-              Matches(EndLane(0).z_at({2., 0.2, 0., {}},
-                                      Direction::kReverse),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s7",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at({{10., 0., 0.}, kFlatZWithoutThetaDot},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(20.), kLinearTolerance),
-              Matches(EndLane(0).z_at({10., 0., -7.5 * M_PI / 180., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s8",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{30., 0., 0.}, {10., 0., -7.5 * M_PI / 180., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(10.), kLinearTolerance),
-              Matches(EndLane(0).z_at({10., 0., -5 * M_PI / 180., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s9",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{40., 0., 0.}, {10., 0., -5 * M_PI / 180., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(ArcOffset(12.5, 90. * M_PI / 180.), kLinearTolerance,
-                      kAngularTolerance),
-              Matches(EndLane(0).z_at({10., 0., 0., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s10",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{52.5, 12.5, M_PI / 2.}, {10., 0., 0., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(ArcOffset(7.5, -90. * M_PI / 180.), kLinearTolerance,
-                      kAngularTolerance),
-              Matches(EndLane(0).z_at({10., 0., 5. * M_PI / 180., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s11",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{60., 20., 0.}, {10., 0., 5. * M_PI / 180., {}}},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(10.), kLinearTolerance),
-              Matches(
-                  EndLane(0).z_at({10., 0., 7.5 * M_PI / 180., {}},
-                                  Direction::kForward),
-                  kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s12",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{70., 20., 0.}, {10., 0., 7.5 * M_PI / 180., {}}},
-              Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(20.), kZeroTolerance),
-              Matches(EndLane(0).z_at({2., 0.2, 0., {}},
-                                      Direction::kReverse),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s13",
-              Matches(LaneLayout(kLeftShoulder, kRightShoulder,
-                                 kSixLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(5).at(kEndpointB, Direction::kReverse),
-                      kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(10.), kZeroTolerance),
-              Matches(EndLane(5).z_at({2., 0.2, 0., {}},
-                                      Direction::kForward),
-                      kLinearTolerance, kAngularTolerance)));
-
-  prebuild_expectations += EXPECT_CALL(
-      *builder_mock,
-      Connect("s14",
-              Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder,
-                                 kTwoLanes, kRefLane, kZeroRRef),
-                      kZeroTolerance),
-              Matches(StartLane(0).at(
-                  {{10., 10., 0.}, kFlatZWithoutThetaDot},
-                  Direction::kForward), kLinearTolerance, kAngularTolerance),
-              Matches(LineOffset(80.), kZeroTolerance),
-              Matches(EndLane(0).z_at({2., 0.2, 0., {}},
-                                      Direction::kReverse),
-                      kLinearTolerance, kAngularTolerance)));
+      Connect(
+          "s14",
+          Matches(LaneLayout(kZeroLeftShoulder, kZeroRightShoulder, kTwoLanes, kRefLane, kZeroRRef), kZeroTolerance),
+          Matches(StartLane(0).at({{10., 10., 0.}, kFlatZWithoutThetaDot}, Direction::kForward), kLinearTolerance,
+                  kAngularTolerance),
+          Matches(LineOffset(80.), kZeroTolerance),
+          Matches(EndLane(0).z_at({2., 0.2, 0., {}}, Direction::kReverse), kLinearTolerance, kAngularTolerance)));
 
   // Group expectations. In the following we check that:
   //
@@ -1319,37 +1128,30 @@ GTEST_TEST(MultilaneLoaderTest, FunkyRoadCircuit) {
   group_factory_mock->add_group(std::make_unique<GroupMock>("g1"));
   group_factory_mock->add_group(std::make_unique<GroupMock>("g2"));
 
-  GroupMock* g1 =
-      dynamic_cast<GroupMock*>(group_factory_mock->get_group_by_id("g1"));
+  GroupMock* g1 = dynamic_cast<GroupMock*>(group_factory_mock->get_group_by_id("g1"));
   EXPECT_NE(g1, nullptr);
-  GroupMock* g2 =
-      dynamic_cast<GroupMock*>(group_factory_mock->get_group_by_id("g2"));
+  GroupMock* g2 = dynamic_cast<GroupMock*>(group_factory_mock->get_group_by_id("g2"));
   EXPECT_NE(g2, nullptr);
 
   prebuild_expectations += EXPECT_CALL(*group_factory_mock, Make("g1"));
-  prebuild_expectations +=
-      EXPECT_CALL(*g1, Add(An<const Connection*>())).Times(6);
+  prebuild_expectations += EXPECT_CALL(*g1, Add(An<const Connection*>())).Times(6);
   EXPECT_CALL(*g1, id()).Times(AtLeast(1));
   EXPECT_CALL(*g1, connections()).Times(AtLeast(1));
 
   prebuild_expectations += EXPECT_CALL(*group_factory_mock, Make("g2"));
-  prebuild_expectations +=
-      EXPECT_CALL(*g2, Add(An<const Connection*>())).Times(6);
+  prebuild_expectations += EXPECT_CALL(*g2, Add(An<const Connection*>())).Times(6);
   EXPECT_CALL(*g2, id()).Times(AtLeast(1));
   EXPECT_CALL(*g2, connections()).Times(AtLeast(1));
 
-  EXPECT_CALL(*builder_mock, Build(api::RoadGeometryId(kRoadName)))
-      .After(prebuild_expectations);
+  EXPECT_CALL(*builder_mock, Build(api::RoadGeometryId(kRoadName))).After(prebuild_expectations);
 
   // At some point inside this function, `builder_factory_mock.Make()` will
   // be called. That will transfer ownership of `builder_mock` to a local scope
   // variable inside `Load()`. As a consequence, that memory will be freed and
   // `builder_mock` must not be used anymore.
-  std::unique_ptr<const api::RoadGeometry> rg =
-      Load(builder_factory_mock, std::string(kMultilaneYaml));
+  std::unique_ptr<const api::RoadGeometry> rg = Load(builder_factory_mock, std::string(kMultilaneYaml));
   EXPECT_NE(rg, nullptr);
 }
-
 
 }  // namespace
 }  // namespace multilane

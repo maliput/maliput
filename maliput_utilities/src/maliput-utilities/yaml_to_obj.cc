@@ -18,23 +18,18 @@
 
 #include "yaml-cpp/yaml.h"
 
-DEFINE_string(yaml_file, "",
-              "yaml input file defining a multilane road geometry");
+DEFINE_string(yaml_file, "", "yaml input file defining a multilane road geometry");
 DEFINE_string(obj_dir, ".", "Directory to contain rendered road surface");
 DEFINE_string(obj_file, "", "Basename for output Wavefront OBJ and MTL files");
-DEFINE_double(max_grid_unit,
-              maliput::utility::ObjFeatures().max_grid_unit,
+DEFINE_double(max_grid_unit, maliput::utility::ObjFeatures().max_grid_unit,
               "Maximum size of a grid unit in the rendered mesh covering the "
               "road surface");
-DEFINE_double(min_grid_resolution,
-              maliput::utility::ObjFeatures().min_grid_resolution,
+DEFINE_double(min_grid_resolution, maliput::utility::ObjFeatures().min_grid_resolution,
               "Minimum number of grid-units in either lateral or longitudinal "
               "direction in the rendered mesh covering the road surface");
-DEFINE_bool(draw_elevation_bounds,
-            maliput::utility::ObjFeatures().draw_elevation_bounds,
+DEFINE_bool(draw_elevation_bounds, maliput::utility::ObjFeatures().draw_elevation_bounds,
             "Whether to draw the elevation bounds");
-DEFINE_double(simplify_mesh_threshold,
-              maliput::utility::ObjFeatures().simplify_mesh_threshold,
+DEFINE_double(simplify_mesh_threshold, maliput::utility::ObjFeatures().simplify_mesh_threshold,
               "Optional tolerance for mesh simplification, in meters. Make it "
               "equal to the road linear tolerance to get a mesh size reduction "
               "while keeping geometrical fidelity.");
@@ -81,8 +76,7 @@ int main(int argc, char* argv[]) {
   std::unique_ptr<const maliput::api::RoadGeometry> rg{};
   switch (GetMaliputImplementation(FLAGS_yaml_file)) {
     case MaliputImplementation::kMultilane: {
-      rg = maliput::multilane::LoadFile(
-          maliput::multilane::BuilderFactory(), FLAGS_yaml_file);
+      rg = maliput::multilane::LoadFile(maliput::multilane::BuilderFactory(), FLAGS_yaml_file);
       drake::log()->info("Loaded a multilane road geometry.");
       break;
     }
@@ -107,6 +101,4 @@ int main(int argc, char* argv[]) {
 }  // namespace utility
 }  // namespace maliput
 
-int main(int argc, char* argv[]) {
-  return maliput::utility::main(argc, argv);
-}
+int main(int argc, char* argv[]) { return maliput::utility::main(argc, argv); }

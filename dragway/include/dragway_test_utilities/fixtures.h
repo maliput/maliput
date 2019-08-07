@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/api/lane.h"
 #include "dragway/road_geometry.h"
+#include "maliput/api/lane.h"
 
 namespace maliput {
 namespace dragway {
@@ -28,7 +28,6 @@ class DragwayBasedTest : public ::testing::Test {
   const api::Lane* center_lane_;
   const api::Lane* left_lane_;
 };
-
 
 }  // namespace dragway
 }  // namespace maliput

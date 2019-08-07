@@ -4,36 +4,28 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/test_utilities/rules_test_utilities.h"
 #include "drake/common/unused.h"
+#include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace test {
 
-
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   rules::RightOfWayRule::ZoneType a,
-                                   rules::RightOfWayRule::ZoneType b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   rules::RightOfWayRule::ZoneType a, rules::RightOfWayRule::ZoneType b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
-
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   rules::RightOfWayRule::State::Type a,
-                                   rules::RightOfWayRule::State::Type b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   rules::RightOfWayRule::State::Type a, rules::RightOfWayRule::State::Type b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
-
 
 // TODO(maddog@tri.global)  Make a generic template for vector<T>.
-::testing::AssertionResult IsEqual(
-     const char* a_expression, const char* b_expression,
-     const std::vector<rules::RightOfWayRule::Id>& a,
-     const std::vector<rules::RightOfWayRule::Id>& b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const std::vector<rules::RightOfWayRule::Id>& a,
+                                   const std::vector<rules::RightOfWayRule::Id>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
@@ -44,11 +36,8 @@ namespace test {
   return c.result();
 }
 
-
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const rules::RightOfWayRule::State& a,
-                                   const rules::RightOfWayRule::State& b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const rules::RightOfWayRule::State& a, const rules::RightOfWayRule::State& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
@@ -57,18 +46,14 @@ namespace test {
   return c.result();
 }
 
-
 ::testing::AssertionResult IsEqual(
-     const char* a_expression, const char* b_expression,
-     const std::unordered_map<rules::RightOfWayRule::State::Id,
-                              rules::RightOfWayRule::State>& a,
-     const std::unordered_map<rules::RightOfWayRule::State::Id,
-                              rules::RightOfWayRule::State>& b) {
+    const char* a_expression, const char* b_expression,
+    const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& a,
+    const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
-  const std::unordered_map<rules::RightOfWayRule::State::Id,
-                           rules::RightOfWayRule::State>& largest =
+  const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& largest =
       (a.size() < b.size()) ? b : a;
 
   for (const auto& pair : largest) {
@@ -84,9 +69,7 @@ namespace test {
   return c.result();
 }
 
-
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const RightOfWayRule::RelatedBulbGroups& a,
                                    const RightOfWayRule::RelatedBulbGroups& b) {
   drake::unused(a_expression, b_expression);
@@ -100,14 +83,9 @@ namespace test {
       if (b_it == b.cend()) {
         break;
       }
-      for (const BulbGroup::Id& bulb_group_id :
-           traffic_light_bulb_group.second) {
-        const auto& b_bulb_group_id_it =
-            std::find(b_it->second.cbegin(), b_it->second.cend(),
-                      bulb_group_id);
-        MALIPUT_ADD_RESULT(
-            c, MALIPUT_IS_EQUAL((b_bulb_group_id_it != b_it->second.cend()),
-            true));
+      for (const BulbGroup::Id& bulb_group_id : traffic_light_bulb_group.second) {
+        const auto& b_bulb_group_id_it = std::find(b_it->second.cbegin(), b_it->second.cend(), bulb_group_id);
+        MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL((b_bulb_group_id_it != b_it->second.cend()), true));
         if (b_bulb_group_id_it == b_it->second.cend()) {
           break;
         }
@@ -117,10 +95,7 @@ namespace test {
   return c.result();
 }
 
-
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const rules::RightOfWayRule& a,
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::RightOfWayRule& a,
                                    const rules::RightOfWayRule& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
@@ -134,35 +109,26 @@ namespace test {
   } else {
     MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.states(), b.states()));
   }
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_bulb_groups(),
-                                         b.related_bulb_groups()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_bulb_groups(), b.related_bulb_groups()));
   return c.result();
 }
 
-
-::testing::AssertionResult IsEqual(
-     const char* a_expression,
-     const char* b_expression,
-     const rules::RuleStateProvider::RightOfWayResult& a,
-     const rules::RuleStateProvider::RightOfWayResult& b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const rules::RuleStateProvider::RightOfWayResult& a,
+                                   const rules::RuleStateProvider::RightOfWayResult& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.current_id, b.current_id));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next.has_value(),
-                                         b.next.has_value()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next.has_value(), b.next.has_value()));
   if (a.next.has_value() && b.next.has_value()) {
     MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->id, b.next->id));
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->duration_until.has_value(),
-                                           b.next->duration_until.has_value()));
-    if (a.next->duration_until.has_value() &&
-        b.next->duration_until.has_value()) {
-      MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->duration_until.value(),
-                                             b.next->duration_until.value()));
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->duration_until.has_value(), b.next->duration_until.has_value()));
+    if (a.next->duration_until.has_value() && b.next->duration_until.has_value()) {
+      MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->duration_until.value(), b.next->duration_until.value()));
     }
   }
   return c.result();
 }
-
 
 }  // namespace test
 }  // namespace rules

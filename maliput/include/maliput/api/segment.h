@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "maliput/api/type_specific_identifier.h"
 #include "drake/common/drake_copyable.h"
+#include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {
 namespace api {
@@ -11,10 +11,8 @@ namespace api {
 class Junction;
 class Lane;
 
-
 /// Persistent identifier for a Segment element.
 using SegmentId = TypeSpecificIdentifier<class Segment>;
-
 
 /// A Segment represents a bundle of adjacent Lanes which share a
 /// continuously traversable road surface.  Every LanePosition on a

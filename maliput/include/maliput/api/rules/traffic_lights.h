@@ -5,11 +5,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "maliput/api/lane_data.h"
-#include "maliput/api/type_specific_identifier.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 #include "drake/common/hash.h"
+#include "maliput/api/lane_data.h"
+#include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {
 namespace api {
@@ -66,8 +66,7 @@ class Bulb final {
     /// `p_BMax` of (3.5", 7", 7"). In metric units, this is a `p_BMin` of
     /// (-0.0889m, -0.1778m, -0.1778m) and a `p_BMax` of (0.0889m, 0.1778m,
     /// 0.1778m).
-    BoundingBox()
-        : p_BMin(-0.0889, -0.1778, -0.1778), p_BMax(0.0889, 0.1778, 0.1778) {}
+    BoundingBox() : p_BMin(-0.0889, -0.1778, -0.1778), p_BMax(0.0889, 0.1778, 0.1778) {}
     Eigen::Vector3d p_BMin;
     Eigen::Vector3d p_BMax;
   };
@@ -108,9 +107,8 @@ class Bulb final {
   ///
   /// @param bounding_box The bounding box of the bulb. See BoundingBox for
   /// details about the default value.
-  Bulb(const Id& id, const GeoPosition& position_bulb_group,
-       const Rotation& orientation_bulb_group, const BulbColor& color,
-       const BulbType& type,
+  Bulb(const Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
+       const BulbColor& color, const BulbType& type,
        const drake::optional<double>& arrow_orientation_rad = drake::nullopt,
        const drake::optional<std::vector<BulbState>>& states = drake::nullopt,
        BoundingBox bounding_box = BoundingBox());
@@ -120,15 +118,11 @@ class Bulb final {
 
   /// Returns the linear offset of this bulb's frame relative to the frame of
   /// the bulb group that contains it.
-  const GeoPosition& position_bulb_group() const {
-    return position_bulb_group_;
-  }
+  const GeoPosition& position_bulb_group() const { return position_bulb_group_; }
 
   /// Returns the rotational offset of this bulb's frame relative to the frame
   /// of the bulb group that contains it.
-  const Rotation& orientation_bulb_group() const {
-    return orientation_bulb_group_;
-  }
+  const Rotation& orientation_bulb_group() const { return orientation_bulb_group_; }
 
   /// Returns the color of this bulb.
   const BulbColor& color() const { return color_; }
@@ -138,9 +132,7 @@ class Bulb final {
 
   /// Returns the arrow's orientation. Only applicable if type() returns
   /// BulbType::kArrow. See constructor's documentation for semantics.
-  drake::optional<double> arrow_orientation_rad() const {
-    return arrow_orientation_rad_;
-  }
+  drake::optional<double> arrow_orientation_rad() const { return arrow_orientation_rad_; }
 
   /// Returns the possible states of this bulb.
   const std::vector<BulbState>& states() const { return states_; }
@@ -198,8 +190,7 @@ class BulbGroup final {
   ///
   /// @param bulbs The bulbs that are part of this BulbGroup. There must be at
   /// least one bulb within this group.
-  BulbGroup(const Id& id, const GeoPosition& position_traffic_light,
-            const Rotation& orientation_traffic_light,
+  BulbGroup(const Id& id, const GeoPosition& position_traffic_light, const Rotation& orientation_traffic_light,
             const std::vector<Bulb>& bulbs);
 
   /// Returns this BulbGroup instance's unique identifier.
@@ -207,15 +198,11 @@ class BulbGroup final {
 
   /// Returns the linear offset of this bulb group's frame relative to the
   /// frame of the traffic light that contains it.
-  const GeoPosition& position_traffic_light() const {
-    return position_traffic_light_;
-  }
+  const GeoPosition& position_traffic_light() const { return position_traffic_light_; }
 
   /// Returns the rotational offset of this bulb group's frame relative to the
   /// frame of the traffic light that contains it.
-  const Rotation& orientation_traffic_light() const {
-    return orientation_traffic_light_;
-  }
+  const Rotation& orientation_traffic_light() const { return orientation_traffic_light_; }
 
   /// Returns the bulbs contained within this bulb group.
   const std::vector<Bulb>& bulbs() const { return bulbs_; }
@@ -268,8 +255,7 @@ class TrafficLight final {
   /// light and bulb group should ideally match, if possible.
   ///
   /// @param bulb_groups The bulb groups that are part of this traffic light.
-  TrafficLight(const Id& id, const GeoPosition& position_road_network,
-               const Rotation& orientation_road_network,
+  TrafficLight(const Id& id, const GeoPosition& position_road_network, const Rotation& orientation_road_network,
                const std::vector<BulbGroup>& bulb_groups);
 
   /// Returns this traffic light's unique identifier.
@@ -277,13 +263,9 @@ class TrafficLight final {
 
   /// Returns this traffic light's frame's position within the road network's
   /// frame.
-  const GeoPosition& position_road_network() const {
-    return position_road_network_;
-  }
+  const GeoPosition& position_road_network() const { return position_road_network_; }
 
-  const Rotation& orientation_road_network() const {
-    return orientation_road_network_;
-  }
+  const Rotation& orientation_road_network() const { return orientation_road_network_; }
 
   /// Returns the bulb groups contained within this traffic light.
   const std::vector<BulbGroup>& bulb_groups() const { return bulb_groups_; }
@@ -307,27 +289,21 @@ struct UniqueBulbId {
   UniqueBulbId()
       : traffic_light_id(TrafficLight::Id("default")),
         bulb_group_id(BulbGroup::Id("default")),
-        bulb_id(Bulb::Id("default")) {};
+        bulb_id(Bulb::Id("default")){};
 
   /// Constructs a UniqueBulbId.
-  UniqueBulbId(const TrafficLight::Id& traffic_light_id_in,
-               const BulbGroup::Id& bulb_group_id_in,
+  UniqueBulbId(const TrafficLight::Id& traffic_light_id_in, const BulbGroup::Id& bulb_group_id_in,
                const Bulb::Id& bulb_id_in)
-      : traffic_light_id(traffic_light_id_in),
-        bulb_group_id(bulb_group_id_in),
-        bulb_id(bulb_id_in) {
-  }
+      : traffic_light_id(traffic_light_id_in), bulb_group_id(bulb_group_id_in), bulb_id(bulb_id_in) {}
 
   /// Returns the string representation of the %TypeSpecificIdentifier.
   const std::string to_string() const {
-    return traffic_light_id.string() + "-" + bulb_group_id.string() + "-" +
-           bulb_id.string();
+    return traffic_light_id.string() + "-" + bulb_group_id.string() + "-" + bulb_id.string();
   }
 
   /// Tests for equality with another UniqueBulbId.
   bool operator==(const UniqueBulbId& rhs) const {
-    return traffic_light_id == rhs.traffic_light_id &&
-           bulb_group_id == rhs.bulb_group_id && bulb_id == rhs.bulb_id;
+    return traffic_light_id == rhs.traffic_light_id && bulb_group_id == rhs.bulb_group_id && bulb_id == rhs.bulb_id;
   }
 
   /// Tests for inequality with another UniqueBulbId, specifically
@@ -336,8 +312,7 @@ struct UniqueBulbId {
 
   /// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
-  friend void hash_append(HashAlgorithm& hasher,
-                          const UniqueBulbId& id) noexcept {
+  friend void hash_append(HashAlgorithm& hasher, const UniqueBulbId& id) noexcept {
     using drake::hash_append;
     hash_append(hasher, id.traffic_light_id);
     hash_append(hasher, id.bulb_group_id);
@@ -357,16 +332,14 @@ namespace std {
 
 /// Specialization of std::hash for maliput::api::rules::UniqueBulbId.
 template <>
-struct hash<maliput::api::rules::UniqueBulbId>
-    : public drake::DefaultHash {};
+struct hash<maliput::api::rules::UniqueBulbId> : public drake::DefaultHash {};
 
 /// Specialization of std::less for maliput::api::rules::UniqueBulbId
 /// providing a strict ordering over maliput::api::rules::UniqueBulbId
 /// suitable for use with ordered containers.
 template <>
 struct less<maliput::api::rules::UniqueBulbId> {
-  bool operator()(const maliput::api::rules::UniqueBulbId& lhs,
-                  const maliput::api::rules::UniqueBulbId& rhs) const {
+  bool operator()(const maliput::api::rules::UniqueBulbId& lhs, const maliput::api::rules::UniqueBulbId& rhs) const {
     if (lhs.traffic_light_id.string() < rhs.traffic_light_id.string()) {
       return true;
     }

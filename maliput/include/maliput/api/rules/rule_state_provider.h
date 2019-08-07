@@ -1,8 +1,8 @@
 #pragma once
 
-#include "maliput/api/rules/right_of_way_rule.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+#include "maliput/api/rules/right_of_way_rule.h"
 
 namespace maliput {
 namespace api {
@@ -44,19 +44,14 @@ class RuleStateProvider {
   ///
   /// Returns drake::nullopt if `id` is unrecognized, which would be the case
   /// if no such rule exists or if the rule has only static semantics.
-  drake::optional<RightOfWayResult> GetState(const RightOfWayRule::Id& id)
-      const {
-    return DoGetState(id);
-  }
+  drake::optional<RightOfWayResult> GetState(const RightOfWayRule::Id& id) const { return DoGetState(id); }
 
  protected:
   RuleStateProvider() = default;
 
  private:
-  virtual drake::optional<RightOfWayResult> DoGetState(
-      const RightOfWayRule::Id& id) const = 0;
+  virtual drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id& id) const = 0;
 };
-
 
 }  // namespace rules
 }  // namespace api

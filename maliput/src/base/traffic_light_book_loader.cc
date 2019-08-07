@@ -15,7 +15,6 @@
 #include "maliput/base/traffic_light_book.h"
 #include "maliput/common/maliput_throw.h"
 
-
 using drake::Quaternion;
 using maliput::api::GeoPosition;
 using maliput::api::Rotation;
@@ -73,8 +72,8 @@ struct convert<Rotation> {
     if (!node.IsSequence() || node.size() != 4) {
       return false;
     }
-    const drake::Quaternion<double> q(node[0].as<double>(), node[1].as<double>(),
-                               node[2].as<double>(), node[3].as<double>());
+    const drake::Quaternion<double> q(node[0].as<double>(), node[1].as<double>(), node[2].as<double>(),
+                                      node[3].as<double>());
     rhs.set_quat(q);
     return true;
   }
@@ -109,21 +108,15 @@ struct convert<Bulb::BoundingBox> {
       return false;
     }
     const Node& min_node = node["min"];
-    if (!min_node.IsDefined() || !min_node.IsSequence() ||
-        min_node.size() != 3) {
+    if (!min_node.IsDefined() || !min_node.IsSequence() || min_node.size() != 3) {
       return false;
     }
     const Node& max_node = node["max"];
-    if (!max_node.IsDefined() || !max_node.IsSequence() ||
-        max_node.size() != 3) {
+    if (!max_node.IsDefined() || !max_node.IsSequence() || max_node.size() != 3) {
       return false;
     }
-    rhs.p_BMin =
-        Eigen::Vector3d(min_node[0].as<double>(), min_node[1].as<double>(),
-                        min_node[2].as<double>());
-    rhs.p_BMax =
-        Eigen::Vector3d(max_node[0].as<double>(), max_node[1].as<double>(),
-                        max_node[2].as<double>());
+    rhs.p_BMin = Eigen::Vector3d(min_node[0].as<double>(), min_node[1].as<double>(), min_node[2].as<double>());
+    rhs.p_BMax = Eigen::Vector3d(max_node[0].as<double>(), max_node[1].as<double>(), max_node[2].as<double>());
     return true;
   }
 };
@@ -230,10 +223,8 @@ Bulb BuildBulb(const YAML::Node& bulb_node) {
   MALIPUT_THROW_UNLESS(pose_node.IsMap());
   MALIPUT_THROW_UNLESS(pose_node["position_bulb_group"].IsDefined());
   MALIPUT_THROW_UNLESS(pose_node["orientation_bulb_group"].IsDefined());
-  const GeoPosition position_bulb_group =
-      pose_node["position_bulb_group"].as<GeoPosition>();
-  const Rotation orientation_bulb_group =
-      pose_node["orientation_bulb_group"].as<Rotation>();
+  const GeoPosition position_bulb_group = pose_node["position_bulb_group"].as<GeoPosition>();
+  const Rotation orientation_bulb_group = pose_node["orientation_bulb_group"].as<Rotation>();
 
   const YAML::Node& bounding_box_node = bulb_node["BoundingBox"];
   Bulb::BoundingBox bounding_box;
@@ -263,8 +254,8 @@ Bulb BuildBulb(const YAML::Node& bulb_node) {
     bulb_states = states_node.as<std::vector<BulbState>>();
   }
 
-  return Bulb(id, position_bulb_group, orientation_bulb_group, color, type,
-              arrow_orientation_rad, bulb_states, bounding_box);
+  return Bulb(id, position_bulb_group, orientation_bulb_group, color, type, arrow_orientation_rad, bulb_states,
+              bounding_box);
 }
 
 BulbGroup BuildBulbGroup(const YAML::Node& bulb_group_node) {
@@ -277,10 +268,8 @@ BulbGroup BuildBulbGroup(const YAML::Node& bulb_group_node) {
   MALIPUT_THROW_UNLESS(pose_node.IsMap());
   MALIPUT_THROW_UNLESS(pose_node["position_traffic_light"].IsDefined());
   MALIPUT_THROW_UNLESS(pose_node["orientation_traffic_light"].IsDefined());
-  const GeoPosition position_traffic_light =
-      pose_node["position_traffic_light"].as<GeoPosition>();
-  const Rotation orientation_traffic_light =
-      pose_node["orientation_traffic_light"].as<Rotation>();
+  const GeoPosition position_traffic_light = pose_node["position_traffic_light"].as<GeoPosition>();
+  const Rotation orientation_traffic_light = pose_node["orientation_traffic_light"].as<Rotation>();
   const YAML::Node& bulbs_node = bulb_group_node["Bulbs"];
   MALIPUT_THROW_UNLESS(bulbs_node.IsDefined());
   MALIPUT_THROW_UNLESS(bulbs_node.IsSequence());
@@ -288,8 +277,7 @@ BulbGroup BuildBulbGroup(const YAML::Node& bulb_group_node) {
   for (const YAML::Node& bulb_node : bulbs_node) {
     bulbs.push_back(BuildBulb(bulb_node));
   }
-  return BulbGroup(id, position_traffic_light, orientation_traffic_light,
-                   bulbs);
+  return BulbGroup(id, position_traffic_light, orientation_traffic_light, bulbs);
 }
 
 TrafficLight BuildTrafficLight(const YAML::Node& traffic_light_node) {
@@ -300,10 +288,8 @@ TrafficLight BuildTrafficLight(const YAML::Node& traffic_light_node) {
   MALIPUT_THROW_UNLESS(pose_node.IsMap());
   MALIPUT_THROW_UNLESS(pose_node["position_road_network"].IsDefined());
   MALIPUT_THROW_UNLESS(pose_node["orientation_road_network"].IsDefined());
-  const GeoPosition position_road_network =
-      pose_node["position_road_network"].as<GeoPosition>();
-  const Rotation orientation_road_network =
-      pose_node["orientation_road_network"].as<Rotation>();
+  const GeoPosition position_road_network = pose_node["position_road_network"].as<GeoPosition>();
+  const Rotation orientation_road_network = pose_node["orientation_road_network"].as<Rotation>();
 
   const YAML::Node& bulb_groups_node = traffic_light_node["BulbGroups"];
   MALIPUT_THROW_UNLESS(bulb_groups_node.IsDefined());
@@ -312,12 +298,10 @@ TrafficLight BuildTrafficLight(const YAML::Node& traffic_light_node) {
   for (const YAML::Node& bulb_group_node : bulb_groups_node) {
     bulb_groups.push_back(BuildBulbGroup(bulb_group_node));
   }
-  return TrafficLight(id, position_road_network, orientation_road_network,
-                      bulb_groups);
+  return TrafficLight(id, position_road_network, orientation_road_network, bulb_groups);
 }
 
-std::unique_ptr<api::rules::TrafficLightBook> BuildFrom(
-    const YAML::Node& root_node) {
+std::unique_ptr<api::rules::TrafficLightBook> BuildFrom(const YAML::Node& root_node) {
   MALIPUT_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& traffic_lights_node = root_node["TrafficLights"];
   MALIPUT_THROW_UNLESS(traffic_lights_node.IsDefined());
@@ -331,13 +315,11 @@ std::unique_ptr<api::rules::TrafficLightBook> BuildFrom(
 
 }  // namespace
 
-std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBook(
-    const std::string& input) {
+std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBook(const std::string& input) {
   return BuildFrom(YAML::Load(input));
 }
 
-std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBookFromFile(
-    const std::string& filename) {
+std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBookFromFile(const std::string& filename) {
   return BuildFrom(YAML::LoadFile(filename));
 }
 

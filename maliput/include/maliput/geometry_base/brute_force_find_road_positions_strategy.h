@@ -26,11 +26,8 @@ namespace geometry_base {
 /// @throws maliput::common::assertion_error If rg is nullptr, or any entity
 ///         within it is nullptr.
 /// @throws maliput::common::assertion_error If radius is negative.
-std::vector<maliput::api::RoadPositionResult>
-BruteForceFindRoadPositionsStrategy(
-    const maliput::api::RoadGeometry* rg,
-    const maliput::api::GeoPosition& geo_position,
-    double radius);
+std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrategy(
+    const maliput::api::RoadGeometry* rg, const maliput::api::GeoPosition& geo_position, double radius);
 
 }  // namespace geometry_base
 }  // namespace maliput

@@ -45,11 +45,9 @@ class MaliputDragwayLaneTest : public ::testing::Test {
   };
 
   void MakeDragway(int num_lanes) {
-    const api::RoadGeometryId road_geometry_id(std::to_string(num_lanes) +
-                                               "LaneDragwayRoadGeometry");
-    road_geometry_.reset(new RoadGeometry(
-        road_geometry_id, num_lanes, length_, lane_width_, shoulder_width_,
-        maximum_height_, kLinearTolerance, kAngularTolerance));
+    const api::RoadGeometryId road_geometry_id(std::to_string(num_lanes) + "LaneDragwayRoadGeometry");
+    road_geometry_.reset(new RoadGeometry(road_geometry_id, num_lanes, length_, lane_width_, shoulder_width_,
+                                          maximum_height_, kLinearTolerance, kAngularTolerance));
 
     const api::Junction* junction = road_geometry_->junction(0);
     ASSERT_NE(junction, nullptr);
@@ -62,8 +60,7 @@ class MaliputDragwayLaneTest : public ::testing::Test {
     EXPECT_EQ(segment_->num_lanes(), num_lanes);
   }
 
-  ExpectedLaneParameters GetExpectedLaneParameters(int num_lanes,
-                                                   int lane_index) const {
+  ExpectedLaneParameters GetExpectedLaneParameters(int num_lanes, int lane_index) const {
     ExpectedLaneParameters result{};
     if (num_lanes == 1) {
       result.y_offset = 0.0;
@@ -87,43 +84,33 @@ class MaliputDragwayLaneTest : public ::testing::Test {
 
   // Verifies the correctness of the provided `lane`.
   void VerifyLaneCorrectness(const api::Lane* lane, int num_lanes) {
-    const ExpectedLaneParameters expected =
-        GetExpectedLaneParameters(num_lanes, lane->index());
+    const ExpectedLaneParameters expected = GetExpectedLaneParameters(num_lanes, lane->index());
 
     // Tests Lane::lane_bounds().
-    for (double s = 0 ; s < length_; s += length_ / 100) {
+    for (double s = 0; s < length_; s += length_ / 100) {
       const api::RBounds lane_bounds = lane->lane_bounds(s);
-      EXPECT_TRUE(api::test::IsRBoundsClose(
-          lane_bounds, api::RBounds(-lane_width_ / 2, lane_width_ / 2),
-          kLinearTolerance));
+      EXPECT_TRUE(
+          api::test::IsRBoundsClose(lane_bounds, api::RBounds(-lane_width_ / 2, lane_width_ / 2), kLinearTolerance));
     }
 
     EXPECT_EQ(lane->length(), length_);
 
     // Tests Lane::driveable_bounds().
-    for (double s = 0 ; s < length_; s += length_ / 100) {
+    for (double s = 0; s < length_; s += length_ / 100) {
       const api::RBounds driveable_bounds = lane->driveable_bounds(s);
       EXPECT_TRUE(api::test::IsRBoundsClose(
-          driveable_bounds,
-          api::RBounds(expected.driveable_r_min, expected.driveable_r_max),
-          kLinearTolerance));
+          driveable_bounds, api::RBounds(expected.driveable_r_min, expected.driveable_r_max), kLinearTolerance));
     }
 
     // Tests Lane::elevation_bounds().
-    for (double s = 0 ; s < length_; s += length_ / 10) {
+    for (double s = 0; s < length_; s += length_ / 10) {
       const api::RBounds driveable_bounds = lane->driveable_bounds(s);
-      const api::HBounds elevation_bounds0 =
-          lane->elevation_bounds(s, driveable_bounds.min());
-      const api::HBounds elevation_bounds1 =
-          lane->elevation_bounds(s, driveable_bounds.max());
+      const api::HBounds elevation_bounds0 = lane->elevation_bounds(s, driveable_bounds.min());
+      const api::HBounds elevation_bounds1 = lane->elevation_bounds(s, driveable_bounds.max());
       EXPECT_TRUE(api::test::IsHBoundsClose(
-          elevation_bounds0,
-          api::HBounds(expected.elevation_min, expected.elevation_max),
-          kLinearTolerance));
+          elevation_bounds0, api::HBounds(expected.elevation_min, expected.elevation_max), kLinearTolerance));
       EXPECT_TRUE(api::test::IsHBoundsClose(
-          elevation_bounds1,
-          api::HBounds(expected.elevation_min, expected.elevation_max),
-          kLinearTolerance));
+          elevation_bounds1, api::HBounds(expected.elevation_min, expected.elevation_max), kLinearTolerance));
     }
 
     // The following block of test code evaluates methods that take as input a
@@ -133,24 +120,18 @@ class MaliputDragwayLaneTest : public ::testing::Test {
     // (s, r, h). Instead we pick points in a grid that spans the (s, r, h)
     // state space and only check those points in the hopes that they are
     // representative of the entire state space.
-    const double driveable_width =
-      expected.driveable_r_max - expected.driveable_r_min;
+    const double driveable_width = expected.driveable_r_max - expected.driveable_r_min;
     for (double s = 0; s < length_; s += length_ / 20) {
-      for (double r = expected.driveable_r_min; r <= expected.driveable_r_max;
-          r += driveable_width / 20) {
-        for (double h = expected.elevation_min;
-             h < expected.elevation_max;
+      for (double r = expected.driveable_r_min; r <= expected.driveable_r_max; r += driveable_width / 20) {
+        for (double h = expected.elevation_min; h < expected.elevation_max;
              h += (expected.elevation_max - expected.elevation_min) * 0.1) {
           const api::LanePosition lane_position(s, r, h);
 
           // Tests Lane::ToGeoPosition().
-          const api::GeoPosition geo_position =
-              lane->ToGeoPosition(lane_position);
-          const double linear_tolerance =
-              lane->segment()->junction()->road_geometry()->linear_tolerance();
+          const api::GeoPosition geo_position = lane->ToGeoPosition(lane_position);
+          const double linear_tolerance = lane->segment()->junction()->road_geometry()->linear_tolerance();
           EXPECT_DOUBLE_EQ(geo_position.x(), s);
-          EXPECT_NEAR(geo_position.y(),
-                      expected.y_offset + r, linear_tolerance);
+          EXPECT_NEAR(geo_position.y(), expected.y_offset + r, linear_tolerance);
           EXPECT_DOUBLE_EQ(geo_position.z(), h);
 
           // Tests Lane::ToGeoPositionAutoDiff().
@@ -159,32 +140,24 @@ class MaliputDragwayLaneTest : public ::testing::Test {
           drake::AutoDiffXd s_autodiff{s, drake::Vector3<double>(1., 0., 0.)};
           drake::AutoDiffXd r_autodiff{r, drake::Vector3<double>(0., 1., 0.)};
           drake::AutoDiffXd h_autodiff{h, drake::Vector3<double>(0., 0., 1.)};
-          api::LanePositionT<drake::AutoDiffXd> lane_position_ad{
-            s_autodiff, r_autodiff, h_autodiff};
+          api::LanePositionT<drake::AutoDiffXd> lane_position_ad{s_autodiff, r_autodiff, h_autodiff};
 
           const api::GeoPositionT<drake::AutoDiffXd> geo_position_ad =
               lane->ToGeoPositionT<drake::AutoDiffXd>(lane_position_ad);
           EXPECT_DOUBLE_EQ(geo_position_ad.x().value(), s);
-          EXPECT_NEAR(geo_position_ad.y().value(),
-                      expected.y_offset + r, linear_tolerance);
+          EXPECT_NEAR(geo_position_ad.y().value(), expected.y_offset + r, linear_tolerance);
           EXPECT_DOUBLE_EQ(geo_position_ad.z().value(), h);
 
           // For the s-coordinate, expect the following derivatives for
           // geo_position: ∂x/∂s = 1, ∂y/∂s = 0., ∂z/∂s = 0 (the world x-y-z
           // axis has the same orientation as Dragway's s-r-h axis).
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(1., 0., 0.),
-                                      geo_position_ad.x().derivatives()));
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(0., 1., 0.),
-                                      geo_position_ad.y().derivatives()));
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(0., 0., 1.),
-                                      geo_position_ad.z().derivatives()));
+          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(1., 0., 0.), geo_position_ad.x().derivatives()));
+          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(0., 1., 0.), geo_position_ad.y().derivatives()));
+          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(0., 0., 1.), geo_position_ad.z().derivatives()));
 
           // Tests Lane::GetOrientation().
-          const api::Rotation rotation =
-              lane->GetOrientation(lane_position);
-          EXPECT_TRUE(api::test::IsRotationClose(
-              rotation, api::Rotation::FromRpy(0.0, 0.0, 0.0),
-              kAngularTolerance));
+          const api::Rotation rotation = lane->GetOrientation(lane_position);
+          EXPECT_TRUE(api::test::IsRotationClose(rotation, api::Rotation::FromRpy(0.0, 0.0, 0.0), kAngularTolerance));
 
           // Tests Lane::EvalMotionDerivatives().
           //
@@ -196,11 +169,9 @@ class MaliputDragwayLaneTest : public ::testing::Test {
           const double kEta_v = 3.3;
 
           const api::LanePosition motion_derivatives =
-              lane->EvalMotionDerivatives(lane_position,
-                  api::IsoLaneVelocity(kSigma_v, kRho_v, kEta_v));
-          EXPECT_TRUE(api::test::IsLanePositionClose(
-              motion_derivatives, api::LanePosition(kSigma_v, kRho_v, kEta_v),
-              kLinearTolerance));
+              lane->EvalMotionDerivatives(lane_position, api::IsoLaneVelocity(kSigma_v, kRho_v, kEta_v));
+          EXPECT_TRUE(api::test::IsLanePositionClose(motion_derivatives, api::LanePosition(kSigma_v, kRho_v, kEta_v),
+                                                     kLinearTolerance));
         }
       }
     }
@@ -208,67 +179,53 @@ class MaliputDragwayLaneTest : public ::testing::Test {
 
   // Verifies that the branches within the provided `lane` are correct. The
   // provided `lane` must be in the provided `road_geometry`.
-  void VerifyBranches(const api::Lane* lane,
-      const RoadGeometry* road_geometry) const {
+  void VerifyBranches(const api::Lane* lane, const RoadGeometry* road_geometry) const {
     // Verifies that the same BranchPoint covers both ends of the dragway lane.
-    EXPECT_EQ(lane->GetBranchPoint(api::LaneEnd::kStart),
-              lane->GetBranchPoint(api::LaneEnd::kFinish));
+    EXPECT_EQ(lane->GetBranchPoint(api::LaneEnd::kStart), lane->GetBranchPoint(api::LaneEnd::kFinish));
 
-    const api::BranchPoint* branch_point =
-        lane->GetBranchPoint(api::LaneEnd::kStart);
+    const api::BranchPoint* branch_point = lane->GetBranchPoint(api::LaneEnd::kStart);
     EXPECT_NE(branch_point, nullptr);
-    EXPECT_EQ(branch_point->id(),
-              api::BranchPointId(lane->id().string() + "_Branch_Point"));
+    EXPECT_EQ(branch_point->id(), api::BranchPointId(lane->id().string() + "_Branch_Point"));
     EXPECT_EQ(branch_point->road_geometry(), road_geometry);
 
     // Verifies correctness of the confluent branches.
     {
-      const api::LaneEndSet* lane_end_set_start =
-          lane->GetConfluentBranches(api::LaneEnd::kStart);
-      const api::LaneEndSet* lane_end_set_finish =
-          lane->GetConfluentBranches(api::LaneEnd::kFinish);
+      const api::LaneEndSet* lane_end_set_start = lane->GetConfluentBranches(api::LaneEnd::kStart);
+      const api::LaneEndSet* lane_end_set_finish = lane->GetConfluentBranches(api::LaneEnd::kFinish);
       EXPECT_EQ(lane_end_set_start->size(), 1);
       EXPECT_EQ(lane_end_set_finish->size(), 1);
 
-      const api::LaneEnd& lane_end_start =
-          lane->GetConfluentBranches(api::LaneEnd::kStart)->get(0);
+      const api::LaneEnd& lane_end_start = lane->GetConfluentBranches(api::LaneEnd::kStart)->get(0);
       EXPECT_EQ(lane_end_start.lane, lane);
       EXPECT_EQ(lane_end_start.end, api::LaneEnd::kStart);
-      const api::LaneEnd& lane_end_finish =
-          lane->GetConfluentBranches(api::LaneEnd::kFinish)->get(0);
+      const api::LaneEnd& lane_end_finish = lane->GetConfluentBranches(api::LaneEnd::kFinish)->get(0);
       EXPECT_EQ(lane_end_finish.lane, lane);
       EXPECT_EQ(lane_end_finish.end, api::LaneEnd::kFinish);
     }
 
     // Verifies correctness of the ongoing branches.
     {
-      const api::LaneEndSet* lane_end_set_start =
-          lane->GetOngoingBranches(api::LaneEnd::kStart);
-      const api::LaneEndSet* lane_end_set_finish =
-          lane->GetOngoingBranches(api::LaneEnd::kFinish);
+      const api::LaneEndSet* lane_end_set_start = lane->GetOngoingBranches(api::LaneEnd::kStart);
+      const api::LaneEndSet* lane_end_set_finish = lane->GetOngoingBranches(api::LaneEnd::kFinish);
       EXPECT_EQ(lane_end_set_start->size(), 1);
       EXPECT_EQ(lane_end_set_finish->size(), 1);
 
-      const api::LaneEnd& lane_end_start =
-        lane->GetOngoingBranches(api::LaneEnd::kStart)->get(0);
+      const api::LaneEnd& lane_end_start = lane->GetOngoingBranches(api::LaneEnd::kStart)->get(0);
       EXPECT_EQ(lane_end_start.lane, lane);
       EXPECT_EQ(lane_end_start.end, api::LaneEnd::kFinish);
-      const api::LaneEnd& lane_end_finish =
-        lane->GetOngoingBranches(api::LaneEnd::kFinish)->get(0);
+      const api::LaneEnd& lane_end_finish = lane->GetOngoingBranches(api::LaneEnd::kFinish)->get(0);
       EXPECT_EQ(lane_end_finish.lane, lane);
       EXPECT_EQ(lane_end_finish.end, api::LaneEnd::kStart);
     }
 
     // Verifies correctness of the default branches.
     {
-      drake::optional<api::LaneEnd> default_start_lane_end =
-          lane->GetDefaultBranch(api::LaneEnd::kStart);
+      drake::optional<api::LaneEnd> default_start_lane_end = lane->GetDefaultBranch(api::LaneEnd::kStart);
       EXPECT_TRUE(default_start_lane_end);
       EXPECT_EQ(default_start_lane_end->end, api::LaneEnd::kFinish);
       EXPECT_EQ(default_start_lane_end->lane, lane);
 
-      drake::optional<api::LaneEnd> default_finish_lane_end =
-          lane->GetDefaultBranch(api::LaneEnd::kFinish);
+      drake::optional<api::LaneEnd> default_finish_lane_end = lane->GetDefaultBranch(api::LaneEnd::kFinish);
       EXPECT_TRUE(default_finish_lane_end);
       EXPECT_EQ(default_finish_lane_end->end, api::LaneEnd::kStart);
       EXPECT_EQ(default_finish_lane_end->lane, lane);
@@ -305,22 +262,18 @@ class MaliputDragwayLaneTest : public ::testing::Test {
 
     // Defines the test case values for x and y. Points both far away and close
     // to the driveable area are evaluated, with a focus on edge cases.
-    std::vector<double> x_values{min_x_ - 10., min_x_ - 1e-10, min_x_,
-          min_x_ + 1e-10, (max_x_ + min_x_) / 2., max_x_ - 1e-10, max_x_,
-          max_x_ + 1e-10, max_x_ + 10.};
-    std::vector<double> y_values{min_y_ - 10., min_y_ - 1e-10, min_y_,
-          min_y_ + 1e-10, (max_y_ + min_y_) / 2., max_y_ - 1e-10, max_y_,
-          max_y_ + 1e-10, max_y_ + 10.};
-    std::vector<double> z_values{min_z_ - 10., min_z_ - 1e-10, min_z_,
-          min_z_ + 1e-10, (max_z_ + min_z_) / 2., max_z_ - 1e-10,  max_z_,
-          max_z_ + 1e-10, max_z_ + 10.};
+    std::vector<double> x_values{min_x_ - 10.,   min_x_ - 1e-10, min_x_,         min_x_ + 1e-10, (max_x_ + min_x_) / 2.,
+                                 max_x_ - 1e-10, max_x_,         max_x_ + 1e-10, max_x_ + 10.};
+    std::vector<double> y_values{min_y_ - 10.,   min_y_ - 1e-10, min_y_,         min_y_ + 1e-10, (max_y_ + min_y_) / 2.,
+                                 max_y_ - 1e-10, max_y_,         max_y_ + 1e-10, max_y_ + 10.};
+    std::vector<double> z_values{min_z_ - 10.,   min_z_ - 1e-10, min_z_,         min_z_ + 1e-10, (max_z_ + min_z_) / 2.,
+                                 max_z_ - 1e-10, max_z_,         max_z_ + 1e-10, max_z_ + 10.};
     x_test_cases_ = x_values;
     y_test_cases_ = y_values;
     z_test_cases_ = z_values;
   }
 
-  std::vector<int> GetTransgressedBoundaries(
-      const api::GeoPositionT<drake::AutoDiffXd>& geo_position) {
+  std::vector<int> GetTransgressedBoundaries(const api::GeoPositionT<drake::AutoDiffXd>& geo_position) {
     const int kXIndex = 0;
     const int kYIndex = 1;
     const int kZIndex = 2;
@@ -439,24 +392,18 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOnRoad) {
   // Spot checks geographic positions on lane 0 and the right shoulder with a
   // focus on edge cases.
   for (double x = 0; x <= length_; x += length_ / 2) {
-    for (double y = -lane_width_ - shoulder_width_; y <= 0;
-        y += (lane_width_ + shoulder_width_) / 2) {
+    for (double y = -lane_width_ - shoulder_width_; y <= 0; y += (lane_width_ + shoulder_width_) / 2) {
       for (double z = 0; z <= maximum_height_; z += maximum_height_ / 2.) {
         api::GeoPosition nearest_position;
         double distance;
-        const api::RoadPosition road_position = road_geometry_->ToRoadPosition(
-            api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position,
-            &distance);
-        const api::Lane* expected_lane =
-            road_geometry_->junction(0)->segment(0)->lane(0);
-        EXPECT_TRUE(api::test::IsGeoPositionClose(
-            nearest_position, api::GeoPosition(x, y, z),
-            kLinearTolerance));
+        const api::RoadPosition road_position =
+            road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position, &distance);
+        const api::Lane* expected_lane = road_geometry_->junction(0)->segment(0)->lane(0);
+        EXPECT_TRUE(api::test::IsGeoPositionClose(nearest_position, api::GeoPosition(x, y, z), kLinearTolerance));
         EXPECT_DOUBLE_EQ(distance, 0);
         EXPECT_EQ(road_position.lane, expected_lane);
-        EXPECT_TRUE(api::test::IsLanePositionClose(
-            road_position.pos, api::LanePosition(x, y + lane_width_ / 2, z),
-            kLinearTolerance));
+        EXPECT_TRUE(api::test::IsLanePositionClose(road_position.pos, api::LanePosition(x, y + lane_width_ / 2, z),
+                                                   kLinearTolerance));
       }
     }
   }
@@ -464,32 +411,23 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOnRoad) {
   // Spot checks geographic positions on lane 1 and the left shoulder with a
   // focus on edge cases.
   for (double x = 0; x <= length_; x += length_ / 2) {
-    for (double y = 0; y <= lane_width_ + shoulder_width_;
-        y += (lane_width_ + shoulder_width_) / 2) {
+    for (double y = 0; y <= lane_width_ + shoulder_width_; y += (lane_width_ + shoulder_width_) / 2) {
       for (double z = 0; z <= maximum_height_; z += maximum_height_ / 2.) {
         api::GeoPosition nearest_position;
         double distance;
-        const api::RoadPosition road_position = road_geometry_->ToRoadPosition(
-            api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position,
-            &distance);
+        const api::RoadPosition road_position =
+            road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position, &distance);
         const int lane_index = (y == 0 ? 0 : 1);
-        const api::Lane* expected_lane =
-            road_geometry_->junction(0)->segment(0)->lane(lane_index);
-        EXPECT_TRUE(api::test::IsGeoPositionClose(
-            nearest_position, api::GeoPosition(x, y, z),
-            kLinearTolerance));
+        const api::Lane* expected_lane = road_geometry_->junction(0)->segment(0)->lane(lane_index);
+        EXPECT_TRUE(api::test::IsGeoPositionClose(nearest_position, api::GeoPosition(x, y, z), kLinearTolerance));
         EXPECT_DOUBLE_EQ(distance, 0);
         EXPECT_EQ(road_position.lane, expected_lane);
         if (y == 0) {
-          EXPECT_TRUE(api::test::IsLanePositionClose(
-              road_position.pos,
-              api::LanePosition(x, y + lane_width_ / 2, z),
-              kLinearTolerance));
+          EXPECT_TRUE(api::test::IsLanePositionClose(road_position.pos, api::LanePosition(x, y + lane_width_ / 2, z),
+                                                     kLinearTolerance));
         } else {
-          EXPECT_TRUE(api::test::IsLanePositionClose(
-              road_position.pos,
-              api::LanePosition(x, y - lane_width_ / 2, z),
-              kLinearTolerance));
+          EXPECT_TRUE(api::test::IsLanePositionClose(road_position.pos, api::LanePosition(x, y - lane_width_ / 2, z),
+                                                     kLinearTolerance));
         }
       }
     }
@@ -523,12 +461,9 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
 
   // Defines the test case values for x and y. Points both far away and close to
   // the driveable area are evaluated.
-  const std::vector<double> x_test_cases{
-    test_x_min, x_min - 1e-10, x_max + 1e-10, test_x_max};
-  const std::vector<double> y_test_cases{
-    test_y_min, y_min - 1e-10, y_max + 1e-10, test_y_max};
-  const std::vector<double> z_test_cases{
-    test_z_min, z_min - 1e-10, z_max + 1e-10, test_z_max};
+  const std::vector<double> x_test_cases{test_x_min, x_min - 1e-10, x_max + 1e-10, test_x_max};
+  const std::vector<double> y_test_cases{test_y_min, y_min - 1e-10, y_max + 1e-10, test_y_max};
+  const std::vector<double> z_test_cases{test_z_min, z_min - 1e-10, z_max + 1e-10, test_z_max};
   // TODO(maddog@tri.global)  Needs test cases where *one* coordinate is
   //                          out-of-bounds.  (Currently, only tests when
   //                          *all* coordinates are out-of-bounds.)
@@ -537,9 +472,8 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
       for (const auto z : z_test_cases) {
         api::GeoPosition nearest_position;
         double distance;
-        const api::RoadPosition road_position = road_geometry_->ToRoadPosition(
-            api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position,
-            &distance);
+        const api::RoadPosition road_position =
+            road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position, &distance);
         EXPECT_LE(nearest_position.x(), x_max);
         EXPECT_GE(nearest_position.x(), x_min);
         EXPECT_LE(nearest_position.y(), y_max);
@@ -570,20 +504,17 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
           expected_nearest_position.set_z(z_max);
         }
 
-        EXPECT_TRUE(api::test::IsGeoPositionClose(
-            nearest_position, expected_nearest_position, kLinearTolerance));
+        EXPECT_TRUE(api::test::IsGeoPositionClose(nearest_position, expected_nearest_position, kLinearTolerance));
         // TODO(maddog@tri.global)  Should test for explicit correct distance.
         EXPECT_LT(0, distance);
         const int expected_lane_index = (y > 0 ? 1 : 0);
-        const Lane* expected_lane = dynamic_cast<const Lane*>(
-            road_geometry_->junction(0)->segment(0)->lane(expected_lane_index));
+        const Lane* expected_lane =
+            dynamic_cast<const Lane*>(road_geometry_->junction(0)->segment(0)->lane(expected_lane_index));
         EXPECT_EQ(road_position.lane, expected_lane);
         EXPECT_TRUE(api::test::IsLanePositionClose(
             road_position.pos,
-            api::LanePosition(
-                expected_nearest_position.x(),
-                expected_nearest_position.y() - expected_lane->y_offset(),
-                expected_nearest_position.z()),
+            api::LanePosition(expected_nearest_position.x(), expected_nearest_position.y() - expected_lane->y_offset(),
+                              expected_nearest_position.z()),
             kLinearTolerance));
       }
     }
@@ -596,18 +527,14 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionNullptr) {
   MakeDragway(2 /* num lanes */);
 
   // Case 1: The provided geo_pos is in the driveable region.
-  EXPECT_NO_THROW(road_geometry_->ToRoadPosition(
-            api::GeoPosition(length_ / 2 /* x */, 0 /* y */, 0 /* z */),
-            nullptr /* hint */,
-            nullptr /* nearest_position */,
-            nullptr /* distance */));
+  EXPECT_NO_THROW(road_geometry_->ToRoadPosition(api::GeoPosition(length_ / 2 /* x */, 0 /* y */, 0 /* z */),
+                                                 nullptr /* hint */, nullptr /* nearest_position */,
+                                                 nullptr /* distance */));
 
   // Case 2: The provided geo_pos is beyond the driveable region.
-  EXPECT_NO_THROW(road_geometry_->ToRoadPosition(
-            api::GeoPosition(length_ + 1e-10 /* x */, 0 /* y */, 0 /* z */),
-            nullptr /* hint */,
-            nullptr /* nearest_position */,
-            nullptr /* distance */));
+  EXPECT_NO_THROW(road_geometry_->ToRoadPosition(api::GeoPosition(length_ + 1e-10 /* x */, 0 /* y */, 0 /* z */),
+                                                 nullptr /* hint */, nullptr /* nearest_position */,
+                                                 nullptr /* distance */));
 }
 
 // Tests dragway::Lane::ToLanePosition() using geographic positions whose
@@ -621,8 +548,8 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePosition) {
       for (const double z : z_test_cases_) {
         api::GeoPosition nearest_position;
         double distance;
-        const api::LanePosition lane_position = lane_->ToLanePosition(
-            api::GeoPosition(x, y, z), &nearest_position, &distance);
+        const api::LanePosition lane_position =
+            lane_->ToLanePosition(api::GeoPosition(x, y, z), &nearest_position, &distance);
         api::GeoPosition expected_nearest_position(x, y, z);
         if (x < min_x_) {
           expected_nearest_position.set_x(min_x_);
@@ -643,17 +570,13 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePosition) {
           expected_nearest_position.set_z(max_z_);
         }
 
-        EXPECT_TRUE(api::test::IsGeoPositionClose(
-            nearest_position, expected_nearest_position,
-            kLinearTolerance));
+        EXPECT_TRUE(api::test::IsGeoPositionClose(nearest_position, expected_nearest_position, kLinearTolerance));
         // TODO(maddog@tri.global)  Should test for explicit correct distance.
         EXPECT_GE(distance, 0);
         EXPECT_TRUE(api::test::IsLanePositionClose(
             lane_position,
-            api::LanePosition(
-                expected_nearest_position.x(),
-                expected_nearest_position.y() - lane_->y_offset(),
-                expected_nearest_position.z()),
+            api::LanePosition(expected_nearest_position.x(), expected_nearest_position.y() - lane_->y_offset(),
+                              expected_nearest_position.z()),
             kLinearTolerance));
       }
     }
@@ -679,20 +602,17 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePositionAutoDiff) {
         drake::AutoDiffXd y_autodiff{y, drake::Vector3<double>(0., 1., 0.)};
         drake::AutoDiffXd z_autodiff{z, drake::Vector3<double>(0., 0., 1.)};
 
-        api::GeoPositionT<drake::AutoDiffXd> geo_position{
-          x_autodiff, y_autodiff, z_autodiff};
+        api::GeoPositionT<drake::AutoDiffXd> geo_position{x_autodiff, y_autodiff, z_autodiff};
 
         // Compute LanePositionT with and without the I/O arguments.
         const api::LanePositionT<drake::AutoDiffXd> lane_position =
-            lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position,
-                                               &nearest_position, &distance);
+            lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position, &nearest_position, &distance);
         const api::LanePositionT<drake::AutoDiffXd> lane_position_nullargs =
             lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position, nullptr, nullptr);
 
-        std::vector<drake::Vector3<double>> positional_derivatives{
-          drake::Vector3<double>::Zero(),   // s
-          drake::Vector3<double>::Zero(),   // r
-          drake::Vector3<double>::Zero()};  // h
+        std::vector<drake::Vector3<double>> positional_derivatives{drake::Vector3<double>::Zero(),   // s
+                                                                   drake::Vector3<double>::Zero(),   // r
+                                                                   drake::Vector3<double>::Zero()};  // h
         for (int i{0}; i < 3; ++i) positional_derivatives[i](i) = 1.;
 
         if (distance == 0.) {
@@ -704,19 +624,13 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePositionAutoDiff) {
           // axis).  Verify that the derivatives of nearest position are the
           // same as for geo_position.
           for (int i{0}; i < 3; ++i) {
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i],
-                                        lane_position.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(
-                positional_derivatives[i],
-                lane_position_nullargs.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(
-                positional_derivatives[i],
-                nearest_position.xyz()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], lane_position.srh()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], lane_position_nullargs.srh()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], nearest_position.xyz()(i).derivatives()));
           }
           // Expect ∂/∂x(distance) = 0., as distance remains unchanged when
           // on the boundary or within the interior of the lane.
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>::Zero(),
-                                      distance.derivatives()));
+          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>::Zero(), distance.derivatives()));
         } else {
           // `geo_position` is outside of the lane.  In this case, the
           // derivatives for distance and position depend on the region in
@@ -768,33 +682,21 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePositionAutoDiff) {
           // ∂/∂x(NP.r()) should always be zero.  Similar principles apply
           // in cases where z ≠ 0.
           const drake::Vector3<double> derivative_candidates(
-              (x < min_x_) ?
-              (x - min_x_) / distance.value() :
-              (x - max_x_) / distance.value(),
-              (y < min_y_) ?
-              (y - min_y_) / distance.value() :
-              (y - max_y_) / distance.value(),
-              (z < min_z_) ?
-              (z - min_z_) / distance.value() :
-              (z - max_z_) / distance.value());
+              (x < min_x_) ? (x - min_x_) / distance.value() : (x - max_x_) / distance.value(),
+              (y < min_y_) ? (y - min_y_) / distance.value() : (y - max_y_) / distance.value(),
+              (z < min_z_) ? (z - min_z_) / distance.value() : (z - max_z_) / distance.value());
           drake::Vector3<double> distance_derivatives = drake::Vector3<double>::Zero();
 
           for (int index : GetTransgressedBoundaries(geo_position)) {
             distance_derivatives(index) = derivative_candidates(index);
             positional_derivatives[index](index) = 0.;  // (entry was = 1).
           }
-          EXPECT_TRUE(CompareMatrices(
-              distance_derivatives, distance.derivatives(),
-              1e-15 /* account for small numerical errors */));
+          EXPECT_TRUE(CompareMatrices(distance_derivatives, distance.derivatives(),
+                                      1e-15 /* account for small numerical errors */));
           for (int i{0}; i < 3; ++i) {
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i],
-                                        lane_position.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(
-                positional_derivatives[i],
-                lane_position_nullargs.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(
-                positional_derivatives[i],
-                nearest_position.xyz()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], lane_position.srh()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], lane_position_nullargs.srh()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], nearest_position.xyz()(i).derivatives()));
           }
         }
       }
@@ -812,9 +714,7 @@ TEST_F(MaliputDragwayLaneTest, ThrowIfGeoPosHasMismatchedDerivatives) {
   drake::AutoDiffXd h{7., drake::Vector1<double>(1.)};
   api::LanePositionT<drake::AutoDiffXd> lane_position(s, r, h);
 
-  EXPECT_THROW(
-      lane_->ToGeoPositionT<drake::AutoDiffXd>(lane_position),
-      maliput::common::assertion_error);
+  EXPECT_THROW(lane_->ToGeoPositionT<drake::AutoDiffXd>(lane_position), maliput::common::assertion_error);
 }
 
 TEST_F(MaliputDragwayLaneTest, ThrowIfLanePosHasMismatchedDerivatives) {
@@ -827,9 +727,8 @@ TEST_F(MaliputDragwayLaneTest, ThrowIfLanePosHasMismatchedDerivatives) {
   drake::AutoDiffXd z{7., drake::Vector1<double>(1.)};
   api::GeoPositionT<drake::AutoDiffXd> geo_position(x, y, z);
 
-  EXPECT_THROW(
-      lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position, nullptr, nullptr),
-      maliput::common::assertion_error);
+  EXPECT_THROW(lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position, nullptr, nullptr),
+               maliput::common::assertion_error);
 }
 
 TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic1) {
@@ -849,16 +748,13 @@ TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic1) {
   // Computes symbolic gp and distance.
   api::GeoPositionT<drake::symbolic::Expression> symbolic_gp;
   drake::symbolic::Expression symbolic_distance{0.0};
-  const api::LanePositionT<drake::symbolic::Expression> symbolic_lp{
-      lane_->ToLanePositionT<drake::symbolic::Expression>(
-          api::GeoPositionT<drake::symbolic::Expression>{x, y, z}, &symbolic_gp,
-          &symbolic_distance)};
+  const api::LanePositionT<drake::symbolic::Expression> symbolic_lp{lane_->ToLanePositionT<drake::symbolic::Expression>(
+      api::GeoPositionT<drake::symbolic::Expression>{x, y, z}, &symbolic_gp, &symbolic_distance)};
 
   // Computes gp and distance (of double).
   api::GeoPosition gp;
   double distance{0.0};
-  const api::LanePosition lp{
-      lane_->ToLanePosition(api::GeoPosition{v_x, v_y, v_z}, &gp, &distance)};
+  const api::LanePosition lp{lane_->ToLanePosition(api::GeoPosition{v_x, v_y, v_z}, &gp, &distance)};
 
   EXPECT_EQ(symbolic_lp.s().Evaluate(env), lp.s());
   EXPECT_EQ(symbolic_lp.r().Evaluate(env), lp.r());
@@ -873,8 +769,7 @@ TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic1) {
   // positive distance and 2) the symbolic_gp evaluated with those values is
   // different from (1.0, 2.0, -0.5).
   EXPECT_GT(distance, 0.0);
-  EXPECT_FALSE(symbolic_gp.x().Evaluate(env) == v_x &&
-               symbolic_gp.y().Evaluate(env) == v_y &&
+  EXPECT_FALSE(symbolic_gp.x().Evaluate(env) == v_x && symbolic_gp.y().Evaluate(env) == v_y &&
                symbolic_gp.z().Evaluate(env) == v_z);
 }
 
@@ -896,16 +791,13 @@ TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic2) {
   api::GeoPositionT<drake::symbolic::Expression> symbolic_gp;
   drake::symbolic::Expression symbolic_distance{0.0};
 
-  const api::LanePositionT<drake::symbolic::Expression> symbolic_lp{
-      lane_->ToLanePositionT<drake::symbolic::Expression>(
-          api::GeoPositionT<drake::symbolic::Expression>{x, y, z}, &symbolic_gp,
-          &symbolic_distance)};
+  const api::LanePositionT<drake::symbolic::Expression> symbolic_lp{lane_->ToLanePositionT<drake::symbolic::Expression>(
+      api::GeoPositionT<drake::symbolic::Expression>{x, y, z}, &symbolic_gp, &symbolic_distance)};
 
   // Computes gp and distance (of double).
   api::GeoPosition gp;
   double distance{0.0};
-  const api::LanePosition lp{
-      lane_->ToLanePosition(api::GeoPosition{v_x, v_y, v_z}, &gp, &distance)};
+  const api::LanePosition lp{lane_->ToLanePosition(api::GeoPosition{v_x, v_y, v_z}, &gp, &distance)};
 
   EXPECT_EQ(symbolic_lp.s().Evaluate(env), lp.s());
   EXPECT_EQ(symbolic_lp.r().Evaluate(env), lp.r());
@@ -920,8 +812,7 @@ TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic2) {
   // distance and 2) the symbolic_gp evaluated with those values is (1.0, 2.0,
   // 0.0).
   EXPECT_EQ(distance, 0.0);
-  EXPECT_TRUE(symbolic_gp.x().Evaluate(env) == v_x &&
-              symbolic_gp.y().Evaluate(env) == v_y &&
+  EXPECT_TRUE(symbolic_gp.x().Evaluate(env) == v_x && symbolic_gp.y().Evaluate(env) == v_y &&
               symbolic_gp.z().Evaluate(env) == v_z);
 }
 
@@ -941,18 +832,15 @@ TEST_F(MaliputDragwayLaneTest, ToGeoPositionSymbolic) {
 
   // Computes symbolic gp.
   const api::GeoPositionT<drake::symbolic::Expression> symbolic_gp{
-      lane_->ToGeoPositionT<drake::symbolic::Expression>(
-          api::LanePositionT<drake::symbolic::Expression>{s, r, h})};
+      lane_->ToGeoPositionT<drake::symbolic::Expression>(api::LanePositionT<drake::symbolic::Expression>{s, r, h})};
 
   // Computes gp (of double).
-  const api::GeoPosition gp{
-      lane_->ToGeoPosition(api::LanePosition{v_s, v_r, v_h})};
+  const api::GeoPosition gp{lane_->ToGeoPosition(api::LanePosition{v_s, v_r, v_h})};
 
   EXPECT_EQ(symbolic_gp.x().Evaluate(env), gp.x());
   EXPECT_EQ(symbolic_gp.y().Evaluate(env), gp.y());
   EXPECT_EQ(symbolic_gp.z().Evaluate(env), gp.z());
 }
-
 
 // Holds RoadPositionResult expected arguments.
 struct RoadPositionResultExpectation {
@@ -970,19 +858,15 @@ struct FindRoadPositionsTestParameters {
 };
 
 // Operator overload for GTest log.
-std::ostream& operator<<(
-    std::ostream& os, const FindRoadPositionsTestParameters& test_parameters) {
-  os << "{dragway_num_lanes: " << test_parameters.dragway_num_lanes
-     << ", radius: " << test_parameters.radius
-     << ", inertial_position: " << test_parameters.inertial_position
-     << ", expected_results: {...}}";
+std::ostream& operator<<(std::ostream& os, const FindRoadPositionsTestParameters& test_parameters) {
+  os << "{dragway_num_lanes: " << test_parameters.dragway_num_lanes << ", radius: " << test_parameters.radius
+     << ", inertial_position: " << test_parameters.inertial_position << ", expected_results: {...}}";
   return os;
 }
 
 // To understand the characteristics of the geometry, consult the
 // dragway::Segment and dragway::Lane detailed class overview docs.
-class MaliputDragwayFindRoadPositionTest :
-    public ::testing::TestWithParam<FindRoadPositionsTestParameters> {
+class MaliputDragwayFindRoadPositionTest : public ::testing::TestWithParam<FindRoadPositionsTestParameters> {
  public:
   const double kLength = 100.;
   const double kLaneWidth = 6.;
@@ -999,15 +883,12 @@ class MaliputDragwayFindRoadPositionTest :
   static std::vector<FindRoadPositionsTestParameters> TestParameters();
 
   void MakeDragway(int num_lanes) {
-    const api::RoadGeometryId road_geometry_id(std::to_string(num_lanes) +
-                                               "LaneDragwayRoadGeometry");
-    road_geometry_.reset(new RoadGeometry(
-        road_geometry_id, num_lanes, kLength, kLaneWidth, kShoulderWidth,
-        kMaximumHeight, kLinearTolerance, kAngularTolerance));
+    const api::RoadGeometryId road_geometry_id(std::to_string(num_lanes) + "LaneDragwayRoadGeometry");
+    road_geometry_.reset(new RoadGeometry(road_geometry_id, num_lanes, kLength, kLaneWidth, kShoulderWidth,
+                                          kMaximumHeight, kLinearTolerance, kAngularTolerance));
   }
 
  protected:
-
   void SetUp() override {
     const FindRoadPositionsTestParameters test_parameters = GetParam();
     dragway_num_lanes_ = test_parameters.dragway_num_lanes;
@@ -1023,130 +904,117 @@ class MaliputDragwayFindRoadPositionTest :
   std::unique_ptr<RoadGeometry> road_geometry_;
 };
 
-
-std::vector<FindRoadPositionsTestParameters>
-    MaliputDragwayFindRoadPositionTest::TestParameters() {
+std::vector<FindRoadPositionsTestParameters> MaliputDragwayFindRoadPositionTest::TestParameters() {
   return {
-    // For the following set of test cases, an Inertial Frame position is placed
-    // outside the road volume on purpose expecting the method to derive the
-    // right LanePosition for each coordinate (s, r, and h), not only a mapping
-    // to the ground.
+      // For the following set of test cases, an Inertial Frame position is placed
+      // outside the road volume on purpose expecting the method to derive the
+      // right LanePosition for each coordinate (s, r, and h), not only a mapping
+      // to the ground.
 
-    // { Single-lane Dragway tests cases.
-    // Point is outside the RoadGeometry volume with zero radius, no possible
-    // match.
-    {1, 0., api::GeoPosition(10., 20., 30.), {}},
-    // Point is outside the RoadGeometry volume with small radius, no possible
-    // match.
-    {1, 10., api::GeoPosition(10., 20., 30.), {}},
-    // Point is outside the RoadGeometry volume with big enough radius to produce
-    // a match.
-    {1, 30., api::GeoPosition(10., 20., 30.),
-     {{api::LaneId("Dragway_Lane_0"),
-       {api::LanePosition(10., 3.5, 5.),
-        api::GeoPosition(10., 3.5, 5.),
-        29.95413160150032}},
+      // { Single-lane Dragway tests cases.
+      // Point is outside the RoadGeometry volume with zero radius, no possible
+      // match.
+      {1, 0., api::GeoPosition(10., 20., 30.), {}},
+      // Point is outside the RoadGeometry volume with small radius, no possible
+      // match.
+      {1, 10., api::GeoPosition(10., 20., 30.), {}},
+      // Point is outside the RoadGeometry volume with big enough radius to produce
+      // a match.
+      {
+          1,
+          30.,
+          api::GeoPosition(10., 20., 30.),
+          {
+              {api::LaneId("Dragway_Lane_0"),
+               {api::LanePosition(10., 3.5, 5.), api::GeoPosition(10., 3.5, 5.), 29.95413160150032}},
+          },
       },
-    },
-    // Same result as before but with a relatively big radius.
-    {1, 1000., api::GeoPosition(10., 20., 30.),
-     {{api::LaneId("Dragway_Lane_0"),
-       {api::LanePosition(10., 3.5, 5.),
-        api::GeoPosition(10., 3.5, 5.),
-        29.95413160150032}},
+      // Same result as before but with a relatively big radius.
+      {
+          1,
+          1000.,
+          api::GeoPosition(10., 20., 30.),
+          {
+              {api::LaneId("Dragway_Lane_0"),
+               {api::LanePosition(10., 3.5, 5.), api::GeoPosition(10., 3.5, 5.), 29.95413160150032}},
+          },
       },
-    },
-    // Biggest radius possible, the closest point to Inertial position is
-    // expected for all lanes (just one).
-    {1, std::numeric_limits<double>::infinity(),
-     api::GeoPosition(10., 20., 30.),
-     {{api::LaneId("Dragway_Lane_0"),
-       {api::LanePosition(10., 3.5, 5.),
-        api::GeoPosition(10., 3.5, 5.),
-        29.95413160150032}},
+      // Biggest radius possible, the closest point to Inertial position is
+      // expected for all lanes (just one).
+      {
+          1,
+          std::numeric_limits<double>::infinity(),
+          api::GeoPosition(10., 20., 30.),
+          {
+              {api::LaneId("Dragway_Lane_0"),
+               {api::LanePosition(10., 3.5, 5.), api::GeoPosition(10., 3.5, 5.), 29.95413160150032}},
+          },
       },
-    },
-    // } Single-lane Dragway tests cases.
+      // } Single-lane Dragway tests cases.
 
-    // { Multiple-lane Dragway test cases.
-    // Point is outside the RoadGeometry volume with zero radius, no possible
-    // match.
-    {3, 0., api::GeoPosition(10., 20., 30.), {}},
-    // Point is outside the RoadGeometry volume with small radius, no possible
-    // match.
-    {3, 10., api::GeoPosition(10., 20., 30.), {}},
-    // Point is outside the RoadGeometry volume with big enough radius to
-    // produce a match.
-    {3, 28., api::GeoPosition(10., 20., 30.),
-     {{api::LaneId("Dragway_Lane_0"),
-       {api::LanePosition(10., 15.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        27.115493725912497}},
-      {api::LaneId("Dragway_Lane_1"),
-       {api::LanePosition(10., 9.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        27.115493725912497}},
-      {api::LaneId("Dragway_Lane_2"),
-       {api::LanePosition(10., 3.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        27.115493725912497}},
+      // { Multiple-lane Dragway test cases.
+      // Point is outside the RoadGeometry volume with zero radius, no possible
+      // match.
+      {3, 0., api::GeoPosition(10., 20., 30.), {}},
+      // Point is outside the RoadGeometry volume with small radius, no possible
+      // match.
+      {3, 10., api::GeoPosition(10., 20., 30.), {}},
+      // Point is outside the RoadGeometry volume with big enough radius to
+      // produce a match.
+      {
+          3,
+          28.,
+          api::GeoPosition(10., 20., 30.),
+          {
+              {api::LaneId("Dragway_Lane_0"),
+               {api::LanePosition(10., 15.5, 5.), api::GeoPosition(10., 9.5, 5.), 27.115493725912497}},
+              {api::LaneId("Dragway_Lane_1"),
+               {api::LanePosition(10., 9.5, 5.), api::GeoPosition(10., 9.5, 5.), 27.115493725912497}},
+              {api::LaneId("Dragway_Lane_2"),
+               {api::LanePosition(10., 3.5, 5.), api::GeoPosition(10., 9.5, 5.), 27.115493725912497}},
+          },
       },
-    },
-    // Point is within the RoadGeometry volume, specifically at the interface.
-    {3, 0., api::GeoPosition(10., 9.5, 5.),
-     {{api::LaneId("Dragway_Lane_0"),
-       {api::LanePosition(10., 15.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        0.}},
-      {api::LaneId("Dragway_Lane_1"),
-       {api::LanePosition(10., 9.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        0.}},
-      {api::LaneId("Dragway_Lane_2"),
-       {api::LanePosition(10., 3.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        0.}},
+      // Point is within the RoadGeometry volume, specifically at the interface.
+      {
+          3,
+          0.,
+          api::GeoPosition(10., 9.5, 5.),
+          {
+              {api::LaneId("Dragway_Lane_0"), {api::LanePosition(10., 15.5, 5.), api::GeoPosition(10., 9.5, 5.), 0.}},
+              {api::LaneId("Dragway_Lane_1"), {api::LanePosition(10., 9.5, 5.), api::GeoPosition(10., 9.5, 5.), 0.}},
+              {api::LaneId("Dragway_Lane_2"), {api::LanePosition(10., 3.5, 5.), api::GeoPosition(10., 9.5, 5.), 0.}},
+          },
       },
-    },
-    // Point is outside the RoadGeometry volume with infinite radius, all lanes
-    // are expected to produce a result.
-    {3, std::numeric_limits<double>::infinity(),
-     api::GeoPosition(10., 20., 30.),
-     {{api::LaneId("Dragway_Lane_0"),
-       {api::LanePosition(10., 15.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        27.115493725912497}},
-      {api::LaneId("Dragway_Lane_1"),
-       {api::LanePosition(10., 9.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        27.115493725912497}},
-      {api::LaneId("Dragway_Lane_2"),
-       {api::LanePosition(10., 3.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        27.115493725912497}},
+      // Point is outside the RoadGeometry volume with infinite radius, all lanes
+      // are expected to produce a result.
+      {
+          3,
+          std::numeric_limits<double>::infinity(),
+          api::GeoPosition(10., 20., 30.),
+          {
+              {api::LaneId("Dragway_Lane_0"),
+               {api::LanePosition(10., 15.5, 5.), api::GeoPosition(10., 9.5, 5.), 27.115493725912497}},
+              {api::LaneId("Dragway_Lane_1"),
+               {api::LanePosition(10., 9.5, 5.), api::GeoPosition(10., 9.5, 5.), 27.115493725912497}},
+              {api::LaneId("Dragway_Lane_2"),
+               {api::LanePosition(10., 3.5, 5.), api::GeoPosition(10., 9.5, 5.), 27.115493725912497}},
+          },
       },
-    },
-    // Point is within the RoadGeometry volume, with infinite radius, all lanes
-    // are expected to produce a result.
-    {3, std::numeric_limits<double>::infinity(), api::GeoPosition(10., 9.5, 5.),
-     {{api::LaneId("Dragway_Lane_0"),
-       {api::LanePosition(10., 15.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        0.}},
-      {api::LaneId("Dragway_Lane_1"),
-       {api::LanePosition(10., 9.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        0.}},
-      {api::LaneId("Dragway_Lane_2"),
-       {api::LanePosition(10., 3.5, 5.),
-        api::GeoPosition(10., 9.5, 5.),
-        0.}},
+      // Point is within the RoadGeometry volume, with infinite radius, all lanes
+      // are expected to produce a result.
+      {
+          3,
+          std::numeric_limits<double>::infinity(),
+          api::GeoPosition(10., 9.5, 5.),
+          {
+              {api::LaneId("Dragway_Lane_0"), {api::LanePosition(10., 15.5, 5.), api::GeoPosition(10., 9.5, 5.), 0.}},
+              {api::LaneId("Dragway_Lane_1"), {api::LanePosition(10., 9.5, 5.), api::GeoPosition(10., 9.5, 5.), 0.}},
+              {api::LaneId("Dragway_Lane_2"), {api::LanePosition(10., 3.5, 5.), api::GeoPosition(10., 9.5, 5.), 0.}},
+          },
       },
-    },
-    // } Multiple-lane Dragway test cases.
+      // } Multiple-lane Dragway test cases.
   };
 }
-
 
 // Evaluates RoadGeometry::FindRoadPositions() using a single-lane Dragway with
 // different radii and Inertial positions.
@@ -1159,26 +1027,17 @@ TEST_P(MaliputDragwayFindRoadPositionTest, FindRoadPositionsWithOneLane) {
 
   // Evaluates RoadPosition matching.
   for (const api::RoadPositionResult& dut : road_position_results) {
-    EXPECT_TRUE(expected_results_.find(dut.road_position.lane->id()) !=
-                expected_results_.end());
+    EXPECT_TRUE(expected_results_.find(dut.road_position.lane->id()) != expected_results_.end());
     EXPECT_TRUE(api::test::IsLanePositionClose(
-        dut.road_position.pos,
-        expected_results_[dut.road_position.lane->id()].lane_position,
-        kLinearTolerance));
+        dut.road_position.pos, expected_results_[dut.road_position.lane->id()].lane_position, kLinearTolerance));
     EXPECT_TRUE(api::test::IsGeoPositionClose(
-        dut.nearest_position,
-        expected_results_[dut.road_position.lane->id()].nearest_position,
-        kLinearTolerance));
-    EXPECT_NEAR(
-        dut.distance,
-        expected_results_[dut.road_position.lane->id()].distance,
-        kLinearTolerance);
+        dut.nearest_position, expected_results_[dut.road_position.lane->id()].nearest_position, kLinearTolerance));
+    EXPECT_NEAR(dut.distance, expected_results_[dut.road_position.lane->id()].distance, kLinearTolerance);
   }
 }
 
-INSTANTIATE_TEST_CASE_P(
-    MaliputDragwayFindLaneMappingsTestGroup, MaliputDragwayFindRoadPositionTest,
-    ::testing::ValuesIn(MaliputDragwayFindRoadPositionTest::TestParameters()));
+INSTANTIATE_TEST_CASE_P(MaliputDragwayFindLaneMappingsTestGroup, MaliputDragwayFindRoadPositionTest,
+                        ::testing::ValuesIn(MaliputDragwayFindRoadPositionTest::TestParameters()));
 
 }  // namespace
 }  // namespace dragway

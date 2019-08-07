@@ -44,12 +44,9 @@ TrafficLightBook::TrafficLightBook() : impl_(std::make_unique<Impl>()) {}
 
 TrafficLightBook::~TrafficLightBook() = default;
 
-void TrafficLightBook::AddTrafficLight(const TrafficLight& traffic_light) {
-  impl_->AddTrafficLight(traffic_light);
-}
+void TrafficLightBook::AddTrafficLight(const TrafficLight& traffic_light) { impl_->AddTrafficLight(traffic_light); }
 
-drake::optional<TrafficLight> TrafficLightBook::DoGetTrafficLight(
-    const TrafficLight::Id& id) const {
+drake::optional<TrafficLight> TrafficLightBook::DoGetTrafficLight(const TrafficLight::Id& id) const {
   return impl_->DoGetTrafficLight(id);
 }
 

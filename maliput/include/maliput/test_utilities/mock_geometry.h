@@ -42,23 +42,17 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
   ///
   /// @throws std::exception if either `linear_tolerance` or
   ///         `angular_tolerance` or `scale_length` is non-positive.
-  MockRoadGeometry(const api::RoadGeometryId& id,
-                   double linear_tolerance,
-                   double angular_tolerance,
+  MockRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance,
                    double scale_length)
-      : geometry_base::RoadGeometry(id, linear_tolerance, angular_tolerance,
-                                    scale_length) {}
+      : geometry_base::RoadGeometry(id, linear_tolerance, angular_tolerance, scale_length) {}
 
  private:
-  api::RoadPosition DoToRoadPosition(const api::GeoPosition& geo_position,
-                                     const api::RoadPosition* hint,
-                                     api::GeoPosition* nearest_position,
-                                     double* distance) const override;
+  api::RoadPosition DoToRoadPosition(const api::GeoPosition& geo_position, const api::RoadPosition* hint,
+                                     api::GeoPosition* nearest_position, double* distance) const override;
 
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(
-      const api::GeoPosition& geo_position, double radius) const override;
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::GeoPosition& geo_position,
+                                                           double radius) const override;
 };
-
 
 /// Mock api::BranchPoint implementation; see mock_geometry.h.
 class MockBranchPoint : public geometry_base::BranchPoint {
@@ -70,10 +64,8 @@ class MockBranchPoint : public geometry_base::BranchPoint {
   /// @param id the ID
   ///
   /// See geometry_base::BranchPoint for discussion on initialization.
-  explicit MockBranchPoint(const api::BranchPointId& id)
-      : geometry_base::BranchPoint(id) {}
+  explicit MockBranchPoint(const api::BranchPointId& id) : geometry_base::BranchPoint(id) {}
 };
-
 
 /// Mock api::Junction implementation; see mock_geometry.h.
 class MockJunction : public geometry_base::Junction {
@@ -85,10 +77,8 @@ class MockJunction : public geometry_base::Junction {
   /// @param id the ID
   ///
   /// See geometry_base::Junction for discussion on initialization.
-  explicit MockJunction(const api::JunctionId& id)
-      : geometry_base::Junction(id) {}
+  explicit MockJunction(const api::JunctionId& id) : geometry_base::Junction(id) {}
 };
-
 
 /// Mock api::Segment implementation; see mock_geometry.h.
 class MockSegment : public geometry_base::Segment {
@@ -100,10 +90,8 @@ class MockSegment : public geometry_base::Segment {
   /// @param id the ID
   ///
   /// See geometry_base::Segment for discussion on initialization.
-  explicit MockSegment(const api::SegmentId& id)
-      : geometry_base::Segment(id) {}
+  explicit MockSegment(const api::SegmentId& id) : geometry_base::Segment(id) {}
 };
-
 
 /// Mock api::Lane implementation; see mock_geometry.h.
 class MockLane : public geometry_base::Lane {
@@ -122,18 +110,13 @@ class MockLane : public geometry_base::Lane {
   api::RBounds do_lane_bounds(double) const override;
   api::RBounds do_driveable_bounds(double) const override;
   api::HBounds do_elevation_bounds(double, double) const override;
-  api::GeoPosition DoToGeoPosition(
-      const api::LanePosition& lane_pos) const override;
-  api::Rotation DoGetOrientation(
-      const api::LanePosition& lane_pos) const override;
-  api::LanePosition DoEvalMotionDerivatives(
-      const api::LanePosition& position,
-      const api::IsoLaneVelocity& velocity) const override;
-  api::LanePosition DoToLanePosition(
-      const api::GeoPosition& geo_position,
-      api::GeoPosition* nearest_position, double* distance) const override;
+  api::GeoPosition DoToGeoPosition(const api::LanePosition& lane_pos) const override;
+  api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const override;
+  api::LanePosition DoEvalMotionDerivatives(const api::LanePosition& position,
+                                            const api::IsoLaneVelocity& velocity) const override;
+  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_position, api::GeoPosition* nearest_position,
+                                     double* distance) const override;
 };
-
 
 }  // namespace test
 }  // namespace geometry_base

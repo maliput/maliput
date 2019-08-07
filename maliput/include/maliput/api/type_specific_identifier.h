@@ -9,7 +9,6 @@
 
 #include "maliput/common/maliput_throw.h"
 
-
 namespace maliput {
 namespace api {
 
@@ -47,8 +46,7 @@ class TypeSpecificIdentifier {
   /// Constructs a %TypeSpecificIdentifier from the given `string`.
   ///
   /// @throws maliput::common::assertion_error if `string` is empty.
-  explicit TypeSpecificIdentifier(std::string string)
-      : string_(std::move(string)) {
+  explicit TypeSpecificIdentifier(std::string string) : string_(std::move(string)) {
     MALIPUT_THROW_UNLESS(!string_.empty());
   }
 
@@ -56,20 +54,15 @@ class TypeSpecificIdentifier {
   const std::string& string() const { return string_; }
 
   /// Tests for equality with another %TypeSpecificIdentifier.
-  bool operator==(const TypeSpecificIdentifier<T>& rhs) const {
-    return string_ == rhs.string_;
-  }
+  bool operator==(const TypeSpecificIdentifier<T>& rhs) const { return string_ == rhs.string_; }
 
   /// Tests for inequality with another %TypeSpecificIdentifier, specifically
   /// returning the opposite of operator==().
-  bool operator!=(const TypeSpecificIdentifier<T>& rhs) const {
-    return !(*this == rhs);
-  }
+  bool operator!=(const TypeSpecificIdentifier<T>& rhs) const { return !(*this == rhs); }
 
   /// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
-  friend void hash_append(
-      HashAlgorithm& hasher, const TypeSpecificIdentifier& item) noexcept {
+  friend void hash_append(HashAlgorithm& hasher, const TypeSpecificIdentifier& item) noexcept {
     using drake::hash_append;
     hash_append(hasher, item.string_);
   }
@@ -81,13 +74,11 @@ class TypeSpecificIdentifier {
 }  // namespace api
 }  // namespace maliput
 
-
 namespace std {
 
 /// Specialization of std::hash for TypeSpecificIdentifier<T>.
 template <typename T>
-struct hash<maliput::api::TypeSpecificIdentifier<T>>
-    : public drake::DefaultHash {};
+struct hash<maliput::api::TypeSpecificIdentifier<T>> : public drake::DefaultHash {};
 
 /// Specialization of std::less for TypeSpecificIdentifier<T> providing a
 /// strict ordering over TypeSpecificIdentifier<T> suitable for use with ordered
@@ -95,8 +86,7 @@ struct hash<maliput::api::TypeSpecificIdentifier<T>>
 template <typename T>
 struct less<maliput::api::TypeSpecificIdentifier<T>> {
   bool operator()(const maliput::api::TypeSpecificIdentifier<T>& lhs,
-                  const maliput::api::TypeSpecificIdentifier<T>& rhs)
-      const {
+                  const maliput::api::TypeSpecificIdentifier<T>& rhs) const {
     return lhs.string() < rhs.string();
   }
 };

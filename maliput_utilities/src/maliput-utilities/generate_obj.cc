@@ -6,27 +6,27 @@
 #include <fstream>
 #include <functional>
 #include <initializer_list>
-#include <tuple>
 #include <map>
+#include <tuple>
 #include <vector>
 
 #include "fmt/ostream.h"
 
+#include "maliput-utilities/mesh.h"
+#include "maliput-utilities/mesh_simplification.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
-#include "maliput-utilities/mesh.h"
-#include "maliput-utilities/mesh_simplification.h"
 
 namespace maliput {
 namespace utility {
 
 using mesh::GeoMesh;
-using mesh::SrhFace;
 using mesh::SimplifyMeshFaces;
+using mesh::SrhFace;
 
 namespace {
 
@@ -43,48 +43,33 @@ const std::string kGrayedMarkerPaint("grayed_marker_paint");
 // were taken from the original .mtl description that
 // lives in GenerateObjFile().
 const std::vector<Material> kMaterial{
-  {kBlandAsphalt,
-    {0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0},
-  {kLaneHaze,
-    {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8},
-  {kMarkerPaint,
-    {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5},
-  {kHBoundsHaze,
-    {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8},
-  {kBranchPointGlow,
-    {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9},
-  {kGrayedBlandAsphalt,
-    {0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9},
-  {kGrayedLaneHaze,
-    {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9},
-  {kGrayedMarkerPaint,
-    {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}
-};
+    {kBlandAsphalt, {0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0},
+    {kLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8},
+    {kMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5},
+    {kHBoundsHaze, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8},
+    {kBranchPointGlow, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9},
+    {kGrayedBlandAsphalt, {0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9},
+    {kGrayedLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9},
+    {kGrayedMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}};
 
-std::string FormatDrakeVector3AsRow(const drake::Vector3<double> &vec)
-{
-  return fmt::format("{} {} {}", std::to_string(vec.x()),
-                                 std::to_string(vec.y()),
-                                 std::to_string(vec.z())
-                     );
+std::string FormatDrakeVector3AsRow(const drake::Vector3<double>& vec) {
+  return fmt::format("{} {} {}", std::to_string(vec.x()), std::to_string(vec.y()), std::to_string(vec.z()));
 }
 
-std::string FormatMaterial(const Material& mat)
-{
-  return fmt::format("newmtl {}\n"
-                      "Ka {}\n"
-                      "Kd {}\n"
-                      "Ks {}\n"
-                      "Ns {}\n"
-                      "illum 2\n"
-                      "d {}\n",
-                      mat.name, FormatDrakeVector3AsRow(mat.ambient),
-                      FormatDrakeVector3AsRow(mat.diffuse),
-                      FormatDrakeVector3AsRow(mat.specular),
-                      mat.shinines, 1.0 - mat.transparency);
+std::string FormatMaterial(const Material& mat) {
+  return fmt::format(
+      "newmtl {}\n"
+      "Ka {}\n"
+      "Kd {}\n"
+      "Ks {}\n"
+      "Ns {}\n"
+      "illum 2\n"
+      "d {}\n",
+      mat.name, FormatDrakeVector3AsRow(mat.ambient), FormatDrakeVector3AsRow(mat.diffuse),
+      FormatDrakeVector3AsRow(mat.specular), mat.shinines, 1.0 - mat.transparency);
 }
 
-// Compute the maximum step in s-coordinates that can approximate the distance 
+// Compute the maximum step in s-coordinates that can approximate the distance
 // between its ends in world's inertial frame coordinates up to the given
 // `grid_unit` (taken as an absolute tolerance).
 //
@@ -94,21 +79,17 @@ std::string FormatMaterial(const Material& mat)
 // arc-length, to the `lane`'s end along the center line, increase `step_s`
 // until the distance between its ends in world's coordinates along the center,
 // left most and right most lines of the `lane`'s driveable
-// surface is bigger than `grid_unit` or the end of the `lane` is reached. 
-double ComputeSampleStep(
-      const maliput::api::Lane* lane, double s0, double grid_unit) {
+// surface is bigger than `grid_unit` or the end of the `lane` is reached.
+double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_unit) {
   DRAKE_DEMAND(lane != nullptr);
 
   const double length = lane->length();
   const double min_step = std::min(grid_unit, length - s0);
 
   const maliput::api::RBounds prev_lane_bounds = lane->lane_bounds(s0);
-  const maliput::api::GeoPosition prev_pos_center =
-        lane->ToGeoPosition({s0, 0., 0.});
-  const maliput::api::GeoPosition prev_pos_left =
-        lane->ToGeoPosition({s0, prev_lane_bounds.max(), 0.});
-  const maliput::api::GeoPosition prev_pos_right =
-        lane->ToGeoPosition({s0, prev_lane_bounds.min(), 0.});
+  const maliput::api::GeoPosition prev_pos_center = lane->ToGeoPosition({s0, 0., 0.});
+  const maliput::api::GeoPosition prev_pos_left = lane->ToGeoPosition({s0, prev_lane_bounds.max(), 0.});
+  const maliput::api::GeoPosition prev_pos_right = lane->ToGeoPosition({s0, prev_lane_bounds.min(), 0.});
 
   // Start from minimum step.
   double step_best = min_step;
@@ -119,20 +100,14 @@ double ComputeSampleStep(
     const double s_proposed = s0 + step_proposed;
     const maliput::api::RBounds lane_bounds = lane->lane_bounds(s_proposed);
 
-    const maliput::api::GeoPosition proposed_pos_center_lane =
-        lane->ToGeoPosition({s_proposed, 0., 0.});
-    const maliput::api::GeoPosition proposed_pos_left_lane =
-        lane->ToGeoPosition({s_proposed, lane_bounds.max(), 0.});
-    const maliput::api::GeoPosition proposed_pos_right_lane =
-        lane->ToGeoPosition({s_proposed, lane_bounds.min(), 0.});
+    const maliput::api::GeoPosition proposed_pos_center_lane = lane->ToGeoPosition({s_proposed, 0., 0.});
+    const maliput::api::GeoPosition proposed_pos_left_lane = lane->ToGeoPosition({s_proposed, lane_bounds.max(), 0.});
+    const maliput::api::GeoPosition proposed_pos_right_lane = lane->ToGeoPosition({s_proposed, lane_bounds.min(), 0.});
 
     // Calculate distance between geo positions for every lane.
-    const double distance_from_center =
-        (prev_pos_center.xyz() - proposed_pos_center_lane.xyz()).norm();
-    const double distance_from_left =
-        (prev_pos_left.xyz() - proposed_pos_left_lane.xyz()).norm();
-    const double distance_from_right =
-        (prev_pos_right.xyz() - proposed_pos_right_lane.xyz()).norm();
+    const double distance_from_center = (prev_pos_center.xyz() - proposed_pos_center_lane.xyz()).norm();
+    const double distance_from_left = (prev_pos_left.xyz() - proposed_pos_left_lane.xyz()).norm();
+    const double distance_from_right = (prev_pos_right.xyz() - proposed_pos_right_lane.xyz()).norm();
 
     // Check if distance between geo position and local path length ( delta s ) is small enough.
     if (std::fabs(distance_from_center - step_proposed) > grid_unit ||
@@ -160,21 +135,15 @@ double ComputeSampleStep(
 // covering the left and right side of the road, considering the grid_unit
 // as a tolerance between patches. Bigger tolerance, worst quality but less
 // vertices.
-void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane,
-    double grid_unit, bool use_driveable_bounds,
-    const std::function<double(double, double)>& elevation) {
-
+void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_driveable_bounds,
+                               const std::function<double(double, double)>& elevation) {
   const double s_max = lane->length();
   for (double s0 = 0, s1; s0 < s_max; s0 = s1) {
-    const double step_increment = ComputeSampleStep(lane,
-                                                    s0,
-                                                    grid_unit);
+    const double step_increment = ComputeSampleStep(lane, s0, grid_unit);
     s1 = s0 + step_increment;
 
-    const api::RBounds rb0 = use_driveable_bounds ?
-        lane->driveable_bounds(s0) : lane->lane_bounds(s0);
-    const api::RBounds rb1 = use_driveable_bounds ?
-        lane->driveable_bounds(s1) : lane->lane_bounds(s1);
+    const api::RBounds rb0 = use_driveable_bounds ? lane->driveable_bounds(s0) : lane->lane_bounds(s0);
+    const api::RBounds rb1 = use_driveable_bounds ? lane->driveable_bounds(s1) : lane->lane_bounds(s1);
     //
     // (s1,r10) o <-- o (s1,r11)
     //          | \   ^
@@ -185,34 +154,27 @@ void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane,
     const double r01 = rb0.min();
     const double r10 = rb1.max();
     const double r11 = rb1.min();
-    SrhFace first_triangle({
-        {s0, r00, elevation(s0, r00)},
-        {s0, r01, elevation(s0, r01)},
-        {s1, r10, elevation(s1, r10)}}, {0., 0., 1.});
-    SrhFace second_triangle({
-        {s0, r01, elevation(s0, r01)},
-        {s1, r11, elevation(s1, r11)},
-        {s1, r10, elevation(s1, r10)}}, {0., 0., 1.});
+    SrhFace first_triangle(
+        {{s0, r00, elevation(s0, r00)}, {s0, r01, elevation(s0, r01)}, {s1, r10, elevation(s1, r10)}}, {0., 0., 1.});
+    SrhFace second_triangle(
+        {{s0, r01, elevation(s0, r01)}, {s1, r11, elevation(s1, r11)}, {s1, r10, elevation(s1, r10)}}, {0., 0., 1.});
     mesh->PushFace(first_triangle.ToGeoFace(lane));
     mesh->PushFace(second_triangle.ToGeoFace(lane));
   }
 }
 
-void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane,
-    double grid_unit, bool use_driveable_bounds,
-    const std::function<double(double, double)>& elevation) {
-
-  const double linear_tolerance =
-    lane->segment()->junction()->road_geometry()->linear_tolerance();
+void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_driveable_bounds,
+                             const std::function<double(double, double)>& elevation) {
+  const double linear_tolerance = lane->segment()->junction()->road_geometry()->linear_tolerance();
   const double s_max = lane->length();
   for (double s0 = 0, s1; s0 < s_max; s0 = s1) {
     s1 = s0 + grid_unit;
-    if (s1 > s_max - linear_tolerance) { s1 = s_max; }
+    if (s1 > s_max - linear_tolerance) {
+      s1 = s_max;
+    }
 
-    const api::RBounds rb0 = use_driveable_bounds ?
-        lane->driveable_bounds(s0) : lane->lane_bounds(s0);
-    const api::RBounds rb1 = use_driveable_bounds ?
-        lane->driveable_bounds(s1) : lane->lane_bounds(s1);
+    const api::RBounds rb0 = use_driveable_bounds ? lane->driveable_bounds(s0) : lane->lane_bounds(s0);
+    const api::RBounds rb1 = use_driveable_bounds ? lane->driveable_bounds(s1) : lane->lane_bounds(s1);
 
     // Left side of lane (r >= 0).
     {
@@ -227,11 +189,11 @@ void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane,
         //          v     |          +r <--o
         // (s0,r01) o --> * (s0,r00)
         //
-        SrhFace srh_face({
-            {s0, r00, elevation(s0, r00)},
-            {s1, r10, elevation(s1, r10)},
-            {s1, r11, elevation(s1, r11)},
-            {s0, r01, elevation(s0, r01)}}, {0., 0., 1.});
+        SrhFace srh_face({{s0, r00, elevation(s0, r00)},
+                          {s1, r10, elevation(s1, r10)},
+                          {s1, r11, elevation(s1, r11)},
+                          {s0, r01, elevation(s0, r01)}},
+                         {0., 0., 1.});
         mesh->PushFace(srh_face.ToGeoFace(lane));
 
         r00 += grid_unit;
@@ -251,11 +213,11 @@ void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane,
         //          v     |           o--> -r
         // (s0,r00) * --> o (s0,r01)
         //
-        SrhFace srh_face({
-            {s0, r00, elevation(s0, r00)},
-            {s0, r01, elevation(s0, r01)},
-            {s1, r11, elevation(s1, r11)},
-            {s1, r10, elevation(s1, r10)}}, {0., 0., 1.});
+        SrhFace srh_face({{s0, r00, elevation(s0, r00)},
+                          {s0, r01, elevation(s0, r01)},
+                          {s1, r11, elevation(s1, r11)},
+                          {s1, r10, elevation(s1, r10)}},
+                         {0., 0., 1.});
         mesh->PushFace(srh_face.ToGeoFace(lane));
 
         r00 -= grid_unit;
@@ -277,23 +239,14 @@ void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane,
 //        lane_bounds()
 // @param elevation a function taking `(s, r)` as parameters and returning
 //        the corresponding elevation `h`, to yield a quad vertex `(s, r, h)`
-void CoverLaneWithQuads(
-    GeoMesh* mesh, const api::Lane* lane,
-    double grid_unit, bool use_driveable_bounds,
-    const std::function<double(double, double)>& elevation,
-    bool optimize_generation) {
-  if (optimize_generation)
-  {
-    GenerateOptimizedRoadMesh(mesh, lane, grid_unit,
-                              use_driveable_bounds, elevation);
-  }
-  else
-  {
-    GeneratePreciseRoadMesh(mesh, lane, grid_unit,
-                            use_driveable_bounds, elevation);
+void CoverLaneWithQuads(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_driveable_bounds,
+                        const std::function<double(double, double)>& elevation, bool optimize_generation) {
+  if (optimize_generation) {
+    GenerateOptimizedRoadMesh(mesh, lane, grid_unit, use_driveable_bounds, elevation);
+  } else {
+    GeneratePreciseRoadMesh(mesh, lane, grid_unit, use_driveable_bounds, elevation);
   }
 }
-
 
 // Adds faces to @p mesh which draw stripes along the lane_bounds() of
 // @p lane.
@@ -303,41 +256,39 @@ void CoverLaneWithQuads(
 // @param grid_unit  longitudinal size (s dimension) of each face
 // @param h_offset  h value of each vertex (height above road surface)
 // @param stripe_width  width (r dimension) of each stripe
-void StripeLaneBounds(GeoMesh* mesh, const api::Lane* lane,
-                      double grid_unit, double h_offset,
-                      double stripe_width) {
+void StripeLaneBounds(GeoMesh* mesh, const api::Lane* lane, double grid_unit, double h_offset, double stripe_width) {
   const double half_stripe = 0.5 * stripe_width;
-  const double linear_tolerance =
-    lane->segment()->junction()->road_geometry()->linear_tolerance();
+  const double linear_tolerance = lane->segment()->junction()->road_geometry()->linear_tolerance();
   const double s_max = lane->length();
   for (double s0 = 0, s1; s0 < s_max; s0 = s1) {
     s1 = s0 + grid_unit;
-    if (s1 > s_max - linear_tolerance) { s1 = s_max; }
+    if (s1 > s_max - linear_tolerance) {
+      s1 = s_max;
+    }
 
     api::RBounds rb0 = lane->lane_bounds(s0);
     api::RBounds rb1 = lane->lane_bounds(s1);
 
     // Left side of lane.
     {
-      SrhFace srh_face({
-          {s0, rb0.max() - half_stripe, h_offset},
-          {s1, rb1.max() - half_stripe, h_offset},
-          {s1, rb1.max() + half_stripe, h_offset},
-          {s0, rb0.max() + half_stripe, h_offset}}, {0., 0., 1.});
+      SrhFace srh_face({{s0, rb0.max() - half_stripe, h_offset},
+                        {s1, rb1.max() - half_stripe, h_offset},
+                        {s1, rb1.max() + half_stripe, h_offset},
+                        {s0, rb0.max() + half_stripe, h_offset}},
+                       {0., 0., 1.});
       mesh->PushFace(srh_face.ToGeoFace(lane));
     }
     // Right side of lane.
     {
-      SrhFace srh_face({
-          {s0, rb0.min() - half_stripe, h_offset},
-          {s1, rb1.min() - half_stripe, h_offset},
-          {s1, rb1.min() + half_stripe, h_offset},
-          {s0, rb0.min() + half_stripe, h_offset}}, {0., 0., 1.});
+      SrhFace srh_face({{s0, rb0.min() - half_stripe, h_offset},
+                        {s1, rb1.min() - half_stripe, h_offset},
+                        {s1, rb1.min() + half_stripe, h_offset},
+                        {s0, rb0.min() + half_stripe, h_offset}},
+                       {0., 0., 1.});
       mesh->PushFace(srh_face.ToGeoFace(lane));
     }
   }
 }
-
 
 // Adds faces to @p mesh which draw a simple triangular arrow in the
 // `Lane`-frame of @p lane.  The width of the arrow is fixed at 80% of
@@ -350,8 +301,8 @@ void StripeLaneBounds(GeoMesh* mesh, const api::Lane* lane,
 //                  beginning (s = 0) of @p lane
 // @param s_size  length of the arrow from base to tip
 // @param h_offset  h value of each vertex (height above road surface)
-void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
-                   double s_offset, double s_size, double h_offset) {
+void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit, double s_offset, double s_size,
+                   double h_offset) {
   MALIPUT_DEMAND(s_offset >= 0.);
   MALIPUT_DEMAND((s_offset + s_size) <= lane->length());
   const double kRelativeWidth = 0.8;
@@ -365,9 +316,7 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
   const int max_num_rl_units = static_cast<int>(std::ceil(rl_size / grid_unit));
   const int max_num_rr_units = static_cast<int>(std::ceil(rr_size / grid_unit));
 
-  const int num_units = std::max(max_num_s_units,
-                                 std::max(max_num_rl_units,
-                                          max_num_rr_units));
+  const int num_units = std::max(max_num_s_units, std::max(max_num_rl_units, max_num_rr_units));
 
   MALIPUT_DEMAND(num_units >= 1);
   const double s_unit = s_size / num_units;
@@ -391,11 +340,8 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
         //          v     |          +r <--o
         // (s0,r01) o --> * (s0,r00)
         //
-        SrhFace srh_face({
-            {s0, r00, h_offset},
-            {s1, r10, h_offset},
-            {s1, r11, h_offset},
-            {s0, r01, h_offset}}, {0., 0., 1.});
+        SrhFace srh_face({{s0, r00, h_offset}, {s1, r10, h_offset}, {s1, r11, h_offset}, {s0, r01, h_offset}},
+                         {0., 0., 1.});
         mesh->PushFace(srh_face.ToGeoFace(lane));
 
         r00 += rl_unit;
@@ -405,10 +351,7 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
       //              / ^                |
       //            /   |          +r <--o
       // (s0,r01) o --> * (s0,r00)
-      SrhFace srh_face({
-          {s0, r00, h_offset},
-          {s1, r10, h_offset},
-          {s0, r00 + rl_unit, h_offset}}, {0., 0., 1.});
+      SrhFace srh_face({{s0, r00, h_offset}, {s1, r10, h_offset}, {s0, r00 + rl_unit, h_offset}}, {0., 0., 1.});
       mesh->PushFace(srh_face.ToGeoFace(lane));
     }
     // Right side of lane.
@@ -424,11 +367,8 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
         //          v     |           o--> -r
         // (s0,r00) * --> o (s0,r01)
         //
-        SrhFace srh_face({
-            {s0, r00, h_offset},
-            {s0, r01, h_offset},
-            {s1, r11, h_offset},
-            {s1, r10, h_offset}}, {0., 0., 1.});
+        SrhFace srh_face({{s0, r00, h_offset}, {s0, r01, h_offset}, {s1, r11, h_offset}, {s1, r10, h_offset}},
+                         {0., 0., 1.});
         mesh->PushFace(srh_face.ToGeoFace(lane));
 
         r00 -= rr_unit;
@@ -440,17 +380,13 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
       //          v   \             o--> -r
       // (s0,r00) * --> o (s0,r01)
       //
-      SrhFace srh_face({
-          {s0, r00, h_offset},
-          {s0, r00 - rr_unit, h_offset},
-          {s1, r10, h_offset}}, {0., 0., 1.});
+      SrhFace srh_face({{s0, r00, h_offset}, {s0, r00 - rr_unit, h_offset}, {s1, r10, h_offset}}, {0., 0., 1.});
       mesh->PushFace(srh_face.ToGeoFace(lane));
     }
 
     num_r_units -= 1;
   }
 }
-
 
 // Marks the start and finish ends of @p lane with arrows, rendered into
 // @p mesh.
@@ -462,36 +398,28 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
 // @param lane  the api::Lane to provide the surface
 // @param grid_unit  size of each quad (length of edge in s and r dimensions)
 // @param h_offset  h value of each vertex (height above road surface)
-void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
-                  double h_offset) {
+void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit, double h_offset) {
   // To avoid crossing boundaries (and tripping assertions) due to
   // numeric precision issues, we will nudge the arrows inward from
   // the ends of the lanes by the RoadGeometry's linear_tolerance().
-  const double nudge =
-      lane->segment()->junction()->road_geometry()->linear_tolerance();
+  const double nudge = lane->segment()->junction()->road_geometry()->linear_tolerance();
   const double max_length = 0.3 * lane->length();
   // Arrows are sized relative to their respective ends.
   const api::RBounds start_rb = lane->lane_bounds(0.);
-  const double start_s_size = std::min(max_length,
-                                       (start_rb.max() - start_rb.min()));
+  const double start_s_size = std::min(max_length, (start_rb.max() - start_rb.min()));
 
   const api::RBounds finish_rb = lane->lane_bounds(lane->length());
-  const double finish_s_size = std::min(max_length,
-                                        (finish_rb.max() - finish_rb.min()));
+  const double finish_s_size = std::min(max_length, (finish_rb.max() - finish_rb.min()));
 
   // Avoid drawing the arrows when its length is shorter than nudge or it would
   // start / end outside lane boundaries.
   if (nudge + start_s_size < lane->length() && start_s_size > nudge) {
-    DrawLaneArrow(mesh, lane, grid_unit,
-                  0. + nudge, start_s_size, h_offset);
+    DrawLaneArrow(mesh, lane, grid_unit, 0. + nudge, start_s_size, h_offset);
   }
   if (lane->length() - nudge - finish_s_size > 0. && finish_s_size > nudge) {
-    DrawLaneArrow(mesh, lane, grid_unit,
-                  lane->length() - finish_s_size - nudge, finish_s_size,
-                  h_offset);
+    DrawLaneArrow(mesh, lane, grid_unit, lane->length() - finish_s_size - nudge, finish_s_size, h_offset);
   }
 }
-
 
 // Calculates an appropriate grid-unit size for @p lane.
 //
@@ -503,8 +431,7 @@ void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
 // However, the returned grid will never be smaller than @p linear_tolerance.
 // Note that @p max_size would be the maximum possible grid unit every time it
 // it is bigger than @p linear_tolerance.
-double PickGridUnit(const api::Lane* lane, double max_size,
-                    double min_resolution, double linear_tolerance) {
+double PickGridUnit(const api::Lane* lane, double max_size, double min_resolution, double linear_tolerance) {
   double result = max_size;
 
   const api::RBounds rb0 = lane->lane_bounds(0.);
@@ -524,7 +451,6 @@ double PickGridUnit(const api::Lane* lane, double max_size,
   return result;
 }
 
-
 // Renders a BranchPoint @p branch_point as a collection of pointy
 // arrows for each branch.  @p base_elevation is the desired elevation
 // of the center of the rendering (above the road surface), and
@@ -535,13 +461,9 @@ double PickGridUnit(const api::Lane* lane, double max_size,
 // centers of previously rendered BranchPoints (in order to avoid
 // overlaps with them); this list will be updated with the rendered
 // center of this BranchPoint.
-void RenderBranchPoint(
-    const api::BranchPoint* const branch_point,
-    const double base_elevation, const double height,
-    GeoMesh* mesh,
-    std::vector<api::GeoPosition>* previous_centers) {
-  if ((branch_point->GetASide()->size() == 0) &&
-      (branch_point->GetBSide()->size() == 0)) {
+void RenderBranchPoint(const api::BranchPoint* const branch_point, const double base_elevation, const double height,
+                       GeoMesh* mesh, std::vector<api::GeoPosition>* previous_centers) {
+  if ((branch_point->GetASide()->size() == 0) && (branch_point->GetBSide()->size() == 0)) {
     // No branches?  Odd, but, oh, well... nothing to do here.
     return;
   }
@@ -549,14 +471,9 @@ void RenderBranchPoint(
   // Arbitrarily pick one of the LaneEnds in the BranchPoint as a reference
   // for its geometry (e.g., *where* is the BranchPoint).
   const api::LaneEnd reference_end =
-      (branch_point->GetASide()->size() > 0) ?
-      branch_point->GetASide()->get(0) :
-      branch_point->GetBSide()->get(0);
-  const double reference_end_s =
-      (reference_end.end == api::LaneEnd::kStart) ? 0. :
-      reference_end.lane->length();
-  const api::RBounds reference_bounds =
-      reference_end.lane->lane_bounds(reference_end_s);
+      (branch_point->GetASide()->size() > 0) ? branch_point->GetASide()->get(0) : branch_point->GetBSide()->get(0);
+  const double reference_end_s = (reference_end.end == api::LaneEnd::kStart) ? 0. : reference_end.lane->length();
+  const api::RBounds reference_bounds = reference_end.lane->lane_bounds(reference_end_s);
   const double sr_margin = reference_bounds.max() - reference_bounds.min();
   const double h_margin = height;
 
@@ -566,14 +483,10 @@ void RenderBranchPoint(
   bool has_conflict = true;
   while (has_conflict) {
     // Calculate center in world-frame with current elevation.
-    const api::LanePosition center_srh(
-        (reference_end.end == api::LaneEnd::kStart) ? 0. :
-        reference_end.lane->length(),
-        0., elevation);
-    const api::Rotation orientation =
-        reference_end.lane->GetOrientation(center_srh);
-    const api::GeoPosition center_xyz =
-        reference_end.lane->ToGeoPosition(center_srh);
+    const api::LanePosition center_srh((reference_end.end == api::LaneEnd::kStart) ? 0. : reference_end.lane->length(),
+                                       0., elevation);
+    const api::Rotation orientation = reference_end.lane->GetOrientation(center_srh);
+    const api::GeoPosition center_xyz = reference_end.lane->ToGeoPosition(center_srh);
 
     has_conflict = false;
     // Compare center against every already-rendered center....
@@ -581,8 +494,7 @@ void RenderBranchPoint(
     // too close, then increase elevation and try again.
     for (const api::GeoPosition& previous_xyz : *previous_centers) {
       const drake::Vector3<double> delta_xyz = previous_xyz.xyz() - center_xyz.xyz();
-      const drake::Vector3<double> delta_srh =
-          orientation.matrix().transpose() * delta_xyz;
+      const drake::Vector3<double> delta_srh = orientation.matrix().transpose() * delta_xyz;
 
       if ((drake::Vector2<double>(delta_srh.x(), delta_srh.y()).norm() < sr_margin) &&
           (std::abs(delta_srh.z()) < h_margin)) {
@@ -608,46 +520,36 @@ void RenderBranchPoint(
   static const double kMaxLengthFraction = 0.4;
 
   // Helper to draw a LaneEnd as either diamond or arrow.
-  const auto draw_branch =
-      [elevation, height, &mesh](const api::LaneEnd& lane_end,
-                                 bool as_diamond) {
-    const double end_s =
-      (lane_end.end == api::LaneEnd::kStart) ? 0. : lane_end.lane->length();
+  const auto draw_branch = [elevation, height, &mesh](const api::LaneEnd& lane_end, bool as_diamond) {
+    const double end_s = (lane_end.end == api::LaneEnd::kStart) ? 0. : lane_end.lane->length();
     const api::RBounds r_bounds = lane_end.lane->lane_bounds(end_s);
 
-    const double half_width =
-      (r_bounds.max() - r_bounds.min()) * kWidthFactor * 0.5;
+    const double half_width = (r_bounds.max() - r_bounds.min()) * kWidthFactor * 0.5;
     const double length =
-      std::min(kMaxLengthFraction * lane_end.lane->length(),
-               kLengthFactor * (r_bounds.max() - r_bounds.min())) *
-      ((lane_end.end == api::LaneEnd::kStart) ? 1. : -1);
+        std::min(kMaxLengthFraction * lane_end.lane->length(), kLengthFactor * (r_bounds.max() - r_bounds.min())) *
+        ((lane_end.end == api::LaneEnd::kStart) ? 1. : -1);
 
-    const double left_r =
-      half_width * ((lane_end.end == api::LaneEnd::kStart) ? 1. : -1);
+    const double left_r = half_width * ((lane_end.end == api::LaneEnd::kStart) ? 1. : -1);
     const double right_r = -left_r;
 
     if (as_diamond) {
-      SrhFace srh_face({
-          {end_s, 0., elevation - (0.5 * height)},
-          {end_s, right_r, elevation},
-          {end_s, 0., elevation + (0.5 * height)},
-          {end_s, left_r, elevation}},
-        api::LanePosition{(end_s == 0. ? 1. : -1), 0., 0.});
+      SrhFace srh_face({{end_s, 0., elevation - (0.5 * height)},
+                        {end_s, right_r, elevation},
+                        {end_s, 0., elevation + (0.5 * height)},
+                        {end_s, left_r, elevation}},
+                       api::LanePosition{(end_s == 0. ? 1. : -1), 0., 0.});
       mesh->PushFace(srh_face.ToGeoFace(lane_end.lane));
     } else {
-      SrhFace srh_face1({
-          {end_s, left_r, elevation},
-          {end_s, right_r, elevation},
-          {end_s + length, right_r * kTipFactor, elevation},
-          {end_s + length, left_r * kTipFactor, elevation}},
-        api::LanePosition{0., 0., 1.});
-      SrhFace srh_face2({
-          {end_s, 0., elevation - (0.5 * height)},
-          {end_s, 0., elevation + (0.5 * height)},
-          {end_s + length, 0., elevation + (0.5 * kTipFactor * height)},
-          {end_s + length, 0., elevation - (0.5 * kTipFactor * height)}
-        },
-        api::LanePosition{0., (length > 0. ? 1. : -1.), 0.});
+      SrhFace srh_face1({{end_s, left_r, elevation},
+                         {end_s, right_r, elevation},
+                         {end_s + length, right_r * kTipFactor, elevation},
+                         {end_s + length, left_r * kTipFactor, elevation}},
+                        api::LanePosition{0., 0., 1.});
+      SrhFace srh_face2({{end_s, 0., elevation - (0.5 * height)},
+                         {end_s, 0., elevation + (0.5 * height)},
+                         {end_s + length, 0., elevation + (0.5 * kTipFactor * height)},
+                         {end_s + length, 0., elevation - (0.5 * kTipFactor * height)}},
+                        api::LanePosition{0., (length > 0. ? 1. : -1.), 0.});
       mesh->PushFace(srh_face1.ToGeoFace(lane_end.lane));
       mesh->PushFace(srh_face2.ToGeoFace(lane_end.lane));
     }
@@ -672,84 +574,56 @@ GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
   return SimplifyMeshFaces(mesh, features.simplify_mesh_threshold);
 }
 
-void RenderSegment(const api::Segment* segment,
-                   const ObjFeatures& features,
-                   GeoMesh* asphalt_mesh,
-                   GeoMesh* lane_mesh,
-                   GeoMesh* marker_mesh,
-                   GeoMesh* h_bounds_mesh) {
-  const double linear_tolerance =
-      segment->junction()->road_geometry()->linear_tolerance();
+void RenderSegment(const api::Segment* segment, const ObjFeatures& features, GeoMesh* asphalt_mesh, GeoMesh* lane_mesh,
+                   GeoMesh* marker_mesh, GeoMesh* h_bounds_mesh) {
+  const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
   const double base_grid_unit =
-    features.off_grid_mesh_generation ? linear_tolerance : PickGridUnit(
-        segment->lane(0), features.max_grid_unit, features.min_grid_resolution,
-        linear_tolerance);
+      features.off_grid_mesh_generation
+          ? linear_tolerance
+          : PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
   {
     // Lane 0 should be as good as any other for driveable-bounds.
     GeoMesh driveable_mesh;
-    CoverLaneWithQuads(&driveable_mesh, segment->lane(0),
-                       base_grid_unit,
-                       true /*use_driveable_bounds*/,
-                       [](double, double) { return 0.; },
-                       features.off_grid_mesh_generation);
+    CoverLaneWithQuads(&driveable_mesh, segment->lane(0), base_grid_unit, true /*use_driveable_bounds*/,
+                       [](double, double) { return 0.; }, features.off_grid_mesh_generation);
     asphalt_mesh->AddFacesFrom(SimplifyMesh(driveable_mesh, features));
   }
 
   if (features.draw_elevation_bounds) {
     GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
-    CoverLaneWithQuads(
-        &upper_h_bounds_mesh,
-        segment->lane(0),
-        base_grid_unit,
-        true /*use_driveable_bounds*/,
-        [&segment](double s, double r) {
-          return segment->lane(0)->elevation_bounds(s, r).max(); },
-        features.off_grid_mesh_generation);
-    CoverLaneWithQuads(
-        &lower_h_bounds_mesh,
-        segment->lane(0),
-        base_grid_unit,
-        true /*use_driveable_bounds*/,
-        [&segment](double s, double r) {
-          return segment->lane(0)->elevation_bounds(s, r).min(); },
-        features.off_grid_mesh_generation);
+    CoverLaneWithQuads(&upper_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_driveable_bounds*/,
+                       [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).max(); },
+                       features.off_grid_mesh_generation);
+    CoverLaneWithQuads(&lower_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_driveable_bounds*/,
+                       [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).min(); },
+                       features.off_grid_mesh_generation);
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
   }
   for (int li = 0; li < segment->num_lanes(); ++li) {
     const api::Lane* lane = segment->lane(li);
-    const double grid_unit = PickGridUnit(
-        lane, features.max_grid_unit, features.min_grid_resolution,
-        linear_tolerance);
+    const double grid_unit = PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
-      CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit,
-                         false /*use_driveable_bounds*/,
-                         [&features](double, double) {
-                           return features.lane_haze_elevation;
-                         },
+      CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /*use_driveable_bounds*/,
+                         [&features](double, double) { return features.lane_haze_elevation; },
                          features.off_grid_mesh_generation);
       lane_mesh->AddFacesFrom(SimplifyMesh(haze_mesh, features));
     }
     if (features.draw_stripes) {
       GeoMesh stripes_mesh;
-      StripeLaneBounds(&stripes_mesh, lane, grid_unit,
-                       features.stripe_elevation,
-                       features.stripe_width);
+      StripeLaneBounds(&stripes_mesh, lane, grid_unit, features.stripe_elevation, features.stripe_width);
       marker_mesh->AddFacesFrom(SimplifyMesh(stripes_mesh, features));
     }
     if (features.draw_arrows) {
       GeoMesh arrows_mesh;
-      MarkLaneEnds(&arrows_mesh, lane, grid_unit,
-                   features.arrow_elevation);
+      MarkLaneEnds(&arrows_mesh, lane, grid_unit, features.arrow_elevation);
       marker_mesh->AddFacesFrom(SimplifyMesh(arrows_mesh, features));
     }
   }
 }
 
-
-bool IsSegmentRenderedNormally(const api::SegmentId& id,
-                               const std::vector<api::SegmentId>& highlights) {
+bool IsSegmentRenderedNormally(const api::SegmentId& id, const std::vector<api::SegmentId>& highlights) {
   if (highlights.empty()) {
     return true;
   }
@@ -763,9 +637,8 @@ bool IsSegmentRenderedNormally(const api::SegmentId& id,
 
 }  // namespace
 
-std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(
-                                           const api::RoadGeometry* rg,
-                                           const ObjFeatures& features) {
+std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* rg,
+                                                                      const ObjFeatures& features) {
   GeoMesh asphalt_mesh;
   GeoMesh lane_mesh;
   GeoMesh marker_mesh;
@@ -785,14 +658,10 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(
     for (int si = 0; si < junction->num_segments(); ++si) {
       const api::Segment* segment = junction->segment(si);
       // TODO(maddog@tri.global)  Id's need well-defined comparison semantics.
-      if (IsSegmentRenderedNormally(segment->id(),
-                                    features.highlighted_segments)) {
-        RenderSegment(segment, features,
-                      &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh);
+      if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
+        RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh);
       } else {
-        RenderSegment(segment, features,
-                      &grayed_asphalt_mesh, &grayed_lane_mesh,
-                      &grayed_marker_mesh, &h_bounds_mesh);
+        RenderSegment(segment, features, &grayed_asphalt_mesh, &grayed_lane_mesh, &grayed_marker_mesh, &h_bounds_mesh);
       }
     }
   }
@@ -801,41 +670,26 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(
     std::vector<api::GeoPosition> rendered_centers;
     for (int bpi = 0; bpi < rg->num_branch_points(); ++bpi) {
       const api::BranchPoint* branch_point = rg->branch_point(bpi);
-      RenderBranchPoint(branch_point,
-                        features.branch_point_elevation,
-                        features.branch_point_height,
-                        &branch_point_mesh,
+      RenderBranchPoint(branch_point, features.branch_point_elevation, features.branch_point_height, &branch_point_mesh,
                         &rendered_centers);
     }
   }
 
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes;
-  meshes["asphalt"] = std::make_pair(std::move(asphalt_mesh),
-                                  GetMaterialByName(kBlandAsphalt));
-  meshes["lane"] = std::make_pair(std::move(lane_mesh),
-                                  GetMaterialByName(kLaneHaze));
-  meshes["marker"] = std::make_pair(std::move(marker_mesh),
-                                  GetMaterialByName(kMarkerPaint));
-  meshes["h_bounds"] = std::make_pair(std::move(h_bounds_mesh),
-                                  GetMaterialByName(kHBoundsHaze));
-  meshes["branch_point"] = std::make_pair(std::move(branch_point_mesh),
-                                  GetMaterialByName(kBranchPointGlow));
-  meshes["grayed_asphalt"] = std::make_pair(std::move(grayed_asphalt_mesh),
-                                  GetMaterialByName(kGrayedBlandAsphalt));
-  meshes["grayed_lane"] = std::make_pair(std::move(grayed_lane_mesh),
-                                  GetMaterialByName(kGrayedLaneHaze));
-  meshes["grayed_marker"] = std::make_pair(std::move(grayed_marker_mesh),
-                                  GetMaterialByName(kGrayedMarkerPaint));
+  meshes["asphalt"] = std::make_pair(std::move(asphalt_mesh), GetMaterialByName(kBlandAsphalt));
+  meshes["lane"] = std::make_pair(std::move(lane_mesh), GetMaterialByName(kLaneHaze));
+  meshes["marker"] = std::make_pair(std::move(marker_mesh), GetMaterialByName(kMarkerPaint));
+  meshes["h_bounds"] = std::make_pair(std::move(h_bounds_mesh), GetMaterialByName(kHBoundsHaze));
+  meshes["branch_point"] = std::make_pair(std::move(branch_point_mesh), GetMaterialByName(kBranchPointGlow));
+  meshes["grayed_asphalt"] = std::make_pair(std::move(grayed_asphalt_mesh), GetMaterialByName(kGrayedBlandAsphalt));
+  meshes["grayed_lane"] = std::make_pair(std::move(grayed_lane_mesh), GetMaterialByName(kGrayedLaneHaze));
+  meshes["grayed_marker"] = std::make_pair(std::move(grayed_marker_mesh), GetMaterialByName(kGrayedMarkerPaint));
   return meshes;
 }
 
-void GenerateObjFile(const api::RoadGeometry* rg,
-                     const std::string& dirpath,
-                     const std::string& fileroot,
+void GenerateObjFile(const api::RoadGeometry* rg, const std::string& dirpath, const std::string& fileroot,
                      const ObjFeatures& features) {
-
-  std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes =
-    BuildMeshes(rg, features);
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes = BuildMeshes(rg, features);
   const GeoMesh& asphalt_mesh = meshes["asphalt"].first;
   const GeoMesh& lane_mesh = meshes["lane"].first;
   const GeoMesh& marker_mesh = meshes["marker"].first;
@@ -867,9 +721,7 @@ void GenerateObjFile(const api::RoadGeometry* rg,
     // so we want `n` such that `0.5 * 10^(-n) < ε / (sqrt(3) * 10)`.
     // This yields:  `n > log10(sqrt(3) * 5) - log10(ε)`.
     MALIPUT_DEMAND(rg->linear_tolerance() > 0.);
-    const int precision =
-        std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) -
-                               std::log10(rg->linear_tolerance())));
+    const int precision = std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) - std::log10(rg->linear_tolerance())));
 
     std::ofstream os(dirpath + "/" + obj_filename, std::ios::binary);
     fmt::print(os,
@@ -883,39 +735,23 @@ mtllib {}
     int vertex_index_offset = 0;
     int normal_index_offset = 0;
     std::tie(vertex_index_offset, normal_index_offset) =
-        asphalt_mesh.EmitObj(os, kBlandAsphalt,
-                             precision, features.origin,
-                             vertex_index_offset, normal_index_offset);
+        asphalt_mesh.EmitObj(os, kBlandAsphalt, precision, features.origin, vertex_index_offset, normal_index_offset);
     std::tie(vertex_index_offset, normal_index_offset) =
-        lane_mesh.EmitObj(os, kLaneHaze,
-                          precision, features.origin,
-                          vertex_index_offset, normal_index_offset);
+        lane_mesh.EmitObj(os, kLaneHaze, precision, features.origin, vertex_index_offset, normal_index_offset);
     std::tie(vertex_index_offset, normal_index_offset) =
-        marker_mesh.EmitObj(os, kMarkerPaint,
-                            precision, features.origin,
-                            vertex_index_offset, normal_index_offset);
-    std::tie(vertex_index_offset, normal_index_offset) =
-        branch_point_mesh.EmitObj(os, kBranchPointGlow,
-                                  precision, features.origin,
-                                  vertex_index_offset, normal_index_offset);
+        marker_mesh.EmitObj(os, kMarkerPaint, precision, features.origin, vertex_index_offset, normal_index_offset);
+    std::tie(vertex_index_offset, normal_index_offset) = branch_point_mesh.EmitObj(
+        os, kBranchPointGlow, precision, features.origin, vertex_index_offset, normal_index_offset);
+
+    std::tie(vertex_index_offset, normal_index_offset) = grayed_asphalt_mesh.EmitObj(
+        os, kGrayedBlandAsphalt, precision, features.origin, vertex_index_offset, normal_index_offset);
+    std::tie(vertex_index_offset, normal_index_offset) = grayed_lane_mesh.EmitObj(
+        os, kGrayedLaneHaze, precision, features.origin, vertex_index_offset, normal_index_offset);
+    std::tie(vertex_index_offset, normal_index_offset) = grayed_marker_mesh.EmitObj(
+        os, kGrayedMarkerPaint, precision, features.origin, vertex_index_offset, normal_index_offset);
 
     std::tie(vertex_index_offset, normal_index_offset) =
-        grayed_asphalt_mesh.EmitObj(os, kGrayedBlandAsphalt,
-                                    precision, features.origin,
-                                    vertex_index_offset, normal_index_offset);
-    std::tie(vertex_index_offset, normal_index_offset) =
-        grayed_lane_mesh.EmitObj(os, kGrayedLaneHaze,
-                                 precision, features.origin,
-                                 vertex_index_offset, normal_index_offset);
-    std::tie(vertex_index_offset, normal_index_offset) =
-        grayed_marker_mesh.EmitObj(os, kGrayedMarkerPaint,
-                                   precision, features.origin,
-                                   vertex_index_offset, normal_index_offset);
-
-    std::tie(vertex_index_offset, normal_index_offset) =
-        h_bounds_mesh.EmitObj(os, kHBoundsHaze,
-                              precision, features.origin,
-                              vertex_index_offset, normal_index_offset);
+        h_bounds_mesh.EmitObj(os, kHBoundsHaze, precision, features.origin, vertex_index_offset, normal_index_offset);
   }
 
   // Create the MTL file referenced by the OBJ file.
@@ -923,8 +759,7 @@ mtllib {}
     std::ofstream os(dirpath + "/" + mtl_filename, std::ios::binary);
     os << "# GENERATED BY maliput::utility::GenerateObjFile()\n"
        << "# DON'T BE A HERO.  Do not edit by hand.\n\n";
-    for (const auto &matPair : meshes)
-    {
+    for (const auto& matPair : meshes) {
       const Material& mat = matPair.second.second;
       os << FormatMaterial(mat);
     }
@@ -932,12 +767,10 @@ mtllib {}
 }
 
 const Material& GetMaterialByName(const std::string& material_name) {
-  auto material = std::find(kMaterial.cbegin(), kMaterial.cend(),
-    material_name);
+  auto material = std::find(kMaterial.cbegin(), kMaterial.cend(), material_name);
   MALIPUT_DEMAND(material != kMaterial.cend());
   return *material;
 }
-
 
 }  // namespace utility
 }  // namespace maliput

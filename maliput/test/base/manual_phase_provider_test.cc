@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
+#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace {
@@ -23,8 +23,7 @@ constexpr double kDurationUntil{10.};  // Arbitrarily chosen.
 
 // Fixture for testing the ManualPhaseProvider.
 struct ManualPhaseProviderTest : public ::testing::Test {
-  ManualPhaseProviderTest()
-      : phase_id_1("foo"), phase_id_2("bar"), phase_ring_id("bar") {}
+  ManualPhaseProviderTest() : phase_id_1("foo"), phase_id_2("bar"), phase_ring_id("bar") {}
 
   const Phase::Id phase_id_1;
   const Phase::Id phase_id_2;
@@ -40,8 +39,7 @@ TEST_F(ManualPhaseProviderTest, EmptyProvider) {
 // Tests that an exception is thrown if duration-until is specified but the next
 // phase is not when adding a PhaseRing.
 TEST_F(ManualPhaseProviderTest, AddPhaseRingDurationSpecifiedOnly) {
-  EXPECT_THROW(dut.AddPhaseRing(phase_ring_id, phase_id_1,
-                                drake::nullopt /* next phase */, kDurationUntil),
+  EXPECT_THROW(dut.AddPhaseRing(phase_ring_id, phase_id_1, drake::nullopt /* next phase */, kDurationUntil),
                std::logic_error);
 }
 
@@ -49,8 +47,7 @@ TEST_F(ManualPhaseProviderTest, AddPhaseRingDurationSpecifiedOnly) {
 // phase is not when setting the phase of a PhaseRing.
 TEST_F(ManualPhaseProviderTest, SetPhaseRingDurationSpecifiedOnly) {
   EXPECT_NO_THROW(dut.AddPhaseRing(phase_ring_id, phase_id_1));
-  EXPECT_THROW(dut.SetPhase(phase_ring_id, phase_id_1, drake::nullopt /* next phase */,
-                            kDurationUntil),
+  EXPECT_THROW(dut.SetPhase(phase_ring_id, phase_id_1, drake::nullopt /* next phase */, kDurationUntil),
                std::logic_error);
 }
 
@@ -58,8 +55,7 @@ TEST_F(ManualPhaseProviderTest, SetPhaseRingDurationSpecifiedOnly) {
 TEST_F(ManualPhaseProviderTest, CurrentPhaseOnly) {
   EXPECT_NO_THROW(dut.AddPhaseRing(phase_ring_id, phase_id_1));
   EXPECT_THROW(dut.AddPhaseRing(phase_ring_id, phase_id_1), std::logic_error);
-  drake::optional<PhaseProvider::Result> returned_phase =
-      dut.GetPhase(phase_ring_id);
+  drake::optional<PhaseProvider::Result> returned_phase = dut.GetPhase(phase_ring_id);
   EXPECT_EQ(returned_phase->id, phase_id_1);
   EXPECT_EQ(returned_phase->next, drake::nullopt);
   EXPECT_NO_THROW(dut.SetPhase(phase_ring_id, phase_id_2));
@@ -70,16 +66,13 @@ TEST_F(ManualPhaseProviderTest, CurrentPhaseOnly) {
 
 // Tests situation where both the current and next phases are specified.
 TEST_F(ManualPhaseProviderTest, CurrentAndNextPhases) {
-  EXPECT_NO_THROW(
-      dut.AddPhaseRing(phase_ring_id, phase_id_1, phase_id_2, kDurationUntil));
-  drake::optional<PhaseProvider::Result> returned_phase =
-      dut.GetPhase(phase_ring_id);
+  EXPECT_NO_THROW(dut.AddPhaseRing(phase_ring_id, phase_id_1, phase_id_2, kDurationUntil));
+  drake::optional<PhaseProvider::Result> returned_phase = dut.GetPhase(phase_ring_id);
   EXPECT_EQ(returned_phase->id, phase_id_1);
   EXPECT_NE(returned_phase->next, drake::nullopt);
   EXPECT_EQ(returned_phase->next->id, phase_id_2);
   EXPECT_EQ(*returned_phase->next->duration_until, kDurationUntil);
-  EXPECT_NO_THROW(
-      dut.SetPhase(phase_ring_id, phase_id_2, phase_id_1, 2 * kDurationUntil));
+  EXPECT_NO_THROW(dut.SetPhase(phase_ring_id, phase_id_2, phase_id_1, 2 * kDurationUntil));
   returned_phase = dut.GetPhase(phase_ring_id);
   EXPECT_EQ(returned_phase->id, phase_id_2);
   EXPECT_NE(returned_phase->next, drake::nullopt);
@@ -90,11 +83,9 @@ TEST_F(ManualPhaseProviderTest, CurrentAndNextPhases) {
 // Tests that an exception is thrown if the phases within a PhaseRing cover
 // different sets of RightOfWayRules.
 GTEST_TEST(PhaseRingTest, InvalidPhases) {
-  const RuleStates rule_states_1{
-      {RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")},
-      {RightOfWayRule::Id("b"), RightOfWayRule::State::Id("2")}};
-  const RuleStates rule_states_2{
-      {RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")}};
+  const RuleStates rule_states_1{{RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")},
+                                 {RightOfWayRule::Id("b"), RightOfWayRule::State::Id("2")}};
+  const RuleStates rule_states_2{{RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")}};
   Phase phase_1(Phase::Id("bar"), rule_states_1);
   Phase phase_2(Phase::Id("baz"), rule_states_2);
   const std::vector<Phase> phases{phase_1, phase_2};

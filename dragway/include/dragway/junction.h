@@ -13,7 +13,6 @@
 
 #include "dragway/segment.h"
 
-
 namespace maliput {
 namespace dragway {
 
@@ -29,12 +28,8 @@ class Junction final : public api::Junction {
   /// @p road_geometry must remain valid for the lifetime of this class,
   /// and must refer to the RoadGeometry which will contain this newly
   /// constructed Junction instance.
-  Junction(RoadGeometry* road_geometry,
-      int num_lanes,
-      double length,
-      double lane_width,
-      double shoulder_width,
-      double maximum_height);
+  Junction(RoadGeometry* road_geometry, int num_lanes, double length, double lane_width, double shoulder_width,
+           double maximum_height);
 
   ~Junction() final = default;
 
