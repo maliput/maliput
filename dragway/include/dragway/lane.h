@@ -2,10 +2,12 @@
 
 #include <memory>
 
-#include "drake/common/drake_optional.h"
-#include "drake/common/eigen_autodiff_types.h"
+// clang-format off
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
+#include "drake/common/drake_optional.h"
+#include "drake/common/eigen_autodiff_types.h"
+// clang-format on
 
 namespace maliput {
 namespace dragway {
