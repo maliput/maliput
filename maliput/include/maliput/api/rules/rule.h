@@ -144,9 +144,10 @@ class RangeValueRule : public Rule {
 
 /// Describes an arbitrary discrete and string based rule.
 ///
-/// Semantics of this rule are provided by _all_ possible values that this
-/// Rule::TypeId could have, not only the ones that a specific instance of
-/// this rule provides.
+/// Semantics of this rule are based on _all_ possible values that this
+/// Rule::TypeId could have (as specified by RuleRegistry::FindRuleByType()),
+/// not only the subset of values that a specific instance of this rule can
+/// be in.
 class DiscreteValueRule : public Rule {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DiscreteValueRule);
