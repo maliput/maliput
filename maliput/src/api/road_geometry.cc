@@ -68,12 +68,20 @@ GeoPosition Rotate(const Rotation& rot, const GeoPosition& in) {
   const double cb = std::cos(rot.pitch());
   const double sg = std::sin(rot.yaw());
   const double cg = std::cos(rot.yaw());
+  // clang-format off
+  return GeoPosition(
+	((cb*cg) * in.x()) +
+       	((-ca*sg + sa*sb*cg) * in.y()) +
+       	((sa*sg + ca*sb*cg) * in.z()),
 
-  return GeoPosition(((cb * cg) * in.x()) + ((-ca * sg + sa * sb * cg) * in.y()) + ((sa * sg + ca * sb * cg) * in.z()),
+        ((cb*sg) * in.x()) +
+       	((ca*cg + sa*sb*sg) * in.y()) +
+       	((-sa*cg + ca*sb*sg) * in.z()),
 
-                     ((cb * sg) * in.x()) + ((ca * cg + sa * sb * sg) * in.y()) + ((-sa * cg + ca * sb * sg) * in.z()),
-
-                     ((-sb) * in.x()) + ((sa * cb) * in.y()) + ((ca * cb) * in.z()));
+        ((-sb) * in.x()) +
+       	((sa*cb) * in.y()) +
+       	((ca*cb) * in.z()));
+  // clang-format on
 }
 
 // Return a distance measure (in radians) for two rotations that reflects
