@@ -7,6 +7,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/assertion_error.h"
+
+
 namespace maliput {
 namespace api {
 namespace {
@@ -19,7 +22,7 @@ using CId = TypeSpecificIdentifier<C>;  // ID type specific to class C
 
 GTEST_TEST(TypeSpecificIdentifierTest, Construction) {
   EXPECT_NO_THROW(CId("x"));
-  EXPECT_THROW(CId(""), std::runtime_error);
+  EXPECT_THROW(CId(""), maliput::common::assertion_error);
 }
 
 

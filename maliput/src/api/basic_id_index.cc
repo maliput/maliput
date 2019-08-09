@@ -1,27 +1,27 @@
 #include "maliput/api/basic_id_index.h"
 
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace api {
 
 void BasicIdIndex::AddLane(const Lane* lane) {
-  DRAKE_THROW_UNLESS(lane_map_.emplace(lane->id(), lane).second);
+  MALIPUT_THROW_UNLESS(lane_map_.emplace(lane->id(), lane).second);
 }
 
 
 void BasicIdIndex::AddSegment(const Segment* segment) {
-  DRAKE_THROW_UNLESS(segment_map_.emplace(segment->id(), segment).second);
+  MALIPUT_THROW_UNLESS(segment_map_.emplace(segment->id(), segment).second);
 }
 
 
 void BasicIdIndex::AddJunction(const Junction* junction) {
-  DRAKE_THROW_UNLESS(junction_map_.emplace(junction->id(), junction).second);
+  MALIPUT_THROW_UNLESS(junction_map_.emplace(junction->id(), junction).second);
 }
 
 
 void BasicIdIndex::AddBranchPoint(const BranchPoint* branch_point) {
-  DRAKE_THROW_UNLESS(
+  MALIPUT_THROW_UNLESS(
       branch_point_map_.emplace(branch_point->id(), branch_point).second);
 }
 

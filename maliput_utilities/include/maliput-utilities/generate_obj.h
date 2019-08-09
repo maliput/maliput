@@ -29,6 +29,10 @@ struct ObjFeatures {
   bool draw_branch_points{true};
   /// Draw highlighting of elevation_bounds of each lane?
   bool draw_elevation_bounds{true};
+  /// Reduce the amount of vertices from the road by creating
+  /// quads big enough which don't violate some tolerance. This could affect
+  /// the accuracy of curved roads.
+  bool off_grid_mesh_generation{false};
   /// Tolerance for mesh simplification, or the distance from a vertex to an
   /// edge line or to a face plane at which said vertex is considered redundant
   /// (i.e. it is not necessary to further define those geometrical entities),

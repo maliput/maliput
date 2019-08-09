@@ -1,8 +1,6 @@
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
 
 #include <algorithm>
-#include <unordered_map>
-#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -89,6 +87,39 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression,
                                    const char* b_expression,
+                                   const RightOfWayRule::RelatedBulbGroups& a,
+                                   const RightOfWayRule::RelatedBulbGroups& b) {
+  drake::unused(a_expression, b_expression);
+  AssertionResultCollector c;
+
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
+  if (a.size() == b.size()) {
+    for (const auto& traffic_light_bulb_group : a) {
+      const auto& b_it = b.find(traffic_light_bulb_group.first);
+      MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL((b_it != b.cend()), true));
+      if (b_it == b.cend()) {
+        break;
+      }
+      for (const BulbGroup::Id& bulb_group_id :
+           traffic_light_bulb_group.second) {
+        const auto& b_bulb_group_id_it =
+            std::find(b_it->second.cbegin(), b_it->second.cend(),
+                      bulb_group_id);
+        MALIPUT_ADD_RESULT(
+            c, MALIPUT_IS_EQUAL((b_bulb_group_id_it != b_it->second.cend()),
+            true));
+        if (b_bulb_group_id_it == b_it->second.cend()) {
+          break;
+        }
+      }
+    }
+  }
+  return c.result();
+}
+
+
+::testing::AssertionResult IsEqual(const char* a_expression,
+                                   const char* b_expression,
                                    const rules::RightOfWayRule& a,
                                    const rules::RightOfWayRule& b) {
   drake::unused(a_expression, b_expression);
@@ -103,6 +134,8 @@ namespace test {
   } else {
     MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.states(), b.states()));
   }
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_bulb_groups(),
+                                         b.related_bulb_groups()));
   return c.result();
 }
 

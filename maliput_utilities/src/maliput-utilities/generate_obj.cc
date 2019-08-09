@@ -39,8 +39,9 @@ const std::string kGrayedBlandAsphalt("grayed_bland_asphalt");
 const std::string kGrayedLaneHaze("grayed_lane_haze");
 const std::string kGrayedMarkerPaint("grayed_marker_paint");
 
-// This map holds the properties of different materials. Those properties were
-// taken from the original .mtl description that lives in GenerateObjFile().
+// This vector holds the properties of different materials. Those properties
+// were taken from the original .mtl description that
+// lives in GenerateObjFile().
 const std::vector<Material> kMaterial{
   {kBlandAsphalt,
     {0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0},
@@ -83,22 +84,124 @@ std::string FormatMaterial(const Material& mat)
                       mat.shinines, 1.0 - mat.transparency);
 }
 
-// Traverses @p lane, generating a cover of the surface with with quads
-// (4-vertex faces) which are added to @p mesh.  The quads are squares in
-// the (s,r) space of the lane.
+// Compute the maximum step in s-coordinates that can approximate the distance 
+// between its ends in world's inertial frame coordinates up to the given
+// `grid_unit` (taken as an absolute tolerance).
 //
-// @param mesh  the GeoMesh which will receive the quads
-// @param lane  the api::Lane to cover with quads
-// @param grid_unit  size of each quad (length of edge in s and r dimensions)
-// @param use_driveable_bounds  if true, use the lane's driveable_bounds()
-//        to determine the lateral extent of the coverage; otherwise, use
-//        lane_bounds()
-// @param elevation a function taking `(s, r)` as parameters and returning
-//        the corresponding elevation `h`, to yield a quad vertex `(s, r, h)`
-void CoverLaneWithQuads(
-    GeoMesh* mesh, const api::Lane* lane,
+// Let `step_s` be a step in s-coordinates, `s0` a valid s-coordinate in
+// `lane` and `grid_unit` the minimum step in s-coordinates to take.
+// Starting at the minimum of `grid_unit` and the distance in s-coordinates i.e.
+// arc-length, to the `lane`'s end along the center line, increase `step_s`
+// until the distance between its ends in world's coordinates along the center,
+// left most and right most lines of the `lane`'s driveable
+// surface is bigger than `grid_unit` or the end of the `lane` is reached. 
+double ComputeSampleStep(
+      const maliput::api::Lane* lane, double s0, double grid_unit) {
+  DRAKE_DEMAND(lane != nullptr);
+
+  const double length = lane->length();
+  const double min_step = std::min(grid_unit, length - s0);
+
+  const maliput::api::RBounds prev_lane_bounds = lane->lane_bounds(s0);
+  const maliput::api::GeoPosition prev_pos_center =
+        lane->ToGeoPosition({s0, 0., 0.});
+  const maliput::api::GeoPosition prev_pos_left =
+        lane->ToGeoPosition({s0, prev_lane_bounds.max(), 0.});
+  const maliput::api::GeoPosition prev_pos_right =
+        lane->ToGeoPosition({s0, prev_lane_bounds.min(), 0.});
+
+  // Start from minimum step.
+  double step_best = min_step;
+
+  while (true) {
+    // Make step in travel_with_s direction.
+    const double step_proposed = std::min(step_best * 2., length - s0);
+    const double s_proposed = s0 + step_proposed;
+    const maliput::api::RBounds lane_bounds = lane->lane_bounds(s_proposed);
+
+    const maliput::api::GeoPosition proposed_pos_center_lane =
+        lane->ToGeoPosition({s_proposed, 0., 0.});
+    const maliput::api::GeoPosition proposed_pos_left_lane =
+        lane->ToGeoPosition({s_proposed, lane_bounds.max(), 0.});
+    const maliput::api::GeoPosition proposed_pos_right_lane =
+        lane->ToGeoPosition({s_proposed, lane_bounds.min(), 0.});
+
+    // Calculate distance between geo positions for every lane.
+    const double distance_from_center =
+        (prev_pos_center.xyz() - proposed_pos_center_lane.xyz()).norm();
+    const double distance_from_left =
+        (prev_pos_left.xyz() - proposed_pos_left_lane.xyz()).norm();
+    const double distance_from_right =
+        (prev_pos_right.xyz() - proposed_pos_right_lane.xyz()).norm();
+
+    // Check if distance between geo position and local path length ( delta s ) is small enough.
+    if (std::fabs(distance_from_center - step_proposed) > grid_unit ||
+        std::fabs(distance_from_left - step_proposed) > grid_unit ||
+        std::fabs(distance_from_right - step_proposed) > grid_unit) {
+      // Tolerance is violated, can't increase step.
+      break;
+    }
+    if (std::fabs(s_proposed - length) < grid_unit) {
+      // Clamp the s coordinate since nothing
+      // ensures that s_proposed is not negative
+      // or a little bit bigger than the lane length.
+      step_best = std::max(std::min(0.0, step_proposed), length);
+      break;
+    }
+    // Tolerance is satisfied - increase step 2X in the next iteration and try again.
+    step_best = step_proposed;
+  }
+
+  step_best = std::min(step_best, length - s0);
+  return step_best;
+}
+
+// Iterate trough the s-coordinate of the road and generate two triangles
+// covering the left and right side of the road, considering the grid_unit
+// as a tolerance between patches. Bigger tolerance, worst quality but less
+// vertices.
+void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane,
     double grid_unit, bool use_driveable_bounds,
     const std::function<double(double, double)>& elevation) {
+
+  const double s_max = lane->length();
+  for (double s0 = 0, s1; s0 < s_max; s0 = s1) {
+    const double step_increment = ComputeSampleStep(lane,
+                                                    s0,
+                                                    grid_unit);
+    s1 = s0 + step_increment;
+
+    const api::RBounds rb0 = use_driveable_bounds ?
+        lane->driveable_bounds(s0) : lane->lane_bounds(s0);
+    const api::RBounds rb1 = use_driveable_bounds ?
+        lane->driveable_bounds(s1) : lane->lane_bounds(s1);
+    //
+    // (s1,r10) o <-- o (s1,r11)
+    //          | \   ^
+    //          v   \ |
+    // (s0,r00) o --> o (s0,r01)
+    //
+    const double r00 = rb0.max();
+    const double r01 = rb0.min();
+    const double r10 = rb1.max();
+    const double r11 = rb1.min();
+    SrhFace first_triangle({
+        {s0, r00, elevation(s0, r00)},
+        {s0, r01, elevation(s0, r01)},
+        {s1, r10, elevation(s1, r10)}}, {0., 0., 1.});
+    SrhFace second_triangle({
+        {s0, r01, elevation(s0, r01)},
+        {s1, r11, elevation(s1, r11)},
+        {s1, r10, elevation(s1, r10)}}, {0., 0., 1.});
+    mesh->PushFace(first_triangle.ToGeoFace(lane));
+    mesh->PushFace(second_triangle.ToGeoFace(lane));
+  }
+}
+
+void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane,
+    double grid_unit, bool use_driveable_bounds,
+    const std::function<double(double, double)>& elevation) {
+
   const double linear_tolerance =
     lane->segment()->junction()->road_geometry()->linear_tolerance();
   const double s_max = lane->length();
@@ -159,6 +262,35 @@ void CoverLaneWithQuads(
         r10 -= grid_unit;
       }
     }
+  }
+}
+
+// Traverses @p lane, generating a cover of the surface with quads
+// (4-vertex faces) which are added to @p mesh.  The quads are quadrilaterals in
+// the (s,r) space of the lane.
+//
+// @param mesh  the GeoMesh which will receive the quads
+// @param lane  the api::Lane to cover with quads
+// @param grid_unit  size of each quad (length of edge in s and r dimensions)
+// @param use_driveable_bounds  if true, use the lane's driveable_bounds()
+//        to determine the lateral extent of the coverage; otherwise, use
+//        lane_bounds()
+// @param elevation a function taking `(s, r)` as parameters and returning
+//        the corresponding elevation `h`, to yield a quad vertex `(s, r, h)`
+void CoverLaneWithQuads(
+    GeoMesh* mesh, const api::Lane* lane,
+    double grid_unit, bool use_driveable_bounds,
+    const std::function<double(double, double)>& elevation,
+    bool optimize_generation) {
+  if (optimize_generation)
+  {
+    GenerateOptimizedRoadMesh(mesh, lane, grid_unit,
+                              use_driveable_bounds, elevation);
+  }
+  else
+  {
+    GeneratePreciseRoadMesh(mesh, lane, grid_unit,
+                            use_driveable_bounds, elevation);
   }
 }
 
@@ -548,17 +680,18 @@ void RenderSegment(const api::Segment* segment,
                    GeoMesh* h_bounds_mesh) {
   const double linear_tolerance =
       segment->junction()->road_geometry()->linear_tolerance();
-
-  const double base_grid_unit = PickGridUnit(
-      segment->lane(0), features.max_grid_unit, features.min_grid_resolution,
-      linear_tolerance);
+  const double base_grid_unit =
+    features.off_grid_mesh_generation ? linear_tolerance : PickGridUnit(
+        segment->lane(0), features.max_grid_unit, features.min_grid_resolution,
+        linear_tolerance);
   {
     // Lane 0 should be as good as any other for driveable-bounds.
     GeoMesh driveable_mesh;
     CoverLaneWithQuads(&driveable_mesh, segment->lane(0),
                        base_grid_unit,
                        true /*use_driveable_bounds*/,
-                       [](double, double) { return 0.; });
+                       [](double, double) { return 0.; },
+                       features.off_grid_mesh_generation);
     asphalt_mesh->AddFacesFrom(SimplifyMesh(driveable_mesh, features));
   }
 
@@ -570,14 +703,16 @@ void RenderSegment(const api::Segment* segment,
         base_grid_unit,
         true /*use_driveable_bounds*/,
         [&segment](double s, double r) {
-          return segment->lane(0)->elevation_bounds(s, r).max(); });
+          return segment->lane(0)->elevation_bounds(s, r).max(); },
+        features.off_grid_mesh_generation);
     CoverLaneWithQuads(
         &lower_h_bounds_mesh,
         segment->lane(0),
         base_grid_unit,
         true /*use_driveable_bounds*/,
         [&segment](double s, double r) {
-          return segment->lane(0)->elevation_bounds(s, r).min(); });
+          return segment->lane(0)->elevation_bounds(s, r).min(); },
+        features.off_grid_mesh_generation);
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
   }
@@ -588,11 +723,12 @@ void RenderSegment(const api::Segment* segment,
         linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
-      CoverLaneWithQuads(&haze_mesh, lane, grid_unit,
+      CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit,
                          false /*use_driveable_bounds*/,
                          [&features](double, double) {
                            return features.lane_haze_elevation;
-                         });
+                         },
+                         features.off_grid_mesh_generation);
       lane_mesh->AddFacesFrom(SimplifyMesh(haze_mesh, features));
     }
     if (features.draw_stripes) {

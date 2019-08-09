@@ -14,6 +14,7 @@
 #include "drake/common/text_logging.h"
 
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_throw.h"
 
 #include "multilane/builder.h"
 #include "multilane/connection.h"
@@ -175,7 +176,7 @@ ComputationPolicy ParseComputationPolicy(const YAML::Node& node) {
   if (policy == "prefer-speed") {
     return ComputationPolicy::kPreferSpeed;
   }
-  throw std::runtime_error("Unknown ComputationPolicy");
+  MALIPUT_THROW_MESSAGE("Unknown ComputationPolicy");
 }
 
 // Builds a LaneLayout based `node`'s lane node, the left and right shoulders.
@@ -233,7 +234,7 @@ Direction ResolveDirection(const std::string& direction_key) {
   } else if (direction_key == "reverse") {
     return Direction::kReverse;
   }
-  throw std::runtime_error("Unknown direction_key");
+  MALIPUT_THROW_MESSAGE("Unknown direction_key");
 }
 
 // Returns the Direction that `end_key` sets to the Endpoint / EndpointZ.
@@ -244,7 +245,7 @@ api::LaneEnd::Which ResolveEnd(const std::string& end_key) {
   } else if (end_key == "end") {
     return api::LaneEnd::Which::kFinish;
   }
-  throw std::runtime_error("Unknown end_key");
+  MALIPUT_THROW_MESSAGE("Unknown end_key");
 }
 
 // Returns a ParsedReference structure by extracting keywords from
@@ -280,7 +281,7 @@ ParsedReference ResolveEndpointReference(const std::string& endpoint_key) {
     parsed_reference.lane_id = pieces_match[3].str() == "ref"
         ? drake::nullopt : drake::optional<int>(std::atoi(pieces_match[3].str().c_str()));
   } else {
-    throw std::runtime_error("Unknown endpoint reference");
+    MALIPUT_THROW_MESSAGE("Unknown endpoint reference");
   }
   return parsed_reference;
 }
@@ -363,7 +364,7 @@ drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
           parsed_reference.end.value(), parsed_reference.direction);
     }
   } else {
-    throw std::runtime_error("Unknown endpoint");
+    MALIPUT_THROW_MESSAGE("Unknown endpoint");
   }
   return {{parsed_anchor_point, spec}};
 }
@@ -435,10 +436,10 @@ drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
             parsed_reference.end.value(), parsed_reference.direction);
       }
     } else {
-      throw std::runtime_error("Unknown EndpointZ scalar");
+      MALIPUT_THROW_MESSAGE("Unknown EndpointZ scalar");
     }
   } else {
-    throw std::runtime_error("Unknown EndpointZ node type");
+    MALIPUT_THROW_MESSAGE("Unknown EndpointZ node type");
   }
   return {{parsed_anchor_point, spec}};
 }
@@ -547,7 +548,7 @@ const Connection* MaybeMakeConnection(
     }
   }
   MALIPUT_ABORT_MESSAGE("connection type of the start_spec is neither "
-                      "Connection::kArc nor Connection::kLine");
+                        "Connection::kArc nor Connection::kLine");
 }
 
 // Parses a YAML `node` that represents a RoadGeometry.

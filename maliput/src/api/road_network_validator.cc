@@ -20,7 +20,7 @@ void ValidateRoadNetwork(const RoadNetwork& road_network,
       const LaneId lane_id = lane_map.first;
       const auto results = road_network.rulebook()->FindRules(
           {{lane_id, {0.0, lane_map.second->length()}}}, 0);
-      DRAKE_THROW_UNLESS(results.direction_usage.size() > 0);
+      MALIPUT_THROW_UNLESS(results.direction_usage.size() > 0);
     }
   }
 }

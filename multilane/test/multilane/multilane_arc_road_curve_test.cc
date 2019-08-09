@@ -4,8 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/api/lane_data.h"
 #include "drake/common/eigen_types.h"
+
+#include "maliput/api/lane_data.h"
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 
 namespace maliput {
@@ -39,26 +41,26 @@ TEST_F(MultilaneArcRoadCurveTest, ConstructorTest) {
   EXPECT_THROW(ArcRoadCurve(kCenter, -kRadius, kTheta0, kDTheta, zp, zp,
                             kLinearTolerance, kScaleLength,
                             kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_THROW(ArcRoadCurve(kCenter, kRadius, kTheta0, kDTheta, zp, zp,
                             kZeroTolerance, kScaleLength, kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_THROW(ArcRoadCurve(kCenter, kRadius, kTheta0, kDTheta, zp, zp,
                             -kLinearTolerance, kScaleLength,
                             kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_THROW(ArcRoadCurve(kCenter, kRadius, kTheta0, kDTheta, zp, zp,
                             kLinearTolerance, -kScaleLength,
                             kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_THROW(ArcRoadCurve(kCenter, kRadius, kTheta0, kDTheta, zp, zp,
                             kLinearTolerance, kZeroScaleLength,
                             kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_NO_THROW(ArcRoadCurve(kCenter, kRadius, kTheta0, kDTheta, zp, zp,
                                kLinearTolerance, kScaleLength,
@@ -83,8 +85,9 @@ TEST_F(MultilaneArcRoadCurveTest, ArcGeometryTest) {
   // mapping evaluation along the centerline
   std::function<double(double)> p_from_s_at_r0 =
       dut.OptimizeCalcPFromS(kR0Offset);
-  EXPECT_THROW(s_from_p_at_r0(2.), std::runtime_error);
-  EXPECT_THROW(p_from_s_at_r0(2. * centerline_length), std::runtime_error);
+  EXPECT_THROW(s_from_p_at_r0(2.), maliput::common::assertion_error);
+  EXPECT_THROW(p_from_s_at_r0(2. * centerline_length),
+               maliput::common::assertion_error);
   // Checks that both `s` and `p` bounds are enforced on
   // mapping evaluation at an offset
   std::function<double(double)> s_from_p_at_r =
@@ -92,8 +95,9 @@ TEST_F(MultilaneArcRoadCurveTest, ArcGeometryTest) {
   std::function<double(double)> p_from_s_at_r =
       dut.OptimizeCalcPFromS(kROffset);
   const double offset_line_length = s_from_p_at_r(1.);
-  EXPECT_THROW(s_from_p_at_r(2.), std::runtime_error);
-  EXPECT_THROW(p_from_s_at_r(2. * offset_line_length), std::runtime_error);
+  EXPECT_THROW(s_from_p_at_r(2.), maliput::common::assertion_error);
+  EXPECT_THROW(p_from_s_at_r(2. * offset_line_length),
+               maliput::common::assertion_error);
 
   // Checks the evaluation of xy at different values over the reference curve.
   EXPECT_TRUE(CompareMatrices(
@@ -274,10 +278,14 @@ TEST_F(MultilaneArcRoadCurveTest, OffsetTest) {
                               kComputationPolicy);
   EXPECT_DOUBLE_EQ(flat_dut.l_max(), kRadius * kDTheta);
   // Checks that functions throw when lateral offset is exceeded.
-  EXPECT_THROW(flat_dut.OptimizeCalcPFromS(kRadius), std::runtime_error);
-  EXPECT_THROW(flat_dut.OptimizeCalcPFromS(2.0 * kRadius), std::runtime_error);
-  EXPECT_THROW(flat_dut.OptimizeCalcPFromS(kRadius), std::runtime_error);
-  EXPECT_THROW(flat_dut.OptimizeCalcSFromP(2.0 * kRadius), std::runtime_error);
+  EXPECT_THROW(flat_dut.OptimizeCalcPFromS(kRadius),
+               maliput::common::assertion_error);
+  EXPECT_THROW(flat_dut.OptimizeCalcPFromS(2.0 * kRadius),
+               maliput::common::assertion_error);
+  EXPECT_THROW(flat_dut.OptimizeCalcPFromS(kRadius),
+               maliput::common::assertion_error);
+  EXPECT_THROW(flat_dut.OptimizeCalcSFromP(2.0 * kRadius),
+               maliput::common::assertion_error);
   // Evaluates inverse function for different path length and offset values.
   for (double r : r_vector) {
     std::function<double(double)> p_from_s_at_r =

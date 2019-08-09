@@ -33,6 +33,9 @@ rules::RightOfWayRule::State NoYieldState();
 /// Returns a rules::RightOfWayRule::State containing yield groups.
 rules::RightOfWayRule::State YieldState();
 
+///  Returns an arbitrary rules::RightOfWayRule::RelatedBulbGroups.
+rules::RightOfWayRule::RelatedBulbGroups RelatedBulbGroups();
+
 /// Returns a rules::RightOfWayRule containing arbitrary state.
 rules::RightOfWayRule Rule();
 

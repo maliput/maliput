@@ -5,6 +5,7 @@
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
 #include "maliput/test_utilities/rules_speed_limit_compare.h"
@@ -32,7 +33,8 @@ class ManualRulebookTest : public ::testing::Test {
       RightOfWayRule::ZoneType::kStopExcluded,
       {RightOfWayRule::State{RightOfWayRule::State::Id("rowr_state_id"),
                              RightOfWayRule::State::Type::kStopThenGo,
-                             {}}}};
+                             {}}},
+      {} /* related_bulb_groups */};
 
   const SpeedLimitRule kSpeedLimit{SpeedLimitRule::Id("slr_id"),
                                    kZone,
@@ -58,10 +60,11 @@ TEST_F(ManualRulebookTest, AddGetRemoveRightOfWay) {
   EXPECT_THROW(dut.GetRule(kRightOfWay.id()), std::out_of_range);
   dut.AddRule(kRightOfWay);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kRightOfWay.id()), kRightOfWay));
-  EXPECT_THROW(dut.AddRule(kRightOfWay), std::runtime_error);
+  EXPECT_THROW(dut.AddRule(kRightOfWay), maliput::common::assertion_error);
   dut.RemoveRule(kRightOfWay.id());
   EXPECT_THROW(dut.GetRule(kRightOfWay.id()), std::out_of_range);
-  EXPECT_THROW(dut.RemoveRule(kRightOfWay.id()), std::runtime_error);
+  EXPECT_THROW(dut.RemoveRule(kRightOfWay.id()),
+               maliput::common::assertion_error);
 }
 
 
@@ -71,10 +74,11 @@ TEST_F(ManualRulebookTest, AddGetRemoveSpeedLimit) {
   EXPECT_THROW(dut.GetRule(kSpeedLimit.id()), std::out_of_range);
   dut.AddRule(kSpeedLimit);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
-  EXPECT_THROW(dut.AddRule(kSpeedLimit), std::runtime_error);
+  EXPECT_THROW(dut.AddRule(kSpeedLimit), maliput::common::assertion_error);
   dut.RemoveRule(kSpeedLimit.id());
   EXPECT_THROW(dut.GetRule(kSpeedLimit.id()), std::out_of_range);
-  EXPECT_THROW(dut.RemoveRule(kSpeedLimit.id()), std::runtime_error);
+  EXPECT_THROW(dut.RemoveRule(kSpeedLimit.id()),
+               maliput::common::assertion_error);
 }
 
 TEST_F(ManualRulebookTest, AddGetRemoveDirectionUsage) {
@@ -84,10 +88,11 @@ TEST_F(ManualRulebookTest, AddGetRemoveDirectionUsage) {
   dut.AddRule(kDirectionUsage);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDirectionUsage.id()),
                                kDirectionUsage));
-  EXPECT_THROW(dut.AddRule(kDirectionUsage), std::runtime_error);
+  EXPECT_THROW(dut.AddRule(kDirectionUsage), maliput::common::assertion_error);
   dut.RemoveRule(kDirectionUsage.id());
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
-  EXPECT_THROW(dut.RemoveRule(kDirectionUsage.id()), std::runtime_error);
+  EXPECT_THROW(dut.RemoveRule(kDirectionUsage.id()),
+               maliput::common::assertion_error);
 }
 
 TEST_F(ManualRulebookTest, RemoveAll) {
@@ -98,11 +103,14 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   dut.AddRule(kDirectionUsage);
   dut.RemoveAll();
   EXPECT_THROW(dut.GetRule(kRightOfWay.id()), std::out_of_range);
-  EXPECT_THROW(dut.RemoveRule(kRightOfWay.id()), std::runtime_error);
+  EXPECT_THROW(dut.RemoveRule(kRightOfWay.id()),
+               maliput::common::assertion_error);
   EXPECT_THROW(dut.GetRule(kSpeedLimit.id()), std::out_of_range);
-  EXPECT_THROW(dut.RemoveRule(kSpeedLimit.id()), std::runtime_error);
+  EXPECT_THROW(dut.RemoveRule(kSpeedLimit.id()),
+               maliput::common::assertion_error);
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
-  EXPECT_THROW(dut.RemoveRule(kDirectionUsage.id()), std::runtime_error);
+  EXPECT_THROW(dut.RemoveRule(kDirectionUsage.id()),
+               maliput::common::assertion_error);
 
   // Since the original rules are gone, it should be possible to re-add them.
   dut.AddRule(kRightOfWay);

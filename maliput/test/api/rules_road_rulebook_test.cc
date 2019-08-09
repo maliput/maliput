@@ -9,7 +9,7 @@
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
-#include "drake/common/drake_throw.h"
+#include "maliput/common/assertion_error.h"
 
 namespace maliput {
 namespace api {
@@ -27,7 +27,8 @@ class MockRulebook : public RoadRulebook {
     {RightOfWayRule::State(
         RightOfWayRule::State::Id("green"),
         RightOfWayRule::State::Type::kGo,
-        {})}};
+        {} /* states */)},
+    {} /* related_bulb_groups */};
   const SpeedLimitRule kSpeedLimit{SpeedLimitRule::Id("slr_id"),
                                    kZone,
                                    SpeedLimitRule::Severity::kStrict,
@@ -94,7 +95,7 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
 
   const double kNegativeTolerance = -1.;
   EXPECT_THROW(dut.FindRules({}, kNegativeTolerance),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_EQ(dut.GetRule(dut.kRightOfWay.id()).id(), dut.kRightOfWay.id());
   EXPECT_THROW(dut.GetRule(RightOfWayRule::Id("xxx")), std::out_of_range);

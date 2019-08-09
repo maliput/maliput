@@ -61,3 +61,10 @@ void Throw(const char* condition, const char* func, const char* file, int line);
           #condition, __func__, __FILE__, __LINE__);                          \
     }                                                                         \
   } while (0)
+
+/// Throws an exception with a message showing at least the condition text,
+/// function name, file, and line.
+#define MALIPUT_THROW_MESSAGE(msg)                                            \
+  do {                                                                        \
+    ::maliput::common::internal::Throw(#msg, __func__, __FILE__, __LINE__);   \
+  } while (0)

@@ -1,6 +1,6 @@
 #include "maliput/base/intersection.h"
 
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 
@@ -9,7 +9,7 @@ Intersection::Intersection(const Id& id,
                            const api::rules::PhaseRing& ring,
                            ManualPhaseProvider* phase_provider)
     : api::Intersection(id, region, ring), phase_provider_(phase_provider) {
-  DRAKE_THROW_UNLESS(phase_provider_ != nullptr);
+  MALIPUT_THROW_UNLESS(phase_provider_ != nullptr);
 }
 
 drake::optional<api::rules::PhaseProvider::Result> Intersection::Phase() const {

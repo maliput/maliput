@@ -125,24 +125,32 @@ RoadRulebook:
       - Lane: l:ns_intersection_segment_0
         SRange: [0, 18.75]
       ZoneType: StopExcluded
+      RelatedBulbGroups:
+        SouthFacing: [SouthFacingBulbs]
     - ID: SouthStraight
       States:
         Go: []
         Stop: []
       Zone:
       - Lane: l:ns_intersection_segment_1
+      RelatedBulbGroups:
+        NorthFacing: [NorthFacingBulbs]
     - ID: EastStraight
       States:
         Go: []
         Stop: []
       Zone:
       - Lane: l:ew_intersection_segment_0
+      RelatedBulbGroups:
+        WestFacing: [WestFacingBulbs]
     - ID: WestStraight
       States:
         Go: []
         Stop: []
       Zone:
       - Lane: l:ew_intersection_segment_1
+      RelatedBulbGroups:
+        EastFacing: [EastFacingBulbs]
     # Right-turn rules only have both Go and StopThenGo states to model an
     # intersection that allows turn-on-red. When in state Go, they yield to no
     # other rule since their original direction of travel will have right-of-way.
@@ -155,24 +163,32 @@ RoadRulebook:
         StopThenGo: [EastStraight, SouthLeftTurn]
       Zone:
       - Lane: l:north_right_turn_segment_0
+      RelatedBulbGroups:
+        SouthFacing: [SouthFacingBulbs]
     - ID: SouthRightTurn
       States:
         Go: [NorthLeftTurn]
         StopThenGo: [WestStraight, NorthLeftTurn]
       Zone:
       - Lane: l:south_right_turn_segment_0
+      RelatedBulbGroups:
+        NorthFacing: [NorthFacingBulbs]
     - ID: EastRightTurn
       States:
         Go: [WestLeftTurn]
         StopThenGo: [SouthStraight, WestLeftTurn]
       Zone:
       - Lane: l:east_right_turn_segment_0
+      RelatedBulbGroups:
+        WestFacing: [WestFacingBulbs]
     - ID: WestRightTurn
       States:
         Go: [EastLeftTurn]
         StopThenGo: [NorthStraight, EastLeftTurn]
       Zone:
       - Lane: l:west_right_turn_segment_0
+      RelatedBulbGroups:
+        EastFacing: [EastFacingBulbs]
      # Left-turn rules have both Go and Stop states. They yield to antiparallel
      # straight-through rules.
     - ID: NorthLeftTurn
@@ -181,24 +197,32 @@ RoadRulebook:
         Stop: []
       Zone:
       - Lane: l:north_left_turn_segment_0
+      RelatedBulbGroups:
+        SouthFacing: [SouthFacingBulbs]
     - ID: SouthLeftTurn
       States:
         Go: [NorthStraight]
         Stop: []
       Zone:
       - Lane: l:south_left_turn_segment_0
+      RelatedBulbGroups:
+        NorthFacing: [NorthFacingBulbs]
     - ID: EastLeftTurn
       States:
         Go: [WestStraight]
         Stop: []
       Zone:
       - Lane: l:east_left_turn_segment_0
+      RelatedBulbGroups:
+        WestFacing: [WestFacingBulbs]
     - ID: WestLeftTurn
       States:
         Go: [EastStraight]
         Stop: []
       Zone:
       - Lane: l:west_left_turn_segment_0
+      RelatedBulbGroups:
+        EastFacing: [EastFacingBulbs]
   DirectionUsageRules:
     - ID: NorthRightTurn
       Zone:

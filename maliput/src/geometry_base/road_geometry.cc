@@ -12,7 +12,7 @@ namespace geometry_base {
 
 void RoadGeometry::AddJunctionPrivate(std::unique_ptr<Junction> junction) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(junction.get() != nullptr);
+  MALIPUT_THROW_UNLESS(junction.get() != nullptr);
   junctions_.emplace_back(std::move(junction));
   Junction* const raw_junction = junctions_.back().get();
   raw_junction->AttachToRoadGeometry(
@@ -27,7 +27,7 @@ void RoadGeometry::AddJunctionPrivate(std::unique_ptr<Junction> junction) {
 void RoadGeometry::AddBranchPointPrivate(
     std::unique_ptr<BranchPoint> branch_point) {
   // Parameter checks
-  DRAKE_THROW_UNLESS(branch_point.get() != nullptr);
+  MALIPUT_THROW_UNLESS(branch_point.get() != nullptr);
   branch_points_.emplace_back(std::move(branch_point));
   BranchPoint* const raw_branch_point = branch_points_.back().get();
   raw_branch_point->AttachToRoadGeometry({}, this);

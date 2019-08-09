@@ -4,9 +4,11 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/check_id_indexing.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
+
 #include "dragway/branch_point.h"
 #include "dragway/junction.h"
 #include "dragway/lane.h"
@@ -811,7 +813,8 @@ TEST_F(MaliputDragwayLaneTest, ThrowIfGeoPosHasMismatchedDerivatives) {
   api::LanePositionT<drake::AutoDiffXd> lane_position(s, r, h);
 
   EXPECT_THROW(
-      lane_->ToGeoPositionT<drake::AutoDiffXd>(lane_position), std::runtime_error);
+      lane_->ToGeoPositionT<drake::AutoDiffXd>(lane_position),
+      maliput::common::assertion_error);
 }
 
 TEST_F(MaliputDragwayLaneTest, ThrowIfLanePosHasMismatchedDerivatives) {
@@ -826,7 +829,7 @@ TEST_F(MaliputDragwayLaneTest, ThrowIfLanePosHasMismatchedDerivatives) {
 
   EXPECT_THROW(
       lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position, nullptr, nullptr),
-      std::runtime_error);
+      maliput::common::assertion_error);
 }
 
 TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic1) {

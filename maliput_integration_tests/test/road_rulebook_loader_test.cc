@@ -11,6 +11,8 @@
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/traffic_lights.h"
+#include "maliput/base/traffic_light_book_loader.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
@@ -27,11 +29,13 @@ namespace {
 constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 
 using maliput::api::LaneId;
+using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
 using maliput::api::rules::LaneSRange;
 using maliput::api::rules::LaneSRoute;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::SRange;
+using maliput::api::rules::TrafficLight;
 
 class TestLoading2x2IntersectionRules : public ::testing::Test {
  protected:
@@ -46,12 +50,18 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
     struct TestCase {
       std::string rule_name;
       std::string lane_name;
+      std::string traffic_light_name;
+      std::string bulb_group_name;
     };
     const std::vector<TestCase> test_cases = {
-        {"NorthStraight", "l:ns_intersection_segment_0"},
-        {"SouthStraight", "l:ns_intersection_segment_1"},
-        {"EastStraight", "l:ew_intersection_segment_0"},
-        {"WestStraight", "l:ew_intersection_segment_1"},
+        {"NorthStraight", "l:ns_intersection_segment_0", "SouthFacing",
+         "SouthFacingBulbs"},
+        {"SouthStraight", "l:ns_intersection_segment_1", "NorthFacing",
+         "NorthFacingBulbs"},
+        {"EastStraight", "l:ew_intersection_segment_0", "WestFacing",
+         "WestFacingBulbs"},
+        {"WestStraight", "l:ew_intersection_segment_1", "EastFacing",
+         "EastFacingBulbs"},
     };
     std::vector<RightOfWayRule> result;
     for (const auto& test_case : test_cases) {
@@ -63,7 +73,10 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
           {RightOfWayRule::State(RightOfWayRule::State::Id("Go"),
                                  RightOfWayRule::State::Type::kGo, {}),
            RightOfWayRule::State(RightOfWayRule::State::Id("Stop"),
-                                 RightOfWayRule::State::Type::kStop, {})}));
+                                 RightOfWayRule::State::Type::kStop, {})},
+          RightOfWayRule::RelatedBulbGroups{
+              {TrafficLight::Id(test_case.traffic_light_name),
+               {BulbGroup::Id(test_case.bulb_group_name)}}}));
     }
     return result;
   }
@@ -74,16 +87,18 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
       std::string lane_name;
       std::string yield_1;
       std::string yield_2;
+      std::string traffic_light_name;
+      std::string bulb_group_name;
     };
     const std::vector<TestCase> test_cases = {
         {"NorthRightTurn", "l:north_right_turn_segment_0", "EastStraight",
-         "SouthLeftTurn"},
+         "SouthLeftTurn", "SouthFacing", "SouthFacingBulbs"},
         {"SouthRightTurn", "l:south_right_turn_segment_0", "WestStraight",
-         "NorthLeftTurn"},
+         "NorthLeftTurn", "NorthFacing", "NorthFacingBulbs"},
         {"EastRightTurn", "l:east_right_turn_segment_0", "SouthStraight",
-         "WestLeftTurn"},
+         "WestLeftTurn", "WestFacing", "WestFacingBulbs"},
         {"WestRightTurn", "l:west_right_turn_segment_0", "NorthStraight",
-         "EastLeftTurn"},
+         "EastLeftTurn", "EastFacing", "EastFacingBulbs"},
     };
     std::vector<RightOfWayRule> result;
     for (const auto& test_case : test_cases) {
@@ -98,7 +113,10 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
            RightOfWayRule::State(RightOfWayRule::State::Id("StopThenGo"),
                                  RightOfWayRule::State::Type::kStopThenGo,
                                  {RightOfWayRule::Id(test_case.yield_1),
-                                  RightOfWayRule::Id(test_case.yield_2)})}));
+                                  RightOfWayRule::Id(test_case.yield_2)})},
+          RightOfWayRule::RelatedBulbGroups{
+              {TrafficLight::Id(test_case.traffic_light_name),
+               {BulbGroup::Id(test_case.bulb_group_name)}}}));
     }
     return result;
   }
@@ -108,12 +126,18 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
       std::string rule_name;
       std::string lane_name;
       std::string yield;
+      std::string traffic_light_name;
+      std::string bulb_group_name;
     };
     std::vector<TestCase> test_cases = {
-        {"NorthLeftTurn", "l:north_left_turn_segment_0", "SouthStraight"},
-        {"SouthLeftTurn", "l:south_left_turn_segment_0", "NorthStraight"},
-        {"EastLeftTurn", "l:east_left_turn_segment_0", "WestStraight"},
-        {"WestLeftTurn", "l:west_left_turn_segment_0", "EastStraight"},
+        {"NorthLeftTurn", "l:north_left_turn_segment_0", "SouthStraight",
+         "SouthFacing", "SouthFacingBulbs"},
+        {"SouthLeftTurn", "l:south_left_turn_segment_0", "NorthStraight",
+         "NorthFacing", "NorthFacingBulbs"},
+        {"EastLeftTurn", "l:east_left_turn_segment_0", "WestStraight",
+         "WestFacing", "WestFacingBulbs"},
+        {"WestLeftTurn", "l:west_left_turn_segment_0", "EastStraight",
+         "EastFacing", "EastFacingBulbs"},
     };
     std::vector<RightOfWayRule> result;
     for (const auto& test_case : test_cases) {
@@ -126,7 +150,10 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
                                  RightOfWayRule::State::Type::kGo,
                                  {RightOfWayRule::Id(test_case.yield)}),
            RightOfWayRule::State(RightOfWayRule::State::Id("Stop"),
-                                 RightOfWayRule::State::Type::kStop, {})}));
+                                 RightOfWayRule::State::Type::kStop, {})},
+          RightOfWayRule::RelatedBulbGroups{
+              {TrafficLight::Id(test_case.traffic_light_name),
+               {BulbGroup::Id(test_case.bulb_group_name)}}}));
     }
     return result;
   }
@@ -214,6 +241,22 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
     return result;
   }
 
+  // Evaluates that RelatedBulbGroups in `rule` has valid TrafficLight::Ids and
+  // BulbGroup::Ids.
+  void EvaluateRelatedBulbGroups(
+      const RightOfWayRule& rule,
+      const api::rules::TrafficLightBook* traffic_light_book) {
+    for (const auto& traffic_light_bulb_groups : rule.related_bulb_groups()) {
+      const drake::optional<api::rules::TrafficLight> traffic_light =
+        traffic_light_book->GetTrafficLight(traffic_light_bulb_groups.first);
+      EXPECT_TRUE(traffic_light.has_value());
+      for (const api::rules::BulbGroup::Id& bulb_group_id :
+           traffic_light_bulb_groups.second) {
+        EXPECT_TRUE(traffic_light->GetBulbGroup(bulb_group_id).has_value());
+      }
+    }
+  }
+
   const std::string filepath_;
   const std::unique_ptr<const api::RoadGeometry> road_geometry_;
 };
@@ -222,6 +265,9 @@ TEST_F(TestLoading2x2IntersectionRules, LoadFromFile) {
   const std::unique_ptr<api::rules::RoadRulebook> rulebook =
       LoadRoadRulebookFromFile(road_geometry_.get(), filepath_);
   EXPECT_NE(rulebook, nullptr);
+
+  const std::unique_ptr<api::rules::TrafficLightBook> traffic_light_book =
+      LoadTrafficLightBookFromFile(filepath_);
 
   // RightOfWayRules testing.
   {
@@ -240,6 +286,7 @@ TEST_F(TestLoading2x2IntersectionRules, LoadFromFile) {
     for (const auto& test_case : test_cases) {
       const RightOfWayRule rule = rulebook->GetRule(test_case.id());
       EXPECT_TRUE(MALIPUT_IS_EQUAL(rule, test_case));
+      EvaluateRelatedBulbGroups(rule, traffic_light_book.get());
     }
   }
 

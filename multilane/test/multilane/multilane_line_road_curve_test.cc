@@ -6,8 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/api/lane_data.h"
 #include "drake/common/eigen_types.h"
+
+#include "maliput/api/lane_data.h"
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 
 namespace maliput {
@@ -54,8 +56,9 @@ TEST_F(MultilaneLineRoadCurveTest, LineRoadCurve) {
   // mapping evaluation along the centerline
   std::function<double(double)> p_from_s_at_r0 =
       dut.OptimizeCalcPFromS(kR0Offset);
-  EXPECT_THROW(s_from_p_at_r0(2.), std::runtime_error);
-  EXPECT_THROW(p_from_s_at_r0(2. * centerline_length), std::runtime_error);
+  EXPECT_THROW(s_from_p_at_r0(2.), maliput::common::assertion_error);
+  EXPECT_THROW(p_from_s_at_r0(2. * centerline_length),
+               maliput::common::assertion_error);
   // Checks that both `s` and `p` bounds are enforced on
   // mapping evaluation at an offset
   std::function<double(double)> s_from_p_at_r =
@@ -63,8 +66,9 @@ TEST_F(MultilaneLineRoadCurveTest, LineRoadCurve) {
   std::function<double(double)> p_from_s_at_r =
       dut.OptimizeCalcPFromS(kROffset);
   const double offset_line_length = s_from_p_at_r(1.);
-  EXPECT_THROW(s_from_p_at_r0(2.), std::runtime_error);
-  EXPECT_THROW(p_from_s_at_r0(2. * offset_line_length), std::runtime_error);
+  EXPECT_THROW(s_from_p_at_r0(2.), maliput::common::assertion_error);
+  EXPECT_THROW(p_from_s_at_r0(2. * offset_line_length),
+               maliput::common::assertion_error);
 
   // Check the evaluation of xy at different p values.
   EXPECT_TRUE(
@@ -95,19 +99,19 @@ TEST_F(MultilaneLineRoadCurveTest, LineRoadCurve) {
 TEST_F(MultilaneLineRoadCurveTest, ConstructorTest) {
   EXPECT_THROW(LineRoadCurve(kOrigin, kDirection, zp, zp, -kLinearTolerance,
                              kScaleLength, kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_THROW(LineRoadCurve(kOrigin, kDirection, zp, zp, kZeroTolerance,
                              kScaleLength, kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_THROW(LineRoadCurve(kOrigin, kDirection, zp, zp, kLinearTolerance,
                              -kScaleLength, kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_THROW(LineRoadCurve(kOrigin, kDirection, zp, zp, kLinearTolerance,
                              kZeroScaleLength, kComputationPolicy),
-               std::runtime_error);
+               maliput::common::assertion_error);
 
   EXPECT_NO_THROW(LineRoadCurve(kOrigin, kDirection, zp, zp, kLinearTolerance,
                                 kScaleLength, kComputationPolicy));

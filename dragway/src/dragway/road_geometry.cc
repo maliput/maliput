@@ -8,6 +8,7 @@
 #include "drake/math/saturate.h"
 
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_throw.h"
 #include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
 
 #include "dragway/branch_point.h"
@@ -121,7 +122,7 @@ int RoadGeometry::GetLaneIndex(const api::GeoPosition& geo_pos) const {
     }
   }
   if (!lane_found) {
-    throw std::runtime_error("dragway::RoadGeometry::GetLaneIndex: Failed to "
+    MALIPUT_THROW_MESSAGE("dragway::RoadGeometry::GetLaneIndex: Failed to "
         "find lane for geo_pos (" + std::to_string(geo_pos.x()) + ", " +
         std::to_string(geo_pos.y()) + ").");
   }

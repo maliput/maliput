@@ -6,21 +6,25 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "drake/common/text_logging.h"
+
 #include "maliput/api/lane.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/manual_rulebook.h"
-#include "drake/common/drake_throw.h"
-#include "drake/common/text_logging.h"
+#include "maliput/common/maliput_throw.h"
+
 
 using maliput::api::Lane;
 using maliput::api::LaneId;
+using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
 using maliput::api::rules::LaneSRange;
 using maliput::api::rules::LaneSRoute;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::SRange;
+using maliput::api::rules::TrafficLight;
 
 namespace YAML {
 
@@ -80,7 +84,7 @@ struct convert<DirectionUsageRule::State::Severity> {
       node = "Preferred";
       return node;
     } else {
-      DRAKE_THROW_UNLESS(rhs == DirectionUsageRule::State::Severity::kStrict);
+      MALIPUT_THROW_UNLESS(rhs == DirectionUsageRule::State::Severity::kStrict);
       node = "Strict";
       return node;
     }
@@ -159,8 +163,8 @@ namespace {
 SRange ObtainSRange(const Lane* lane, const YAML::Node& lane_node) {
   if (lane_node["SRange"]) {
     const SRange srange = lane_node["SRange"].as<SRange>();
-    DRAKE_THROW_UNLESS(srange.s0() >= 0);
-    DRAKE_THROW_UNLESS(srange.s1() <= lane->length());
+    MALIPUT_THROW_UNLESS(srange.s0() >= 0);
+    MALIPUT_THROW_UNLESS(srange.s1() <= lane->length());
     return srange;
   } else {
     return SRange(0, lane->length());
@@ -169,18 +173,18 @@ SRange ObtainSRange(const Lane* lane, const YAML::Node& lane_node) {
 
 LaneSRange BuildLaneSRange(const api::RoadGeometry* road_geometry,
                            const YAML::Node& lane_node) {
-  DRAKE_THROW_UNLESS(lane_node.IsMap());
-  DRAKE_THROW_UNLESS(lane_node["Lane"].IsDefined());
+  MALIPUT_THROW_UNLESS(lane_node.IsMap());
+  MALIPUT_THROW_UNLESS(lane_node["Lane"].IsDefined());
   const LaneId lane_id(lane_node["Lane"].as<std::string>());
   const Lane* lane = road_geometry->ById().GetLane(lane_id);
-  DRAKE_THROW_UNLESS(lane != nullptr);
+  MALIPUT_THROW_UNLESS(lane != nullptr);
   const SRange s_range = ObtainSRange(lane, lane_node);
   return LaneSRange(lane_id, s_range);
 }
 
 LaneSRoute BuildLaneSRoute(const api::RoadGeometry* road_geometry,
                            const YAML::Node& zone_node) {
-  DRAKE_THROW_UNLESS(zone_node.IsSequence());
+  MALIPUT_THROW_UNLESS(zone_node.IsSequence());
   std::vector<LaneSRange> ranges;
   for (const YAML::Node& lane_node : zone_node) {
     ranges.emplace_back(BuildLaneSRange(road_geometry, lane_node));
@@ -193,7 +197,7 @@ namespace {
 
 std::vector<RightOfWayRule::State> BuildRightOfWayStates(
     const YAML::Node& states_node) {
-  DRAKE_THROW_UNLESS(states_node.IsMap());
+  MALIPUT_THROW_UNLESS(states_node.IsMap());
   std::vector<RightOfWayRule::State> states;
   if (states_node["Go"]) {
     states.push_back(RightOfWayRule::State(
@@ -247,23 +251,48 @@ RightOfWayRule::ZoneType BuildRightOfWayZoneType(const YAML::Node& rule_node) {
   }
 }
 
+RightOfWayRule::RelatedBulbGroups BuildRelatedBulbGroups(
+      const YAML::Node& rule_node) {
+  if (rule_node["RelatedBulbGroups"]) {
+    MALIPUT_THROW_UNLESS(rule_node["RelatedBulbGroups"].IsMap());
+
+    RightOfWayRule::RelatedBulbGroups related_bulb_groups;
+
+    for (const auto& traffic_light_bulb_group :
+         rule_node["RelatedBulbGroups"]) {
+      const TrafficLight::Id traffic_light_id(
+          traffic_light_bulb_group.first.as<std::string>());
+
+      std::vector<BulbGroup::Id> bulb_groups;
+      for (auto& bulb_groups_node : traffic_light_bulb_group.second) {
+        bulb_groups.emplace_back(bulb_groups_node.as<std::string>());
+      }
+
+      MALIPUT_THROW_UNLESS(
+          related_bulb_groups.emplace(traffic_light_id, bulb_groups).second);
+    }
+    return related_bulb_groups;
+  }
+  return {};
+}
+
 RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
                                    const YAML::Node& rule_node) {
-  DRAKE_THROW_UNLESS(rule_node.IsMap());
-  DRAKE_THROW_UNLESS(rule_node["ID"].IsDefined());
+  MALIPUT_THROW_UNLESS(rule_node.IsMap());
+  MALIPUT_THROW_UNLESS(rule_node["ID"].IsDefined());
   const RightOfWayRule::Id rule_id(rule_node["ID"].as<std::string>());
 
   const YAML::Node& states_node = rule_node["States"];
-  DRAKE_THROW_UNLESS(states_node.IsDefined());
+  MALIPUT_THROW_UNLESS(states_node.IsDefined());
   const std::vector<RightOfWayRule::State> states =
       BuildRightOfWayStates(states_node);
 
   const YAML::Node& zone_node = rule_node["Zone"];
-  DRAKE_THROW_UNLESS(zone_node.IsDefined());
+  MALIPUT_THROW_UNLESS(zone_node.IsDefined());
   const LaneSRoute zone = BuildLaneSRoute(road_geometry, zone_node);
 
   return RightOfWayRule(rule_id, zone, BuildRightOfWayZoneType(rule_node),
-                        states);
+                        states, BuildRelatedBulbGroups(rule_node));
 }
 }  // namespace
 
@@ -271,12 +300,12 @@ RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
 namespace {
 std::vector<DirectionUsageRule::State> BuildDirectionUsageStates(
     const YAML::Node& states_node) {
-  DRAKE_THROW_UNLESS(states_node.IsSequence());
+  MALIPUT_THROW_UNLESS(states_node.IsSequence());
   std::vector<DirectionUsageRule::State> states;
   for (const YAML::Node& state_node : states_node) {
-    DRAKE_THROW_UNLESS(state_node["ID"].IsDefined());
-    DRAKE_THROW_UNLESS(state_node["Severity"].IsDefined());
-    DRAKE_THROW_UNLESS(state_node["Type"].IsDefined());
+    MALIPUT_THROW_UNLESS(state_node["ID"].IsDefined());
+    MALIPUT_THROW_UNLESS(state_node["Severity"].IsDefined());
+    MALIPUT_THROW_UNLESS(state_node["Type"].IsDefined());
     states.push_back(DirectionUsageRule::State(
         DirectionUsageRule::State::Id(state_node["ID"].as<std::string>()),
         state_node["Type"].as<DirectionUsageRule::State::Type>(),
@@ -287,17 +316,17 @@ std::vector<DirectionUsageRule::State> BuildDirectionUsageStates(
 
 DirectionUsageRule BuildDirectionUsageRule(
     const api::RoadGeometry* road_geometry, const YAML::Node& rule_node) {
-  DRAKE_THROW_UNLESS(rule_node.IsMap());
-  DRAKE_THROW_UNLESS(rule_node["ID"].IsDefined());
+  MALIPUT_THROW_UNLESS(rule_node.IsMap());
+  MALIPUT_THROW_UNLESS(rule_node["ID"].IsDefined());
   const DirectionUsageRule::Id rule_id(rule_node["ID"].as<std::string>());
 
   const YAML::Node& states_node = rule_node["States"];
-  DRAKE_THROW_UNLESS(states_node.IsDefined());
+  MALIPUT_THROW_UNLESS(states_node.IsDefined());
   const std::vector<DirectionUsageRule::State> states =
       BuildDirectionUsageStates(states_node);
 
   const YAML::Node& zone_node = rule_node["Zone"];
-  DRAKE_THROW_UNLESS(zone_node.IsDefined());
+  MALIPUT_THROW_UNLESS(zone_node.IsDefined());
   const LaneSRange zone = BuildLaneSRange(road_geometry, zone_node);
 
   return DirectionUsageRule(rule_id, zone, states);
@@ -306,13 +335,13 @@ DirectionUsageRule BuildDirectionUsageRule(
 
 std::unique_ptr<api::rules::RoadRulebook> BuildFrom(
     const api::RoadGeometry* road_geometry, const YAML::Node& root_node) {
-  DRAKE_THROW_UNLESS(root_node.IsMap());
+  MALIPUT_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& rulebook_node = root_node["RoadRulebook"];
-  DRAKE_THROW_UNLESS(rulebook_node.IsDefined());
-  DRAKE_THROW_UNLESS(rulebook_node.IsMap());
+  MALIPUT_THROW_UNLESS(rulebook_node.IsDefined());
+  MALIPUT_THROW_UNLESS(rulebook_node.IsMap());
   const YAML::Node& right_of_way_rules_node = rulebook_node["RightOfWayRules"];
-  DRAKE_THROW_UNLESS(right_of_way_rules_node.IsDefined());
-  DRAKE_THROW_UNLESS(right_of_way_rules_node.IsSequence());
+  MALIPUT_THROW_UNLESS(right_of_way_rules_node.IsDefined());
+  MALIPUT_THROW_UNLESS(right_of_way_rules_node.IsSequence());
   std::unique_ptr<ManualRulebook> rulebook = std::make_unique<ManualRulebook>();
   for (const YAML::Node& right_of_way_rule_node : right_of_way_rules_node) {
     rulebook->AddRule(
@@ -320,8 +349,8 @@ std::unique_ptr<api::rules::RoadRulebook> BuildFrom(
   }
   const YAML::Node& direction_usage_rules_node =
       rulebook_node["DirectionUsageRules"];
-  DRAKE_THROW_UNLESS(direction_usage_rules_node.IsDefined());
-  DRAKE_THROW_UNLESS(direction_usage_rules_node.IsSequence());
+  MALIPUT_THROW_UNLESS(direction_usage_rules_node.IsDefined());
+  MALIPUT_THROW_UNLESS(direction_usage_rules_node.IsSequence());
   for (const YAML::Node& direction_usage_rule_node :
        direction_usage_rules_node) {
     rulebook->AddRule(

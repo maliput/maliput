@@ -1,12 +1,19 @@
 #pragma once
 
+#include <algorithm>
 #include <unordered_map>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/type_specific_identifier.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
+
+#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/traffic_lights.h"
+#include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace api {
@@ -28,6 +35,8 @@ namespace rules {
 ///   allowed;
 /// * a catalog of one or more States, each of which indicate the possible
 ///   right-of-way semantics for a vehicle traversing the zone.
+/// * a collection of related BulbGroup::Ids and their respective
+///   TrafficLight::Ids.
 ///
 /// The `zone` is directed; the rule applies to vehicles traveling forward
 /// through the `zone`.
@@ -36,12 +45,19 @@ namespace rules {
 /// semantics.  A rule instance with multiple States is considered "dynamic"
 /// and determination of the active rule State at any given time is delegated
 /// to a RuleStateProvider agent, linked by the rule's Id.
+///
+/// Rules and BulbGroups are linked via a many-to-many relationship. The
+/// Rule-to-BulbGroups relationship is stored in this class.
 class RightOfWayRule final {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RightOfWayRule);
 
   /// Unique identifier for a RightOfWayRule.
   using Id = TypeSpecificIdentifier<class RightOfWayRule>;
+
+  /// Alias for the related bulb groups type.
+  using RelatedBulbGroups = std::unordered_map<TrafficLight::Id,
+                                               std::vector<BulbGroup::Id>>;
 
   /// Description of stopping properties of the zone.
   enum class ZoneType {
@@ -116,19 +132,35 @@ class RightOfWayRule final {
   /// @param id the unique ID of this rule (in the RoadRulebook)
   /// @param controlled_zone LaneSRoute to which this rule applies
   /// @param type the static semantics of this rule
+  /// @param related_bulb_groups The related bulb groups. All IDs present within
+  ///        the supplied map are assumed to be valid.
   ///
-  /// @throws std::exception if `states` is empty or if `states` contains
-  /// duplicate State::Id's.
-  RightOfWayRule(const Id& id,
-                 const LaneSRoute& zone,
-                 ZoneType zone_type,
-                 const std::vector<State>& states)
-      : id_(id), zone_(zone), zone_type_(zone_type) {
+  /// @throws maliput::common::assertion_error if `states` is empty or if
+  ///         `states` contains duplicate State::Id's.
+  /// @throws maliput::common::assertion_error if any duplicate BulbGroup::Id is
+  ///         found.
+  RightOfWayRule(
+      const Id& id,
+      const LaneSRoute& zone,
+      ZoneType zone_type,
+      const std::vector<State>& states,
+      const RelatedBulbGroups& related_bulb_groups)
+        : id_(id), zone_(zone), zone_type_(zone_type),
+          related_bulb_groups_(related_bulb_groups) {
     DRAKE_THROW_UNLESS(states.size() >= 1);
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
-      DRAKE_THROW_UNLESS(result.second);
+      MALIPUT_THROW_UNLESS(result.second);
+    }
+    for (const auto& traffic_light_bulb_group : related_bulb_groups) {
+      for (const BulbGroup::Id& bulb_group_id :
+           traffic_light_bulb_group.second) {
+        MALIPUT_THROW_UNLESS(std::count(traffic_light_bulb_group.second.begin(),
+                                        traffic_light_bulb_group.second.end(),
+                                        bulb_group_id) ==
+                             1);
+      }
     }
   }
 
@@ -154,10 +186,15 @@ class RightOfWayRule final {
   ///
   /// This is a convenience function for returning a static rule's single state.
   ///
-  /// @throws std::exception if `is_static()` is false.
+  /// @throws maliput::common::assertion_error if `is_static()` is false.
   const State& static_state() const {
-    DRAKE_THROW_UNLESS(is_static());
+    MALIPUT_THROW_UNLESS(is_static());
     return states_.begin()->second;
+  }
+
+  /// Returns the related bulb groups.
+  const RelatedBulbGroups& related_bulb_groups() const {
+    return related_bulb_groups_;
   }
 
  private:
@@ -165,6 +202,7 @@ class RightOfWayRule final {
   LaneSRoute zone_;
   ZoneType zone_type_{};
   std::unordered_map<State::Id, State> states_;
+  RelatedBulbGroups related_bulb_groups_;
 };
 
 }  // namespace rules

@@ -3,12 +3,14 @@
 #include <memory>
 #include <string>
 
-#include "maliput/api/lane_data.h"
-#include "maliput/api/type_specific_identifier.h"
 #include "drake/common/autodiff.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 #include "drake/common/symbolic.h"
+
+#include "maliput/api/lane_data.h"
+#include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace api {
@@ -288,7 +290,7 @@ class Lane {
   // drake::AutoDiffXd overload of DoToGeoPosition().
   virtual GeoPositionT<drake::AutoDiffXd> DoToGeoPositionAutoDiff(
       const LanePositionT<drake::AutoDiffXd>&) const {
-    throw std::runtime_error(
+    MALIPUT_THROW_MESSAGE(
         "DoToGeoPosition has been instantiated with drake::AutoDiffXd arguments, "
         "but a Lane backend has not overridden its drake::AutoDiffXd specialization.");
   }
@@ -298,7 +300,7 @@ class Lane {
       const GeoPositionT<drake::AutoDiffXd>&,
       GeoPositionT<drake::AutoDiffXd>*,
       drake::AutoDiffXd*) const {
-    throw std::runtime_error(
+    MALIPUT_THROW_MESSAGE(
         "DoToLanePosition has been instantiated with drake::AutoDiffXd arguments, "
         "but a Lane backend has not overridden its drake::AutoDiffXd specialization.");
   }
@@ -306,7 +308,7 @@ class Lane {
   // drake::symbolic::Expression overload of DoToGeoPosition().
   virtual GeoPositionT<drake::symbolic::Expression> DoToGeoPositionSymbolic(
       const LanePositionT<drake::symbolic::Expression>&) const {
-    throw std::runtime_error(
+    MALIPUT_THROW_MESSAGE(
         "DoToGeoPosition has been instantiated with drake::symbolic::Expression "
         "arguments, but a Lane backend has not overridden its "
         "drake::symbolic::Expression specialization.");
@@ -316,7 +318,7 @@ class Lane {
   virtual LanePositionT<drake::symbolic::Expression> DoToLanePositionSymbolic(
       const GeoPositionT<drake::symbolic::Expression>&,
       GeoPositionT<drake::symbolic::Expression>*, drake::symbolic::Expression*) const {
-    throw std::runtime_error(
+    MALIPUT_THROW_MESSAGE(
         "DoToLanePosition has been instantiated with drake::symbolic::Expression "
         "arguments, but a Lane backend has not overridden its "
         "drake::symbolic::Expression specialization.");

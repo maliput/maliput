@@ -5,14 +5,16 @@
 #include <utility>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+
 #include "maliput/api/basic_id_index.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/geometry_base/branch_point.h"
 #include "maliput/geometry_base/junction.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_throw.h"
+#include "maliput/common/maliput_throw.h"
+
 
 namespace maliput {
 namespace geometry_base {
@@ -46,7 +48,7 @@ class RoadGeometry : public api::RoadGeometry {
   /// @param linear_tolerance the linear tolerance
   /// @param angular_tolerance the angular tolerance
   ///
-  /// @throws std::exception if either `linear_tolerance` or
+  /// @throws maliput::common::assertion_error if either `linear_tolerance` or
   ///         `angular_tolerance` or `scale_length` is non-positive.
   RoadGeometry(const api::RoadGeometryId& id,
                double linear_tolerance, double angular_tolerance,
@@ -55,9 +57,9 @@ class RoadGeometry : public api::RoadGeometry {
         linear_tolerance_(linear_tolerance),
         angular_tolerance_(angular_tolerance),
         scale_length_(scale_length) {
-    DRAKE_THROW_UNLESS(linear_tolerance_ > 0.);
-    DRAKE_THROW_UNLESS(angular_tolerance_ > 0.);
-    DRAKE_THROW_UNLESS(scale_length_ > 0.);
+    MALIPUT_THROW_UNLESS(linear_tolerance_ > 0.);
+    MALIPUT_THROW_UNLESS(angular_tolerance_ > 0.);
+    MALIPUT_THROW_UNLESS(scale_length_ > 0.);
   }
 
   /// Adds @p junction to this RoadGeometry.

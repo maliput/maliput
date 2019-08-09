@@ -472,13 +472,13 @@ void Builder::AttachBranchPoint(
       DirectionOutFromLane(old_le.lane, old_le.end, kZeroROffset);
   if (direction.dot(old_direction) > 0.) {
     // Assert continuity before attaching the lane.
-    DRAKE_THROW_UNLESS(IsLaneContinuousAtBranchPoint(
+    MALIPUT_THROW_UNLESS(IsLaneContinuousAtBranchPoint(
         lane, end, bp->GetASide(), bp->GetBSide(),
         angular_tolerance_));
     bp->AddABranch({lane, end});
   } else {
     // Assert continuity before attaching the lane.
-    DRAKE_THROW_UNLESS(IsLaneContinuousAtBranchPoint(
+    MALIPUT_THROW_UNLESS(IsLaneContinuousAtBranchPoint(
         lane, end, bp->GetBSide(), bp->GetASide(),
         angular_tolerance_));
     bp->AddBBranch({lane, end});
