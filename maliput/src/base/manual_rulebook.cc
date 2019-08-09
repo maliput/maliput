@@ -9,6 +9,7 @@
 #include "drake/common/drake_optional.h"
 #include "drake/common/hash.h"
 
+#include "maliput/api/rules/rule.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -64,7 +65,6 @@ struct IdVariant {
     hash_append(hasher, item.dvr);
     hash_append(hasher, item.rvr);
   }
-
 };
 
 IdVariant IdVariant::FromDiscreteValueRuleId(const Rule::Id& dvr_in) {
@@ -167,7 +167,7 @@ class ManualRulebook::Impl {
           result.direction_usage.push_back(direction_usage_rules_.at(*id.d));
         } else if (id.dvr) {
           result.discrete_value_rules.push_back(discrete_value_rules_.at(*id.dvr));
-        } else if (id.dvr) {
+        } else if (id.rvr) {
           result.range_value_rules.push_back(range_value_rules_.at(*id.rvr));
         } else {
           std::stringstream s;
@@ -211,31 +211,31 @@ class ManualRulebook::Impl {
     void RemoveAll() { map_.clear(); }
 
     void AddRule(const SpeedLimitRule& rule) {
-      AddRange(rule.id(), rule.zone());
+      AddRange(IdVariant(rule.id()), rule.zone());
     }
 
     void RemoveRule(const SpeedLimitRule& rule) {
-      RemoveRanges(rule.id(), rule.zone().lane_id());
+      RemoveRanges(IdVariant(rule.id()), rule.zone().lane_id());
     }
 
     void AddRule(const RightOfWayRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-        AddRange(rule.id(), range);
+        AddRange(IdVariant(rule.id()), range);
       }
     }
 
     void RemoveRule(const RightOfWayRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-        RemoveRanges(rule.id(), range.lane_id());
+        RemoveRanges(IdVariant(rule.id()), range.lane_id());
       }
     }
 
     void AddRule(const DirectionUsageRule& rule) {
-      AddRange(rule.id(), rule.zone());
+      AddRange(IdVariant(rule.id()), rule.zone());
     }
 
     void RemoveRule(const DirectionUsageRule& rule) {
-      RemoveRanges(rule.id(), rule.zone().lane_id());
+      RemoveRanges(IdVariant(rule.id()), rule.zone().lane_id());
     }
 
     void AddRule(const DiscreteValueRule& rule) {
@@ -246,8 +246,7 @@ class ManualRulebook::Impl {
 
     void RemoveRule(const DiscreteValueRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-        RemoveRanges(IdVariant::FromDiscreteValueRuleId(rule.id()),
-                     range.lane_id());
+        RemoveRanges(IdVariant::FromDiscreteValueRuleId(rule.id()), range.lane_id());
       }
     }
 

@@ -4,6 +4,7 @@
 
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
@@ -16,10 +17,13 @@ namespace {
 
 using api::LaneId;
 using api::rules::DirectionUsageRule;
+using api::rules::DiscreteValueRule;
 using api::rules::LaneSRange;
 using api::rules::LaneSRoute;
+using api::rules::RangeValueRule;
 using api::rules::RightOfWayRule;
 using api::rules::RoadRulebook;
+using api::rules::Rule;
 using api::rules::SpeedLimitRule;
 
 
@@ -46,6 +50,15 @@ class ManualRulebookTest : public ::testing::Test {
     {DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"),
      DirectionUsageRule::State::Type::kWithS,
      DirectionUsageRule::State::Severity::kStrict)}};
+
+  const DiscreteValueRule kDiscreteValueRule{
+    Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), LaneSRoute({kZone}),
+    {} /* related rules */, {"value1", "value2"}};
+
+  const RangeValueRule kRangeValueRule{
+    Rule::Id("rvrt/rvr"), Rule::TypeId("rvrt"), LaneSRoute({kZone}),
+    {} /* related_rules */,
+    {RangeValueRule::Range{"description", 123. /* min */, 456. /* max */}}};
 };
 
 
@@ -95,12 +108,43 @@ TEST_F(ManualRulebookTest, AddGetRemoveDirectionUsage) {
                maliput::common::assertion_error);
 }
 
+TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
+  ManualRulebook dut;
+
+  EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
+  dut.AddRule(kRangeValueRule);
+  // EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kRangeValueRule.id()),
+  //                              kRangeValueRule));
+  EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
+  dut.RemoveRule(kRangeValueRule.id());
+  EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
+  EXPECT_THROW(dut.RemoveRule(kRangeValueRule.id()),
+               maliput::common::assertion_error);
+}
+
+TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
+  ManualRulebook dut;
+
+  EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
+  dut.AddRule(kDiscreteValueRule);
+  // EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDiscreteValueRule.id()),
+  //                              kDiscreteValueRule));
+  EXPECT_THROW(dut.AddRule(kDiscreteValueRule),
+               maliput::common::assertion_error);
+  dut.RemoveRule(kDiscreteValueRule.id());
+  EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
+  EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()),
+               maliput::common::assertion_error);
+}
+
 TEST_F(ManualRulebookTest, RemoveAll) {
   ManualRulebook dut;
   dut.RemoveAll();  // I.e., should work on empty rulebook.
   dut.AddRule(kRightOfWay);
   dut.AddRule(kSpeedLimit);
   dut.AddRule(kDirectionUsage);
+  dut.AddRule(kDiscreteValueRule);
+  dut.AddRule(kRangeValueRule);
   dut.RemoveAll();
   EXPECT_THROW(dut.GetRule(kRightOfWay.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kRightOfWay.id()),
@@ -111,15 +155,26 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kDirectionUsage.id()),
                maliput::common::assertion_error);
-
+  EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
+  EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()),
+               maliput::common::assertion_error);
+  EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
+  EXPECT_THROW(dut.RemoveRule(kRangeValueRule.id()),
+               maliput::common::assertion_error);
   // Since the original rules are gone, it should be possible to re-add them.
   dut.AddRule(kRightOfWay);
   dut.AddRule(kSpeedLimit);
   dut.AddRule(kDirectionUsage);
+  dut.AddRule(kDiscreteValueRule);
+  dut.AddRule(kRangeValueRule);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kRightOfWay.id()), kRightOfWay));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDirectionUsage.id()),
                                kDirectionUsage));
+  // EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDiscreteValueRule(kDiscreteValueRule.id()),
+  //                              kDiscreteValueRule))
+  // EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDiscreteValueRule(kRangeValueRule.id()),
+  //                              kRangeValueRule))
 }
 
 
@@ -128,18 +183,25 @@ TEST_F(ManualRulebookTest, FindRules) {
   dut.AddRule(kSpeedLimit);
   dut.AddRule(kRightOfWay);
   dut.AddRule(kDirectionUsage);
+  dut.AddRule(kDiscreteValueRule);
+  dut.AddRule(kRangeValueRule);
 
   const double kZeroTolerance = 0.;
 
   const RoadRulebook::QueryResults empty = dut.FindRules({}, kZeroTolerance);
   EXPECT_EQ(empty.right_of_way.size(), 0);
   EXPECT_EQ(empty.speed_limit.size(), 0);
+  EXPECT_EQ(empty.direction_usage.size(), 0);
+  EXPECT_EQ(empty.discrete_value_rules.size(), 0);
+  EXPECT_EQ(empty.range_value_rules.size(), 0);
 
   const RoadRulebook::QueryResults nonempty = dut.FindRules({kZone},
                                                             kZeroTolerance);
   EXPECT_EQ(nonempty.right_of_way.size(), 1);
   EXPECT_EQ(nonempty.speed_limit.size(), 1);
   EXPECT_EQ(nonempty.direction_usage.size(), 1);
+  EXPECT_EQ(nonempty.discrete_value_rules.size(), 1);
+  EXPECT_EQ(nonempty.range_value_rules.size(), 1);
 
   const LaneSRange kReversedZone(kZone.lane_id(),
                                  {kZone.s_range().s1(), kZone.s_range().s0()});
@@ -148,6 +210,8 @@ TEST_F(ManualRulebookTest, FindRules) {
   EXPECT_EQ(reversed.right_of_way.size(), 1);
   EXPECT_EQ(reversed.speed_limit.size(), 1);
   EXPECT_EQ(reversed.direction_usage.size(), 1);
+  EXPECT_EQ(reversed.discrete_value_rules.size(), 1);
+  EXPECT_EQ(reversed.range_value_rules.size(), 1);
 
   const double kNonzeroTolerance = 0.1;
 
@@ -163,6 +227,8 @@ TEST_F(ManualRulebookTest, FindRules) {
   EXPECT_EQ(nearby.right_of_way.size(), 1);
   EXPECT_EQ(nearby.speed_limit.size(), 1);
   EXPECT_EQ(nearby.direction_usage.size(), 1);
+  EXPECT_EQ(nearby.discrete_value_rules.size(), 1);
+  EXPECT_EQ(nearby.range_value_rules.size(), 1);
 
   // Construct a range that sits just outside of the kNonzeroTolerance band
   // of kZone.s1.
@@ -175,6 +241,8 @@ TEST_F(ManualRulebookTest, FindRules) {
   EXPECT_EQ(toofar.right_of_way.size(), 0);
   EXPECT_EQ(toofar.speed_limit.size(), 0);
   EXPECT_EQ(toofar.direction_usage.size(), 0);
+  EXPECT_EQ(toofar.discrete_value_rules.size(), 0);
+  EXPECT_EQ(toofar.range_value_rules.size(), 0);
 }
 
 
