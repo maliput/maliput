@@ -578,7 +578,10 @@ class Builder : public BuilderBase {
    public:
     DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EndpointFuzzyOrder)
 
-    explicit EndpointFuzzyOrder(const double linear_tolerance) : lin_tol_(linear_tolerance) {}
+    // clang-format off
+    explicit EndpointFuzzyOrder(const double linear_tolerance)
+        : lin_tol_(linear_tolerance) {}
+    // clang-format on
 
     bool operator()(const Endpoint& lhs, const Endpoint& rhs) const {
       switch (fuzzy_compare(rhs.xy().x(), lhs.xy().x())) {

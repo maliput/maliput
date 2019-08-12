@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "drake/common/drake_optional.h"
 #include "drake/common/autodiff.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 

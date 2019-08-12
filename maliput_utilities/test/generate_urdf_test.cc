@@ -25,7 +25,11 @@ class GenerateUrdfTest : public ::testing::Test {
     ASSERT_TRUE(common::Filesystem::create_directory(directory_));
   }
 
-  void TearDown() override { ASSERT_TRUE(common::Filesystem::remove_directory(directory_)); }
+  // clang-format off
+  void TearDown() override {
+    ASSERT_TRUE(common::Filesystem::remove_directory(directory_));
+  }
+  // clang-format on
 
   common::Path directory_;
 };

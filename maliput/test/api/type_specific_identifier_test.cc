@@ -22,7 +22,11 @@ GTEST_TEST(TypeSpecificIdentifierTest, Construction) {
   EXPECT_THROW(CId(""), maliput::common::assertion_error);
 }
 
-GTEST_TEST(TypeSpecificIdentifierTest, IdentifiedType) { ::testing::StaticAssertTypeEq<CId::identified_type, C>(); }
+// clang-format off
+GTEST_TEST(TypeSpecificIdentifierTest, IdentifiedType) {
+  ::testing::StaticAssertTypeEq<CId::identified_type, C>();
+}
+// clang-format on
 
 GTEST_TEST(TypeSpecificIdentifierTest, Accessors) {
   const CId dut("x");

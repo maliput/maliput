@@ -889,7 +889,12 @@ class BuildProcedure {
 
 // An stream operator overload for shared references to
 // BuildProcedure instances. Useful for gtest to print.
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<BuildProcedure>& proc) { return os << proc->name(); }
+// clang-format off
+std::ostream& operator<<(
+    std::ostream& os, const std::shared_ptr<BuildProcedure>& proc) {
+  return os << proc->name();
+}
+// clang-format on
 
 // An encapsulated Multilane road turn build procedure.
 class TurnBuildProcedure : public BuildProcedure {
