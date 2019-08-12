@@ -5,10 +5,8 @@
 
 #include <gflags/gflags.h>
 
-#include "drake/common/text_logging.h"
-#include "drake/common/text_logging_gflags.h"
-
 #include "maliput/common/filesystem.h"
+#include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput-utilities/generate_urdf.h"
 
@@ -35,6 +33,16 @@ DEFINE_string(file_name_root, "dragway",
     "parameter is \"foo\", the following files will be created: \"foo.urdf\", "
     "\"foo.obj\", and \"foo.mtl\". These files will be placed in the path "
     "specified by parameter 'dirpath'.");
+DEFINE_string(spdlog_level, "unchanged",
+              "sets the spdlog output threshold; possible values are "
+              "'unchanged', "
+              "'trace', "
+              "'debug', "
+              "'info', "
+              "'warn', "
+              "'err', "
+              "'critical', "
+              "'off'");
 
 namespace maliput {
 namespace dragway {
@@ -42,7 +50,7 @@ namespace {
 
 int exec(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  drake::logging::HandleSpdlogGflags();
+  maliput::set_log_level(FLAGS_spdlog_level);
 
   RoadGeometry road_geometry(
       api::RoadGeometryId{
@@ -70,7 +78,7 @@ int exec(int argc, char* argv[]) {
   // when using `dragway_to_urdf`.
   const maliput::common::Path my_path = maliput::common::Filesystem::get_cwd();
 
-  drake::log()->info("Creating Dragway URDF in {}.", my_path.get_path());
+  maliput::log()->info("Creating Dragway URDF in {}.", my_path.get_path());
   utility::GenerateUrdfFile(&road_geometry, directory.get_path(),
       FLAGS_file_name_root, features);
   return 0;

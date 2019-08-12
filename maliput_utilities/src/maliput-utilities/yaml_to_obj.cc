@@ -6,9 +6,7 @@
 
 #include <gflags/gflags.h>
 
-#include "drake/common/text_logging.h"
-#include "drake/common/text_logging_gflags.h"
-
+#include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 
 #include "maliput-utilities/generate_obj.h"
@@ -38,6 +36,16 @@ DEFINE_double(simplify_mesh_threshold,
               "Optional tolerance for mesh simplification, in meters. Make it "
               "equal to the road linear tolerance to get a mesh size reduction "
               "while keeping geometrical fidelity.");
+DEFINE_string(spdlog_level, "unchanged",
+              "sets the spdlog output threshold; possible values are "
+              "'unchanged', "
+              "'trace', "
+              "'debug', "
+              "'info', "
+              "'warn', "
+              "'err', "
+              "'critical', "
+              "'off'");
 
 namespace maliput {
 namespace utility {
@@ -64,30 +72,30 @@ MaliputImplementation GetMaliputImplementation(const std::string& filename) {
 
 // Generates an OBJ file from a YAML file path given as CLI argument.
 int main(int argc, char* argv[]) {
-  drake::log()->debug("main()");
+  maliput::log()->debug("main()");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  drake::logging::HandleSpdlogGflags();
+  maliput::set_log_level(FLAGS_spdlog_level);
 
   if (FLAGS_yaml_file.empty()) {
-    drake::log()->critical("No input file specified.");
+    maliput::log()->critical("No input file specified.");
     return 1;
   }
   if (FLAGS_obj_file.empty()) {
-    drake::log()->critical("No output file specified.");
+    maliput::log()->critical("No output file specified.");
     return 1;
   }
 
-  drake::log()->info("Loading road geometry...");
+  maliput::log()->info("Loading road geometry...");
   std::unique_ptr<const maliput::api::RoadGeometry> rg{};
   switch (GetMaliputImplementation(FLAGS_yaml_file)) {
     case MaliputImplementation::kMultilane: {
       rg = maliput::multilane::LoadFile(
           maliput::multilane::BuilderFactory(), FLAGS_yaml_file);
-      drake::log()->info("Loaded a multilane road geometry.");
+      maliput::log()->info("Loaded a multilane road geometry.");
       break;
     }
     case MaliputImplementation::kUnknown: {
-      drake::log()->error("Unknown map.");
+      maliput::log()->error("Unknown map.");
       return 1;
     }
   }
@@ -97,7 +105,7 @@ int main(int argc, char* argv[]) {
   features.min_grid_resolution = FLAGS_min_grid_resolution;
   features.draw_elevation_bounds = FLAGS_draw_elevation_bounds;
   features.simplify_mesh_threshold = FLAGS_simplify_mesh_threshold;
-  drake::log()->info("Generating OBJ.");
+  maliput::log()->info("Generating OBJ.");
   GenerateObjFile(rg.get(), FLAGS_obj_dir, FLAGS_obj_file, features);
 
   return 0;
