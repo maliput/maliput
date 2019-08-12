@@ -3,10 +3,10 @@
 #include <cmath>
 #include <memory>
 
-#include "drake/common/text_logging.h"
 #include "drake/common/unused.h"
 #include "drake/math/saturate.h"
 
+#include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
@@ -79,7 +79,7 @@ bool RoadGeometry::IsGeoPositionOnDragway(const api::GeoPosition& geo_pos)
 
   if (geo_pos.x() < 0 || geo_pos.x() > length ||
       geo_pos.y() > max_y || geo_pos.y() < min_y) {
-    drake::log()->trace(
+    maliput::log()->trace(
         "dragway::RoadGeometry::IsGeoPositionOnDragway(): The provided geo_pos "
         "({}, {}) is not on the dragway (length = {}, min_y = {}, max_y = {}).",
         geo_pos.x(), geo_pos.y(), length, min_y, max_y);

@@ -11,8 +11,8 @@
 #include "yaml-cpp/yaml.h"
 
 #include "drake/common/drake_optional.h"
-#include "drake/common/text_logging.h"
 
+#include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
 
@@ -587,11 +587,11 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
       angular_tolerance, scale_length, computation_policy);
   MALIPUT_DEMAND(builder != nullptr);
 
-  DRAKE_SPDLOG_DEBUG(drake::log(), "loading points !");
+  maliput::log()->debug("loading points !");
   std::map<std::string, Endpoint> point_catalog;
   ParseEndpointsFromPoints(mmb["points"], &point_catalog);
 
-  DRAKE_SPDLOG_DEBUG(drake::log(), "loading raw connections !");
+  maliput::log()->debug("loading raw connections !");
   YAML::Node connections = mmb["connections"];
   MALIPUT_DEMAND(connections.IsMap());
   std::map<std::string, YAML::Node> raw_connections;
@@ -599,11 +599,11 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
     raw_connections[c.first.as<std::string>()] = c.second;
   }
 
-  DRAKE_SPDLOG_DEBUG(drake::log(), "building cooked connections !");
+  maliput::log()->debug("building cooked connections !");
   std::map<std::string, const Connection*> cooked_connections;
   while (!raw_connections.empty()) {
-    DRAKE_SPDLOG_DEBUG(drake::log(), "raw count {}  cooked count {}",
-                       raw_connections.size(), cooked_connections.size());
+    maliput::log()->debug("raw count {}  cooked count {}",
+                        raw_connections.size(), cooked_connections.size());
     const size_t cooked_before_this_pass = cooked_connections.size();
     for (const auto& r : raw_connections) {
       const std::string id = r.first;
@@ -611,10 +611,10 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
           id, r.second, point_catalog, cooked_connections, builder.get(),
           default_left_shoulder, default_right_shoulder);
       if (!conn) {
-        DRAKE_SPDLOG_DEBUG(drake::log(), "...skipping '{}'", id);
+        maliput::log()->debug("...skipping '{}'", id);
         continue;
       }
-      DRAKE_SPDLOG_DEBUG(drake::log(), "...cooked '{}'", id);
+      maliput::log()->debug("...cooked '{}'", id);
       cooked_connections[id] = conn;
     }
     MALIPUT_DEMAND(cooked_connections.size() > cooked_before_this_pass);
@@ -624,25 +624,24 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
   }
 
   if (mmb["groups"]) {
-    DRAKE_SPDLOG_DEBUG(drake::log(), "grouping connections !");
+    maliput::log()->debug("grouping connections !");
     YAML::Node groups = mmb["groups"];
     MALIPUT_DEMAND(groups.IsMap());
     std::map<std::string, const Group*> cooked_groups;
     for (const auto& g : groups) {
       const std::string gid = g.first.as<std::string>();
-      DRAKE_SPDLOG_DEBUG(drake::log(), "   create group '{}'", gid);
+      DRAKE_SPDLOG_DEBUG(maliput::log(), "   create group '{}'", gid);
       Group* group = builder->MakeGroup(gid);
       YAML::Node cids_node = g.second;
       MALIPUT_DEMAND(cids_node.IsSequence());
       for (const YAML::Node& cid_node : cids_node) {
         const std::string cid = cid_node.as<std::string>();
-        DRAKE_SPDLOG_DEBUG(drake::log(), "      add cnx '{}'", cid);
+        DRAKE_SPDLOG_DEBUG(maliput::log(), "      add cnx '{}'", cid);
         group->Add(cooked_connections[cid]);
       }
     }
   }
-  DRAKE_SPDLOG_DEBUG(drake::log(), "building road geometry {}",
-                     mmb["id"].Scalar());
+  maliput::log()->debug("building road geometry {}", mmb["id"].Scalar());
   return builder->Build(api::RoadGeometryId{mmb["id"].Scalar()});
 }
 

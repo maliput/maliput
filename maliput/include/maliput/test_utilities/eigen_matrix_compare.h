@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 
-#include "drake/common/text_logging.h"
+#include "maliput/common/logger.h"
 
 
 enum class MatrixCompareType { absolute, relative };

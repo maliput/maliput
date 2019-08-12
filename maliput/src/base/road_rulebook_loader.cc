@@ -6,13 +6,12 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/common/text_logging.h"
-
 #include "maliput/api/lane.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/manual_rulebook.h"
+#include "maliput/common/logger.h"
 #include "maliput/common/maliput_throw.h"
 
 
@@ -107,7 +106,7 @@ struct convert<DirectionUsageRule::State::Severity> {
       std::stringstream s;
       s << "DirectionUsageRule Severity value: \"" << severity << "\" "
         << " is neither \"Preferred\" or \"Strict\"";
-      DRAKE_SPDLOG_DEBUG(drake::log(), s.str());
+      maliput::log()->debug(s.str());
       return false;
     }
   }
@@ -150,7 +149,7 @@ struct convert<DirectionUsageRule::State::Type> {
       s << type.second;
     }
     s << "]";
-    DRAKE_SPDLOG_DEBUG(drake::log(), s.str());
+    maliput::log()->debug(s.str());
     return false;
   }
 };
