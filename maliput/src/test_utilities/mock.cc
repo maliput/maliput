@@ -160,13 +160,13 @@ class MockRoadRulebook final : public rules::RoadRulebook {
   MockRoadRulebook() {}
 
  private:
-  QueryResults DoFindRules(const std::vector<rules::LaneSRange>&, double) const override { return {{}, {}}; }
+  QueryResults DoFindRules(const std::vector<rules::LaneSRange>&, double) const override { return {{}, {}, {}}; }
+  QueryResults DoRules() const override { return {{}, {}, {}}; }
   RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override { return Rule(); }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override {
     return SpeedLimitRule(rules::SpeedLimitRule::Id("some_id"), CreateLaneSRange(),
                           rules::SpeedLimitRule::Severity::kStrict, 33., 77.);
   }
-
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return CreateDirectionUsageRule(); }
 };
 

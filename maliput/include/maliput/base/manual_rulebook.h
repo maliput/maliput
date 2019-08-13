@@ -62,6 +62,7 @@ class ManualRulebook : public api::rules::RoadRulebook {
  private:
   api::rules::RoadRulebook::QueryResults DoFindRules(const std::vector<api::rules::LaneSRange>& ranges,
                                                      double tolerance) const override;
+  api::rules::RoadRulebook::QueryResults DoRules() const override;
   api::rules::RightOfWayRule DoGetRule(const api::rules::RightOfWayRule::Id& id) const override;
   api::rules::SpeedLimitRule DoGetRule(const api::rules::SpeedLimitRule::Id& id) const override;
   api::rules::DirectionUsageRule DoGetRule(const api::rules::DirectionUsageRule::Id& id) const override;
