@@ -7,6 +7,7 @@
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
+#include "maliput/test_utilities/rules_compare.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
 #include "maliput/test_utilities/rules_speed_limit_compare.h"
@@ -113,8 +114,8 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
 
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
   dut.AddRule(kRangeValueRule);
-  // EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kRangeValueRule.id()),
-  //                              kRangeValueRule));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRangeValueRule(kRangeValueRule.id()),
+                               kRangeValueRule));
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
   dut.RemoveRule(kRangeValueRule.id());
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
@@ -127,12 +128,13 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
 
   EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
   dut.AddRule(kDiscreteValueRule);
-  // EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDiscreteValueRule.id()),
-  //                              kDiscreteValueRule));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(
+      dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule));
   EXPECT_THROW(dut.AddRule(kDiscreteValueRule),
                maliput::common::assertion_error);
   dut.RemoveRule(kDiscreteValueRule.id());
-  EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
+  EXPECT_THROW({ dut.GetDiscreteValueRule(kDiscreteValueRule.id()); },
+               std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()),
                maliput::common::assertion_error);
 }
@@ -171,10 +173,10 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDirectionUsage.id()),
                                kDirectionUsage));
-  // EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDiscreteValueRule(kDiscreteValueRule.id()),
-  //                              kDiscreteValueRule))
-  // EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDiscreteValueRule(kRangeValueRule.id()),
-  //                              kRangeValueRule))
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDiscreteValueRule(kDiscreteValueRule.id()),
+                               kDiscreteValueRule));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRangeValueRule(kRangeValueRule.id()),
+                               kRangeValueRule));
 }
 
 
