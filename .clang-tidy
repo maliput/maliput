@@ -1,0 +1,89 @@
+# Copyright 2019 Toyota Research Institute.  All rights reserved.
+#
+# clang-tidy lists all rules in a single YAML string, which makes it
+# hard to have inline comments.  Thus we'll add comments out-of-line
+# up here.
+#
+# Disabled checks have rationale documented here.
+
+# * cert-err58-cpp - This verifies that exceptions are not thrown
+#   during static initialization or destruction.  However, boost::test
+#   violates this, so we leave it off for now.
+
+# * cert-err60-cpp - This requires that exception types have noexcept
+#   copy constructors.  SystemError could do so, except that it
+#   contains a std::string, which can throw std::bad_alloc.  Hopefully
+#   soon C++ will delete std::bad_alloc entirely, but in the meantime,
+#   we disable this check.
+
+# * cppcoreguidelines-pro-type-vararg,hicpp-vararg - boost::test uses
+#   varargs, so for now we leave this disabled globally
+
+# * cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+#   hicpp-no-array-decay - every call to BOOST_ASSERT_MSG triggers
+#   this along with things like using std::cout
+
+# * cppcoreguidelines-pro-type-reinterpret-cast - we currently have a
+#   lot of reinterpret_casts that are required in order to perform low
+#   level bit manipulation.  It probably isn't worth annotating all of
+#   them yet.
+
+# * cppcoreguidelines-pro-bounds-pointer-arithmetic - until we get
+#   C++20's span or some similar construct, this will be difficult to
+#   satisfy.
+
+# * fuchsia-default-arguments - we currently permit C++ default
+#   arguments
+
+# * fuchsia-multiple-inheritance - we currently permit inheriting
+#   implementation and multiple inheritance
+
+# * fuchsia-overloaded-operator - we (and GSG) consider operator
+#   overloading fine
+
+# * fuchsia-statically-constructed-objects - boost::test uses
+#   statically constructed objects, so we leave this around.
+
+# * google-runtime-references - boost::asio widely uses the convention
+#   of passing io_service by mutable reference, as does the C++
+#   iostreams library
+
+# * hicpp-exception-baseclass - either boost::system::system_error
+#   doesn't inherit from std::exception or clang can't discover that
+#   it does.  In either case, this isn't important enough to figure
+#   out.
+
+# * readability-named-parameter - This requires that all parameters be
+#   named.  This rule seems to be of dubious value, since often the
+#   type alone of an argument is sufficient documentation.
+
+# * readability-redundant-declaration - C++14 requires static
+#   constexpr class members to have a separate definition.  Until we
+#   drop C++14 support, it is easiest to just ignore this warning.
+
+# * performance-unnecessary-copy-initialization,
+#   performance-unnecessary-value-param - These checks seem to be of
+#   dubious value, as the conditions they warn about would all likely
+#   be optimized away by a sane compiler and they require moderate
+#   contortions to satisfy.
+
+Checks: >
+    *,
+    -cert-err58-cpp,
+    -cert-err60-cpp,
+    -cppcoreguidelines-pro-type-vararg,
+    -hicpp-vararg,
+    -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+    -hicpp-no-array-decay,
+    -cppcoreguidelines-pro-type-reinterpret-cast,
+    -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+    -fuchsia-default-arguments,
+    -fuchsia-multiple-inheritance,
+    -fuchsia-overloaded-operator,
+    -fuchsia-statically-constructed-objects,
+    -google-runtime-references,
+    -hicpp-exception-baseclass,
+    -readability-named-parameter,
+    -readability-redundant-declaration,
+    -performance-unnecessary-copy-initialization,
+    -performance-unnecessary-value-param,
