@@ -54,47 +54,39 @@ whenever `DRAKE_ENABLE_ASSERTS` is defined, which Debug builds do by default.
 
 #else  // DRAKE_DOXYGEN_CXX
 
-#define DRAKE_EXPECT_THROWS_MESSAGE_HELPER( \
-    expression, exception, regexp, must_throw, fatal_failure) \
-do { \
-try { \
-  expression; \
-  if (must_throw) { \
-    if (fatal_failure) { \
-      GTEST_FATAL_FAILURE_("\t" #expression " failed to throw " #exception); \
-    } else { \
-      GTEST_NONFATAL_FAILURE_("\t" #expression " failed to throw " #exception);\
-    } \
-  } \
-} catch (const exception& err) { \
-  auto matcher = [](const char* s, const std::string& re) { \
-    return std::regex_match(s, std::regex(re)); }; \
-  if (fatal_failure) { \
-    ASSERT_PRED2(matcher, err.what(), regexp); \
-  } else { \
-    EXPECT_PRED2(matcher, err.what(), regexp); \
-  } \
-} \
-} while (0)
+#define DRAKE_EXPECT_THROWS_MESSAGE_HELPER(expression, exception, regexp, must_throw, fatal_failure)           \
+  do {                                                                                                         \
+    try {                                                                                                      \
+      expression;                                                                                              \
+      if (must_throw) {                                                                                        \
+        if (fatal_failure) {                                                                                   \
+          GTEST_FATAL_FAILURE_("\t" #expression " failed to throw " #exception);                               \
+        } else {                                                                                               \
+          GTEST_NONFATAL_FAILURE_("\t" #expression " failed to throw " #exception);                            \
+        }                                                                                                      \
+      }                                                                                                        \
+    } catch (const exception& err) {                                                                           \
+      auto matcher = [](const char* s, const std::string& re) { return std::regex_match(s, std::regex(re)); }; \
+      if (fatal_failure) {                                                                                     \
+        ASSERT_PRED2(matcher, err.what(), regexp);                                                             \
+      } else {                                                                                                 \
+        EXPECT_PRED2(matcher, err.what(), regexp);                                                             \
+      }                                                                                                        \
+    }                                                                                                          \
+  } while (0)
 
 #define DRAKE_EXPECT_THROWS_MESSAGE(expression, exception, regexp) \
-  DRAKE_EXPECT_THROWS_MESSAGE_HELPER( \
-      expression, exception, regexp, \
-      true /*must_throw*/, false /*non-fatal*/)
+  DRAKE_EXPECT_THROWS_MESSAGE_HELPER(expression, exception, regexp, true /*must_throw*/, false /*non-fatal*/)
 
 #define DRAKE_ASSERT_THROWS_MESSAGE(expression, exception, regexp) \
-  DRAKE_EXPECT_THROWS_MESSAGE_HELPER( \
-      expression, exception, regexp, \
-      true /*must_throw*/, true /*fatal*/)
+  DRAKE_EXPECT_THROWS_MESSAGE_HELPER(expression, exception, regexp, true /*must_throw*/, true /*fatal*/)
 
-#define DRAKE_EXPECT_THROWS_MESSAGE_IF_ARMED(expression, exception, regexp) \
-  DRAKE_EXPECT_THROWS_MESSAGE_HELPER( \
-      expression, exception, regexp, \
-      ::drake::kDrakeAssertIsArmed /*must_throw*/, false /*non-fatal*/)
+#define DRAKE_EXPECT_THROWS_MESSAGE_IF_ARMED(expression, exception, regexp)                                      \
+  DRAKE_EXPECT_THROWS_MESSAGE_HELPER(expression, exception, regexp, ::drake::kDrakeAssertIsArmed /*must_throw*/, \
+                                     false /*non-fatal*/)
 
-#define DRAKE_ASSERT_THROWS_MESSAGE_IF_ARMED(expression, exception, regexp) \
-  DRAKE_EXPECT_THROWS_MESSAGE_HELPER( \
-      expression, exception, regexp, \
-      ::drake::kDrakeAssertIsArmed /*must_throw*/, true /*fatal*/)
+#define DRAKE_ASSERT_THROWS_MESSAGE_IF_ARMED(expression, exception, regexp)                                      \
+  DRAKE_EXPECT_THROWS_MESSAGE_HELPER(expression, exception, regexp, ::drake::kDrakeAssertIsArmed /*must_throw*/, \
+                                     true /*fatal*/)
 
 #endif  // DRAKE_DOXYGEN_CXX

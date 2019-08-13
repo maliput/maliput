@@ -5,20 +5,15 @@
 namespace maliput {
 namespace dragway {
 
-BranchPoint::BranchPoint(const api::BranchPointId& id, const Lane* lane,
-                         const api::RoadGeometry* road_geometry)
+BranchPoint::BranchPoint(const api::BranchPointId& id, const Lane* lane, const api::RoadGeometry* road_geometry)
     : id_(id),
       road_geometry_(road_geometry),
       start_side_lane_end_set_(lane, api::LaneEnd::kStart),
-      finish_side_lane_end_set_(lane, api::LaneEnd::kFinish) {
-}
+      finish_side_lane_end_set_(lane, api::LaneEnd::kFinish) {}
 
-const api::RoadGeometry* BranchPoint::do_road_geometry() const {
-  return road_geometry_;
-}
+const api::RoadGeometry* BranchPoint::do_road_geometry() const { return road_geometry_; }
 
-const api::LaneEndSet* BranchPoint::DoGetConfluentBranches(
-    const api::LaneEnd& end) const {
+const api::LaneEndSet* BranchPoint::DoGetConfluentBranches(const api::LaneEnd& end) const {
   if (end.end == api::LaneEnd::kStart) {
     return &start_side_lane_end_set_;
   } else {
@@ -26,8 +21,7 @@ const api::LaneEndSet* BranchPoint::DoGetConfluentBranches(
   }
 }
 
-const api::LaneEndSet* BranchPoint::DoGetOngoingBranches(
-    const api::LaneEnd& end) const {
+const api::LaneEndSet* BranchPoint::DoGetOngoingBranches(const api::LaneEnd& end) const {
   if (end.end == api::LaneEnd::kStart) {
     return &finish_side_lane_end_set_;
   } else {
@@ -35,8 +29,7 @@ const api::LaneEndSet* BranchPoint::DoGetOngoingBranches(
   }
 }
 
-drake::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(
-    const api::LaneEnd& end) const {
+drake::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(const api::LaneEnd& end) const {
   // The result should be an ongoing branch for the given input. Thus, a Start
   // input should yield a Finish output (since start connects to finish) and
   // vice-versa.
@@ -49,13 +42,9 @@ drake::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(
   }
 }
 
-const api::LaneEndSet* BranchPoint::DoGetASide() const {
-  return &start_side_lane_end_set_;
-}
+const api::LaneEndSet* BranchPoint::DoGetASide() const { return &start_side_lane_end_set_; }
 
-const api::LaneEndSet* BranchPoint::DoGetBSide() const {
-  return &finish_side_lane_end_set_;
-}
+const api::LaneEndSet* BranchPoint::DoGetBSide() const { return &finish_side_lane_end_set_; }
 
 }  // namespace dragway
 }  // namespace maliput

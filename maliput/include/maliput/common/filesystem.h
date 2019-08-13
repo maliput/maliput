@@ -1,3 +1,4 @@
+// clang-format off
 #pragma once
 
 #include <string>
@@ -54,3 +55,4 @@ public:
 
 } // namespace common
 } // namespace maliput
+// clang-format on

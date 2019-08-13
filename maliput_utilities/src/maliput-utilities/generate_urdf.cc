@@ -9,9 +9,7 @@
 namespace maliput {
 namespace utility {
 
-void GenerateUrdfFile(const api::RoadGeometry* road_geometry,
-                      const std::string& dirpath,
-                      const std::string& fileroot,
+void GenerateUrdfFile(const api::RoadGeometry* road_geometry, const std::string& dirpath, const std::string& fileroot,
                       const ObjFeatures& features) {
   GenerateObjFile(road_geometry, dirpath, fileroot, features);
 
@@ -40,10 +38,8 @@ void GenerateUrdfFile(const api::RoadGeometry* road_geometry,
   </link>
 </robot>
 )X",
-             road_geometry->id().string(),
-             obj_filename);
+             road_geometry->id().string(), obj_filename);
 }
-
 
 }  // namespace utility
 }  // namespace maliput

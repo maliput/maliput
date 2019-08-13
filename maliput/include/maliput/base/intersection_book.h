@@ -2,9 +2,9 @@
 
 #include <memory>
 
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/intersection.h"
 #include "maliput/api/intersection_book.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 
@@ -26,8 +26,7 @@ class IntersectionBook : public api::IntersectionBook {
  private:
   std::vector<api::Intersection*> DoGetIntersections() override;
 
-  api::Intersection* DoGetIntersection(const api::Intersection::Id& id)
-      override;
+  api::Intersection* DoGetIntersection(const api::Intersection::Id& id) override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

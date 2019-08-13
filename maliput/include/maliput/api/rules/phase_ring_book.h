@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include "maliput/api/rules/phase_ring.h"
-#include "maliput/api/rules/right_of_way_rule.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+#include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/right_of_way_rule.h"
 
 namespace maliput {
 namespace api {
@@ -20,21 +20,15 @@ class PhaseRingBook {
   virtual ~PhaseRingBook() = default;
 
   /// Gets a list of all PhaseRings within this book.
-  std::vector<PhaseRing::Id> GetPhaseRings() const {
-    return DoGetPhaseRings();
-  }
+  std::vector<PhaseRing::Id> GetPhaseRings() const { return DoGetPhaseRings(); }
 
   /// Gets the specified PhaseRing. Returns drake::nullopt if @p ring_id is
   /// unrecognized.
-  drake::optional<PhaseRing> GetPhaseRing(const PhaseRing::Id& ring_id) const {
-    return DoGetPhaseRing(ring_id);
-  }
+  drake::optional<PhaseRing> GetPhaseRing(const PhaseRing::Id& ring_id) const { return DoGetPhaseRing(ring_id); }
 
   /// Finds and returns the PhaseRing containing the specified
   /// RightOfWayRule. Returns drake::nullopt if @p rule_id is unrecognized.
-  drake::optional<PhaseRing> FindPhaseRing(const RightOfWayRule::Id& rule_id) const {
-    return DoFindPhaseRing(rule_id);
-  }
+  drake::optional<PhaseRing> FindPhaseRing(const RightOfWayRule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
 
  protected:
   PhaseRingBook() = default;
@@ -42,11 +36,9 @@ class PhaseRingBook {
  private:
   virtual std::vector<PhaseRing::Id> DoGetPhaseRings() const = 0;
 
-  virtual drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id)
-      const = 0;
+  virtual drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const = 0;
 
-  virtual drake::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id)
-      const  = 0;
+  virtual drake::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const = 0;
 };
 
 }  // namespace rules

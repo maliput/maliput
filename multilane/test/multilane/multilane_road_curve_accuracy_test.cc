@@ -31,23 +31,20 @@ GTEST_TEST(BruteForceIntegralTest, ArcRoadCurvePathLength) {
   const drake::Vector2<double> kCenter{10.0, 10.0};
   const double kLinearTolerance{0.01};
   const double kScaleLength{1.};
-  const ComputationPolicy kComputationPolicy{
-    ComputationPolicy::kPreferAccuracy};
+  const ComputationPolicy kComputationPolicy{ComputationPolicy::kPreferAccuracy};
   const CubicPolynomial zp(0., 0., 0., 0.);
   const double kP0{0.};
   const double kP1{1.};
   const double kR{0.};
   const double kH{0.};
 
-  const ArcRoadCurve rc(kCenter, kRadius, kTheta0, kDTheta, zp, zp,
-                        kLinearTolerance, kScaleLength, kComputationPolicy);
+  const ArcRoadCurve rc(kCenter, kRadius, kTheta0, kDTheta, zp, zp, kLinearTolerance, kScaleLength, kComputationPolicy);
 
   // A k = 0 order approximation uses a single segment, as n = 2^k,
   // where n is the segment count.
   double maximum_step = 0;
   const double path_length_zero_order_approx =
-      test::BruteForcePathLengthIntegral(
-          rc, kP0, kP1, kR, kH, 0, &maximum_step);
+      test::BruteForcePathLengthIntegral(rc, kP0, kP1, kR, kH, 0, &maximum_step);
   const double path_length_zero_order = std::sin(M_PI / 4.) * kRadius * 2.;
   EXPECT_NEAR(path_length_zero_order_approx, path_length_zero_order, kAccuracy);
   EXPECT_NEAR(maximum_step, path_length_zero_order, kAccuracy);
@@ -55,14 +52,12 @@ GTEST_TEST(BruteForceIntegralTest, ArcRoadCurvePathLength) {
   int k_order_hint = 0;
   const double tolerance = .01 * rc.OptimizeCalcSFromP(0.)(1.);
   const double path_length_adaptive_approx =
-      test::AdaptiveBruteForcePathLengthIntegral(
-          rc, kP0, kP1, kR, kH, tolerance, &k_order_hint);
+      test::AdaptiveBruteForcePathLengthIntegral(rc, kP0, kP1, kR, kH, tolerance, &k_order_hint);
   EXPECT_NEAR(path_length_adaptive_approx, kRadius * M_PI / 2., tolerance);
 }
 
 // A test fixture for RoadCurve computation accuracy tests.
-class RoadCurveAccuracyTest
-    : public ::testing::TestWithParam<std::shared_ptr<RoadCurve>> {};
+class RoadCurveAccuracyTest : public ::testing::TestWithParam<std::shared_ptr<RoadCurve>> {};
 
 // Checks that optimized path length computations are within tolerance.
 TEST_P(RoadCurveAccuracyTest, PathLengthComputationAccuracy) {
@@ -77,50 +72,31 @@ TEST_P(RoadCurveAccuracyTest, PathLengthComputationAccuracy) {
   const double kH = 0.0;
 
   std::shared_ptr<RoadCurve> road_curve = GetParam();
-  const double kTolerance = road_curve->linear_tolerance()
-                            / road_curve->scale_length();
+  const double kTolerance = road_curve->linear_tolerance() / road_curve->scale_length();
   for (double r = kMinimumR; r <= kMaximumR; r += kRStep) {
     int k_order = 0;
-    std::function<double(double)> s_from_p_at_r =
-        road_curve->OptimizeCalcSFromP(r);
+    std::function<double(double)> s_from_p_at_r = road_curve->OptimizeCalcSFromP(r);
     for (double p = kMinimumP; p <= kMaximumP; p += kPStep) {
-      const double k_order_s_approximation =
-          test::AdaptiveBruteForcePathLengthIntegral(
-              *road_curve, kMinimumP, p, r, kH,
-              road_curve->linear_tolerance(), &k_order);
-      const double relative_error =
-          (k_order_s_approximation != 0.0) ?
-          (s_from_p_at_r(p) - k_order_s_approximation) /
-          k_order_s_approximation : s_from_p_at_r(p);
+      const double k_order_s_approximation = test::AdaptiveBruteForcePathLengthIntegral(
+          *road_curve, kMinimumP, p, r, kH, road_curve->linear_tolerance(), &k_order);
+      const double relative_error = (k_order_s_approximation != 0.0)
+                                        ? (s_from_p_at_r(p) - k_order_s_approximation) / k_order_s_approximation
+                                        : s_from_p_at_r(p);
       EXPECT_LE(relative_error, kTolerance) << fmt::format(
           "Path length estimation with a tolerance of {} "
           "m failed at p = {}, r = {} m, h = {} m with "
           "{} for elevation and {} for superelevation",
-          road_curve->linear_tolerance(), p, r, kH,
-          road_curve->elevation(), road_curve->superelevation());
+          road_curve->linear_tolerance(), p, r, kH, road_curve->elevation(), road_curve->superelevation());
     }
   }
 }
 
 // Returns an exhaustive combination of CubicPolynomial instances for testing.
 std::vector<CubicPolynomial> GetCubicPolynomials() {
-  return {
-    {0.0, 0.0, 0.0, 0.0},
-    {1.0, 0.0, 0.0, 0.0},
-    {0.0, 1.0, 0.0, 0.0},
-    {1.0, 1.0, 0.0, 0.0},
-    {0.0, 0.0, 1.0, 0.0},
-    {1.0, 0.0, 1.0, 0.0},
-    {0.0, 1.0, 1.0, 0.0},
-    {1.0, 1.0, 1.0, 0.0},
-    {0.0, 0.0, 0.0, 1.0},
-    {1.0, 0.0, 0.0, 1.0},
-    {0.0, 1.0, 0.0, 1.0},
-    {1.0, 1.0, 0.0, 1.0},
-    {0.0, 0.0, 1.0, 1.0},
-    {1.0, 0.0, 1.0, 1.0},
-    {0.0, 1.0, 1.0, 1.0},
-    {1.0, 1.0, 1.0, 1.0}};
+  return {{0.0, 0.0, 0.0, 0.0}, {1.0, 0.0, 0.0, 0.0}, {0.0, 1.0, 0.0, 0.0}, {1.0, 1.0, 0.0, 0.0},
+          {0.0, 0.0, 1.0, 0.0}, {1.0, 0.0, 1.0, 0.0}, {0.0, 1.0, 1.0, 0.0}, {1.0, 1.0, 1.0, 0.0},
+          {0.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, {1.0, 1.0, 0.0, 1.0},
+          {0.0, 0.0, 1.0, 1.0}, {1.0, 0.0, 1.0, 1.0}, {0.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}};
 }
 
 // Returns a collection of ArcRoadCurve instances for testing
@@ -136,15 +112,13 @@ std::vector<std::shared_ptr<RoadCurve>> GetSimpleLineRoadCurves() {
   std::vector<std::shared_ptr<RoadCurve>> road_curves;
   for (const auto& elevation_polynomial : GetCubicPolynomials()) {
     if (elevation_polynomial.order() <= 1) {
-      road_curves.push_back(std::make_shared<LineRoadCurve>(
-          kStart, kEnd - kStart, elevation_polynomial,
-          zp, kLinearTolerance, kScaleLength,
-          ComputationPolicy::kPreferSpeed));
+      road_curves.push_back(std::make_shared<LineRoadCurve>(kStart, kEnd - kStart, elevation_polynomial, zp,
+                                                            kLinearTolerance, kScaleLength,
+                                                            ComputationPolicy::kPreferSpeed));
     }
   }
   return road_curves;
 }
-
 
 // Returns a collection of LineRoadCurve instances for testing.
 std::vector<std::shared_ptr<RoadCurve>> GetLineRoadCurves() {
@@ -156,15 +130,13 @@ std::vector<std::shared_ptr<RoadCurve>> GetLineRoadCurves() {
   std::vector<std::shared_ptr<RoadCurve>> road_curves;
   for (const auto& elevation_polynomial : GetCubicPolynomials()) {
     for (const auto& superelevation_polynomial : GetCubicPolynomials()) {
-      road_curves.push_back(std::make_shared<LineRoadCurve>(
-          kStart, kEnd - kStart, elevation_polynomial,
-          superelevation_polynomial, kLinearTolerance, kScaleLength,
-          ComputationPolicy::kPreferAccuracy));
+      road_curves.push_back(std::make_shared<LineRoadCurve>(kStart, kEnd - kStart, elevation_polynomial,
+                                                            superelevation_polynomial, kLinearTolerance, kScaleLength,
+                                                            ComputationPolicy::kPreferAccuracy));
     }
   }
   return road_curves;
 }
-
 
 // Returns a collection of ArcRoadCurve instances for testing
 // that are simple enough for fast analytical computations to be
@@ -181,11 +153,9 @@ std::vector<std::shared_ptr<RoadCurve>> GetSimpleArcRoadCurves() {
   std::vector<std::shared_ptr<RoadCurve>> road_curves;
   for (const auto& elevation_polynomial : GetCubicPolynomials()) {
     if (elevation_polynomial.order() <= 1) {
-      road_curves.push_back(std::make_shared<ArcRoadCurve>(
-          kCenter, kRadius, kTheta0, kDTheta,
-          elevation_polynomial, zp,
-          kLinearTolerance, kScaleLength,
-          ComputationPolicy::kPreferSpeed));
+      road_curves.push_back(std::make_shared<ArcRoadCurve>(kCenter, kRadius, kTheta0, kDTheta, elevation_polynomial, zp,
+                                                           kLinearTolerance, kScaleLength,
+                                                           ComputationPolicy::kPreferSpeed));
     }
   }
   return road_curves;
@@ -203,31 +173,24 @@ std::vector<std::shared_ptr<RoadCurve>> GetArcRoadCurves() {
   std::vector<std::shared_ptr<RoadCurve>> road_curves;
   for (const auto& elevation_polynomial : GetCubicPolynomials()) {
     for (const auto& superelevation_polynomial : GetCubicPolynomials()) {
-      road_curves.push_back(std::make_shared<ArcRoadCurve>(
-        kCenter, kRadius, kTheta0, kDTheta,
-        elevation_polynomial, superelevation_polynomial,
-        kLinearTolerance, kScaleLength,
-        ComputationPolicy::kPreferAccuracy));
+      road_curves.push_back(std::make_shared<ArcRoadCurve>(kCenter, kRadius, kTheta0, kDTheta, elevation_polynomial,
+                                                           superelevation_polynomial, kLinearTolerance, kScaleLength,
+                                                           ComputationPolicy::kPreferAccuracy));
     }
   }
   return road_curves;
 }
 
-
-INSTANTIATE_TEST_CASE_P(SimpleAndFastLineRoadCurveAccuracyTest,
-                        RoadCurveAccuracyTest,
+INSTANTIATE_TEST_CASE_P(SimpleAndFastLineRoadCurveAccuracyTest, RoadCurveAccuracyTest,
                         ::testing::ValuesIn(GetSimpleLineRoadCurves()));
 
-INSTANTIATE_TEST_CASE_P(ExhaustiveLineRoadCurveAccuracyTest,
-                        RoadCurveAccuracyTest,
+INSTANTIATE_TEST_CASE_P(ExhaustiveLineRoadCurveAccuracyTest, RoadCurveAccuracyTest,
                         ::testing::ValuesIn(GetLineRoadCurves()));
 
-INSTANTIATE_TEST_CASE_P(SimpleAndFastArcRoadCurveAccuracyTest,
-                        RoadCurveAccuracyTest,
+INSTANTIATE_TEST_CASE_P(SimpleAndFastArcRoadCurveAccuracyTest, RoadCurveAccuracyTest,
                         ::testing::ValuesIn(GetSimpleArcRoadCurves()));
 
-INSTANTIATE_TEST_CASE_P(ExhaustiveArcRoadCurveAccuracyTest,
-                        RoadCurveAccuracyTest,
+INSTANTIATE_TEST_CASE_P(ExhaustiveArcRoadCurveAccuracyTest, RoadCurveAccuracyTest,
                         ::testing::ValuesIn(GetArcRoadCurves()));
 
 }  // namespace

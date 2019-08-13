@@ -4,12 +4,12 @@
 #include <memory>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "multilane/road_curve.h"
 #include "multilane/segment.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace multilane {
@@ -29,9 +29,7 @@ class Junction : public api::Junction {
   Junction(const api::JunctionId& id, const api::RoadGeometry* road_geometry,
            const std::function<void(const api::Segment*)>& register_segment,
            const std::function<void(const api::Lane*)>& register_lane)
-      : id_(id), road_geometry_(road_geometry),
-        register_segment_(register_segment),
-        register_lane_(register_lane) {}
+      : id_(id), road_geometry_(road_geometry), register_segment_(register_segment), register_lane_(register_lane) {}
 
   /// Creates and adds a new Segment.
   /// @param id Segment's ID.
@@ -42,9 +40,8 @@ class Junction : public api::Junction {
   /// from where Segment's surface ends.
   /// @param elevation_bounds The height bounds over the segment' surface.
   /// @return A Segment object.
-  Segment* NewSegment(const api::SegmentId& id,
-                      std::unique_ptr<RoadCurve> road_curve, double r_min,
-                      double r_max, const api::HBounds& elevation_bounds);
+  Segment* NewSegment(const api::SegmentId& id, std::unique_ptr<RoadCurve> road_curve, double r_min, double r_max,
+                      const api::HBounds& elevation_bounds);
 
   ~Junction() override = default;
 
@@ -55,9 +52,7 @@ class Junction : public api::Junction {
 
   int do_num_segments() const override { return segments_.size(); }
 
-  const api::Segment* do_segment(int index) const override {
-    return segments_[index].get();
-  }
+  const api::Segment* do_segment(int index) const override { return segments_[index].get(); }
 
   api::JunctionId id_;
   const api::RoadGeometry* road_geometry_{};

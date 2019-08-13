@@ -14,32 +14,25 @@
 #include "dragway/branch_point.h"
 #include "dragway/junction.h"
 
-
 using std::make_unique;
 
 namespace maliput {
 namespace dragway {
 
-RoadGeometry::RoadGeometry(const api::RoadGeometryId& id,
-               int num_lanes,
-               double length,
-               double lane_width,
-               double shoulder_width,
-               double maximum_height,
-               double linear_tolerance,
-               double angular_tolerance)
-  : id_(id),
-    linear_tolerance_(linear_tolerance),
-    angular_tolerance_(angular_tolerance),
-    // Dragway is completely flat and featureless, so the scale-length might
-    // as well be any value that characterizes its overall size.
-    // TODO(maddog@tri.global)  If this code is ever re-arranged in a way that
-    //                          makes it possible to query the segment for its
-    //                          `road_width`, then use the max of length and
-    //                          width.
-    scale_length_(length),
-    junction_(this, num_lanes, length,
-              lane_width, shoulder_width, maximum_height) {
+RoadGeometry::RoadGeometry(const api::RoadGeometryId& id, int num_lanes, double length, double lane_width,
+                           double shoulder_width, double maximum_height, double linear_tolerance,
+                           double angular_tolerance)
+    : id_(id),
+      linear_tolerance_(linear_tolerance),
+      angular_tolerance_(angular_tolerance),
+      // Dragway is completely flat and featureless, so the scale-length might
+      // as well be any value that characterizes its overall size.
+      // TODO(maddog@tri.global)  If this code is ever re-arranged in a way that
+      //                          makes it possible to query the segment for its
+      //                          `road_width`, then use the max of length and
+      //                          width.
+      scale_length_(length),
+      junction_(this, num_lanes, length, lane_width, shoulder_width, maximum_height) {
   MALIPUT_DEMAND(length > 0);
   MALIPUT_DEMAND(lane_width > 0);
   MALIPUT_DEMAND(shoulder_width >= 0);
@@ -64,12 +57,10 @@ const api::BranchPoint* RoadGeometry::do_branch_point(int index) const {
   MALIPUT_DEMAND(index < num_branch_points());
   // The same BranchPoint is at the start versus end of a Lane, thus it doesn't
   // matter whether the start or finish BranchPoint is returned.
-  return junction_.segment(0)->lane(index)->GetBranchPoint(
-      api::LaneEnd::kStart);
+  return junction_.segment(0)->lane(index)->GetBranchPoint(api::LaneEnd::kStart);
 }
 
-bool RoadGeometry::IsGeoPositionOnDragway(const api::GeoPosition& geo_pos)
-    const {
+bool RoadGeometry::IsGeoPositionOnDragway(const api::GeoPosition& geo_pos) const {
   const Lane* lane = dynamic_cast<const Lane*>(junction_.segment(0)->lane(0));
   MALIPUT_DEMAND(lane != nullptr);
   const double length = lane->length();
@@ -77,8 +68,7 @@ bool RoadGeometry::IsGeoPositionOnDragway(const api::GeoPosition& geo_pos)
   const double min_y = lane->y_offset() + lane_driveable_bounds.min();
   const double max_y = lane->y_offset() + lane_driveable_bounds.max();
 
-  if (geo_pos.x() < 0 || geo_pos.x() > length ||
-      geo_pos.y() > max_y || geo_pos.y() < min_y) {
+  if (geo_pos.x() < 0 || geo_pos.x() > length || geo_pos.y() > max_y || geo_pos.y() < min_y) {
     maliput::log()->trace(
         "dragway::RoadGeometry::IsGeoPositionOnDragway(): The provided geo_pos "
         "({}, {}) is not on the dragway (length = {}, min_y = {}, max_y = {}).",
@@ -122,18 +112,16 @@ int RoadGeometry::GetLaneIndex(const api::GeoPosition& geo_pos) const {
     }
   }
   if (!lane_found) {
-    MALIPUT_THROW_MESSAGE("dragway::RoadGeometry::GetLaneIndex: Failed to "
-        "find lane for geo_pos (" + std::to_string(geo_pos.x()) + ", " +
-        std::to_string(geo_pos.y()) + ").");
+    MALIPUT_THROW_MESSAGE(
+        "dragway::RoadGeometry::GetLaneIndex: Failed to "
+        "find lane for geo_pos (" +
+        std::to_string(geo_pos.x()) + ", " + std::to_string(geo_pos.y()) + ").");
   }
   return result;
 }
 
-api::RoadPosition RoadGeometry::DoToRoadPosition(
-    const api::GeoPosition& geo_pos,
-    const api::RoadPosition* hint,
-    api::GeoPosition* nearest_position,
-    double* distance) const {
+api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos, const api::RoadPosition* hint,
+                                                 api::GeoPosition* nearest_position, double* distance) const {
   drake::unused(hint);
 
   // Computes the dragway's (x,y) driveable region coordinates.
@@ -195,21 +183,17 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(
   }
 
   const int closest_lane_index = GetLaneIndex(closest_position);
-  const Lane* closest_lane =
-      dynamic_cast<const Lane*>(junction_.segment(0)->lane(closest_lane_index));
+  const Lane* closest_lane = dynamic_cast<const Lane*>(junction_.segment(0)->lane(closest_lane_index));
   MALIPUT_DEMAND(closest_lane != nullptr);
-  const api::LanePosition closest_lane_position(
-      closest_position.x()                             /* s */,
-      closest_position.y() - closest_lane->y_offset()  /* r */,
-      closest_position.z()                             /* h */);
+  const api::LanePosition closest_lane_position(closest_position.x() /* s */,
+                                                closest_position.y() - closest_lane->y_offset() /* r */,
+                                                closest_position.z() /* h */);
   return api::RoadPosition(closest_lane, closest_lane_position);
 }
 
-std::vector<api::RoadPositionResult>
-RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
-                                  double radius) const {
-  return maliput::geometry_base::BruteForceFindRoadPositionsStrategy(
-      this, geo_position, radius);
+std::vector<api::RoadPositionResult> RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
+                                                                       double radius) const {
+  return maliput::geometry_base::BruteForceFindRoadPositionsStrategy(this, geo_position, radius);
 }
 
 }  // namespace dragway

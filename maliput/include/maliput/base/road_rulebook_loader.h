@@ -22,8 +22,8 @@ namespace maliput {
 /// @throws std::exception if the YAML document within @p input is invalid, or
 /// an api::rules::RightOfWayRule within @p input has an invalid state or zone
 /// type.
-std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebook(
-    const api::RoadGeometry* road_geometry, const std::string& input);
+std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebook(const api::RoadGeometry* road_geometry,
+                                                           const std::string& input);
 
 /// Instantiates an api::rules::RoadRulebook based on the specified @p
 /// road_geometry and @p filename.
@@ -39,7 +39,7 @@ std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebook(
 /// @throws std::exception if the YAML document within @p input is invalid, or
 /// an api::rules::RightOfWayRule within @p input has an invalid state or zone
 /// type.
-std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebookFromFile(
-    const api::RoadGeometry* road_geometry, const std::string& filename);
+std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebookFromFile(const api::RoadGeometry* road_geometry,
+                                                                   const std::string& filename);
 
 }  // namespace maliput

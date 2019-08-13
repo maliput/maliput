@@ -9,14 +9,13 @@
 namespace maliput {
 namespace api {
 
-RoadNetwork::RoadNetwork(
-    std::unique_ptr<const RoadGeometry> road_geometry,
-    std::unique_ptr<const rules::RoadRulebook> rulebook,
-    std::unique_ptr<const rules::TrafficLightBook> traffic_light_book,
-    std::unique_ptr<IntersectionBook> intersection_book,
-    std::unique_ptr<rules::PhaseRingBook> phase_ring_book,
-    std::unique_ptr<rules::RuleStateProvider> rule_state_provider,
-    std::unique_ptr<rules::PhaseProvider> phase_provider)
+RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
+                         std::unique_ptr<const rules::RoadRulebook> rulebook,
+                         std::unique_ptr<const rules::TrafficLightBook> traffic_light_book,
+                         std::unique_ptr<IntersectionBook> intersection_book,
+                         std::unique_ptr<rules::PhaseRingBook> phase_ring_book,
+                         std::unique_ptr<rules::RuleStateProvider> rule_state_provider,
+                         std::unique_ptr<rules::PhaseProvider> phase_provider)
     : road_geometry_(std::move(road_geometry)),
       rulebook_(std::move(rulebook)),
       traffic_light_book_(std::move(traffic_light_book)),

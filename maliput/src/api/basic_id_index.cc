@@ -5,26 +5,19 @@
 namespace maliput {
 namespace api {
 
-void BasicIdIndex::AddLane(const Lane* lane) {
-  MALIPUT_THROW_UNLESS(lane_map_.emplace(lane->id(), lane).second);
-}
-
+void BasicIdIndex::AddLane(const Lane* lane) { MALIPUT_THROW_UNLESS(lane_map_.emplace(lane->id(), lane).second); }
 
 void BasicIdIndex::AddSegment(const Segment* segment) {
   MALIPUT_THROW_UNLESS(segment_map_.emplace(segment->id(), segment).second);
 }
 
-
 void BasicIdIndex::AddJunction(const Junction* junction) {
   MALIPUT_THROW_UNLESS(junction_map_.emplace(junction->id(), junction).second);
 }
 
-
 void BasicIdIndex::AddBranchPoint(const BranchPoint* branch_point) {
-  MALIPUT_THROW_UNLESS(
-      branch_point_map_.emplace(branch_point->id(), branch_point).second);
+  MALIPUT_THROW_UNLESS(branch_point_map_.emplace(branch_point->id(), branch_point).second);
 }
-
 
 void BasicIdIndex::WalkAndAddAll(const RoadGeometry* road_geometry) {
   for (int ji = 0; ji < road_geometry->num_junctions(); ++ji) {
@@ -43,7 +36,6 @@ void BasicIdIndex::WalkAndAddAll(const RoadGeometry* road_geometry) {
   }
 }
 
-
 namespace {
 template <typename T, typename U>
 T find_or_nullptr(const std::unordered_map<U, T>& map, const U& id) {
@@ -52,32 +44,17 @@ T find_or_nullptr(const std::unordered_map<U, T>& map, const U& id) {
 }
 }  // namespace
 
+const Lane* BasicIdIndex::DoGetLane(const LaneId& id) const { return find_or_nullptr(lane_map_, id); }
 
-const Lane* BasicIdIndex::DoGetLane(const LaneId& id) const {
-  return find_or_nullptr(lane_map_, id);
-}
+const std::unordered_map<LaneId, const Lane*>& BasicIdIndex::DoGetLanes() const { return lane_map_; }
 
-const std::unordered_map<LaneId, const Lane*>& BasicIdIndex::DoGetLanes()
-    const {
-  return lane_map_;
-}
+const Segment* BasicIdIndex::DoGetSegment(const SegmentId& id) const { return find_or_nullptr(segment_map_, id); }
 
+const Junction* BasicIdIndex::DoGetJunction(const JunctionId& id) const { return find_or_nullptr(junction_map_, id); }
 
-const Segment* BasicIdIndex::DoGetSegment(const SegmentId& id) const {
-  return find_or_nullptr(segment_map_, id);
-}
-
-
-const Junction* BasicIdIndex::DoGetJunction(const JunctionId& id) const {
-  return find_or_nullptr(junction_map_, id);
-}
-
-
-const BranchPoint*
-BasicIdIndex::DoGetBranchPoint(const BranchPointId& id) const {
+const BranchPoint* BasicIdIndex::DoGetBranchPoint(const BranchPointId& id) const {
   return find_or_nullptr(branch_point_map_, id);
 }
-
 
 }  // namespace api
 }  // namespace maliput

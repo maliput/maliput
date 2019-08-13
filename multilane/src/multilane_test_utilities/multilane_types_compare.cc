@@ -11,9 +11,7 @@ namespace maliput {
 namespace multilane {
 namespace test {
 
-::testing::AssertionResult IsEndpointXyClose(const EndpointXy& xy1,
-                                             const EndpointXy& xy2,
-                                             double linear_tolerance,
+::testing::AssertionResult IsEndpointXyClose(const EndpointXy& xy1, const EndpointXy& xy2, double linear_tolerance,
                                              double angular_tolerance) {
   bool fails = false;
   std::string error_message{};
@@ -51,9 +49,7 @@ namespace test {
              xy1, xy2, linear_tolerance, angular_tolerance);
 }
 
-::testing::AssertionResult IsEndpointZClose(const EndpointZ& z1,
-                                            const EndpointZ& z2,
-                                            double linear_tolerance,
+::testing::AssertionResult IsEndpointZClose(const EndpointZ& z1, const EndpointZ& z2, double linear_tolerance,
                                             double angular_tolerance) {
   bool fails = false;
   std::string error_message{};
@@ -112,9 +108,7 @@ namespace test {
              z1, z2, linear_tolerance, angular_tolerance);
 }
 
-::testing::AssertionResult IsEndpointClose(const Endpoint& p1,
-                                           const Endpoint& p2,
-                                           double linear_tolerance,
+::testing::AssertionResult IsEndpointClose(const Endpoint& p1, const Endpoint& p2, double linear_tolerance,
                                            double angular_tolerance) {
   bool fails = false;
   std::string error_message{};
@@ -124,16 +118,14 @@ namespace test {
   if (!endpoint_xy_comparison) {
     fails = true;
     error_message +=
-        fmt::format("Endpoint p1 is different from p2 at EndpointXy. [{}]\n",
-                    endpoint_xy_comparison.message());
+        fmt::format("Endpoint p1 is different from p2 at EndpointXy. [{}]\n", endpoint_xy_comparison.message());
   }
   const ::testing::AssertionResult endpoint_z_comparison =
       IsEndpointZClose(p1.z(), p2.z(), linear_tolerance, angular_tolerance);
   if (!endpoint_z_comparison) {
     fails = true;
     error_message +=
-        fmt::format("Endpoint p1 is different from p2 at EndpointZ. [{}]\n",
-                    endpoint_z_comparison.message());
+        fmt::format("Endpoint p1 is different from p2 at EndpointZ. [{}]\n", endpoint_z_comparison.message());
   }
   if (fails) {
     return ::testing::AssertionFailure() << error_message;
@@ -144,10 +136,8 @@ namespace test {
              p1, p2, linear_tolerance, angular_tolerance);
 }
 
-::testing::AssertionResult IsArcOffsetClose(const ArcOffset& arc_offset1,
-                                            const ArcOffset& arc_offset2,
-                                            double linear_tolerance,
-                                            double angular_tolerance) {
+::testing::AssertionResult IsArcOffsetClose(const ArcOffset& arc_offset1, const ArcOffset& arc_offset2,
+                                            double linear_tolerance, double angular_tolerance) {
   bool fails = false;
   std::string error_message{};
   double delta = std::abs(arc_offset1.radius() - arc_offset2.radius());
@@ -176,16 +166,13 @@ namespace test {
              arc_offset1, arc_offset2, linear_tolerance, angular_tolerance);
 }
 
-::testing::AssertionResult IsCubicPolynomialClose(const CubicPolynomial& cubic1,
-                                                  const CubicPolynomial& cubic2,
+::testing::AssertionResult IsCubicPolynomialClose(const CubicPolynomial& cubic1, const CubicPolynomial& cubic2,
                                                   double tolerance) {
   bool fails = false;
   std::string error_message{};
   const std::vector<std::string> coefficient_strs{"a", "b", "c", "d"};
-  const std::vector<double> coefficients1{cubic1.a(), cubic1.b(), cubic1.c(),
-                                          cubic1.d()};
-  const std::vector<double> coefficients2{cubic2.a(), cubic2.b(), cubic2.c(),
-                                          cubic2.d()};
+  const std::vector<double> coefficients1{cubic1.a(), cubic1.b(), cubic1.c(), cubic1.d()};
+  const std::vector<double> coefficients2{cubic2.a(), cubic2.b(), cubic2.c(), cubic2.d()};
 
   for (int i = 0; i < 4; ++i) {
     const double delta = std::abs(coefficients1[i] - coefficients2[i]);
@@ -195,8 +182,7 @@ namespace test {
           "Cubic polynomials are different at {0} coefficient. "
           "cubic1.{0}(): {1} vs. cubic2.{0}(): {2}, diff = {3}, "
           "tolerance = {4}\n",
-          coefficient_strs[i], coefficients1[i], coefficients2[i], delta,
-          tolerance);
+          coefficient_strs[i], coefficients1[i], coefficients2[i], delta, tolerance);
     }
   }
   if (fails) {
@@ -208,54 +194,40 @@ namespace test {
              cubic1, cubic2, tolerance);
 }
 
-Matcher<const api::HBounds&> Matches(const api::HBounds& elevation_bounds,
-                                     double tolerance) {
+Matcher<const api::HBounds&> Matches(const api::HBounds& elevation_bounds, double tolerance) {
   return MakeMatcher(new HBoundsMatcher(elevation_bounds, tolerance));
 }
 
-Matcher<const ArcOffset&> Matches(const ArcOffset& arc_offset,
-                                  double linear_tolerance,
-                                  double angular_tolerance) {
-  return MakeMatcher(
-      new ArcOffsetMatcher(arc_offset, linear_tolerance, angular_tolerance));
+Matcher<const ArcOffset&> Matches(const ArcOffset& arc_offset, double linear_tolerance, double angular_tolerance) {
+  return MakeMatcher(new ArcOffsetMatcher(arc_offset, linear_tolerance, angular_tolerance));
 }
 
-Matcher<const LineOffset&> Matches(const LineOffset& line_offset,
-                                   double tolerance) {
+Matcher<const LineOffset&> Matches(const LineOffset& line_offset, double tolerance) {
   return MakeMatcher(new LineOffsetMatcher(line_offset, tolerance));
 }
 
-Matcher<const LaneLayout&> Matches(const LaneLayout& lane_layout,
-                                   double tolerance) {
+Matcher<const LaneLayout&> Matches(const LaneLayout& lane_layout, double tolerance) {
   return MakeMatcher(new LaneLayoutMatcher(lane_layout, tolerance));
 }
 
-Matcher<const StartReference::Spec&> Matches(
-    const StartReference::Spec& start_reference, double linear_tolerance,
-    double angular_tolerance) {
-  return MakeMatcher(new StartReferenceSpecMatcher(
-      start_reference, linear_tolerance, angular_tolerance));
+Matcher<const StartReference::Spec&> Matches(const StartReference::Spec& start_reference, double linear_tolerance,
+                                             double angular_tolerance) {
+  return MakeMatcher(new StartReferenceSpecMatcher(start_reference, linear_tolerance, angular_tolerance));
 }
 
-Matcher<const StartLane::Spec&> Matches(
-    const StartLane::Spec& start_lane, double linear_tolerance,
-    double angular_tolerance) {
-  return MakeMatcher(new StartLaneSpecMatcher(
-      start_lane, linear_tolerance, angular_tolerance));
+Matcher<const StartLane::Spec&> Matches(const StartLane::Spec& start_lane, double linear_tolerance,
+                                        double angular_tolerance) {
+  return MakeMatcher(new StartLaneSpecMatcher(start_lane, linear_tolerance, angular_tolerance));
 }
 
-Matcher<const EndReference::Spec&> Matches(
-    const EndReference::Spec& end_reference, double linear_tolerance,
-    double angular_tolerance) {
-  return MakeMatcher(new EndReferenceSpecMatcher(
-      end_reference, linear_tolerance, angular_tolerance));
+Matcher<const EndReference::Spec&> Matches(const EndReference::Spec& end_reference, double linear_tolerance,
+                                           double angular_tolerance) {
+  return MakeMatcher(new EndReferenceSpecMatcher(end_reference, linear_tolerance, angular_tolerance));
 }
 
-Matcher<const EndLane::Spec&> Matches(
-    const EndLane::Spec& end_lane, double linear_tolerance,
-    double angular_tolerance) {
-  return MakeMatcher(new EndLaneSpecMatcher(
-      end_lane, linear_tolerance, angular_tolerance));
+Matcher<const EndLane::Spec&> Matches(const EndLane::Spec& end_lane, double linear_tolerance,
+                                      double angular_tolerance) {
+  return MakeMatcher(new EndLaneSpecMatcher(end_lane, linear_tolerance, angular_tolerance));
 }
 
 }  // namespace test

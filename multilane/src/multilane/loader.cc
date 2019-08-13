@@ -19,7 +19,6 @@
 #include "multilane/builder.h"
 #include "multilane/connection.h"
 
-
 namespace maliput {
 namespace multilane {
 namespace {
@@ -99,8 +98,7 @@ api::HBounds ParseHBounds(const YAML::Node& node) {
 EndpointXy ParseEndpointXy(const YAML::Node& node) {
   MALIPUT_DEMAND(node.IsSequence());
   MALIPUT_DEMAND(node.size() == 3);
-  return EndpointXy(node[0].as<double>(), node[1].as<double>(),
-                    deg_to_rad(node[2].as<double>()));
+  return EndpointXy(node[0].as<double>(), node[1].as<double>(), deg_to_rad(node[2].as<double>()));
 }
 
 // Parses a YAML `node` and returns an EndpointZ object from it.
@@ -113,11 +111,8 @@ EndpointXy ParseEndpointXy(const YAML::Node& node) {
 EndpointZ ParseEndpointZ(const YAML::Node& node) {
   MALIPUT_DEMAND(node.IsSequence());
   MALIPUT_DEMAND(node.size() == 3 || node.size() == 4);
-  return EndpointZ(node[0].as<double>(), node[1].as<double>(),
-                   deg_to_rad(node[2].as<double>()),
-                   node.size() == 4
-                       ? drake::optional<double>(deg_to_rad(node[3].as<double>()))
-                       : drake::nullopt);
+  return EndpointZ(node[0].as<double>(), node[1].as<double>(), deg_to_rad(node[2].as<double>()),
+                   node.size() == 4 ? drake::optional<double>(deg_to_rad(node[3].as<double>())) : drake::nullopt);
 }
 
 // Parses a YAML `node` and returns an Endpoint object from it.
@@ -126,8 +121,7 @@ EndpointZ ParseEndpointZ(const YAML::Node& node) {
 // that represents an EndpointZ.
 Endpoint ParseEndpoint(const YAML::Node& node) {
   MALIPUT_DEMAND(node.IsMap());
-  return Endpoint(ParseEndpointXy(node["xypoint"]),
-                  ParseEndpointZ(node["zpoint"]));
+  return Endpoint(ParseEndpointXy(node["xypoint"]), ParseEndpointZ(node["zpoint"]));
 }
 
 // Parses a YAML `node` and returns a tuple object from it.
@@ -180,9 +174,7 @@ ComputationPolicy ParseComputationPolicy(const YAML::Node& node) {
 }
 
 // Builds a LaneLayout based `node`'s lane node, the left and right shoulders.
-LaneLayout ResolveLaneLayout(const YAML::Node& node,
-                             double default_left_shoulder,
-                             double default_right_shoulder) {
+LaneLayout ResolveLaneLayout(const YAML::Node& node, double default_left_shoulder, double default_right_shoulder) {
   int num_lanes{};
   int ref_lane{};
   double r_ref{};
@@ -190,12 +182,8 @@ LaneLayout ResolveLaneLayout(const YAML::Node& node,
 
   // Left and right shoulders are not required, if any of them is present it
   // will override the default value.
-  const double left_shoulder = node["left_shoulder"]
-                                   ? node["left_shoulder"].as<double>()
-                                   : default_left_shoulder;
-  const double right_shoulder = node["right_shoulder"]
-                                    ? node["right_shoulder"].as<double>()
-                                    : default_right_shoulder;
+  const double left_shoulder = node["left_shoulder"] ? node["left_shoulder"].as<double>() : default_left_shoulder;
+  const double right_shoulder = node["right_shoulder"] ? node["right_shoulder"].as<double>() : default_right_shoulder;
   // Create lane layout.
   return LaneLayout(left_shoulder, right_shoulder, num_lanes, ref_lane, r_ref);
 }
@@ -204,9 +192,8 @@ LaneLayout ResolveLaneLayout(const YAML::Node& node,
 // `endpoint_key` should be a bare Endpoint in "points" YAML map.
 // @return An drake::optional<Endpoint> with the Endpoint or drake::nullopt if it is not
 // found inside `point_catalog`.
-drake::optional<Endpoint> FindEndpointInCatalog(
-    const std::string& endpoint_key,
-    const std::map<std::string, Endpoint>& point_catalog) {
+drake::optional<Endpoint> FindEndpointInCatalog(const std::string& endpoint_key,
+                                                const std::map<std::string, Endpoint>& point_catalog) {
   auto it = point_catalog.find(endpoint_key);
   return it == point_catalog.end() ? drake::nullopt : drake::optional<Endpoint>(it->second);
 }
@@ -218,12 +205,10 @@ drake::optional<Endpoint> FindEndpointInCatalog(
 // @return An drake::optional<const Connection*> with the Connection or drake::nullopt if it
 // is not found inside `connection_catalog`.
 drake::optional<const Connection*> FindConnectionInCatalog(
-    const std::string& connection_key,
-    const std::map<std::string, const Connection*>& connection_catalog) {
+    const std::string& connection_key, const std::map<std::string, const Connection*>& connection_catalog) {
   return connection_catalog.find(connection_key) == connection_catalog.end()
              ? drake::nullopt
-             : drake::optional<const Connection*>(
-                   connection_catalog.at(connection_key));
+             : drake::optional<const Connection*>(connection_catalog.at(connection_key));
 }
 
 // Returns the Direction that `direction_key` sets to the Endpoint / EndpointZ.
@@ -262,24 +247,22 @@ api::LaneEnd::Which ResolveEnd(const std::string& end_key) {
 // - LANE_ID is a non negative integer that refers to C_ID Connection's lane.
 ParsedReference ResolveEndpointReference(const std::string& endpoint_key) {
   ParsedReference parsed_reference{};
-  static const std::regex kPointsPattern{"^points[.](.*)[.](forward|reverse)$",
-                                         std::regex::ECMAScript};
-  static const std::regex kConnectionsPattern{
-      "^connections[.](.*)[.](start|end)[.](ref|[0-9]*)[.](forward|reverse)$",
-      std::regex::ECMAScript};
+  static const std::regex kPointsPattern{"^points[.](.*)[.](forward|reverse)$", std::regex::ECMAScript};
+  static const std::regex kConnectionsPattern{"^connections[.](.*)[.](start|end)[.](ref|[0-9]*)[.](forward|reverse)$",
+                                              std::regex::ECMAScript};
   std::smatch pieces_match;
   if (std::regex_match(endpoint_key, pieces_match, kPointsPattern)) {
     parsed_reference.type = ReferenceType::kPoint;
     parsed_reference.id = pieces_match[1].str();
     parsed_reference.direction = ResolveDirection(pieces_match[2].str());
-  } else if (std::regex_match(endpoint_key, pieces_match,
-                              kConnectionsPattern)) {
+  } else if (std::regex_match(endpoint_key, pieces_match, kConnectionsPattern)) {
     parsed_reference.type = ReferenceType::kConnection;
     parsed_reference.id = pieces_match[1].str();
     parsed_reference.direction = ResolveDirection(pieces_match[4].str());
     parsed_reference.end = {ResolveEnd(pieces_match[2].str())};
     parsed_reference.lane_id = pieces_match[3].str() == "ref"
-        ? drake::nullopt : drake::optional<int>(std::atoi(pieces_match[3].str().c_str()));
+                                   ? drake::nullopt
+                                   : drake::optional<int>(std::atoi(pieces_match[3].str().c_str()));
   } else {
     MALIPUT_THROW_MESSAGE("Unknown endpoint reference");
   }
@@ -302,9 +285,7 @@ ParsedAnchorPoint ParseAnchorPoint(const std::string anchor_key) {
   }
   const auto it = anchor_key.find("lane.");
   MALIPUT_DEMAND(it != std::string::npos && it == 0);
-  const std::string lane_str =
-      anchor_key.substr(std::strlen("lane."),
-                        anchor_key.length() - std::strlen("lane."));
+  const std::string lane_str = anchor_key.substr(std::strlen("lane."), anchor_key.length() - std::strlen("lane."));
   // Checks that lane_str only contains digits but no other character.
   MALIPUT_DEMAND(lane_str.find_first_not_of("0123456789") == std::string::npos);
   const int lane_id = std::stoi(lane_str);
@@ -319,49 +300,40 @@ ParsedAnchorPoint ParseAnchorPoint(const std::string anchor_key) {
 // information when it is possible to identify. When the point refers to a
 // Connection that is not in `connection_catalog`, drake::nullopt is returned.
 drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
-    const YAML::Node& node,
-    const std::map<std::string, Endpoint>& point_catalog,
+    const YAML::Node& node, const std::map<std::string, Endpoint>& point_catalog,
     const std::map<std::string, const Connection*>& connection_catalog) {
   MALIPUT_DEMAND(node.IsSequence());
   MALIPUT_DEMAND(node.size() == 2);
   MALIPUT_DEMAND(node[1].IsScalar());
 
-  const ParsedAnchorPoint parsed_anchor_point =
-      ParseAnchorPoint(node[0].as<std::string>());
+  const ParsedAnchorPoint parsed_anchor_point = ParseAnchorPoint(node[0].as<std::string>());
 
   const std::string endpoint_key = node[1].as<std::string>();
-  const ParsedReference parsed_reference =
-      ResolveEndpointReference(endpoint_key);
+  const ParsedReference parsed_reference = ResolveEndpointReference(endpoint_key);
 
   StartSpec spec{};
   if (parsed_reference.type == ReferenceType::kPoint) {
-    drake::optional<Endpoint> endpoint =
-        FindEndpointInCatalog(parsed_reference.id, point_catalog);
+    drake::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
     MALIPUT_DEMAND(endpoint.has_value());
     if (parsed_anchor_point.type == AnchorPointType::kReference) {
-      spec.ref_spec =
-          StartReference().at(endpoint.value(), parsed_reference.direction);
+      spec.ref_spec = StartReference().at(endpoint.value(), parsed_reference.direction);
     } else {
-      spec.lane_spec =
-          StartLane(parsed_anchor_point.lane_id.value()).at(
-              endpoint.value(), parsed_reference.direction);
+      spec.lane_spec = StartLane(parsed_anchor_point.lane_id.value()).at(endpoint.value(), parsed_reference.direction);
     }
   } else if (parsed_reference.type == ReferenceType::kConnection) {
-    drake::optional<const Connection*> connection =
-        FindConnectionInCatalog(parsed_reference.id, connection_catalog);
+    drake::optional<const Connection*> connection = FindConnectionInCatalog(parsed_reference.id, connection_catalog);
     if (!connection) {
       return drake::nullopt;
     }
     if (parsed_anchor_point.type == AnchorPointType::kReference) {
       MALIPUT_DEMAND(!parsed_reference.lane_id.has_value());
-      spec.ref_spec = StartReference().at(*connection.value(),
-                                          parsed_reference.end.value(),
-                                          parsed_reference.direction);
+      spec.ref_spec =
+          StartReference().at(*connection.value(), parsed_reference.end.value(), parsed_reference.direction);
     } else {
       MALIPUT_DEMAND(parsed_reference.lane_id.has_value());
-      spec.lane_spec = StartLane(parsed_anchor_point.lane_id.value()).at(
-          *connection.value(), parsed_reference.lane_id.value(),
-          parsed_reference.end.value(), parsed_reference.direction);
+      spec.lane_spec = StartLane(parsed_anchor_point.lane_id.value())
+                           .at(*connection.value(), parsed_reference.lane_id.value(), parsed_reference.end.value(),
+                               parsed_reference.direction);
     }
   } else {
     MALIPUT_THROW_MESSAGE("Unknown endpoint");
@@ -381,59 +353,47 @@ drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
 // information when it is possible to identify. When the point refers to a
 //  Connection that is not in `connection_catalog`, drake::nullopt is returned.
 drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
-    const YAML::Node& node,
-    const std::map<std::string, Endpoint>& point_catalog,
+    const YAML::Node& node, const std::map<std::string, Endpoint>& point_catalog,
     const std::map<std::string, const Connection*>& connection_catalog) {
   MALIPUT_DEMAND(node.IsSequence());
   MALIPUT_DEMAND(node.size() == 2);
 
-  const ParsedAnchorPoint parsed_anchor_point =
-      ParseAnchorPoint(node[0].as<std::string>());
+  const ParsedAnchorPoint parsed_anchor_point = ParseAnchorPoint(node[0].as<std::string>());
   EndSpec spec{};
 
   if (node[1].IsSequence()) {
     if (parsed_anchor_point.type == AnchorPointType::kReference) {
-      spec.ref_spec =
-          EndReference().z_at(ParseEndpointZ(node[1]), Direction::kForward);
+      spec.ref_spec = EndReference().z_at(ParseEndpointZ(node[1]), Direction::kForward);
     } else {
-      spec.lane_spec =
-          EndLane(parsed_anchor_point.lane_id.value()).z_at(
-              ParseEndpointZ(node[1]), Direction::kForward);
+      spec.lane_spec = EndLane(parsed_anchor_point.lane_id.value()).z_at(ParseEndpointZ(node[1]), Direction::kForward);
     }
   } else if (node[1].IsScalar()) {
     const std::string endpoint_key = node[1].as<std::string>();
-    const ParsedReference parsed_reference =
-        ResolveEndpointReference(endpoint_key);
+    const ParsedReference parsed_reference = ResolveEndpointReference(endpoint_key);
 
     if (parsed_reference.type == ReferenceType::kPoint) {
-      drake::optional<Endpoint> endpoint =
-          FindEndpointInCatalog(parsed_reference.id, point_catalog);
+      drake::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
       MALIPUT_DEMAND(endpoint.has_value());
       if (parsed_anchor_point.type == AnchorPointType::kReference) {
-        spec.ref_spec =
-            EndReference().z_at(endpoint.value().z(),
-                                 parsed_reference.direction);
+        spec.ref_spec = EndReference().z_at(endpoint.value().z(), parsed_reference.direction);
       } else {
         spec.lane_spec =
-            EndLane(parsed_anchor_point.lane_id.value()).z_at(
-                endpoint.value().z(), parsed_reference.direction);
+            EndLane(parsed_anchor_point.lane_id.value()).z_at(endpoint.value().z(), parsed_reference.direction);
       }
     } else if (parsed_reference.type == ReferenceType::kConnection) {
-      drake::optional<const Connection*> connection =
-          FindConnectionInCatalog(parsed_reference.id, connection_catalog);
+      drake::optional<const Connection*> connection = FindConnectionInCatalog(parsed_reference.id, connection_catalog);
       if (!connection) {
         return drake::nullopt;
       }
       if (parsed_anchor_point.type == AnchorPointType::kReference) {
         MALIPUT_DEMAND(!parsed_reference.lane_id.has_value());
-        spec.ref_spec = EndReference().z_at(*connection.value(),
-                                            parsed_reference.end.value(),
-                                            parsed_reference.direction);
+        spec.ref_spec =
+            EndReference().z_at(*connection.value(), parsed_reference.end.value(), parsed_reference.direction);
       } else {
         MALIPUT_DEMAND(parsed_reference.lane_id.has_value());
-        spec.lane_spec = EndLane(parsed_anchor_point.lane_id.value()).z_at(
-            *connection.value(), parsed_reference.lane_id.value(),
-            parsed_reference.end.value(), parsed_reference.direction);
+        spec.lane_spec = EndLane(parsed_anchor_point.lane_id.value())
+                             .z_at(*connection.value(), parsed_reference.lane_id.value(), parsed_reference.end.value(),
+                                   parsed_reference.direction);
       }
     } else {
       MALIPUT_THROW_MESSAGE("Unknown EndpointZ scalar");
@@ -448,8 +408,7 @@ drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
 // `points` must be a YAML map.
 // `point_catalog` will be fed with the parsed endpoints from `points`.
 // `point_catalog` must not be nullptr.
-void ParseEndpointsFromPoints(const YAML::Node& points,
-                              std::map<std::string, Endpoint>* point_catalog) {
+void ParseEndpointsFromPoints(const YAML::Node& points, std::map<std::string, Endpoint>* point_catalog) {
   MALIPUT_DEMAND(points.IsMap());
   MALIPUT_DEMAND(point_catalog != nullptr);
   for (const auto& p : points) {
@@ -460,12 +419,11 @@ void ParseEndpointsFromPoints(const YAML::Node& points,
 // Make a Connection, if all the references in the YAML node can be resolved.
 // Otherwise, return a nullptr (meaning, "try again after making some other
 // connections").
-const Connection* MaybeMakeConnection(
-    std::string id, const YAML::Node& node,
-    const std::map<std::string, Endpoint>& point_catalog,
-    const std::map<std::string, const Connection*>& connection_catalog,
-    BuilderBase* builder, double default_left_shoulder,
-    double default_right_shoulder) {
+const Connection* MaybeMakeConnection(std::string id, const YAML::Node& node,
+                                      const std::map<std::string, Endpoint>& point_catalog,
+                                      const std::map<std::string, const Connection*>& connection_catalog,
+                                      BuilderBase* builder, double default_left_shoulder,
+                                      double default_right_shoulder) {
   MALIPUT_DEMAND(node.IsMap());
   MALIPUT_DEMAND(builder != nullptr);
   // "lanes" is required.
@@ -480,12 +438,10 @@ const Connection* MaybeMakeConnection(
   MALIPUT_DEMAND(!(node["z_end"] && node["explicit_end"]));
 
   // Create lane layout.
-  const LaneLayout lane_layout =
-      ResolveLaneLayout(node, default_left_shoulder, default_right_shoulder);
+  const LaneLayout lane_layout = ResolveLaneLayout(node, default_left_shoulder, default_right_shoulder);
 
   // Define which geometry type the connection is.
-  const Connection::Type geometry_type =
-      node["length"] ? Connection::kLine : Connection::kArc;
+  const Connection::Type geometry_type = node["length"] ? Connection::kLine : Connection::kArc;
 
   // Resolve start endpoint.
   drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> start_spec =
@@ -499,9 +455,8 @@ const Connection* MaybeMakeConnection(
   //                     "explicit_end" is used, the Endpoint it refers to
   //                     actually matches within linear and angular tolerance
   //                     the new Connection's end Endpoint.
-  drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> end_spec = ResolveEndpointZ(
-      node["explicit_end"] ? node["explicit_end"] : node["z_end"],
-      point_catalog, connection_catalog);
+  drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> end_spec =
+      ResolveEndpointZ(node["explicit_end"] ? node["explicit_end"] : node["z_end"], point_catalog, connection_catalog);
   if (!end_spec.has_value()) {
     return nullptr;
   }  // "Try to resolve later."
@@ -513,42 +468,37 @@ const Connection* MaybeMakeConnection(
     case AnchorPointType::kReference: {
       switch (geometry_type) {
         case Connection::kLine: {
-          return builder->Connect(id, lane_layout,
-                                  *(start_spec->second.ref_spec),
-                                  ParseLineOffset(node["length"]),
+          return builder->Connect(id, lane_layout, *(start_spec->second.ref_spec), ParseLineOffset(node["length"]),
                                   *(end_spec->second.ref_spec));
         }
         case Connection::kArc: {
-          return builder->Connect(id, lane_layout,
-                                  *(start_spec->second.ref_spec),
-                                  ParseArcOffset(node["arc"]),
+          return builder->Connect(id, lane_layout, *(start_spec->second.ref_spec), ParseArcOffset(node["arc"]),
                                   *(end_spec->second.ref_spec));
         }
       }
-      MALIPUT_ABORT_MESSAGE("connection type of the start_spec is neither "
-                            "Connection::kArc nor Connection::kLine");
+      MALIPUT_ABORT_MESSAGE(
+          "connection type of the start_spec is neither "
+          "Connection::kArc nor Connection::kLine");
     }
     case AnchorPointType::kLane: {
       switch (geometry_type) {
         case Connection::kLine: {
-          return builder->Connect(id, lane_layout,
-                                  *(start_spec->second.lane_spec),
-                                  ParseLineOffset(node["length"]),
+          return builder->Connect(id, lane_layout, *(start_spec->second.lane_spec), ParseLineOffset(node["length"]),
                                   *(end_spec->second.lane_spec));
         }
         case Connection::kArc: {
-          return builder->Connect(id, lane_layout,
-                                  *(start_spec->second.lane_spec),
-                                  ParseArcOffset(node["arc"]),
+          return builder->Connect(id, lane_layout, *(start_spec->second.lane_spec), ParseArcOffset(node["arc"]),
                                   *(end_spec->second.lane_spec));
         }
       }
-      MALIPUT_ABORT_MESSAGE("connection type of the start_spec is neither "
-                            "Connection::kArc nor Connection::kLine");
+      MALIPUT_ABORT_MESSAGE(
+          "connection type of the start_spec is neither "
+          "Connection::kArc nor Connection::kLine");
     }
   }
-  MALIPUT_ABORT_MESSAGE("connection type of the start_spec is neither "
-                        "Connection::kArc nor Connection::kLine");
+  MALIPUT_ABORT_MESSAGE(
+      "connection type of the start_spec is neither "
+      "Connection::kArc nor Connection::kLine");
 }
 
 // Parses a YAML `node` that represents a RoadGeometry.
@@ -559,8 +509,7 @@ const Connection* MaybeMakeConnection(
 // "connections" node. "points" map node contains the description of reference
 // Endpoints and "connections" describes the Connections. If provided, "groups"
 // map node will contain sequences of Groups to join Connections.
-std::unique_ptr<const api::RoadGeometry> BuildFrom(
-    const BuilderFactoryBase& builder_factory, const YAML::Node& node) {
+std::unique_ptr<const api::RoadGeometry> BuildFrom(const BuilderFactoryBase& builder_factory, const YAML::Node& node) {
   MALIPUT_DEMAND(node.IsMap());
   YAML::Node mmb = node["maliput_multilane_builder"];
   MALIPUT_DEMAND(mmb.IsMap());
@@ -574,17 +523,14 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
   MALIPUT_DEMAND(lane_width >= 0.);
   const double linear_tolerance = mmb["linear_tolerance"].as<double>();
   MALIPUT_DEMAND(linear_tolerance >= 0.);
-  const double angular_tolerance =
-      deg_to_rad(mmb["angular_tolerance"].as<double>());
+  const double angular_tolerance = deg_to_rad(mmb["angular_tolerance"].as<double>());
   MALIPUT_DEMAND(angular_tolerance >= 0.);
   const double scale_length = mmb["scale_length"].as<double>();
   MALIPUT_DEMAND(scale_length > 0.);
-  const ComputationPolicy computation_policy =
-      ParseComputationPolicy(mmb["computation_policy"]);
+  const ComputationPolicy computation_policy = ParseComputationPolicy(mmb["computation_policy"]);
 
-  auto builder = builder_factory.Make(
-      lane_width, ParseHBounds(mmb["elevation_bounds"]), linear_tolerance,
-      angular_tolerance, scale_length, computation_policy);
+  auto builder = builder_factory.Make(lane_width, ParseHBounds(mmb["elevation_bounds"]), linear_tolerance,
+                                      angular_tolerance, scale_length, computation_policy);
   MALIPUT_DEMAND(builder != nullptr);
 
   maliput::log()->debug("loading points !");
@@ -602,14 +548,13 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
   maliput::log()->debug("building cooked connections !");
   std::map<std::string, const Connection*> cooked_connections;
   while (!raw_connections.empty()) {
-    maliput::log()->debug("raw count {}  cooked count {}",
-                        raw_connections.size(), cooked_connections.size());
+    maliput::log()->debug("raw count {}  cooked count {}", raw_connections.size(),
+                          cooked_connections.size());
     const size_t cooked_before_this_pass = cooked_connections.size();
     for (const auto& r : raw_connections) {
       const std::string id = r.first;
-      const Connection* conn = MaybeMakeConnection(
-          id, r.second, point_catalog, cooked_connections, builder.get(),
-          default_left_shoulder, default_right_shoulder);
+      const Connection* conn = MaybeMakeConnection(id, r.second, point_catalog, cooked_connections, builder.get(),
+                                                   default_left_shoulder, default_right_shoulder);
       if (!conn) {
         maliput::log()->debug("...skipping '{}'", id);
         continue;
@@ -647,13 +592,12 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(
 
 }  // namespace
 
-std::unique_ptr<const api::RoadGeometry> Load(
-    const BuilderFactoryBase& builder_factory, const std::string& input) {
+std::unique_ptr<const api::RoadGeometry> Load(const BuilderFactoryBase& builder_factory, const std::string& input) {
   return BuildFrom(builder_factory, YAML::Load(input));
 }
 
-std::unique_ptr<const api::RoadGeometry> LoadFile(
-    const BuilderFactoryBase& builder_factory, const std::string& filename) {
+std::unique_ptr<const api::RoadGeometry> LoadFile(const BuilderFactoryBase& builder_factory,
+                                                  const std::string& filename) {
   return BuildFrom(builder_factory, YAML::LoadFile(filename));
 }
 

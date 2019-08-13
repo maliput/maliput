@@ -18,8 +18,7 @@ class CubicPolynomial {
   CubicPolynomial() : CubicPolynomial(0., 0., 0., 0.) {}
 
   /// Constructs a cubic polynomial given all four coefficients.
-  CubicPolynomial(double a, double b, double c, double d)
-      : a_(a), b_(b), c_(c), d_(d) {
+  CubicPolynomial(double a, double b, double c, double d) : a_(a), b_(b), c_(c), d_(d) {
     const double df = f_p(1.) - f_p(0.);
     s_1_ = std::sqrt(1. + (df * df));
   }
@@ -46,19 +45,13 @@ class CubicPolynomial {
   }
 
   /// Checks whether the polynomial is _exactly_ zero.
-  bool is_zero() const {
-    return (a_ == 0.0 && b_ == 0.0 && c_ == 0.0 && d_ == 0.0);
-  }
+  bool is_zero() const { return (a_ == 0.0 && b_ == 0.0 && c_ == 0.0 && d_ == 0.0); }
 
   /// Evaluates the polynomial f at @p p.
-  double f_p(double p) const {
-    return a_ + (b_ * p) + (c_ * p * p) + (d_ * p * p * p);
-  }
+  double f_p(double p) const { return a_ + (b_ * p) + (c_ * p * p) + (d_ * p * p * p); }
 
   /// Evaluates the derivative df/dp at @p p.
-  double f_dot_p(double p) const {
-    return b_ + (2. * c_ * p) + (3. * d_ * p * p);
-  }
+  double f_dot_p(double p) const { return b_ + (2. * c_ * p) + (3. * d_ * p * p); }
 
   /// Evaluates the double-derivative d^2f/dp^2 at @p p.
   double f_ddot_p(double p) const { return (2. * c_) + (6. * d_ * p); }
@@ -96,8 +89,7 @@ class CubicPolynomial {
 /// Streams a string representation of `cubic_polynomial` into `out`.
 /// Returns `out`. This method is provided for the purposes of debugging or
 /// text-logging. It is not intended for serialization.
-std::ostream& operator<<(std::ostream& out,
-                         const CubicPolynomial& cubic_polynomial);
+std::ostream& operator<<(std::ostream& out, const CubicPolynomial& cubic_polynomial);
 
 }  // namespace multilane
 }  // namespace maliput

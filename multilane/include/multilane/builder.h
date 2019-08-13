@@ -16,7 +16,6 @@
 #include "multilane/connection.h"
 #include "multilane/junction.h"
 
-
 namespace maliput {
 namespace multilane {
 
@@ -57,29 +56,24 @@ class StartReference {
   /// Builds a Spec at `endpoint` with `direction` direction. When
   /// `direction` == `Direction::kReverse`, `endpoint` is reversed.
   Spec at(const Endpoint& endpoint, Direction direction) const {
-    return direction == Direction::kForward ? Spec(endpoint)
-                                            : Spec(endpoint.reverse());
+    return direction == Direction::kForward ? Spec(endpoint) : Spec(endpoint.reverse());
   }
 
   /// Builds a Spec at `connection`'s `end` side with `direction` direction.
   /// `connection`'s theta_dot at the given `end` will be ignored by the new
   /// Spec so that the Builder can adjust it to match road continuity
   /// constraints.
-  Spec at(const Connection& connection, api::LaneEnd::Which end,
-          Direction direction) const {
-    Endpoint endpoint = end == api::LaneEnd::Which::kStart ? connection.start()
-                                                           : connection.end();
+  Spec at(const Connection& connection, api::LaneEnd::Which end, Direction direction) const {
+    Endpoint endpoint = end == api::LaneEnd::Which::kStart ? connection.start() : connection.end();
     endpoint.get_mutable_z().get_mutable_theta_dot() = {};
-    return direction == Direction::kForward ? Spec(endpoint)
-                                            : Spec(endpoint.reverse());
+    return direction == Direction::kForward ? Spec(endpoint) : Spec(endpoint.reverse());
   }
 };
 
 /// Streams a string representation of `start_spec` into `out`. Returns `out`.
 /// This method is provided for the purposes of debugging or text-logging.
 /// It is not intended for serialization.
-std::ostream& operator<<(std::ostream& out,
-                         const StartReference::Spec& start_spec);
+std::ostream& operator<<(std::ostream& out, const StartReference::Spec& start_spec);
 
 /// Provides methods to build an StartLane::Spec.
 class StartLane {
@@ -101,8 +95,7 @@ class StartLane {
 
     // Constructs a Spec that specifies with `endpoint` how a Connection's
     // `lane_id` lane-curve starts.
-    Spec(const Endpoint& endpoint, int lane_id)
-        : endpoint_(endpoint), lane_id_(lane_id) {}
+    Spec(const Endpoint& endpoint, int lane_id) : endpoint_(endpoint), lane_id_(lane_id) {}
 
     // Describes the connection's `lane_id_` lane-curve start-point.
     Endpoint endpoint_{};
@@ -118,9 +111,7 @@ class StartLane {
   /// point.
   ///
   /// `start_lane` must be non-negative.
-  explicit StartLane(int start_lane) : start_lane_(start_lane) {
-    MALIPUT_DEMAND(start_lane_ >= 0);
-  }
+  explicit StartLane(int start_lane) : start_lane_(start_lane) { MALIPUT_DEMAND(start_lane_ >= 0); }
 
   /// Builds a Spec at `endpoint` with `direction` direction. When
   /// `direction` == `Direction::kReverse`, `endpoint` is reversed.
@@ -128,9 +119,7 @@ class StartLane {
   /// the Builder is unable to match road continuity constraints.
   Spec at(const Endpoint& endpoint, Direction direction) const {
     MALIPUT_DEMAND(!endpoint.z().theta_dot().has_value());
-    return direction == Direction::kForward
-               ? Spec(endpoint, start_lane_)
-               : Spec(endpoint.reverse(), start_lane_);
+    return direction == Direction::kForward ? Spec(endpoint, start_lane_) : Spec(endpoint.reverse(), start_lane_);
   }
 
   /// Builds a Spec at `connection`'s `lane_id` lane at `end` side with
@@ -140,16 +129,12 @@ class StartLane {
   ///
   /// `lane_id` must be non-negative and smaller than `connection`'s number of
   /// lanes.
-  Spec at(const Connection& connection, int lane_id, api::LaneEnd::Which end,
-          Direction direction) const {
+  Spec at(const Connection& connection, int lane_id, api::LaneEnd::Which end, Direction direction) const {
     MALIPUT_DEMAND(lane_id >= 0 && lane_id < connection.num_lanes());
-    Endpoint endpoint = end == api::LaneEnd::Which::kStart
-                            ? connection.LaneStart(lane_id)
-                            : connection.LaneEnd(lane_id);
+    Endpoint endpoint =
+        end == api::LaneEnd::Which::kStart ? connection.LaneStart(lane_id) : connection.LaneEnd(lane_id);
     endpoint.get_mutable_z().get_mutable_theta_dot() = {};
-    return direction == Direction::kForward
-               ? Spec(endpoint, start_lane_)
-               : Spec(endpoint.reverse(), start_lane_);
+    return direction == Direction::kForward ? Spec(endpoint, start_lane_) : Spec(endpoint.reverse(), start_lane_);
   }
 
  private:
@@ -195,21 +180,16 @@ class EndReference {
   /// `connection`'s theta_dot at the given `end` will be ignored by the new
   /// Spec so that the Builder can adjust it to match road continuity
   /// constraints.
-  Spec z_at(const Connection& connection, api::LaneEnd::Which end,
-            Direction direction) const {
-    EndpointZ endpoint_z = end == api::LaneEnd::Which::kStart
-                               ? connection.start().z()
-                               : connection.end().z();
+  Spec z_at(const Connection& connection, api::LaneEnd::Which end, Direction direction) const {
+    EndpointZ endpoint_z = end == api::LaneEnd::Which::kStart ? connection.start().z() : connection.end().z();
     endpoint_z.get_mutable_theta_dot() = {};
-    return direction == Direction::kForward ? Spec(endpoint_z)
-                                            : Spec(endpoint_z.reverse());
+    return direction == Direction::kForward ? Spec(endpoint_z) : Spec(endpoint_z.reverse());
   }
 
   /// Builds an Spec at `endpoint_z` with `direction` direction.
   /// When `direction` == `Direction::kReverse`, `endpoint_z` is reversed.
   Spec z_at(const EndpointZ& endpoint_z, Direction direction) const {
-    return direction == Direction::kForward ? Spec(endpoint_z)
-                                            : Spec(endpoint_z.reverse());
+    return direction == Direction::kForward ? Spec(endpoint_z) : Spec(endpoint_z.reverse());
   }
 };
 
@@ -238,8 +218,7 @@ class EndLane {
 
     // Constructs a Spec that specifies with `endpoint_z` how a Connection's
     // `lane_id` lane-curve ends.
-    explicit Spec(const EndpointZ& endpoint_z, int lane_id)
-        : endpoint_z_(endpoint_z), lane_id_(lane_id) {}
+    explicit Spec(const EndpointZ& endpoint_z, int lane_id) : endpoint_z_(endpoint_z), lane_id_(lane_id) {}
 
     // Describes the connection's `lane_id_` lane-curve end-point.
     EndpointZ endpoint_z_{};
@@ -255,9 +234,7 @@ class EndLane {
   /// point.
   ///
   /// `end_lane` must be non-negative.
-  explicit EndLane(int end_lane) : end_lane_(end_lane) {
-    MALIPUT_DEMAND(end_lane_ >= 0);
-  }
+  explicit EndLane(int end_lane) : end_lane_(end_lane) { MALIPUT_DEMAND(end_lane_ >= 0); }
 
   /// Builds a Spec at `connection`'s `end` side with `direction` direction.
   /// `connection`'s theta_dot at the given `end` will be ignored by the new
@@ -266,16 +243,12 @@ class EndLane {
   ///
   /// `lane_id` must be non-negative and smaller than `connection`'s number of
   /// lanes.
-  Spec z_at(const Connection& connection, int lane_id, api::LaneEnd::Which end,
-            Direction direction) const {
+  Spec z_at(const Connection& connection, int lane_id, api::LaneEnd::Which end, Direction direction) const {
     MALIPUT_DEMAND(lane_id >= 0 && lane_id < connection.num_lanes());
-    EndpointZ endpoint_z = end == api::LaneEnd::Which::kStart
-                               ? connection.LaneStart(lane_id).z()
-                               : connection.LaneEnd(lane_id).z();
+    EndpointZ endpoint_z =
+        end == api::LaneEnd::Which::kStart ? connection.LaneStart(lane_id).z() : connection.LaneEnd(lane_id).z();
     endpoint_z.get_mutable_theta_dot() = {};
-    return direction == Direction::kForward
-               ? Spec(endpoint_z, end_lane_)
-               : Spec(endpoint_z.reverse(), end_lane_);
+    return direction == Direction::kForward ? Spec(endpoint_z, end_lane_) : Spec(endpoint_z.reverse(), end_lane_);
   }
 
   /// Builds an Spec at `endpoint_z` with `direction` direction.
@@ -284,9 +257,7 @@ class EndLane {
   /// the Builder is unable to match road continuity constraints.
   Spec z_at(const EndpointZ& endpoint_z, Direction direction) const {
     MALIPUT_DEMAND(!endpoint_z.theta_dot().has_value());
-    return direction == Direction::kForward
-               ? Spec(endpoint_z, end_lane_)
-               : Spec(endpoint_z.reverse(), end_lane_);
+    return direction == Direction::kForward ? Spec(endpoint_z, end_lane_) : Spec(endpoint_z.reverse(), end_lane_);
   }
 
  private:
@@ -316,8 +287,7 @@ class LaneLayout {
   /// `left_shoulder` and `right_shoulder` must be nonnegative.
   /// `num_lanes` must be positive and `ref_lane` must be nonnegative and
   /// smaller than `num_lanes`.
-  LaneLayout(double left_shoulder, double right_shoulder, int num_lanes,
-             int ref_lane, double ref_r0)
+  LaneLayout(double left_shoulder, double right_shoulder, int num_lanes, int ref_lane, double ref_r0)
       : left_shoulder_(left_shoulder),
         right_shoulder_(right_shoulder),
         num_lanes_(num_lanes),
@@ -395,10 +365,8 @@ class BuilderBase {
   /// `lane_layout` defines the number of lanes, their width, extra shoulder
   /// asphalt extensions and placing with respect to connection's reference
   /// curve.
-  virtual const Connection* Connect(const std::string& id,
-                                    const LaneLayout& lane_layout,
-                                    const StartReference::Spec& start_spec,
-                                    const LineOffset& line_offset,
+  virtual const Connection* Connect(const std::string& id, const LaneLayout& lane_layout,
+                                    const StartReference::Spec& start_spec, const LineOffset& line_offset,
                                     const EndReference::Spec& end_spec) = 0;
 
   /// Connects `start_spec`'s Endpoint to an end-point displaced from
@@ -410,10 +378,8 @@ class BuilderBase {
   /// `lane_layout` defines the number of lanes, their width, extra shoulder
   /// asphalt extensions and placing with respect to connection's reference
   /// curve.
-  virtual const Connection* Connect(const std::string& id,
-                                    const LaneLayout& lane_layout,
-                                    const StartReference::Spec& start_spec,
-                                    const ArcOffset& arc_offset,
+  virtual const Connection* Connect(const std::string& id, const LaneLayout& lane_layout,
+                                    const StartReference::Spec& start_spec, const ArcOffset& arc_offset,
                                     const EndReference::Spec& end_spec) = 0;
 
   /// Creates a Connection whose planar reference curve is a line.
@@ -428,10 +394,8 @@ class BuilderBase {
   /// `lane_layout` defines the number of lanes, their width, extra shoulder
   /// asphalt extensions and placing with respect to connection's reference
   /// curve.
-  virtual const Connection* Connect(const std::string& id,
-                                    const LaneLayout& lane_layout,
-                                    const StartLane::Spec& start_spec,
-                                    const LineOffset& line_offset,
+  virtual const Connection* Connect(const std::string& id, const LaneLayout& lane_layout,
+                                    const StartLane::Spec& start_spec, const LineOffset& line_offset,
                                     const EndLane::Spec& end_spec) = 0;
 
   /// Creates a Connection whose planar reference curve is an arc.
@@ -445,10 +409,8 @@ class BuilderBase {
   /// `lane_layout` defines the number of lanes, their width, extra shoulder
   /// asphalt extensions and placing with respect to connection's reference
   /// curve.
-  virtual const Connection* Connect(const std::string& id,
-                                    const LaneLayout& lane_layout,
-                                    const StartLane::Spec& start_spec,
-                                    const ArcOffset& arc_offset,
+  virtual const Connection* Connect(const std::string& id, const LaneLayout& lane_layout,
+                                    const StartLane::Spec& start_spec, const ArcOffset& arc_offset,
                                     const EndLane::Spec& end_spec) = 0;
 
   /// Sets the default branch for one end of a connection.
@@ -458,25 +420,20 @@ class BuilderBase {
   /// `out_lane_index`. The specified connections must actually be joined at the
   /// specified ends (i.e., the Endpoint's for those ends must be coincident and
   /// (anti)parallel within the tolerances for the Builder).
-  virtual void SetDefaultBranch(const Connection* in, int in_lane_index,
-                                api::LaneEnd::Which in_end,
-                                const Connection* out, int out_lane_index,
-                                api::LaneEnd::Which out_end) = 0;
+  virtual void SetDefaultBranch(const Connection* in, int in_lane_index, api::LaneEnd::Which in_end,
+                                const Connection* out, int out_lane_index, api::LaneEnd::Which out_end) = 0;
 
   /// Creates a new empty connection group with ID string `id`.
   virtual Group* MakeGroup(const std::string& id) = 0;
 
   /// Creates a new connection group with ID `id`, populated with the
   /// given `connections`.
-  virtual Group* MakeGroup(
-      const std::string& id,
-      const std::vector<const Connection*>& connections) = 0;
+  virtual Group* MakeGroup(const std::string& id, const std::vector<const Connection*>& connections) = 0;
 
   /// Produces a RoadGeometry, with the ID `id`.
   /// @throws maliput::common::assertion_error if unable to produce a valid
   ///         (i.e. G1) RoadGeometry.
-  virtual std::unique_ptr<const api::RoadGeometry> Build(
-      const api::RoadGeometryId& id) const = 0;
+  virtual std::unique_ptr<const api::RoadGeometry> Build(const api::RoadGeometryId& id) const = 0;
 };
 
 /// Factory interface to construct BuilderBase instances.
@@ -496,10 +453,9 @@ class BuilderFactoryBase {
   /// `lane_width`, `elevation_bounds`, `linear_tolerance`,
   /// `angular_tolerance`, `scale_length` and `computation_policy` are
   /// BuilderBase properties.
-  virtual std::unique_ptr<BuilderBase> Make(
-      double lane_width, const api::HBounds& elevation_bounds,
-      double linear_tolerance, double angular_tolerance,
-      double scale_length, ComputationPolicy computation_policy) const = 0;
+  virtual std::unique_ptr<BuilderBase> Make(double lane_width, const api::HBounds& elevation_bounds,
+                                            double linear_tolerance, double angular_tolerance, double scale_length,
+                                            ComputationPolicy computation_policy) const = 0;
 };
 
 /// Convenient builder class which makes it easy to construct a multilane road
@@ -567,18 +523,14 @@ class Builder : public BuilderBase {
   /// the maximum level of detail captured by the resulting RoadGeometry.
   /// `computation_policy` sets the speed vs. accuracy balance for computations.
   /// `group_factory` allows to create groups.
-  Builder(double lane_width, const api::HBounds& elevation_bounds,
-          double linear_tolerance, double angular_tolerance,
-          double scale_length, ComputationPolicy computation_policy,
-          std::unique_ptr<GroupFactoryBase> group_factory);
+  Builder(double lane_width, const api::HBounds& elevation_bounds, double linear_tolerance, double angular_tolerance,
+          double scale_length, ComputationPolicy computation_policy, std::unique_ptr<GroupFactoryBase> group_factory);
 
   /// Gets `lane_width` value.
   double get_lane_width() const override { return lane_width_; }
 
   /// Gets `elevation_bounds` value.
-  const api::HBounds& get_elevation_bounds() const override {
-    return elevation_bounds_;
-  }
+  const api::HBounds& get_elevation_bounds() const override { return elevation_bounds_; }
 
   /// Gets `linear_tolerance` value.
   double get_linear_tolerance() const override { return linear_tolerance_; }
@@ -588,47 +540,30 @@ class Builder : public BuilderBase {
 
   double get_scale_length() const override { return scale_length_; }
 
-  ComputationPolicy get_computation_policy() const override {
-    return computation_policy_;
-  }
+  ComputationPolicy get_computation_policy() const override { return computation_policy_; }
 
-  const Connection* Connect(const std::string& id,
-                            const LaneLayout& lane_layout,
-                            const StartReference::Spec& start_spec,
-                            const LineOffset& line_offset,
+  const Connection* Connect(const std::string& id, const LaneLayout& lane_layout,
+                            const StartReference::Spec& start_spec, const LineOffset& line_offset,
                             const EndReference::Spec& end_spec) override;
 
-  const Connection* Connect(const std::string& id,
-                            const LaneLayout& lane_layout,
-                            const StartReference::Spec& start_spec,
-                            const ArcOffset& arc_offset,
+  const Connection* Connect(const std::string& id, const LaneLayout& lane_layout,
+                            const StartReference::Spec& start_spec, const ArcOffset& arc_offset,
                             const EndReference::Spec& end_spec) override;
 
-  const Connection* Connect(const std::string& id,
-                            const LaneLayout& lane_layout,
-                            const StartLane::Spec& start_spec,
-                            const LineOffset& line_offset,
-                            const EndLane::Spec& end_spec) override;
+  const Connection* Connect(const std::string& id, const LaneLayout& lane_layout, const StartLane::Spec& start_spec,
+                            const LineOffset& line_offset, const EndLane::Spec& end_spec) override;
 
-  const Connection* Connect(const std::string& id,
-                            const LaneLayout& lane_layout,
-                            const StartLane::Spec& start_spec,
-                            const ArcOffset& arc_offset,
-                            const EndLane::Spec& end_spec) override;
+  const Connection* Connect(const std::string& id, const LaneLayout& lane_layout, const StartLane::Spec& start_spec,
+                            const ArcOffset& arc_offset, const EndLane::Spec& end_spec) override;
 
-  void SetDefaultBranch(const Connection* in, int in_lane_index,
-                        const api::LaneEnd::Which in_end, const Connection* out,
-                        int out_lane_index,
-                        const api::LaneEnd::Which out_end) override;
+  void SetDefaultBranch(const Connection* in, int in_lane_index, const api::LaneEnd::Which in_end,
+                        const Connection* out, int out_lane_index, const api::LaneEnd::Which out_end) override;
 
   Group* MakeGroup(const std::string& id) override;
 
-  Group* MakeGroup(
-      const std::string& id,
-      const std::vector<const Connection*>& connections) override;
+  Group* MakeGroup(const std::string& id, const std::vector<const Connection*>& connections) override;
 
-  std::unique_ptr<const api::RoadGeometry> Build(
-      const api::RoadGeometryId& id) const override;
+  std::unique_ptr<const api::RoadGeometry> Build(const api::RoadGeometryId& id) const override;
 
  private:
   // EndpointFuzzyOrder is an arbitrary strict complete ordering of Endpoints
@@ -643,22 +578,38 @@ class Builder : public BuilderBase {
    public:
     DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EndpointFuzzyOrder)
 
+    // clang-format off
     explicit EndpointFuzzyOrder(const double linear_tolerance)
         : lin_tol_(linear_tolerance) {}
+    // clang-format on
 
     bool operator()(const Endpoint& lhs, const Endpoint& rhs) const {
       switch (fuzzy_compare(rhs.xy().x(), lhs.xy().x())) {
-        case -1: { return true; }
-        case 1: { return false; }
+        case -1: {
+          return true;
+        }
+        case 1: {
+          return false;
+        }
         case 0: {
           switch (fuzzy_compare(rhs.xy().y(), lhs.xy().y())) {
-            case -1: { return true; }
-            case 1: { return false; }
+            case -1: {
+              return true;
+            }
+            case 1: {
+              return false;
+            }
             case 0: {
               switch (fuzzy_compare(rhs.z().z(), lhs.z().z())) {
-                case -1: { return true; }
-                case 1: { return false; }
-                case 0: { return false; }
+                case -1: {
+                  return true;
+                }
+                case 1: {
+                  return false;
+                }
+                case 0: {
+                  return false;
+                }
               }
             }
           }
@@ -684,8 +635,7 @@ class Builder : public BuilderBase {
   struct DefaultBranch {
     DefaultBranch() = default;
 
-    DefaultBranch(const Connection* ain, int ain_lane_index,
-                  const api::LaneEnd::Which ain_end, const Connection* aout,
+    DefaultBranch(const Connection* ain, int ain_lane_index, const api::LaneEnd::Which ain_end, const Connection* aout,
                   int aout_lane_index, const api::LaneEnd::Which aout_end)
         : in(ain),
           in_lane_index(ain_lane_index),
@@ -702,20 +652,14 @@ class Builder : public BuilderBase {
     api::LaneEnd::Which out_end{};
   };
 
-  std::vector<Lane*> BuildConnection(
-      const Connection* const cnx, Junction* const junction,
-      RoadGeometry* const rg,
-      std::map<Endpoint, BranchPoint*, EndpointFuzzyOrder>* const bp_map) const;
+  std::vector<Lane*> BuildConnection(const Connection* const cnx, Junction* const junction, RoadGeometry* const rg,
+                                     std::map<Endpoint, BranchPoint*, EndpointFuzzyOrder>* const bp_map) const;
 
-  BranchPoint* FindOrCreateBranchPoint(
-      const Endpoint& point,
-      RoadGeometry* rg,
-      std::map<Endpoint, BranchPoint*, EndpointFuzzyOrder>* const bp_map) const;
+  BranchPoint* FindOrCreateBranchPoint(const Endpoint& point, RoadGeometry* rg,
+                                       std::map<Endpoint, BranchPoint*, EndpointFuzzyOrder>* const bp_map) const;
 
-  void AttachBranchPoint(
-      const Endpoint& point, Lane* const lane, const api::LaneEnd::Which end,
-      RoadGeometry* rg,
-      std::map<Endpoint, BranchPoint*, EndpointFuzzyOrder>* bp_map) const;
+  void AttachBranchPoint(const Endpoint& point, Lane* const lane, const api::LaneEnd::Which end, RoadGeometry* rg,
+                         std::map<Endpoint, BranchPoint*, EndpointFuzzyOrder>* bp_map) const;
 
   double lane_width_{};
   api::HBounds elevation_bounds_;
@@ -736,14 +680,11 @@ class BuilderFactory : public BuilderFactoryBase {
 
   BuilderFactory() = default;
 
-  std::unique_ptr<BuilderBase> Make(
-      double lane_width, const api::HBounds& elevation_bounds,
-      double linear_tolerance, double angular_tolerance, double scale_length,
-      ComputationPolicy computation_policy) const override {
-    return std::make_unique<Builder>(lane_width, elevation_bounds,
-                                     linear_tolerance, angular_tolerance,
-                                     scale_length, computation_policy,
-                                     std::make_unique<GroupFactory>());
+  std::unique_ptr<BuilderBase> Make(double lane_width, const api::HBounds& elevation_bounds, double linear_tolerance,
+                                    double angular_tolerance, double scale_length,
+                                    ComputationPolicy computation_policy) const override {
+    return std::make_unique<Builder>(lane_width, elevation_bounds, linear_tolerance, angular_tolerance, scale_length,
+                                     computation_policy, std::make_unique<GroupFactory>());
   }
 };
 

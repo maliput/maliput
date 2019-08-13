@@ -23,16 +23,13 @@ class RuleStateProviderTest : public ::testing::Test {
 
   class MockStateProvider : public RuleStateProvider {
    public:
-    explicit MockStateProvider(const RuleStateProviderTest* fixture)
-        : fixture_(fixture) {}
+    explicit MockStateProvider(const RuleStateProviderTest* fixture) : fixture_(fixture) {}
+
    private:
-    drake::optional<RightOfWayResult> DoGetState(
-        const RightOfWayRule::Id& id) const final {
+    drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id& id) const final {
       if (id == fixture_->kExistingId) {
         return RightOfWayResult{fixture_->kCurrentStateId,
-                                RightOfWayResult::Next{
-                                    fixture_->kNextStateId,
-                                    fixture_->kDurationUntil}};
+                                RightOfWayResult::Next{fixture_->kNextStateId, fixture_->kDurationUntil}};
       }
       return drake::nullopt;
     }
@@ -41,17 +38,14 @@ class RuleStateProviderTest : public ::testing::Test {
   };
 };
 
-
 TEST_F(RuleStateProviderTest, ExerciseInterface) {
   using Result = RuleStateProvider::RightOfWayResult;
 
   const MockStateProvider dut(this);
 
   EXPECT_TRUE(dut.GetState(kExistingId).has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(
-      dut.GetState(kExistingId).value(),
-      (Result{kCurrentStateId,
-              Result::Next{kNextStateId, kDurationUntil}})));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetState(kExistingId).value(),
+                               (Result{kCurrentStateId, Result::Next{kNextStateId, kDurationUntil}})));
 
   EXPECT_FALSE(dut.GetState(kNonExistingId).has_value());
 }

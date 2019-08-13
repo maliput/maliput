@@ -14,23 +14,20 @@ class IntersectionTest : public ::testing::Test {
   IntersectionTest()
       : dummy_phase_1_(api::rules::Phase::Id("dummy_phase_1"), rule_states_1_),
         dummy_phase_2_(api::rules::Phase::Id("dummy_phase_2"), rule_states_2_),
-        dummy_ring_(api::rules::PhaseRing::Id("dummy_ring"),
-                    {dummy_phase_1_, dummy_phase_2_}) {}
+        dummy_ring_(api::rules::PhaseRing::Id("dummy_ring"), {dummy_phase_1_, dummy_phase_2_}) {}
 
   const api::rules::RuleStates rule_states_1_{
-      {api::rules::RightOfWayRule::Id("dummy_rule"),
-       api::rules::RightOfWayRule::State::Id("GO")}};
+      {api::rules::RightOfWayRule::Id("dummy_rule"), api::rules::RightOfWayRule::State::Id("GO")}};
   const api::rules::RuleStates rule_states_2_{
-      {api::rules::RightOfWayRule::Id("dummy_rule"),
-       api::rules::RightOfWayRule::State::Id("STOP")}};
+      {api::rules::RightOfWayRule::Id("dummy_rule"), api::rules::RightOfWayRule::State::Id("STOP")}};
 
   const api::rules::Phase dummy_phase_1_;
   const api::rules::Phase dummy_phase_2_;
 
   const api::rules::PhaseRing dummy_ring_;
 
-  const std::vector<api::rules::LaneSRange> ranges_{api::rules::LaneSRange(
-      api::LaneId("road A"), api::rules::SRange(0, 100))};
+  const std::vector<api::rules::LaneSRange> ranges_{
+      api::rules::LaneSRange(api::LaneId("road A"), api::rules::SRange(0, 100))};
 };
 
 TEST_F(IntersectionTest, BasicTest) {

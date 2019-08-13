@@ -13,7 +13,6 @@
 #include "maliput/common/maliput_abort.h"
 #include "multilane/road_curve.h"
 
-
 namespace maliput {
 namespace multilane {
 
@@ -33,14 +32,10 @@ class EndpointXy {
   // Constructs an EndpointXy with all zero parameters.
   EndpointXy() = default;
 
-  EndpointXy(double x, double y, double heading)
-      : x_(x), y_(y), heading_(heading) {}
+  EndpointXy(double x, double y, double heading) : x_(x), y_(y), heading_(heading) {}
 
   /// Returns an EndpointXy with reversed direction.
-  EndpointXy reverse() const {
-    return EndpointXy(x_, y_,
-                      std::atan2(-std::sin(heading_), -std::cos(heading_)));
-  }
+  EndpointXy reverse() const { return EndpointXy(x_, y_, std::atan2(-std::sin(heading_), -std::cos(heading_))); }
 
   double x() const { return x_; }
 
@@ -88,9 +83,7 @@ class EndpointZ {
   /// Reversing direction is equivalent to rotating s (and along with it, r)
   /// around the h-axis by 180 degrees, thus flipping the signs of z_dot
   /// and theta. theta_dot will remain the same.
-  EndpointZ reverse() const {
-    return EndpointZ(z_, -z_dot_, -theta_, theta_dot_);
-  }
+  EndpointZ reverse() const { return EndpointZ(z_, -z_dot_, -theta_, theta_dot_); }
 
   double z() const { return z_; }
 
@@ -158,9 +151,7 @@ class LineOffset {
 
   LineOffset() = default;
 
-  explicit LineOffset(double length) : length_(length) {
-    MALIPUT_DEMAND(length_ >= 0.);
-  }
+  explicit LineOffset(double length) : length_(length) { MALIPUT_DEMAND(length_ >= 0.); }
 
   double length() const { return length_; }
 
@@ -186,10 +177,7 @@ class ArcOffset {
   /// Constructs an ArcOffset with all zero parameters.
   ArcOffset() = default;
 
-  ArcOffset(double radius, double d_theta)
-      : radius_(radius), d_theta_(d_theta) {
-    MALIPUT_DEMAND(radius_ > 0.);
-  }
+  ArcOffset(double radius, double d_theta) : radius_(radius), d_theta_(d_theta) { MALIPUT_DEMAND(radius_ > 0.); }
 
   double radius() const { return radius_; }
 
@@ -248,11 +236,9 @@ class Connection {
   ///
   /// `linear_tolerance` and `computation_policy` set the efficiency vs. speed
   /// balance for computations in the underlying RoadCurve.
-  Connection(const std::string& id, const Endpoint& start,
-             const EndpointZ& end_z, int num_lanes, double r0,
-             double lane_width, double left_shoulder, double right_shoulder,
-             const LineOffset& line_offset, double linear_tolerance,
-             double scale_length, ComputationPolicy computation_policy);
+  Connection(const std::string& id, const Endpoint& start, const EndpointZ& end_z, int num_lanes, double r0,
+             double lane_width, double left_shoulder, double right_shoulder, const LineOffset& line_offset,
+             double linear_tolerance, double scale_length, ComputationPolicy computation_policy);
 
   /// Constructs an arc-segment connection.
   ///
@@ -282,11 +268,9 @@ class Connection {
   ///
   /// `computation_policy` sets the speed vs. accuracy for computations in the
   /// underlying RoadCurve.
-  Connection(const std::string& id, const Endpoint& start,
-             const EndpointZ& end_z, int num_lanes, double r0,
-             double lane_width, double left_shoulder, double right_shoulder,
-             const ArcOffset& arc_offset, double linear_tolerance,
-             double scale_length, ComputationPolicy computation_policy);
+  Connection(const std::string& id, const Endpoint& start, const EndpointZ& end_z, int num_lanes, double r0,
+             double lane_width, double left_shoulder, double right_shoulder, const ArcOffset& arc_offset,
+             double linear_tolerance, double scale_length, ComputationPolicy computation_policy);
 
   /// Returns the geometric type of the path.
   Type type() const { return type_; }
@@ -444,11 +428,9 @@ class GroupFactoryBase {
   /// Makes a Group with `id`, populated by `connections`.
   ///
   /// `connections` must not contain duplicates.
-  virtual std::unique_ptr<Group> Make(
-      const std::string& id,
-      const std::vector<const Connection*>& connections) const = 0;
+  virtual std::unique_ptr<Group> Make(const std::string& id,
+                                      const std::vector<const Connection*>& connections) const = 0;
 };
-
 
 /// Implements a GroupFactoryBase to construct Group objects.
 class GroupFactory : public GroupFactoryBase {
@@ -467,9 +449,7 @@ class GroupFactory : public GroupFactoryBase {
     // Constructs a Group with `id`, populated by `connections`.
     //
     // `connections` must not contain duplicates.
-    RealGroup(const std::string& id,
-              const std::vector<const Connection*>& connections)
-        : id_(id) {
+    RealGroup(const std::string& id, const std::vector<const Connection*>& connections) : id_(id) {
       for (const Connection* connection : connections) {
         Add(connection);
       }
@@ -488,9 +468,7 @@ class GroupFactory : public GroupFactoryBase {
     const std::string& id() const override { return id_; }
 
     // Returns the grouped Connections.
-    const std::vector<const Connection*>& connections() const override {
-      return connection_vector_;
-    }
+    const std::vector<const Connection*>& connections() const override { return connection_vector_; }
 
    private:
     std::string id_;
@@ -505,18 +483,12 @@ class GroupFactory : public GroupFactoryBase {
 
   virtual ~GroupFactory() = default;
 
-  virtual std::unique_ptr<Group> Make(const std::string& id) const {
-    return std::make_unique<RealGroup>(id);
-  }
+  virtual std::unique_ptr<Group> Make(const std::string& id) const { return std::make_unique<RealGroup>(id); }
 
-  virtual std::unique_ptr<Group> Make(
-      const std::string& id,
-      const std::vector<const Connection*>& connections) const {
+  virtual std::unique_ptr<Group> Make(const std::string& id, const std::vector<const Connection*>& connections) const {
     return std::make_unique<RealGroup>(id, connections);
   }
 };
-
-
 
 }  // namespace multilane
 }  // namespace maliput

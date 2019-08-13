@@ -2,14 +2,13 @@
 
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/type_specific_identifier.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
-
 
 /// Directed, inclusive longitudinal (s value) range from s0 to s1.
 class SRange {
@@ -39,15 +38,13 @@ class SRange {
   double s1_{0.};
 };
 
-
 /// Directed longitudinal range of a specific Lane, identified by a LaneId.
 class LaneSRange {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneSRange);
 
   /// Constructs a LaneSRange as `s_range` on Lane `lane_id`.
-  LaneSRange(const LaneId& lane_id, const SRange& s_range)
-      : lane_id_(lane_id), s_range_(s_range) {}
+  LaneSRange(const LaneId& lane_id, const SRange& s_range) : lane_id_(lane_id), s_range_(s_range) {}
 
   /// Gets the LaneId.
   const LaneId& lane_id() const { return lane_id_; }
@@ -59,7 +56,6 @@ class LaneSRange {
   LaneId lane_id_;
   SRange s_range_;
 };
-
 
 // TODO(maddog@tri.global) Figure out if there would be any loss or gain of
 //                         utility if the contiguity requirement were removed.
@@ -76,8 +72,7 @@ class LaneSRoute {
   LaneSRoute() = default;
 
   /// Constructs a LaneSRoute from the given sequence of LaneSRanges.
-  explicit LaneSRoute(const std::vector<LaneSRange>& ranges)
-      : ranges_(ranges) {}
+  explicit LaneSRoute(const std::vector<LaneSRange>& ranges) : ranges_(ranges) {}
 
   /// Returns the sequence of LaneSRanges.
   const std::vector<LaneSRange>& ranges() const { return ranges_; }
@@ -89,7 +84,6 @@ class LaneSRoute {
  private:
   std::vector<LaneSRange> ranges_;
 };
-
 
 }  // namespace rules
 }  // namespace api

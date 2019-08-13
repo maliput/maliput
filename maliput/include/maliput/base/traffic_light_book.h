@@ -2,10 +2,10 @@
 
 #include <memory>
 
-#include "maliput/api/rules/traffic_light_book.h"
-#include "maliput/api/rules/traffic_lights.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+#include "maliput/api/rules/traffic_light_book.h"
+#include "maliput/api/rules/traffic_lights.h"
 
 namespace maliput {
 
@@ -26,8 +26,7 @@ class TrafficLightBook : public api::rules::TrafficLightBook {
   void AddTrafficLight(const api::rules::TrafficLight& traffic_light);
 
  private:
-  drake::optional<api::rules::TrafficLight> DoGetTrafficLight(
-      const api::rules::TrafficLight::Id& id) const override;
+  drake::optional<api::rules::TrafficLight> DoGetTrafficLight(const api::rules::TrafficLight::Id& id) const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

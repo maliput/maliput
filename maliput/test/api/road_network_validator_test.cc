@@ -22,11 +22,9 @@ using rules::SRange;
 using rules::TrafficLightBook;
 
 GTEST_TEST(RoadNetworkValidatorTest, RuleCoverageTest) {
-  RoadNetwork road_network(
-      test::CreateOneLaneRoadGeometry(), test::CreateRoadRulebook(),
-      test::CreateTrafficLightBook(), test::CreateIntersectionBook(),
-      test::CreatePhaseRingBook(), test::CreateRuleStateProvider(),
-      test::CreatePhaseProvider());
+  RoadNetwork road_network(test::CreateOneLaneRoadGeometry(), test::CreateRoadRulebook(),
+                           test::CreateTrafficLightBook(), test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
+                           test::CreateRuleStateProvider(), test::CreatePhaseProvider());
 
   RoadNetworkValidatorOptions options;
   EXPECT_THROW(ValidateRoadNetwork(road_network, options), std::exception);

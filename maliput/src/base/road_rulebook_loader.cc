@@ -14,7 +14,6 @@
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_throw.h"
 
-
 using maliput::api::Lane;
 using maliput::api::LaneId;
 using maliput::api::rules::BulbGroup;
@@ -170,8 +169,7 @@ SRange ObtainSRange(const Lane* lane, const YAML::Node& lane_node) {
   }
 }
 
-LaneSRange BuildLaneSRange(const api::RoadGeometry* road_geometry,
-                           const YAML::Node& lane_node) {
+LaneSRange BuildLaneSRange(const api::RoadGeometry* road_geometry, const YAML::Node& lane_node) {
   MALIPUT_THROW_UNLESS(lane_node.IsMap());
   MALIPUT_THROW_UNLESS(lane_node["Lane"].IsDefined());
   const LaneId lane_id(lane_node["Lane"].as<std::string>());
@@ -181,8 +179,7 @@ LaneSRange BuildLaneSRange(const api::RoadGeometry* road_geometry,
   return LaneSRange(lane_id, s_range);
 }
 
-LaneSRoute BuildLaneSRoute(const api::RoadGeometry* road_geometry,
-                           const YAML::Node& zone_node) {
+LaneSRoute BuildLaneSRoute(const api::RoadGeometry* road_geometry, const YAML::Node& zone_node) {
   MALIPUT_THROW_UNLESS(zone_node.IsSequence());
   std::vector<LaneSRange> ranges;
   for (const YAML::Node& lane_node : zone_node) {
@@ -194,25 +191,21 @@ LaneSRoute BuildLaneSRoute(const api::RoadGeometry* road_geometry,
 // RightOfWayRule Loading.
 namespace {
 
-std::vector<RightOfWayRule::State> BuildRightOfWayStates(
-    const YAML::Node& states_node) {
+std::vector<RightOfWayRule::State> BuildRightOfWayStates(const YAML::Node& states_node) {
   MALIPUT_THROW_UNLESS(states_node.IsMap());
   std::vector<RightOfWayRule::State> states;
   if (states_node["Go"]) {
-    states.push_back(RightOfWayRule::State(
-        RightOfWayRule::State::Id("Go"), RightOfWayRule::State::Type::kGo,
-        states_node["Go"].as<RightOfWayRule::State::YieldGroup>()));
+    states.push_back(RightOfWayRule::State(RightOfWayRule::State::Id("Go"), RightOfWayRule::State::Type::kGo,
+                                           states_node["Go"].as<RightOfWayRule::State::YieldGroup>()));
   }
   if (states_node["Stop"]) {
-    states.push_back(RightOfWayRule::State(
-        RightOfWayRule::State::Id("Stop"), RightOfWayRule::State::Type::kStop,
-        states_node["Stop"].as<RightOfWayRule::State::YieldGroup>()));
+    states.push_back(RightOfWayRule::State(RightOfWayRule::State::Id("Stop"), RightOfWayRule::State::Type::kStop,
+                                           states_node["Stop"].as<RightOfWayRule::State::YieldGroup>()));
   }
   if (states_node["StopThenGo"]) {
-    states.push_back(RightOfWayRule::State(
-        RightOfWayRule::State::Id("StopThenGo"),
-        RightOfWayRule::State::Type::kStopThenGo,
-        states_node["StopThenGo"].as<RightOfWayRule::State::YieldGroup>()));
+    states.push_back(RightOfWayRule::State(RightOfWayRule::State::Id("StopThenGo"),
+                                           RightOfWayRule::State::Type::kStopThenGo,
+                                           states_node["StopThenGo"].as<RightOfWayRule::State::YieldGroup>()));
   }
   if (states.size() != states_node.size()) {
     std::stringstream s;
@@ -250,79 +243,68 @@ RightOfWayRule::ZoneType BuildRightOfWayZoneType(const YAML::Node& rule_node) {
   }
 }
 
-RightOfWayRule::RelatedBulbGroups BuildRelatedBulbGroups(
-      const YAML::Node& rule_node) {
+RightOfWayRule::RelatedBulbGroups BuildRelatedBulbGroups(const YAML::Node& rule_node) {
   if (rule_node["RelatedBulbGroups"]) {
     MALIPUT_THROW_UNLESS(rule_node["RelatedBulbGroups"].IsMap());
 
     RightOfWayRule::RelatedBulbGroups related_bulb_groups;
 
-    for (const auto& traffic_light_bulb_group :
-         rule_node["RelatedBulbGroups"]) {
-      const TrafficLight::Id traffic_light_id(
-          traffic_light_bulb_group.first.as<std::string>());
+    for (const auto& traffic_light_bulb_group : rule_node["RelatedBulbGroups"]) {
+      const TrafficLight::Id traffic_light_id(traffic_light_bulb_group.first.as<std::string>());
 
       std::vector<BulbGroup::Id> bulb_groups;
       for (auto& bulb_groups_node : traffic_light_bulb_group.second) {
         bulb_groups.emplace_back(bulb_groups_node.as<std::string>());
       }
 
-      MALIPUT_THROW_UNLESS(
-          related_bulb_groups.emplace(traffic_light_id, bulb_groups).second);
+      MALIPUT_THROW_UNLESS(related_bulb_groups.emplace(traffic_light_id, bulb_groups).second);
     }
     return related_bulb_groups;
   }
   return {};
 }
 
-RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry,
-                                   const YAML::Node& rule_node) {
+RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry, const YAML::Node& rule_node) {
   MALIPUT_THROW_UNLESS(rule_node.IsMap());
   MALIPUT_THROW_UNLESS(rule_node["ID"].IsDefined());
   const RightOfWayRule::Id rule_id(rule_node["ID"].as<std::string>());
 
   const YAML::Node& states_node = rule_node["States"];
   MALIPUT_THROW_UNLESS(states_node.IsDefined());
-  const std::vector<RightOfWayRule::State> states =
-      BuildRightOfWayStates(states_node);
+  const std::vector<RightOfWayRule::State> states = BuildRightOfWayStates(states_node);
 
   const YAML::Node& zone_node = rule_node["Zone"];
   MALIPUT_THROW_UNLESS(zone_node.IsDefined());
   const LaneSRoute zone = BuildLaneSRoute(road_geometry, zone_node);
 
-  return RightOfWayRule(rule_id, zone, BuildRightOfWayZoneType(rule_node),
-                        states, BuildRelatedBulbGroups(rule_node));
+  return RightOfWayRule(rule_id, zone, BuildRightOfWayZoneType(rule_node), states, BuildRelatedBulbGroups(rule_node));
 }
 }  // namespace
 
 // DirectionUsageRule loading
 namespace {
-std::vector<DirectionUsageRule::State> BuildDirectionUsageStates(
-    const YAML::Node& states_node) {
+std::vector<DirectionUsageRule::State> BuildDirectionUsageStates(const YAML::Node& states_node) {
   MALIPUT_THROW_UNLESS(states_node.IsSequence());
   std::vector<DirectionUsageRule::State> states;
   for (const YAML::Node& state_node : states_node) {
     MALIPUT_THROW_UNLESS(state_node["ID"].IsDefined());
     MALIPUT_THROW_UNLESS(state_node["Severity"].IsDefined());
     MALIPUT_THROW_UNLESS(state_node["Type"].IsDefined());
-    states.push_back(DirectionUsageRule::State(
-        DirectionUsageRule::State::Id(state_node["ID"].as<std::string>()),
-        state_node["Type"].as<DirectionUsageRule::State::Type>(),
-        state_node["Severity"].as<DirectionUsageRule::State::Severity>()));
+    states.push_back(DirectionUsageRule::State(DirectionUsageRule::State::Id(state_node["ID"].as<std::string>()),
+                                               state_node["Type"].as<DirectionUsageRule::State::Type>(),
+                                               state_node["Severity"].as<DirectionUsageRule::State::Severity>()));
   }
   return states;
 }
 
-DirectionUsageRule BuildDirectionUsageRule(
-    const api::RoadGeometry* road_geometry, const YAML::Node& rule_node) {
+DirectionUsageRule BuildDirectionUsageRule(const api::RoadGeometry* road_geometry, const YAML::Node& rule_node) {
   MALIPUT_THROW_UNLESS(rule_node.IsMap());
   MALIPUT_THROW_UNLESS(rule_node["ID"].IsDefined());
   const DirectionUsageRule::Id rule_id(rule_node["ID"].as<std::string>());
 
   const YAML::Node& states_node = rule_node["States"];
   MALIPUT_THROW_UNLESS(states_node.IsDefined());
-  const std::vector<DirectionUsageRule::State> states =
-      BuildDirectionUsageStates(states_node);
+  const std::vector<DirectionUsageRule::State> states = BuildDirectionUsageStates(states_node);
 
   const YAML::Node& zone_node = rule_node["Zone"];
   MALIPUT_THROW_UNLESS(zone_node.IsDefined());
@@ -332,8 +314,8 @@ DirectionUsageRule BuildDirectionUsageRule(
 }
 }  // namespace
 
-std::unique_ptr<api::rules::RoadRulebook> BuildFrom(
-    const api::RoadGeometry* road_geometry, const YAML::Node& root_node) {
+std::unique_ptr<api::rules::RoadRulebook> BuildFrom(const api::RoadGeometry* road_geometry,
+                                                    const YAML::Node& root_node) {
   MALIPUT_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& rulebook_node = root_node["RoadRulebook"];
   MALIPUT_THROW_UNLESS(rulebook_node.IsDefined());
@@ -343,30 +325,26 @@ std::unique_ptr<api::rules::RoadRulebook> BuildFrom(
   MALIPUT_THROW_UNLESS(right_of_way_rules_node.IsSequence());
   std::unique_ptr<ManualRulebook> rulebook = std::make_unique<ManualRulebook>();
   for (const YAML::Node& right_of_way_rule_node : right_of_way_rules_node) {
-    rulebook->AddRule(
-        BuildRightOfWayRule(road_geometry, right_of_way_rule_node));
+    rulebook->AddRule(BuildRightOfWayRule(road_geometry, right_of_way_rule_node));
   }
-  const YAML::Node& direction_usage_rules_node =
-      rulebook_node["DirectionUsageRules"];
+  const YAML::Node& direction_usage_rules_node = rulebook_node["DirectionUsageRules"];
   MALIPUT_THROW_UNLESS(direction_usage_rules_node.IsDefined());
   MALIPUT_THROW_UNLESS(direction_usage_rules_node.IsSequence());
-  for (const YAML::Node& direction_usage_rule_node :
-       direction_usage_rules_node) {
-    rulebook->AddRule(
-        BuildDirectionUsageRule(road_geometry, direction_usage_rule_node));
+  for (const YAML::Node& direction_usage_rule_node : direction_usage_rules_node) {
+    rulebook->AddRule(BuildDirectionUsageRule(road_geometry, direction_usage_rule_node));
   }
   // TODO(liang.fok) Add loading of speed limit rules.
   return rulebook;
 }
 }  // namespace
 
-std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebook(
-    const api::RoadGeometry* road_geometry, const std::string& input) {
+std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebook(const api::RoadGeometry* road_geometry,
+                                                           const std::string& input) {
   return BuildFrom(road_geometry, YAML::Load(input));
 }
 
-std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebookFromFile(
-    const api::RoadGeometry* road_geometry, const std::string& filename) {
+std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebookFromFile(const api::RoadGeometry* road_geometry,
+                                                                   const std::string& filename) {
   return BuildFrom(road_geometry, YAML::LoadFile(filename));
 }
 

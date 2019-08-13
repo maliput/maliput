@@ -40,8 +40,7 @@ struct IdVariant {
   IdVariant(const DirectionUsageRule::Id& d_in) : d(d_in) {}
 
   template <class HashAlgorithm>
-  friend void hash_append(HashAlgorithm& hasher,
-                          const IdVariant& item) noexcept {
+  friend void hash_append(HashAlgorithm& hasher, const IdVariant& item) noexcept {
     using drake::hash_append;
     hash_append(hasher, item.r);
     hash_append(hasher, item.s);
@@ -69,32 +68,19 @@ class ManualRulebook::Impl {
     index_->RemoveAll();
   }
 
-  void AddRule(const api::rules::RightOfWayRule& rule) {
-    AddAnyRule(rule, &right_of_ways_);
-  }
+  void AddRule(const api::rules::RightOfWayRule& rule) { AddAnyRule(rule, &right_of_ways_); }
 
-  void RemoveRule(const api::rules::RightOfWayRule::Id& id) {
-    RemoveAnyRule(id, &right_of_ways_);
-  }
+  void RemoveRule(const api::rules::RightOfWayRule::Id& id) { RemoveAnyRule(id, &right_of_ways_); }
 
-  void AddRule(const api::rules::SpeedLimitRule& rule) {
-    AddAnyRule(rule, &speed_limits_);
-  }
+  void AddRule(const api::rules::SpeedLimitRule& rule) { AddAnyRule(rule, &speed_limits_); }
 
-  void RemoveRule(const api::rules::SpeedLimitRule::Id& id) {
-    RemoveAnyRule(id, &speed_limits_);
-  }
+  void RemoveRule(const api::rules::SpeedLimitRule::Id& id) { RemoveAnyRule(id, &speed_limits_); }
 
-  void AddRule(const api::rules::DirectionUsageRule& rule) {
-    AddAnyRule(rule, &direction_usage_rules_);
-  }
+  void AddRule(const api::rules::DirectionUsageRule& rule) { AddAnyRule(rule, &direction_usage_rules_); }
 
-  void RemoveRule(const api::rules::DirectionUsageRule::Id& id) {
-    RemoveAnyRule(id, &direction_usage_rules_);
-  }
+  void RemoveRule(const api::rules::DirectionUsageRule::Id& id) { RemoveAnyRule(id, &direction_usage_rules_); }
 
-  QueryResults DoFindRules(const std::vector<LaneSRange>& ranges,
-                           double tolerance) const {
+  QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double tolerance) const {
     QueryResults result;
     for (const LaneSRange& range : ranges) {
       for (const IdVariant& id : index_->FindRules(range, tolerance)) {
@@ -106,9 +92,8 @@ class ManualRulebook::Impl {
           result.direction_usage.push_back(direction_usage_rules_.at(*id.d));
         } else {
           std::stringstream s;
-          s << "ManualRulebook: IdVariant is empty (LaneId: "
-            << range.lane_id().string() << ", s0: " << range.s_range().s0()
-            << ", s1: " << range.s_range().s1() << ")";
+          s << "ManualRulebook: IdVariant is empty (LaneId: " << range.lane_id().string()
+            << ", s0: " << range.s_range().s0() << ", s1: " << range.s_range().s1() << ")";
           throw std::domain_error(s.str());
         }
       }
@@ -116,13 +101,9 @@ class ManualRulebook::Impl {
     return result;
   }
 
-  RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const {
-    return GetAnyRule(id, right_of_ways_);
-  }
+  RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const { return GetAnyRule(id, right_of_ways_); }
 
-  SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const {
-    return GetAnyRule(id, speed_limits_);
-  }
+  SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const { return GetAnyRule(id, speed_limits_); }
 
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const {
     return GetAnyRule(id, direction_usage_rules_);
@@ -136,13 +117,9 @@ class ManualRulebook::Impl {
    public:
     void RemoveAll() { map_.clear(); }
 
-    void AddRule(const SpeedLimitRule& rule) {
-      AddRange(rule.id(), rule.zone());
-    }
+    void AddRule(const SpeedLimitRule& rule) { AddRange(rule.id(), rule.zone()); }
 
-    void RemoveRule(const SpeedLimitRule& rule) {
-      RemoveRanges(rule.id(), rule.zone().lane_id());
-    }
+    void RemoveRule(const SpeedLimitRule& rule) { RemoveRanges(rule.id(), rule.zone().lane_id()); }
 
     void AddRule(const RightOfWayRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
@@ -156,16 +133,11 @@ class ManualRulebook::Impl {
       }
     }
 
-    void AddRule(const DirectionUsageRule& rule) {
-      AddRange(rule.id(), rule.zone());
-    }
+    void AddRule(const DirectionUsageRule& rule) { AddRange(rule.id(), rule.zone()); }
 
-    void RemoveRule(const DirectionUsageRule& rule) {
-      RemoveRanges(rule.id(), rule.zone().lane_id());
-    }
+    void RemoveRule(const DirectionUsageRule& rule) { RemoveRanges(rule.id(), rule.zone().lane_id()); }
 
-    std::vector<IdVariant> FindRules(const LaneSRange& range,
-                                     double tolerance) {
+    std::vector<IdVariant> FindRules(const LaneSRange& range, double tolerance) {
       std::vector<IdVariant> result;
       auto it = map_.find(range.lane_id());
       if (it != map_.end()) {
@@ -196,21 +168,16 @@ class ManualRulebook::Impl {
 
     // Determines if two SRanges intersect.  Positive tolerance makes the
     // comparison more optimistic.
-    static bool Intersects(const SRange& lhs, const SRange& rhs,
-                           double tolerance) {
-      const SRange wider_rhs(std::min(rhs.s0(), rhs.s1()) - tolerance,
-                             std::max(rhs.s0(), rhs.s1()) + tolerance);
-      return !((std::max(lhs.s0(), lhs.s1()) < wider_rhs.s0()) ||
-               (std::min(lhs.s0(), lhs.s1()) > wider_rhs.s1()));
+    static bool Intersects(const SRange& lhs, const SRange& rhs, double tolerance) {
+      const SRange wider_rhs(std::min(rhs.s0(), rhs.s1()) - tolerance, std::max(rhs.s0(), rhs.s1()) + tolerance);
+      return !((std::max(lhs.s0(), lhs.s1()) < wider_rhs.s0()) || (std::min(lhs.s0(), lhs.s1()) > wider_rhs.s1()));
     }
 
     // TODO(maddog@tri.global)  Perhaps this class would benefit from something
     //                          like boost::interval_map, though if there are
     //                          not many rules attached to each individual
     //                          lane_id, this is probably good enough.
-    std::unordered_map<
-        LaneId, std::unordered_multimap<IdVariant, SRange, drake::DefaultHash>>
-        map_;
+    std::unordered_map<LaneId, std::unordered_multimap<IdVariant, SRange, drake::DefaultHash>> map_;
   };
 
   // ID->Rule indices for each rule type.
@@ -254,46 +221,26 @@ ManualRulebook::~ManualRulebook() = default;
 
 void ManualRulebook::RemoveAll() { impl_->RemoveAll(); }
 
-void ManualRulebook::AddRule(const api::rules::RightOfWayRule& rule) {
-  impl_->AddRule(rule);
-}
+void ManualRulebook::AddRule(const api::rules::RightOfWayRule& rule) { impl_->AddRule(rule); }
 
-void ManualRulebook::RemoveRule(const api::rules::RightOfWayRule::Id& id) {
-  impl_->RemoveRule(id);
-}
+void ManualRulebook::RemoveRule(const api::rules::RightOfWayRule::Id& id) { impl_->RemoveRule(id); }
 
-void ManualRulebook::AddRule(const api::rules::SpeedLimitRule& rule) {
-  impl_->AddRule(rule);
-}
+void ManualRulebook::AddRule(const api::rules::SpeedLimitRule& rule) { impl_->AddRule(rule); }
 
-void ManualRulebook::RemoveRule(const api::rules::SpeedLimitRule::Id& id) {
-  impl_->RemoveRule(id);
-}
+void ManualRulebook::RemoveRule(const api::rules::SpeedLimitRule::Id& id) { impl_->RemoveRule(id); }
 
-void ManualRulebook::AddRule(const api::rules::DirectionUsageRule& rule) {
-  impl_->AddRule(rule);
-}
+void ManualRulebook::AddRule(const api::rules::DirectionUsageRule& rule) { impl_->AddRule(rule); }
 
-void ManualRulebook::RemoveRule(const api::rules::DirectionUsageRule::Id& id) {
-  impl_->RemoveRule(id);
-}
+void ManualRulebook::RemoveRule(const api::rules::DirectionUsageRule::Id& id) { impl_->RemoveRule(id); }
 
-QueryResults ManualRulebook::DoFindRules(const std::vector<LaneSRange>& ranges,
-                                         double tolerance) const {
+QueryResults ManualRulebook::DoFindRules(const std::vector<LaneSRange>& ranges, double tolerance) const {
   return impl_->DoFindRules(ranges, tolerance);
 }
 
-RightOfWayRule ManualRulebook::DoGetRule(const RightOfWayRule::Id& id) const {
-  return impl_->DoGetRule(id);
-}
+RightOfWayRule ManualRulebook::DoGetRule(const RightOfWayRule::Id& id) const { return impl_->DoGetRule(id); }
 
-SpeedLimitRule ManualRulebook::DoGetRule(const SpeedLimitRule::Id& id) const {
-  return impl_->DoGetRule(id);
-}
+SpeedLimitRule ManualRulebook::DoGetRule(const SpeedLimitRule::Id& id) const { return impl_->DoGetRule(id); }
 
-DirectionUsageRule ManualRulebook::DoGetRule(
-    const DirectionUsageRule::Id& id) const {
-  return impl_->DoGetRule(id);
-}
+DirectionUsageRule ManualRulebook::DoGetRule(const DirectionUsageRule::Id& id) const { return impl_->DoGetRule(id); }
 
 }  // namespace maliput

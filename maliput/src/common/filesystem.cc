@@ -1,3 +1,4 @@
+// clang-format off
 #include "maliput/common/filesystem.h"
 
 #include <algorithm>
@@ -150,3 +151,4 @@ std::string Filesystem::get_env_path(const std::string &env_var) {
 
 } // namespace common
 } // namespace maliput
+// clang-format on

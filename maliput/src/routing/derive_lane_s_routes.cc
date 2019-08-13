@@ -23,16 +23,13 @@ bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane* lane) {
 }
 
 // Returns the S coordinate in @p lane that is on the border with @p next_lane.
-drake::optional<double> DetermineEdgeS(const api::Lane* lane,
-                                const api::Lane* next_lane) {
+drake::optional<double> DetermineEdgeS(const api::Lane* lane, const api::Lane* next_lane) {
   MALIPUT_DEMAND(lane != nullptr);
   MALIPUT_DEMAND(next_lane != nullptr);
-  if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kFinish),
-                      next_lane)) {
+  if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kFinish), next_lane)) {
     return lane->length();
   }
-  if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kStart),
-                      next_lane)) {
+  if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kStart), next_lane)) {
     return 0.;
   }
   return drake::nullopt;
@@ -40,17 +37,15 @@ drake::optional<double> DetermineEdgeS(const api::Lane* lane,
 
 }  // namespace
 
-std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
-    const api::RoadPosition& start, const api::RoadPosition& end,
-    double max_length_m) {
+std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(const api::RoadPosition& start, const api::RoadPosition& end,
+                                                      double max_length_m) {
   MALIPUT_DEMAND(start.lane != nullptr);
   MALIPUT_DEMAND(end.lane != nullptr);
   const double start_s = start.pos.s();
   const double end_s = end.pos.s();
   std::vector<api::rules::LaneSRoute> result;
 
-  for (const auto& lane_sequence :
-       FindLaneSequences(start.lane, end.lane, max_length_m)) {
+  for (const auto& lane_sequence : FindLaneSequences(start.lane, end.lane, max_length_m)) {
     MALIPUT_DEMAND(!lane_sequence.empty());
     std::vector<api::rules::LaneSRange> ranges;
 
@@ -59,8 +54,7 @@ std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
     if (lane_sequence.size() == 1) {
       MALIPUT_DEMAND(start.lane == end.lane);
       const std::vector<api::rules::LaneSRange> lane_s_ranges = {
-          api::rules::LaneSRange(start.lane->id(),
-                                 api::rules::SRange(start_s, end_s))};
+          api::rules::LaneSRange(start.lane->id(), api::rules::SRange(start_s, end_s))};
       result.emplace_back(lane_s_ranges);
       continue;
     }
@@ -71,28 +65,20 @@ std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
       MALIPUT_DEMAND(lane != nullptr);
       if (i == 0) {
         MALIPUT_DEMAND(lane->id() == start.lane->id());
-        const drake::optional<double> first_end_s =
-            DetermineEdgeS(lane, lane_sequence.at(1));
+        const drake::optional<double> first_end_s = DetermineEdgeS(lane, lane_sequence.at(1));
         MALIPUT_DEMAND(first_end_s.has_value());
-        ranges.emplace_back(lane->id(),
-                            api::rules::SRange(start_s, first_end_s.value()));
+        ranges.emplace_back(lane->id(), api::rules::SRange(start_s, first_end_s.value()));
       } else if (i + 1 == lane_sequence.size()) {
         MALIPUT_DEMAND(lane->id() == end.lane->id());
         MALIPUT_DEMAND(i > 0);
-        const drake::optional<double> last_start_s =
-            DetermineEdgeS(lane, lane_sequence.at(i - 1));
+        const drake::optional<double> last_start_s = DetermineEdgeS(lane, lane_sequence.at(i - 1));
         MALIPUT_DEMAND(last_start_s.has_value());
-        ranges.emplace_back(lane->id(),
-                            api::rules::SRange(last_start_s.value(), end_s));
+        ranges.emplace_back(lane->id(), api::rules::SRange(last_start_s.value(), end_s));
       } else {
-        const drake::optional<double> middle_start_s =
-            DetermineEdgeS(lane, lane_sequence.at(i - 1));
-        const drake::optional<double> middle_end_s =
-            DetermineEdgeS(lane, lane_sequence.at(i + 1));
+        const drake::optional<double> middle_start_s = DetermineEdgeS(lane, lane_sequence.at(i - 1));
+        const drake::optional<double> middle_end_s = DetermineEdgeS(lane, lane_sequence.at(i + 1));
         MALIPUT_DEMAND(middle_start_s && middle_end_s);
-        ranges.emplace_back(
-            lane->id(),
-            api::rules::SRange(middle_start_s.value(), middle_end_s.value()));
+        ranges.emplace_back(lane->id(), api::rules::SRange(middle_start_s.value(), middle_end_s.value()));
       }
     }
     result.emplace_back(ranges);

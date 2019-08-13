@@ -11,10 +11,9 @@
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/maliput_throw.h"
 #include "maliput/geometry_base/branch_point.h"
 #include "maliput/geometry_base/junction.h"
-#include "maliput/common/maliput_throw.h"
-
 
 namespace maliput {
 namespace geometry_base {
@@ -50,9 +49,7 @@ class RoadGeometry : public api::RoadGeometry {
   ///
   /// @throws maliput::common::assertion_error if either `linear_tolerance` or
   ///         `angular_tolerance` or `scale_length` is non-positive.
-  RoadGeometry(const api::RoadGeometryId& id,
-               double linear_tolerance, double angular_tolerance,
-               double scale_length)
+  RoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length)
       : id_(id),
         linear_tolerance_(linear_tolerance),
         angular_tolerance_(angular_tolerance),
@@ -74,8 +71,7 @@ class RoadGeometry : public api::RoadGeometry {
   /// @throws std::exception if `junction` is empty.
   template <class T>
   T* AddJunction(std::unique_ptr<T> junction) {
-    static_assert(std::is_base_of<Junction, T>::value,
-                  "T is not derived from geometry_base::Junction");
+    static_assert(std::is_base_of<Junction, T>::value, "T is not derived from geometry_base::Junction");
     T* const raw_pointer = junction.get();
     AddJunctionPrivate(std::move(junction));
     return raw_pointer;
@@ -93,8 +89,7 @@ class RoadGeometry : public api::RoadGeometry {
   /// @throws std::exception if `branch_point` is empty.
   template <class T>
   T* AddBranchPoint(std::unique_ptr<T> branch_point) {
-    static_assert(std::is_base_of<BranchPoint, T>::value,
-                  "T is not derived from geometry_base::BranchPoint");
+    static_assert(std::is_base_of<BranchPoint, T>::value, "T is not derived from geometry_base::BranchPoint");
     T* const raw_pointer = branch_point.get();
     AddBranchPointPrivate(std::move(branch_point));
     return raw_pointer;
@@ -135,7 +130,6 @@ class RoadGeometry : public api::RoadGeometry {
   std::vector<std::unique_ptr<BranchPoint>> branch_points_;
   api::BasicIdIndex id_index_;
 };
-
 
 }  // namespace geometry_base
 }  // namespace maliput

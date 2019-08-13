@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
+#include "maliput-utilities/mesh.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
-#include "maliput-utilities/mesh.h"
 
 namespace maliput {
 namespace utility {
@@ -64,19 +64,15 @@ struct ObjFeatures {
 /// Material information for built meshes.
 struct Material {
   std::string name;
-  drake::Vector3<double> diffuse;  /// Kd
-  drake::Vector3<double> ambient;  /// Ka
+  drake::Vector3<double> diffuse;   /// Kd
+  drake::Vector3<double> ambient;   /// Ka
   drake::Vector3<double> specular;  /// Ks
-  double shinines;  /// Ns
-  double transparency;  /// 1.0 - d
+  double shinines;                  /// Ns
+  double transparency;              /// 1.0 - d
 
-  friend bool operator==(const Material& matA, const Material& matB) {
-    return matA.name == matB.name;
-  }
+  friend bool operator==(const Material& matA, const Material& matB) { return matA.name == matB.name; }
 
-  friend bool operator==(const Material& matA, const std::string &name) {
-    return matA.name == name;
-  }
+  friend bool operator==(const Material& matA, const std::string& name) { return matA.name == name; }
 };
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
@@ -93,9 +89,8 @@ struct Material {
 ///   - grayed_asphalt
 ///   - grayed_lane
 ///   - grayed_marker
-std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(
-  const api::RoadGeometry* rg,
-  const ObjFeatures& features);
+std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* rg,
+                                                                      const ObjFeatures& features);
 
 /// Generates a Wavefront OBJ model of the road surface of an api::RoadGeometry.
 ///
@@ -112,9 +107,7 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(
 ///
 /// The produced mesh covers the area within the driveable-bounds of the
 /// road surface described by the RoadGeometry.
-void GenerateObjFile(const api::RoadGeometry* road_geometry,
-                     const std::string& dirpath,
-                     const std::string& fileroot,
+void GenerateObjFile(const api::RoadGeometry* road_geometry, const std::string& dirpath, const std::string& fileroot,
                      const ObjFeatures& features);
 
 /// Gets a Material based on `material_name` key.

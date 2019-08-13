@@ -15,7 +15,6 @@
 #include "multilane/cubic_polynomial.h"
 #include "multilane/road_curve.h"
 
-
 namespace maliput {
 namespace multilane {
 
@@ -49,14 +48,11 @@ class Lane : public api::Lane {
   ///
   /// @note The override Lane::ToLanePosition() is currently restricted to
   /// lanes in which superelevation and elevation change are both zero.
-  Lane(const api::LaneId& id, const api::Segment* segment,
-       int index,
-       const api::RBounds& lane_bounds,
-       const api::RBounds& driveable_bounds,
-       const api::HBounds& elevation_bounds,
-       const RoadCurve* road_curve,
+  Lane(const api::LaneId& id, const api::Segment* segment, int index, const api::RBounds& lane_bounds,
+       const api::RBounds& driveable_bounds, const api::HBounds& elevation_bounds, const RoadCurve* road_curve,
        double r0)
-      : id_(id), segment_(segment),
+      : id_(id),
+        segment_(segment),
         index_(index),
         lane_bounds_(lane_bounds),
         driveable_bounds_(driveable_bounds),
@@ -75,13 +71,9 @@ class Lane : public api::Lane {
   // TODO(maddog-tri)  Allow superelevation to have a center-of-rotation
   //                   which is different from r = 0.
 
-  const CubicPolynomial& elevation() const {
-    return road_curve_->elevation();
-  }
+  const CubicPolynomial& elevation() const { return road_curve_->elevation(); }
 
-  const CubicPolynomial& superelevation() const {
-    return road_curve_->superelevation();
-  }
+  const CubicPolynomial& superelevation() const { return road_curve_->superelevation(); }
 
   double r0() const { return r0_; }
 
@@ -117,44 +109,31 @@ class Lane : public api::Lane {
     }
   }
 
-  const api::BranchPoint* DoGetBranchPoint(
-      const api::LaneEnd::Which which_end) const override;
+  const api::BranchPoint* DoGetBranchPoint(const api::LaneEnd::Which which_end) const override;
 
-  const api::LaneEndSet* DoGetConfluentBranches(
-      const api::LaneEnd::Which which_end) const override;
+  const api::LaneEndSet* DoGetConfluentBranches(const api::LaneEnd::Which which_end) const override;
 
-  const api::LaneEndSet* DoGetOngoingBranches(
-      const api::LaneEnd::Which which_end) const override;
+  const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd::Which which_end) const override;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(
-      const api::LaneEnd::Which which_end) const override;
+  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
 
   double do_length() const override { return lane_length_; }
 
   api::RBounds do_lane_bounds(double) const override { return lane_bounds_; }
 
-  api::RBounds do_driveable_bounds(double) const override {
-    return driveable_bounds_;
-  }
+  api::RBounds do_driveable_bounds(double) const override { return driveable_bounds_; }
 
-  api::HBounds do_elevation_bounds(double, double) const override {
-    return elevation_bounds_;
-  }
+  api::HBounds do_elevation_bounds(double, double) const override { return elevation_bounds_; }
 
-  api::GeoPosition DoToGeoPosition(
-      const api::LanePosition& lane_pos) const override;
+  api::GeoPosition DoToGeoPosition(const api::LanePosition& lane_pos) const override;
 
-  api::Rotation DoGetOrientation(
-      const api::LanePosition& lane_pos) const override;
+  api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const override;
 
-  api::LanePosition DoEvalMotionDerivatives(
-      const api::LanePosition& position,
-      const api::IsoLaneVelocity& velocity) const override;
+  api::LanePosition DoEvalMotionDerivatives(const api::LanePosition& position,
+                                            const api::IsoLaneVelocity& velocity) const override;
 
-  api::LanePosition DoToLanePosition(
-      const api::GeoPosition& geo_position,
-      api::GeoPosition* nearest_position,
-      double* distance) const override;
+  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_position, api::GeoPosition* nearest_position,
+                                     double* distance) const override;
 
   const api::LaneId id_;
   const api::Segment* segment_{};
@@ -172,7 +151,6 @@ class Lane : public api::Lane {
   std::function<double(double)> p_from_s_at_r0_;
   double lane_length_;
 };
-
 
 }  // namespace multilane
 }  // namespace maliput

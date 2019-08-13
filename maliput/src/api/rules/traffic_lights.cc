@@ -6,7 +6,6 @@
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
 
-
 namespace maliput {
 namespace api {
 namespace rules {
@@ -34,11 +33,9 @@ std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper()
   return result;
 }
 
-Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group,
-           const Rotation& orientation_bulb_group, const BulbColor& color,
-           const BulbType& type, const drake::optional<double>& arrow_orientation_rad,
-           const drake::optional<std::vector<BulbState>>& states,
-           BoundingBox bounding_box)
+Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
+           const BulbColor& color, const BulbType& type, const drake::optional<double>& arrow_orientation_rad,
+           const drake::optional<std::vector<BulbState>>& states, BoundingBox bounding_box)
     : id_(id),
       position_bulb_group_(position_bulb_group),
       orientation_bulb_group_(orientation_bulb_group),
@@ -46,8 +43,7 @@ Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group,
       type_(type),
       arrow_orientation_rad_(arrow_orientation_rad),
       bounding_box_(std::move(bounding_box)) {
-  MALIPUT_THROW_UNLESS(type_ != BulbType::kArrow ||
-                     arrow_orientation_rad_ != drake::nullopt);
+  MALIPUT_THROW_UNLESS(type_ != BulbType::kArrow || arrow_orientation_rad_ != drake::nullopt);
   if (type_ != BulbType::kArrow) {
     MALIPUT_THROW_UNLESS(arrow_orientation_rad_ == drake::nullopt);
   }
@@ -59,8 +55,7 @@ Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group,
 }
 
 BulbState Bulb::GetDefaultState() const {
-  for (const auto& bulb_state :
-       {BulbState::kOff, BulbState::kBlinking, BulbState::kOn}) {
+  for (const auto& bulb_state : {BulbState::kOff, BulbState::kBlinking, BulbState::kOn}) {
     if (IsValidState(bulb_state)) {
       return bulb_state;
     }
@@ -72,10 +67,8 @@ bool Bulb::IsValidState(const BulbState& bulb_state) const {
   return std::find(states_.begin(), states_.end(), bulb_state) != states_.end();
 }
 
-BulbGroup::BulbGroup(const BulbGroup::Id& id,
-                     const GeoPosition& position_traffic_light,
-                     const Rotation& orientation_traffic_light,
-                     const std::vector<Bulb>& bulbs)
+BulbGroup::BulbGroup(const BulbGroup::Id& id, const GeoPosition& position_traffic_light,
+                     const Rotation& orientation_traffic_light, const std::vector<Bulb>& bulbs)
     : id_(id),
       position_traffic_light_(position_traffic_light),
       orientation_traffic_light_(orientation_traffic_light),
@@ -92,10 +85,8 @@ drake::optional<Bulb> BulbGroup::GetBulb(const Bulb::Id& id) const {
   return drake::nullopt;
 }
 
-TrafficLight::TrafficLight(const TrafficLight::Id& id,
-                           const GeoPosition& position_road_network,
-                           const Rotation& orientation_road_network,
-                           const std::vector<BulbGroup>& bulb_groups)
+TrafficLight::TrafficLight(const TrafficLight::Id& id, const GeoPosition& position_road_network,
+                           const Rotation& orientation_road_network, const std::vector<BulbGroup>& bulb_groups)
     : id_(id),
       position_road_network_(position_road_network),
       orientation_road_network_(orientation_road_network),

@@ -22,16 +22,14 @@ class IntersectionBook::Impl {
     MALIPUT_THROW_UNLESS(intersection != nullptr);
     auto result = book_.emplace(intersection->id(), std::move(intersection));
     if (!result.second) {
-      throw std::logic_error(
-          "Attempted to add multiple Intersection instances with ID " +
-          intersection->id().string());
+      throw std::logic_error("Attempted to add multiple Intersection instances with ID " + intersection->id().string());
     }
   }
 
   std::vector<Intersection*> DoGetIntersections() const {
     std::vector<Intersection*> intersections;
     auto it = book_.begin();
-    while(it != book_.end()) {
+    while (it != book_.end()) {
       intersections.push_back(it->second.get());
       it++;
     }
@@ -54,17 +52,12 @@ IntersectionBook::IntersectionBook() : impl_(std::make_unique<Impl>()) {}
 
 IntersectionBook::~IntersectionBook() = default;
 
-void IntersectionBook::AddIntersection(
-    std::unique_ptr<api::Intersection> intersection) {
+void IntersectionBook::AddIntersection(std::unique_ptr<api::Intersection> intersection) {
   impl_->AddIntersection(std::move(intersection));
 }
 
-std::vector<Intersection*> IntersectionBook::DoGetIntersections() {
-  return impl_->DoGetIntersections();
-}
+std::vector<Intersection*> IntersectionBook::DoGetIntersections() { return impl_->DoGetIntersections(); }
 
-Intersection* IntersectionBook::DoGetIntersection(const Intersection::Id& id) {
-  return impl_->DoGetIntersection(id);
-}
+Intersection* IntersectionBook::DoGetIntersection(const Intersection::Id& id) { return impl_->DoGetIntersection(id); }
 
 }  // namespace maliput

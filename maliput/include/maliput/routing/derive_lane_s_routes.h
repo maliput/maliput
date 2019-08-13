@@ -14,9 +14,8 @@ namespace routing {
 /// between @p start and @p end. See the description of FindLaneSequences() for
 /// more details. If @p start and @p end are the same lane, a route consisting
 /// of one lane is returned regardless of @p max_length_m.
-std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(
-    const api::RoadPosition& start, const api::RoadPosition& end,
-    double max_length_m);
+std::vector<api::rules::LaneSRoute> DeriveLaneSRoutes(const api::RoadPosition& start, const api::RoadPosition& end,
+                                                      double max_length_m);
 
 }  // namespace routing
 }  // namespace maliput

@@ -28,8 +28,7 @@ struct GenerateStringOptions {
 /// @param options Options that affect the types of information to include in
 /// the returned string.
 /// @return The generated string.
-std::string GenerateString(const api::RoadGeometry& road_geometry,
-                           const GenerateStringOptions& options);
+std::string GenerateString(const api::RoadGeometry& road_geometry, const GenerateStringOptions& options);
 
 }  // namespace utility
 }  // namespace maliput

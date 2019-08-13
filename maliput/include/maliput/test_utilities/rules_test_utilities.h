@@ -44,15 +44,13 @@ class AssertionResultCollector {
   /// `filename` and `line`, as would be produced by __FILE__ and __LINE__
   /// preprocessor macros, identify the location of the expression which
   /// yielded `result`.
-  void AddResult(const char* filename, int line, const char* expression,
-                 ::testing::AssertionResult result) {
+  void AddResult(const char* filename, int line, const char* expression, ::testing::AssertionResult result) {
     ++count_;
     if (!result) {
       ++failed_;
-      failure_message_ = failure_message_ + filename + ":" +
-                         std::to_string(line) + ": Failure #" +
-                         std::to_string(failed_) + ":\n" + "Expression '" +
-                         expression + "' failed:\n" + result.message() + "\n";
+      failure_message_ = failure_message_ + filename + ":" + std::to_string(line) + ": Failure #" +
+                         std::to_string(failed_) + ":\n" + "Expression '" + expression + "' failed:\n" +
+                         result.message() + "\n";
     }
   }
 
@@ -60,12 +58,10 @@ class AssertionResultCollector {
   /// collector, which is basically an `and` of the collected results.
   ::testing::AssertionResult result() {
     if (failed_) {
-      return ::testing::AssertionFailure()
-             << failed_ << " of " << count_ << " expressions failed:\n"
-             << failure_message_;
+      return ::testing::AssertionFailure() << failed_ << " of " << count_ << " expressions failed:\n"
+                                           << failure_message_;
     } else {
-      return ::testing::AssertionSuccess()
-             << count_ << " expressions all succeeded.";
+      return ::testing::AssertionSuccess() << count_ << " expressions all succeeded.";
     }
   }
 
@@ -84,14 +80,12 @@ class AssertionResultCollector {
 /// Adds AssertionResult `result` to AssertionResultCollector `collector`.
 /// The location of the invocation and the literal expression of `result`
 /// will be recorded by the collector.
-#define MALIPUT_ADD_RESULT(collector, result) \
-  collector.AddResult(__FILE__, __LINE__, #result, result)
+#define MALIPUT_ADD_RESULT(collector, result) collector.AddResult(__FILE__, __LINE__, #result, result)
 
 /// Returns an AssertionResult which is successful if `e1` equals `e2`
 /// according to the `IsEqual()` predicate-formatter function.  The
 /// literal expressions for `e1` and `e2` will be provided to `IsEqual()`.
-#define MALIPUT_IS_EQUAL(e1, e2) \
-  ::maliput::api::rules::test::IsEqual(#e1, #e2, e1, e2)
+#define MALIPUT_IS_EQUAL(e1, e2) ::maliput::api::rules::test::IsEqual(#e1, #e2, e1, e2)
 
 // TODO(maddog@tri.global)  Create macros (like below) as an alternative
 //                          to EXPECT_PRED_FORMAT*()/etc, which simply returns
@@ -103,25 +97,21 @@ class AssertionResultCollector {
 //                          what to do for types with operator==.
 
 /// Predicate-formatter which tests equality of double.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const double& a, const double& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const double& a,
+                                          const double& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 /// Predicate-formatter which tests equality of TypeSpecificIdentifier<T>.
 template <class T>
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const TypeSpecificIdentifier<T>& a,
-                                          const TypeSpecificIdentifier<T>& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                          const TypeSpecificIdentifier<T>& a, const TypeSpecificIdentifier<T>& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 /// Predicate-formatter which tests equality of SRange.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const SRange& a, const SRange& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const SRange& a,
+                                          const SRange& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s0(), b.s0()));
@@ -130,9 +120,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 }
 
 /// Predicate-formatter which tests equality of LaneSRange.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const LaneSRange& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const LaneSRange& a,
                                           const LaneSRange& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
@@ -142,10 +130,8 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 }
 
 /// Predicate-formatter which tests equality of std::vector<LaneSRange>.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const std::vector<LaneSRange>& a,
-                                          const std::vector<LaneSRange>& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                          const std::vector<LaneSRange>& a, const std::vector<LaneSRange>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
@@ -157,9 +143,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 }
 
 /// Predicate-formatter which tests equality of LaneSRoute.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const LaneSRoute& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const LaneSRoute& a,
                                           const LaneSRoute& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
@@ -168,59 +152,44 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 }
 
 /// Predicate-formatter which tests equality of GeoPosition.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const GeoPosition& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const GeoPosition& a,
                                           const GeoPosition& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 /// Predicate-formatter which tests equality of Rotation.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const Rotation& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Rotation& a,
                                           const Rotation& b) {
-  return ::testing::internal::CmpHelperEQ(a_expression, b_expression,
-                                          a.matrix(), b.matrix());
+  return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a.matrix(), b.matrix());
 }
 
 /// Predicate-formatter which tests equality of BulbColor.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const BulbColor& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbColor& a,
                                           const BulbColor& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 /// Predicate-formatter which tests equality of BulbType.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const BulbType& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbType& a,
                                           const BulbType& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 /// Predicate-formatter which tests equality of BulbState.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const BulbState& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbState& a,
                                           const BulbState& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 /// Predicate-formatter which tests equality of drake::optional<double>.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const drake::optional<double>& a,
-                                          const drake::optional<double>& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                          const drake::optional<double>& a, const drake::optional<double>& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 /// Predicate-formatter which tests equality of Bulb::BoundingBox.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const Bulb::BoundingBox& a,
-                                          const Bulb::BoundingBox& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                          const Bulb::BoundingBox& a, const Bulb::BoundingBox& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   for (int i = 0; i < 3; ++i) {
@@ -231,20 +200,16 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 }
 
 /// Predicate-formatter which tests equality of Bulb.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const Bulb& a, const Bulb& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Bulb& a,
+                                          const Bulb& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
-  MALIPUT_ADD_RESULT(
-      c, MALIPUT_IS_EQUAL(a.position_bulb_group(), b.position_bulb_group()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_bulb_group(),
-                                         b.orientation_bulb_group()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.position_bulb_group(), b.position_bulb_group()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_bulb_group(), b.orientation_bulb_group()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.color(), b.color()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type(), b.type()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.arrow_orientation_rad(),
-                                         b.arrow_orientation_rad()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.arrow_orientation_rad(), b.arrow_orientation_rad()));
   const std::vector<BulbState>& a_states = a.states();
   const std::vector<BulbState>& b_states = b.states();
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a_states.size(), b_states.size()));
@@ -257,10 +222,8 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 }
 
 /// Predicate-formatter which tests equality of std::vector<Bulb>.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const std::vector<Bulb>& a,
-                                          const std::vector<Bulb>& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                          const std::vector<Bulb>& a, const std::vector<Bulb>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
@@ -272,82 +235,65 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 }
 
 /// Predicate-formatter which tests equality of BulbGroup.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const BulbGroup& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbGroup& a,
                                           const BulbGroup& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.position_traffic_light(),
-                                         b.position_traffic_light()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_traffic_light(),
-                                         b.orientation_traffic_light()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.position_traffic_light(), b.position_traffic_light()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_traffic_light(), b.orientation_traffic_light()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.bulbs(), b.bulbs()));
   return c.result();
 }
 
 /// Predicate-formatter which tests equality of TrafficLight.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const TrafficLight& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const TrafficLight& a,
                                           const TrafficLight& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.position_road_network(),
-                                         b.position_road_network()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_road_network(),
-                                         b.orientation_road_network()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.position_road_network(), b.position_road_network()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_road_network(), b.orientation_road_network()));
   const std::vector<BulbGroup>& bulb_groups_a = a.bulb_groups();
   const std::vector<BulbGroup>& bulb_groups_b = b.bulb_groups();
-  MALIPUT_ADD_RESULT(
-      c, MALIPUT_IS_EQUAL(bulb_groups_a.size(), bulb_groups_b.size()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(bulb_groups_a.size(), bulb_groups_b.size()));
   const int smallest = std::min(bulb_groups_a.size(), bulb_groups_b.size());
   for (int i = 0; i < smallest; ++i) {
-    MALIPUT_ADD_RESULT(
-        c, MALIPUT_IS_EQUAL(bulb_groups_a.at(i), bulb_groups_b.at(i)));
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(bulb_groups_a.at(i), bulb_groups_b.at(i)));
   }
   return c.result();
 }
 
 /// Predicate-formatter which tests equality of RuleStates.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const RuleStates& a,
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const RuleStates& a,
                                           const RuleStates& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   for (const auto& rule_state : a) {
-    MALIPUT_ADD_RESULT(
-        c, MALIPUT_IS_EQUAL(b.at(rule_state.first), rule_state.second));
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(b.at(rule_state.first), rule_state.second));
   }
   return c.result();
 }
 
 /// Predicate-formatter which tests equality of drake::optional<BulbStates>.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const drake::optional<BulbStates>& a,
-                                          const drake::optional<BulbStates>& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                          const drake::optional<BulbStates>& a, const drake::optional<BulbStates>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.has_value(), b.has_value()));
   if (a.has_value()) {
     MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->size(), b->size()));
     for (const auto& bulb_state : *a) {
-      MALIPUT_ADD_RESULT(
-          c, MALIPUT_IS_EQUAL(b->at(bulb_state.first), bulb_state.second));
+      MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(b->at(bulb_state.first), bulb_state.second));
     }
   }
   return c.result();
 }
 
 /// Predicate-formatter which tests equality of Phase.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const Phase& a, const Phase& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Phase& a,
+                                          const Phase& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
@@ -357,10 +303,8 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 }
 
 /// Predicate-formatter which tests equality of PhaseRing::NextPhase.
-inline ::testing::AssertionResult IsEqual(const char* a_expression,
-                                          const char* b_expression,
-                                          const PhaseRing::NextPhase& a,
-                                          const PhaseRing::NextPhase& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                          const PhaseRing::NextPhase& a, const PhaseRing::NextPhase& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id, b.id));
@@ -370,10 +314,9 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression,
 
 /// Predicate-formatter which tests equality of
 /// std::vector<PhaseRing::NextPhase>.
-inline ::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    const std::vector<PhaseRing::NextPhase>& a,
-    const std::vector<PhaseRing::NextPhase>& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                          const std::vector<PhaseRing::NextPhase>& a,
+                                          const std::vector<PhaseRing::NextPhase>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));

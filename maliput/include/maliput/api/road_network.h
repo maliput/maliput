@@ -28,8 +28,7 @@ class RoadNetwork {
   /// Constructs a RoadNetwork instance. After creation, you are encouraged to
   /// validate it using ValidateRoadNetwork(), which is defined in
   /// maliput/api/road_network_validator.h.
-  RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
-              std::unique_ptr<const rules::RoadRulebook> rulebook,
+  RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry, std::unique_ptr<const rules::RoadRulebook> rulebook,
               std::unique_ptr<const rules::TrafficLightBook> traffic_light_book,
               std::unique_ptr<IntersectionBook> intersection_book,
               std::unique_ptr<rules::PhaseRingBook> phase_ring_book,
@@ -42,25 +41,15 @@ class RoadNetwork {
 
   const rules::RoadRulebook* rulebook() const { return rulebook_.get(); }
 
-  const rules::TrafficLightBook* traffic_light_book() const {
-    return traffic_light_book_.get();
-  }
+  const rules::TrafficLightBook* traffic_light_book() const { return traffic_light_book_.get(); }
 
-  IntersectionBook* intersection_book() const {
-    return intersection_book_.get();
-  }
+  IntersectionBook* intersection_book() const { return intersection_book_.get(); }
 
-  const rules::PhaseRingBook* phase_ring_book() const {
-    return phase_ring_book_.get();
-  }
+  const rules::PhaseRingBook* phase_ring_book() const { return phase_ring_book_.get(); }
 
-  const rules::RuleStateProvider* rule_state_provider() const {
-    return rule_state_provider_.get();
-  }
+  const rules::RuleStateProvider* rule_state_provider() const { return rule_state_provider_.get(); }
 
-  const rules::PhaseProvider* phase_provider() const {
-    return phase_provider_.get();
-  }
+  const rules::PhaseProvider* phase_provider() const { return phase_provider_.get(); }
 
  private:
   std::unique_ptr<const RoadGeometry> road_geometry_;

@@ -13,8 +13,7 @@ namespace maliput {
 /// @param input The YAML TrafficLights document.
 ///
 /// @return The newly created api::rules::TrafficLightBook instance.
-std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBook(
-    const std::string& input);
+std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBook(const std::string& input);
 
 /// Instantiates and returns an api::rules::TrafficLightBook instance based
 /// on the specified @p filename.
@@ -22,7 +21,6 @@ std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBook(
 /// @param filename The YAML file that contains a TrafficLights document.
 ///
 /// @return The newly created api::rules::TrafficLightBook instance.
-std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBookFromFile(
-    const std::string& filename);
+std::unique_ptr<api::rules::TrafficLightBook> LoadTrafficLightBookFromFile(const std::string& filename);
 
 }  // namespace maliput

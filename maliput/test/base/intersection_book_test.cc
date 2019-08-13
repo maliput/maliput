@@ -20,8 +20,8 @@ GTEST_TEST(IntersectionBookTest, BasicTest) {
   ManualPhaseProvider phase_provider;
   const Intersection::Id id("my intersection");
   const std::vector<api::rules::LaneSRange> region;
-  auto intersection = std::make_unique<Intersection>(
-      id, region, api::rules::PhaseRing::Id("phase ring"), &phase_provider);
+  auto intersection =
+      std::make_unique<Intersection>(id, region, api::rules::PhaseRing::Id("phase ring"), &phase_provider);
   const Intersection* intersection_ptr = intersection.get();
   IntersectionBook dut;
   EXPECT_THROW(dut.AddIntersection(nullptr), std::exception);

@@ -8,7 +8,6 @@
 
 #include "maliput/common/maliput_abort.h"
 
-
 namespace maliput {
 namespace multilane {
 
@@ -16,16 +15,14 @@ double ArcRoadCurve::FastCalcPFromS(double s, double r) const {
   const double effective_radius = offset_radius(r);
   const double elevation_domain = effective_radius / radius_;
   return s / (l_max() * std::sqrt(elevation_domain * elevation_domain +
-                                  elevation().fake_gprime(1.) *
-                                  elevation().fake_gprime(1.)));
+                                  elevation().fake_gprime(1.) * elevation().fake_gprime(1.)));
 }
 
 double ArcRoadCurve::FastCalcSFromP(double p, double r) const {
   const double effective_radius = offset_radius(r);
   const double elevation_domain = effective_radius / radius_;
-  return p * l_max() * std::sqrt(elevation_domain * elevation_domain +
-                                 elevation().fake_gprime(p) *
-                                 elevation().fake_gprime(p));
+  return p * l_max() *
+         std::sqrt(elevation_domain * elevation_domain + elevation().fake_gprime(p) * elevation().fake_gprime(p));
 }
 
 namespace {
@@ -50,8 +47,7 @@ double wrap(double theta) {
 // interval, saturating is the usual. If the result is two intervals, saturating
 // involves the extra step picking the 'closest' interval to saturate
 // within.
-double saturate_on_wrapped_bounds(double theta, double theta_min,
-                                  double theta_max) {
+double saturate_on_wrapped_bounds(double theta, double theta_min, double theta_max) {
   MALIPUT_DEMAND(-M_PI <= theta);
   MALIPUT_DEMAND(theta <= M_PI);
   MALIPUT_DEMAND(theta_min <= theta_max);
@@ -72,19 +68,15 @@ double saturate_on_wrapped_bounds(double theta, double theta_min,
   if (theta_1 < theta_0 && theta_0 <= theta) return theta;
 
   // Saturate at the appropriate bound.
-  const double delta_0 = std::min(std::abs(theta - theta_0),
-                                  std::abs(theta - 2. * M_PI - theta_0));
-  const double delta_1 = std::min(std::abs(theta - theta_1),
-                                  std::abs(theta + 2. * M_PI - theta_1));
+  const double delta_0 = std::min(std::abs(theta - theta_0), std::abs(theta - 2. * M_PI - theta_0));
+  const double delta_1 = std::min(std::abs(theta - theta_1), std::abs(theta + 2. * M_PI - theta_1));
   return (delta_0 <= delta_1) ? theta_0 : theta_1;
 }
 
 }  // namespace
 
-drake::Vector3<double> ArcRoadCurve::ToCurveFrame(
-    const drake::Vector3<double>& geo_coordinate,
-    double r_min, double r_max,
-    const api::HBounds& height_bounds) const {
+drake::Vector3<double> ArcRoadCurve::ToCurveFrame(const drake::Vector3<double>& geo_coordinate, double r_min,
+                                                  double r_max, const api::HBounds& height_bounds) const {
   MALIPUT_DEMAND(r_min <= r_max);
   // TODO(jadecastro): Lift the zero superelevation and zero elevation gradient
   // restriction.
@@ -98,21 +90,17 @@ drake::Vector3<double> ArcRoadCurve::ToCurveFrame(
   const double theta_max = std::max(theta0_, d_theta_ + theta0_);
 
   // First, find a saturated theta that is nearest to point q.
-  const double theta_nearest =
-      saturate_on_wrapped_bounds(std::atan2(v(1), v(0)), theta_min, theta_max);
+  const double theta_nearest = saturate_on_wrapped_bounds(std::atan2(v(1), v(0)), theta_min, theta_max);
   // Find the angle swept from the beginning of the lane (s = 0) to
   // theta_nearest.
-  const double d_theta_nearest = (d_theta_ > 0.)
-      ? theta_nearest - wrap(theta_min) : wrap(theta_max) - theta_nearest;
+  const double d_theta_nearest = (d_theta_ > 0.) ? theta_nearest - wrap(theta_min) : wrap(theta_max) - theta_nearest;
   // Then, unwrap this angle (if necessary) to deal with possible crossings with
   // the ±π wrap-around point.
-  const double d_theta_nearest_unwrapped =
-      (d_theta_nearest < 0.) ? d_theta_nearest + 2. * M_PI : d_theta_nearest;
+  const double d_theta_nearest_unwrapped = (d_theta_nearest < 0.) ? d_theta_nearest + 2. * M_PI : d_theta_nearest;
   // Convert this angular displacement to arc length (s).
   const double p = d_theta_nearest_unwrapped / std::abs(d_theta_);
   // Compute r (its direction depends on the direction of the +s-coordinate)
-  const double r_unsaturated = (d_theta_ >= 0.) ?
-                               radius_ - v.norm() : v.norm() - radius_;
+  const double r_unsaturated = (d_theta_ >= 0.) ? radius_ - v.norm() : v.norm() - radius_;
   // Saturate r within drivable bounds.
   const double r = drake::math::saturate(r_unsaturated, r_min, r_max);
 
@@ -120,13 +108,11 @@ drake::Vector3<double> ArcRoadCurve::ToCurveFrame(
   // N.B. h is the geo z-coordinate referenced against the lane elevation (whose
   // `a` coefficient is normalized by lane length).
   const double h_unsaturated = geo_coordinate.z() - elevation().a() * l_max();
-  const double h = drake::math::saturate(h_unsaturated, height_bounds.min(),
-                                  height_bounds.max());
+  const double h = drake::math::saturate(h_unsaturated, height_bounds.min(), height_bounds.max());
   return drake::Vector3<double>(p, r, h);
 }
 
-bool ArcRoadCurve::IsValid(double r_min, double r_max,
-                           const api::HBounds& height_bounds) const {
+bool ArcRoadCurve::IsValid(double r_min, double r_max, const api::HBounds& height_bounds) const {
   // TODO(@agalbachicar)      There is no check on height constraints. When the
   //                          curve bends over itself, if it does, it must do it
   //                          with a difference in height greater than
@@ -158,8 +144,7 @@ bool ArcRoadCurve::IsValid(double r_min, double r_max,
   double theta_min = std::numeric_limits<double>::max();
   double theta_max = std::numeric_limits<double>::min();
   const CubicPolynomial& f_superelevation = superelevation();
-  auto update_range_given_p = [&theta_min, &theta_max,
-                               &f_superelevation](double p) {
+  auto update_range_given_p = [&theta_min, &theta_max, &f_superelevation](double p) {
     // Skip p if outside of domain [0, 1].
     if ((p < 0.) || (p > 1.)) {
       return;
@@ -175,28 +160,21 @@ bool ArcRoadCurve::IsValid(double r_min, double r_max,
   // ...possible extrema at the local min/max of superelevation (if the local
   // min/max occur within domain [0, 1]).
   if (f_superelevation.d() != 0) {
-    const double p_plus =
-        (-f_superelevation.c() +
-         std::sqrt((f_superelevation.c() * f_superelevation.c()) -
-                   (3. * f_superelevation.b() * f_superelevation.d()))) /
-        (3. * f_superelevation.d());
+    const double p_plus = (-f_superelevation.c() + std::sqrt((f_superelevation.c() * f_superelevation.c()) -
+                                                             (3. * f_superelevation.b() * f_superelevation.d()))) /
+                          (3. * f_superelevation.d());
     update_range_given_p(p_plus);
-    const double p_minus =
-        (-f_superelevation.c() -
-         std::sqrt((f_superelevation.c() * f_superelevation.c()) -
-                   (3. * f_superelevation.b() * f_superelevation.d()))) /
-        (3. * f_superelevation.d());
+    const double p_minus = (-f_superelevation.c() - std::sqrt((f_superelevation.c() * f_superelevation.c()) -
+                                                              (3. * f_superelevation.b() * f_superelevation.d()))) /
+                           (3. * f_superelevation.d());
     update_range_given_p(p_minus);
   } else if (f_superelevation.c() != 0) {
-    const double p_extremum = -f_superelevation.b() /
-                              (2. * f_superelevation.c());
+    const double p_extremum = -f_superelevation.b() / (2. * f_superelevation.c());
     update_range_given_p(p_extremum);
   }
   // If theta_min and theta_max flank zero, then min(abs(theta)) is 0....
   const double max_cos_theta =
-      std::cos(((theta_min < 0.) && (theta_max > 0.))
-                   ? 0.
-                   : std::min(std::abs(theta_min), std::abs(theta_max)));
+      std::cos(((theta_min < 0.) && (theta_max > 0.)) ? 0. : std::min(std::abs(theta_min), std::abs(theta_max)));
   // TODO(maddog@tri.global)  When you have nothing better to do, handle the
   //                          improbable case of superelevation >= 90 deg, too.
   if (d_theta_ > 0.) {

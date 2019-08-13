@@ -2,10 +2,10 @@
 
 #include <memory>
 
+#include "drake/common/autodiff.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
-#include "drake/common/drake_optional.h"
-#include "drake/common/eigen_autodiff_types.h"
 
 namespace maliput {
 namespace dragway {
@@ -99,10 +99,8 @@ class Lane final : public api::Lane {
   /// @param elevation_bounds The elevation bounds of the lane, uniform along
   ///        the entire reference path.
   ///
-  Lane(const Segment* segment, const api::LaneId& id,  int index, double length,
-       double y_offset, const api::RBounds& lane_bounds,
-       const api::RBounds& driveable_bounds,
-       const api::HBounds& elevation_bounds);
+  Lane(const Segment* segment, const api::LaneId& id, int index, double length, double y_offset,
+       const api::RBounds& lane_bounds, const api::RBounds& driveable_bounds, const api::HBounds& elevation_bounds);
 
   ~Lane() final = default;
 
@@ -130,17 +128,13 @@ class Lane final : public api::Lane {
 
   const api::Lane* do_to_right() const final { return lane_to_right_; }
 
-  const api::BranchPoint* DoGetBranchPoint(
-      const api::LaneEnd::Which which_end) const final;
+  const api::BranchPoint* DoGetBranchPoint(const api::LaneEnd::Which which_end) const final;
 
-  const api::LaneEndSet* DoGetConfluentBranches(
-      const api::LaneEnd::Which which_end) const final;
+  const api::LaneEndSet* DoGetConfluentBranches(const api::LaneEnd::Which which_end) const final;
 
-  const api::LaneEndSet* DoGetOngoingBranches(
-      const api::LaneEnd::Which which_end) const final;
+  const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd::Which which_end) const final;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(
-      const api::LaneEnd::Which which_end) const final;
+  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const final;
 
   double do_length() const final { return length_; }
 
@@ -150,42 +144,33 @@ class Lane final : public api::Lane {
 
   api::HBounds do_elevation_bounds(double, double) const final;
 
-  api::LanePosition DoEvalMotionDerivatives(
-      const api::LanePosition& position,
-      const api::IsoLaneVelocity& velocity) const final;
+  api::LanePosition DoEvalMotionDerivatives(const api::LanePosition& position,
+                                            const api::IsoLaneVelocity& velocity) const final;
 
-  api::GeoPosition DoToGeoPosition(const api::LanePosition& lane_pos) const
-      final;
+  api::GeoPosition DoToGeoPosition(const api::LanePosition& lane_pos) const final;
 
   api::GeoPositionT<drake::AutoDiffXd> DoToGeoPositionAutoDiff(
       const api::LanePositionT<drake::AutoDiffXd>& lane_pos) const final;
 
-  api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const
-      final;
+  api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const final;
 
   api::GeoPositionT<drake::symbolic::Expression> DoToGeoPositionSymbolic(
       const api::LanePositionT<drake::symbolic::Expression>& lane_pos) const final;
 
-
-  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_pos,
-                                     api::GeoPosition* nearest_point,
+  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_pos, api::GeoPosition* nearest_point,
                                      double* distance) const final;
 
-  api::LanePositionT<drake::AutoDiffXd> DoToLanePositionAutoDiff(
-      const api::GeoPositionT<drake::AutoDiffXd>& geo_pos,
-      api::GeoPositionT<drake::AutoDiffXd>* nearest_point,
-      drake::AutoDiffXd* distance) const final;
+  api::LanePositionT<drake::AutoDiffXd> DoToLanePositionAutoDiff(const api::GeoPositionT<drake::AutoDiffXd>& geo_pos,
+                                                                 api::GeoPositionT<drake::AutoDiffXd>* nearest_point,
+                                                                 drake::AutoDiffXd* distance) const final;
 
   api::LanePositionT<drake::symbolic::Expression> DoToLanePositionSymbolic(
       const api::GeoPositionT<drake::symbolic::Expression>& geo_pos,
-      api::GeoPositionT<drake::symbolic::Expression>* nearest_point,
-      drake::symbolic::Expression* distance) const final;
+      api::GeoPositionT<drake::symbolic::Expression>* nearest_point, drake::symbolic::Expression* distance) const final;
 
   template <typename T>
-  api::LanePositionT<T> ImplDoToLanePositionT(
-      const api::GeoPositionT<T>& geo_pos,
-      api::GeoPositionT<T>* nearest_point,
-      T* distance) const;
+  api::LanePositionT<T> ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos, api::GeoPositionT<T>* nearest_point,
+                                              T* distance) const;
 
   const Segment* segment_{};  // The segment to which this lane belongs.
   const api::LaneId id_;

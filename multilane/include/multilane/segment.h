@@ -17,7 +17,6 @@
 #include "multilane/lane.h"
 #include "multilane/road_curve.h"
 
-
 namespace maliput {
 namespace multilane {
 
@@ -48,9 +47,8 @@ class Segment : public api::Segment {
   /// `r_min`.
   /// @param elevation_bounds The height bounds over the segment' surface.
   Segment(const api::SegmentId& id, const api::Junction* junction,
-          const std::function<void(const api::Lane*)>& register_lane,
-          std::unique_ptr<RoadCurve> road_curve, double r_min, double r_max,
-          const api::HBounds& elevation_bounds)
+          const std::function<void(const api::Lane*)>& register_lane, std::unique_ptr<RoadCurve> road_curve,
+          double r_min, double r_max, const api::HBounds& elevation_bounds)
       : id_(id),
         junction_(junction),
         register_lane_(register_lane),
@@ -61,8 +59,7 @@ class Segment : public api::Segment {
     MALIPUT_DEMAND(road_curve_.get() != nullptr);
     MALIPUT_DEMAND(r_min <= r_max);
     MALIPUT_DEMAND(road_curve_->IsValid(r_min_, r_max_, elevation_bounds_));
-    MALIPUT_DEMAND(junction_->road_geometry()->linear_tolerance() ==
-                   road_curve_->linear_tolerance());
+    MALIPUT_DEMAND(junction_->road_geometry()->linear_tolerance() == road_curve_->linear_tolerance());
   }
 
   /// Creates a new Lane object.

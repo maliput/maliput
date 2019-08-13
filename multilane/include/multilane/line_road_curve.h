@@ -14,7 +14,6 @@
 #include "maliput/api/lane_data.h"
 #include "multilane/road_curve.h"
 
-
 namespace maliput {
 namespace multilane {
 
@@ -44,16 +43,13 @@ class LineRoadCurve : public RoadCurve {
   /// positive number.
   /// @throws maliput::common::assertion_error if @p scale_length is not a
   /// positive number.
-  explicit LineRoadCurve(
-      const drake::Vector2<double>& xy0, const drake::Vector2<double>& dxy,
-      const CubicPolynomial& elevation,
-      const CubicPolynomial& superelevation,
-      double linear_tolerance, double scale_length,
-      ComputationPolicy computation_policy)
-      : RoadCurve(linear_tolerance, scale_length,
-                  elevation, superelevation,
-                  computation_policy),
-        p0_(xy0), dp_(dxy), heading_(std::atan2(dxy.y(), dxy.x())) {
+  explicit LineRoadCurve(const drake::Vector2<double>& xy0, const drake::Vector2<double>& dxy,
+                         const CubicPolynomial& elevation, const CubicPolynomial& superelevation,
+                         double linear_tolerance, double scale_length, ComputationPolicy computation_policy)
+      : RoadCurve(linear_tolerance, scale_length, elevation, superelevation, computation_policy),
+        p0_(xy0),
+        dp_(dxy),
+        heading_(std::atan2(dxy.y(), dxy.x())) {
     MALIPUT_DEMAND(dxy.norm() > kMinimumNorm);
   }
 
@@ -78,14 +74,10 @@ class LineRoadCurve : public RoadCurve {
 
   double l_max() const override { return dp_.norm(); }
 
-  drake::Vector3<double> ToCurveFrame(
-      const drake::Vector3<double>& geo_coordinate,
-      double r_min, double r_max,
-      const api::HBounds& height_bounds) const override;
+  drake::Vector3<double> ToCurveFrame(const drake::Vector3<double>& geo_coordinate, double r_min, double r_max,
+                                      const api::HBounds& height_bounds) const override;
 
-  bool IsValid(
-      double r_min, double r_max,
-      const api::HBounds& height_bounds) const override {
+  bool IsValid(double r_min, double r_max, const api::HBounds& height_bounds) const override {
     drake::unused(r_min);
     drake::unused(r_max);
     drake::unused(height_bounds);

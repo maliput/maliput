@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "maliput/api/intersection.h"
 #include "drake/common/drake_copyable.h"
+#include "maliput/api/intersection.h"
 
 namespace maliput {
 namespace api {
@@ -17,16 +17,12 @@ class IntersectionBook {
   virtual ~IntersectionBook() = default;
 
   /// Gets a list of all Intersections within this book.
-  std::vector<Intersection*> GetIntersections() {
-    return DoGetIntersections();
-  }
+  std::vector<Intersection*> GetIntersections() { return DoGetIntersections(); }
 
   /// Gets the specified Intersection. Returns nullptr if @p id is unrecognized.
   /// Otherwise, the returned pointer is guaranteed to remain valid throughout
   /// the lifetime of this IntersectionBook's instance.
-  Intersection* GetIntersection(const Intersection::Id& id) {
-    return DoGetIntersection(id);
-  }
+  Intersection* GetIntersection(const Intersection::Id& id) { return DoGetIntersection(id); }
 
  protected:
   IntersectionBook() = default;

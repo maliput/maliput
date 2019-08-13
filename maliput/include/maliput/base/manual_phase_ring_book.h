@@ -3,11 +3,11 @@
 #include <memory>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/right_of_way_rule.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 
@@ -39,11 +39,9 @@ class ManualPhaseRingBook : public api::rules::PhaseRingBook {
  private:
   std::vector<api::rules::PhaseRing::Id> DoGetPhaseRings() const override;
 
-  drake::optional<api::rules::PhaseRing> DoGetPhaseRing(
-      const api::rules::PhaseRing::Id& ring_id) const override;
+  drake::optional<api::rules::PhaseRing> DoGetPhaseRing(const api::rules::PhaseRing::Id& ring_id) const override;
 
-  drake::optional<api::rules::PhaseRing> DoFindPhaseRing(
-      const api::rules::RightOfWayRule::Id& rule_id) const override;
+  drake::optional<api::rules::PhaseRing> DoFindPhaseRing(const api::rules::RightOfWayRule::Id& rule_id) const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

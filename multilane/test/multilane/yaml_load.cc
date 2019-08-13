@@ -7,16 +7,15 @@
 
 #include <gflags/gflags.h>
 
+#include "drake/common/text_logging.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/common/logger.h"
 #include "multilane/builder.h"
 #include "multilane/loader.h"
 
-
 namespace multilane = maliput::multilane;
 
-DEFINE_string(yaml_file, "",
-              "yaml input file defining a multilane road geometry");
+DEFINE_string(yaml_file, "", "yaml input file defining a multilane road geometry");
 
 int main(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);

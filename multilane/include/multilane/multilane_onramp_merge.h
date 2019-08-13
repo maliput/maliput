@@ -25,12 +25,8 @@ struct MultilaneRoadCharacteristics {
   /// @param lshoulder The left shoulder width.
   /// @param rshoulder The right shoulder width.
   /// @param lnumber The number of lanes.
-  MultilaneRoadCharacteristics(double lw, double lshoulder, double rshoulder,
-                               int lnumber)
-      : lane_width(lw),
-        left_shoulder(lshoulder),
-        right_shoulder(rshoulder),
-        lane_number(lnumber) {}
+  MultilaneRoadCharacteristics(double lw, double lshoulder, double rshoulder, int lnumber)
+      : lane_width(lw), left_shoulder(lshoulder), right_shoulder(rshoulder), lane_number(lnumber) {}
 
   const double lane_width{4.};
   const double left_shoulder{2.};
@@ -81,13 +77,11 @@ class MultilaneOnrampMerge {
   /// Constructor for the factory.
   ///
   /// @param rc A structure that aggregates the road boundary data.
-  explicit MultilaneOnrampMerge(const MultilaneRoadCharacteristics& rc)
-      : rc_(rc) {}
+  explicit MultilaneOnrampMerge(const MultilaneRoadCharacteristics& rc) : rc_(rc) {}
 
   /// Constructor for the example, using default MultilaneRoadCharacteristics
   /// settings.
-  MultilaneOnrampMerge()
-      : MultilaneOnrampMerge(MultilaneRoadCharacteristics{}) {}
+  MultilaneOnrampMerge() : MultilaneOnrampMerge(MultilaneRoadCharacteristics{}) {}
 
   /// @return A std::unique_ptr<const maliput::api::RoadGeometry> with the
   /// onramp example.
@@ -98,8 +92,7 @@ class MultilaneOnrampMerge {
   const double linear_tolerance_{0.01};
   const double angular_tolerance_{0.01 * M_PI};
   const double scale_length_{1.};
-  const maliput::multilane::ComputationPolicy computation_policy_{
-      maliput::multilane::ComputationPolicy::kPreferSpeed};
+  const maliput::multilane::ComputationPolicy computation_policy_{maliput::multilane::ComputationPolicy::kPreferSpeed};
   // Road characteristics.
   const MultilaneRoadCharacteristics rc_;
 };

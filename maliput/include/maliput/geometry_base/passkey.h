@@ -12,7 +12,8 @@ namespace geometry_base {
 /// passkey instance at the call site).
 ///
 /// @see https://arne-mertz.de/2016/10/passkey-idiom/
-/// @see https://stackoverflow.com/questions/3324898/can-we-increase-the-re-usability-of-this-key-oriented-access-protection-pattern
+/// @see
+/// https://stackoverflow.com/questions/3324898/can-we-increase-the-re-usability-of-this-key-oriented-access-protection-pattern
 template <class T>
 class Passkey {
  private:

@@ -2,13 +2,13 @@
 
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/type_specific_identifier.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace api {
@@ -32,8 +32,7 @@ class Intersection {
   /// part of the intersection.
   ///
   /// @param ring The PhaseRing that defines the phases within the intersection.
-  Intersection(const Id& id, const std::vector<rules::LaneSRange>& region,
-               const rules::PhaseRing& ring);
+  Intersection(const Id& id, const std::vector<rules::LaneSRange>& region, const rules::PhaseRing& ring);
 
   virtual ~Intersection() = default;
 
