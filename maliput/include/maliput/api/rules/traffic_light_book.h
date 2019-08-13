@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+
+#include "maliput/api/rules/traffic_lights.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 #include "maliput/api/rules/traffic_lights.h"
@@ -16,6 +19,11 @@ class TrafficLightBook {
 
   virtual ~TrafficLightBook() = default;
 
+  /// Returns a vector with all the TrafficLights this entity has.
+  std::vector<TrafficLight> TrafficLights() const {
+    return DoTrafficLights();
+  }
+
   /// Gets the specified TrafficLight. Returns drake::nullopt if @p id is unrecognized.
   drake::optional<TrafficLight> GetTrafficLight(const TrafficLight::Id& id) const { return DoGetTrafficLight(id); }
 
@@ -24,6 +32,8 @@ class TrafficLightBook {
 
  private:
   virtual drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id& id) const = 0;
+
+  virtual std::vector<TrafficLight> DoTrafficLights() const = 0;
 };
 
 }  // namespace rules

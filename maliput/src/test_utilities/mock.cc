@@ -177,6 +177,7 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
 
  private:
   drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id&) const override { return drake::nullopt; }
+  std::vector<TrafficLight> DoTrafficLights() const override { return {}; }
 };
 
 class MockPhaseRingBook final : public rules::PhaseRingBook {
