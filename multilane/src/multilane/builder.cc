@@ -3,8 +3,7 @@
 #include <cmath>
 #include <utility>
 
-#include "drake/common/text_logging.h"
-
+#include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 
 #include "multilane/arc_road_curve.h"
@@ -418,9 +417,9 @@ std::unique_ptr<const api::RoadGeometry> Builder::Build(const api::RoadGeometryI
 
   for (const std::unique_ptr<Group>& group : groups_) {
     Junction* junction = road_geometry->NewJunction(api::JunctionId{std::string("j:") + group->id()});
-    drake::log()->debug("junction: {}", junction->id().string());
+    maliput::log()->debug("junction: {}", junction->id().string());
     for (auto& connection : group->connections()) {
-      drake::log()->debug("connection: {}", connection->id());
+      maliput::log()->debug("connection: {}", connection->id());
       MALIPUT_DEMAND(!connection_was_built[connection]);
       lane_map[connection] = BuildConnection(connection, junction, road_geometry.get(), &bp_map);
       connection_was_built[connection] = true;
@@ -432,8 +431,8 @@ std::unique_ptr<const api::RoadGeometry> Builder::Build(const api::RoadGeometryI
       continue;
     }
     Junction* junction = road_geometry->NewJunction(api::JunctionId{std::string("j:") + connection->id()});
-    drake::log()->debug("junction: {}", junction->id().string());
-    drake::log()->debug("connection: {}", connection->id());
+    maliput::log()->debug("junction: {}", junction->id().string());
+    maliput::log()->debug("connection: {}", connection->id());
     lane_map[connection.get()] = BuildConnection(connection.get(), junction, road_geometry.get(), &bp_map);
   }
 
@@ -448,7 +447,7 @@ std::unique_ptr<const api::RoadGeometry> Builder::Build(const api::RoadGeometryI
   // Make sure we didn't screw up!
   std::vector<std::string> failures = road_geometry->CheckInvariants();
   for (const auto& s : failures) {
-    drake::log()->error(s);
+    maliput::log()->error(s);
   }
   MALIPUT_DEMAND(failures.size() == 0);
 

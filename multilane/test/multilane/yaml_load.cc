@@ -9,6 +9,7 @@
 
 #include "drake/common/text_logging.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/logger.h"
 #include "multilane/builder.h"
 #include "multilane/loader.h"
 
@@ -20,16 +21,16 @@ int main(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   if (FLAGS_yaml_file.empty()) {
-    drake::log()->error("No input file!");
+    maliput::log()->error("No input file!");
     return 1;
   }
-  drake::log()->info("Loading '{}'.", FLAGS_yaml_file);
+  maliput::log()->info("Loading '{}'.", FLAGS_yaml_file);
   auto rg = multilane::LoadFile(multilane::BuilderFactory(), FLAGS_yaml_file);
   const std::vector<std::string> failures = rg->CheckInvariants();
 
   if (!failures.empty()) {
     for (const auto& f : failures) {
-      drake::log()->error(f);
+      maliput::log()->error(f);
     }
     return 1;
   }
