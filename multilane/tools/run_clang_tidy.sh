@@ -38,4 +38,3 @@ if [ "$CLANGTIDYFAILED" -ne "0" ]; then
   echo $'\n*** ament_clang_tidy failed ***'
   exit 1
 fi
-
