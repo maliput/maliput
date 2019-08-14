@@ -142,7 +142,7 @@ class RangeValueRule : public Rule {
   std::vector<Range> ranges_;
 };
 
-/// Describes an arbitrary discrete and string based rule.
+/// Describes a discrete value rule. Each discrete value is a std::string.
 ///
 /// Semantics of this rule are based on _all_ possible values that this
 /// Rule::TypeId could have (as specified by RuleRegistry::FindRuleByType()),
