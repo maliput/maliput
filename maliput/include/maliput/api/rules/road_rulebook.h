@@ -51,7 +51,7 @@ class RoadRulebook {
     return DoFindRules(ranges, tolerance);
   }
 
-  /// Returns a QueryResults structure with all rules in this RoadRulebook.
+  /// Returns all the rules in this RoadRulebook.
   QueryResults Rules() const {
     return DoRules();
   }
