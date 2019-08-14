@@ -1,6 +1,7 @@
 #include "maliput/base/manual_rulebook.h"
 
 #include <algorithm>
+#include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <string>
