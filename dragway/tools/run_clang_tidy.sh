@@ -16,7 +16,6 @@ check_program_installed() {
 
 check_program_installed ament_clang_tidy
 
-DIR_NAME='./'$1
 REGEX='/.*/.*\.\(c\|cc\|cpp\|cxx\|h\|hh\|hpp\|hxx\)$'
 
 declare -i CLANGTIDYFAILED=0
@@ -28,7 +27,7 @@ declare -i CLANGTIDYFAILED=0
 if [ "$CLANGTIDYFAILED" -eq "0" ]; then
   pushd $REPO_DIR    
   # Run ament_clang_tidy
-  find -regex $DIR_NAME$REGEX -printf '%h\n' | sort | uniq | xargs ament_clang_tidy --config=.clang-tidy || CLANGTIDYFAILED=1
+  find -regex $REGEX -printf '%h\n' | sort | uniq | xargs ament_clang_tidy --config=./../.clang-tidy || CLANGTIDYFAILED=1
   popd
 else
   echo $'\n*** ament_clang_tidy failed, not doing style formatting ***'
