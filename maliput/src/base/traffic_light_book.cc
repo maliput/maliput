@@ -63,5 +63,4 @@ std::vector<TrafficLight> TrafficLightBook::DoTrafficLights() const {
   return impl_->DoTrafficLights();
 }
 
-
 }  // namespace maliput

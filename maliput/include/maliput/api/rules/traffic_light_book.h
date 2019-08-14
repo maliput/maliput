@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "maliput/api/rules/traffic_lights.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+
 #include "maliput/api/rules/traffic_lights.h"
 
 namespace maliput {
@@ -19,7 +19,7 @@ class TrafficLightBook {
 
   virtual ~TrafficLightBook() = default;
 
-  /// Returns a vector with all the TrafficLights this entity has.
+  /// Returns all TrafficLights in this book.
   std::vector<TrafficLight> TrafficLights() const {
     return DoTrafficLights();
   }
