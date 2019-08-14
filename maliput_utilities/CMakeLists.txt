@@ -41,8 +41,8 @@ add_subdirectory(src)
 if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(test)
-  add_test(NAME CLANGFORMAT COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../tools/run_clang_format.sh maliput_utilities)
-  # add_test(NAME CLANGTIDY COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../tools/run_clang_tidy.sh maliput_utilities)
+  add_test(NAME CLANGFORMAT COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../tools/run_clang_format.sh)
+  # add_test(NAME CLANGTIDY COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../tools/run_clang_tidy.sh)
 endif()
 
 ##############################################################################
