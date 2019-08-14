@@ -148,5 +148,27 @@ TEST_F(ManualRulebookTest, FindRules) {
   EXPECT_EQ(toofar.direction_usage.size(), 0);
 }
 
+TEST_F(ManualRulebookTest, GetAllRules) {
+  ManualRulebook dut;
+
+  const RoadRulebook::QueryResults empty = dut.Rules();
+  EXPECT_TRUE(empty.right_of_way.empty());
+  EXPECT_TRUE(empty.speed_limit.empty());
+  EXPECT_TRUE(empty.direction_usage.empty());
+
+  dut.AddRule(kSpeedLimit);
+  dut.AddRule(kRightOfWay);
+  const RoadRulebook::QueryResults nonempty = dut.Rules();
+  EXPECT_EQ(nonempty.right_of_way.size(), 1);
+  EXPECT_EQ(nonempty.speed_limit.size(), 1);
+  EXPECT_EQ(nonempty.direction_usage.size(), 0);
+
+  dut.AddRule(kDirectionUsage);
+  const RoadRulebook::QueryResults full = dut.Rules();
+  EXPECT_EQ(full.right_of_way.size(), 1);
+  EXPECT_EQ(full.speed_limit.size(), 1);
+  EXPECT_EQ(full.direction_usage.size(), 1);
+}
+
 }  // namespace
 }  // namespace maliput

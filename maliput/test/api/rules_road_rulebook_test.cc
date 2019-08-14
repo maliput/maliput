@@ -46,6 +46,10 @@ class MockRulebook : public RoadRulebook {
     return results;
   }
 
+  virtual QueryResults DoRules() const {
+    return QueryResults{{kRightOfWay}, {kSpeedLimit}, {kDirectionUsage}};
+  }
+
   virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const {
     if (id != kRightOfWay.id()) {
       throw std::out_of_range("");
@@ -84,6 +88,11 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
 
   const double kNegativeTolerance = -1.;
   EXPECT_THROW(dut.FindRules({}, kNegativeTolerance), maliput::common::assertion_error);
+
+  nonempty = dut.Rules();
+  EXPECT_EQ(nonempty.right_of_way.size(), 1);
+  EXPECT_EQ(nonempty.speed_limit.size(), 1);
+  EXPECT_EQ(nonempty.direction_usage.size(), 1);
 
   EXPECT_EQ(dut.GetRule(dut.kRightOfWay.id()).id(), dut.kRightOfWay.id());
   EXPECT_THROW(dut.GetRule(RightOfWayRule::Id("xxx")), std::out_of_range);

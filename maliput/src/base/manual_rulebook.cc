@@ -1,6 +1,7 @@
 #include "maliput/base/manual_rulebook.h"
 
 #include <algorithm>
+#include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -98,6 +99,20 @@ class ManualRulebook::Impl {
         }
       }
     }
+    return result;
+  }
+
+  QueryResults DoRules() const {
+    QueryResults result;
+    std::transform(right_of_ways_.begin(), right_of_ways_.end(),
+                   std::back_inserter(result.right_of_way),
+                   [](const auto& key_val) { return key_val.second; });
+    std::transform(speed_limits_.begin(), speed_limits_.end(),
+                   std::back_inserter(result.speed_limit),
+                   [](const auto& key_val) { return key_val.second; });
+    std::transform(direction_usage_rules_.begin(), direction_usage_rules_.end(),
+                   std::back_inserter(result.direction_usage),
+                   [](const auto& key_val) { return key_val.second; });
     return result;
   }
 
@@ -236,6 +251,8 @@ void ManualRulebook::RemoveRule(const api::rules::DirectionUsageRule::Id& id) { 
 QueryResults ManualRulebook::DoFindRules(const std::vector<LaneSRange>& ranges, double tolerance) const {
   return impl_->DoFindRules(ranges, tolerance);
 }
+
+QueryResults ManualRulebook::DoRules() const { return impl_->DoRules(); }
 
 RightOfWayRule ManualRulebook::DoGetRule(const RightOfWayRule::Id& id) const { return impl_->DoGetRule(id); }
 

@@ -51,6 +51,11 @@ class RoadRulebook {
     return DoFindRules(ranges, tolerance);
   }
 
+  /// Returns all the rules in this RoadRulebook.
+  QueryResults Rules() const {
+    return DoRules();
+  }
+
   /// Returns the RightOfWayRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
@@ -75,6 +80,7 @@ class RoadRulebook {
   // corresponding public methods.
   //@{
   virtual QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double tolerance) const = 0;
+  virtual QueryResults DoRules() const = 0;
   virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const = 0;
   virtual SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const = 0;
   virtual DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const = 0;
