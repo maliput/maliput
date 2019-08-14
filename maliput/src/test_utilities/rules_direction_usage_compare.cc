@@ -2,30 +2,26 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/test_utilities/rules_test_utilities.h"
 #include "drake/common/unused.h"
+#include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace test {
 
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   rules::DirectionUsageRule::State::Type a,
-                                   rules::DirectionUsageRule::State::Type b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   rules::DirectionUsageRule::State::Type a, rules::DirectionUsageRule::State::Type b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
-::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    rules::DirectionUsageRule::State::Severity a,
-    rules::DirectionUsageRule::State::Severity b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   rules::DirectionUsageRule::State::Severity a,
+                                   rules::DirectionUsageRule::State::Severity b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const rules::DirectionUsageRule::State& a,
                                    const rules::DirectionUsageRule::State& b) {
   drake::unused(a_expression, b_expression);
@@ -38,15 +34,12 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(
     const char* a_expression, const char* b_expression,
-    const std::unordered_map<rules::DirectionUsageRule::State::Id,
-                             rules::DirectionUsageRule::State>& a,
-    const std::unordered_map<rules::DirectionUsageRule::State::Id,
-                             rules::DirectionUsageRule::State>& b) {
+    const std::unordered_map<rules::DirectionUsageRule::State::Id, rules::DirectionUsageRule::State>& a,
+    const std::unordered_map<rules::DirectionUsageRule::State::Id, rules::DirectionUsageRule::State>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
-  const std::unordered_map<rules::DirectionUsageRule::State::Id,
-                           rules::DirectionUsageRule::State>& largest =
+  const std::unordered_map<rules::DirectionUsageRule::State::Id, rules::DirectionUsageRule::State>& largest =
       (a.size() < b.size()) ? b : a;
 
   for (const auto& pair : largest) {
@@ -62,10 +55,8 @@ namespace test {
   return c.result();
 }
 
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const rules::DirectionUsageRule& a,
-                                   const rules::DirectionUsageRule& b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const rules::DirectionUsageRule& a, const rules::DirectionUsageRule& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));

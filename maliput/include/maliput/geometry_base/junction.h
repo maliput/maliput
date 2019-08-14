@@ -6,12 +6,12 @@
 #include <utility>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "maliput/geometry_base/passkey.h"
 #include "maliput/geometry_base/segment.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -43,15 +43,13 @@ class Junction : public api::Junction {
   /// @throws std::exception if `segment` is empty.
   template <class T>
   T* AddSegment(std::unique_ptr<T> segment) {
-    static_assert(std::is_base_of<Segment, T>::value,
-                  "T is not derived from geometry_base::Segment");
+    static_assert(std::is_base_of<Segment, T>::value, "T is not derived from geometry_base::Segment");
     T* const raw_pointer = segment.get();
     AddSegmentPrivate(std::move(segment));
     return raw_pointer;
   }
 
   ~Junction() override = default;
-
 
 #ifndef DRAKE_DOXYGEN_CXX
   // Notifies Junction of its parent RoadGeometry.
@@ -69,11 +67,9 @@ class Junction : public api::Junction {
   // @pre `segment_indexing_callback` is non-empty.
   // @pre `lane_indexing_callback` is non-empty.
   // @pre Parent RoadGeometry and the callbacks have not already been set.
-  void AttachToRoadGeometry(
-      Passkey<RoadGeometry>,
-      const api::RoadGeometry* road_geometry,
-      const std::function<void(const api::Segment*)>& segment_indexing_callback,
-      const std::function<void(const api::Lane*)>& lane_indexing_callback);
+  void AttachToRoadGeometry(Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry,
+                            const std::function<void(const api::Segment*)>& segment_indexing_callback,
+                            const std::function<void(const api::Lane*)>& lane_indexing_callback);
 #endif  // DRAKE_DOXYGEN_CXX
 
  private:
@@ -86,9 +82,7 @@ class Junction : public api::Junction {
 
   int do_num_segments() const override { return segments_.size(); }
 
-  const api::Segment* do_segment(int index) const override {
-    return segments_.at(index).get();
-  }
+  const api::Segment* do_segment(int index) const override { return segments_.at(index).get(); }
 
   const api::JunctionId id_;
   const api::RoadGeometry* road_geometry_{};
@@ -96,7 +90,6 @@ class Junction : public api::Junction {
   std::function<void(const api::Lane*)> lane_indexing_callback_;
   std::vector<std::unique_ptr<Segment>> segments_;
 };
-
 
 }  // namespace geometry_base
 }  // namespace maliput

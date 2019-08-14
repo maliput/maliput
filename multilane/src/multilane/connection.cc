@@ -1,23 +1,22 @@
 #include "multilane/connection.h"
 
+#include "drake/common/eigen_types.h"
 #include "multilane/arc_road_curve.h"
 #include "multilane/line_road_curve.h"
-#include "drake/common/eigen_types.h"
 
 namespace maliput {
 namespace multilane {
 
 std::ostream& operator<<(std::ostream& out, const EndpointXy& endpoint_xy) {
-  return out << "(x = " << endpoint_xy.x() << ", y = " << endpoint_xy.y()
-             << ", heading = " << endpoint_xy.heading() << ")";
+  return out << "(x = " << endpoint_xy.x() << ", y = " << endpoint_xy.y() << ", heading = " << endpoint_xy.heading()
+             << ")";
 }
 
 std::ostream& operator<<(std::ostream& out, const EndpointZ& endpoint_z) {
-  return out << "(z = " << endpoint_z.z() << ", z_dot = " << endpoint_z.z_dot()
-             << ", theta = " << endpoint_z.theta() << ", theta_dot = "
-             << (endpoint_z.theta_dot().has_value()
-                     ? std::to_string(*endpoint_z.theta_dot())
-                     : std::string("drake::nullopt"))
+  return out << "(z = " << endpoint_z.z() << ", z_dot = " << endpoint_z.z_dot() << ", theta = " << endpoint_z.theta()
+             << ", theta_dot = "
+             << (endpoint_z.theta_dot().has_value() ? std::to_string(*endpoint_z.theta_dot())
+                                                    : std::string("drake::nullopt"))
              << ")";
 }
 
@@ -30,16 +29,12 @@ std::ostream& operator<<(std::ostream& out, const LineOffset& line_offset) {
 }
 
 std::ostream& operator<<(std::ostream& out, const ArcOffset& arc_offset) {
-  return out << "(r: " << arc_offset.radius()
-             << ", d_theta: " << arc_offset.d_theta() << ")";
+  return out << "(r: " << arc_offset.radius() << ", d_theta: " << arc_offset.d_theta() << ")";
 }
 
-Connection::Connection(const std::string& id, const Endpoint& start,
-                       const EndpointZ& end_z, int num_lanes, double r0,
-                       double lane_width, double left_shoulder,
-                       double right_shoulder, const LineOffset& line_offset,
-                       double linear_tolerance, double scale_length,
-                       ComputationPolicy computation_policy)
+Connection::Connection(const std::string& id, const Endpoint& start, const EndpointZ& end_z, int num_lanes, double r0,
+                       double lane_width, double left_shoulder, double right_shoulder, const LineOffset& line_offset,
+                       double linear_tolerance, double scale_length, ComputationPolicy computation_policy)
     : type_(kLine),
       id_(id),
       start_(start),
@@ -49,8 +44,7 @@ Connection::Connection(const std::string& id, const Endpoint& start,
       left_shoulder_(left_shoulder),
       right_shoulder_(right_shoulder),
       r_min_(r0 - lane_width / 2. - right_shoulder),
-      r_max_(r0 + lane_width * (static_cast<double>(num_lanes - 1) + 0.5) +
-             left_shoulder),
+      r_max_(r0 + lane_width * (static_cast<double>(num_lanes - 1) + 0.5) + left_shoulder),
       linear_tolerance_(linear_tolerance),
       scale_length_(scale_length),
       computation_policy_(computation_policy),
@@ -66,11 +60,9 @@ Connection::Connection(const std::string& id, const Endpoint& start,
   MALIPUT_DEMAND(start.z().theta_dot().has_value());
   MALIPUT_DEMAND(end_z.theta_dot().has_value());
   // Computes end Endpoint and RoadCurve.
-  end_ = Endpoint(
-      {start_.xy().x() + line_length_ * std::cos(start_.xy().heading()),
-       start_.xy().y() + line_length_ * std::sin(start_.xy().heading()),
-       start_.xy().heading()},
-      end_z);
+  end_ = Endpoint({start_.xy().x() + line_length_ * std::cos(start_.xy().heading()),
+                   start_.xy().y() + line_length_ * std::sin(start_.xy().heading()), start_.xy().heading()},
+                  end_z);
   road_curve_ = CreateRoadCurve();
   // TODO(agalbachicar)  Modify Connection API to provide support for HBounds
   //                     once RoadCurve's children are capable of computing
@@ -78,12 +70,9 @@ Connection::Connection(const std::string& id, const Endpoint& start,
   MALIPUT_DEMAND(road_curve_->IsValid(r_min_, r_max_, {0., 0.}));
 }
 
-Connection::Connection(const std::string& id, const Endpoint& start,
-                       const EndpointZ& end_z, int num_lanes, double r0,
-                       double lane_width, double left_shoulder,
-                       double right_shoulder, const ArcOffset& arc_offset,
-                       double linear_tolerance, double scale_length,
-                       ComputationPolicy computation_policy)
+Connection::Connection(const std::string& id, const Endpoint& start, const EndpointZ& end_z, int num_lanes, double r0,
+                       double lane_width, double left_shoulder, double right_shoulder, const ArcOffset& arc_offset,
+                       double linear_tolerance, double scale_length, ComputationPolicy computation_policy)
     : type_(kArc),
       id_(id),
       start_(start),
@@ -93,8 +82,7 @@ Connection::Connection(const std::string& id, const Endpoint& start,
       left_shoulder_(left_shoulder),
       right_shoulder_(right_shoulder),
       r_min_(r0 - lane_width / 2. - right_shoulder),
-      r_max_(r0 + lane_width * (static_cast<double>(num_lanes - 1) + 0.5) +
-             left_shoulder),
+      r_max_(r0 + lane_width * (static_cast<double>(num_lanes - 1) + 0.5) + left_shoulder),
       linear_tolerance_(linear_tolerance),
       scale_length_(scale_length),
       computation_policy_(computation_policy),
@@ -117,9 +105,7 @@ Connection::Connection(const std::string& id, const Endpoint& start,
   cy_ = start.xy().y() - (radius_ * std::sin(theta0_));
   const double theta1 = theta0_ + d_theta_;
   end_ = Endpoint(
-      {cx_ + radius_ * std::cos(theta1), cy_ + radius_ * std::sin(theta1),
-       start_.xy().heading() + d_theta_},
-      end_z);
+      {cx_ + radius_ * std::cos(theta1), cy_ + radius_ * std::sin(theta1), start_.xy().heading() + d_theta_}, end_z);
   road_curve_ = CreateRoadCurve();
   // TODO(agalbachicar)  Modify Connection API to provide support for HBounds
   //                     once RoadCurve's children are capable of computing
@@ -142,29 +128,23 @@ Endpoint Connection::LaneStart(int lane_index) const {
 
   // Computes w_prime to obtain ∂z/∂p.
   const drake::Vector3<double> w_prime =
-      road_curve_->W_prime_of_prh(0., r, 0., road_curve_->Rabg_of_p(0.),
-                                  road_curve_->elevation().f_dot_p(0.));
+      road_curve_->W_prime_of_prh(0., r, 0., road_curve_->Rabg_of_p(0.), road_curve_->elevation().f_dot_p(0.));
   // Computes ∂p/∂t based on Connection geometry type.
 
   // TODO(maddog-tri)  A (second-order?) contribution of theta_dot to ∂p/∂t is
   //                   being ignored.
-  const double cos_superelevation =
-      std::cos(road_curve_->superelevation().f_p(0.));
-  const double t_max = type_ == kLine ?
-      line_length_ :
-      std::abs(d_theta_ * (radius_ - std::copysign(1., d_theta_) * r *
-                           cos_superelevation));
+  const double cos_superelevation = std::cos(road_curve_->superelevation().f_p(0.));
+  const double t_max = type_ == kLine
+                           ? line_length_
+                           : std::abs(d_theta_ * (radius_ - std::copysign(1., d_theta_) * r * cos_superelevation));
   // Given that ∂p/∂t = 1 / t_max.
   const double z_dot = w_prime.z() / t_max;
   // theta_dot is derivative with respect to t, but the reference curve t
   // coordinate. So, a ∂t_0/∂t_i is needed, being t_0 the reference curve
   // coordinate and t_i the arc-length xy projection for lane_index lane.
-  const double theta_dot = type_ == kLine ? *start_.z().theta_dot()
-                                          : (*start_.z().theta_dot()) *
-                                                std::abs(d_theta_ * radius_) /
-                                                t_max;
-  return Endpoint({position[0], position[1], rotation.yaw()},
-                  {position[2], z_dot, start_.z().theta(), theta_dot});
+  const double theta_dot =
+      type_ == kLine ? *start_.z().theta_dot() : (*start_.z().theta_dot()) * std::abs(d_theta_ * radius_) / t_max;
+  return Endpoint({position[0], position[1], rotation.yaw()}, {position[2], z_dot, start_.z().theta(), theta_dot});
 }
 
 Endpoint Connection::LaneEnd(int lane_index) const {
@@ -182,29 +162,23 @@ Endpoint Connection::LaneEnd(int lane_index) const {
 
   // Computes w_prime to obtain ∂z/∂p.
   const drake::Vector3<double> w_prime =
-      road_curve_->W_prime_of_prh(1., r, 0., road_curve_->Rabg_of_p(1.),
-                                  road_curve_->elevation().f_dot_p(1.));
+      road_curve_->W_prime_of_prh(1., r, 0., road_curve_->Rabg_of_p(1.), road_curve_->elevation().f_dot_p(1.));
   // Computes ∂p/∂t based on Connection geometry type.
 
   // TODO(maddog-tri)  A (second-order?) contribution of theta_dot to ∂p/∂t is
   //                   being ignored.
-  const double cos_superelevation =
-      std::cos(road_curve_->superelevation().f_p(1.));
-  const double t_max = type_ == kLine ?
-      line_length_ :
-      std::abs(d_theta_ * (radius_ - std::copysign(1., d_theta_) * r *
-                           cos_superelevation));
+  const double cos_superelevation = std::cos(road_curve_->superelevation().f_p(1.));
+  const double t_max = type_ == kLine
+                           ? line_length_
+                           : std::abs(d_theta_ * (radius_ - std::copysign(1., d_theta_) * r * cos_superelevation));
   // Given that ∂p/∂t = 1 / t_max.
   const double z_dot = w_prime.z() / t_max;
   // theta_dot is derivative with respect to t, but the reference curve t
   // coordinate. So, a ∂t_0/∂t_i is needed, being t_0 the reference curve
   // coordinate and t_i the arc-length xy projection for lane_index lane.
-  const double theta_dot = type_ == kLine ? *end_.z().theta_dot()
-                                          : (*end_.z().theta_dot()) *
-                                                std::abs(d_theta_ * radius_) /
-                                                t_max;
-  return Endpoint({position[0], position[1], rotation.yaw()},
-                  {position[2], z_dot, end_.z().theta(), theta_dot});
+  const double theta_dot =
+      type_ == kLine ? *end_.z().theta_dot() : (*end_.z().theta_dot()) * std::abs(d_theta_ * radius_) / t_max;
+  return Endpoint({position[0], position[1], rotation.yaw()}, {position[2], z_dot, end_.z().theta(), theta_dot});
 }
 
 namespace {
@@ -216,12 +190,8 @@ namespace {
 //    g(0) = Y0          g'(0) = Ydot0
 //    g(dX) = Y0 + dY    g'(1) = Ydot1
 // and isotropically scaling it (scale both axes) by a factor of 1/dX
-CubicPolynomial MakeCubic(double dX, double Y0, double dY,
-                          double Ydot0, double Ydot1) {
-  return CubicPolynomial(Y0 / dX,
-                         Ydot0,
-                         (3. * dY / dX) - (2. * Ydot0) - Ydot1,
-                         Ydot0 + Ydot1 - (2. * dY / dX));
+CubicPolynomial MakeCubic(double dX, double Y0, double dY, double Ydot0, double Ydot1) {
+  return CubicPolynomial(Y0 / dX, Ydot0, (3. * dY / dX) - (2. * Ydot0) - Ydot1, Ydot0 + Ydot1 - (2. * dY / dX));
 }
 }  // namespace
 
@@ -229,41 +199,28 @@ std::unique_ptr<RoadCurve> Connection::CreateRoadCurve() const {
   switch (type_) {
     case Connection::kLine: {
       const drake::Vector2<double> xy0(start_.xy().x(), start_.xy().y());
-      const drake::Vector2<double> dxy(end_.xy().x() - start_.xy().x(),
-                                end_.xy().y() - start_.xy().y());
-      const CubicPolynomial elevation(MakeCubic(
-          dxy.norm(),
-          start_.z().z(),
-          end_.z().z() - start_.z().z(),
-          start_.z().z_dot(),
-          end_.z().z_dot()));
-      const CubicPolynomial superelevation(MakeCubic(
-          dxy.norm(), start_.z().theta(), end_.z().theta() - start_.z().theta(),
-          *start_.z().theta_dot(), *end_.z().theta_dot()));
-      return std::make_unique<LineRoadCurve>(
-          xy0, dxy, elevation, superelevation,
-          linear_tolerance_, scale_length_,
-          computation_policy_);
+      const drake::Vector2<double> dxy(end_.xy().x() - start_.xy().x(), end_.xy().y() - start_.xy().y());
+      const CubicPolynomial elevation(
+          MakeCubic(dxy.norm(), start_.z().z(), end_.z().z() - start_.z().z(), start_.z().z_dot(), end_.z().z_dot()));
+      const CubicPolynomial superelevation(MakeCubic(dxy.norm(), start_.z().theta(),
+                                                     end_.z().theta() - start_.z().theta(), *start_.z().theta_dot(),
+                                                     *end_.z().theta_dot()));
+      return std::make_unique<LineRoadCurve>(xy0, dxy, elevation, superelevation, linear_tolerance_, scale_length_,
+                                             computation_policy_);
     };
     case Connection::kArc: {
       const drake::Vector2<double> center(cx_, cy_);
       const double arc_length = radius_ * std::abs(d_theta_);
-      const CubicPolynomial elevation(MakeCubic(
-          arc_length,
-          start_.z().z(),
-          end_.z().z() - start_.z().z(),
-          start_.z().z_dot(),
-          end_.z().z_dot()));
-      const CubicPolynomial superelevation(MakeCubic(
-          arc_length, start_.z().theta(), end_.z().theta() - start_.z().theta(),
-          *start_.z().theta_dot(), *end_.z().theta_dot()));
-      return std::make_unique<ArcRoadCurve>(
-          center, radius_, theta0_, d_theta_, elevation, superelevation,
-          linear_tolerance_, scale_length_, computation_policy_);
+      const CubicPolynomial elevation(
+          MakeCubic(arc_length, start_.z().z(), end_.z().z() - start_.z().z(), start_.z().z_dot(), end_.z().z_dot()));
+      const CubicPolynomial superelevation(MakeCubic(arc_length, start_.z().theta(),
+                                                     end_.z().theta() - start_.z().theta(), *start_.z().theta_dot(),
+                                                     *end_.z().theta_dot()));
+      return std::make_unique<ArcRoadCurve>(center, radius_, theta0_, d_theta_, elevation, superelevation,
+                                            linear_tolerance_, scale_length_, computation_policy_);
     };
   }
-  MALIPUT_ABORT_MESSAGE(
-      "type_ is neither Connection::kArc nor Connection::kLine.");
+  MALIPUT_ABORT_MESSAGE("type_ is neither Connection::kArc nor Connection::kLine.");
 }
 
 }  // namespace multilane

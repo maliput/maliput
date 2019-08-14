@@ -23,14 +23,15 @@ class Lane;
 struct LaneEnd {
   /// Labels for the endpoints of a Lane.
   /// kStart is the "s == 0" end, and kFinish is the other end.
-  enum Which { kStart, kFinish, };
+  enum Which {
+    kStart,
+    kFinish,
+  };
 
   /// An arbitrary strict complete ordering, useful for, e.g., std::map.
   struct StrictOrder {
     bool operator()(const LaneEnd& lhs, const LaneEnd& rhs) const {
-      auto as_tuple = [](const LaneEnd& le) {
-        return std::tie(le.lane, le.end);
-      };
+      auto as_tuple = [](const LaneEnd& le) { return std::tie(le.lane, le.end); };
       return as_tuple(lhs) < as_tuple(rhs);
     }
   };
@@ -60,9 +61,7 @@ class Rotation {
 
   /// Constructs a Rotation from a quaternion @p quaternion (which will be
   /// normalized).
-  static Rotation FromQuat(const drake::Quaternion<double>& quaternion) {
-    return Rotation(quaternion.normalized());
-  }
+  static Rotation FromQuat(const drake::Quaternion<double>& quaternion) { return Rotation(quaternion.normalized()); }
 
   /// Constructs a Rotation from @p rpy, a vector of `[roll, pitch, yaw]`,
   /// expressing a roll around X, followed by pitch around Y,
@@ -82,20 +81,14 @@ class Rotation {
   const drake::Quaternion<double>& quat() const { return quaternion_; }
 
   /// Sets value from a Quaternion @p quaternion (which will be normalized).
-  void set_quat(const drake::Quaternion<double>& quaternion) {
-    quaternion_ = quaternion.normalized();
-  }
+  void set_quat(const drake::Quaternion<double>& quaternion) { quaternion_ = quaternion.normalized(); }
 
   /// Provides a 3x3 rotation matrix representation of "this" rotation.
-  drake::Matrix3<double> matrix() const {
-    return drake::math::RotationMatrix<double>(quaternion_).matrix();
-  }
+  drake::Matrix3<double> matrix() const { return drake::math::RotationMatrix<double>(quaternion_).matrix(); }
 
   /// Provides a representation of rotation as a vector of angles
   /// `[roll, pitch, yaw]` (in radians).
-  drake::math::RollPitchYaw<double> rpy() const {
-    return drake::math::RollPitchYaw<double>(quaternion_);
-  }
+  drake::math::RollPitchYaw<double> rpy() const { return drake::math::RollPitchYaw<double>(quaternion_); }
 
   // TODO(maddog@tri.global)  Deprecate and/or remove roll()/pitch()/yaw(),
   //                          since they hide the call to rpy(), and since
@@ -121,7 +114,6 @@ class Rotation {
 /// text-logging. It is not intended for serialization.
 std::ostream& operator<<(std::ostream& out, const Rotation& rotation);
 
-
 /// A position in 3-dimensional geographical Cartesian space, i.e., in the world
 /// frame, consisting of three components x, y, and z.
 ///
@@ -144,9 +136,7 @@ class GeoPositionT {
   GeoPositionT(const T& x, const T& y, const T& z) : xyz_(x, y, z) {}
 
   /// Constructs a GeoPositionT from a 3-vector @p xyz of the form `[x, y, z]`.
-  static GeoPositionT<T> FromXyz(const drake::Vector3<T>& xyz) {
-    return GeoPositionT<T>(xyz);
-  }
+  static GeoPositionT<T> FromXyz(const drake::Vector3<T>& xyz) { return GeoPositionT<T>(xyz); }
 
   /// Returns all components as 3-vector `[x, y, z]`.
   const drake::Vector3<T>& xyz() const { return xyz_; }
@@ -175,8 +165,7 @@ class GeoPositionT {
   /// Constructs a GeoPositionT<double> from other types, producing a clone if
   /// already double.
   GeoPositionT<double> MakeDouble() const {
-    return {drake::ExtractDoubleOrThrow(xyz_.x()),
-            drake::ExtractDoubleOrThrow(xyz_.y()),
+    return {drake::ExtractDoubleOrThrow(xyz_.x()), drake::ExtractDoubleOrThrow(xyz_.y()),
             drake::ExtractDoubleOrThrow(xyz_.z())};
   }
 
@@ -208,8 +197,7 @@ auto operator!=(const GeoPositionT<T>& lhs, const GeoPositionT<T>& rhs) {
 
 /// GeoPosition overload for the plus operator.
 template <typename T>
-GeoPositionT<T> operator+(const GeoPositionT<T>& lhs,
-                          const GeoPositionT<T>& rhs) {
+GeoPositionT<T> operator+(const GeoPositionT<T>& lhs, const GeoPositionT<T>& rhs) {
   drake::Vector3<T> result = lhs.xyz();
   result += rhs.xyz();
   return GeoPositionT<T>::FromXyz(result);
@@ -217,8 +205,7 @@ GeoPositionT<T> operator+(const GeoPositionT<T>& lhs,
 
 /// GeoPosition overload for the minus operator.
 template <typename T>
-GeoPositionT<T> operator-(const GeoPositionT<T>& lhs,
-                          const GeoPositionT<T>& rhs) {
+GeoPositionT<T> operator-(const GeoPositionT<T>& lhs, const GeoPositionT<T>& rhs) {
   drake::Vector3<T> result = lhs.xyz();
   result -= rhs.xyz();
   return GeoPositionT<T>::FromXyz(result);
@@ -226,8 +213,7 @@ GeoPositionT<T> operator-(const GeoPositionT<T>& lhs,
 
 /// GeoPosition overload for the multiplication by scalar operator.
 template <typename T>
-GeoPositionT<T> operator*(double lhs,
-                          const GeoPositionT<T>& rhs) {
+GeoPositionT<T> operator*(double lhs, const GeoPositionT<T>& rhs) {
   drake::Vector3<T> result = rhs.xyz();
   result *= lhs;
   return GeoPositionT<T>::FromXyz(result);
@@ -235,8 +221,7 @@ GeoPositionT<T> operator*(double lhs,
 
 /// GeoPosition overload for the multiplication by scalar operator.
 template <typename T>
-GeoPositionT<T> operator*(const GeoPositionT<T>& lhs,
-                          double rhs) {
+GeoPositionT<T> operator*(const GeoPositionT<T>& lhs, double rhs) {
   drake::Vector3<T> result = lhs.xyz();
   result *= rhs;
   return GeoPositionT<T>::FromXyz(result);
@@ -268,9 +253,7 @@ class LanePositionT {
   LanePositionT(const T& s, const T& r, const T& h) : srh_(s, r, h) {}
 
   /// Constructs a LanePosition from a 3-vector @p srh of the form `[s, r, h]`.
-  static LanePositionT<T> FromSrh(const drake::Vector3<T>& srh) {
-    return LanePositionT<T>(srh);
-  }
+  static LanePositionT<T> FromSrh(const drake::Vector3<T>& srh) { return LanePositionT<T>(srh); }
 
   /// Returns all components as 3-vector `[s, r, h]`.
   const drake::Vector3<T>& srh() const { return srh_; }
@@ -296,8 +279,7 @@ class LanePositionT {
   /// Constructs a LanePositionT<double> from other types, producing a clone if
   /// already double.
   LanePositionT<double> MakeDouble() const {
-    return {drake::ExtractDoubleOrThrow(srh_.x()),
-            drake::ExtractDoubleOrThrow(srh_.y()),
+    return {drake::ExtractDoubleOrThrow(srh_.x()), drake::ExtractDoubleOrThrow(srh_.y()),
             drake::ExtractDoubleOrThrow(srh_.z())};
   }
 
@@ -328,14 +310,12 @@ struct IsoLaneVelocity {
   IsoLaneVelocity() = default;
 
   /// Fully parameterized constructor.
-  IsoLaneVelocity(double _sigma_v, double _rho_v, double _eta_v)
-      : sigma_v(_sigma_v), rho_v(_rho_v), eta_v(_eta_v) {}
+  IsoLaneVelocity(double _sigma_v, double _rho_v, double _eta_v) : sigma_v(_sigma_v), rho_v(_rho_v), eta_v(_eta_v) {}
 
   double sigma_v{};
   double rho_v{};
   double eta_v{};
 };
-
 
 /// A position in the road network, consisting of a pointer to a specific
 /// Lane and a `Lane`-frame position in that Lane.
@@ -344,13 +324,11 @@ struct RoadPosition {
   RoadPosition() = default;
 
   /// Fully parameterized constructor.
-  RoadPosition(const Lane* _lane, const LanePosition& _pos)
-      : lane(_lane), pos(_pos) {}
+  RoadPosition(const Lane* _lane, const LanePosition& _pos) : lane(_lane), pos(_pos) {}
 
   const Lane* lane{};
   LanePosition pos;
 };
-
 
 /// Included in the return result of RoadGeometry::FindRoadPositions().
 struct RoadPositionResult {
@@ -362,7 +340,6 @@ struct RoadPositionResult {
   /// to RoadGeometry::FindRoadPositions().
   double distance{};
 };
-
 
 /// Bounds in the lateral dimension (r component) of a `Lane`-frame, consisting
 /// of a pair of minimum and maximum r value.  The bounds must straddle r = 0,
@@ -406,7 +383,6 @@ class RBounds {
   double min_{};
   double max_{};
 };
-
 
 /// Bounds in the elevation dimension (`h` component) of a `Lane`-frame,
 /// consisting of a pair of minimum and maximum `h` value.  The bounds

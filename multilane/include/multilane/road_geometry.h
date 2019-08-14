@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/basic_id_index.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
@@ -10,7 +11,6 @@
 #include "maliput/api/road_geometry.h"
 #include "multilane/branch_point.h"
 #include "multilane/junction.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace multilane {
@@ -24,10 +24,7 @@ class RoadGeometry : public api::RoadGeometry {
 
   /// Constructs an empty RoadGeometry with the specified tolerances and
   /// scale-length.
-  RoadGeometry(const api::RoadGeometryId& id,
-               double linear_tolerance,
-               double angular_tolerance,
-               double scale_length)
+  RoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length)
       : id_(id),
         linear_tolerance_(linear_tolerance),
         angular_tolerance_(angular_tolerance),
@@ -62,15 +59,12 @@ class RoadGeometry : public api::RoadGeometry {
   // `hint->lane` and lanes adjacent to `hint->lane`.
   // TODO(agalbachicar) Take into account `h` coordinate to return by minimum
   //                    `h` and then minimum `r`.
-  api::RoadPosition DoToRoadPosition(
-      const api::GeoPosition& geo_position,
-      const api::RoadPosition* hint,
-      api::GeoPosition* nearest_position,
-      double* distance) const override;
+  api::RoadPosition DoToRoadPosition(const api::GeoPosition& geo_position, const api::RoadPosition* hint,
+                                     api::GeoPosition* nearest_position, double* distance) const override;
 
   // TODO(agalbachicar) Needs implementation.
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(
-      const api::GeoPosition& geo_position, double radius) const override;
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::GeoPosition& geo_position,
+                                                           double radius) const override;
 
   double do_linear_tolerance() const override { return linear_tolerance_; }
 

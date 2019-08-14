@@ -12,18 +12,16 @@ namespace routing {
 namespace {
 
 // Adds the lanes in @p lane_end_set to @p container.
-void AddLanes(const LaneEndSet* lane_end_set,
-              std::vector<const Lane*>* container) {
+void AddLanes(const LaneEndSet* lane_end_set, std::vector<const Lane*>* container) {
   for (int i = 0; i < lane_end_set->size(); ++i) {
     const LaneEnd& lane_end = lane_end_set->get(i);
     container->push_back(lane_end.lane);
   }
 }
 
-std::vector<std::vector<const Lane*>> FindLaneSequencesHelper(
-    const Lane* start, const Lane* end,
-    const std::vector<const Lane*>& visited_list, double max_length_m,
-    double current_length_m) {
+std::vector<std::vector<const Lane*>> FindLaneSequencesHelper(const Lane* start, const Lane* end,
+                                                              const std::vector<const Lane*>& visited_list,
+                                                              double max_length_m, double current_length_m) {
   std::vector<std::vector<const Lane*>> result;
   if (current_length_m > max_length_m) return result;
 
@@ -34,8 +32,7 @@ std::vector<std::vector<const Lane*>> FindLaneSequencesHelper(
   AddLanes(start->GetOngoingBranches(LaneEnd::kFinish), &lanes_to_check);
 
   for (const auto& next_lane : lanes_to_check) {
-    if (std::find(visited_list.begin(), visited_list.end(), next_lane) !=
-        visited_list.end()) {
+    if (std::find(visited_list.begin(), visited_list.end(), next_lane) != visited_list.end()) {
       continue;
     }
     if (next_lane->id() == end->id()) {
@@ -43,9 +40,8 @@ std::vector<std::vector<const Lane*>> FindLaneSequencesHelper(
     } else {
       std::vector<const Lane*> new_visited_list = visited_list;
       new_visited_list.push_back(next_lane);
-      const auto subsequences = FindLaneSequencesHelper(
-          next_lane, end, new_visited_list, max_length_m,
-          current_length_m + next_lane->length());
+      const auto subsequences = FindLaneSequencesHelper(next_lane, end, new_visited_list, max_length_m,
+                                                        current_length_m + next_lane->length());
       for (std::vector<const Lane*> subsequence : subsequences) {
         subsequence.insert(subsequence.begin(), start);
         result.push_back(subsequence);
@@ -57,9 +53,7 @@ std::vector<std::vector<const Lane*>> FindLaneSequencesHelper(
 
 }  // namespace
 
-std::vector<std::vector<const Lane*>> FindLaneSequences(const Lane* start,
-                                                        const Lane* end,
-                                                        double max_length_m) {
+std::vector<std::vector<const Lane*>> FindLaneSequences(const Lane* start, const Lane* end, double max_length_m) {
   if (start->id() == end->id()) {
     return {{start}};
   }

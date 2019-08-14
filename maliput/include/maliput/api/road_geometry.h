@@ -20,7 +20,6 @@ namespace api {
 class BranchPoint;
 class Junction;
 
-
 /// Persistent identifier for a RoadGeometry element.
 using RoadGeometryId = TypeSpecificIdentifier<class RoadGeometry>;
 
@@ -61,9 +60,7 @@ class RoadGeometry {
   /// Returns the BranchPoint indexed by @p index.
   ///
   /// @pre @p index must be >= 0 and < num_branch_points().
-  const BranchPoint* branch_point(int index) const {
-    return do_branch_point(index);
-  }
+  const BranchPoint* branch_point(int index) const { return do_branch_point(index); }
 
   /// Accesses the IdIndex interface, which allows getting elements of
   /// the RoadGeometry's object graph by their unique id's.
@@ -110,9 +107,7 @@ class RoadGeometry {
   //                          of an entity some small dT in the past, then one
   //                          might expect an updated RoadPosition which is
   //                          nearby (e.g., on the same Lane).
-  RoadPosition ToRoadPosition(const GeoPosition& geo_position,
-                              const RoadPosition* hint,
-                              GeoPosition* nearest_position,
+  RoadPosition ToRoadPosition(const GeoPosition& geo_position, const RoadPosition* hint, GeoPosition* nearest_position,
                               double* distance) const {
     return DoToRoadPosition(geo_position, hint, nearest_position, distance);
   }
@@ -138,27 +133,20 @@ class RoadGeometry {
   /// Note that derivative implementations may choose to violate the above
   /// semantics for performance reasons. See docstrings of derivative
   /// implementations for details.
-  std::vector<RoadPositionResult> FindRoadPositions(
-      const GeoPosition& geo_position, double radius) const {
+  std::vector<RoadPositionResult> FindRoadPositions(const GeoPosition& geo_position, double radius) const {
     MALIPUT_THROW_UNLESS(radius >= 0.);
     return DoFindRoadPositions(geo_position, radius);
   }
 
   /// Returns the tolerance guaranteed for linear measurements (positions).
-  double linear_tolerance() const {
-    return do_linear_tolerance();
-  }
+  double linear_tolerance() const { return do_linear_tolerance(); }
 
   /// Returns the tolerance guaranteed for angular measurements (orientations).
-  double angular_tolerance() const {
-    return do_angular_tolerance();
-  }
+  double angular_tolerance() const { return do_angular_tolerance(); }
 
   // TODO(maddog@tri.global) Needs a precise mathematical definition.
   /// Returns the characteristic scale length expressed by this RoadGeometry.
-  double scale_length() const {
-    return do_scale_length();
-  }
+  double scale_length() const { return do_scale_length(); }
 
   /// Verifies certain invariants guaranteed by the API.
   ///
@@ -186,13 +174,10 @@ class RoadGeometry {
 
   virtual const IdIndex& DoById() const = 0;
 
-  virtual RoadPosition DoToRoadPosition(const GeoPosition& geo_pos,
-                                        const RoadPosition* hint,
-                                        GeoPosition* nearest_position,
-                                        double* distance) const = 0;
+  virtual RoadPosition DoToRoadPosition(const GeoPosition& geo_pos, const RoadPosition* hint,
+                                        GeoPosition* nearest_position, double* distance) const = 0;
 
-  virtual std::vector<RoadPositionResult> DoFindRoadPositions(
-      const GeoPosition& geo_position, double radius) const = 0;
+  virtual std::vector<RoadPositionResult> DoFindRoadPositions(const GeoPosition& geo_position, double radius) const = 0;
 
   virtual double do_linear_tolerance() const = 0;
 
@@ -201,7 +186,6 @@ class RoadGeometry {
   virtual double do_scale_length() const = 0;
   ///@}
 };
-
 
 /// Abstract interface for a collection of methods which allow accessing
 /// objects in a RoadGeometry's object graph (Lanes, Segments, Junctions,
@@ -215,27 +199,19 @@ class RoadGeometry::IdIndex {
   const Lane* GetLane(const LaneId& id) const { return DoGetLane(id); }
 
   // Returns all of the Lane instances.
-  const std::unordered_map<LaneId, const Lane*>& GetLanes() const {
-    return DoGetLanes();
-  }
+  const std::unordered_map<LaneId, const Lane*>& GetLanes() const { return DoGetLanes(); }
 
   /// Returns the Segment identified by @p id, or `nullptr` if @p id is
   /// unknown.
-  const Segment* GetSegment(const SegmentId& id) const {
-    return DoGetSegment(id);
-  }
+  const Segment* GetSegment(const SegmentId& id) const { return DoGetSegment(id); }
 
   /// Returns the Junction identified by @p id, or `nullptr` if @p id is
   /// unknown.
-  const Junction* GetJunction(const JunctionId& id) const {
-    return DoGetJunction(id);
-  }
+  const Junction* GetJunction(const JunctionId& id) const { return DoGetJunction(id); }
 
   /// Returns the BranchPoint identified by @p id, or `nullptr` if @p id is
   /// unknown.
-  const BranchPoint* GetBranchPoint(const BranchPointId& id) const {
-    return DoGetBranchPoint(id);
-  }
+  const BranchPoint* GetBranchPoint(const BranchPointId& id) const { return DoGetBranchPoint(id); }
 
  protected:
   IdIndex() = default;
@@ -245,10 +221,8 @@ class RoadGeometry::IdIndex {
   virtual const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const = 0;
   virtual const Segment* DoGetSegment(const SegmentId& id) const = 0;
   virtual const Junction* DoGetJunction(const JunctionId& id) const = 0;
-  virtual const BranchPoint* DoGetBranchPoint(
-      const BranchPointId& id) const = 0;
+  virtual const BranchPoint* DoGetBranchPoint(const BranchPointId& id) const = 0;
 };
-
 
 }  // namespace api
 }  // namespace maliput

@@ -18,22 +18,16 @@ class PhaseTest : public ::testing::Test {
  protected:
   PhaseTest()
       : id_("test_id"),
-        rule_states_{{RightOfWayRule::Id("northbound-forward"),
-                      RightOfWayRule::State::Id("GO")},
-                     {RightOfWayRule::Id("southbound-left-turn"),
-                      RightOfWayRule::State::Id("STOP")}},
+        rule_states_{{RightOfWayRule::Id("northbound-forward"), RightOfWayRule::State::Id("GO")},
+                     {RightOfWayRule::Id("southbound-left-turn"), RightOfWayRule::State::Id("STOP")}},
         bulb_states_{
-            {{{TrafficLight::Id("major-intersection"),
-               BulbGroup::Id("northbound"), Bulb::Id("forward-green")},
+            {{{TrafficLight::Id("major-intersection"), BulbGroup::Id("northbound"), Bulb::Id("forward-green")},
               BulbState::kOn},
-             {{TrafficLight::Id("major-intersection"),
-               BulbGroup::Id("northbound"), Bulb::Id("forward-red")},
+             {{TrafficLight::Id("major-intersection"), BulbGroup::Id("northbound"), Bulb::Id("forward-red")},
               BulbState::kOff},
-             {{TrafficLight::Id("major-intersection"),
-               BulbGroup::Id("southbound"), Bulb::Id("left-turn-green")},
+             {{TrafficLight::Id("major-intersection"), BulbGroup::Id("southbound"), Bulb::Id("left-turn-green")},
               BulbState::kOff},
-             {{TrafficLight::Id("major-intersection"),
-               BulbGroup::Id("southbound"), Bulb::Id("left-turn-red")},
+             {{TrafficLight::Id("major-intersection"), BulbGroup::Id("southbound"), Bulb::Id("left-turn-red")},
               BulbState::kOn}}},
         phase_{id_, rule_states_, bulb_states_} {}
 

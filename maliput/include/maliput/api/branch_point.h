@@ -3,20 +3,18 @@
 #include <memory>
 #include <string>
 
-#include "maliput/api/lane_data.h"
-#include "maliput/api/type_specific_identifier.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+#include "maliput/api/lane_data.h"
+#include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {
 namespace api {
 
 class RoadGeometry;
 
-
 // Persistent identifier for a BranchPoint element.
 using BranchPointId = TypeSpecificIdentifier<class BranchPoint>;
-
 
 /// A set of LaneEnds.
 class LaneEndSet {
@@ -53,7 +51,6 @@ class LaneEndSet {
   ///@}
 };
 
-
 /// A BranchPoint is a node in the network of a RoadGeometry at which
 /// Lanes connect to one another.  A BranchPoint is a collection of LaneEnds
 /// specifying the Lanes (and, in particular, which ends of the Lanes) are
@@ -81,17 +78,13 @@ class BranchPoint {
   /// The returned set includes the given @p end.
   ///
   /// @pre @p end must be connected to the BranchPoint.
-  const LaneEndSet* GetConfluentBranches(const LaneEnd& end) const {
-    return DoGetConfluentBranches(end);
-  }
+  const LaneEndSet* GetConfluentBranches(const LaneEnd& end) const { return DoGetConfluentBranches(end); }
 
   /// Returns the set of LaneEnds on the other side from the given @p end,
   /// e.g., the LaneEnds which @p end flows into.
   ///
   /// @pre @p end must be connected to the BranchPoint.
-  const LaneEndSet* GetOngoingBranches(const LaneEnd& end) const {
-    return DoGetOngoingBranches(end);
-  }
+  const LaneEndSet* GetOngoingBranches(const LaneEnd& end) const { return DoGetOngoingBranches(end); }
 
   /// Returns the default ongoing branch (if any) for the given @p end.
   /// This typically represents what would be considered "continuing
@@ -102,9 +95,7 @@ class BranchPoint {
   /// value will be drake::nullopt.
   ///
   /// @pre @p end must be connected to the BranchPoint.
-  drake::optional<LaneEnd> GetDefaultBranch(const LaneEnd& end) const {
-    return DoGetDefaultBranch(end);
-  }
+  drake::optional<LaneEnd> GetDefaultBranch(const LaneEnd& end) const { return DoGetDefaultBranch(end); }
 
   /// Returns the set of LaneEnds grouped together on the "A-side".
   const LaneEndSet* GetASide() const { return DoGetASide(); }
@@ -124,14 +115,11 @@ class BranchPoint {
 
   virtual const RoadGeometry* do_road_geometry() const = 0;
 
-  virtual const LaneEndSet* DoGetConfluentBranches(
-      const LaneEnd& end) const = 0;
+  virtual const LaneEndSet* DoGetConfluentBranches(const LaneEnd& end) const = 0;
 
-  virtual const LaneEndSet* DoGetOngoingBranches(
-      const LaneEnd& end) const = 0;
+  virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd& end) const = 0;
 
-  virtual drake::optional<LaneEnd> DoGetDefaultBranch(
-      const LaneEnd& end) const = 0;
+  virtual drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd& end) const = 0;
 
   virtual const LaneEndSet* DoGetASide() const = 0;
 

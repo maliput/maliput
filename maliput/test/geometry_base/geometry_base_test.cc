@@ -19,19 +19,18 @@ namespace rules {
 namespace test {
 
 // Predicate-formatter which tests equality of Lane*.
-inline ::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    const api::Lane* a, const api::Lane* b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const api::Lane* a,
+                                          const api::Lane* b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 // Predicate-formatter which tests equality of LaneEnd.
-inline ::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    const api::LaneEnd& a, const api::LaneEnd& b) {
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const api::LaneEnd& a,
+                                          const api::LaneEnd& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.lane, b.lane));;
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.lane, b.lane));
+  ;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.end, b.end));
   return c.result();
 }
@@ -51,8 +50,7 @@ GTEST_TEST(GeometryBaseTest, LaneEndSet) {
 
   // NB:  LaneEndSet::Add() only tests for non-nullness of the lane pointer,
   //      so we fake up a non-null pointer for this test.
-  const api::Lane* const kNonNullLane =
-      reinterpret_cast<api::Lane*>(0xDeadBeef);
+  const api::Lane* const kNonNullLane = reinterpret_cast<api::Lane*>(0xDeadBeef);
   const api::LaneEnd kValidLaneEnd{kNonNullLane, api::LaneEnd::kFinish};
   const api::LaneEnd kInvalidLaneEnd{nullptr, api::LaneEnd::kFinish};
 
@@ -62,12 +60,10 @@ GTEST_TEST(GeometryBaseTest, LaneEndSet) {
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.get(0), kValidLaneEnd));
 }
 
-
 GTEST_TEST(GeometryBaseLaneTest, BasicConstruction) {
   const MockLane dut(api::LaneId("dut"));
   EXPECT_EQ(dut.id(), api::LaneId("dut"));
 }
-
 
 GTEST_TEST(GeometryBaseLaneTest, UnimplementedMethods) {
   const MockLane dut(api::LaneId("dut"));
@@ -78,19 +74,14 @@ GTEST_TEST(GeometryBaseLaneTest, UnimplementedMethods) {
   EXPECT_THROW(dut.elevation_bounds(0., 0.), std::exception);
   EXPECT_THROW(dut.ToGeoPosition(api::LanePosition()), std::exception);
   EXPECT_THROW(dut.GetOrientation(api::LanePosition()), std::exception);
-  EXPECT_THROW(dut.EvalMotionDerivatives(api::LanePosition(),
-                                         api::IsoLaneVelocity()),
-               std::exception);
-  EXPECT_THROW(dut.ToLanePosition(
-      api::GeoPosition(), nullptr, nullptr), std::exception);
+  EXPECT_THROW(dut.EvalMotionDerivatives(api::LanePosition(), api::IsoLaneVelocity()), std::exception);
+  EXPECT_THROW(dut.ToLanePosition(api::GeoPosition(), nullptr, nullptr), std::exception);
 }
-
 
 GTEST_TEST(GeometryBaseBranchPointTest, BasicConstruction) {
   const MockBranchPoint dut(api::BranchPointId("dut"));
   EXPECT_EQ(dut.id(), api::BranchPointId("dut"));
 }
-
 
 GTEST_TEST(GeometryBaseBranchPointTest, AddingLanes) {
   constexpr auto kStart = api::LaneEnd::kStart;
@@ -113,8 +104,7 @@ GTEST_TEST(GeometryBaseBranchPointTest, AddingLanes) {
   dut.AddBBranch(&lane1, kStart);
   EXPECT_EQ(dut.GetASide()->size(), 0);
   EXPECT_EQ(dut.GetBSide()->size(), 1);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetBSide()->get(0),
-                               api::LaneEnd(&lane1, kStart)));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetBSide()->get(0), api::LaneEnd(&lane1, kStart)));
   EXPECT_EQ(dut.GetConfluentBranches({&lane1, kStart})->size(), 1);
   EXPECT_EQ(dut.GetOngoingBranches({&lane1, kStart})->size(), 0);
   EXPECT_FALSE(dut.GetDefaultBranch({&lane1, kStart}).has_value());
@@ -131,48 +121,31 @@ GTEST_TEST(GeometryBaseBranchPointTest, AddingLanes) {
   dut.AddABranch(&lane2, kFinish);
   EXPECT_EQ(lane2.GetBranchPoint(kFinish), &dut);
   EXPECT_EQ(dut.GetOngoingBranches({&lane2, kFinish})->size(), 2);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(
-      dut.GetOngoingBranches({&lane2, kFinish})->get(0),
-      api::LaneEnd(&lane1, kStart)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(
-      dut.GetOngoingBranches({&lane2, kFinish})->get(1),
-      api::LaneEnd(&lane1, kFinish)));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetOngoingBranches({&lane2, kFinish})->get(0), api::LaneEnd(&lane1, kStart)));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetOngoingBranches({&lane2, kFinish})->get(1), api::LaneEnd(&lane1, kFinish)));
   EXPECT_EQ(dut.GetOngoingBranches({&lane1, kStart})->size(), 1);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(
-      dut.GetOngoingBranches({&lane1, kStart})->get(0),
-      api::LaneEnd(&lane2, kFinish)));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetOngoingBranches({&lane1, kStart})->get(0), api::LaneEnd(&lane2, kFinish)));
 
   // Add a third lane-end to the "B-side" again.
   dut.AddBBranch(&lane3, kFinish);
   EXPECT_EQ(dut.GetConfluentBranches({&lane1, kStart})->size(), 3);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(
-      dut.GetConfluentBranches({&lane1, kStart})->get(0),
-      api::LaneEnd(&lane1, kStart)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(
-      dut.GetOngoingBranches({&lane2, kFinish})->get(1),
-      api::LaneEnd(&lane1, kFinish)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(
-      dut.GetConfluentBranches({&lane1, kStart})->get(2),
-      api::LaneEnd(&lane3, kFinish)));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetConfluentBranches({&lane1, kStart})->get(0), api::LaneEnd(&lane1, kStart)));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetOngoingBranches({&lane2, kFinish})->get(1), api::LaneEnd(&lane1, kFinish)));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetConfluentBranches({&lane1, kStart})->get(2), api::LaneEnd(&lane3, kFinish)));
 
   // Set default branches.
   // First try:  fails because specified default is not an ongoing branch.
-  EXPECT_THROW(dut.SetDefault({&lane1, kStart}, {&lane3, kFinish}),
-               std::exception);
+  EXPECT_THROW(dut.SetDefault({&lane1, kStart}, {&lane3, kFinish}), std::exception);
   // Second try:  succeeds.
   dut.SetDefault({&lane1, kStart}, {&lane2, kFinish});
   EXPECT_TRUE(dut.GetDefaultBranch({&lane1, kStart}).has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(
-      dut.GetDefaultBranch({&lane1, kStart}).value(),
-      api::LaneEnd(&lane2, kFinish)));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDefaultBranch({&lane1, kStart}).value(), api::LaneEnd(&lane2, kFinish)));
 }
-
 
 GTEST_TEST(GeometryBaseSegmentTest, BasicConstruction) {
   const MockSegment dut(api::SegmentId("dut"));
   EXPECT_EQ(dut.id(), api::SegmentId("dut"));
 }
-
 
 GTEST_TEST(GeometryBaseSegmentTest, AddingLanes) {
   auto lane0 = std::make_unique<MockLane>(api::LaneId("lane0"));
@@ -201,12 +174,10 @@ GTEST_TEST(GeometryBaseSegmentTest, AddingLanes) {
   EXPECT_THROW(dut.lane(2), std::exception);
 }
 
-
 GTEST_TEST(GeometryBaseJunctionTest, BasicConstruction) {
   const MockJunction dut(api::JunctionId("dut"));
   EXPECT_EQ(dut.id(), api::JunctionId("dut"));
 }
-
 
 GTEST_TEST(GeometryBaseJunctionTest, AddingSegments) {
   auto segment0 = std::make_unique<MockSegment>(api::SegmentId("s0"));
@@ -233,44 +204,34 @@ GTEST_TEST(GeometryBaseJunctionTest, AddingSegments) {
   EXPECT_THROW(dut.segment(2), std::exception);
 }
 
-
 GTEST_TEST(GeometryBaseRoadGeometryTest, BasicConstruction) {
   const double kValidLinearTolerance = 7.0;
   const double kValidAngularTolerance = 99.0;
   const double kValidScaleLength = 0.5;
   // Tolerance/scale-length values must be positive.
-  EXPECT_THROW(MockRoadGeometry(
-      api::RoadGeometryId("dut"),
-      0., kValidAngularTolerance, kValidScaleLength), std::exception);
-  EXPECT_THROW(MockRoadGeometry(
-      api::RoadGeometryId("dut"),
-      kValidLinearTolerance, 0., kValidScaleLength), std::exception);
-  EXPECT_THROW(MockRoadGeometry(
-      api::RoadGeometryId("dut"),
-      kValidLinearTolerance, kValidAngularTolerance, 0.), std::exception);
+  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), 0., kValidAngularTolerance, kValidScaleLength),
+               std::exception);
+  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), kValidLinearTolerance, 0., kValidScaleLength),
+               std::exception);
+  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), kValidLinearTolerance, kValidAngularTolerance, 0.),
+               std::exception);
 
-  const MockRoadGeometry dut(
-      api::RoadGeometryId("dut"),
-      kValidLinearTolerance, kValidAngularTolerance, kValidScaleLength);
+  const MockRoadGeometry dut(api::RoadGeometryId("dut"), kValidLinearTolerance, kValidAngularTolerance,
+                             kValidScaleLength);
   EXPECT_EQ(dut.id(), api::RoadGeometryId("dut"));
   EXPECT_EQ(dut.linear_tolerance(), kValidLinearTolerance);
   EXPECT_EQ(dut.angular_tolerance(), kValidAngularTolerance);
   EXPECT_EQ(dut.scale_length(), kValidScaleLength);
 }
 
-
 GTEST_TEST(GeometryBaseRoadGeometryTest, AddingBranchPoints) {
-  auto branch_point0 = std::make_unique<MockBranchPoint>(
-      api::BranchPointId("bp0"));
+  auto branch_point0 = std::make_unique<MockBranchPoint>(api::BranchPointId("bp0"));
   MockBranchPoint* raw_branch_point0 = branch_point0.get();
-  auto branch_point1 = std::make_unique<MockBranchPoint>(
-      api::BranchPointId("bp1"));
+  auto branch_point1 = std::make_unique<MockBranchPoint>(api::BranchPointId("bp1"));
   MockBranchPoint* raw_branch_point1 = branch_point1.get();
 
   const double kSomePositiveDouble = 7.0;
-  MockRoadGeometry dut(
-      api::RoadGeometryId("dut"),
-      kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble);
+  MockRoadGeometry dut(api::RoadGeometryId("dut"), kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble);
 
   // Test the empty dut.
   EXPECT_EQ(dut.num_branch_points(), 0);
@@ -288,15 +249,12 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, AddingBranchPoints) {
   EXPECT_EQ(raw_branch_point1->road_geometry(), &dut);
   EXPECT_THROW(dut.branch_point(2), std::exception);
 
-  EXPECT_EQ(dut.ById().GetBranchPoint(api::BranchPointId("bp0")),
-            raw_branch_point0);
-  EXPECT_EQ(dut.ById().GetBranchPoint(api::BranchPointId("bp1")),
-            raw_branch_point1);
+  EXPECT_EQ(dut.ById().GetBranchPoint(api::BranchPointId("bp0")), raw_branch_point0);
+  EXPECT_EQ(dut.ById().GetBranchPoint(api::BranchPointId("bp1")), raw_branch_point1);
   // ID's must be unique.
   auto another0 = std::make_unique<MockBranchPoint>(api::BranchPointId("bp0"));
   EXPECT_THROW(dut.AddBranchPoint(std::move(another0)), std::exception);
 }
-
 
 GTEST_TEST(GeometryBaseRoadGeometryTest, AddingJunctions) {
   auto junction0 = std::make_unique<MockJunction>(api::JunctionId("j0"));
@@ -305,9 +263,7 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, AddingJunctions) {
   MockJunction* raw_junction1 = junction1.get();
 
   const double kSomePositiveDouble = 7.0;
-  MockRoadGeometry dut(
-      api::RoadGeometryId("dut"),
-      kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble);
+  MockRoadGeometry dut(api::RoadGeometryId("dut"), kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble);
 
   // Test the empty dut.
   EXPECT_EQ(dut.num_junctions(), 0);
@@ -332,7 +288,6 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, AddingJunctions) {
   EXPECT_THROW(dut.AddJunction(std::move(another0)), std::exception);
 }
 
-
 // Test by-id indexing of Segments and Lanes in RoadGeometry.
 class GeometryBaseRoadGeometryIndexingTest : public ::testing::Test {
  protected:
@@ -345,13 +300,11 @@ class GeometryBaseRoadGeometryIndexingTest : public ::testing::Test {
 
   void SetUp() override {
     constexpr double kArbitrary{1.};
-    road_geometry_ = std::make_unique<MockRoadGeometry>(
-        api::RoadGeometryId("dut"), kArbitrary, kArbitrary, kArbitrary);
+    road_geometry_ = std::make_unique<MockRoadGeometry>(api::RoadGeometryId("dut"), kArbitrary, kArbitrary, kArbitrary);
   }
 
   std::unique_ptr<RoadGeometry> road_geometry_;
 };
-
 
 TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
   // The intent here is to ensure that all Lanes and Segments are recorded
@@ -368,14 +321,11 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
   //       L-S-J   L-J-S   S-J-L
   //       S-L-J   J-L-S   J-S-L
   const std::vector<TestCase> cases{
-    {"LSJ", {kAttachLane,     kAttachSegment,  kAttachJunction}},
-    {"SLJ", {kAttachSegment,  kAttachLane,     kAttachJunction}},
+      {"LSJ", {kAttachLane, kAttachSegment, kAttachJunction}}, {"SLJ", {kAttachSegment, kAttachLane, kAttachJunction}},
 
-    {"LJS", {kAttachLane,     kAttachJunction, kAttachSegment}},
-    {"JLS", {kAttachJunction, kAttachLane,     kAttachSegment}},
+      {"LJS", {kAttachLane, kAttachJunction, kAttachSegment}}, {"JLS", {kAttachJunction, kAttachLane, kAttachSegment}},
 
-    {"SJL", {kAttachSegment,  kAttachJunction, kAttachLane}},
-    {"JSL", {kAttachJunction, kAttachSegment,  kAttachLane}},
+      {"SJL", {kAttachSegment, kAttachJunction, kAttachLane}}, {"JSL", {kAttachJunction, kAttachSegment, kAttachLane}},
   };
 
   for (const auto& kase : cases) {
@@ -404,17 +354,14 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
       }
     }
     EXPECT_EQ(road_geometry_->ById().GetLane(raw_lane->id()), raw_lane);
-    EXPECT_EQ(road_geometry_->ById().GetSegment(raw_segment->id()),
-              raw_segment);
+    EXPECT_EQ(road_geometry_->ById().GetSegment(raw_segment->id()), raw_segment);
   }
 }
-
 
 GTEST_TEST(GeometryBaseRoadGeometryTest, UnimplementedMethods) {
   MockRoadGeometry dut(api::RoadGeometryId("dut"), 1., 1., 1.);
   // Ensure that the not-actually-implemented methods throw an exception.
-  EXPECT_THROW(dut.ToRoadPosition(
-      api::GeoPosition(), nullptr, nullptr, nullptr), std::exception);
+  EXPECT_THROW(dut.ToRoadPosition(api::GeoPosition(), nullptr, nullptr, nullptr), std::exception);
   EXPECT_THROW(dut.FindRoadPositions(api::GeoPosition(), 1.), std::exception);
 }
 

@@ -1,11 +1,11 @@
 #pragma once
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule_state_provider.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 
@@ -31,23 +31,18 @@ class PhaseBasedRuleStateProvider final : public api::rules::RuleStateProvider {
   ///
   /// All pointer parameters are aliased; they must not be nullptr and their
   /// lifespans must exceed that of this instance.
-  PhaseBasedRuleStateProvider(
-      const api::rules::PhaseRingBook* phase_ring_book,
-      const api::rules::PhaseProvider* phase_provider);
+  PhaseBasedRuleStateProvider(const api::rules::PhaseRingBook* phase_ring_book,
+                              const api::rules::PhaseProvider* phase_provider);
 
   ~PhaseBasedRuleStateProvider() final = default;
 
-  const api::rules::PhaseRingBook& phase_ring_book() const {
-    return *phase_ring_book_;
-  }
+  const api::rules::PhaseRingBook& phase_ring_book() const { return *phase_ring_book_; }
 
-  const api::rules::PhaseProvider& phase_provider() const {
-    return *phase_provider_;
-  }
+  const api::rules::PhaseProvider& phase_provider() const { return *phase_provider_; }
 
  private:
-  drake::optional<api::rules::RuleStateProvider::RightOfWayResult>
-      DoGetState(const api::rules::RightOfWayRule::Id& id) const final;
+  drake::optional<api::rules::RuleStateProvider::RightOfWayResult> DoGetState(
+      const api::rules::RightOfWayRule::Id& id) const final;
 
   const api::rules::PhaseRingBook* phase_ring_book_{};
   const api::rules::PhaseProvider* phase_provider_{};

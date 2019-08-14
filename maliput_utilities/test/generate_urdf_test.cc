@@ -25,14 +25,14 @@ class GenerateUrdfTest : public ::testing::Test {
     ASSERT_TRUE(common::Filesystem::create_directory(directory_));
   }
 
-
+  // clang-format off
   void TearDown() override {
     ASSERT_TRUE(common::Filesystem::remove_directory(directory_));
   }
+  // clang-format on
 
   common::Path directory_;
 };
-
 
 TEST_F(GenerateUrdfTest, AtLeastRunIt) {
   const double kLinearTolerance = 0.01;
@@ -41,26 +41,19 @@ TEST_F(GenerateUrdfTest, AtLeastRunIt) {
   const double kShoulder = 1.;
   const api::HBounds kElevationBounds{0., 5.};
   const double kScaleLength = 1.;
-  const multi::ComputationPolicy kComputationPolicy =
-      multi::ComputationPolicy::kPreferAccuracy;
-  const multi::LaneLayout kLaneLayout{kShoulder, kShoulder, 1 /* num_lanes */,
-                                      0 /* ref_lane */, 0. /* ref_r0 */};
-  auto b = multi::BuilderFactory().Make(kLaneWidth, kElevationBounds,
-                                        kLinearTolerance, kAngularTolerance,
-                                        kScaleLength, kComputationPolicy);
+  const multi::ComputationPolicy kComputationPolicy = multi::ComputationPolicy::kPreferAccuracy;
+  const multi::LaneLayout kLaneLayout{kShoulder, kShoulder, 1 /* num_lanes */, 0 /* ref_lane */, 0. /* ref_r0 */};
+  auto b = multi::BuilderFactory().Make(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance, kScaleLength,
+                                        kComputationPolicy);
 
   const multi::EndpointZ kZeroZ{0., 0., 0., 0.};
   const multi::Endpoint start{{0., 0., 0.}, kZeroZ};
 
-  b->Connect("0", kLaneLayout,
-             multi::StartReference().at(start, multi::Direction::kForward),
-             multi::LineOffset(10.),
+  b->Connect("0", kLaneLayout, multi::StartReference().at(start, multi::Direction::kForward), multi::LineOffset(10.),
              multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
-  const std::unique_ptr<const api::RoadGeometry> dut =
-      b->Build(api::RoadGeometryId{"dut"});
+  const std::unique_ptr<const api::RoadGeometry> dut = b->Build(api::RoadGeometryId{"dut"});
 
-  GenerateUrdfFile(dut.get(), directory_.get_path(), kJunkBasename,
-                   ObjFeatures());
+  GenerateUrdfFile(dut.get(), directory_.get_path(), kJunkBasename, ObjFeatures());
   // We expect to get three files out of this.
 
   common::Path expected_urdf(directory_);
@@ -98,7 +91,8 @@ TEST_F(GenerateUrdfTest, AtLeastRunIt) {
     </visual>
   </link>
 </robot>
-)R", actual_urdf_contents);
+)R",
+            actual_urdf_contents);
 
   // filesystem has no functionality for reading/walking a
   // directory, so we have to delete all our files individually here where

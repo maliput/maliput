@@ -2,16 +2,15 @@
 
 #include <unordered_map>
 
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace api {
-
 
 /// Basic general-purpose concrete implementation of the
 /// RoadGeometry::IdIndex interface.
@@ -67,7 +66,6 @@ class BasicIdIndex : public RoadGeometry::IdIndex {
   std::unordered_map<LaneId, const Lane*> lane_map_;
   std::unordered_map<BranchPointId, const BranchPoint*> branch_point_map_;
 };
-
 
 }  // namespace api
 }  // namespace maliput

@@ -1,11 +1,11 @@
 #pragma once
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/segment.h"
 #include "maliput/geometry_base/passkey.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -36,7 +36,6 @@ class Lane : public api::Lane {
   /// or nullptr if the finish end hasn't been added to a BranchPoint yet.
   BranchPoint* mutable_finish_branch_point() { return finish_branch_point_; }
 
-
 #ifndef DRAKE_DOXYGEN_CXX
   // Notifies Lane of its parent Segment.
   // This may only be called, once, by a Segment.
@@ -47,8 +46,7 @@ class Lane : public api::Lane {
   // @pre `segment` is non-null.
   // @pre `index` is non-negative.
   // @pre Parent Segment and the index have not already been set.
-  void AttachToSegment(Passkey<Segment>,
-                       const api::Segment* segment, int index);
+  void AttachToSegment(Passkey<Segment>, const api::Segment* segment, int index);
 
   // Notifies Lane of the BranchPoint for its "start" end.
   // This may only be called, once, by a BranchPoint.
@@ -82,17 +80,13 @@ class Lane : public api::Lane {
 
   const api::Lane* do_to_right() const override;
 
-  const api::BranchPoint* DoGetBranchPoint(
-      const api::LaneEnd::Which which_end) const override;
+  const api::BranchPoint* DoGetBranchPoint(const api::LaneEnd::Which which_end) const override;
 
-  const api::LaneEndSet* DoGetConfluentBranches(
-      const api::LaneEnd::Which which_end) const override;
+  const api::LaneEndSet* DoGetConfluentBranches(const api::LaneEnd::Which which_end) const override;
 
-  const api::LaneEndSet* DoGetOngoingBranches(
-      const api::LaneEnd::Which which_end) const override;
+  const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd::Which which_end) const override;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(
-      const api::LaneEnd::Which which_end) const override;
+  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
 
   const api::LaneId id_;
   const api::Segment* segment_{};
@@ -100,7 +94,6 @@ class Lane : public api::Lane {
   BranchPoint* start_branch_point_{};
   BranchPoint* finish_branch_point_{};
 };
-
 
 }  // namespace geometry_base
 }  // namespace maliput

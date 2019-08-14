@@ -1,16 +1,14 @@
 #include "maliput/geometry_base/branch_point.h"
 
-#include "maliput/geometry_base/lane.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/geometry_base/lane.h"
 
 namespace maliput {
 namespace geometry_base {
 
 BranchPoint::BranchPoint(const api::BranchPointId& id) : id_(id) {}
 
-void BranchPoint::AttachToRoadGeometry(
-    Passkey<RoadGeometry>,
-    const api::RoadGeometry* road_geometry) {
+void BranchPoint::AttachToRoadGeometry(Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
   // Preconditions
@@ -18,9 +16,7 @@ void BranchPoint::AttachToRoadGeometry(
   road_geometry_ = road_geometry;
 }
 
-
-void BranchPoint::AddBranch(Lane* lane, api::LaneEnd::Which end,
-                            LaneEndSet* side) {
+void BranchPoint::AddBranch(Lane* lane, api::LaneEnd::Which end, LaneEndSet* side) {
   // Parameter checks
   // TODO(maddog@tri.global)  This invariant should be part of api::LaneEnd.
   MALIPUT_THROW_UNLESS(lane != nullptr);
@@ -34,7 +30,7 @@ void BranchPoint::AddBranch(Lane* lane, api::LaneEnd::Which end,
   confluent_branches_[lane_end] = side;
   ongoing_branches_[lane_end] = other_side;
   switch (end) {
-    case api::LaneEnd::kStart:  {
+    case api::LaneEnd::kStart: {
       lane->SetStartBranchPoint({}, this);
       break;
     }
@@ -45,9 +41,7 @@ void BranchPoint::AddBranch(Lane* lane, api::LaneEnd::Which end,
   }
 }
 
-
-void BranchPoint::SetDefault(const api::LaneEnd& lane_end,
-                             const api::LaneEnd& default_branch) {
+void BranchPoint::SetDefault(const api::LaneEnd& lane_end, const api::LaneEnd& default_branch) {
   // Parameter checks
   const auto& le_ongoing = ongoing_branches_.find(lane_end);
   const auto& db_confluent = confluent_branches_.find(default_branch);
@@ -61,27 +55,23 @@ void BranchPoint::SetDefault(const api::LaneEnd& lane_end,
   defaults_[lane_end] = default_branch;
 }
 
-
 api::BranchPointId BranchPoint::do_id() const { return id_; }
 
-const api::RoadGeometry* BranchPoint::do_road_geometry() const {
-  return road_geometry_;
-}
+const api::RoadGeometry* BranchPoint::do_road_geometry() const { return road_geometry_; }
 
-const api::LaneEndSet* BranchPoint::DoGetConfluentBranches(
-    const api::LaneEnd& end) const {
+const api::LaneEndSet* BranchPoint::DoGetConfluentBranches(const api::LaneEnd& end) const {
   return confluent_branches_.at(end);
 }
 
-const api::LaneEndSet* BranchPoint::DoGetOngoingBranches(
-    const api::LaneEnd& end) const {
+const api::LaneEndSet* BranchPoint::DoGetOngoingBranches(const api::LaneEnd& end) const {
   return ongoing_branches_.at(end);
 }
 
-drake::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(
-    const api::LaneEnd& end) const {
+drake::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(const api::LaneEnd& end) const {
   auto default_it = defaults_.find(end);
-  if (default_it == defaults_.end()) { return drake::nullopt; }
+  if (default_it == defaults_.end()) {
+    return drake::nullopt;
+  }
   return default_it->second;
 }
 

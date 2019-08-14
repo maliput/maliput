@@ -25,24 +25,19 @@ class ManualRuleStateProvider final : public api::rules::RuleStateProvider {
   /// already exists in this provider.
   /// @throws maliput::common::assertion_error if the dynamic state failed to be
   /// added.
-  void AddState(
-      const api::rules::RightOfWayRule::Id& id,
-      const api::rules::RightOfWayRule::State::Id& initial_state);
+  void AddState(const api::rules::RightOfWayRule::Id& id, const api::rules::RightOfWayRule::State::Id& initial_state);
 
   /// Sets the dynamic state of a RightOfWayRule within this provider.
   ///
   /// @throws std::out_of_range if no dynamic state with @p id exists in this
   /// provider.
-  void SetState(const api::rules::RightOfWayRule::Id& id,
-                const api::rules::RightOfWayRule::State::Id& state);
+  void SetState(const api::rules::RightOfWayRule::Id& id, const api::rules::RightOfWayRule::State::Id& state);
 
  private:
-  drake::optional<api::rules::RuleStateProvider::RightOfWayResult>
-      DoGetState(const api::rules::RightOfWayRule::Id& id) const final;
+  drake::optional<api::rules::RuleStateProvider::RightOfWayResult> DoGetState(
+      const api::rules::RightOfWayRule::Id& id) const final;
 
-  std::unordered_map<
-    api::rules::RightOfWayRule::Id,
-    api::rules::RightOfWayRule::State::Id> states_;
+  std::unordered_map<api::rules::RightOfWayRule::Id, api::rules::RightOfWayRule::State::Id> states_;
 };
 
 }  // namespace maliput

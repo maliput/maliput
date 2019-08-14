@@ -19,10 +19,9 @@ namespace maliput {
 /// @param input The YAML PhaseRings document.
 ///
 /// @return The newly created api::rules::PhaseRingBook instance.
-std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBook(
-    const api::rules::RoadRulebook* rulebook,
-    const api::rules::TrafficLightBook* traffic_light_book,
-    const std::string& input);
+std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBook(const api::rules::RoadRulebook* rulebook,
+                                                             const api::rules::TrafficLightBook* traffic_light_book,
+                                                             const std::string& input);
 
 /// Instantiates and returns an api::rules::PhaseRingBook instance based on the
 /// specified @p rulebook, and @p filename.
@@ -35,8 +34,7 @@ std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBook(
 ///
 /// @return The newly created api::rules::PhaseRingBook instance.
 std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBookFromFile(
-    const api::rules::RoadRulebook* rulebook,
-    const api::rules::TrafficLightBook* traffic_light_book,
+    const api::rules::RoadRulebook* rulebook, const api::rules::TrafficLightBook* traffic_light_book,
     const std::string& filename);
 
 }  // namespace maliput

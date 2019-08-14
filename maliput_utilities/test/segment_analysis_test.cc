@@ -13,7 +13,6 @@ namespace maliput {
 namespace utility {
 namespace {
 
-
 GTEST_TEST(SegmentAnalysisAnalyzeConfluentSegments, BasicOperation) {
   // ---------------------------------------------------
   // |                                                 |
@@ -105,25 +104,17 @@ maliput_multilane_builder:
 
   groups: {}
 )R";
-  const std::unique_ptr<const api::RoadGeometry> rg =
-      multilane::Load(multilane::BuilderFactory(), dut_yaml);
+  const std::unique_ptr<const api::RoadGeometry> rg = multilane::Load(multilane::BuilderFactory(), dut_yaml);
 
-  const std::vector<std::unordered_set<const api::Segment*>> groups =
-      AnalyzeConfluentSegments(rg.get());
+  const std::vector<std::unordered_set<const api::Segment*>> groups = AnalyzeConfluentSegments(rg.get());
 
-  const auto lookup_segment = [&rg] (const std::string& id_string) {
+  const auto lookup_segment = [&rg](const std::string& id_string) {
     return rg->ById().GetSegment(api::SegmentId(id_string));
   };
-  const std::set<std::set<const api::Segment*>> expected
-      {{lookup_segment("s:east0")},
-       {lookup_segment("s:east2")},
-       {lookup_segment("s:north0")},
-       {lookup_segment("s:north2")},
-       {lookup_segment("s:loop")},
-       {lookup_segment("s:north1"),
-        lookup_segment("s:east1"),
-        lookup_segment("s:turn")}
-      };
+  const std::set<std::set<const api::Segment*>> expected{
+      {lookup_segment("s:east0")},  {lookup_segment("s:east2")},
+      {lookup_segment("s:north0")}, {lookup_segment("s:north2")},
+      {lookup_segment("s:loop")},   {lookup_segment("s:north1"), lookup_segment("s:east1"), lookup_segment("s:turn")}};
 
   // Recast groups as "set of sets" (instead of "vector of unordered_sets")
   // to make equality testing trivial.
@@ -134,7 +125,6 @@ maliput_multilane_builder:
   }
   EXPECT_EQ(actual, expected);
 }
-
 
 }  // anonymous namespace
 }  // namespace utility

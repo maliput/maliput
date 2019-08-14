@@ -27,10 +27,8 @@ namespace test {
 // @pre Given lower integration bound @p p_0 is greater than or equal to 0.
 // @pre Given @p k_order for the linear approximation is a non-negative number.
 // @throws std::runtime_error if preconditions are not met.
-double BruteForcePathLengthIntegral(const RoadCurve& road_curve,
-                                    double p_0, double p_1, double r,
-                                    double h, int k_order,
-                                    double* maximum_step);
+double BruteForcePathLengthIntegral(const RoadCurve& road_curve, double p_0, double p_1, double r, double h,
+                                    int k_order, double* maximum_step);
 
 // Approximates the path length of a given @p road_curve from @p p_0 to @p p_1,
 // for constant @p r and @p h offsets, to within specified @p tolerance.
@@ -68,10 +66,8 @@ double BruteForcePathLengthIntegral(const RoadCurve& road_curve,
 // @pre If given, the order suggested by @p k_order_hint is a non-negative
 //      number.
 // @throws std::runtime_error if preconditions are not met.
-double AdaptiveBruteForcePathLengthIntegral(
-    const RoadCurve& rc, double p_0, double p_1,
-    double r, double h, double tolerance,
-    int* k_order_hint);
+double AdaptiveBruteForcePathLengthIntegral(const RoadCurve& rc, double p_0, double p_1, double r, double h,
+                                            double tolerance, int* k_order_hint);
 
 }  // namespace test
 }  // namespace multilane

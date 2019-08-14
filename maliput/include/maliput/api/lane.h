@@ -19,10 +19,8 @@ class BranchPoint;
 class Segment;
 class LaneEndSet;
 
-
 /// Persistent identifier for a Lane element.
 using LaneId = TypeSpecificIdentifier<class Lane>;
-
 
 /// A Lane represents a lane of travel in a road network.  A Lane defines
 /// a curvilinear coordinate system covering the road surface, with a
@@ -76,7 +74,6 @@ class Lane {
   /// "staying in the lane".
   RBounds lane_bounds(double s) const { return do_lane_bounds(s); }
 
-
   /// Returns the driveable lateral (r) bounds of the lane as a function of s.
   ///
   /// These are the lateral bounds for a position that is considered to be
@@ -88,8 +85,7 @@ class Lane {
   ///
   /// These are the elevation bounds for a position that is considered to be
   /// within the volume modelled by the RoadGeometry.
-  HBounds elevation_bounds(double s, double r) const {
-    return do_elevation_bounds(s, r); }
+  HBounds elevation_bounds(double s, double r) const { return do_elevation_bounds(s, r); }
 
   /// Returns the GeoPosition corresponding to the given LanePosition.
   ///
@@ -99,9 +95,7 @@ class Lane {
   //
   // TODO(jadecastro): Generalize `Lane::ToGeoPosition` (and possibly others)
   // with another member function `Lane::ToGeoPositionT<T>()`.
-  GeoPosition ToGeoPosition(const LanePosition& lane_pos) const {
-    return DoToGeoPosition(lane_pos);
-  }
+  GeoPosition ToGeoPosition(const LanePosition& lane_pos) const { return DoToGeoPosition(lane_pos); }
 
   // TODO(jadecastro): Apply this implementation in all the subclasses of
   // `api::Lane`.
@@ -141,9 +135,7 @@ class Lane {
   /// This method guarantees that its result satisfies the condition that
   /// `ToGeoPosition(result)` is within `linear_tolerance()` of
   /// `*nearest_position`.
-  LanePosition ToLanePosition(const GeoPosition& geo_pos,
-                              GeoPosition* nearest_point,
-                              double* distance) const {
+  LanePosition ToLanePosition(const GeoPosition& geo_pos, GeoPosition* nearest_point, double* distance) const {
     return DoToLanePosition(geo_pos, nearest_point, distance);
   }
 
@@ -178,9 +170,7 @@ class Lane {
   // TODO(jadecastro): Apply this implementation in all the subclasses of
   // `api::Lane`.
   template <typename T>
-  LanePositionT<T> ToLanePositionT(const GeoPositionT<T>& geo_pos,
-                                   GeoPositionT<T>* nearest_point,
-                                   T* distance) const;
+  LanePositionT<T> ToLanePositionT(const GeoPositionT<T>& geo_pos, GeoPositionT<T>* nearest_point, T* distance) const;
 
   // TODO(maddog@tri.global) Method to convert LanePosition to that of
   //                         another Lane.  (Should assert that both
@@ -192,48 +182,37 @@ class Lane {
   /// Returns the rotation which expresses the orientation of the
   /// `Lane`-frame basis at @p lane_pos with respect to the
   /// world frame basis.
-  Rotation GetOrientation(const LanePosition& lane_pos) const {
-    return DoGetOrientation(lane_pos);
-  }
+  Rotation GetOrientation(const LanePosition& lane_pos) const { return DoGetOrientation(lane_pos); }
 
   /// Computes derivatives of LanePosition given a velocity vector @p velocity.
   /// @p velocity is a isometric velocity vector oriented in the `Lane`-frame
   /// at @p position.
   ///
   /// @returns `Lane`-frame derivatives packed into a LanePosition struct.
-  LanePosition EvalMotionDerivatives(const LanePosition& position,
-                                     const IsoLaneVelocity& velocity) const {
+  LanePosition EvalMotionDerivatives(const LanePosition& position, const IsoLaneVelocity& velocity) const {
     return DoEvalMotionDerivatives(position, velocity);
   }
 
   // TODO(maddog@tri.global)  Design/implement this.
   // void EvalSurfaceDerivatives(...) const { return do_(); }
 
-
   /// Returns the lane's BranchPoint for the end specified by @p which_end.
-  const BranchPoint* GetBranchPoint(const LaneEnd::Which which_end) const {
-    return DoGetBranchPoint(which_end);
-  }
+  const BranchPoint* GetBranchPoint(const LaneEnd::Which which_end) const { return DoGetBranchPoint(which_end); }
 
   /// Returns the set of LaneEnd's which connect with this lane on the
   /// same side of the BranchPoint at @p which_end.  At a minimum,
   /// this set will include this Lane.
-  const LaneEndSet* GetConfluentBranches(
-      const LaneEnd::Which which_end) const {
+  const LaneEndSet* GetConfluentBranches(const LaneEnd::Which which_end) const {
     return DoGetConfluentBranches(which_end);
   }
 
   /// Returns the set of LaneEnd's which continue onward from this lane at the
   /// BranchPoint at @p which_end.
-  const LaneEndSet* GetOngoingBranches(
-      const LaneEnd::Which which_end) const {
-    return DoGetOngoingBranches(which_end);
-  }
+  const LaneEndSet* GetOngoingBranches(const LaneEnd::Which which_end) const { return DoGetOngoingBranches(which_end); }
 
   /// Returns the default ongoing LaneEnd connected at @p which_end,
   /// or drake::nullopt if no default branch has been established at @p which_end.
-  drake::optional<LaneEnd> GetDefaultBranch(
-      const LaneEnd::Which which_end) const {
+  drake::optional<LaneEnd> GetDefaultBranch(const LaneEnd::Which which_end) const {
     return DoGetDefaultBranch(which_end);
   }
 
@@ -265,41 +244,32 @@ class Lane {
 
   virtual GeoPosition DoToGeoPosition(const LanePosition& lane_pos) const = 0;
 
-  virtual LanePosition DoToLanePosition(
-      const GeoPosition& geo_pos,
-      GeoPosition* nearest_point,
-      double* distance) const = 0;
+  virtual LanePosition DoToLanePosition(const GeoPosition& geo_pos, GeoPosition* nearest_point,
+                                        double* distance) const = 0;
 
   virtual Rotation DoGetOrientation(const LanePosition& lane_pos) const = 0;
 
-  virtual LanePosition DoEvalMotionDerivatives(
-      const LanePosition& position, const IsoLaneVelocity& velocity) const = 0;
+  virtual LanePosition DoEvalMotionDerivatives(const LanePosition& position, const IsoLaneVelocity& velocity) const = 0;
 
-  virtual const BranchPoint* DoGetBranchPoint(
-      const LaneEnd::Which which_end) const = 0;
+  virtual const BranchPoint* DoGetBranchPoint(const LaneEnd::Which which_end) const = 0;
 
-  virtual const LaneEndSet* DoGetConfluentBranches(
-      const LaneEnd::Which which_end) const = 0;
+  virtual const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which which_end) const = 0;
 
-  virtual const LaneEndSet* DoGetOngoingBranches(
-      const LaneEnd::Which which_end) const = 0;
+  virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which which_end) const = 0;
 
-  virtual drake::optional<LaneEnd> DoGetDefaultBranch(
-      const LaneEnd::Which which_end) const = 0;
+  virtual drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
 
   // drake::AutoDiffXd overload of DoToGeoPosition().
-  virtual GeoPositionT<drake::AutoDiffXd> DoToGeoPositionAutoDiff(
-      const LanePositionT<drake::AutoDiffXd>&) const {
+  virtual GeoPositionT<drake::AutoDiffXd> DoToGeoPositionAutoDiff(const LanePositionT<drake::AutoDiffXd>&) const {
     MALIPUT_THROW_MESSAGE(
         "DoToGeoPosition has been instantiated with drake::AutoDiffXd arguments, "
         "but a Lane backend has not overridden its drake::AutoDiffXd specialization.");
   }
 
   // drake::AutoDiffXd overload of DoToLanePosition().
-  virtual LanePositionT<drake::AutoDiffXd> DoToLanePositionAutoDiff(
-      const GeoPositionT<drake::AutoDiffXd>&,
-      GeoPositionT<drake::AutoDiffXd>*,
-      drake::AutoDiffXd*) const {
+  virtual LanePositionT<drake::AutoDiffXd> DoToLanePositionAutoDiff(const GeoPositionT<drake::AutoDiffXd>&,
+                                                                    GeoPositionT<drake::AutoDiffXd>*,
+                                                                    drake::AutoDiffXd*) const {
     MALIPUT_THROW_MESSAGE(
         "DoToLanePosition has been instantiated with drake::AutoDiffXd arguments, "
         "but a Lane backend has not overridden its drake::AutoDiffXd specialization.");
@@ -316,8 +286,8 @@ class Lane {
 
   // drake::symbolic::Expression overload of DoToLanePosition().
   virtual LanePositionT<drake::symbolic::Expression> DoToLanePositionSymbolic(
-      const GeoPositionT<drake::symbolic::Expression>&,
-      GeoPositionT<drake::symbolic::Expression>*, drake::symbolic::Expression*) const {
+      const GeoPositionT<drake::symbolic::Expression>&, GeoPositionT<drake::symbolic::Expression>*,
+      drake::symbolic::Expression*) const {
     MALIPUT_THROW_MESSAGE(
         "DoToLanePosition has been instantiated with drake::symbolic::Expression "
         "arguments, but a Lane backend has not overridden its "

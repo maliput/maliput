@@ -7,8 +7,7 @@
 namespace maliput {
 namespace geometry_base {
 
-void Lane::AttachToSegment(Passkey<Segment>,
-                           const api::Segment* segment, int index) {
+void Lane::AttachToSegment(Passkey<Segment>, const api::Segment* segment, int index) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(segment != nullptr);
   MALIPUT_THROW_UNLESS(index >= 0);
@@ -20,8 +19,7 @@ void Lane::AttachToSegment(Passkey<Segment>,
   index_ = index;
 }
 
-void Lane::SetStartBranchPoint(Passkey<BranchPoint>,
-                               BranchPoint* branch_point) {
+void Lane::SetStartBranchPoint(Passkey<BranchPoint>, BranchPoint* branch_point) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(branch_point != nullptr);
   // Preconditions
@@ -30,8 +28,7 @@ void Lane::SetStartBranchPoint(Passkey<BranchPoint>,
   start_branch_point_ = branch_point;
 }
 
-void Lane::SetFinishBranchPoint(Passkey<BranchPoint>,
-                                BranchPoint* branch_point) {
+void Lane::SetFinishBranchPoint(Passkey<BranchPoint>, BranchPoint* branch_point) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(branch_point != nullptr);
   // Preconditions
@@ -39,7 +36,6 @@ void Lane::SetFinishBranchPoint(Passkey<BranchPoint>,
 
   finish_branch_point_ = branch_point;
 }
-
 
 api::LaneId Lane::do_id() const { return id_; }
 
@@ -63,28 +59,27 @@ const api::Lane* Lane::do_to_right() const {
   }
 }
 
-const api::BranchPoint* Lane::DoGetBranchPoint(
-    const api::LaneEnd::Which which_end) const {
+const api::BranchPoint* Lane::DoGetBranchPoint(const api::LaneEnd::Which which_end) const {
   switch (which_end) {
-    case api::LaneEnd::kStart:  { return start_branch_point_; }
-    case api::LaneEnd::kFinish: { return finish_branch_point_; }
+    case api::LaneEnd::kStart: {
+      return start_branch_point_;
+    }
+    case api::LaneEnd::kFinish: {
+      return finish_branch_point_;
+    }
   }
-  MALIPUT_ABORT_MESSAGE(
-      "which_end is neither LaneEnd::kStart nor LaneEnd::kFinish.");
+  MALIPUT_ABORT_MESSAGE("which_end is neither LaneEnd::kStart nor LaneEnd::kFinish.");
 }
 
-const api::LaneEndSet* Lane::DoGetConfluentBranches(
-    api::LaneEnd::Which which_end) const {
+const api::LaneEndSet* Lane::DoGetConfluentBranches(api::LaneEnd::Which which_end) const {
   return GetBranchPoint(which_end)->GetConfluentBranches({this, which_end});
 }
 
-const api::LaneEndSet* Lane::DoGetOngoingBranches(
-    api::LaneEnd::Which which_end) const {
+const api::LaneEndSet* Lane::DoGetOngoingBranches(api::LaneEnd::Which which_end) const {
   return GetBranchPoint(which_end)->GetOngoingBranches({this, which_end});
 }
 
-drake::optional<api::LaneEnd> Lane::DoGetDefaultBranch(
-    api::LaneEnd::Which which_end) const {
+drake::optional<api::LaneEnd> Lane::DoGetDefaultBranch(api::LaneEnd::Which which_end) const {
   return GetBranchPoint(which_end)->GetDefaultBranch({this, which_end});
 }
 

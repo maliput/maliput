@@ -18,9 +18,7 @@ namespace utility {
 ///
 /// @returns an unordered_set of Segments connected to `seed_segment`,
 ///          including `seed_segment` itself.
-std::unordered_set<const api::Segment*>
-FindConfluentSegments(const api::Segment* seed_segment);
-
+std::unordered_set<const api::Segment*> FindConfluentSegments(const api::Segment* seed_segment);
 
 /// Analyzes how Segments in @p road_geometry are connected via confluency
 /// of their Lanes at BranchPoints.
@@ -39,9 +37,7 @@ FindConfluentSegments(const api::Segment* seed_segment);
 ///          unordered_sets.  The ordering of the components in the vector is
 ///          arbitrary.  Each Segment in @p road_geometry shall belong
 ///          to exactly one component.
-std::vector<std::unordered_set<const api::Segment*>>
-AnalyzeConfluentSegments(const api::RoadGeometry* road_geometry);
-
+std::vector<std::unordered_set<const api::Segment*>> AnalyzeConfluentSegments(const api::RoadGeometry* road_geometry);
 
 }  // namespace utility
 }  // namespace maliput

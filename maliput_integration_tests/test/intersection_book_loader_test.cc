@@ -20,7 +20,6 @@
 #include "multilane/builder.h"
 #include "multilane/loader.h"
 
-
 namespace maliput {
 namespace {
 
@@ -38,15 +37,11 @@ constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 class TestLoading2x2IntersectionIntersectionBook : public ::testing::Test {
  protected:
   TestLoading2x2IntersectionIntersectionBook()
-      : filepath_(
-            maliput::common::Filesystem::get_env_path(
-              MULTILANE_RESOURCE_VAR) + "/2x2_intersection.yaml"),
-        road_geometry_(
-            multilane::LoadFile(multilane::BuilderFactory(), filepath_)),
+      : filepath_(maliput::common::Filesystem::get_env_path(MULTILANE_RESOURCE_VAR) + "/2x2_intersection.yaml"),
+        road_geometry_(multilane::LoadFile(multilane::BuilderFactory(), filepath_)),
         rulebook_(LoadRoadRulebookFromFile(road_geometry_.get(), filepath_)),
         traffic_light_book_(LoadTrafficLightBookFromFile(filepath_)),
-        ring_book_(LoadPhaseRingBookFromFile(
-            rulebook_.get(), traffic_light_book_.get(), filepath_)) {}
+        ring_book_(LoadPhaseRingBookFromFile(rulebook_.get(), traffic_light_book_.get(), filepath_)) {}
 
   const std::string filepath_;
   const std::unique_ptr<const RoadGeometry> road_geometry_;
@@ -57,18 +52,16 @@ class TestLoading2x2IntersectionIntersectionBook : public ::testing::Test {
 
 TEST_F(TestLoading2x2IntersectionIntersectionBook, LoadFromFile) {
   const PhaseRing::Id ring_id("2x2Intersection");
-  const drake::optional<PhaseRing> ring =
-      ring_book_->GetPhaseRing(PhaseRing::Id(ring_id));
+  const drake::optional<PhaseRing> ring = ring_book_->GetPhaseRing(PhaseRing::Id(ring_id));
   EXPECT_TRUE(ring.has_value());
 
   ManualPhaseProvider phase_provider;
-  std::unique_ptr<api::IntersectionBook> book = LoadIntersectionBookFromFile(
-      filepath_, *rulebook_, *ring_book_, &phase_provider);
+  std::unique_ptr<api::IntersectionBook> book =
+      LoadIntersectionBookFromFile(filepath_, *rulebook_, *ring_book_, &phase_provider);
   EXPECT_NE(book, nullptr);
   EXPECT_EQ(int(book->GetIntersections().size()), 1);
   EXPECT_EQ(book->GetIntersection(Intersection::Id("unknown")), nullptr);
-  Intersection* intersection =
-      book->GetIntersection(Intersection::Id("2x2Intersection"));
+  Intersection* intersection = book->GetIntersection(Intersection::Id("2x2Intersection"));
   EXPECT_NE(intersection, nullptr);
   EXPECT_TRUE(intersection->Phase().has_value());
   EXPECT_EQ(intersection->Phase()->id, Phase::Id("NorthSouthPhase"));

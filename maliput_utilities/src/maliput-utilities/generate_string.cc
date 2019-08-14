@@ -36,14 +36,11 @@ IndentLevels ComputeIndentLevels(const GenerateStringOptions& options) {
   return result;
 }
 
-std::string GetIndent(int indent) {
-  return std::string(indent * kIndentSize, ' ');
-}
+std::string GetIndent(int indent) { return std::string(indent * kIndentSize, ' '); }
 
 }  // namespace
 
-std::string GenerateString(const api::RoadGeometry& road_geometry,
-                           const GenerateStringOptions& options) {
+std::string GenerateString(const api::RoadGeometry& road_geometry, const GenerateStringOptions& options) {
   const IndentLevels indent = ComputeIndentLevels(options);
   std::stringstream result;
   if (options.include_road_geometry_id) {
@@ -85,20 +82,13 @@ std::string GenerateString(const api::RoadGeometry& road_geometry,
           if (options.include_lane_details) {
             result << lane_prefix << "  length: " << lane->length() << "\n";
             result << lane_prefix << "  geo positions:\n";
-            result << lane_prefix << "    s_min: "
-                   << lane->ToGeoPosition(api::LanePosition(0, 0, 0)) << "\n";
-            result << lane_prefix << "    s_max: "
-                   << lane->ToGeoPosition(
-                          api::LanePosition(lane->length(), 0, 0))
+            result << lane_prefix << "    s_min: " << lane->ToGeoPosition(api::LanePosition(0, 0, 0)) << "\n";
+            result << lane_prefix << "    s_max: " << lane->ToGeoPosition(api::LanePosition(lane->length(), 0, 0))
                    << "\n";
             const api::Lane* left = lane->to_left();
             const api::Lane* right = lane->to_right();
-            result << lane_prefix
-                   << "  to left: " << (left ? left->id().string() : "")
-                   << "\n";
-            result << lane_prefix
-                   << "  to right: " << (right ? right->id().string() : "")
-                   << "\n";
+            result << lane_prefix << "  to left: " << (left ? left->id().string() : "") << "\n";
+            result << lane_prefix << "  to right: " << (right ? right->id().string() : "") << "\n";
           }
         }
       }

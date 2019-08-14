@@ -4,11 +4,11 @@
 #include <memory>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace dragway {
@@ -22,8 +22,7 @@ class LaneEndSet final : public api::LaneEndSet {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet)
 
-  explicit LaneEndSet(const api::Lane* lane, api::LaneEnd::Which which_end)
-      : end_(lane, which_end) {}
+  explicit LaneEndSet(const api::Lane* lane, api::LaneEnd::Which which_end) : end_(lane, which_end) {}
 
   ~LaneEndSet() override = default;
 
@@ -34,7 +33,6 @@ class LaneEndSet final : public api::LaneEndSet {
 
   const api::LaneEnd end_;
 };
-
 
 /// Dragway's implementation of api::BranchPoint.
 class BranchPoint final : public api::BranchPoint {
@@ -53,8 +51,7 @@ class BranchPoint final : public api::BranchPoint {
   /// BranchPoint belongs. This pointer must remain valid for the lifetime of
   /// this class's instance.
   ///
-  BranchPoint(const api::BranchPointId& id, const Lane* lane,
-      const api::RoadGeometry* road_geometry);
+  BranchPoint(const api::BranchPointId& id, const Lane* lane, const api::RoadGeometry* road_geometry);
 
   ~BranchPoint() final = default;
 
@@ -63,14 +60,11 @@ class BranchPoint final : public api::BranchPoint {
 
   const api::RoadGeometry* do_road_geometry() const override;
 
-  const api::LaneEndSet* DoGetConfluentBranches(
-      const api::LaneEnd& end) const override;
+  const api::LaneEndSet* DoGetConfluentBranches(const api::LaneEnd& end) const override;
 
-  const api::LaneEndSet* DoGetOngoingBranches(
-      const api::LaneEnd& end) const override;
+  const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd& end) const override;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(
-      const api::LaneEnd& end) const override;
+  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd& end) const override;
 
   const api::LaneEndSet* DoGetASide() const override;
 

@@ -9,7 +9,6 @@
 
 #include "multilane/road_curve.h"
 
-
 namespace maliput {
 namespace multilane {
 
@@ -47,17 +46,14 @@ class ArcRoadCurve : public RoadCurve {
   ///         positive number.
   /// @throws maliput::common::assertion_error if @p scale_length is not a
   ///         positive number.
-  explicit ArcRoadCurve(
-      const drake::Vector2<double>& center, double radius,
-      double theta0, double d_theta,
-      const CubicPolynomial& elevation,
-      const CubicPolynomial& superelevation,
-      double linear_tolerance, double scale_length,
-      ComputationPolicy computation_policy)
-      : RoadCurve(linear_tolerance, scale_length,
-                  elevation, superelevation,
-                  computation_policy),
-        center_(center), radius_(radius), theta0_(theta0), d_theta_(d_theta) {
+  explicit ArcRoadCurve(const drake::Vector2<double>& center, double radius, double theta0, double d_theta,
+                        const CubicPolynomial& elevation, const CubicPolynomial& superelevation,
+                        double linear_tolerance, double scale_length, ComputationPolicy computation_policy)
+      : RoadCurve(linear_tolerance, scale_length, elevation, superelevation, computation_policy),
+        center_(center),
+        radius_(radius),
+        theta0_(theta0),
+        d_theta_(d_theta) {
     MALIPUT_THROW_UNLESS(radius > 0.0);
   }
 
@@ -69,8 +65,7 @@ class ArcRoadCurve : public RoadCurve {
     // and:
     //      θ = θ₀ + (p * Δθ)
     const double theta = theta_of_p(p);
-    return center_ + drake::Vector2<double>(radius_ * std::cos(theta),
-                                     radius_ * std::sin(theta));
+    return center_ + drake::Vector2<double>(radius_ * std::cos(theta), radius_ * std::sin(theta));
   }
 
   drake::Vector2<double> xy_dot_of_p(double p) const override {
@@ -83,8 +78,7 @@ class ArcRoadCurve : public RoadCurve {
     //      [dx/dp; dy/dp] = [-radius * sin(θ) * dθ/dp; radius * cos(θ) * dθ/dp]
     //                     = [-radius * sin(θ) * Δθ; radius * cos(θ) * Δθ]
     const double theta = theta_of_p(p);
-    return drake::Vector2<double>(-radius_ * std::sin(theta) * d_theta_,
-                           radius_ * std::cos(theta) * d_theta_);
+    return drake::Vector2<double>(-radius_ * std::sin(theta) * d_theta_, radius_ * std::cos(theta) * d_theta_);
   }
 
   double heading_of_p(double p) const override {
@@ -110,31 +104,24 @@ class ArcRoadCurve : public RoadCurve {
 
   double l_max() const override { return radius_ * std::abs(d_theta_); }
 
-  drake::Vector3<double> ToCurveFrame(
-      const drake::Vector3<double>& geo_coordinate,
-      double r_min, double r_max,
-      const api::HBounds& height_bounds) const override;
+  drake::Vector3<double> ToCurveFrame(const drake::Vector3<double>& geo_coordinate, double r_min, double r_max,
+                                      const api::HBounds& height_bounds) const override;
 
-  bool IsValid(double r_min, double r_max,
-               const api::HBounds& height_bounds) const override;
+  bool IsValid(double r_min, double r_max, const api::HBounds& height_bounds) const override;
 
  private:
   double FastCalcPFromS(double s, double r) const override;
 
   double FastCalcSFromP(double p, double r) const override;
 
-  double CalcMinimumRadiusAtOffset(double r) const override {
-    return offset_radius(r);
-  }
+  double CalcMinimumRadiusAtOffset(double r) const override { return offset_radius(r); }
 
   // Computes the radius of the reference arc offset at a distance @p r.
   // Uses d_theta_'s sign (see ArcRoadCurve() for more details) to add or
   // or subtract @p r distance.
   // @param r Lateral offset of the reference curve over the z=0 plane.
   // @return The reference arc offset radius.
-  double offset_radius(double r) const {
-    return radius_ - std::copysign(1., d_theta_) * r;
-  }
+  double offset_radius(double r) const { return radius_ - std::copysign(1., d_theta_) * r; }
 
   // Computes the absolute position along reference arc as an angle in
   // range [theta0_, (theta0 + d_theta_)],

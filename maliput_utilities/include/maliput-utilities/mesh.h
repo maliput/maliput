@@ -15,7 +15,6 @@
 #include "maliput/api/lane.h"
 #include "maliput/common/maliput_abort.h"
 
-
 namespace maliput {
 namespace utility {
 namespace mesh {
@@ -58,7 +57,6 @@ class UniqueIndexer {
   std::vector<const T*> vector_;
 };
 
-
 /// A world frame vertex.
 class GeoVertex {
  public:
@@ -67,9 +65,7 @@ class GeoVertex {
 
   /// An equivalence operation suitable for std::unordered_map.
   struct Equiv {
-    bool operator()(const GeoVertex& lhs, const GeoVertex& rhs) const {
-      return (lhs.v().xyz() == rhs.v().xyz());
-    }
+    bool operator()(const GeoVertex& lhs, const GeoVertex& rhs) const { return (lhs.v().xyz() == rhs.v().xyz()); }
   };
 
   GeoVertex() {}
@@ -80,8 +76,7 @@ class GeoVertex {
 
   //// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
-  friend void hash_append(
-      HashAlgorithm& hasher, const GeoVertex& item) noexcept {
+  friend void hash_append(HashAlgorithm& hasher, const GeoVertex& item) noexcept {
     using drake::hash_append;
     hash_append(hasher, item.v_.x());
     hash_append(hasher, item.v_.y());
@@ -92,7 +87,6 @@ class GeoVertex {
   api::GeoPosition v_;
 };
 
-
 /// A world frame normal vector.
 class GeoNormal {
  public:
@@ -101,9 +95,7 @@ class GeoNormal {
 
   /// An equivalence operation suitable for std::unordered_map.
   struct Equiv {
-    bool operator()(const GeoNormal& lhs, const GeoNormal& rhs) const {
-      return (lhs.n().xyz() == rhs.n().xyz());
-    }
+    bool operator()(const GeoNormal& lhs, const GeoNormal& rhs) const { return (lhs.n().xyz() == rhs.n().xyz()); }
   };
 
   GeoNormal() {}
@@ -114,8 +106,7 @@ class GeoNormal {
 
   //// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
-  friend void hash_append(
-      HashAlgorithm& hasher, const GeoNormal& item) noexcept {
+  friend void hash_append(HashAlgorithm& hasher, const GeoNormal& item) noexcept {
     using drake::hash_append;
     hash_append(hasher, item.n_.x());
     hash_append(hasher, item.n_.y());
@@ -126,14 +117,12 @@ class GeoNormal {
   api::GeoPosition n_;
 };
 
-
 /// A world frame face:  a sequence of vertices with corresponding normals.
 class GeoFace {
  public:
   GeoFace() {}
 
-  GeoFace(const std::vector<GeoVertex>& vertices,
-          const std::vector<GeoNormal>& normals)
+  GeoFace(const std::vector<GeoVertex>& vertices, const std::vector<GeoNormal>& normals)
       : vertices_(vertices), normals_(normals) {
     MALIPUT_DEMAND(vertices.size() == normals.size());
   }
@@ -152,31 +141,25 @@ class GeoFace {
   std::vector<GeoNormal> normals_;
 };
 
-
 /// A face --- a sequence of vertices with normals --- in which the
 /// vertices and normals are represented by integer indices into some
 /// other container/dictionary.
 class IndexFace {
  public:
   struct Vertex {
-    Vertex(int vertex_index_in, int normal_index_in)
-        : vertex_index(vertex_index_in),
-          normal_index(normal_index_in) {}
+    Vertex(int vertex_index_in, int normal_index_in) : vertex_index(vertex_index_in), normal_index(normal_index_in) {}
 
     int vertex_index{};
     int normal_index{};
   };
 
-  void push_vertex(int vertex_index, int normal_index) {
-    vertices_.emplace_back(vertex_index, normal_index);
-  }
+  void push_vertex(int vertex_index, int normal_index) { vertices_.emplace_back(vertex_index, normal_index); }
 
   const std::vector<Vertex>& vertices() const { return vertices_; }
 
  private:
   std::vector<Vertex> vertices_;
 };
-
 
 /// A world frame mesh:  a collection of GeoFaces.
 class GeoMesh {
@@ -199,14 +182,11 @@ class GeoMesh {
     const std::vector<const GeoNormal*>& other_normals = other_mesh.normals();
     for (const IndexFace& other_face : other_faces) {
       IndexFace face;
-      const std::vector<IndexFace::Vertex>&
-          other_face_vertices = other_face.vertices();
+      const std::vector<IndexFace::Vertex>& other_face_vertices = other_face.vertices();
       for (size_t i = 0; i < other_face_vertices.size(); ++i) {
         const IndexFace::Vertex& other_face_vertex = other_face_vertices[i];
-        int vi = vertices_.push_back(*other_vertices[
-            other_face_vertex.vertex_index]);
-        int ni = normals_.push_back(*other_normals[
-            other_face_vertex.normal_index]);
+        int vi = vertices_.push_back(*other_vertices[other_face_vertex.vertex_index]);
+        int ni = normals_.push_back(*other_normals[other_face_vertex.normal_index]);
         face.push_vertex(vi, ni);
       }
       faces_.push_back(face);
@@ -226,10 +206,8 @@ class GeoMesh {
   /// Conveniently, EmitObj() returns a tuple of (vertex_index_offset,
   /// normal_index_offset) which can be chained into a succeeding call to
   /// EmitObj().
-  std::tuple<int, int>
-  EmitObj(std::ostream& os, const std::string& material,
-          int precision, const api::GeoPosition& origin,
-          int vertex_index_offset, int normal_index_offset) const {
+  std::tuple<int, int> EmitObj(std::ostream& os, const std::string& material, int precision,
+                               const api::GeoPosition& origin, int vertex_index_offset, int normal_index_offset) const {
     if (faces_.empty()) {
       // Short-circuit if there is nothing to draw.
       return std::make_tuple(vertex_index_offset, normal_index_offset);
@@ -239,17 +217,13 @@ class GeoMesh {
     using namespace fmt::literals;
     fmt::print(os, "# Vertices\n");
     for (const GeoVertex* gv : vertices_.vector()) {
-      fmt::print(os, "v {x:.{p}f} {y:.{p}f} {z:.{p}f}\n",
-                 "x"_a = (gv->v().x() - origin.x()),
-                 "y"_a = (gv->v().y() - origin.y()),
-                 "z"_a = (gv->v().z() - origin.z()),
-                 "p"_a = precision);
+      fmt::print(os, "v {x:.{p}f} {y:.{p}f} {z:.{p}f}\n", "x"_a = (gv->v().x() - origin.x()),
+                 "y"_a = (gv->v().y() - origin.y()), "z"_a = (gv->v().z() - origin.z()), "p"_a = precision);
     }
     fmt::print(os, "# Normals\n");
     for (const GeoNormal* gn : normals_.vector()) {
-      fmt::print(os, "vn {x:.{p}f} {y:.{p}f} {z:.{p}f}\n",
-                 "x"_a = gn->n().x(), "y"_a = gn->n().y(), "z"_a = gn->n().z(),
-                 "p"_a = precision);
+      fmt::print(os, "vn {x:.{p}f} {y:.{p}f} {z:.{p}f}\n", "x"_a = gn->n().x(), "y"_a = gn->n().y(),
+                 "z"_a = gn->n().z(), "p"_a = precision);
     }
     fmt::print(os, "\n");
     fmt::print(os, "# Faces\n");
@@ -259,8 +233,7 @@ class GeoMesh {
     for (const IndexFace& f : faces_) {
       fmt::print(os, "f");
       for (const IndexFace::Vertex& ifv : f.vertices()) {
-        fmt::print(os, " {}//{}",
-                   (ifv.vertex_index + 1 + vertex_index_offset),
+        fmt::print(os, " {}//{}", (ifv.vertex_index + 1 + vertex_index_offset),
                    (ifv.normal_index + 1 + normal_index_offset));
       }
       fmt::print(os, "\n");
@@ -269,13 +242,9 @@ class GeoMesh {
                            normal_index_offset + normals_.vector().size());
   }
 
-  const std::vector<const GeoVertex*>& vertices() const {
-    return vertices_.vector();
-  }
+  const std::vector<const GeoVertex*>& vertices() const { return vertices_.vector(); }
 
-  const std::vector<const GeoNormal*>& normals() const {
-    return normals_.vector();
-  }
+  const std::vector<const GeoNormal*>& normals() const { return normals_.vector(); }
 
   const std::vector<IndexFace>& faces() const { return faces_; }
 
@@ -290,24 +259,20 @@ class GeoMesh {
   std::vector<IndexFace> faces_;
 };
 
-
 /// A `Lane`-frame face: a sequence of vertices expressed in the (s,r,h)
 /// coordinates of an api::Lane (which is not referenced here).  Each
 /// vertex has a normal vector also expressed in the `Lane`-frame.
 class SrhFace {
  public:
-  SrhFace(const std::initializer_list<api::LanePosition> vertices,
-          const api::LanePosition& normal)
-      : vertices_(vertices),
-        normal_(normal) {}
+  SrhFace(const std::initializer_list<api::LanePosition> vertices, const api::LanePosition& normal)
+      : vertices_(vertices), normal_(normal) {}
 
   /// Given a @p lane, calculates the corresponding GeoFace.
   GeoFace ToGeoFace(const api::Lane* lane) const {
     GeoFace geo_face;
     for (const api::LanePosition& srh : vertices_) {
       api::GeoPosition xyz(lane->ToGeoPosition(srh));
-      api::GeoPosition n = api::GeoPosition::FromXyz(
-          lane->GetOrientation(srh).quat() * normal_.srh());
+      api::GeoPosition n = api::GeoPosition::FromXyz(lane->GetOrientation(srh).quat() * normal_.srh());
       geo_face.push_vn(GeoVertex(xyz), GeoNormal(n));
     }
     return geo_face;
@@ -317,7 +282,6 @@ class SrhFace {
   std::vector<api::LanePosition> vertices_;
   api::LanePosition normal_;
 };
-
 
 }  // namespace mesh
 }  // namespace utility

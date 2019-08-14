@@ -26,9 +26,7 @@ using ::testing::MatchResultListener;
 // @return ::testing::AssertionSuccess() When EndpointXy objects' quantities
 //                                       are within @p linear_tolerance or
 //                                       @p angular_tolerance, as appropriate.
-::testing::AssertionResult IsEndpointXyClose(const EndpointXy& xy1,
-                                             const EndpointXy& xy2,
-                                             double linear_tolerance,
+::testing::AssertionResult IsEndpointXyClose(const EndpointXy& xy1, const EndpointXy& xy2, double linear_tolerance,
                                              double angular_tolerance);
 
 // Compares equality within @p tolerance deviation of two EndpointZ objects.
@@ -51,9 +49,7 @@ using ::testing::MatchResultListener;
 //                                       @p angular_tolerance, as appropriate.
 // TODO(hidmic): Review tolerances definition, units and usage for elevation
 //               and superelevation derivatives in EndpointZ instances.
-::testing::AssertionResult IsEndpointZClose(const EndpointZ& z1,
-                                            const EndpointZ& z2,
-                                            double linear_tolerance,
+::testing::AssertionResult IsEndpointZClose(const EndpointZ& z1, const EndpointZ& z2, double linear_tolerance,
                                             double angular_tolerance);
 
 // Compares equality within @p tolerance deviation of two Endpoint objects.
@@ -75,9 +71,7 @@ using ::testing::MatchResultListener;
 // @return ::testing::AssertionSuccess() When Endpoint objects' quantities
 //                                       are within @p linear_tolerance or
 //                                       @p angular_tolerance, as appropriate.
-::testing::AssertionResult IsEndpointClose(const Endpoint& pos1,
-                                           const Endpoint& pos2,
-                                           double linear_tolerance,
+::testing::AssertionResult IsEndpointClose(const Endpoint& pos1, const Endpoint& pos2, double linear_tolerance,
                                            double angular_tolerance);
 
 // Compares equality within @p linear_tolerance and @p angular_tolerance
@@ -91,10 +85,8 @@ using ::testing::MatchResultListener;
 // @return ::testing::AssertionFailure() When ArcOffset objects are different.
 // @return ::testing::AssertionSuccess() When ArcOffset objects are within
 // @p linear_tolerance and @p angular_tolerance deviations.
-::testing::AssertionResult IsArcOffsetClose(const ArcOffset& arc_offset1,
-                                            const ArcOffset& arc_offset2,
-                                            double linear_tolerance,
-                                            double angular_tolerance);
+::testing::AssertionResult IsArcOffsetClose(const ArcOffset& arc_offset1, const ArcOffset& arc_offset2,
+                                            double linear_tolerance, double angular_tolerance);
 
 // Compares equality within @p tolerance of @p cubic1 and @p cubic2
 // coefficients.
@@ -105,8 +97,7 @@ using ::testing::MatchResultListener;
 // CubicPolynomial objects are different.
 // @return ::testing::AssertionSuccess() When all coefficients of
 // CubicPolynomial objects are equal.
-::testing::AssertionResult IsCubicPolynomialClose(const CubicPolynomial& cubic1,
-                                                  const CubicPolynomial& cubic2,
+::testing::AssertionResult IsCubicPolynomialClose(const CubicPolynomial& cubic1, const CubicPolynomial& cubic2,
                                                   double tolerance);
 
 /// Wraps api::HBounds comparison into a MatcherInterface.
@@ -115,14 +106,13 @@ class HBoundsMatcher : public MatcherInterface<const api::HBounds&> {
   HBoundsMatcher(const api::HBounds& elevation_bounds, double tolerance)
       : elevation_bounds_(elevation_bounds), tolerance_(tolerance) {}
 
-  bool MatchAndExplain(const api::HBounds& other,
-                       MatchResultListener*) const override {
+  bool MatchAndExplain(const api::HBounds& other, MatchResultListener*) const override {
     return api::test::IsHBoundsClose(elevation_bounds_, other, tolerance_);
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within tolerance [" << tolerance_ << "] of elevation_bounds: ["
-        << elevation_bounds_.min() << ", " << elevation_bounds_.max() << "].";
+    *os << "is within tolerance [" << tolerance_ << "] of elevation_bounds: [" << elevation_bounds_.min() << ", "
+        << elevation_bounds_.max() << "].";
   }
 
  private:
@@ -131,28 +121,21 @@ class HBoundsMatcher : public MatcherInterface<const api::HBounds&> {
 };
 
 /// @return A Matcher<const api::HBounds&> of type HBoundsMatcher.
-Matcher<const api::HBounds&> Matches(const api::HBounds& elevation_bounds,
-                                     double tolerance);
+Matcher<const api::HBounds&> Matches(const api::HBounds& elevation_bounds, double tolerance);
 
 /// Wraps an ArcOffset comparison into a MatcherInterface.
 class ArcOffsetMatcher : public MatcherInterface<const ArcOffset&> {
  public:
-  ArcOffsetMatcher(const ArcOffset& arc_offset, double linear_tolerance,
-                   double angular_tolerance)
-      : arc_offset_(arc_offset),
-        linear_tolerance_(linear_tolerance),
-        angular_tolerance_(angular_tolerance) {}
+  ArcOffsetMatcher(const ArcOffset& arc_offset, double linear_tolerance, double angular_tolerance)
+      : arc_offset_(arc_offset), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
 
-  bool MatchAndExplain(const ArcOffset& other,
-                       MatchResultListener*) const override {
-    return IsArcOffsetClose(arc_offset_, other, linear_tolerance_,
-                            angular_tolerance_);
+  bool MatchAndExplain(const ArcOffset& other, MatchResultListener*) const override {
+    return IsArcOffsetClose(arc_offset_, other, linear_tolerance_, angular_tolerance_);
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within linear and angular tolerance: [" << linear_tolerance_
-        << ", " << angular_tolerance_ << "] of arc_offset: ["
-        << arc_offset_.radius() << ", " << arc_offset_.d_theta() << "].";
+    *os << "is within linear and angular tolerance: [" << linear_tolerance_ << ", " << angular_tolerance_
+        << "] of arc_offset: [" << arc_offset_.radius() << ", " << arc_offset_.d_theta() << "].";
   }
 
  private:
@@ -162,9 +145,7 @@ class ArcOffsetMatcher : public MatcherInterface<const ArcOffset&> {
 };
 
 /// @return A Matcher<const ArcOffset&> of type ArcOffsetMatcher.
-Matcher<const ArcOffset&> Matches(const ArcOffset& arc_offset,
-                                  double linear_tolerance,
-                                  double angular_tolerance);
+Matcher<const ArcOffset&> Matches(const ArcOffset& arc_offset, double linear_tolerance, double angular_tolerance);
 
 /// Wraps a LineOffset comparison into a MatcherInterface.
 class LineOffsetMatcher : public MatcherInterface<const LineOffset&> {
@@ -172,15 +153,13 @@ class LineOffsetMatcher : public MatcherInterface<const LineOffset&> {
   LineOffsetMatcher(const LineOffset& line_offset, double tolerance)
       : line_offset_(line_offset), tolerance_(tolerance) {}
 
-  bool MatchAndExplain(const LineOffset& other,
-                       MatchResultListener*) const override {
+  bool MatchAndExplain(const LineOffset& other, MatchResultListener*) const override {
     const double delta = std::abs(line_offset_.length() - other.length());
     return delta <= tolerance_;
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within tolerance: [" << tolerance_ << "] of line_offset: ["
-        << line_offset_ << "].";
+    *os << "is within tolerance: [" << tolerance_ << "] of line_offset: [" << line_offset_ << "].";
   }
 
  private:
@@ -189,8 +168,7 @@ class LineOffsetMatcher : public MatcherInterface<const LineOffset&> {
 };
 
 /// @return A Matcher<const LineOffset&> of type LineOffsetMatcher.
-Matcher<const LineOffset&> Matches(const LineOffset& line_offset,
-                                   double tolerance);
+Matcher<const LineOffset&> Matches(const LineOffset& line_offset, double tolerance);
 
 /// Wraps a LineOffset comparison into a MatcherInterface.
 class LaneLayoutMatcher : public MatcherInterface<const LaneLayout&> {
@@ -198,8 +176,7 @@ class LaneLayoutMatcher : public MatcherInterface<const LaneLayout&> {
   LaneLayoutMatcher(const LaneLayout& lane_layout, double tolerance)
       : lane_layout_(lane_layout), tolerance_(tolerance) {}
 
-  bool MatchAndExplain(const LaneLayout& other,
-                       MatchResultListener*) const override {
+  bool MatchAndExplain(const LaneLayout& other, MatchResultListener*) const override {
     double delta{};
 
     delta = std::abs(lane_layout_.left_shoulder() - other.left_shoulder());
@@ -219,8 +196,7 @@ class LaneLayoutMatcher : public MatcherInterface<const LaneLayout&> {
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within tolerance: [" << tolerance_ << "] of lane_layout: ["
-        << lane_layout_ << "].";
+    *os << "is within tolerance: [" << tolerance_ << "] of lane_layout: [" << lane_layout_ << "].";
   }
 
  private:
@@ -229,28 +205,21 @@ class LaneLayoutMatcher : public MatcherInterface<const LaneLayout&> {
 };
 
 /// @return A Matcher<const LaneLayout&> of type LaneLayoutMatcher.
-Matcher<const LaneLayout&> Matches(const LaneLayout& lane_layout,
-                                   double tolerance);
+Matcher<const LaneLayout&> Matches(const LaneLayout& lane_layout, double tolerance);
 
 /// Wraps a StartReference::Spec comparison into a MatcherInterface.
-class StartReferenceSpecMatcher
-    : public MatcherInterface<const StartReference::Spec&> {
+class StartReferenceSpecMatcher : public MatcherInterface<const StartReference::Spec&> {
  public:
-  StartReferenceSpecMatcher(const StartReference::Spec& start_reference,
-                            double linear_tolerance, double angular_tolerance)
-      : start_reference_(start_reference),
-        linear_tolerance_(linear_tolerance),
-        angular_tolerance_(angular_tolerance) {}
+  StartReferenceSpecMatcher(const StartReference::Spec& start_reference, double linear_tolerance,
+                            double angular_tolerance)
+      : start_reference_(start_reference), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
 
-  bool MatchAndExplain(const StartReference::Spec& other,
-                       MatchResultListener*) const override {
-    return IsEndpointClose(start_reference_.endpoint(), other.endpoint(),
-                           linear_tolerance_, angular_tolerance_);
+  bool MatchAndExplain(const StartReference::Spec& other, MatchResultListener*) const override {
+    return IsEndpointClose(start_reference_.endpoint(), other.endpoint(), linear_tolerance_, angular_tolerance_);
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within linear tolerance: [" << linear_tolerance_
-        << "] and angular tolerance: [" << angular_tolerance_
+    *os << "is within linear tolerance: [" << linear_tolerance_ << "] and angular tolerance: [" << angular_tolerance_
         << "] of start_reference: [" << start_reference_ << "].";
   }
 
@@ -262,29 +231,21 @@ class StartReferenceSpecMatcher
 
 /// @return A Matcher<const StartReference::Spec&> of type
 /// StartReferenceSpecMatcher.
-Matcher<const StartReference::Spec&> Matches(
-    const StartReference::Spec& start_reference,
-    double linear_tolerance, double angular_tolerance);
+Matcher<const StartReference::Spec&> Matches(const StartReference::Spec& start_reference, double linear_tolerance,
+                                             double angular_tolerance);
 
 /// Wraps a EndReference::Spec comparison into a MatcherInterface.
-class EndReferenceSpecMatcher
-    : public MatcherInterface<const EndReference::Spec&> {
+class EndReferenceSpecMatcher : public MatcherInterface<const EndReference::Spec&> {
  public:
-  EndReferenceSpecMatcher(const EndReference::Spec& end_reference,
-                          double linear_tolerance, double angular_tolerance)
-      : end_reference_(end_reference),
-        linear_tolerance_(linear_tolerance),
-        angular_tolerance_(angular_tolerance) {}
+  EndReferenceSpecMatcher(const EndReference::Spec& end_reference, double linear_tolerance, double angular_tolerance)
+      : end_reference_(end_reference), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
 
-  bool MatchAndExplain(const EndReference::Spec& other,
-                       MatchResultListener*) const override {
-    return IsEndpointZClose(end_reference_.endpoint_z(), other.endpoint_z(),
-                            linear_tolerance_, angular_tolerance_);
+  bool MatchAndExplain(const EndReference::Spec& other, MatchResultListener*) const override {
+    return IsEndpointZClose(end_reference_.endpoint_z(), other.endpoint_z(), linear_tolerance_, angular_tolerance_);
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within linear tolerance: [" << linear_tolerance_
-        << "] and angular tolerance: [" << angular_tolerance_
+    *os << "is within linear tolerance: [" << linear_tolerance_ << "] and angular tolerance: [" << angular_tolerance_
         << "] of end_reference: [" << end_reference_ << "].";
   }
 
@@ -297,24 +258,17 @@ class EndReferenceSpecMatcher
 /// Wraps a StartLane::Spec comparison into a MatcherInterface.
 class StartLaneSpecMatcher : public MatcherInterface<const StartLane::Spec&> {
  public:
-  StartLaneSpecMatcher(const StartLane::Spec& start_lane,
-                       double linear_tolerance, double angular_tolerance)
-      : start_lane_(start_lane),
-        linear_tolerance_(linear_tolerance),
-        angular_tolerance_(angular_tolerance) {}
+  StartLaneSpecMatcher(const StartLane::Spec& start_lane, double linear_tolerance, double angular_tolerance)
+      : start_lane_(start_lane), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
 
-  bool MatchAndExplain(const StartLane::Spec& other,
-                       MatchResultListener*) const override {
-    return (IsEndpointClose(start_lane_.endpoint(), other.endpoint(),
-                            linear_tolerance_, angular_tolerance_)
-            && start_lane_.lane_id() == other.lane_id());
+  bool MatchAndExplain(const StartLane::Spec& other, MatchResultListener*) const override {
+    return (IsEndpointClose(start_lane_.endpoint(), other.endpoint(), linear_tolerance_, angular_tolerance_) &&
+            start_lane_.lane_id() == other.lane_id());
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within linear tolerance: [" << linear_tolerance_
-        << "] and angular tolerance: [" << angular_tolerance_
-        << "] and lane ID is equal to start_lane: ["
-        << start_lane_ << "].";
+    *os << "is within linear tolerance: [" << linear_tolerance_ << "] and angular tolerance: [" << angular_tolerance_
+        << "] and lane ID is equal to start_lane: [" << start_lane_ << "].";
   }
 
  private:
@@ -324,36 +278,27 @@ class StartLaneSpecMatcher : public MatcherInterface<const StartLane::Spec&> {
 };
 
 /// @return A Matcher<const StartLane::Spec&> of type StartLaneSpecMatcher.
-Matcher<const StartLane::Spec&> Matches(
-    const StartLane::Spec& start_reference,
-    double linear_tolerance, double angular_tolerance);
+Matcher<const StartLane::Spec&> Matches(const StartLane::Spec& start_reference, double linear_tolerance,
+                                        double angular_tolerance);
 
 /// @return A Matcher<const EndReference::Spec&> of type
 /// EndReferenceSpecMatcher.
-Matcher<const EndReference::Spec&> Matches(
-    const EndReference::Spec& end_reference,
-    double linear_tolerance, double angular_tolerance);
+Matcher<const EndReference::Spec&> Matches(const EndReference::Spec& end_reference, double linear_tolerance,
+                                           double angular_tolerance);
 
 /// Wraps a EndLane::Spec comparison into a MatcherInterface.
 class EndLaneSpecMatcher : public MatcherInterface<const EndLane::Spec&> {
  public:
-  EndLaneSpecMatcher(const EndLane::Spec& end_lane, double linear_tolerance,
-                     double angular_tolerance)
-      : end_lane_(end_lane),
-        linear_tolerance_(linear_tolerance),
-        angular_tolerance_(angular_tolerance) {}
+  EndLaneSpecMatcher(const EndLane::Spec& end_lane, double linear_tolerance, double angular_tolerance)
+      : end_lane_(end_lane), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
 
-  bool MatchAndExplain(const EndLane::Spec& other,
-                       MatchResultListener*) const override {
-    return IsEndpointZClose(end_lane_.endpoint_z(), other.endpoint_z(),
-                            linear_tolerance_, angular_tolerance_);
+  bool MatchAndExplain(const EndLane::Spec& other, MatchResultListener*) const override {
+    return IsEndpointZClose(end_lane_.endpoint_z(), other.endpoint_z(), linear_tolerance_, angular_tolerance_);
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within linear tolerance: [" << linear_tolerance_
-        << "] and angular tolerance: [" << angular_tolerance_
-        << "] and lane ID is equal to end_lane: ["
-        << end_lane_ << "].";
+    *os << "is within linear tolerance: [" << linear_tolerance_ << "] and angular tolerance: [" << angular_tolerance_
+        << "] and lane ID is equal to end_lane: [" << end_lane_ << "].";
   }
 
  private:
@@ -363,9 +308,7 @@ class EndLaneSpecMatcher : public MatcherInterface<const EndLane::Spec&> {
 };
 
 /// @return A Matcher<const EndLane::Spec&> of type EndLaneSpecMatcher.
-Matcher<const EndLane::Spec&> Matches(
-    const EndLane::Spec& end_lane,
-    double linear_tolerance, double angular_tolerance);
+Matcher<const EndLane::Spec&> Matches(const EndLane::Spec& end_lane, double linear_tolerance, double angular_tolerance);
 
 }  // namespace test
 }  // namespace multilane

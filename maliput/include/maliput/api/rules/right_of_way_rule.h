@@ -19,7 +19,6 @@ namespace maliput {
 namespace api {
 namespace rules {
 
-
 /// Rule describing right-of-way, a.k.a. priority.
 ///
 /// Right-of-way rules cover things like stop signs, yield signs, and
@@ -56,8 +55,7 @@ class RightOfWayRule final {
   using Id = TypeSpecificIdentifier<class RightOfWayRule>;
 
   /// Alias for the related bulb groups type.
-  using RelatedBulbGroups = std::unordered_map<TrafficLight::Id,
-                                               std::vector<BulbGroup::Id>>;
+  using RelatedBulbGroups = std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>;
 
   /// Description of stopping properties of the zone.
   enum class ZoneType {
@@ -95,13 +93,13 @@ class RightOfWayRule final {
 
     /// Basic semantic type of a rule state.
     enum class Type {
-      kGo = 0,              ///< Vehicle has right-of-way and may proceed if
-                            ///  safe to do so.
-      kStop,                ///< Vehicle does not have right-of-way and must
-                            ///  stop.
-      kStopThenGo           ///< Vehicle must come to complete stop before
-                            ///  entering controlled zone, but may then
-                            ///  proceed if safe;
+      kGo = 0,     ///< Vehicle has right-of-way and may proceed if
+                   ///  safe to do so.
+      kStop,       ///< Vehicle does not have right-of-way and must
+                   ///  stop.
+      kStopThenGo  ///< Vehicle must come to complete stop before
+                   ///  entering controlled zone, but may then
+                   ///  proceed if safe;
     };
 
     /// Constructs a State instance.
@@ -109,8 +107,7 @@ class RightOfWayRule final {
     /// @param id the unique Id
     /// @param type the semantic Type
     /// @param yield_to the other paths/rules which must be yielded to
-    State(Id id, Type type, const YieldGroup& yield_to)
-        : id_(id), type_(type), yield_to_(yield_to) {}
+    State(Id id, Type type, const YieldGroup& yield_to) : id_(id), type_(type), yield_to_(yield_to) {}
 
     /// Returns the Id.
     const Id& id() const { return id_; }
@@ -139,14 +136,9 @@ class RightOfWayRule final {
   ///         `states` contains duplicate State::Id's.
   /// @throws maliput::common::assertion_error if any duplicate BulbGroup::Id is
   ///         found.
-  RightOfWayRule(
-      const Id& id,
-      const LaneSRoute& zone,
-      ZoneType zone_type,
-      const std::vector<State>& states,
-      const RelatedBulbGroups& related_bulb_groups)
-        : id_(id), zone_(zone), zone_type_(zone_type),
-          related_bulb_groups_(related_bulb_groups) {
+  RightOfWayRule(const Id& id, const LaneSRoute& zone, ZoneType zone_type, const std::vector<State>& states,
+                 const RelatedBulbGroups& related_bulb_groups)
+      : id_(id), zone_(zone), zone_type_(zone_type), related_bulb_groups_(related_bulb_groups) {
     DRAKE_THROW_UNLESS(states.size() >= 1);
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
@@ -154,12 +146,9 @@ class RightOfWayRule final {
       MALIPUT_THROW_UNLESS(result.second);
     }
     for (const auto& traffic_light_bulb_group : related_bulb_groups) {
-      for (const BulbGroup::Id& bulb_group_id :
-           traffic_light_bulb_group.second) {
-        MALIPUT_THROW_UNLESS(std::count(traffic_light_bulb_group.second.begin(),
-                                        traffic_light_bulb_group.second.end(),
-                                        bulb_group_id) ==
-                             1);
+      for (const BulbGroup::Id& bulb_group_id : traffic_light_bulb_group.second) {
+        MALIPUT_THROW_UNLESS(std::count(traffic_light_bulb_group.second.begin(), traffic_light_bulb_group.second.end(),
+                                        bulb_group_id) == 1);
       }
     }
   }
@@ -193,9 +182,7 @@ class RightOfWayRule final {
   }
 
   /// Returns the related bulb groups.
-  const RelatedBulbGroups& related_bulb_groups() const {
-    return related_bulb_groups_;
-  }
+  const RelatedBulbGroups& related_bulb_groups() const { return related_bulb_groups_; }
 
  private:
   Id id_;

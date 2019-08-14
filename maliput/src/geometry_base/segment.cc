@@ -5,13 +5,9 @@
 namespace maliput {
 namespace geometry_base {
 
-const api::Junction* Segment::do_junction() const {
-  return junction_;
-}
+const api::Junction* Segment::do_junction() const { return junction_; }
 
-
-void Segment::AttachToJunction(Passkey<Junction>,
-                               const api::Junction* junction) {
+void Segment::AttachToJunction(Passkey<Junction>, const api::Junction* junction) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(junction != nullptr);
   // Preconditions
@@ -20,10 +16,7 @@ void Segment::AttachToJunction(Passkey<Junction>,
   junction_ = junction;
 }
 
-
-void Segment::SetLaneIndexingCallback(
-    Passkey<Junction>,
-    const std::function<void(const api::Lane*)>& callback) {
+void Segment::SetLaneIndexingCallback(Passkey<Junction>, const std::function<void(const api::Lane*)>& callback) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(!!callback);
   // Preconditions
@@ -35,7 +28,6 @@ void Segment::SetLaneIndexingCallback(
     lane_indexing_callback_(lane.get());
   }
 }
-
 
 void Segment::AddLanePrivate(std::unique_ptr<Lane> lane) {
   // Parameter checks
@@ -49,12 +41,7 @@ void Segment::AddLanePrivate(std::unique_ptr<Lane> lane) {
   }
 }
 
-
-
-const api::Lane* Segment::do_lane(int index) const {
-  return lanes_.at(index).get();
-}
-
+const api::Lane* Segment::do_lane(int index) const { return lanes_.at(index).get(); }
 
 }  // namespace geometry_base
 }  // namespace maliput

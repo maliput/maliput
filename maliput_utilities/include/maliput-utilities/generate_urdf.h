@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "maliput/api/road_geometry.h"
 #include "maliput-utilities/generate_obj.h"
+#include "maliput/api/road_geometry.h"
 
 namespace maliput {
 namespace utility {
@@ -26,9 +26,7 @@ namespace utility {
 ///
 /// The produced mesh covers the area within the lane-bounds of every
 /// api::Lane in the RoadGeometry.
-void GenerateUrdfFile(const api::RoadGeometry* road_geometry,
-                      const std::string& dirpath,
-                      const std::string& fileroot,
+void GenerateUrdfFile(const api::RoadGeometry* road_geometry, const std::string& dirpath, const std::string& fileroot,
                       const ObjFeatures& features);
 
 }  // namespace utility

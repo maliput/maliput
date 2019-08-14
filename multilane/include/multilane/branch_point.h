@@ -4,18 +4,17 @@
 #include <memory>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace multilane {
 
 class BranchPoint;
 class Lane;
-
 
 /// An implementation of LaneEndSet.
 class LaneEndSet : public api::LaneEndSet {
@@ -36,7 +35,6 @@ class LaneEndSet : public api::LaneEndSet {
   std::vector<api::LaneEnd> ends_;
 };
 
-
 /// An implementation of api::BranchPoint.
 class BranchPoint : public api::BranchPoint {
  public:
@@ -45,8 +43,7 @@ class BranchPoint : public api::BranchPoint {
   /// Constructs an empty BranchPoint.
   ///
   /// @p road_geometry must remain valid for the lifetime of this class.
-  BranchPoint(const api::BranchPointId& id,
-              const api::RoadGeometry* road_geometry);
+  BranchPoint(const api::BranchPointId& id, const api::RoadGeometry* road_geometry);
 
   /// Adds a LaneEnd to the "A side" of the BranchPoint.
   const api::LaneEnd& AddABranch(const api::LaneEnd& lane_end);
@@ -57,8 +54,7 @@ class BranchPoint : public api::BranchPoint {
   /// Sets the default branch for @p lane_end to @p default_branch.
   ///
   /// The specified LaneEnds must belong to opposite sides of this BranchPoint.
-  void SetDefault(const api::LaneEnd& lane_end,
-                  const api::LaneEnd& default_branch);
+  void SetDefault(const api::LaneEnd& lane_end, const api::LaneEnd& default_branch);
 
   ~BranchPoint() override = default;
 
@@ -67,14 +63,11 @@ class BranchPoint : public api::BranchPoint {
 
   const api::RoadGeometry* do_road_geometry() const override;
 
-  const api::LaneEndSet* DoGetConfluentBranches(
-      const api::LaneEnd& end) const override;
+  const api::LaneEndSet* DoGetConfluentBranches(const api::LaneEnd& end) const override;
 
-  const api::LaneEndSet* DoGetOngoingBranches(
-      const api::LaneEnd& end) const override;
+  const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd& end) const override;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(
-      const api::LaneEnd& end) const override;
+  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd& end) const override;
 
   const api::LaneEndSet* DoGetASide() const override { return &a_side_; }
 
@@ -85,12 +78,9 @@ class BranchPoint : public api::BranchPoint {
   LaneEndSet a_side_;
   LaneEndSet b_side_;
 
-  std::map<api::LaneEnd, LaneEndSet*,
-           api::LaneEnd::StrictOrder> confluent_branches_;
-  std::map<api::LaneEnd, LaneEndSet*,
-           api::LaneEnd::StrictOrder> ongoing_branches_;
-  std::map<api::LaneEnd, api::LaneEnd,
-           api::LaneEnd::StrictOrder> defaults_;
+  std::map<api::LaneEnd, LaneEndSet*, api::LaneEnd::StrictOrder> confluent_branches_;
+  std::map<api::LaneEnd, LaneEndSet*, api::LaneEnd::StrictOrder> ongoing_branches_;
+  std::map<api::LaneEnd, api::LaneEnd, api::LaneEnd::StrictOrder> defaults_;
 };
 
 }  // namespace multilane
