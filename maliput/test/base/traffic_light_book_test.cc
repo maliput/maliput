@@ -1,7 +1,5 @@
 #include "maliput/base/traffic_light_book.h"
 
-#include <vector>
-
 #include <gtest/gtest.h>
 
 #include "drake/common/drake_optional.h"

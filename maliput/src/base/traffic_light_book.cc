@@ -1,6 +1,7 @@
 #include "maliput/base/traffic_light_book.h"
 
 #include <algorithm>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
