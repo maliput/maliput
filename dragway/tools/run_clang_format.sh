@@ -38,4 +38,3 @@ if [ "$CLANGFORMATFAILED" -ne "0" ]; then
   echo $'\n*** ament_clang_format failed ***'
   exit 1
 fi
-
