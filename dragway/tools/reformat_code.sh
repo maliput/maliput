@@ -5,5 +5,11 @@
 # to the format described in the top-level .clang-format file in this
 # repository.  It is recommended to run this before opening any pull request.
 
-./run_clang_format.sh --reformat
-# ./run_clang_tidy.sh --fix-errors
+SCRIPT_PATH=$(realpath ${BASH_SOURCE[0]})
+SCRIPT_DIR=$(dirname $SCRIPT_PATH)
+REPO_DIR=$SCRIPT_DIR/..
+
+pushd $REPO_DIR
+./tools/run_clang_format.sh --reformat
+# ./tools/run_clang_tidy.sh --fix-errors
+popd
