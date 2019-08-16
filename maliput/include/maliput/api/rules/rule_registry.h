@@ -104,7 +104,7 @@ class RuleRegistry {
   /// @throws maliput::common::assertion_error When `type_id` is not a
   ///         registered DiscreteValueRule type.
   /// @throws maliput::common::assertion_error When an element in `values` is
-  ///         not a possible range of a DiscreteValueRule of type `type_id`.
+  ///         not a possible value of a DiscreteValueRule of type `type_id`.
   DiscreteValueRule BuildDiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                                            const std::vector<Rule::Id>& related_rules,
                                            const std::vector<std::string>& values) const;
