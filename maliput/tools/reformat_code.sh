@@ -11,5 +11,4 @@ REPO_DIR=$SCRIPT_DIR/..
 
 pushd $REPO_DIR
 ./tools/run_clang_format.sh --reformat
-# ./tools/run_clang_tidy.sh --fix-errors
 popd
