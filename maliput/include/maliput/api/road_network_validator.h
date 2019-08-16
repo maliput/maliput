@@ -10,10 +10,22 @@ struct RoadNetworkValidatorOptions {
   /// Whether to check if the DirectionUsageRules within a RoadNetwork cover
   /// the RoadNetwork's RoadGeometry.
   bool check_direction_usage_rule_coverage{true};
-  /// Whether to check if the RoadGeometry within a RoadNetwork satisfies G1
-  /// constraint at BranchPoints.
+  /// Whether to check if the RoadGeometry invariants.
+  /// Please, @see RoadGeometry::CheckInvariants() for further details.
   bool check_road_geometry_invariants{true};
   /// Whether to check if the RoadGeometry hierarchy is correct.
+  /// Hierarchy checks involve that:
+  /// - At least one Junction in the RoadGeometry.
+  /// - At least one Segment lives in each Junction.
+  /// - At least one Lane lives in each Segment.
+  /// - At least two BranchPoints live in the RoadGeometry.
+  /// - Parent-children relations between RoadGeometry and Junctions, Junction
+  ///   and Segments, Segment and Lanes, and RoadGeometry and BranchPoints are
+  ///   correctly set.
+  /// - Every Lane is attached to a BranchPoint at each end.
+  /// - Every BranchPoint's ASide and BSide are not nullptr.
+  /// - Every BranchPoint is not empty, i.e. either ASide or BSide have one
+  ///   Lane at least.
   bool check_road_geometry_hierarchy{true};
 };
 

@@ -26,72 +26,189 @@ using rules::RightOfWayRule;
 using rules::SpeedLimitRule;
 using rules::TrafficLight;
 
-class MockIdIndex final : public RoadGeometry::IdIndex {
+class MockLaneEndSet final : public LaneEndSet {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIdIndex);
-  MockIdIndex() {}
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockLaneEndSet)
+  MockLaneEndSet() = default;
 
+  // { Mock members.
+  LaneEnd lane_end_;
+  // } Mock members.
  private:
-  const Lane* DoGetLane(const LaneId&) const override { return nullptr; }
+  int do_size() const override { return 1; }
+  const LaneEnd& do_get(int index) const override {
+    MALIPUT_THROW_UNLESS(index != 0);
+    return lane_end_;
+  }
+};
 
-  const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
+class MockBranchPoint final : public BranchPoint {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockBranchPoint)
+  explicit MockBranchPoint(const BranchPointId& id) : BranchPoint(), id_(id) {}
 
-  const Segment* DoGetSegment(const SegmentId&) const override { return nullptr; };
-  const Junction* DoGetJunction(const JunctionId&) const override { return nullptr; };
-  const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
+  // { Mock members.
+  RoadGeometry* road_geometry_{nullptr};
+  std::unique_ptr<MockLaneEndSet> lane_end_set_a_;
+  std::unique_ptr<MockLaneEndSet> lane_end_set_b_;
+  // } Mock members.
+ private:
+  BranchPointId do_id() const override { return id_; }
+  const RoadGeometry* do_road_geometry() const override { return road_geometry_; }
+  const LaneEndSet* DoGetConfluentBranches(const LaneEnd&) const override { return nullptr; }
+  const LaneEndSet* DoGetOngoingBranches(const LaneEnd&) const override { return nullptr; }
+  drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd&) const override { return drake::nullopt; }
+  const LaneEndSet* DoGetASide() const override { return lane_end_set_a_.get(); }
+  const LaneEndSet* DoGetBSide() const override { return lane_end_set_b_.get(); }
 
-  const std::unordered_map<LaneId, const Lane*> lane_map_;
+  BranchPointId id_;
 };
 
 class MockLane final : public Lane {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
-  MockLane() {}
+  MockLane(const LaneId& id) : Lane(), id_(id) {}
 
+  // { Mock members.
+  Segment* segment_{nullptr};
+  BranchPoint* start_bp_{nullptr};
+  BranchPoint* end_bp_{nullptr};
+  // } Mock members.
  private:
-  LaneId do_id() const override { return LaneId("mock"); };
-
-  const Segment* do_segment() const override { return nullptr; };
-
+  LaneId do_id() const override { return id_; };
+  const Segment* do_segment() const override { return segment_; };
   int do_index() const override { return 0; };
-
   const Lane* do_to_left() const override { return nullptr; };
-
   const Lane* do_to_right() const override { return nullptr; };
-
   double do_length() const override { return 100; };
-
   RBounds do_lane_bounds(double) const override { return RBounds(-1, 1); };
-
   RBounds do_driveable_bounds(double) const override { return RBounds(-1, 1); };
-
   HBounds do_elevation_bounds(double, double) const override { return HBounds(0, 10); };
-
   GeoPosition DoToGeoPosition(const LanePosition&) const override { return GeoPosition(0, 0, 0); }
-
   LanePosition DoToLanePosition(const GeoPosition&, GeoPosition*, double*) const override {
     return LanePosition(0, 0, 0);
   }
-
   Rotation DoGetOrientation(const LanePosition&) const override { return Rotation(); }
-
   LanePosition DoEvalMotionDerivatives(const LanePosition&, const IsoLaneVelocity&) const override {
     return LanePosition(0, 0, 0);
   }
+  const BranchPoint* DoGetBranchPoint(const LaneEnd::Which end) const override {
+    return end == LaneEnd::Which::kStart ? start_bp_ : end_bp_;
+  };
+  const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which) const override { return nullptr; }
+  const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override { return nullptr; }
+  drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return drake::nullopt; }
 
-  const BranchPoint* DoGetBranchPoint(const LaneEnd::Which) const override { return nullptr; };
+  LaneId id_;
+};
 
-  const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which) const override { return nullptr; };
+class MockSegment final : public Segment {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockSegment)
+  MockSegment(const SegmentId& id) : Segment(), id_(id) {}
 
-  const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override { return nullptr; };
+  // { Mock members.
+  Junction* junction_{nullptr};
+  std::unique_ptr<MockLane> lane_;
+  // } Mock members.
+ private:
+  SegmentId do_id() const override { return id_; }
+  const Junction* do_junction() const override { return junction_; }
+  int do_num_lanes() const override { return lane_ != nullptr ? 1 : 0; }
+  const Lane* do_lane(int index) const override {
+    MALIPUT_THROW_UNLESS(index == 0);
+    return lane_.get();
+  }
 
-  drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return drake::nullopt; };
+  SegmentId id_;
+};
+
+class MockJunction final : public Junction {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockJunction)
+  MockJunction(const JunctionId& id) : Junction(), id_(id) {}
+
+  // { Mock members.
+  RoadGeometry* road_geometry_{nullptr};
+  std::unique_ptr<MockSegment> segment_;
+  // } Mock members.
+ private:
+  JunctionId do_id() const override { return JunctionId("mock"); }
+  int do_num_segments() const override { return 1; }
+  const Segment* do_segment(int i) const override {
+    MALIPUT_THROW_UNLESS(i == 0);
+    return segment_.get();
+  }
+  const RoadGeometry* do_road_geometry() const override { return road_geometry_; }
+
+  JunctionId id_;
+};
+
+class MockIdIndex final : public RoadGeometry::IdIndex {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIdIndex);
+  MockIdIndex() = default;
+
+ private:
+  const Lane* DoGetLane(const LaneId& lane_id) const override { return nullptr; }
+  const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
+  const Segment* DoGetSegment(const SegmentId& segment_id) const override { return nullptr; }
+  const Junction* DoGetJunction(const JunctionId& junction_id) const override { return nullptr; }
+  const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
+
+  const std::unordered_map<LaneId, const Lane*> lane_map_;
+};
+
+class MockRoadGeometry : public RoadGeometry {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry)
+  MockRoadGeometry(const RoadGeometryId& id) : id_(id) {}
+
+  // { Mock members.
+  std::unique_ptr<MockJunction> junction_;
+  std::unique_ptr<MockBranchPoint> start_bp_;
+  std::unique_ptr<MockBranchPoint> end_bp_;
+  // } Mock members.
+ private:
+  RoadGeometryId do_id() const override { return id_; }
+  int do_num_junctions() const override { return junction_ != nullptr ? 1 : 0; }
+  const Junction* do_junction(int i) const override {
+    MALIPUT_THROW_UNLESS(i == 0);
+    return junction_.get();
+  }
+  int do_num_branch_points() const override {
+    if (start_bp_ != nullptr && end_bp_ != nullptr) {
+      return 2;
+    } else if (start_bp_ == nullptr && end_bp_ == nullptr) {
+      return 0;
+    }
+    return 1;
+  }
+  const BranchPoint* do_branch_point(int i) const override {
+    MALIPUT_THROW_UNLESS(i == 0 || i == 1);
+    return i == 0 ? start_bp_.get() : end_bp_.get();
+  }
+  const IdIndex& DoById() const override { return mock_id_index_; }
+  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*,
+                                GeoPosition*, double*) const override {
+    return RoadPosition();
+  }
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(
+      const GeoPosition&, double) const override {
+    return {{RoadPosition(), GeoPosition(), 0.}};
+  }
+  double do_linear_tolerance() const override { return 0; }
+  double do_angular_tolerance() const override { return 0; }
+  double do_scale_length() const override { return 0; }
+
+  const MockIdIndex mock_id_index_;
+  RoadGeometryId id_;
 };
 
 class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockOneLaneIdIndex);
-  MockOneLaneIdIndex() {}
+  MockOneLaneIdIndex() : RoadGeometry::IdIndex() {}
 
  private:
   const Lane* DoGetLane(const LaneId&) const override { &mock_lane_; }
@@ -102,32 +219,8 @@ class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
   const Junction* DoGetJunction(const JunctionId&) const override { return nullptr; };
   const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
 
-  const MockLane mock_lane_;
+  const MockLane mock_lane_{LaneId{"mock"}};
   const std::unordered_map<LaneId, const Lane*> lane_map_{{LaneId("mock"), &mock_lane_}};
-};
-
-class MockRoadGeometry final : public RoadGeometry {
- public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry)
-  MockRoadGeometry() {}
-
- private:
-  RoadGeometryId do_id() const override { return RoadGeometryId("mock"); }
-  int do_num_junctions() const override { return 1; }
-  const Junction* do_junction(int) const override { return nullptr; };
-  int do_num_branch_points() const override { return 1; }
-  const BranchPoint* do_branch_point(int) const override { return nullptr; }
-  const IdIndex& DoById() const override { return mock_id_index_; }
-  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*, GeoPosition*, double*) const override {
-    return RoadPosition();
-  }
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
-    return {{RoadPosition(), GeoPosition(), 0.}};
-  }
-  double do_linear_tolerance() const override { return 0; }
-  double do_angular_tolerance() const override { return 0; }
-  double do_scale_length() const override { return 0; }
-  MockIdIndex mock_id_index_;
 };
 
 class MockOneLaneRoadGeometry final : public RoadGeometry {
@@ -288,7 +381,53 @@ DirectionUsageRule CreateDirectionUsageRule() {
   return DirectionUsageRule(DirectionUsageRule::Id("dur_id"), CreateLaneSRange(), {CreateDirectionUsageRuleState()});
 }
 
-std::unique_ptr<RoadGeometry> CreateRoadGeometry() { return std::make_unique<MockRoadGeometry>(); }
+std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
+  return std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"));
+}
+
+std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& build_flags) {
+  auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"));
+
+  if (build_flags.add_branchpoint) {
+    rg->start_bp_= std::make_unique<MockBranchPoint>(BranchPointId("mock_start"));
+    rg->start_bp_->road_geometry_ = rg.get();
+
+    rg->end_bp_= std::make_unique<MockBranchPoint>(BranchPointId("mock_end"));
+    rg->end_bp_->road_geometry_ = rg.get();
+  }
+
+  if (build_flags.add_junction) {
+    rg->junction_ = std::make_unique<MockJunction>(JunctionId("mock"));
+    rg->junction_->road_geometry_ = rg.get();
+
+    if (build_flags.add_segment) {
+      rg->junction_->segment_ = std::make_unique<MockSegment>(SegmentId("mock"));
+      rg->junction_->segment_->junction_ = rg->junction_.get();
+
+      if (build_flags.add_lane) {
+        rg->junction_->segment_->lane_ = std::make_unique<MockLane>(LaneId("mock"));
+        rg->junction_->segment_->lane_->segment_ =
+            rg->junction_->segment_.get();
+
+        if (build_flags.add_branchpoint && build_flags.add_lane_end_set) {
+          rg->start_bp_->lane_end_set_a_ = std::make_unique<MockLaneEndSet>();
+          rg->start_bp_->lane_end_set_a_->lane_end_ = LaneEnd(
+              rg->junction_->segment_->lane_.get(), LaneEnd::Which::kStart);
+          rg->start_bp_->lane_end_set_b_ = std::make_unique<MockLaneEndSet>();
+
+          rg->end_bp_->lane_end_set_a_ = std::make_unique<MockLaneEndSet>();
+          rg->end_bp_->lane_end_set_a_->lane_end_ = LaneEnd(
+              rg->junction_->segment_->lane_.get(), LaneEnd::Which::kFinish);
+          rg->end_bp_->lane_end_set_b_ = std::make_unique<MockLaneEndSet>();
+
+          rg->junction_->segment_->lane_->start_bp_ = rg->start_bp_.get();
+          rg->junction_->segment_->lane_->end_bp_ = rg->end_bp_.get();
+        }
+      }
+    }
+  }
+  return std::move(rg);
+}
 
 std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry() { return std::make_unique<MockOneLaneRoadGeometry>(); }
 

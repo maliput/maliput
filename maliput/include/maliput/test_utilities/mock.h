@@ -48,6 +48,32 @@ rules::DirectionUsageRule CreateDirectionUsageRule();
 /// Returns an arbitrary RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateRoadGeometry();
 
+/// Holds RoadGeometry build flag configuration.
+/// @see CreateRoadGeometry() docstring for full details on how this
+///      structure pairs with the function.
+struct RoadGeometryBuildFlags {
+  bool add_junction{false};
+  bool add_segment{false};
+  bool add_lane{false};
+  bool add_branchpoint{false};
+  bool add_lane_end_set{false};
+  bool expects_throw{false};
+};
+
+// Builds a RoadGeometry parametrically based on `build_flags` configuration.
+//
+// When `build_flags.add_junction` is true, an empty Junction is added; and
+// if `build_flags.add_segment` is true, an empty Segment is added to the
+// Junction; and  if `build_flags.add_lane` is true, an empty Lane is added
+// to the Segment.
+// When `build_flags.add_branchpoint` is true, two BranchPoints are added to
+// the RoadGeometry.
+// When all items in `build_flags` are true, respective LaneEndSets are
+// created to link Lane with BranchPoints.
+//
+// @returns A MockRoadGeometry pointer.
+std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& build_flags);
+
 /// Returns an arbitrary one-lane RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry();
 
