@@ -1,4 +1,11 @@
 #!/bin/bash
+
+# This script runs clang-format on any C++ code in the package
+# It expects a .clang-format to exist within the root directory
+# of the project.  To stop a directory from being tested, add
+# a blank `AMENT_IGNORE` file to the root of the directory
+# to exclude
+
 SCRIPT_PATH=$(realpath ${BASH_SOURCE[0]})
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 REPO_DIR=$SCRIPT_DIR/..
