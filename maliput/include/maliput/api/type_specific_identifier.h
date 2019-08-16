@@ -91,4 +91,11 @@ struct less<maliput::api::TypeSpecificIdentifier<T>> {
   }
 };
 
+/// Supports implicit string conversion of id with cout
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const maliput::api::TypeSpecificIdentifier<T>& id) {
+  os << id.string();
+  return os;
+}
+
 }  // namespace std
