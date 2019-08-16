@@ -87,24 +87,24 @@ class RuleRegistry {
   ///          found. Otherwise, the found rule type will be loaded.
   drake::optional<QueryResult> FindRuleTypeBy(const Rule::TypeId& type_id) const;
 
-  /// Builds a RangeValueRule whose `type_id` is registered.
+  /// Builds a RangeValueRule.
   ///
   /// @see RangeValueRule constructor for parameter documentation.
   /// @throws maliput::common::assertion_error When `type_id` is not a
-  ///         registered range value rule type.
-  /// @throws maliput::common::assertion_error When any range in `ranges` is not
-  ///         a registered range value in `type_id`.
+  ///         registered RangeValueRule type.
+  /// @throws maliput::common::assertion_error When an element in `ranges` is
+  ///         not a possible range of a RangeValueRule of type `type_id`.
   RangeValueRule BuildRangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                                      const std::vector<Rule::Id>& related_rules,
                                      const std::vector<RangeValueRule::Range>& ranges) const;
 
-  /// Builds a DiscreteValueRule whose `type_id` is registered.
+  /// Builds a DiscreteValueRule.
   ///
   /// @see DiscreteValueRule constructor for parameter documentation.
   /// @throws maliput::common::assertion_error When `type_id` is not a
-  ///         registered discrete value rule type.
-  /// @throws maliput::common::assertion_error When any value in `values` is not
-  ///         a registered discrete value in `type_id`.
+  ///         registered DiscreteValueRule type.
+  /// @throws maliput::common::assertion_error When an element in `values` is
+  ///         not a possible range of a DiscreteValueRule of type `type_id`.
   DiscreteValueRule BuildDiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                                            const std::vector<Rule::Id>& related_rules,
                                            const std::vector<std::string>& values) const;

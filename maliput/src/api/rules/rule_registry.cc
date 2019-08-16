@@ -1,7 +1,6 @@
 #include "maliput/api/rules/rule_registry.h"
 
 #include <algorithm>
-#include <utility>
 
 #include "maliput/common/maliput_throw.h"
 
@@ -22,8 +21,7 @@ bool HasValue(const std::vector<T>& v, const T& item) {
 
 void RuleRegistry::RegisterRangeValueRule(const Rule::TypeId& type_id,
                                           const std::vector<RangeValueRule::Range>& all_possible_ranges) {
-  MALIPUT_THROW_UNLESS(range_rule_types_.find(type_id) == range_rule_types_.end());
-  MALIPUT_THROW_UNLESS(discrete_rule_types_.find(type_id) == discrete_rule_types_.end());
+  MALIPUT_THROW_UNLESS(FindRuleTypeBy(type_id) == drake::nullopt);
   MALIPUT_THROW_UNLESS(!all_possible_ranges.empty());
   for (const RangeValueRule::Range& range : all_possible_ranges) {
     MALIPUT_THROW_UNLESS(std::count(all_possible_ranges.begin(), all_possible_ranges.end(), range) == 1);
@@ -34,8 +32,7 @@ void RuleRegistry::RegisterRangeValueRule(const Rule::TypeId& type_id,
 
 void RuleRegistry::RegisterDiscreteValueRule(const Rule::TypeId& type_id,
                                              const std::vector<std::string>& all_possible_values) {
-  MALIPUT_THROW_UNLESS(range_rule_types_.find(type_id) == range_rule_types_.end());
-  MALIPUT_THROW_UNLESS(discrete_rule_types_.find(type_id) == discrete_rule_types_.end());
+  MALIPUT_THROW_UNLESS(FindRuleTypeBy(type_id) == drake::nullopt);
   MALIPUT_THROW_UNLESS(!all_possible_values.empty());
   for (const std::string& value_state : all_possible_values) {
     MALIPUT_THROW_UNLESS(std::count(all_possible_values.begin(), all_possible_values.end(), value_state) == 1);
@@ -74,8 +71,8 @@ drake::optional<RuleRegistry::QueryResult> RuleRegistry::FindRuleTypeBy(const Ru
 RangeValueRule RuleRegistry::BuildRangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id,
                                                  const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
                                                  const std::vector<RangeValueRule::Range>& ranges) const {
-  MALIPUT_THROW_UNLESS(range_rule_types_.find(type_id) != range_rule_types_.end());
   const auto range_rule_type = range_rule_types_.find(type_id);
+  MALIPUT_THROW_UNLESS(range_rule_type != range_rule_types_.end());
   for (const RangeValueRule::Range& range : ranges) {
     MALIPUT_THROW_UNLESS(HasValue(range_rule_type->second, range));
   }
@@ -87,8 +84,8 @@ DiscreteValueRule RuleRegistry::BuildDiscreteValueRule(const Rule::Id& id, const
                                                        const LaneSRoute& zone,
                                                        const std::vector<Rule::Id>& related_rules,
                                                        const std::vector<std::string>& values) const {
-  MALIPUT_THROW_UNLESS(discrete_rule_types_.find(type_id) != discrete_rule_types_.end());
   const auto discrete_rule_type = discrete_rule_types_.find(type_id);
+  MALIPUT_THROW_UNLESS(discrete_rule_type != discrete_rule_types_.end());
   for (const std::string& value_state : values) {
     MALIPUT_THROW_UNLESS(HasValue(discrete_rule_type->second, value_state));
   }
