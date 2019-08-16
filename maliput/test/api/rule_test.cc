@@ -1,6 +1,5 @@
-/* clang-format off to disable clang-format-includes */
+
 #include "maliput/api/rules/rule.h"
-/* clang-format on */
 
 #include <gtest/gtest.h>
 

@@ -1,6 +1,4 @@
-/* clang-format off to disable clang-format-includes */
 #include "maliput/api/rules/rule_registry.h"
-/* clang-format on */
 
 #include <gtest/gtest.h>
 
@@ -18,7 +16,8 @@ GTEST_TEST(EmptyRuleRegistry, AccessorsTest) {
   EXPECT_TRUE(dut.RangeValueRuleTypes().empty());
   EXPECT_TRUE(dut.DiscreteValueRuleTypes().empty());
 
-  const drake::optional<RuleRegistry::QueryResult> result = dut.FindRuleTypeBy(Rule::TypeId("any_rule_type"));
+  const drake::optional<RuleRegistry::QueryResult> result =
+      dut.GetPossibleStatesOfRuleType(Rule::TypeId("any_rule_type"));
   EXPECT_FALSE(result.has_value());
 }
 
@@ -59,7 +58,7 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   }
 
   // Finds each type.
-  drake::optional<RuleRegistry::QueryResult> result = dut.FindRuleTypeBy(kTypeA);
+  drake::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
   EXPECT_TRUE(result.has_value());
   EXPECT_EQ(result->type_id, kTypeA);
   EXPECT_TRUE(result->range_values.has_value());
@@ -68,7 +67,7 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   EXPECT_EQ(result->range_values->at(1), kRangeB);
   EXPECT_FALSE(result->discrete_values.has_value());
 
-  result = dut.FindRuleTypeBy(kTypeB);
+  result = dut.GetPossibleStatesOfRuleType(kTypeB);
   EXPECT_TRUE(result.has_value());
   EXPECT_EQ(result->type_id, kTypeB);
   EXPECT_TRUE(result->range_values.has_value());
@@ -76,7 +75,7 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   EXPECT_EQ(result->range_values->at(0), kRangeA);
   EXPECT_FALSE(result->discrete_values.has_value());
 
-  result = dut.FindRuleTypeBy(Rule::TypeId("any_rule_type"));
+  result = dut.GetPossibleStatesOfRuleType(Rule::TypeId("any_rule_type"));
   EXPECT_FALSE(result.has_value());
 }
 
@@ -113,7 +112,7 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   }
 
   // Finds each type.
-  drake::optional<RuleRegistry::QueryResult> result = dut.FindRuleTypeBy(kTypeA);
+  drake::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
   EXPECT_TRUE(result.has_value());
   EXPECT_FALSE(result->range_values.has_value());
   EXPECT_EQ(result->type_id, kTypeA);
@@ -123,7 +122,7 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
     EXPECT_NE(std::find(kValuesA.begin(), kValuesA.end(), value), kValuesA.end());
   }
 
-  result = dut.FindRuleTypeBy(kTypeB);
+  result = dut.GetPossibleStatesOfRuleType(kTypeB);
   EXPECT_TRUE(result.has_value());
   EXPECT_FALSE(result->range_values.has_value());
   EXPECT_EQ(result->type_id, kTypeB);
@@ -133,7 +132,7 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
     EXPECT_NE(std::find(kValuesB.begin(), kValuesB.end(), value), kValuesB.end());
   }
 
-  result = dut.FindRuleTypeBy(Rule::TypeId("any_rule_type"));
+  result = dut.GetPossibleStatesOfRuleType(Rule::TypeId("any_rule_type"));
   EXPECT_FALSE(result.has_value());
 }
 

@@ -80,12 +80,12 @@ class RuleRegistry {
   ///          values.
   const std::map<Rule::TypeId, std::vector<std::string>>& DiscreteValueRuleTypes() const;
 
-  /// Finds a rule type by `type_id`.
+  /// Finds the possible states of a rule type by `type_id`.
   ///
   /// @param type_id Rule type ID.
-  /// @returns An optional QueryResult with set to nullopt when no rule was
-  ///          found. Otherwise, the found rule type will be loaded.
-  drake::optional<QueryResult> FindRuleTypeBy(const Rule::TypeId& type_id) const;
+  /// @returns The possible states of a specified rule type, or nullopt if
+  ///          no such rule type exists.
+  drake::optional<QueryResult> GetPossibleStatesOfRuleType(const Rule::TypeId& type_id) const;
 
   /// Builds a RangeValueRule.
   ///
