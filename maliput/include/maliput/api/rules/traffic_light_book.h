@@ -20,9 +20,7 @@ class TrafficLightBook {
   virtual ~TrafficLightBook() = default;
 
   /// Returns all TrafficLights in this book.
-  std::vector<TrafficLight> TrafficLights() const {
-    return DoTrafficLights();
-  }
+  std::vector<TrafficLight> TrafficLights() const { return DoTrafficLights(); }
 
   /// Gets the specified TrafficLight. Returns drake::nullopt if @p id is unrecognized.
   drake::optional<TrafficLight> GetTrafficLight(const TrafficLight::Id& id) const { return DoGetTrafficLight(id); }

@@ -6,8 +6,8 @@
 
 #include "drake/common/drake_copyable.h"
 
-#include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/rules/regions.h"
+#include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -27,7 +27,6 @@ namespace rules {
 /// Finally, a Rule may point to other Rules via `related_rules`.
 class Rule {
  public:
-
   /// Used to specialize TypeSpecificIdentifier and define a unique TypeId.
   class Type;
 
@@ -54,13 +53,10 @@ class Rule {
   ///
   /// @throws maliput::common::assertion_error When any Rule::Id within
   ///         `related_rules` is duplicated.
-  Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone,
-       const std::vector<Id>& related_rules) :
-      id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules) {
+  Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone, const std::vector<Id>& related_rules)
+      : id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules) {
     for (const Rule::Id& rule_id : related_rules_) {
-      MALIPUT_THROW_UNLESS(
-          std::count(related_rules_.begin(), related_rules_.end(), rule_id) ==
-          1);
+      MALIPUT_THROW_UNLESS(std::count(related_rules_.begin(), related_rules_.end(), rule_id) == 1);
     }
   }
 
@@ -94,13 +90,10 @@ class RangeValueRule : public Rule {
   /// Defines a range for a RangeValueRule.
   struct Range {
     bool operator==(const Range& other) const {
-      return min == other.min && max == other.max &&
-             description == other.description;
+      return min == other.min && max == other.max && description == other.description;
     }
 
-    bool operator!=(const Range& other) const {
-      return !(*this == other);
-    }
+    bool operator!=(const Range& other) const { return !(*this == other); }
 
     std::string description;  ///< Semantics of the range quantity.
     double min{};             ///< Minimum value of the range.
@@ -123,16 +116,13 @@ class RangeValueRule : public Rule {
   ///         violates `min <= max` condition.
   /// @throws maliput::common::assertion_error When there are duplicated Range
   ///         in `ranges`.
-  RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id,
-                 const LaneSRoute& zone,
-                 const std::vector<Rule::Id> related_rules,
-                 const std::vector<Range>& ranges) :
-      Rule(id, type_id, zone, related_rules), ranges_(ranges) {
+  RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
+                 const std::vector<Rule::Id> related_rules, const std::vector<Range>& ranges)
+      : Rule(id, type_id, zone, related_rules), ranges_(ranges) {
     MALIPUT_THROW_UNLESS(!ranges_.empty());
     for (const Range& range : ranges_) {
       MALIPUT_THROW_UNLESS(range.min <= range.max);
-      MALIPUT_THROW_UNLESS(std::count(ranges_.begin(), ranges_.end(), range) ==
-                           1);
+      MALIPUT_THROW_UNLESS(std::count(ranges_.begin(), ranges_.end(), range) == 1);
     }
   }
 
@@ -165,15 +155,12 @@ class DiscreteValueRule : public Rule {
   /// @throws maliput::common::assertion_error When `values` is empty.
   /// @throws maliput::common::assertion_error When there are duplicated values
   ///         in `values`.
-  DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id,
-                    const LaneSRoute& zone,
-                    const std::vector<Id> related_rules,
-                    const std::vector<std::string>& values) :
-      Rule(id, type_id, zone, related_rules), values_(values) {
+  DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
+                    const std::vector<Id> related_rules, const std::vector<std::string>& values)
+      : Rule(id, type_id, zone, related_rules), values_(values) {
     MALIPUT_THROW_UNLESS(!values_.empty());
     for (const std::string& value : values_) {
-      MALIPUT_THROW_UNLESS(
-          std::count(values_.begin(), values_.end(), value) == 1);
+      MALIPUT_THROW_UNLESS(std::count(values_.begin(), values_.end(), value) == 1);
     }
   }
 
