@@ -216,23 +216,45 @@ TEST_F(ManualRulebookTest, FindRules) {
 TEST_F(ManualRulebookTest, GetAllRules) {
   ManualRulebook dut;
 
-  const RoadRulebook::QueryResults empty = dut.Rules();
-  EXPECT_TRUE(empty.right_of_way.empty());
-  EXPECT_TRUE(empty.speed_limit.empty());
-  EXPECT_TRUE(empty.direction_usage.empty());
+  RoadRulebook::QueryResults result = dut.Rules();
+  EXPECT_TRUE(result.right_of_way.empty());
+  EXPECT_TRUE(result.speed_limit.empty());
+  EXPECT_TRUE(result.direction_usage.empty());
+  EXPECT_TRUE(result.discrete_value_rules.empty());
+  EXPECT_TRUE(result.range_value_rules.empty());
 
   dut.AddRule(kSpeedLimit);
   dut.AddRule(kRightOfWay);
-  const RoadRulebook::QueryResults nonempty = dut.Rules();
-  EXPECT_EQ(nonempty.right_of_way.size(), 1);
-  EXPECT_EQ(nonempty.speed_limit.size(), 1);
-  EXPECT_EQ(nonempty.direction_usage.size(), 0);
+  result = dut.Rules();
+  EXPECT_EQ(result.right_of_way.size(), 1);
+  EXPECT_EQ(result.speed_limit.size(), 1);
+  EXPECT_EQ(result.direction_usage.size(), 0);
+  EXPECT_EQ(result.discrete_value_rules.size(), 0);
+  EXPECT_EQ(result.range_value_rules.size(), 0);
 
   dut.AddRule(kDirectionUsage);
-  const RoadRulebook::QueryResults full = dut.Rules();
-  EXPECT_EQ(full.right_of_way.size(), 1);
-  EXPECT_EQ(full.speed_limit.size(), 1);
-  EXPECT_EQ(full.direction_usage.size(), 1);
+  result = dut.Rules();
+  EXPECT_EQ(result.right_of_way.size(), 1);
+  EXPECT_EQ(result.speed_limit.size(), 1);
+  EXPECT_EQ(result.direction_usage.size(), 1);
+  EXPECT_EQ(result.discrete_value_rules.size(), 0);
+  EXPECT_EQ(result.range_value_rules.size(), 0);
+
+  dut.AddRule(kDiscreteValueRule);
+  result = dut.Rules();
+  EXPECT_EQ(result.right_of_way.size(), 1);
+  EXPECT_EQ(result.speed_limit.size(), 1);
+  EXPECT_EQ(result.direction_usage.size(), 1);
+  EXPECT_EQ(result.discrete_value_rules.size(), 1);
+  EXPECT_EQ(result.range_value_rules.size(), 0);
+
+  dut.AddRule(kRangeValueRule);
+  result = dut.Rules();
+  EXPECT_EQ(result.right_of_way.size(), 1);
+  EXPECT_EQ(result.speed_limit.size(), 1);
+  EXPECT_EQ(result.direction_usage.size(), 1);
+  EXPECT_EQ(result.discrete_value_rules.size(), 1);
+  EXPECT_EQ(result.range_value_rules.size(), 1);
 }
 
 }  // namespace
