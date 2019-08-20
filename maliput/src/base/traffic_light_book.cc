@@ -1,5 +1,7 @@
 #include "maliput/base/traffic_light_book.h"
 
+#include <algorithm>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -28,6 +30,13 @@ class TrafficLightBook::Impl {
     }
   }
 
+  std::vector<TrafficLight> DoTrafficLights() const {
+    std::vector<TrafficLight> result;
+    std::transform(book_.begin(), book_.end(), std::back_inserter(result),
+                   [](const auto& key_value) { return key_value.second; });
+    return result;
+  }
+
   drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id& id) const {
     auto it = book_.find(id);
     if (it == book_.end()) {
@@ -44,13 +53,14 @@ TrafficLightBook::TrafficLightBook() : impl_(std::make_unique<Impl>()) {}
 
 TrafficLightBook::~TrafficLightBook() = default;
 
-void TrafficLightBook::AddTrafficLight(const TrafficLight& traffic_light) {
-  impl_->AddTrafficLight(traffic_light);
+void TrafficLightBook::AddTrafficLight(const TrafficLight& traffic_light) { impl_->AddTrafficLight(traffic_light); }
+
+drake::optional<TrafficLight> TrafficLightBook::DoGetTrafficLight(const TrafficLight::Id& id) const {
+  return impl_->DoGetTrafficLight(id);
 }
 
-drake::optional<TrafficLight> TrafficLightBook::DoGetTrafficLight(
-    const TrafficLight::Id& id) const {
-  return impl_->DoGetTrafficLight(id);
+std::vector<TrafficLight> TrafficLightBook::DoTrafficLights() const {
+  return impl_->DoTrafficLights();
 }
 
 }  // namespace maliput

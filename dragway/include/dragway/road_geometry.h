@@ -4,14 +4,14 @@
 #include <memory>
 #include <vector>
 
+#include "dragway/branch_point.h"
+#include "dragway/junction.h"
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/basic_id_index.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
-#include "dragway/branch_point.h"
-#include "dragway/junction.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace dragway {
@@ -47,14 +47,8 @@ class RoadGeometry final : public api::RoadGeometry {
   /// @param[in] angular_tolerance The tolerance guaranteed for angular
   /// measurements (orientations).
   ///
-  RoadGeometry(const api::RoadGeometryId& id,
-               int num_lanes,
-               double length,
-               double lane_width,
-               double shoulder_width,
-               double maximum_height,
-               double linear_tolerance,
-               double angular_tolerance);
+  RoadGeometry(const api::RoadGeometryId& id, int num_lanes, double length, double lane_width, double shoulder_width,
+               double maximum_height, double linear_tolerance, double angular_tolerance);
 
   ~RoadGeometry() final = default;
 
@@ -71,16 +65,13 @@ class RoadGeometry final : public api::RoadGeometry {
 
   const IdIndex& DoById() const override { return id_index_; }
 
-  api::RoadPosition DoToRoadPosition(
-      const api::GeoPosition& geo_position,
-      const api::RoadPosition* hint,
-      api::GeoPosition* nearest_position,
-      double* distance) const final;
+  api::RoadPosition DoToRoadPosition(const api::GeoPosition& geo_position, const api::RoadPosition* hint,
+                                     api::GeoPosition* nearest_position, double* distance) const final;
 
   // Forwards the call to
   // maliput::geometry_base::BruteForceFindRoadPositionsStrategy().
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(
-      const api::GeoPosition& geo_position, double radius) const final;
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::GeoPosition& geo_position,
+                                                           double radius) const final;
 
   double do_linear_tolerance() const final { return linear_tolerance_; }
 

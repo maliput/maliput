@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
+#include "drake/common/find_resource.h"
 #include "maliput/common/filesystem.h"
 #include "multilane/builder.h"
 #include "multilane/connection.h"
 #include "multilane/loader.h"
-#include "drake/common/find_resource.h"
 
 namespace maliput {
 namespace utility {
@@ -25,7 +25,6 @@ class GenerateObjTest : public ::testing::Test {
     ASSERT_TRUE(common::Filesystem::create_directory(directory_));
   }
 
-
   void TearDown() override {
     // filesystem has no functionality for reading/walking a
     // directory, so we have to keep track of created files manually and
@@ -36,11 +35,9 @@ class GenerateObjTest : public ::testing::Test {
     ASSERT_TRUE(common::Filesystem::remove_directory(directory_));
   }
 
-
   void ReadAsString(const common::Path& path, std::string* destination) {
     ASSERT_TRUE(common::Filesystem::read_as_string(path, *destination));
   }
-
 
   void ReadExpectedData(const std::string& filename, std::string* destination) {
     /* TODO: Discuss this. static constexpr const char* const kTestDataPath =
@@ -50,23 +47,19 @@ class GenerateObjTest : public ::testing::Test {
     ReadAsString(filename, destination);
   }
 
-
   common::Path directory_;
   std::vector<common::Path> paths_to_cleanup_;
 };
-
 
 TEST_F(GenerateObjTest, NoEpsilonSampling) {
   const double kLaneWidth{4.};
   const double kLinearTolerance{0.01};
   const double kAngularTolerance{0.01 * M_PI};
   const double kScaleLength{1.};
-  const maliput::multilane::ComputationPolicy kComputationPolicy{
-      maliput::multilane::ComputationPolicy::kPreferSpeed};
+  const maliput::multilane::ComputationPolicy kComputationPolicy{maliput::multilane::ComputationPolicy::kPreferSpeed};
   const maliput::api::HBounds kElevationBounds{0., 5.2};
 
-  auto rb = multi::BuilderFactory().Make(kLaneWidth, kElevationBounds,
-                                         kLinearTolerance, kAngularTolerance,
+  auto rb = multi::BuilderFactory().Make(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
                                          kScaleLength, kComputationPolicy);
 
   // Initialize roads lane layouts.
@@ -78,8 +71,7 @@ TEST_F(GenerateObjTest, NoEpsilonSampling) {
   const double kLeftShoulder{2.};
   const double kRightShoulder{2.};
   const int kLaneNumber{1};
-  const multi::LaneLayout lane_layout(kLeftShoulder, kRightShoulder,
-                                      kLaneNumber, kRefLane, kRefR0);
+  const multi::LaneLayout lane_layout(kLeftShoulder, kRightShoulder, kLaneNumber, kRefLane, kRefR0);
 
   // Initialize the road from the origin.
   const multi::EndpointXy kOriginXy{0., 0., 0.};
@@ -89,23 +81,18 @@ TEST_F(GenerateObjTest, NoEpsilonSampling) {
   // Construct road.
   const double kArcLength = 25.;
   const double kArcRadius = 40.;
-  const auto street1 = rb->Connect(
-      "street1", lane_layout,
-      multi::StartReference().at(kRoadOrigin, multi::Direction::kForward),
-      multi::ArcOffset(kArcLength, -kArcRadius / kArcLength),
-      multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
+  const auto street1 =
+      rb->Connect("street1", lane_layout, multi::StartReference().at(kRoadOrigin, multi::Direction::kForward),
+                  multi::ArcOffset(kArcLength, -kArcRadius / kArcLength),
+                  multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
   const auto street2 = rb->Connect(
-      "street2", lane_layout,
-      multi::StartReference().at(*street1, api::LaneEnd::kFinish,
-                                 multi::Direction::kForward),
+      "street2", lane_layout, multi::StartReference().at(*street1, api::LaneEnd::kFinish, multi::Direction::kForward),
       multi::ArcOffset(kArcLength, kArcRadius / kArcLength),
       multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
-  rb->Connect(
-      "street3", lane_layout,
-      multi::StartReference().at(*street2, api::LaneEnd::kFinish,
-                                 multi::Direction::kForward),
-      multi::ArcOffset(kArcLength, -kArcRadius / kArcLength),
-      multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
+  rb->Connect("street3", lane_layout,
+              multi::StartReference().at(*street2, api::LaneEnd::kFinish, multi::Direction::kForward),
+              multi::ArcOffset(kArcLength, -kArcRadius / kArcLength),
+              multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
 
   const std::unique_ptr<const api::RoadGeometry> dut =
       rb->Build(maliput::api::RoadGeometryId{"no-epsilon-sampling-dut"});
@@ -135,12 +122,10 @@ TEST_F(GenerateObjTest, NarrowAndShortSegments) {
   const double kAngularTolerance{0.01 * M_PI};
   const double kScaleLength{1.};
   const double kLaneWidth{kLinearTolerance / 2.};
-  const maliput::multilane::ComputationPolicy kComputationPolicy{
-      maliput::multilane::ComputationPolicy::kPreferSpeed};
+  const maliput::multilane::ComputationPolicy kComputationPolicy{maliput::multilane::ComputationPolicy::kPreferSpeed};
   const maliput::api::HBounds kElevationBounds{0., 5.2};
 
-  auto rb = multi::BuilderFactory().Make(kLaneWidth, kElevationBounds,
-                                         kLinearTolerance, kAngularTolerance,
+  auto rb = multi::BuilderFactory().Make(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance,
                                          kScaleLength, kComputationPolicy);
 
   // Initialize roads lane layouts.
@@ -152,8 +137,7 @@ TEST_F(GenerateObjTest, NarrowAndShortSegments) {
   const double kLeftShoulder{2.};
   const double kRightShoulder{2.};
   const int kLaneNumber{1};
-  const multi::LaneLayout lane_layout(kLeftShoulder, kRightShoulder,
-                                      kLaneNumber, kRefLane, kRefR0);
+  const multi::LaneLayout lane_layout(kLeftShoulder, kRightShoulder, kLaneNumber, kRefLane, kRefR0);
 
   // Initialize the road from the origin.
   const multi::EndpointXy kOriginXy{0., 0., 0.};
@@ -165,11 +149,10 @@ TEST_F(GenerateObjTest, NarrowAndShortSegments) {
   // short road.
   const double kArcLength1 = kLinearTolerance / 3.;
   const double kArcRadius1 = 40.;
-  const auto street1 = rb->Connect(
-      "street1", lane_layout,
-      multi::StartReference().at(kRoadOrigin, multi::Direction::kForward),
-      multi::ArcOffset(kArcRadius1, -kArcLength1 / kArcRadius1),
-      multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
+  const auto street1 =
+      rb->Connect("street1", lane_layout, multi::StartReference().at(kRoadOrigin, multi::Direction::kForward),
+                  multi::ArcOffset(kArcRadius1, -kArcLength1 / kArcRadius1),
+                  multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
 
   // Construct a road a thinner than linear_tolerance but equally long to
   // linear_tolerance road.
@@ -178,9 +161,7 @@ TEST_F(GenerateObjTest, NarrowAndShortSegments) {
   const double kArcLength2 = kLinearTolerance;
   const double kArcRadius2 = 80.;
   const auto street2 = rb->Connect(
-      "street2", lane_layout,
-      multi::StartReference().at(*street1, api::LaneEnd::kFinish,
-                                 multi::Direction::kForward),
+      "street2", lane_layout, multi::StartReference().at(*street1, api::LaneEnd::kFinish, multi::Direction::kForward),
       multi::ArcOffset(kArcRadius2, kArcLength2 / kArcRadius2),
       multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
 
@@ -188,12 +169,10 @@ TEST_F(GenerateObjTest, NarrowAndShortSegments) {
   // No arrows should be added to Lane ends because of being a narrow road.
   const double kArcLength3 = 5. * kLinearTolerance;
   const double kArcRadius3 = 100.;
-  rb->Connect(
-      "street3", lane_layout,
-      multi::StartReference().at(*street2, api::LaneEnd::kFinish,
-                                 multi::Direction::kForward),
-      multi::ArcOffset(kArcRadius3, -kArcLength3 / kArcRadius3),
-      multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
+  rb->Connect("street3", lane_layout,
+              multi::StartReference().at(*street2, api::LaneEnd::kFinish, multi::Direction::kForward),
+              multi::ArcOffset(kArcRadius3, -kArcLength3 / kArcRadius3),
+              multi::EndReference().z_at(kFlatZ, multi::Direction::kForward));
 
   const std::unique_ptr<const api::RoadGeometry> dut =
       rb->Build(maliput::api::RoadGeometryId{"narrow-and-short-segments-dut"});
@@ -216,7 +195,6 @@ TEST_F(GenerateObjTest, NarrowAndShortSegments) {
   paths_to_cleanup_.push_back(actual_mtl_path);
 }
 
-
 class GenerateObjBasicDutTest : public GenerateObjTest {
  protected:
   const double kLinearTolerance = 0.01;
@@ -225,15 +203,12 @@ class GenerateObjBasicDutTest : public GenerateObjTest {
   const double kShoulder = 0.5;
   const api::HBounds kElevationBounds{0., 5.};
   const double kScaleLength = 1.;
-  const multi::ComputationPolicy kComputationPolicy =
-      multi::ComputationPolicy::kPreferAccuracy;
-  const multi::LaneLayout kLaneLayout{kShoulder, kShoulder, 1 /* num_lanes */,
-                                      0 /* ref_lane */, 0. /* ref_r0 */};
+  const multi::ComputationPolicy kComputationPolicy = multi::ComputationPolicy::kPreferAccuracy;
+  const multi::LaneLayout kLaneLayout{kShoulder, kShoulder, 1 /* num_lanes */, 0 /* ref_lane */, 0. /* ref_r0 */};
 
   std::unique_ptr<multi::BuilderBase> MakeMultilaneBuilder() {
-    return multi::BuilderFactory().Make(kLaneWidth, kElevationBounds,
-                                        kLinearTolerance, kAngularTolerance,
-                                        kScaleLength, kComputationPolicy);
+    return multi::BuilderFactory().Make(kLaneWidth, kElevationBounds, kLinearTolerance, kAngularTolerance, kScaleLength,
+                                        kComputationPolicy);
   }
 
   void SetUp() override {
@@ -243,9 +218,7 @@ class GenerateObjBasicDutTest : public GenerateObjTest {
 
     const multi::EndpointZ kZeroZ{0., 0., 0., 0.};
     const multi::Endpoint start{{0., 0., 0.}, kZeroZ};
-    b->Connect("0", kLaneLayout,
-               multi::StartReference().at(start, multi::Direction::kForward),
-               multi::LineOffset(1.),
+    b->Connect("0", kLaneLayout, multi::StartReference().at(start, multi::Direction::kForward), multi::LineOffset(1.),
                multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
     dut_ = b->Build(api::RoadGeometryId{"dut"});
   }
@@ -253,15 +226,13 @@ class GenerateObjBasicDutTest : public GenerateObjTest {
   std::unique_ptr<const api::RoadGeometry> dut_;
 };
 
-
 TEST_F(GenerateObjBasicDutTest, DefaultObjContent) {
   const std::string basename{"DefaultObjContent"};
 
   std::string expected_obj_contents;
   ReadExpectedData(basename + ".obj", &expected_obj_contents);
 
-  GenerateObjFile(dut_.get(), directory_.get_path(), basename,
-                  ObjFeatures());
+  GenerateObjFile(dut_.get(), directory_.get_path(), basename, ObjFeatures());
   // We expect to get two files out of this.
 
   common::Path actual_obj_path(directory_);
@@ -280,7 +251,6 @@ TEST_F(GenerateObjBasicDutTest, DefaultObjContent) {
   EXPECT_EQ(expected_obj_contents, actual_obj_contents);
 }
 
-
 TEST_F(GenerateObjBasicDutTest, ChangeOrigin) {
   const std::string basename{"ChangeOrigin"};
 
@@ -296,9 +266,7 @@ TEST_F(GenerateObjBasicDutTest, ChangeOrigin) {
     auto b = MakeMultilaneBuilder();
     const multi::EndpointZ kZeroZ{kOffsetZ, 0., 0., 0.};
     const multi::Endpoint start{{kOffsetX, kOffsetY, 0.}, kZeroZ};
-    b->Connect("0", kLaneLayout,
-               multi::StartReference().at(start, multi::Direction::kForward),
-               multi::LineOffset(1.),
+    b->Connect("0", kLaneLayout, multi::StartReference().at(start, multi::Direction::kForward), multi::LineOffset(1.),
                multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
     dut_ = b->Build(api::RoadGeometryId{"dut"});
   }
@@ -324,7 +292,6 @@ TEST_F(GenerateObjBasicDutTest, ChangeOrigin) {
   EXPECT_EQ(expected_obj_contents, actual_obj_contents);
 }
 
-
 TEST_F(GenerateObjBasicDutTest, MtlContent) {
   const std::string basename{"MtlContent"};
   GenerateObjFile(dut_.get(), directory_.get_path(), basename, ObjFeatures());
@@ -347,7 +314,6 @@ TEST_F(GenerateObjBasicDutTest, MtlContent) {
   ReadExpectedData(basename + ".mtl", &expected_mtl_contents);
   EXPECT_EQ(expected_mtl_contents, actual_mtl_contents);
 }
-
 
 TEST_F(GenerateObjBasicDutTest, NoBranchPointsObjContent) {
   const std::string basename{"NoBranchPointsObjContent"};
@@ -376,7 +342,6 @@ TEST_F(GenerateObjBasicDutTest, NoBranchPointsObjContent) {
   EXPECT_EQ(expected_obj_contents, actual_obj_contents);
 }
 
-
 TEST_F(GenerateObjBasicDutTest, StackedBranchPointsObjContent) {
   const std::string basename{"StackedBranchPointsObjContent"};
 
@@ -389,13 +354,9 @@ TEST_F(GenerateObjBasicDutTest, StackedBranchPointsObjContent) {
     const multi::EndpointZ kZeroZ{0., 0., 0., 0.};
     const multi::Endpoint start0{{0., 0., 0.}, kZeroZ};
     const multi::Endpoint start1{{10. * kLinearTolerance, 0., M_PI}, kZeroZ};
-    b->Connect("0", kLaneLayout,
-               multi::StartReference().at(start0, multi::Direction::kForward),
-               multi::LineOffset(1.),
+    b->Connect("0", kLaneLayout, multi::StartReference().at(start0, multi::Direction::kForward), multi::LineOffset(1.),
                multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
-    b->Connect("1", kLaneLayout,
-               multi::StartReference().at(start1, multi::Direction::kForward),
-               multi::LineOffset(1.),
+    b->Connect("1", kLaneLayout, multi::StartReference().at(start1, multi::Direction::kForward), multi::LineOffset(1.),
                multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
     dut_ = b->Build(api::RoadGeometryId{"dut"});
   }
@@ -416,7 +377,6 @@ TEST_F(GenerateObjBasicDutTest, StackedBranchPointsObjContent) {
   ReadAsString(actual_obj_path, &actual_obj_contents);
   EXPECT_EQ(expected_obj_contents, actual_obj_contents);
 }
-
 
 // Oblique regression test for tripping of an assertion in DrawLaneArrow()
 // during GenerateObj().  See #5745.
@@ -450,8 +410,7 @@ maliput_multilane_builder:
   groups: {}
 )R";
 
-  const std::unique_ptr<const api::RoadGeometry> dut =
-      multi::Load(multi::BuilderFactory(), dut_yaml);
+  const std::unique_ptr<const api::RoadGeometry> dut = multi::Load(multi::BuilderFactory(), dut_yaml);
 
   const std::string basename{"DontTickleDrawLaneArrowAssert"};
   GenerateObjFile(dut.get(), directory_.get_path(), basename, ObjFeatures());
@@ -469,7 +428,6 @@ maliput_multilane_builder:
   paths_to_cleanup_.push_back(actual_mtl_path);
 }
 
-
 TEST_F(GenerateObjBasicDutTest, HighlightedSegments) {
   const std::string basename{"HighlightedSegments"};
 
@@ -478,16 +436,11 @@ TEST_F(GenerateObjBasicDutTest, HighlightedSegments) {
     auto b = MakeMultilaneBuilder();
     const multi::EndpointZ kZeroZ{0., 0., 0., 0.};
     const multi::Endpoint start0{{0., 0., 0.}, kZeroZ};
-    auto c0 = b->Connect(
-        "0", kLaneLayout,
-        multi::StartReference().at(start0, multi::Direction::kForward),
-        multi::LineOffset(2.),
-        multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
+    auto c0 = b->Connect("0", kLaneLayout, multi::StartReference().at(start0, multi::Direction::kForward),
+                         multi::LineOffset(2.), multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
     b->Connect("1", kLaneLayout,
-               multi::StartReference().at(*c0, api::LaneEnd::Which::kFinish,
-                                          multi::Direction::kForward),
-               multi::LineOffset(2.),
-               multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
+               multi::StartReference().at(*c0, api::LaneEnd::Which::kFinish, multi::Direction::kForward),
+               multi::LineOffset(2.), multi::EndReference().z_at(kZeroZ, multi::Direction::kForward));
     dut_ = b->Build(api::RoadGeometryId{"dut"});
   }
 
@@ -512,7 +465,6 @@ TEST_F(GenerateObjBasicDutTest, HighlightedSegments) {
   ReadAsString(actual_obj_path, &actual_obj_contents);
   EXPECT_EQ(expected_obj_contents, actual_obj_contents);
 }
-
 
 }  // namespace utility
 }  // namespace maliput

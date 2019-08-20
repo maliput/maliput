@@ -6,13 +6,13 @@
 #include <utility>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "maliput/geometry_base/lane.h"
 #include "maliput/geometry_base/passkey.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -30,7 +30,6 @@ class Segment : public api::Segment {
   ///
   /// The Segment is not fully initialized until it is added to a Junction.
   explicit Segment(const api::SegmentId& id) : id_(id) {}
-
 
   /// Adds @p lane to this Segment.
   ///
@@ -53,13 +52,11 @@ class Segment : public api::Segment {
   //                          useful for creating aberrant test cases.)
   template <class T>
   T* AddLane(std::unique_ptr<T> lane) {
-    static_assert(std::is_base_of<Lane, T>::value,
-                  "T is not derived from geometry_base::Lane");
+    static_assert(std::is_base_of<Lane, T>::value, "T is not derived from geometry_base::Lane");
     T* const raw_pointer = lane.get();
     AddLanePrivate(std::move(lane));
     return raw_pointer;
   }
-
 
 #ifndef DRAKE_DOXYGEN_CXX
   // Notifies Segment of its parent Junction.
@@ -79,9 +76,7 @@ class Segment : public api::Segment {
   //
   // @pre `callback` is non-empty.
   // @pre The lane indexing callback has not already been set.
-  void SetLaneIndexingCallback(
-      Passkey<Junction>,
-      const std::function<void(const api::Lane*)>& callback);
+  void SetLaneIndexingCallback(Passkey<Junction>, const std::function<void(const api::Lane*)>& callback);
 #endif  // DRAKE_DOXYGEN_CXX
 
   ~Segment() override = default;
@@ -103,7 +98,6 @@ class Segment : public api::Segment {
   std::function<void(const api::Lane*)> lane_indexing_callback_;
   std::vector<std::unique_ptr<Lane>> lanes_;
 };
-
 
 }  // namespace geometry_base
 }  // namespace maliput

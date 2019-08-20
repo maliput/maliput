@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "maliput/api/type_specific_identifier.h"
 #include "drake/common/drake_copyable.h"
+#include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {
 namespace api {
@@ -11,10 +11,8 @@ namespace api {
 class RoadGeometry;
 class Segment;
 
-
 /// Persistent identifier for a Junction element.
 using JunctionId = TypeSpecificIdentifier<class Junction>;
-
 
 /// A Junction is a closed set of Segments which have physically
 /// coplanar road surfaces, in the sense that RoadPositions with the
@@ -62,7 +60,6 @@ class Junction {
   virtual const Segment* do_segment(int index) const = 0;
   ///@}
 };
-
 
 }  // namespace api
 }  // namespace maliput

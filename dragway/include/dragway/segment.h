@@ -4,12 +4,12 @@
 #include <utility>
 #include <vector>
 
+#include "dragway/lane.h"
+#include "drake/common/drake_copyable.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
-#include "dragway/lane.h"
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace dragway {
@@ -70,12 +70,8 @@ class Segment final : public api::Segment {
   ///
   /// @param[in] maximum_height The maximum height above the road surface.
   /// modelled by the RoadGeometry.
-  Segment(Junction* junction,
-      int num_lanes,
-      double length,
-      double lane_width,
-      double shoulder_width,
-      double maximum_height);
+  Segment(Junction* junction, int num_lanes, double length, double lane_width, double shoulder_width,
+          double maximum_height);
 
   ~Segment() final = default;
 

@@ -4,13 +4,13 @@
 #include <memory>
 #include <vector>
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/geometry_base/lane_end_set.h"
 #include "maliput/geometry_base/passkey.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -35,26 +35,20 @@ class BranchPoint : public api::BranchPoint {
   /// Adds the @p end of @p lane to the "A side" of this BranchPoint.
   ///
   /// @throws std::exception if `lane` is nullptr.
-  void AddABranch(Lane* lane, api::LaneEnd::Which end) {
-    AddBranch(lane, end, &a_side_);
-  }
+  void AddABranch(Lane* lane, api::LaneEnd::Which end) { AddBranch(lane, end, &a_side_); }
 
   /// Adds the @p end of @p lane to the "B side" of this BranchPoint.
   ///
   /// @throws std::exception if `lane` is nullptr.
-  void AddBBranch(Lane* lane, api::LaneEnd::Which end) {
-    AddBranch(lane, end, &b_side_);
-  }
+  void AddBBranch(Lane* lane, api::LaneEnd::Which end) { AddBranch(lane, end, &b_side_); }
 
   /// Sets the default branch for @p lane_end to @p default_branch.
   ///
   /// @throws std::exception if the specified LaneEnds do not belong
   ///         to opposite sides of this BranchPoint.
-  void SetDefault(const api::LaneEnd& lane_end,
-                  const api::LaneEnd& default_branch);
+  void SetDefault(const api::LaneEnd& lane_end, const api::LaneEnd& default_branch);
 
   ~BranchPoint() override = default;
-
 
 #ifndef DRAKE_DOXYGEN_CXX
   // Notifies BranchPoint of its parent RoadGeometry.
@@ -64,8 +58,7 @@ class BranchPoint : public api::BranchPoint {
   //
   // @pre `road_geometry` is non-null.
   // @pre Parent RoadGeometry has not already been set.
-  void AttachToRoadGeometry(Passkey<RoadGeometry>,
-                            const api::RoadGeometry* road_geometry);
+  void AttachToRoadGeometry(Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry);
 #endif  // DRAKE_DOXYGEN_CXX
 
  private:
@@ -76,14 +69,11 @@ class BranchPoint : public api::BranchPoint {
 
   const api::RoadGeometry* do_road_geometry() const override;
 
-  const api::LaneEndSet* DoGetConfluentBranches(
-      const api::LaneEnd& end) const override;
+  const api::LaneEndSet* DoGetConfluentBranches(const api::LaneEnd& end) const override;
 
-  const api::LaneEndSet* DoGetOngoingBranches(
-      const api::LaneEnd& end) const override;
+  const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd& end) const override;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(
-      const api::LaneEnd& end) const override;
+  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd& end) const override;
 
   const api::LaneEndSet* DoGetASide() const override;
 
@@ -94,14 +84,10 @@ class BranchPoint : public api::BranchPoint {
   LaneEndSet a_side_;
   LaneEndSet b_side_;
 
-  std::map<api::LaneEnd, LaneEndSet*,
-           api::LaneEnd::StrictOrder> confluent_branches_;
-  std::map<api::LaneEnd, LaneEndSet*,
-           api::LaneEnd::StrictOrder> ongoing_branches_;
-  std::map<api::LaneEnd, api::LaneEnd,
-           api::LaneEnd::StrictOrder> defaults_;
+  std::map<api::LaneEnd, LaneEndSet*, api::LaneEnd::StrictOrder> confluent_branches_;
+  std::map<api::LaneEnd, LaneEndSet*, api::LaneEnd::StrictOrder> ongoing_branches_;
+  std::map<api::LaneEnd, api::LaneEnd, api::LaneEnd::StrictOrder> defaults_;
 };
-
 
 }  // namespace geometry_base
 }  // namespace maliput

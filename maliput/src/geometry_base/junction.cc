@@ -5,11 +5,9 @@
 namespace maliput {
 namespace geometry_base {
 
-void Junction::AttachToRoadGeometry(
-    Passkey<RoadGeometry>,
-    const api::RoadGeometry* road_geometry,
-    const std::function<void(const api::Segment*)>& segment_indexing_callback,
-    const std::function<void(const api::Lane*)>& lane_indexing_callback) {
+void Junction::AttachToRoadGeometry(Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry,
+                                    const std::function<void(const api::Segment*)>& segment_indexing_callback,
+                                    const std::function<void(const api::Lane*)>& lane_indexing_callback) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
   MALIPUT_THROW_UNLESS(!!segment_indexing_callback);
@@ -31,7 +29,6 @@ void Junction::AttachToRoadGeometry(
   }
 }
 
-
 void Junction::AddSegmentPrivate(std::unique_ptr<Segment> segment) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(segment.get() != nullptr);
@@ -47,11 +44,7 @@ void Junction::AddSegmentPrivate(std::unique_ptr<Segment> segment) {
   }
 }
 
-
-const api::RoadGeometry* Junction::do_road_geometry() const {
-  return road_geometry_;
-}
-
+const api::RoadGeometry* Junction::do_road_geometry() const { return road_geometry_; }
 
 }  // namespace geometry_base
 }  // namespace maliput

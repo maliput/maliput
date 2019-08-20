@@ -17,8 +17,7 @@ GTEST_TEST(MaliputThrowTest, ExpectThrowAndNoThrowTest) {
 
 // Evaluates whether or not MALIPUT_THROW_UNLESS() throws.
 GTEST_TEST(MaliputThrowMessageTest, ExpectThrowWithMessageTest) {
-  EXPECT_THROW({ MALIPUT_THROW_MESSAGE("Exception description"); },
-               assertion_error);
+  EXPECT_THROW({ MALIPUT_THROW_MESSAGE("Exception description"); }, assertion_error);
 }
 
 }  // namespace

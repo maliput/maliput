@@ -9,18 +9,12 @@
 #include "dragway/junction.h"
 #include "dragway/lane.h"
 
-
 namespace maliput {
 namespace dragway {
 
-Segment::Segment(Junction* junction,
-    int num_lanes,
-    double length,
-    double lane_width,
-    double shoulder_width,
-    double maximum_height)
-    : id_("Dragway_Segment_ID"),
-      junction_(junction) {
+Segment::Segment(Junction* junction, int num_lanes, double length, double lane_width, double shoulder_width,
+                 double maximum_height)
+    : id_("Dragway_Segment_ID"), junction_(junction) {
   // To better understand the semantics of the variables defined in this method,
   // see the class description.
 
@@ -31,19 +25,11 @@ Segment::Segment(Junction* junction,
   const double y_max = road_width / 2;
 
   for (int i = 0; i < num_lanes; ++i) {
-    const double y_offset =
-        y_min + shoulder_width + i * lane_width + lane_width / 2;
+    const double y_offset = y_min + shoulder_width + i * lane_width + lane_width / 2;
     const api::RBounds driveable_bounds({y_min - y_offset, y_max - y_offset});
 
-    auto lane = std::make_unique<Lane>(
-        this,
-        api::LaneId("Dragway_Lane_" + std::to_string(i)),
-        i,
-        length,
-        y_offset,
-        lane_bounds,
-        driveable_bounds,
-        elevation_bounds);
+    auto lane = std::make_unique<Lane>(this, api::LaneId("Dragway_Lane_" + std::to_string(i)), i, length, y_offset,
+                                       lane_bounds, driveable_bounds, elevation_bounds);
     lanes_.push_back(move(lane));
   }
 
@@ -63,9 +49,7 @@ Segment::Segment(Junction* junction,
   }
 }
 
-const api::Junction* Segment::do_junction() const {
-  return junction_;
-}
+const api::Junction* Segment::do_junction() const { return junction_; }
 
 const api::Lane* Segment::do_lane(int index) const {
   MALIPUT_DEMAND(index < num_lanes());

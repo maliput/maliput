@@ -53,7 +53,6 @@ GTEST_TEST(SRangeTest, Assignment) {
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
 }
 
-
 GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
   LaneSRange dut(LaneId("dut"), SRange(34., 0.));
   EXPECT_EQ(dut.lane_id(), LaneId("dut"));
@@ -75,7 +74,6 @@ GTEST_TEST(LaneSRangeTest, Assignment) {
   dut = source;
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
 }
-
 
 class LaneSRouteTest : public ::testing::Test {
  protected:
@@ -109,7 +107,6 @@ TEST_F(LaneSRouteTest, Assignment) {
   dut = dut_source;
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, dut_source));
 }
-
 
 }  // namespace
 }  // namespace rules

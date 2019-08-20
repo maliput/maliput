@@ -11,7 +11,6 @@
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/maliput_throw.h"
 
-
 namespace maliput {
 namespace api {
 namespace rules {
@@ -50,46 +49,40 @@ class RoadRulebook {
   /// s-bounds of a Lane).
   ///
   /// @throws maliput::common::assertion_error if `tolerance` is negative.
-  QueryResults FindRules(
-      const std::vector<LaneSRange>& ranges, double tolerance) const {
+  QueryResults FindRules(const std::vector<LaneSRange>& ranges, double tolerance) const {
     MALIPUT_THROW_UNLESS(tolerance >= 0.);
     return DoFindRules(ranges, tolerance);
+  }
+
+  /// Returns all the rules in this RoadRulebook.
+  QueryResults Rules() const {
+    return DoRules();
   }
 
   /// Returns the RightOfWayRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
-  RightOfWayRule GetRule(const RightOfWayRule::Id& id) const {
-    return DoGetRule(id);
-  }
+  RightOfWayRule GetRule(const RightOfWayRule::Id& id) const { return DoGetRule(id); }
 
   /// Returns the SpeedLimitRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
-  SpeedLimitRule GetRule(const SpeedLimitRule::Id& id) const {
-    return DoGetRule(id);
-  }
+  SpeedLimitRule GetRule(const SpeedLimitRule::Id& id) const { return DoGetRule(id); }
 
   /// Returns the DirectionUsageRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
-  DirectionUsageRule GetRule(const DirectionUsageRule::Id& id) const {
-    return DoGetRule(id);
-  }
+  DirectionUsageRule GetRule(const DirectionUsageRule::Id& id) const { return DoGetRule(id); }
 
   /// Returns the DiscreteValueRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
-  DiscreteValueRule GetDiscreteValueRule(const Rule::Id& id) const {
-    return DoGetDiscreteValueRule(id);
-  }
+  DiscreteValueRule GetDiscreteValueRule(const Rule::Id& id) const { return DoGetDiscreteValueRule(id); }
 
   /// Returns the RangeValueRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
-  RangeValueRule GetRangeValueRule(const Rule::Id& id) const {
-    return DoGetRangeValueRule(id);
-  }
+  RangeValueRule GetRangeValueRule(const Rule::Id& id) const { return DoGetRangeValueRule(id); }
 
  protected:
   RoadRulebook() = default;
@@ -99,12 +92,11 @@ class RoadRulebook {
   // These must satisfy the constraints/invariants of the
   // corresponding public methods.
   //@{
-  virtual QueryResults DoFindRules(
-      const std::vector<LaneSRange>& ranges, double tolerance) const = 0;
+  virtual QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double tolerance) const = 0;
+  virtual QueryResults DoRules() const = 0;
   virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const = 0;
   virtual SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const = 0;
-  virtual DirectionUsageRule DoGetRule(
-    const DirectionUsageRule::Id& id) const = 0;
+  virtual DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const = 0;
   virtual DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const = 0;
   virtual RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const = 0;
   //@}

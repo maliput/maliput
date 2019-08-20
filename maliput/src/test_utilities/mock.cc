@@ -37,19 +37,11 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
  private:
   const Lane* DoGetLane(const LaneId&) const override { return nullptr; }
 
-  const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override {
-    return lane_map_;
-  }
+  const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
 
-  const Segment* DoGetSegment(const SegmentId&) const override {
-    return nullptr;
-  };
-  const Junction* DoGetJunction(const JunctionId&) const override {
-    return nullptr;
-  };
-  const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override {
-    return nullptr;
-  }
+  const Segment* DoGetSegment(const SegmentId&) const override { return nullptr; };
+  const Junction* DoGetJunction(const JunctionId&) const override { return nullptr; };
+  const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
 
   const std::unordered_map<LaneId, const Lane*> lane_map_;
 };
@@ -76,45 +68,27 @@ class MockLane final : public Lane {
 
   RBounds do_driveable_bounds(double) const override { return RBounds(-1, 1); };
 
-  HBounds do_elevation_bounds(double, double) const override {
-    return HBounds(0, 10);
-  };
+  HBounds do_elevation_bounds(double, double) const override { return HBounds(0, 10); };
 
-  GeoPosition DoToGeoPosition(const LanePosition&) const override {
-    return GeoPosition(0, 0, 0);
-  }
+  GeoPosition DoToGeoPosition(const LanePosition&) const override { return GeoPosition(0, 0, 0); }
 
-  LanePosition DoToLanePosition(const GeoPosition&, GeoPosition*,
-                                double*) const override {
+  LanePosition DoToLanePosition(const GeoPosition&, GeoPosition*, double*) const override {
     return LanePosition(0, 0, 0);
   }
 
-  Rotation DoGetOrientation(const LanePosition&) const override {
-    return Rotation();
-  }
+  Rotation DoGetOrientation(const LanePosition&) const override { return Rotation(); }
 
-  LanePosition DoEvalMotionDerivatives(const LanePosition&,
-                                       const IsoLaneVelocity&) const override {
+  LanePosition DoEvalMotionDerivatives(const LanePosition&, const IsoLaneVelocity&) const override {
     return LanePosition(0, 0, 0);
   }
 
-  const BranchPoint* DoGetBranchPoint(const LaneEnd::Which) const override {
-    return nullptr;
-  };
+  const BranchPoint* DoGetBranchPoint(const LaneEnd::Which) const override { return nullptr; };
 
-  const LaneEndSet* DoGetConfluentBranches(
-      const LaneEnd::Which) const override {
-    return nullptr;
-  };
+  const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which) const override { return nullptr; };
 
-  const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override {
-    return nullptr;
-  };
+  const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override { return nullptr; };
 
-  drake::optional<LaneEnd> DoGetDefaultBranch(
-      const LaneEnd::Which) const override {
-    return drake::nullopt;
-  };
+  drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return drake::nullopt; };
 };
 
 class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
@@ -125,23 +99,14 @@ class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
  private:
   const Lane* DoGetLane(const LaneId&) const override { &mock_lane_; }
 
-  const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override {
-    return lane_map_;
-  }
+  const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
 
-  const Segment* DoGetSegment(const SegmentId&) const override {
-    return nullptr;
-  };
-  const Junction* DoGetJunction(const JunctionId&) const override {
-    return nullptr;
-  };
-  const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override {
-    return nullptr;
-  }
+  const Segment* DoGetSegment(const SegmentId&) const override { return nullptr; };
+  const Junction* DoGetJunction(const JunctionId&) const override { return nullptr; };
+  const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
 
   const MockLane mock_lane_;
-  const std::unordered_map<LaneId, const Lane*> lane_map_{
-      {LaneId("mock"), &mock_lane_}};
+  const std::unordered_map<LaneId, const Lane*> lane_map_{{LaneId("mock"), &mock_lane_}};
 };
 
 class MockRoadGeometry final : public RoadGeometry {
@@ -156,12 +121,10 @@ class MockRoadGeometry final : public RoadGeometry {
   int do_num_branch_points() const override { return 1; }
   const BranchPoint* do_branch_point(int) const override { return nullptr; }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*,
-                                GeoPosition*, double*) const override {
+  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*, GeoPosition*, double*) const override {
     return RoadPosition();
   }
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(
-      const GeoPosition&, double) const override {
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
     return {{RoadPosition(), GeoPosition(), 0.}};
   }
   double do_linear_tolerance() const override { return 0; }
@@ -182,12 +145,10 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   int do_num_branch_points() const override { return 1; }
   const BranchPoint* do_branch_point(int) const override { return nullptr; }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*,
-                                GeoPosition*, double*) const override {
+  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*, GeoPosition*, double*) const override {
     return RoadPosition();
   }
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(
-      const GeoPosition&, double) const override {
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
     return {{RoadPosition(), GeoPosition(), 0.}};
   }
   double do_linear_tolerance() const override { return 0; }
@@ -202,27 +163,18 @@ class MockRoadRulebook final : public rules::RoadRulebook {
   MockRoadRulebook() {}
 
  private:
-  QueryResults DoFindRules(const std::vector<rules::LaneSRange>&,
-                           double) const override {
-    return {{}, {}};
+  QueryResults DoFindRules(const std::vector<rules::LaneSRange>&, double) const override {
+    return {{}, {}, {}, {}, {}};
   }
-  RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override {
-    return CreateRightOfWayRule();
-  }
+  QueryResults DoRules() const override { return {{}, {}, {}, {}, {}}; }
+  RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override { return CreateRightOfWayRule(); }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override {
-    return SpeedLimitRule(rules::SpeedLimitRule::Id("some_id"),
-                          CreateLaneSRange(),
+    return SpeedLimitRule(rules::SpeedLimitRule::Id("some_id"), CreateLaneSRange(),
                           rules::SpeedLimitRule::Severity::kStrict, 33., 77.);
   }
-  DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override {
-    return CreateDirectionUsageRule();
-  }
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
-    return CreateDiscreteValueRule();
-  }
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
-    return CreateRangeValueRule();
-  }
+  DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return CreateDirectionUsageRule(); }
+  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override { return CreateDiscreteValueRule(); }
+  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override { return CreateRangeValueRule(); }
 };
 
 class MockTrafficLightBook final : public rules::TrafficLightBook {
@@ -231,10 +183,8 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
   MockTrafficLightBook() {}
 
  private:
-  drake::optional<TrafficLight> DoGetTrafficLight(
-      const TrafficLight::Id&) const override {
-    return drake::nullopt;
-  }
+  drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id&) const override { return drake::nullopt; }
+  std::vector<TrafficLight> DoTrafficLights() const override { return {}; }
 };
 
 class MockPhaseRingBook final : public rules::PhaseRingBook {
@@ -243,17 +193,13 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
   MockPhaseRingBook() {}
 
  private:
-  std::vector<rules::PhaseRing::Id> DoGetPhaseRings() const override {
-    return std::vector<rules::PhaseRing::Id>();
-  }
+  std::vector<rules::PhaseRing::Id> DoGetPhaseRings() const override { return std::vector<rules::PhaseRing::Id>(); }
 
-  drake::optional<rules::PhaseRing> DoGetPhaseRing(
-      const rules::PhaseRing::Id&) const override {
+  drake::optional<rules::PhaseRing> DoGetPhaseRing(const rules::PhaseRing::Id&) const override {
     return drake::nullopt;
   }
 
-  drake::optional<rules::PhaseRing> DoFindPhaseRing(
-      const rules::RightOfWayRule::Id&) const override {
+  drake::optional<rules::PhaseRing> DoFindPhaseRing(const rules::RightOfWayRule::Id&) const override {
     return drake::nullopt;
   }
 };
@@ -264,10 +210,7 @@ class MockRuleStateProvider final : public rules::RuleStateProvider {
   MockRuleStateProvider() {}
 
  private:
-  drake::optional<RightOfWayResult> DoGetState(
-      const RightOfWayRule::Id&) const override {
-    return drake::nullopt;
-  }
+  drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id&) const override { return drake::nullopt; }
 };
 
 class MockPhaseProvider final : public rules::PhaseProvider {
@@ -276,35 +219,26 @@ class MockPhaseProvider final : public rules::PhaseProvider {
   MockPhaseProvider() {}
 
  private:
-  drake::optional<Result> DoGetPhase(
-      const rules::PhaseRing::Id&) const override {
-    return drake::nullopt;
-  }
+  drake::optional<Result> DoGetPhase(const rules::PhaseRing::Id&) const override { return drake::nullopt; }
 };
 
 class MockIntersection final : public Intersection {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIntersection)
-  MockIntersection(const Intersection::Id& id, const rules::PhaseRing& ring)
-      : Intersection(id, {}, ring) {}
+  MockIntersection(const Intersection::Id& id, const rules::PhaseRing& ring) : Intersection(id, {}, ring) {}
 
  private:
-  drake::optional<rules::PhaseProvider::Result> Phase() const override {
-    return drake::nullopt;
-  }
+  drake::optional<rules::PhaseProvider::Result> Phase() const override { return drake::nullopt; }
 
   void SetPhase(const api::rules::Phase::Id&) override {}
 };
 
-PhaseRing CreatePhaseRing() {
-  return PhaseRing(PhaseRing::Id("mock"), {Phase(Phase::Id("mock"), {})});
-}
+PhaseRing CreatePhaseRing() { return PhaseRing(PhaseRing::Id("mock"), {Phase(Phase::Id("mock"), {})}); }
 
 class MockIntersectionBook final : public IntersectionBook {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIntersectionBook);
-  MockIntersectionBook()
-      : intersection_(Intersection::Id("Mock"), CreatePhaseRing()) {}
+  MockIntersectionBook() : intersection_(Intersection::Id("Mock"), CreatePhaseRing()) {}
 
  private:
   std::vector<api::Intersection*> DoGetIntersections() {
@@ -325,102 +259,71 @@ class MockIntersectionBook final : public IntersectionBook {
 }  // namespace
 
 rules::LaneSRoute CreateLaneSRoute() {
-  return rules::LaneSRoute({rules::LaneSRange(LaneId("a"), {0., 9.}),
-                            rules::LaneSRange(LaneId("b"), {17., 12.})});
+  return rules::LaneSRoute({rules::LaneSRange(LaneId("a"), {0., 9.}), rules::LaneSRange(LaneId("b"), {17., 12.})});
 }
 
-rules::LaneSRange CreateLaneSRange() {
-  return rules::LaneSRange(LaneId("a"), {0., 9.});
-}
+rules::LaneSRange CreateLaneSRange() { return rules::LaneSRange(LaneId("a"), {0., 9.}); }
 
 RightOfWayRule::State::YieldGroup YieldGroup2() {
-  return {RightOfWayRule::Id("other_rule_a"),
-          RightOfWayRule::Id("other_rule_b")};
+  return {RightOfWayRule::Id("other_rule_a"), RightOfWayRule::Id("other_rule_b")};
 }
 
 RightOfWayRule::State NoYieldState() {
-  return RightOfWayRule::State(RightOfWayRule::State::Id("s1"),
-                               RightOfWayRule::State::Type::kStop, {});
+  return RightOfWayRule::State(RightOfWayRule::State::Id("s1"), RightOfWayRule::State::Type::kStop, {});
 }
 
 RightOfWayRule::State YieldState() {
-  return RightOfWayRule::State(RightOfWayRule::State::Id("s2"),
-                               RightOfWayRule::State::Type::kGo, YieldGroup2());
+  return RightOfWayRule::State(RightOfWayRule::State::Id("s2"), RightOfWayRule::State::Type::kGo, YieldGroup2());
 }
 
 rules::RightOfWayRule::RelatedBulbGroups RelatedBulbGroups() {
   return rules::RightOfWayRule::RelatedBulbGroups{
-      {rules::TrafficLight::Id("TrafficLightId"),
-       {rules::BulbGroup::Id("BulbGroupId")}}};
+      {rules::TrafficLight::Id("TrafficLightId"), {rules::BulbGroup::Id("BulbGroupId")}}};
 }
 
 RightOfWayRule CreateRightOfWayRule() {
-
-  return RightOfWayRule(RightOfWayRule::Id("mock_id"), CreateLaneSRoute(),
-                        RightOfWayRule::ZoneType::kStopExcluded,
+  return RightOfWayRule(RightOfWayRule::Id("mock_id"), CreateLaneSRoute(), RightOfWayRule::ZoneType::kStopExcluded,
                         {NoYieldState(), YieldState()}, RelatedBulbGroups());
 }
 
 DirectionUsageRule::State CreateDirectionUsageRuleState() {
-  return DirectionUsageRule::State(
-      DirectionUsageRule::State::Id("dur_state"),
-      DirectionUsageRule::State::Type::kWithS,
-      DirectionUsageRule::State::Severity::kStrict);
+  return DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"), DirectionUsageRule::State::Type::kWithS,
+                                   DirectionUsageRule::State::Severity::kStrict);
 }
 
 DirectionUsageRule CreateDirectionUsageRule() {
-  return DirectionUsageRule(DirectionUsageRule::Id("dur_id"),
-                            CreateLaneSRange(),
-                            {CreateDirectionUsageRuleState()});
+  return DirectionUsageRule(DirectionUsageRule::Id("dur_id"), CreateLaneSRange(), {CreateDirectionUsageRuleState()});
 }
 
 DiscreteValueRule CreateDiscreteValueRule() {
-  return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"),
-                           CreateLaneSRoute(), {} /* related rules */,
+  return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
                            {"value1", "value2"});
 }
 
-RangeValueRule::Range CreateRange() {
-  return RangeValueRule::Range{"description", 123. /* min */, 456. /* max */};
-}
+RangeValueRule::Range CreateRange() { return RangeValueRule::Range{"description", 123. /* min */, 456. /* max */}; }
 
 RangeValueRule CreateRangeValueRule() {
-  return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("dvrt"),
-                        CreateLaneSRoute(), {} /* related rules */,
+  return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
                         {CreateRange()});
 }
 
-std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
-  return std::make_unique<MockRoadGeometry>();
-}
+std::unique_ptr<RoadGeometry> CreateRoadGeometry() { return std::make_unique<MockRoadGeometry>(); }
 
-std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry() {
-  return std::make_unique<MockOneLaneRoadGeometry>();
-}
+std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry() { return std::make_unique<MockOneLaneRoadGeometry>(); }
 
-std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook() {
-  return std::make_unique<MockRoadRulebook>();
-}
+std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook() { return std::make_unique<MockRoadRulebook>(); }
 
-std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() {
-  return std::make_unique<MockTrafficLightBook>();
-}
+std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() { return std::make_unique<MockTrafficLightBook>(); }
 
-std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook() {
-  return std::make_unique<MockPhaseRingBook>();
-}
+std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook() { return std::make_unique<MockPhaseRingBook>(); }
 
 std::unique_ptr<rules::RuleStateProvider> CreateRuleStateProvider() {
   return std::make_unique<MockRuleStateProvider>();
 }
 
-std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider() {
-  return std::make_unique<MockPhaseProvider>();
-}
+std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider() { return std::make_unique<MockPhaseProvider>(); }
 
-std::unique_ptr<IntersectionBook> CreateIntersectionBook() {
-  return std::make_unique<MockIntersectionBook>();
-}
+std::unique_ptr<IntersectionBook> CreateIntersectionBook() { return std::make_unique<MockIntersectionBook>(); }
 
 }  // namespace test
 }  // namespace api

@@ -38,10 +38,8 @@ constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 class Test2x2Intersection : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    static const char* const kFileName =
-        "/2x2_intersection.yaml";
-    const std::string env_path = maliput::common::Filesystem::get_env_path(
-      MULTILANE_RESOURCE_VAR);
+    static const char* const kFileName = "/2x2_intersection.yaml";
+    const std::string env_path = maliput::common::Filesystem::get_env_path(MULTILANE_RESOURCE_VAR);
     EXPECT_TRUE(!env_path.empty());
     dut_ = LoadFile(multilane::BuilderFactory(), env_path + kFileName);
   }
@@ -72,124 +70,108 @@ TEST_F(Test2x2Intersection, CheckLaneNamesAndPositions) {
       // East-bound lane.
       {LaneId("l:w_segment_0"),
        kApproachLength,
-       {GeoPosition(-kStartDistance, -kHalfLaneWidth, 0),
-        GeoPosition(-kMidDistance, -kHalfLaneWidth, 0),
+       {GeoPosition(-kStartDistance, -kHalfLaneWidth, 0), GeoPosition(-kMidDistance, -kHalfLaneWidth, 0),
         GeoPosition(-kEntryDistance, -kLaneWidth, 0)}},
       // West-bound lane.
       {LaneId("l:w_segment_1"),
        kApproachLength,
-       {GeoPosition(-kStartDistance, kHalfLaneWidth, 0),
-        GeoPosition(-kMidDistance, kHalfLaneWidth, 0),
+       {GeoPosition(-kStartDistance, kHalfLaneWidth, 0), GeoPosition(-kMidDistance, kHalfLaneWidth, 0),
         GeoPosition(-kEntryDistance, kHalfLaneWidth, 0)}},
 
       // Segment east of intersection.
       // East-bound lane.
       {LaneId("l:e_segment_0"),
        kApproachLength,
-       {GeoPosition(kEntryDistance, -kHalfLaneWidth, 0),
-        GeoPosition(kMidDistance, -kHalfLaneWidth, 0),
+       {GeoPosition(kEntryDistance, -kHalfLaneWidth, 0), GeoPosition(kMidDistance, -kHalfLaneWidth, 0),
         GeoPosition(kStartDistance, -kHalfLaneWidth, 0)}},
       // West-bound lane.
       {LaneId("l:e_segment_1"),
        kApproachLength,
-       {GeoPosition(kEntryDistance, kHalfLaneWidth, 0),
-        GeoPosition(kMidDistance, kHalfLaneWidth, 0),
+       {GeoPosition(kEntryDistance, kHalfLaneWidth, 0), GeoPosition(kMidDistance, kHalfLaneWidth, 0),
         GeoPosition(kStartDistance, kHalfLaneWidth, 0)}},
 
       // Segment north of intersection.
       // North-bound lane.
       {LaneId("l:n_segment_0"),
        kApproachLength,
-       {GeoPosition(kHalfLaneWidth, kEntryDistance, 0),
-        GeoPosition(kHalfLaneWidth, kMidDistance, 0),
+       {GeoPosition(kHalfLaneWidth, kEntryDistance, 0), GeoPosition(kHalfLaneWidth, kMidDistance, 0),
         GeoPosition(kHalfLaneWidth, kStartDistance, 0)}},
       // South-bound lane.
       {LaneId("l:n_segment_1"),
        kApproachLength,
-       {GeoPosition(-kHalfLaneWidth, kEntryDistance, 0),
-        GeoPosition(-kHalfLaneWidth, kMidDistance, 0),
+       {GeoPosition(-kHalfLaneWidth, kEntryDistance, 0), GeoPosition(-kHalfLaneWidth, kMidDistance, 0),
         GeoPosition(-kHalfLaneWidth, kStartDistance, 0)}},
 
       // Segment south of intersection.
       // North-bound lane.
       {LaneId("l:s_segment_0"),
        kApproachLength,
-       {GeoPosition(kHalfLaneWidth, -kEntryDistance, 0),
-        GeoPosition(kHalfLaneWidth, -kMidDistance, 0),
+       {GeoPosition(kHalfLaneWidth, -kEntryDistance, 0), GeoPosition(kHalfLaneWidth, -kMidDistance, 0),
         GeoPosition(kHalfLaneWidth, -kStartDistance, 0)}},
       // South-bound lane.
       {LaneId("l:s_segment_1"),
        kApproachLength,
-       {GeoPosition(-kHalfLaneWidth, -kEntryDistance, 0),
-        GeoPosition(-kHalfLaneWidth, -kMidDistance, 0),
+       {GeoPosition(-kHalfLaneWidth, -kEntryDistance, 0), GeoPosition(-kHalfLaneWidth, -kMidDistance, 0),
         GeoPosition(-kHalfLaneWidth, -kStartDistance, 0)}},
 
       // East/West segment inside the intersection.
       // East-bound lane.
       {LaneId("l:ew_intersection_segment_0"),
        kIntersectionWidth,
-       {GeoPosition(0, -kHalfLaneWidth, 0), GeoPosition(8, -kHalfLaneWidth, 0),
-        GeoPosition(-2.33, -2.33, 0), GeoPosition(2.33, -2.33, 0)}},
+       {GeoPosition(0, -kHalfLaneWidth, 0), GeoPosition(8, -kHalfLaneWidth, 0), GeoPosition(-2.33, -2.33, 0),
+        GeoPosition(2.33, -2.33, 0)}},
       // West-bound lane.
       {LaneId("l:ew_intersection_segment_1"),
        kIntersectionWidth,
-       {GeoPosition(0, kHalfLaneWidth, 0), GeoPosition(8, kHalfLaneWidth, 0),
-        GeoPosition(2.33, 2.33, 0), GeoPosition(-2.33, 2.33, 0)}},
+       {GeoPosition(0, kHalfLaneWidth, 0), GeoPosition(8, kHalfLaneWidth, 0), GeoPosition(2.33, 2.33, 0),
+        GeoPosition(-2.33, 2.33, 0)}},
 
       // North/South segment inside the intersection.
       // North-bound lane.
       {LaneId("l:ns_intersection_segment_0"),
        kIntersectionWidth,
-       {GeoPosition(kHalfLaneWidth, 0, 0), GeoPosition(kHalfLaneWidth, -8, 0),
-        GeoPosition(2.33, -2.33, 0), GeoPosition(2.33, 2.33, 0)}},
+       {GeoPosition(kHalfLaneWidth, 0, 0), GeoPosition(kHalfLaneWidth, -8, 0), GeoPosition(2.33, -2.33, 0),
+        GeoPosition(2.33, 2.33, 0)}},
       // South-bound lane.
       {LaneId("l:ns_intersection_segment_1"),
        kIntersectionWidth,
-       {GeoPosition(0, -kHalfLaneWidth, 0), GeoPosition(-kHalfLaneWidth, 8, 0),
-        GeoPosition(-2.33, -2.33, 0), GeoPosition(-2.33, 2.33, 0)}},
+       {GeoPosition(0, -kHalfLaneWidth, 0), GeoPosition(-kHalfLaneWidth, 8, 0), GeoPosition(-2.33, -2.33, 0),
+        GeoPosition(-2.33, 2.33, 0)}},
 
       // Right turn lanes.
       {LaneId("l:east_right_turn_segment_0"),
        M_PI_2 * 7.5,
-       {GeoPosition(-kEntryDistance, -kHalfLaneWidth, 0),
-        GeoPosition(-4.8, -4.8, 0),
+       {GeoPosition(-kEntryDistance, -kHalfLaneWidth, 0), GeoPosition(-4.8, -4.8, 0),
         GeoPosition(-kHalfLaneWidth, -kEntryDistance, 0)}},
       {LaneId("l:west_right_turn_segment_0"),
        M_PI_2 * 7.5,
-       {GeoPosition(kEntryDistance, kHalfLaneWidth, 0),
-        GeoPosition(4.8, 4.8, 0),
+       {GeoPosition(kEntryDistance, kHalfLaneWidth, 0), GeoPosition(4.8, 4.8, 0),
         GeoPosition(kHalfLaneWidth, kEntryDistance, 0)}},
       {LaneId("l:north_right_turn_segment_0"),
        M_PI_2 * 7.5,
-       {GeoPosition(kHalfLaneWidth, -kEntryDistance, 0),
-        GeoPosition(4.8, -4.8, 0),
+       {GeoPosition(kHalfLaneWidth, -kEntryDistance, 0), GeoPosition(4.8, -4.8, 0),
         GeoPosition(kEntryDistance, -kHalfLaneWidth, 0)}},
       {LaneId("l:south_right_turn_segment_0"),
        M_PI_2 * 7.5,
-       {GeoPosition(-kHalfLaneWidth, kEntryDistance, 0),
-        GeoPosition(-4.8, 4.8, 0),
+       {GeoPosition(-kHalfLaneWidth, kEntryDistance, 0), GeoPosition(-4.8, 4.8, 0),
         GeoPosition(-kEntryDistance, kHalfLaneWidth, 0)}},
 
       // Left turn lanes.
       {LaneId("l:east_left_turn_segment_0"),
        M_PI_2 * 11.25,
-       {GeoPosition(-kEntryDistance, -kHalfLaneWidth, 0),
-        GeoPosition(-1.66, 0.64, 0),
+       {GeoPosition(-kEntryDistance, -kHalfLaneWidth, 0), GeoPosition(-1.66, 0.64, 0),
         GeoPosition(kHalfLaneWidth, kEntryDistance, 0)}},
       {LaneId("l:west_left_turn_segment_0"),
        M_PI_2 * 11.25,
-       {GeoPosition(kEntryDistance, kHalfLaneWidth, 0),
-        GeoPosition(1.66, -0.64, 0),
+       {GeoPosition(kEntryDistance, kHalfLaneWidth, 0), GeoPosition(1.66, -0.64, 0),
         GeoPosition(-kHalfLaneWidth, -kEntryDistance, 0)}},
       {LaneId("l:north_left_turn_segment_0"),
        M_PI_2 * 11.25,
-       {GeoPosition(kHalfLaneWidth, -kEntryDistance, 0),
-        GeoPosition(0.64, -1.66, 0),
+       {GeoPosition(kHalfLaneWidth, -kEntryDistance, 0), GeoPosition(0.64, -1.66, 0),
         GeoPosition(-kEntryDistance, kHalfLaneWidth, 0)}},
       {LaneId("l:south_left_turn_segment_0"),
        M_PI_2 * 11.25,
-       {GeoPosition(-kHalfLaneWidth, kEntryDistance, 0),
-        GeoPosition(-0.64, 1.66, 0),
+       {GeoPosition(-kHalfLaneWidth, kEntryDistance, 0), GeoPosition(-0.64, 1.66, 0),
         GeoPosition(kEntryDistance, -kHalfLaneWidth, 0)}},
   };
   double distance{};
@@ -199,8 +181,7 @@ TEST_F(Test2x2Intersection, CheckLaneNamesAndPositions) {
     EXPECT_NE(lane, nullptr);
     EXPECT_NEAR(lane->length(), test_case.length, dut_->linear_tolerance());
     for (const auto& geo_position : test_case.geo_positions) {
-      const LanePosition lane_position =
-          lane->ToLanePosition(geo_position, &closest_point, &distance);
+      const LanePosition lane_position = lane->ToLanePosition(geo_position, &closest_point, &distance);
       EXPECT_NEAR(distance, 0, dut_->linear_tolerance());
       const RBounds lane_bounds = lane->lane_bounds(lane_position.s());
       EXPECT_TRUE(lane_bounds.min() <= lane_position.r());
@@ -242,18 +223,12 @@ TEST_F(Test2x2Intersection, CheckBranches) {
   // from or towards the intersection. They have three confluent branches:
   // forward, left turn, and right turn.
   const std::vector<LaneId> inside_intersection_test_cases{
-      {LaneId("l:ew_intersection_segment_0")},
-      {LaneId("l:ew_intersection_segment_1")},
-      {LaneId("l:ns_intersection_segment_0")},
-      {LaneId("l:ns_intersection_segment_1")},
-      {LaneId("l:east_right_turn_segment_0")},
-      {LaneId("l:west_right_turn_segment_0")},
-      {LaneId("l:north_right_turn_segment_0")},
-      {LaneId("l:south_right_turn_segment_0")},
-      {LaneId("l:east_left_turn_segment_0")},
-      {LaneId("l:west_left_turn_segment_0")},
-      {LaneId("l:north_left_turn_segment_0")},
-      {LaneId("l:south_left_turn_segment_0")},
+      {LaneId("l:ew_intersection_segment_0")},  {LaneId("l:ew_intersection_segment_1")},
+      {LaneId("l:ns_intersection_segment_0")},  {LaneId("l:ns_intersection_segment_1")},
+      {LaneId("l:east_right_turn_segment_0")},  {LaneId("l:west_right_turn_segment_0")},
+      {LaneId("l:north_right_turn_segment_0")}, {LaneId("l:south_right_turn_segment_0")},
+      {LaneId("l:east_left_turn_segment_0")},   {LaneId("l:west_left_turn_segment_0")},
+      {LaneId("l:north_left_turn_segment_0")},  {LaneId("l:south_left_turn_segment_0")},
   };
   for (const auto& test_case : inside_intersection_test_cases) {
     const Lane* lane = dut_->ById().GetLane(test_case);

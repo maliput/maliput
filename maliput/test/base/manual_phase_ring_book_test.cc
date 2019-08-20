@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
+#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace {
@@ -21,8 +21,7 @@ struct ManualPhaseRingBookTest : public ::testing::Test {
       : rule_id_a("rule a"),
         rule_id_b("rule b"),
         phase(Phase::Id("phase"),
-              {{rule_id_a, RightOfWayRule::State::Id("a")},
-               {rule_id_b, RightOfWayRule::State::Id("b")}}),
+              {{rule_id_a, RightOfWayRule::State::Id("a")}, {rule_id_b, RightOfWayRule::State::Id("b")}}),
         ring_id("ring"),
         ring(ring_id, {phase}) {}
 
@@ -64,9 +63,8 @@ TEST_F(ManualPhaseRingBookTest, RingWithSameId) {
   ManualPhaseRingBook dut;
   dut.AddPhaseRing(ring);
   const RightOfWayRule::Id rule_id_c("rule c");
-  const Phase different_phase(
-      Phase::Id("different phase with different rules"),
-      {{rule_id_c, RightOfWayRule::State::Id("c")}});
+  const Phase different_phase(Phase::Id("different phase with different rules"),
+                              {{rule_id_c, RightOfWayRule::State::Id("c")}});
   const PhaseRing ring_with_same_id(ring_id, {different_phase});
   EXPECT_THROW(dut.AddPhaseRing(ring_with_same_id), std::logic_error);
 }
@@ -77,11 +75,9 @@ TEST_F(ManualPhaseRingBookTest, RingWithSameId) {
 TEST_F(ManualPhaseRingBookTest, RingWithOverlappingRule) {
   ManualPhaseRingBook dut;
   dut.AddPhaseRing(ring);
-  const Phase phase_with_overlapping_rule(
-      Phase::Id("different phase with overlapping rules"),
-      {{rule_id_a, RightOfWayRule::State::Id("a")}});
-  const PhaseRing ring_with_overlapping_rule(PhaseRing::Id("unique phase ID"),
-                                             {phase_with_overlapping_rule});
+  const Phase phase_with_overlapping_rule(Phase::Id("different phase with overlapping rules"),
+                                          {{rule_id_a, RightOfWayRule::State::Id("a")}});
+  const PhaseRing ring_with_overlapping_rule(PhaseRing::Id("unique phase ID"), {phase_with_overlapping_rule});
   EXPECT_THROW(dut.AddPhaseRing(ring_with_overlapping_rule), std::logic_error);
 }
 

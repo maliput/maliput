@@ -7,10 +7,8 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/common/maliput_throw.h"
 
-
 namespace maliput {
 namespace geometry_base {
-
 
 /// geometry_base's implementation of api::LaneEndSet.
 class LaneEndSet : public api::LaneEndSet {
@@ -34,12 +32,10 @@ class LaneEndSet : public api::LaneEndSet {
  private:
   int do_size() const override { return ends_.size(); }
 
-  const api::LaneEnd&
-  do_get(int index) const override { return ends_.at(index); }
+  const api::LaneEnd& do_get(int index) const override { return ends_.at(index); }
 
   std::vector<api::LaneEnd> ends_;
 };
-
 
 }  // namespace geometry_base
 }  // namespace maliput

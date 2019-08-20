@@ -26,8 +26,7 @@ namespace maliput {
 namespace {
 
 // TODO(liang.fok) Eliminate duplicate regions within the returned vector.
-std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook,
-                                  const Phase& phase) {
+std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook, const Phase& phase) {
   std::vector<LaneSRange> result;
   for (const auto& rule_state : phase.rule_states()) {
     const RightOfWayRule::Id rule_id = rule_state.first;
@@ -39,9 +38,10 @@ std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook,
   return result;
 }
 
-std::unique_ptr<api::Intersection> BuildIntersection(
-    const YAML::Node& intersection_node, const RoadRulebook& road_rulebook,
-    const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
+std::unique_ptr<api::Intersection> BuildIntersection(const YAML::Node& intersection_node,
+                                                     const RoadRulebook& road_rulebook,
+                                                     const PhaseRingBook& phase_ring_book,
+                                                     ManualPhaseProvider* phase_provider) {
   MALIPUT_THROW_UNLESS(intersection_node.IsMap());
   MALIPUT_THROW_UNLESS(intersection_node["ID"].IsDefined());
   MALIPUT_THROW_UNLESS(intersection_node["PhaseRing"].IsDefined());
@@ -55,8 +55,7 @@ std::unique_ptr<api::Intersection> BuildIntersection(
   MALIPUT_THROW_UNLESS(ring->phases().find(phase_id) != ring->phases().end());
   drake::optional<api::rules::Phase::Id> next_phase_id = drake::nullopt;
   drake::optional<double> duration_until = drake::nullopt;
-  std::vector<PhaseRing::NextPhase> next_phases =
-      ring->next_phases().at(phase_id);
+  std::vector<PhaseRing::NextPhase> next_phases = ring->next_phases().at(phase_id);
   if (next_phases.size() > 0) {
     // This arbitrarily selects the first (index 0) next phase. In the future,
     // we may want to more intelligently choose this.
@@ -65,23 +64,20 @@ std::unique_ptr<api::Intersection> BuildIntersection(
     duration_until = n.duration_until;
   }
   if (!phase_provider->GetPhase(ring_id).has_value()) {
-    phase_provider->AddPhaseRing(ring_id, phase_id, next_phase_id,
-                                 duration_until);
+    phase_provider->AddPhaseRing(ring_id, phase_id, next_phase_id, duration_until);
   } else {
     phase_provider->SetPhase(ring_id, phase_id, next_phase_id, duration_until);
   }
   // The following arbitrarily uses the first phase within the PhaseRing. This
   // is acceptable since a PhaseRing guarantees that all Phases within it share
   // the same domain.
-  const std::vector<LaneSRange> region =
-      GetRegion(road_rulebook, ring->phases().begin()->second);
-  return std::make_unique<Intersection>(id, region, ring.value(),
-                                        phase_provider);
+  const std::vector<LaneSRange> region = GetRegion(road_rulebook, ring->phases().begin()->second);
+  return std::make_unique<Intersection>(id, region, ring.value(), phase_provider);
 }
 
-std::unique_ptr<api::IntersectionBook> BuildFrom(
-    const YAML::Node& root_node, const RoadRulebook& road_rulebook,
-    const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
+std::unique_ptr<api::IntersectionBook> BuildFrom(const YAML::Node& root_node, const RoadRulebook& road_rulebook,
+                                                 const PhaseRingBook& phase_ring_book,
+                                                 ManualPhaseProvider* phase_provider) {
   MALIPUT_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& intersections_node = root_node["Intersections"];
   auto result = std::make_unique<IntersectionBook>();
@@ -90,26 +86,24 @@ std::unique_ptr<api::IntersectionBook> BuildFrom(
   }
   MALIPUT_THROW_UNLESS(intersections_node.IsSequence());
   for (const YAML::Node& intersection_node : intersections_node) {
-    result->AddIntersection(BuildIntersection(intersection_node, road_rulebook,
-                                              phase_ring_book, phase_provider));
+    result->AddIntersection(BuildIntersection(intersection_node, road_rulebook, phase_ring_book, phase_provider));
   }
   return result;
 }
 
 }  // namespace
 
-std::unique_ptr<api::IntersectionBook> LoadIntersectionBook(
-    const std::string& input, const RoadRulebook& road_rulebook,
-    const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
-  return BuildFrom(YAML::Load(input), road_rulebook, phase_ring_book,
-                   phase_provider);
+std::unique_ptr<api::IntersectionBook> LoadIntersectionBook(const std::string& input, const RoadRulebook& road_rulebook,
+                                                            const PhaseRingBook& phase_ring_book,
+                                                            ManualPhaseProvider* phase_provider) {
+  return BuildFrom(YAML::Load(input), road_rulebook, phase_ring_book, phase_provider);
 }
 
-std::unique_ptr<api::IntersectionBook> LoadIntersectionBookFromFile(
-    const std::string& filename, const RoadRulebook& road_rulebook,
-    const PhaseRingBook& phase_ring_book, ManualPhaseProvider* phase_provider) {
-  return BuildFrom(YAML::LoadFile(filename), road_rulebook, phase_ring_book,
-                   phase_provider);
+std::unique_ptr<api::IntersectionBook> LoadIntersectionBookFromFile(const std::string& filename,
+                                                                    const RoadRulebook& road_rulebook,
+                                                                    const PhaseRingBook& phase_ring_book,
+                                                                    ManualPhaseProvider* phase_provider) {
+  return BuildFrom(YAML::LoadFile(filename), road_rulebook, phase_ring_book, phase_provider);
 }
 
 }  // namespace maliput

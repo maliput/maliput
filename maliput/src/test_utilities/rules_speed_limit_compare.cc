@@ -2,29 +2,24 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/test_utilities/rules_test_utilities.h"
 #include "drake/common/unused.h"
+#include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace test {
 
-
 /// Predicate-formatter which tests equality of SpeedLimitRule::Severity.
 // TODO(maddog@tri.global)  This should be replaced by a generic predicate
 //                          which handles anything with operator==.
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   rules::SpeedLimitRule::Severity a,
-                                   rules::SpeedLimitRule::Severity b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   rules::SpeedLimitRule::Severity a, rules::SpeedLimitRule::Severity b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 /// Predicate-formatter which tests equality of SpeedLimitRule.
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const rules::SpeedLimitRule& a,
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::SpeedLimitRule& a,
                                    const rules::SpeedLimitRule& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
@@ -35,10 +30,6 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.min(), b.min()));
   return c.result();
 }
-
-
-
-
 
 }  // namespace test
 }  // namespace rules

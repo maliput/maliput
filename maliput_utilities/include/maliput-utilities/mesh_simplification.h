@@ -11,8 +11,8 @@
 
 #include <Eigen/Geometry>
 
-#include "maliput-utilities/mesh.h"
 #include "drake/common/hash.h"
+#include "maliput-utilities/mesh.h"
 
 namespace maliput {
 namespace utility {
@@ -21,38 +21,27 @@ namespace mesh {
 /// Index for a directed edge in a GeoMesh.
 struct DirectedEdgeIndex {
   /// Returns this edge but reversed.
-  DirectedEdgeIndex reverse() const {
-    return {end_vertex_index, start_vertex_index};
-  }
+  DirectedEdgeIndex reverse() const { return {end_vertex_index, start_vertex_index}; }
 
   int start_vertex_index{-1};  ///< Index of start vertex, or -1
                                ///  to mark index as invalid.
-  int end_vertex_index{-1};  ///< Index of end vertex, or -1 to
-                             ///  mark index as invalid.
+  int end_vertex_index{-1};    ///< Index of end vertex, or -1 to
+                               ///  mark index as invalid.
 };
 
-
-inline bool operator==(const DirectedEdgeIndex& lhs,
-                       const DirectedEdgeIndex& rhs) {
-  return (lhs.start_vertex_index == rhs.start_vertex_index
-          && lhs.end_vertex_index == rhs.end_vertex_index);
+inline bool operator==(const DirectedEdgeIndex& lhs, const DirectedEdgeIndex& rhs) {
+  return (lhs.start_vertex_index == rhs.start_vertex_index && lhs.end_vertex_index == rhs.end_vertex_index);
 }
 
-inline bool operator!=(const DirectedEdgeIndex& lhs,
-                       const DirectedEdgeIndex& rhs) {
-  return !(lhs == rhs);
-}
-
+inline bool operator!=(const DirectedEdgeIndex& lhs, const DirectedEdgeIndex& rhs) { return !(lhs == rhs); }
 
 /// Implements the @ref hash_append concept.
 template <class HashAlgorithm>
-void hash_append(
-    HashAlgorithm& hasher, const DirectedEdgeIndex& item) noexcept {
+void hash_append(HashAlgorithm& hasher, const DirectedEdgeIndex& item) noexcept {
   using drake::hash_append;
   hash_append(hasher, item.start_vertex_index);
   hash_append(hasher, item.end_vertex_index);
 }
-
 
 /// Index for a face edge in a GeoMesh.
 struct FaceEdgeIndex {
@@ -65,24 +54,16 @@ struct FaceEdgeIndex {
                        ///  index as invalid.
 };
 
-
 inline bool operator==(const FaceEdgeIndex& lhs, const FaceEdgeIndex& rhs) {
-  return (lhs.face_index == rhs.face_index &&
-          lhs.edge_index == rhs.edge_index);
+  return (lhs.face_index == rhs.face_index && lhs.edge_index == rhs.edge_index);
 }
 
-
-inline bool operator!=(const FaceEdgeIndex& lhs, const FaceEdgeIndex& rhs) {
-  return !(lhs == rhs);
-}
-
+inline bool operator!=(const FaceEdgeIndex& lhs, const FaceEdgeIndex& rhs) { return !(lhs == rhs); }
 
 /// The inverse of the mapping from face edges indices to their
 /// associated directed edge indices.
 /// @see ComputeInverseFaceEdgeMap
-using InverseFaceEdgeMap =
-    std::unordered_map<DirectedEdgeIndex, FaceEdgeIndex, drake::DefaultHash>;
-
+using InverseFaceEdgeMap = std::unordered_map<DirectedEdgeIndex, FaceEdgeIndex, drake::DefaultHash>;
 
 /// Computes the inverse of the mapping from face edges indices to their
 /// associated directed edge indices for the given @p faces collection.
@@ -92,15 +73,12 @@ using InverseFaceEdgeMap =
 ///      adjacent have the common edge in opposite directions.
 /// @warning If any of the preconditions is not met, this function will
 ///          abort execution.
-InverseFaceEdgeMap
-ComputeInverseFaceEdgeMap(const std::vector<IndexFace>& faces);
-
+InverseFaceEdgeMap ComputeInverseFaceEdgeMap(const std::vector<IndexFace>& faces);
 
 /// A mapping from each IndexFace index in a given GeoMesh to each of its
 /// adjacent faces, along with the index of the edge these share.
 /// @see FaceEdgeIndex
 using FaceAdjacencyMap = std::unordered_map<int, std::vector<FaceEdgeIndex>>;
-
 
 /// Computes a mapping from each IndexFace index in @p faces to each of its
 /// adjacent faces, along with the index of the edge these share.
@@ -114,26 +92,20 @@ using FaceAdjacencyMap = std::unordered_map<int, std::vector<FaceEdgeIndex>>;
 ///          abort execution.
 FaceAdjacencyMap ComputeFaceAdjacencyMap(const std::vector<IndexFace>& faces);
 
-
 template <typename T>
 using Hyperplane3 = Eigen::Hyperplane<T, 3>;
-
 
 /// Gets global position of the @p vertex in the given @p mesh.
 /// @pre Given @p vertex belongs to the @p mesh.
 /// @warning If any of the preconditions is not met, this function will
 ///          abort execution.
-const drake::Vector3<double>& GetMeshFaceVertexPosition(
-    const GeoMesh& mesh, const IndexFace::Vertex& vertex);
-
+const drake::Vector3<double>& GetMeshFaceVertexPosition(const GeoMesh& mesh, const IndexFace::Vertex& vertex);
 
 /// Gets normal vector of the @p vertex in the given @p mesh.
 /// @pre Given @p vertex belongs to the @p mesh.
 /// @warning If any of the preconditions is not met, this function will
 ///          abort execution.
-const drake::Vector3<double>& GetMeshFaceVertexNormal(
-    const GeoMesh& mesh, const IndexFace::Vertex& vertex);
-
+const drake::Vector3<double>& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFace::Vertex& vertex);
 
 /// Checks if all the IndexFace::Vertex instances, from @p first to
 /// @p last, in the given @p mesh lie on the provided @p plane by
@@ -144,18 +116,15 @@ const drake::Vector3<double>& GetMeshFaceVertexNormal(
 ///          will abort execution.
 /// @tparam InputIt An IndexFace::Vertex container iterator type.
 template <typename InputIt>
-bool DoMeshVerticesLieOnPlane(
-    const GeoMesh& mesh, InputIt first, InputIt last,
-    const Hyperplane3<double>& plane, double tolerance) {
-  return std::all_of(
-      first, last, [&mesh, &plane, tolerance](const IndexFace::Vertex& vertex) {
-        const drake::Vector3<double>& x = GetMeshFaceVertexPosition(mesh, vertex);
-        const drake::Vector3<double>& n = GetMeshFaceVertexNormal(mesh, vertex);
-        const double ctheta = std::abs(plane.normal().dot(n.normalized()));
-        return (ctheta != 0. && plane.absDistance(x) / ctheta < tolerance);
-      });
+bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const Hyperplane3<double>& plane,
+                              double tolerance) {
+  return std::all_of(first, last, [&mesh, &plane, tolerance](const IndexFace::Vertex& vertex) {
+    const drake::Vector3<double>& x = GetMeshFaceVertexPosition(mesh, vertex);
+    const drake::Vector3<double>& n = GetMeshFaceVertexNormal(mesh, vertex);
+    const double ctheta = std::abs(plane.normal().dot(n.normalized()));
+    return (ctheta != 0. && plane.absDistance(x) / ctheta < tolerance);
+  });
 }
-
 
 /// Checks if the @p face in the given @p mesh is coplanar with the
 /// given @p plane, by verifying if all @p face vertices are within
@@ -163,11 +132,8 @@ bool DoMeshVerticesLieOnPlane(
 /// @pre Given @p face belongs to the @p mesh.
 /// @warning If any of the preconditions is not met, this function
 ///          will abort execution.
-bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh,
-                                 const IndexFace& face,
-                                 const Hyperplane3<double>& plane,
+bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face, const Hyperplane3<double>& plane,
                                  double tolerance);
-
 
 /// Checks if the @p face in the given @p mesh is planar, by verifying
 /// all @p face vertices lie on a plane using the given @p tolerance
@@ -179,9 +145,7 @@ bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh,
 /// @pre Given @p face has at least three (3) vertices.
 /// @warning If any of the preconditions is not met, this function
 ///          will abort execution.
-bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face,
-                      double tolerance, Hyperplane3<double>* plane);
-
+bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face, double tolerance, Hyperplane3<double>* plane);
 
 /// Aggregates all coplanar faces adjacent to the referred face in the @p mesh.
 /// @param mesh Mesh where faces are to be found.
@@ -201,11 +165,9 @@ bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face,
 /// @post All adjacent coplanar faces found are marked as visited.
 /// @warning If any of the preconditions is not met, this function
 ///          will abort execution.
-std::set<int> AggregateAdjacentCoplanarMeshFaces(
-    const GeoMesh& mesh, int start_face_index,
-    const FaceAdjacencyMap& adjacent_faces_map,
-    double tolerance, std::set<int>* visited_faces_indices);
-
+std::set<int> AggregateAdjacentCoplanarMeshFaces(const GeoMesh& mesh, int start_face_index,
+                                                 const FaceAdjacencyMap& adjacent_faces_map, double tolerance,
+                                                 std::set<int>* visited_faces_indices);
 
 /// Finds the index to the first outer face edge in the given
 /// @p simply_connected_faces_indices.
@@ -218,19 +180,16 @@ std::set<int> AggregateAdjacentCoplanarMeshFaces(
 /// @pre The union of the all the faces referred by the given
 ///      @p simply_connected_faces_indices yields a simply
 ///      connected region (i.e. with no holes).
-FaceEdgeIndex
-FindOuterFaceEdgeIndex(const std::set<int>& simply_connected_faces_indices,
-                       const FaceAdjacencyMap& adjacent_faces_map);
-
+FaceEdgeIndex FindOuterFaceEdgeIndex(const std::set<int>& simply_connected_faces_indices,
+                                     const FaceAdjacencyMap& adjacent_faces_map);
 
 /// Index of a face vertex in a GeoMesh.
 struct FaceVertexIndex {
-  int face_index{-1};  ///< Index of the face the vertex belongs to, or
-                       ///  -1 to mark index as invalid.
+  int face_index{-1};    ///< Index of the face the vertex belongs to, or
+                         ///  -1 to mark index as invalid.
   int vertex_index{-1};  ///< Index of the face vertex, or -1 to mark index
                          /// as invalid.
 };
-
 
 /// Computes the contour of the simply connected region that all the faces
 /// referred by the given @p simply_connected_faces_indices yield.
@@ -242,10 +201,8 @@ struct FaceVertexIndex {
 /// @pre The union of the all the faces referred by the given
 ///      @p simply_connected_faces_indices yield a simply
 ///      connected region (i.e. with no holes).
-std::vector<FaceVertexIndex> ComputeMeshFacesContour(
-    const std::set<int>& simply_connected_faces_indices,
-    const FaceAdjacencyMap& adjacent_faces_map);
-
+std::vector<FaceVertexIndex> ComputeMeshFacesContour(const std::set<int>& simply_connected_faces_indices,
+                                                     const FaceAdjacencyMap& adjacent_faces_map);
 
 /// Gets the face vertex in the @p mesh referred by the given
 /// @p face_vertex_index.
@@ -253,9 +210,7 @@ std::vector<FaceVertexIndex> ComputeMeshFacesContour(
 ///      in the @p mesh.
 /// @warning If any of the preconditions is not met, this function
 ///          will abort execution.
-const IndexFace::Vertex& MeshFaceVertexAt(
-    const GeoMesh& mesh, const FaceVertexIndex& face_vertex_index);
-
+const IndexFace::Vertex& MeshFaceVertexAt(const GeoMesh& mesh, const FaceVertexIndex& face_vertex_index);
 
 /// Applies the Douglas-Peucker simplification algorithm [1] over the
 /// given collection of vertices.
@@ -278,10 +233,8 @@ const IndexFace::Vertex& MeshFaceVertexAt(
 /// @tparam VertexFn Vertex getter function type.
 /// @tparam EdgeFn Edge building function type.
 /// @tparam OutputIt  Output iterator type.
-template <typename InputIt, typename VertexFn,
-          typename EdgeFn, typename OutputIt>
-void ApplyDouglasPeuckerSimplification(InputIt first, InputIt last,
-                                       VertexFn to_vertex, EdgeFn to_edge,
+template <typename InputIt, typename VertexFn, typename EdgeFn, typename OutputIt>
+void ApplyDouglasPeuckerSimplification(InputIt first, InputIt last, VertexFn to_vertex, EdgeFn to_edge,
                                        double tolerance, OutputIt output) {
   if (first == last) {
     *output++ = *last;
@@ -289,32 +242,26 @@ void ApplyDouglasPeuckerSimplification(InputIt first, InputIt last,
   }
 
   const auto edge = to_edge(to_vertex(*first), to_vertex(*last));
-  auto farthest = std::max_element(
-      first, last, [&edge, &to_vertex](const auto& lhs, const auto& rhs) {
-        return (edge.distance(to_vertex(lhs)) < edge.distance(to_vertex(rhs)));
-      });
+  auto farthest = std::max_element(first, last, [&edge, &to_vertex](const auto& lhs, const auto& rhs) {
+    return (edge.distance(to_vertex(lhs)) < edge.distance(to_vertex(rhs)));
+  });
   if (edge.distance(to_vertex(*farthest)) > tolerance) {
-    ApplyDouglasPeuckerSimplification(first, farthest, to_vertex,
-                                      to_edge, tolerance, output);
-    ApplyDouglasPeuckerSimplification(farthest + 1, last, to_vertex,
-                                      to_edge, tolerance, output);
+    ApplyDouglasPeuckerSimplification(first, farthest, to_vertex, to_edge, tolerance, output);
+    ApplyDouglasPeuckerSimplification(farthest + 1, last, to_vertex, to_edge, tolerance, output);
   } else {
     *output++ = *first;
     *output++ = *last;
   }
 }
 
-
 /// Simplifies the @p mesh faces' contour referred by the given
 /// @p contour_indices by elimination of redundant vertices, i.e.
 /// vertices that lie within one @p tolerance distance, in meters,
 /// from the line that the their following and preceding vertices
 /// subtend.
-std::vector<FaceVertexIndex> SimplifyMeshFacesContour(
-    const GeoMesh& mesh,
-    const std::vector<FaceVertexIndex>& contour_indices,
-    double tolerance);
-
+std::vector<FaceVertexIndex> SimplifyMeshFacesContour(const GeoMesh& mesh,
+                                                      const std::vector<FaceVertexIndex>& contour_indices,
+                                                      double tolerance);
 
 /// Merges all the faces in the given @p mesh referred by
 /// @p mergeable_faces_indices into a single GeoFace.
@@ -330,11 +277,8 @@ std::vector<FaceVertexIndex> SimplifyMeshFacesContour(
 /// @pre The union of the all the faces referred by the given
 ///      @p mergeable_faces_indices yields a simply connected
 ///      region (i.e. with no holes).
-GeoFace MergeMeshFaces(const GeoMesh& mesh,
-                       const std::set<int>& mergeable_faces_indices,
-                       const FaceAdjacencyMap& adjacent_faces_map,
-                       double tolerance);
-
+GeoFace MergeMeshFaces(const GeoMesh& mesh, const std::set<int>& mergeable_faces_indices,
+                       const FaceAdjacencyMap& adjacent_faces_map, double tolerance);
 
 /// Simplifies a mesh by merging adjacent coplanar faces.
 /// @param input_mesh Mesh to be simplified.
@@ -345,7 +289,6 @@ GeoFace MergeMeshFaces(const GeoMesh& mesh,
 /// @pre The union of the all the faces in the given @p input_mesh
 ///      yields a simply connected region (i.e. with no holes).
 GeoMesh SimplifyMeshFaces(const GeoMesh& input_mesh, double tolerance);
-
 
 }  // namespace mesh
 }  // namespace utility

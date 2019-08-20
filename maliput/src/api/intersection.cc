@@ -8,10 +8,8 @@ using rules::LaneSRange;
 using rules::PhaseProvider;
 using rules::PhaseRing;
 
-Intersection::Intersection(const Id& id, const std::vector<LaneSRange>& region,
-                           const PhaseRing& ring)
-    : id_(id), region_(region), ring_(ring) {
-}
+Intersection::Intersection(const Id& id, const std::vector<LaneSRange>& region, const PhaseRing& ring)
+    : id_(id), region_(region), ring_(ring) {}
 
 const drake::optional<BulbStates> Intersection::bulb_states() const {
   drake::optional<PhaseProvider::Result> phase_result = Phase();

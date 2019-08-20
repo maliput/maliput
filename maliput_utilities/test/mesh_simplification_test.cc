@@ -21,7 +21,6 @@ GTEST_TEST(DirectedEdgeIndexTest, Equality) {
   EXPECT_NE(edge, reversed_edge);
 }
 
-
 // Tests equality and inequality operator overloads
 // for FaceEdgeIndex instances.
 GTEST_TEST(FaceEdgeIndexTest, Equality) {
@@ -191,7 +190,6 @@ class GeoMeshSimplificationTest : public ::testing::Test {
   GeoMesh simplified_mesh_;
 };
 
-
 TEST_F(GeoMeshSimplificationTest, InverseFaceEdgeMapComputation) {
   InverseFaceEdgeMap map = ComputeInverseFaceEdgeMap(faces());
 
@@ -266,7 +264,6 @@ TEST_F(GeoMeshSimplificationTest, InverseFaceEdgeMapComputation) {
   EXPECT_TRUE(map.empty());
 }
 
-
 TEST_F(GeoMeshSimplificationTest, FaceAdjacencyMapComputation) {
   const FaceAdjacencyMap map = ComputeFaceAdjacencyMap(faces());
 
@@ -307,91 +304,63 @@ TEST_F(GeoMeshSimplificationTest, FaceAdjacencyMapComputation) {
   }
 }
 
-
 TEST_F(GeoMeshSimplificationTest, FaceVertexPosition) {
   const IndexFace& first_quad = faces()[kFirstQuadIndex];
-  EXPECT_EQ(GetMeshFaceVertexPosition(
-      mesh(), first_quad.vertices()[0]), kVertexAPosition);
+  EXPECT_EQ(GetMeshFaceVertexPosition(mesh(), first_quad.vertices()[0]), kVertexAPosition);
   const IndexFace& second_quad = faces()[kSecondQuadIndex];
-  EXPECT_EQ(GetMeshFaceVertexPosition(
-      mesh(), second_quad.vertices()[0]), kVertexCPosition);
+  EXPECT_EQ(GetMeshFaceVertexPosition(mesh(), second_quad.vertices()[0]), kVertexCPosition);
   const IndexFace& triangle = faces()[kTriangleIndex];
-  EXPECT_EQ(GetMeshFaceVertexPosition(
-      mesh(), triangle.vertices()[0]), kVertexFPosition);
+  EXPECT_EQ(GetMeshFaceVertexPosition(mesh(), triangle.vertices()[0]), kVertexFPosition);
 }
-
 
 TEST_F(GeoMeshSimplificationTest, FaceVertexNormal) {
   const IndexFace& first_quad = faces()[kFirstQuadIndex];
-  EXPECT_EQ(GetMeshFaceVertexNormal(
-      mesh(), first_quad.vertices()[0]), kNormalVector);
+  EXPECT_EQ(GetMeshFaceVertexNormal(mesh(), first_quad.vertices()[0]), kNormalVector);
   const IndexFace& second_quad = faces()[kSecondQuadIndex];
-  EXPECT_EQ(GetMeshFaceVertexNormal(
-      mesh(), second_quad.vertices()[0]), kNormalVector);
+  EXPECT_EQ(GetMeshFaceVertexNormal(mesh(), second_quad.vertices()[0]), kNormalVector);
   const IndexFace& triangle = faces()[kTriangleIndex];
-  EXPECT_EQ(GetMeshFaceVertexNormal(
-      mesh(), triangle.vertices()[0]), kNormalVector);
+  EXPECT_EQ(GetMeshFaceVertexNormal(mesh(), triangle.vertices()[0]), kNormalVector);
 }
-
 
 TEST_F(GeoMeshSimplificationTest, VerticesOnPlane) {
   const Hyperplane3<double> planeA(kNormalVector, kVertexAPosition);
 
-  const std::vector<IndexFace::Vertex>&
-      first_quad_vertices = faces()[kFirstQuadIndex].vertices();
-  EXPECT_TRUE(DoMeshVerticesLieOnPlane(mesh(), first_quad_vertices.begin(),
-                                       first_quad_vertices.end(), planeA,
-                                       kAlmostExact));
+  const std::vector<IndexFace::Vertex>& first_quad_vertices = faces()[kFirstQuadIndex].vertices();
+  EXPECT_TRUE(
+      DoMeshVerticesLieOnPlane(mesh(), first_quad_vertices.begin(), first_quad_vertices.end(), planeA, kAlmostExact));
 
-  const std::vector<IndexFace::Vertex>&
-      second_quad_vertices = faces()[kSecondQuadIndex].vertices();
-  EXPECT_TRUE(DoMeshVerticesLieOnPlane(mesh(), second_quad_vertices.begin(),
-                                       second_quad_vertices.end(), planeA,
-                                       kAlmostExact));
+  const std::vector<IndexFace::Vertex>& second_quad_vertices = faces()[kSecondQuadIndex].vertices();
+  EXPECT_TRUE(
+      DoMeshVerticesLieOnPlane(mesh(), second_quad_vertices.begin(), second_quad_vertices.end(), planeA, kAlmostExact));
 
-  const std::vector<IndexFace::Vertex>&
-      triangle_vertices = faces()[kTriangleIndex].vertices();
-  EXPECT_FALSE(DoMeshVerticesLieOnPlane(mesh(), triangle_vertices.begin(),
-                                        triangle_vertices.end(), planeA,
-                                        kAlmostExact));
+  const std::vector<IndexFace::Vertex>& triangle_vertices = faces()[kTriangleIndex].vertices();
+  EXPECT_FALSE(
+      DoMeshVerticesLieOnPlane(mesh(), triangle_vertices.begin(), triangle_vertices.end(), planeA, kAlmostExact));
 }
-
 
 TEST_F(GeoMeshSimplificationTest, CoplanarFaces) {
   const Hyperplane3<double> planeA(kNormalVector, kVertexAPosition);
-  EXPECT_TRUE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kFirstQuadIndex],
-                                          planeA, kAlmostExact));
-  EXPECT_TRUE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kSecondQuadIndex],
-                                          planeA, kAlmostExact));
-  EXPECT_FALSE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kTriangleIndex],
-                                           planeA, kAlmostExact));
-  EXPECT_FALSE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kThirdQuadIndex],
-                                           planeA, kAlmostExact));
+  EXPECT_TRUE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kFirstQuadIndex], planeA, kAlmostExact));
+  EXPECT_TRUE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kSecondQuadIndex], planeA, kAlmostExact));
+  EXPECT_FALSE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kTriangleIndex], planeA, kAlmostExact));
+  EXPECT_FALSE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kThirdQuadIndex], planeA, kAlmostExact));
 }
-
 
 TEST_F(GeoMeshSimplificationTest, PlanarFaces) {
   Hyperplane3<double> plane;
-  EXPECT_TRUE(IsMeshFacePlanar(
-      mesh(), faces()[kFirstQuadIndex], kAlmostExact, &plane));
+  EXPECT_TRUE(IsMeshFacePlanar(mesh(), faces()[kFirstQuadIndex], kAlmostExact, &plane));
   EXPECT_NEAR(plane.absDistance(kVertexCPosition), 0., kAlmostExact);
-  EXPECT_FALSE(IsMeshFacePlanar(
-      mesh(), faces()[kThirdQuadIndex], kAlmostExact, &plane));
+  EXPECT_FALSE(IsMeshFacePlanar(mesh(), faces()[kThirdQuadIndex], kAlmostExact, &plane));
   // Triangle face would be planar BUT its specified normal does not
   // match that of the plane its vertices define.
-  EXPECT_FALSE(IsMeshFacePlanar(
-      mesh(), faces()[kTriangleIndex], kAlmostExact, &plane));
+  EXPECT_FALSE(IsMeshFacePlanar(mesh(), faces()[kTriangleIndex], kAlmostExact, &plane));
 }
 
-
 TEST_F(GeoMeshSimplificationTest, FaceMerging) {
-  const FaceAdjacencyMap adjacency_map =
-      ComputeFaceAdjacencyMap(faces());
+  const FaceAdjacencyMap adjacency_map = ComputeFaceAdjacencyMap(faces());
   std::set<int> visited_faces;
   const std::set<int> merged_faces =
-      AggregateAdjacentCoplanarMeshFaces(mesh(), kFirstQuadIndex,
-                                         adjacency_map, kAlmostExact,
-                                         &visited_faces);
+      AggregateAdjacentCoplanarMeshFaces(mesh(), kFirstQuadIndex, adjacency_map, kAlmostExact, &visited_faces);
   EXPECT_EQ(merged_faces.count(kFirstQuadIndex), 1);
   EXPECT_EQ(merged_faces.count(kSecondQuadIndex), 1);
   EXPECT_EQ(merged_faces.count(kThirdQuadIndex), 0);
@@ -400,12 +369,10 @@ TEST_F(GeoMeshSimplificationTest, FaceMerging) {
   // In what follows, the test relies heavily on the fact that
   // std::set keys are integers and that this container uses
   // std::less as ordering criterion by default.
-  const FaceEdgeIndex outer_edge =
-      FindOuterFaceEdgeIndex(merged_faces, adjacency_map);
+  const FaceEdgeIndex outer_edge = FindOuterFaceEdgeIndex(merged_faces, adjacency_map);
   EXPECT_EQ(outer_edge, kFirstQuadAEdge);
 
-  const std::vector<FaceVertexIndex> merged_face_contour =
-      ComputeMeshFacesContour(merged_faces, adjacency_map);
+  const std::vector<FaceVertexIndex> merged_face_contour = ComputeMeshFacesContour(merged_faces, adjacency_map);
   ASSERT_EQ(merged_face_contour.size(), 6);
   EXPECT_EQ(merged_face_contour[0].face_index, kFirstQuadIndex);
   EXPECT_EQ(merged_face_contour[0].vertex_index, 0);
@@ -432,8 +399,7 @@ TEST_F(GeoMeshSimplificationTest, FaceMerging) {
   EXPECT_EQ(simplified_contour[3].face_index, kFirstQuadIndex);
   EXPECT_EQ(simplified_contour[3].vertex_index, 3);
 
-  const GeoFace merged_face = MergeMeshFaces(
-      mesh(), merged_faces, adjacency_map, kAlmostExact);
+  const GeoFace merged_face = MergeMeshFaces(mesh(), merged_faces, adjacency_map, kAlmostExact);
   EXPECT_EQ(merged_face.vertices()[0].v().xyz(), kVertexAPosition);
   EXPECT_EQ(merged_face.normals()[0].n().xyz(), kNormalVector);
   EXPECT_EQ(merged_face.vertices()[1].v().xyz(), kVertexEPosition);
@@ -444,7 +410,6 @@ TEST_F(GeoMeshSimplificationTest, FaceMerging) {
   EXPECT_EQ(merged_face.normals()[3].n().xyz(), kNormalVector);
 }
 
-
 TEST_F(GeoMeshSimplificationTest, MeshSimplification) {
   const std::string kDummyMaterial{"stone"};
   const int kPrecision{3};
@@ -452,13 +417,12 @@ TEST_F(GeoMeshSimplificationTest, MeshSimplification) {
   const int kZeroVertexIndexOffset{2};
   const int kZeroNormalIndexOffset{0};
   std::stringstream simplified_mesh_obj;
-  SimplifyMeshFaces(mesh(), kAlmostExact).EmitObj(
-      simplified_mesh_obj, kDummyMaterial, kPrecision, kOrigin,
-      kZeroVertexIndexOffset, kZeroNormalIndexOffset);
+  SimplifyMeshFaces(mesh(), kAlmostExact)
+      .EmitObj(simplified_mesh_obj, kDummyMaterial, kPrecision, kOrigin, kZeroVertexIndexOffset,
+               kZeroNormalIndexOffset);
   std::stringstream reference_mesh_obj;
-  simplified_mesh().EmitObj(
-      reference_mesh_obj, kDummyMaterial, kPrecision, kOrigin,
-      kZeroVertexIndexOffset, kZeroNormalIndexOffset);
+  simplified_mesh().EmitObj(reference_mesh_obj, kDummyMaterial, kPrecision, kOrigin, kZeroVertexIndexOffset,
+                            kZeroNormalIndexOffset);
   EXPECT_EQ(simplified_mesh_obj.str(), reference_mesh_obj.str());
 }
 

@@ -23,12 +23,10 @@ void VerifyAllPhasesHaveSameCoverage(const std::vector<Phase>& phases) {
       MALIPUT_THROW_UNLESS(r.rule_states().count(s.first) == 1);
     }
     // Require both set of bulb states to be defined or undefined together.
-    MALIPUT_THROW_UNLESS(
-        (r.bulb_states() == drake::nullopt && phase.bulb_states() == drake::nullopt) ||
-        (r.bulb_states() != drake::nullopt && phase.bulb_states() != drake::nullopt));
+    MALIPUT_THROW_UNLESS((r.bulb_states() == drake::nullopt && phase.bulb_states() == drake::nullopt) ||
+                         (r.bulb_states() != drake::nullopt && phase.bulb_states() != drake::nullopt));
     if (r.bulb_states() != drake::nullopt) {
-      MALIPUT_THROW_UNLESS(phase.bulb_states()->size() ==
-                         r.bulb_states()->size());
+      MALIPUT_THROW_UNLESS(phase.bulb_states()->size() == r.bulb_states()->size());
       for (const auto& s : *phase.bulb_states()) {
         MALIPUT_THROW_UNLESS(r.bulb_states()->count(s.first) == 1);
       }
@@ -38,10 +36,8 @@ void VerifyAllPhasesHaveSameCoverage(const std::vector<Phase>& phases) {
 
 /// Tests that `next_phases` defines the possible next phases of every
 /// phase in `phases` and nothing more.
-void VerifyNextPhases(
-    const std::vector<Phase>& phases,
-    const std::unordered_map<Phase::Id,
-                             std::vector<PhaseRing::NextPhase>>& next_phases) {
+void VerifyNextPhases(const std::vector<Phase>& phases,
+                      const std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>>& next_phases) {
   MALIPUT_THROW_UNLESS(phases.size() == next_phases.size());
   for (const auto& phase : phases) {
     MALIPUT_THROW_UNLESS(next_phases.find(phase.id()) != next_phases.end());
@@ -51,9 +47,7 @@ void VerifyNextPhases(
 }  // namespace
 
 PhaseRing::PhaseRing(const Id& id, const std::vector<Phase>& phases,
-                     const drake::optional<const std::unordered_map<Phase::Id,
-                                                       std::vector<NextPhase>>>&
-                         next_phases)
+                     const drake::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases)
     : id_(id) {
   MALIPUT_THROW_UNLESS(phases.size() >= 1);
   for (const Phase& phase : phases) {
@@ -66,8 +60,7 @@ PhaseRing::PhaseRing(const Id& id, const std::vector<Phase>& phases,
     VerifyNextPhases(phases, next_phases_);
   } else {
     for (const auto& phase : phases) {
-      next_phases_.emplace(
-          std::make_pair(phase.id(), std::vector<NextPhase>()));
+      next_phases_.emplace(std::make_pair(phase.id(), std::vector<NextPhase>()));
     }
   }
   VerifyAllPhasesHaveSameCoverage(phases);

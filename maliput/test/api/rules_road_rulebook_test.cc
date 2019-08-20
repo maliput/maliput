@@ -25,40 +25,28 @@ class MockRulebook final : public RoadRulebook {
  public:
   const LaneSRange kZone{LaneId("some_lane"), {10., 20.}};
   const RightOfWayRule kRightOfWay{
-    RightOfWayRule::Id("rowr_id"),
-    LaneSRoute({kZone}), RightOfWayRule::ZoneType::kStopExcluded,
-    {RightOfWayRule::State(
-        RightOfWayRule::State::Id("green"),
-        RightOfWayRule::State::Type::kGo,
-        {} /* states */)},
-    {} /* related_bulb_groups */};
-  const SpeedLimitRule kSpeedLimit{SpeedLimitRule::Id("slr_id"),
-                                   kZone,
-                                   SpeedLimitRule::Severity::kStrict,
-                                   0., 44.};
+      RightOfWayRule::Id("rowr_id"),
+      LaneSRoute({kZone}),
+      RightOfWayRule::ZoneType::kStopExcluded,
+      {RightOfWayRule::State(RightOfWayRule::State::Id("green"), RightOfWayRule::State::Type::kGo, {} /* states */)},
+      {} /* related_bulb_groups */};
+  const SpeedLimitRule kSpeedLimit{SpeedLimitRule::Id("slr_id"), kZone, SpeedLimitRule::Severity::kStrict, 0., 44.};
   const DirectionUsageRule kDirectionUsage{
-    DirectionUsageRule::Id("dur_id"), kZone,
-    {DirectionUsageRule::State(
-      DirectionUsageRule::State::Id("dur_state"),
-      DirectionUsageRule::State::Type::kWithS,
-      DirectionUsageRule::State::Severity::kPreferred)}};
+      DirectionUsageRule::Id("dur_id"),
+      kZone,
+      {DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"), DirectionUsageRule::State::Type::kWithS,
+                                 DirectionUsageRule::State::Severity::kPreferred)}};
   const RangeValueRule kRangeValueRule{
-      Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}),
-      {} /* related rules */, {RangeValueRule::Range{"range_description",
-                                                     123. /* min */,
-                                                     456. /* max */}}};
+      Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}), {} /* related rules */,
+      {RangeValueRule::Range{"range_description", 123. /* min */, 456. /* max */}}};
   const DiscreteValueRule kDiscreteValueRule{
-      Rule::Id("dvrt/dvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}),
-      {} /* related rules */, {"value1", "value2"}};
+      Rule::Id("dvrt/dvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}), {} /* related rules */, {"value1", "value2"}};
 
  private:
-  QueryResults DoFindRules(
-      const std::vector<LaneSRange>& ranges, double) const override {
+  QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double) const override {
     QueryResults results;
-    if ((!ranges.empty()) &&
-        (ranges[0].lane_id() == kZone.lane_id()) &&
-        (ranges[0].s_range().s0() == kZone.s_range().s0()) &&
-        (ranges[0].s_range().s1() == kZone.s_range().s1())) {
+    if ((!ranges.empty()) && (ranges[0].lane_id() == kZone.lane_id()) &&
+        (ranges[0].s_range().s0() == kZone.s_range().s0()) && (ranges[0].s_range().s1() == kZone.s_range().s1())) {
       results.right_of_way.push_back(kRightOfWay);
       results.speed_limit.push_back(kSpeedLimit);
       results.direction_usage.push_back(kDirectionUsage);
@@ -68,7 +56,11 @@ class MockRulebook final : public RoadRulebook {
     return results;
   }
 
-  RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const override {
+  virtual QueryResults DoRules() const {
+    return QueryResults{{kRightOfWay}, {kSpeedLimit}, {kDirectionUsage}, {kDiscreteValueRule}, {kRangeValueRule}};
+  }
+
+  virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const {
     if (id != kRightOfWay.id()) {
       throw std::out_of_range("");
     }
@@ -104,14 +96,12 @@ class MockRulebook final : public RoadRulebook {
   }
 };
 
-
 GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   const MockRulebook dut;
 
   const double kZeroTolerance = 0.;
 
-  RoadRulebook::QueryResults nonempty = dut.FindRules({dut.kZone},
-                                                      kZeroTolerance);
+  RoadRulebook::QueryResults nonempty = dut.FindRules({dut.kZone}, kZeroTolerance);
   EXPECT_EQ(nonempty.right_of_way.size(), 1);
   EXPECT_EQ(nonempty.speed_limit.size(), 1);
   EXPECT_EQ(nonempty.direction_usage.size(), 1);
@@ -127,8 +117,14 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   EXPECT_EQ(empty.range_value_rules.size(), 0);
 
   const double kNegativeTolerance = -1.;
-  EXPECT_THROW(dut.FindRules({}, kNegativeTolerance),
-               maliput::common::assertion_error);
+  EXPECT_THROW(dut.FindRules({}, kNegativeTolerance), maliput::common::assertion_error);
+
+  nonempty = dut.Rules();
+  EXPECT_EQ(nonempty.right_of_way.size(), 1);
+  EXPECT_EQ(nonempty.speed_limit.size(), 1);
+  EXPECT_EQ(nonempty.direction_usage.size(), 1);
+  EXPECT_EQ(nonempty.discrete_value_rules.size(), 1);
+  EXPECT_EQ(nonempty.range_value_rules.size(), 1);
 
   EXPECT_EQ(dut.GetRule(dut.kRightOfWay.id()).id(), dut.kRightOfWay.id());
   EXPECT_THROW(dut.GetRule(RightOfWayRule::Id("xxx")), std::out_of_range);
@@ -136,12 +132,15 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   EXPECT_EQ(dut.GetRule(dut.kSpeedLimit.id()).id(), dut.kSpeedLimit.id());
   EXPECT_THROW(dut.GetRule(SpeedLimitRule::Id("xxx")), std::out_of_range);
 
-  EXPECT_EQ(dut.GetRule(dut.kDirectionUsage.id()).id(),
-                        dut.kDirectionUsage.id());
-  EXPECT_THROW(dut.GetRule(DirectionUsageRule::Id("xxx")),
-                           std::out_of_range);
-}
+  EXPECT_EQ(dut.GetRule(dut.kDirectionUsage.id()).id(), dut.kDirectionUsage.id());
+  EXPECT_THROW(dut.GetRule(DirectionUsageRule::Id("xxx")), std::out_of_range);
 
+  EXPECT_EQ(dut.GetDiscreteValueRule(dut.kDiscreteValueRule.id()).id(), dut.kDiscreteValueRule.id());
+  EXPECT_THROW(dut.GetDiscreteValueRule(Rule::Id("xxx")), std::out_of_range);
+
+  EXPECT_EQ(dut.GetRangeValueRule(dut.kRangeValueRule.id()).id(), dut.kRangeValueRule.id());
+  EXPECT_THROW(dut.GetRangeValueRule(Rule::Id("xxx")), std::out_of_range);
+}
 
 }  // namespace
 }  // namespace rules

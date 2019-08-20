@@ -2,11 +2,11 @@
 
 #include <unordered_map>
 
+#include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/type_specific_identifier.h"
-#include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace api {
@@ -14,8 +14,7 @@ namespace rules {
 
 /// A mapping from a RightOfWayRule::Id to a RightOfWayRule::State::Id. Just an
 /// alias for user convenience.
-using RuleStates =
-    std::unordered_map<RightOfWayRule::Id, RightOfWayRule::State::Id>;
+using RuleStates = std::unordered_map<RightOfWayRule::Id, RightOfWayRule::State::Id>;
 
 /// A mapping from a UniqueBulbId to a BulbState. Just an alias for user
 /// convenience.
@@ -40,8 +39,7 @@ class Phase final {
   ///
   /// @param bulb_states the states of the bulbs when this phase is applied,
   /// e.g., to an intersection.
-  Phase(const Id& id, const RuleStates& rule_states,
-        drake::optional<BulbStates> bulb_states = drake::nullopt);
+  Phase(const Id& id, const RuleStates& rule_states, drake::optional<BulbStates> bulb_states = drake::nullopt);
 
   /// Returns the phase's identifier.
   const Id& id() const { return id_; }

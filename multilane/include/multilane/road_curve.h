@@ -6,14 +6,14 @@
 
 #include <Eigen/Dense>
 
-#include "maliput/api/lane_data.h"
-#include "multilane/cubic_polynomial.h"
 #include "drake/common/drake_copyable.h"
 #include "drake/common/eigen_types.h"
 #include "drake/common/unused.h"
 #include "drake/math/rotation_matrix.h"
 #include "drake/systems/analysis/antiderivative_function.h"
 #include "drake/systems/analysis/scalar_initial_value_problem.h"
+#include "maliput/api/lane_data.h"
+#include "multilane/cubic_polynomial.h"
 
 namespace maliput {
 namespace multilane {
@@ -118,9 +118,7 @@ class RoadCurve {
 
   const double& scale_length() const { return scale_length_; }
 
-  const ComputationPolicy& computation_policy() const {
-    return computation_policy_;
-  }
+  const ComputationPolicy& computation_policy() const { return computation_policy_; }
 
   /// Optimizes the computation of the parametric position p along the reference
   /// curve from the longitudinal position (in path-length) `s` along a parallel
@@ -194,10 +192,8 @@ class RoadCurve {
   /// bounds of the surface mapping.
   /// @return A 3D vector [p, r, h], that represent the domain coordinates of
   /// the world function, that gives as world function output @p geo_cooridnate.
-  virtual drake::Vector3<double> ToCurveFrame(
-      const drake::Vector3<double>& geo_coordinate,
-      double r_min, double r_max,
-      const api::HBounds& height_bounds) const = 0;
+  virtual drake::Vector3<double> ToCurveFrame(const drake::Vector3<double>& geo_coordinate, double r_min, double r_max,
+                                              const api::HBounds& height_bounds) const = 0;
 
   /// Checks that there are no self-intersections (singularities) in the volume
   /// created by applying the constant @p r_min, @p r_max and @p height_bounds
@@ -209,8 +205,7 @@ class RoadCurve {
   /// @param height_bounds An api::HBounds object that represents the elevation
   /// bounds of the surface mapping.
   /// @return True when there are no self-intersections.
-  virtual bool IsValid(double r_min, double r_max,
-                       const api::HBounds& height_bounds) const = 0;
+  virtual bool IsValid(double r_min, double r_max, const api::HBounds& height_bounds) const = 0;
 
   /// Returns W, the world function evaluated at @p p, @p r, @p h.
   drake::Vector3<double> W_of_prh(double p, double r, double h) const;
@@ -222,8 +217,7 @@ class RoadCurve {
   /// avoid recomputing it.)
   /// (@p g_prime must be the result of elevation().f_dot_p(p) --- passed in
   /// here to avoid recomputing it.)
-  drake::Vector3<double> W_prime_of_prh(double p, double r, double h, const Rot3& Rabg,
-                                 double g_prime) const;
+  drake::Vector3<double> W_prime_of_prh(double p, double r, double h, const Rot3& Rabg, double g_prime) const;
 
   /// Returns the rotation R_αβγ, evaluated at @p p along the reference curve.
   Rot3 Rabg_of_p(double p) const;
@@ -238,8 +232,7 @@ class RoadCurve {
   /// avoid recomputing it.)
   /// (@p g_prime must be the result of elevation().f_dot_p(p) --- passed in
   /// here to avoid recomputing it.)
-  drake::Vector3<double> s_hat_of_prh(double p, double r, double h, const Rot3& Rabg,
-                               double g_prime) const;
+  drake::Vector3<double> s_hat_of_prh(double p, double r, double h, const Rot3& Rabg, double g_prime) const;
 
   /// Returns the r-axis unit-vector, expressed in the world frame,
   /// of the (s,r,h) `Lane`-frame (with respect to the world frame).
@@ -304,10 +297,8 @@ class RoadCurve {
   ///  * p = ℓ / l_max;
   ///  * @p elevation is E_scaled = (1 / l_max) * E_true(l_max * p);
   ///  * @p superelevation is  S_scaled = (1 / l_max) * S_true(l_max * p).
-  RoadCurve(double linear_tolerance, double scale_length,
-            const CubicPolynomial& elevation,
-            const CubicPolynomial& superelevation,
-            ComputationPolicy computation_policy);
+  RoadCurve(double linear_tolerance, double scale_length, const CubicPolynomial& elevation,
+            const CubicPolynomial& superelevation, ComputationPolicy computation_policy);
 
  private:
   // Computes the minimum radius of curvature along a parallel curve at a

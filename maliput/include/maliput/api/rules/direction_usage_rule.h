@@ -9,7 +9,6 @@
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_throw.h"
 
-
 namespace maliput {
 namespace api {
 namespace rules {
@@ -77,8 +76,7 @@ class DirectionUsageRule final {
     /// @param id the unique Id
     /// @param type the semantic Type
     /// @param severity the Severity of the State
-    State(Id id, Type type, Severity severity)
-        : id_(id), type_(type), severity_(severity) {}
+    State(Id id, Type type, Severity severity) : id_(id), type_(type), severity_(severity) {}
 
     /// Returns the Id.
     const Id& id() const { return id_; }
@@ -104,9 +102,7 @@ class DirectionUsageRule final {
   /// @param states a vector of valid states for the rule
   /// @throws maliput::common::assertion_error if size of states is not exactly
   ///         1.
-  DirectionUsageRule(const Id& id, const LaneSRange& zone,
-                     std::vector<State> states)
-      : id_(id), zone_(zone) {
+  DirectionUsageRule(const Id& id, const LaneSRange& zone, std::vector<State> states) : id_(id), zone_(zone) {
     MALIPUT_THROW_UNLESS(states.size() == 1);
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
@@ -139,8 +135,7 @@ class DirectionUsageRule final {
   }
 
   /// Maps DirectionUsageRule::State::Type enums to string representations.
-  static std::unordered_map<State::Type, const char*, drake::DefaultHash>
-  StateTypeMapper();
+  static std::unordered_map<State::Type, const char*, drake::DefaultHash> StateTypeMapper();
 
  private:
   Id id_;

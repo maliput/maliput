@@ -1,8 +1,29 @@
 #pragma once
 
-/// @file maliput_abort.h
+/// @file
+/// To log with `maliput::logger`, you should:
+///
+/// <pre>
+///   maliput::log()->trace("Trace message: {} {}", something, some_other);
+/// </pre>
+///
+/// Similarly, it provides:
+///
+/// <pre>
+///   maliput::log()->debug(...);
+///   maliput::log()->info(...);
+///   maliput::log()->warn(...);
+///   maliput::log()->error(...);
+///   maliput::log()->critical(...);
+/// </pre>
+///
+///
+/// The format string syntax is fmtlib; see http://fmtlib.net/5.3.0/syntax.html.
+/// In particular, any class that overloads `operator<<` for `ostream` can be
+/// printed without any special handling.
+
 /// Code in this file is inspired by:
-/// https://github.com/RobotLocomotion/drake/blob/master/common/drake_assert.h
+/// https://github.com/RobotLocomotion/drake/blob/master/common/text_logging.hs
 ///
 /// Drake's license follows:
 ///
@@ -38,36 +59,31 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 /// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
+
+#include "drake/common/text_logging.h"
+
 namespace maliput {
-namespace common {
-namespace internal {
 
-// Abort the program with an error message.
-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
-void Abort(const char* condition, const char* func, const char* file, int line);
+using Logger = drake::logging::logger;
 
-// Abort the program with an error message and accepts @p extra_details.
-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
-void Abort(const char* condition, const char* func, const char* file, int line,
-           const char* extra_details);
+/// Retrieve an instance of a logger to use for logging; for example:
+///
+/// <pre>
+///   maliput::log()->info("potato!")
+/// </pre>
+///
+/// See the logger.h documentation for a short tutorial.
+Logger* log();
 
-}  // namespace internal
-}  // namespace common
+/// Invokes `maliput::log()->set_level(level)`.
+///
+/// @param level Must be a string from spdlog enumerations: `trace`, `debug`,
+/// `info`, `warn`, `err`, `critical`, `off`, or `unchanged` (not an enum, but
+/// useful for command-line).
+///
+/// @return The string value of the previous log level. If SPDLOG is disabled,
+/// then this returns an empty string.
+std::string set_log_level(const std::string& level);
+
 }  // namespace maliput
-
-/// Evaluates @p condition and iff the value is false will trigger an abortion
-/// with a message showing at least the condition text, function name, file, and
-/// line.
-#define MALIPUT_DEMAND(condition)                                                   \
-  do {                                                                              \
-    if (!(condition)) {                                                             \
-      ::maliput::common::internal::Abort(#condition, __func__, __FILE__, __LINE__); \
-    }                                                                               \
-  } while (0)
-
-/// Triggers an abortion with a message showing at least the condition text,
-/// function name, file, line and @p msg.
-#define MALIPUT_ABORT_MESSAGE(msg)                                              \
-  do {                                                                          \
-    ::maliput::common::internal::Abort("", __func__, __FILE__, __LINE__, #msg); \
-  } while (0)

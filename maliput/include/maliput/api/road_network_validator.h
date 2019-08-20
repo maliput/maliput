@@ -17,8 +17,7 @@ struct RoadNetworkValidatorOptions {
 /// @param road_network The RoadNetwork to validate.
 /// @param options Options for selecting what aspects of RoadNetwork to check.
 /// @throws std::exception if @p road_network is valid.
-void ValidateRoadNetwork(const RoadNetwork& road_network,
-                         const RoadNetworkValidatorOptions& options);
+void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValidatorOptions& options);
 
 }  // namespace api
 }  // namespace maliput

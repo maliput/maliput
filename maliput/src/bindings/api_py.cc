@@ -22,78 +22,56 @@ PYBIND11_MODULE(api, m) {
   // TODO(m-chaturvedi) Add doc when typedefs are parsed (#9599)
   py::class_<api::RoadGeometryId>(m, "RoadGeometryId")
       .def(py::init<std::string>())
-      .def("string", &api::RoadGeometryId::string,
-           py::return_value_policy::reference_internal);
+      .def("string", &api::RoadGeometryId::string, py::return_value_policy::reference_internal);
 
   py::class_<api::GeoPosition>(m, "GeoPosition")
-      .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"),
-           py::arg("z"))
-      .def("xyz", &api::GeoPosition::xyz,
-           py::return_value_policy::reference_internal);
+      .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"), py::arg("z"))
+      .def("xyz", &api::GeoPosition::xyz, py::return_value_policy::reference_internal);
 
   py::class_<api::LanePosition>(m, "LanePosition")
-      .def(py::init<double, double, double>(), py::arg("s"), py::arg("r"),
-          py::arg("h"))
-      .def("srh", &api::LanePosition::srh,
-           py::return_value_policy::reference_internal);
+      .def(py::init<double, double, double>(), py::arg("s"), py::arg("r"), py::arg("h"))
+      .def("srh", &api::LanePosition::srh, py::return_value_policy::reference_internal);
 
   py::class_<api::RoadPosition> road_position(m, "RoadPosition");
   road_position  // BR
       .def(py::init<>())
-      .def(py::init<const api::Lane*, const api::LanePosition&>(),
-           py::arg("lane"), py::arg("pos"),
+      .def(py::init<const api::Lane*, const api::LanePosition&>(), py::arg("lane"), py::arg("pos"),
            // Keep alive, reference: `self` keeps `Lane*` alive.
            py::keep_alive<1, 2>())
       .def_readwrite("pos", &api::RoadPosition::pos)
-      .def_property("lane",
-                    py::cpp_function([](const api::RoadPosition* self) {
-                        return self->lane;
-                    }),
-                    py::cpp_function([](api::RoadPosition* self,
-                                        api::Lane* value) {
-                        self->lane = value;
-                    }),
+      .def_property("lane", py::cpp_function([](const api::RoadPosition* self) { return self->lane; }),
+                    py::cpp_function([](api::RoadPosition* self, api::Lane* value) { self->lane = value; }),
                     py::keep_alive<1, 2>());
 
   py::class_<api::Rotation>(m, "Rotation")
-      .def("quat", &api::Rotation::quat,
-           py::return_value_policy::reference_internal)
+      .def("quat", &api::Rotation::quat, py::return_value_policy::reference_internal)
       .def("rpy", &api::Rotation::rpy);
 
   py::class_<api::RoadNetwork>(m, "RoadNetwork")
-      .def("road_geometry", &api::RoadNetwork::road_geometry,
-           py::return_value_policy::reference_internal);
+      .def("road_geometry", &api::RoadNetwork::road_geometry, py::return_value_policy::reference_internal);
 
   py::class_<api::RoadGeometry>(m, "RoadGeometry")
       .def("num_junctions", &api::RoadGeometry::num_junctions)
-      .def("junction", &api::RoadGeometry::junction,
-           py::return_value_policy::reference_internal)
-      .def("ById", &api::RoadGeometry::ById,
-           py::return_value_policy::reference_internal);
+      .def("junction", &api::RoadGeometry::junction, py::return_value_policy::reference_internal)
+      .def("ById", &api::RoadGeometry::ById, py::return_value_policy::reference_internal);
 
-  py::class_<api::RoadGeometry::IdIndex>(
-      m, "RoadGeometry.IdIndex")
+  py::class_<api::RoadGeometry::IdIndex>(m, "RoadGeometry.IdIndex")
       .def("GetLane",
-           [](const api::RoadGeometry::IdIndex* self, const std::string& id) {
-             return self->GetLane(api::LaneId(id));
-           },
+           [](const api::RoadGeometry::IdIndex* self, const std::string& id) { return self->GetLane(api::LaneId(id)); },
            py::arg("id"), py::return_value_policy::reference_internal);
 
   py::class_<api::Junction>(m, "Junction")
       .def("num_segments", &api::Junction::num_segments)
-      .def("segment", &api::Junction::segment,
-           py::return_value_policy::reference_internal);
+      .def("segment", &api::Junction::segment, py::return_value_policy::reference_internal);
 
   py::class_<api::Segment>(m, "Segment")
       .def("num_lanes", &api::Segment::num_lanes)
-      .def("lane", &api::Segment::lane,
-           py::return_value_policy::reference_internal);
+      .def("lane", &api::Segment::lane, py::return_value_policy::reference_internal);
 
   // TODO(m-chaturvedi) Add Pybind11 documentation.
   py::class_<api::LaneId>(m, "LaneId")
       .def(py::init<std::string>())
-      .def("string", &api::LaneId::string,
-           py::return_value_policy::reference_internal);
+      .def("string", &api::LaneId::string, py::return_value_policy::reference_internal);
 
   py::class_<api::Lane>(m, "Lane")
       .def("ToLanePosition", &api::Lane::ToLanePosition)

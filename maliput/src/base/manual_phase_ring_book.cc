@@ -23,15 +23,17 @@ class ManualPhaseRingBook::Impl {
   void AddPhaseRing(const PhaseRing& ring) {
     auto result = ring_book_.emplace(ring.id(), ring);
     if (!result.second) {
-      throw std::logic_error("Attempted to add multiple PhaseRing instances "
-                             "with ID " + ring.id().string());
+      throw std::logic_error(
+          "Attempted to add multiple PhaseRing instances "
+          "with ID " +
+          ring.id().string());
     }
     const Phase& phase = ring.phases().begin()->second;
     for (const auto& element : phase.rule_states()) {
       auto r = rule_book_.emplace(element.first, ring.id());
       if (!r.second) {
-        throw std::logic_error("RightOfWayRule with ID " +
-                               element.first.string() + " is part of more than "
+        throw std::logic_error("RightOfWayRule with ID " + element.first.string() +
+                               " is part of more than "
                                "one PhaseRing.");
       }
     }
@@ -40,8 +42,7 @@ class ManualPhaseRingBook::Impl {
   void RemovePhaseRing(const PhaseRing::Id& ring_id) {
     const drake::optional<PhaseRing> ring = DoGetPhaseRing(ring_id);
     if (ring == drake::nullopt) {
-      throw std::logic_error("Attempted to remove unknown PhaseRing with ID " +
-                             ring_id.string());
+      throw std::logic_error("Attempted to remove unknown PhaseRing with ID " + ring_id.string());
     }
     MALIPUT_THROW_UNLESS(ring_book_.erase(ring_id) == 1);
     const Phase& phase = ring->phases().begin()->second;
@@ -80,30 +81,21 @@ class ManualPhaseRingBook::Impl {
   std::unordered_map<RightOfWayRule::Id, const PhaseRing::Id> rule_book_;
 };
 
-ManualPhaseRingBook::ManualPhaseRingBook()
-    : impl_(std::make_unique<Impl>()) {}
+ManualPhaseRingBook::ManualPhaseRingBook() : impl_(std::make_unique<Impl>()) {}
 
 ManualPhaseRingBook::~ManualPhaseRingBook() = default;
 
-void ManualPhaseRingBook::AddPhaseRing(const PhaseRing& ring) {
-  impl_->AddPhaseRing(ring);
-}
+void ManualPhaseRingBook::AddPhaseRing(const PhaseRing& ring) { impl_->AddPhaseRing(ring); }
 
-void ManualPhaseRingBook::RemovePhaseRing(const PhaseRing::Id& ring_id) {
-  impl_->RemovePhaseRing(ring_id);
-}
+void ManualPhaseRingBook::RemovePhaseRing(const PhaseRing::Id& ring_id) { impl_->RemovePhaseRing(ring_id); }
 
-std::vector<PhaseRing::Id> ManualPhaseRingBook::DoGetPhaseRings() const {
-  return impl_->DoGetPhaseRings();
-}
+std::vector<PhaseRing::Id> ManualPhaseRingBook::DoGetPhaseRings() const { return impl_->DoGetPhaseRings(); }
 
-drake::optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(
-    const PhaseRing::Id& ring_id) const {
+drake::optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
   return impl_->DoGetPhaseRing(ring_id);
 }
 
-drake::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(
-    const RightOfWayRule::Id& rule_id) const {
+drake::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
   return impl_->DoFindPhaseRing(rule_id);
 }
 
