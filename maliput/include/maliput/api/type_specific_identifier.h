@@ -91,7 +91,9 @@ struct less<maliput::api::TypeSpecificIdentifier<T>> {
   }
 };
 
-/// Supports implicit string conversion of id with cout
+/// Streams a string representation of @p id into @p out. Returns
+/// @p out. This method is provided for the purposes of debugging or
+/// text-logging. It is not intended for serialization.
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const maliput::api::TypeSpecificIdentifier<T>& id) {
   os << id.string();
