@@ -46,9 +46,7 @@ class MockRulebook : public RoadRulebook {
     return results;
   }
 
-  virtual QueryResults DoRules() const {
-    return QueryResults{{kRightOfWay}, {kSpeedLimit}, {kDirectionUsage}};
-  }
+  virtual QueryResults DoRules() const { return QueryResults{{kRightOfWay}, {kSpeedLimit}, {kDirectionUsage}}; }
 
   virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const {
     if (id != kRightOfWay.id()) {

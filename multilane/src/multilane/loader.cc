@@ -548,8 +548,7 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(const BuilderFactoryBase& bui
   maliput::log()->debug("building cooked connections !");
   std::map<std::string, const Connection*> cooked_connections;
   while (!raw_connections.empty()) {
-    maliput::log()->debug("raw count {}  cooked count {}", raw_connections.size(),
-                          cooked_connections.size());
+    maliput::log()->debug("raw count {}  cooked count {}", raw_connections.size(), cooked_connections.size());
     const size_t cooked_before_this_pass = cooked_connections.size();
     for (const auto& r : raw_connections) {
       const std::string id = r.first;

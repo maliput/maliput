@@ -13,6 +13,7 @@ set(API_SOURCES
   rules/direction_usage_rule.cc
   rules/phase.cc
   rules/phase_ring.cc
+  rules/rule_registry.cc
   rules/traffic_lights.cc)
 
 add_library(api ${API_SOURCES})

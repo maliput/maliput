@@ -55,6 +55,14 @@ GTEST_TEST(TypeSpecificIdentifierTest, CopyingAndAssignment) {
   EXPECT_TRUE(dut1 == dut3);
 }
 
+GTEST_TEST(TypeSpecificIdentifierTest, StreamOperator) {
+  const CId dut("x");
+  std::stringstream ss;
+  ss << dut;
+  const std::string dut_str = ss.str();
+  EXPECT_EQ(dut_str, dut.string());
+}
+
 // Test usage with ordered/unordered sets.
 template <typename T>
 class TypeSpecificIdentifierSetTest : public ::testing::Test {};

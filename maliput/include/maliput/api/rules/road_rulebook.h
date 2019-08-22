@@ -52,9 +52,7 @@ class RoadRulebook {
   }
 
   /// Returns all the rules in this RoadRulebook.
-  QueryResults Rules() const {
-    return DoRules();
-  }
+  QueryResults Rules() const { return DoRules(); }
 
   /// Returns the RightOfWayRule with the specified `id`.
   ///
