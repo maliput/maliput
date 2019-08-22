@@ -45,10 +45,14 @@ class ManualRulebookTest : public ::testing::Test {
       {DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"), DirectionUsageRule::State::Type::kWithS,
                                  DirectionUsageRule::State::Severity::kStrict)}};
 
-  const DiscreteValueRule kDiscreteValueRule{
-      Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), LaneSRoute({kZone}), {} /* related rules */, {"value1", "value2"}};
+  const Rule::Id kDiscreteValueRuleId{"dvrt/dvr_id"};
 
-  const RangeValueRule kRangeValueRule{Rule::Id("rvrt/rvr"),
+  const DiscreteValueRule kDiscreteValueRule{
+      kDiscreteValueRuleId, Rule::TypeId("dvrt"), LaneSRoute({kZone}), {} /* related rules */, {"value1", "value2"}};
+
+  const Rule::Id kRangeValueRuleId{"rvrt/rvr"};
+
+  const RangeValueRule kRangeValueRule{kRangeValueRuleId,
                                        Rule::TypeId("rvrt"),
                                        LaneSRoute({kZone}),
                                        {} /* related_rules */,
@@ -105,7 +109,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
   EXPECT_THROW(dut.RemoveRule(kRangeValueRule.id()), maliput::common::assertion_error);
 
   const DiscreteValueRule kDiscreteValueRuleWithSameId{
-      Rule::Id("rvrt/rvr"), Rule::TypeId("dvrt"), LaneSRoute({kZone}), {} /* related rules */, {"value1", "value2"}};
+      kRangeValueRuleId, Rule::TypeId("dvrt"), LaneSRoute({kZone}), {} /* related rules */, {"value1", "value2"}};
   dut.AddRule(kDiscreteValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
 }
@@ -122,7 +126,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
   EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()), maliput::common::assertion_error);
 
   const RangeValueRule kRangeValueRuleWithSameId{
-      Rule::Id("dvrt/dvr_id"),
+      kDiscreteValueRuleId,
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
       {} /* related_rules */,

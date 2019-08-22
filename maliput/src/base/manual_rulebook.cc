@@ -97,7 +97,6 @@ class ManualRulebook::Impl {
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id) { RemoveAnyRule(id, &direction_usage_rules_); }
 
   void AddRule(const api::rules::DiscreteValueRule& rule) {
-    MALIPUT_THROW_UNLESS(discrete_value_rules_.find(rule.id()) == discrete_value_rules_.end());
     MALIPUT_THROW_UNLESS(range_value_rules_.find(rule.id()) == range_value_rules_.end());
 
     MALIPUT_THROW_UNLESS(discrete_value_rules_.emplace(rule.id(), rule).second);
@@ -106,7 +105,6 @@ class ManualRulebook::Impl {
 
   void AddRule(const api::rules::RangeValueRule& rule) {
     MALIPUT_THROW_UNLESS(discrete_value_rules_.find(rule.id()) == discrete_value_rules_.end());
-    MALIPUT_THROW_UNLESS(range_value_rules_.find(rule.id()) == range_value_rules_.end());
 
     MALIPUT_THROW_UNLESS(range_value_rules_.emplace(rule.id(), rule).second);
     index_->AddRule(rule);
