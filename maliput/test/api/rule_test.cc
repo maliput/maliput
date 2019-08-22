@@ -18,7 +18,6 @@ class RuleTest : public ::testing::Test {
   const LaneId kLaneId{"LaneId"};
   const LaneSRoute kZone{{LaneSRange(kLaneId, kSRange)}};
   const std::vector<Rule::Id> kRelatedRules{Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdC/RuleIdC")};
-
 };
 
 // Evaluates RangeValueRule constructor.
@@ -33,8 +32,7 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
 
   // Duplicated related rules.
   const std::vector<Rule::Id> kDuplicatedRelatedRules{Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdB/RuleIdB")};
-  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, kDuplicatedRelatedRules, kRanges),
-               maliput::common::assertion_error);
+  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, kDuplicatedRelatedRules, kRanges), maliput::common::assertion_error);
   // Empty ranges.
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */, {} /* ranges */),
                maliput::common::assertion_error);
@@ -46,8 +44,7 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */, kDuplicatedRanges),
                maliput::common::assertion_error);
   // RangeValueRule::Range::min is greater than RangeValueRule::Range::max.
-  const std::vector<RangeValueRule::Range> kShiftedRanges{
-      {"range_description_3", 456. /* min */, 123. /* max */}};
+  const std::vector<RangeValueRule::Range> kShiftedRanges{{"range_description_3", 456. /* min */, 123. /* max */}};
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */, kShiftedRanges),
                maliput::common::assertion_error);
 }
@@ -84,7 +81,6 @@ GTEST_TEST(RangeTest, EqualOperator) {
   const RangeValueRule::Range range_2{"range_description_1", 456. /* min */, 456. /* max */};
   const RangeValueRule::Range range_3{"range_description_1", 123. /* min */, 789. /* max */};
   const RangeValueRule::Range range_4{"range_description_4", 123. /* min */, 456. /* max */};
-
 
   EXPECT_TRUE(range_1 == range_1);
   EXPECT_FALSE(range_1 != range_1);

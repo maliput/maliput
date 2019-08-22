@@ -35,6 +35,7 @@ add_subdirectory(resources)
 if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(test)
+  add_test(NAME CLANGFORMAT COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/run_clang_format.sh)
 endif()
 
 ##############################################################################

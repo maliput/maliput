@@ -43,8 +43,8 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
 
   EXPECT_TRUE(dut.DiscreteValueRuleTypes().empty());
 
-  const std::map<Rule::TypeId, std::vector<RangeValueRule::Range>> kExpectedRuleTypes{
-      {kTypeA, {kRangeA, kRangeB}}, {kTypeB, {kRangeA}}};
+  const std::map<Rule::TypeId, std::vector<RangeValueRule::Range>> kExpectedRuleTypes{{kTypeA, {kRangeA, kRangeB}},
+                                                                                      {kTypeB, {kRangeA}}};
 
   const std::map<Rule::TypeId, std::vector<RangeValueRule::Range>> range_value_rule_types = dut.RangeValueRuleTypes();
   EXPECT_EQ(range_value_rule_types.size(), kExpectedRuleTypes.size());
@@ -157,17 +157,14 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   dut.RegisterDiscreteValueRule(kDiscreteValueRuleType, kDiscreteValues);
 
   // Builds and evaluates a RangeValueRule.
-  const RangeValueRule range_value_rule = dut.BuildRangeValueRule(
-      kRangeRuleId, kRangeValueRuleType, kZone, {} /* related rules */, {kRange});
+  const RangeValueRule range_value_rule =
+      dut.BuildRangeValueRule(kRangeRuleId, kRangeValueRuleType, kZone, {} /* related rules */, {kRange});
   EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
   EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
   EXPECT_EQ(range_value_rule.zone().ranges().size(), 1);
-  EXPECT_EQ(range_value_rule.zone().ranges()[0].lane_id(),
-            kZone.ranges()[0].lane_id());
-  EXPECT_EQ(range_value_rule.zone().ranges()[0].s_range().s0(),
-            kZone.ranges()[0].s_range().s0());
-  EXPECT_EQ(range_value_rule.zone().ranges()[0].s_range().s1(),
-            kZone.ranges()[0].s_range().s1());
+  EXPECT_EQ(range_value_rule.zone().ranges()[0].lane_id(), kZone.ranges()[0].lane_id());
+  EXPECT_EQ(range_value_rule.zone().ranges()[0].s_range().s0(), kZone.ranges()[0].s_range().s0());
+  EXPECT_EQ(range_value_rule.zone().ranges()[0].s_range().s1(), kZone.ranges()[0].s_range().s1());
   EXPECT_EQ(range_value_rule.related_rules().size(), 0.);
   EXPECT_EQ(range_value_rule.ranges().size(), 1);
   EXPECT_EQ(range_value_rule.ranges().begin()->description, kRange.description);
@@ -175,9 +172,9 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   EXPECT_EQ(range_value_rule.ranges().begin()->max, kRange.max);
 
   // Unregistered type.
-  EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {} /* related rules */,
-                                       {kRange}),
-               maliput::common::assertion_error);
+  EXPECT_THROW(
+      dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {} /* related rules */, {kRange}),
+      maliput::common::assertion_error);
   // Unregistered range.
   EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {} /* related rules */,
                                        {kUnregisteredRange}),

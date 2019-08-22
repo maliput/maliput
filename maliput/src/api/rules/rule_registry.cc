@@ -11,13 +11,12 @@ namespace {
 
 // Convenient function to validate that `item` exists in `v`.
 // @return true When `item` is in `v`.
-template<typename T>
+template <typename T>
 bool HasValue(const std::vector<T>& v, const T& item) {
   return std::find(v.begin(), v.end(), item) != v.end();
 }
 
 }  // namespace
-
 
 void RuleRegistry::RegisterRangeValueRule(const Rule::TypeId& type_id,
                                           const std::vector<RangeValueRule::Range>& all_possible_ranges) {
@@ -67,7 +66,6 @@ drake::optional<RuleRegistry::QueryResult> RuleRegistry::GetPossibleStatesOfRule
 
   return drake::nullopt;
 }
-
 
 RangeValueRule RuleRegistry::BuildRangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id,
                                                  const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
