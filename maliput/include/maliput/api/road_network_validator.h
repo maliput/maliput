@@ -27,6 +27,10 @@ struct RoadNetworkValidatorOptions {
   /// - Every BranchPoint is not empty, i.e. either A-Side or B-Side have at
   ///   least one Lane.
   bool check_road_geometry_hierarchy{true};
+  /// Whether to check that RelatedBulbGroups in RightOfWayRules have
+  /// supporting TrafficLight objects in TrafficLightBook and BulbGroups are
+  /// within the right TrafficLights.
+  bool check_related_bulb_groups{true};
 };
 
 /// Validates a RoadNetwork.
