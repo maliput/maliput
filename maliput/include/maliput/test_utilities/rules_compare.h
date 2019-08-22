@@ -17,50 +17,34 @@ namespace test {
 //                     which handles anything with operator==.
 
 /// Predicate-formatter which tests equality of a vector of Rule::Ids.
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const std::vector<rules::Rule::Id>& a,
-                                   const std::vector<rules::Rule::Id>& b);
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const std::vector<rules::Rule::Id>& a, const std::vector<rules::Rule::Id>& b);
 
 /// Predicate-formatter which tests equality of RangeValueRule::Range.
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const rules::RangeValueRule::Range& a,
-                                   const rules::RangeValueRule::Range& b);
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const rules::RangeValueRule::Range& a, const rules::RangeValueRule::Range& b);
 
 /// Predicate-formatter which tests equality of a vector of
 /// RangeValueRule::Ranges.
-::testing::AssertionResult IsEqual(
-    const char* a_expression, const char* b_expression,
-    const std::vector<rules::RangeValueRule::Range>& a,
-    const std::vector<rules::RangeValueRule::Range>& b);
-
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const std::vector<rules::RangeValueRule::Range>& a,
+                                   const std::vector<rules::RangeValueRule::Range>& b);
 
 /// Predicate-formatter which tests equality of RangeValueRule.
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const rules::RangeValueRule& a,
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::RangeValueRule& a,
                                    const rules::RangeValueRule& b);
 
 /// Predicate-formatter which tests equality of a std::string.
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const std::string& a,
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const std::string& a,
                                    const std::string& b);
 
 /// Predicate-formatter which tests equality of a vector of std::strings.
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const std::vector<std::string>& a,
-                                   const std::vector<std::string>& b);
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const std::vector<std::string>& a, const std::vector<std::string>& b);
 
 /// Predicate-formatter which tests equality of DiscreteValueRule.
-::testing::AssertionResult IsEqual(const char* a_expression,
-                                   const char* b_expression,
-                                   const rules::DiscreteValueRule& a,
-                                   const rules::DiscreteValueRule& b);
-
-
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const rules::DiscreteValueRule& a, const rules::DiscreteValueRule& b);
 
 }  // namespace test
 }  // namespace rules

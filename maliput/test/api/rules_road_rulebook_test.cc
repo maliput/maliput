@@ -35,9 +35,11 @@ class MockRulebook final : public RoadRulebook {
       kZone,
       {DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"), DirectionUsageRule::State::Type::kWithS,
                                  DirectionUsageRule::State::Severity::kPreferred)}};
-  const RangeValueRule kRangeValueRule{
-      Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}), {} /* related rules */,
-      {RangeValueRule::Range{"range_description", 123. /* min */, 456. /* max */}}};
+  const RangeValueRule kRangeValueRule{Rule::Id("rvrt/rvr_id"),
+                                       Rule::TypeId("rvrt"),
+                                       LaneSRoute({kZone}),
+                                       {} /* related rules */,
+                                       {RangeValueRule::Range{"range_description", 123. /* min */, 456. /* max */}}};
   const DiscreteValueRule kDiscreteValueRule{
       Rule::Id("dvrt/dvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}), {} /* related rules */, {"value1", "value2"}};
 
@@ -106,7 +108,6 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   EXPECT_EQ(nonempty.direction_usage.size(), 1);
   EXPECT_EQ(nonempty.discrete_value_rules.size(), 1);
   EXPECT_EQ(nonempty.range_value_rules.size(), 1);
-
 
   RoadRulebook::QueryResults empty = dut.FindRules({}, kZeroTolerance);
   EXPECT_EQ(empty.right_of_way.size(), 0);

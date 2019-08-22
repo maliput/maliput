@@ -118,7 +118,7 @@ class ManualRulebook::Impl {
       index_->RemoveRule(discrete_value_rules_.at(id));
       // Remove from map.
       MALIPUT_THROW_UNLESS(discrete_value_rules_.erase(id) > 0);
-    } else if(range_value_rules_.find(id) != range_value_rules_.end()) {
+    } else if (range_value_rules_.find(id) != range_value_rules_.end()) {
       // Remove from index.
       index_->RemoveRule(range_value_rules_.at(id));
       // Remove from map.
@@ -233,12 +233,7 @@ class ManualRulebook::Impl {
 
     void RemoveRule(const RangeValueRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-<<<<<<< Updated upstream
-        RemoveRanges(IdVariant::FromRangeValueRuleId(rule.id()),
-                     range.lane_id());
-=======
         RemoveRanges(rule.id(), range.lane_id());
->>>>>>> Stashed changes
       }
     }
 
@@ -296,7 +291,9 @@ class ManualRulebook::Impl {
   }
 
   template <class T>
-  T GetAnyRule(const typename T::Id& id, const IdIndex<T>& map) const { return map.at(id); }
+  T GetAnyRule(const typename T::Id& id, const IdIndex<T>& map) const {
+    return map.at(id);
+  }
 
   template <class T>
   void RemoveAnyRule(const typename T::Id& id, IdIndex<T>* map) {
@@ -314,7 +311,7 @@ class ManualRulebook::Impl {
   IdIndex<api::rules::DirectionUsageRule> direction_usage_rules_;
   std::unordered_map<Rule::Id, DiscreteValueRule> discrete_value_rules_;
   std::unordered_map<Rule::Id, RangeValueRule> range_value_rules_;
-};
+};  // namespace maliput
 
 ManualRulebook::ManualRulebook() : impl_(std::make_unique<Impl>()) {}
 
