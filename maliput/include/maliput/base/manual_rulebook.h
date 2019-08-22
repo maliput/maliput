@@ -33,7 +33,7 @@ class ManualRulebook : public api::rules::RoadRulebook {
   /// already exists in the ManualRulebook.
   void AddRule(const api::rules::RightOfWayRule& rule);
 
-  /// Removes the RightOfWayRule labeled by `id`.
+  /// Removes the RightOfWayRule with the specified `id`.
   ///
   /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::RightOfWayRule::Id& id);
@@ -44,7 +44,7 @@ class ManualRulebook : public api::rules::RoadRulebook {
   /// already exists in the ManualRulebook.
   void AddRule(const api::rules::SpeedLimitRule& rule);
 
-  /// Removes the SpeedLimitRule labeled by `id`.
+  /// Removes the SpeedLimitRule with the specified `id`.
   ///
   /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::SpeedLimitRule::Id& id);
@@ -55,7 +55,7 @@ class ManualRulebook : public api::rules::RoadRulebook {
   /// already exists in the ManualRulebook.
   void AddRule(const api::rules::DirectionUsageRule& rule);
 
-  /// Removes the DirectionUsageRule labeled by `id`.
+  /// Removes the DirectionUsageRule with the specified `id`.
   ///
   /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id);
@@ -72,7 +72,7 @@ class ManualRulebook : public api::rules::RoadRulebook {
   ///         already exists in the ManualRulebook.
   void AddRule(const api::rules::RangeValueRule& rule);
 
-  /// Removes the DiscreteValueRule or RangeValueRule labeled by `id`.
+  /// Removes the Rule with the specified `id`.
   ///
   /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::Rule::Id& id);

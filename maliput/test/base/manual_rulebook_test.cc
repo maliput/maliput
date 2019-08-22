@@ -4,7 +4,6 @@
 
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
-#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/rules_compare.h"
@@ -97,13 +96,17 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
 
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
   dut.AddRule(kRangeValueRule);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRangeValueRule(kRangeValueRule.id()),
-                               kRangeValueRule));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule));
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
   dut.RemoveRule(kRangeValueRule.id());
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
-  EXPECT_THROW(dut.RemoveRule(kRangeValueRule.id()),
-               maliput::common::assertion_error);
+  EXPECT_THROW(dut.RemoveRule(kRangeValueRule.id()), maliput::common::assertion_error);
+
+  const DiscreteValueRule kDiscreteValueRuleWithSameId{
+      Rule::Id("rvrt/rvr"), Rule::TypeId("dvrt"), LaneSRoute({kZone}), {} /* related rules */, {"value1", "value2"}};
+  dut.AddRule(kDiscreteValueRuleWithSameId);
+  EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
+
 }
 
 TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
@@ -120,6 +123,12 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
                std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()),
                maliput::common::assertion_error);
+
+  const RangeValueRule kRangeValueRuleWithSameId{
+    Rule::Id("dvrt/dvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}), {} /* related_rules */,
+    {RangeValueRule::Range{"description", 123. /* min */, 456. /* max */}}};
+  dut.AddRule(kRangeValueRuleWithSameId);
+  EXPECT_THROW(dut.AddRule(kDiscreteValueRule), maliput::common::assertion_error);
 }
 
 TEST_F(ManualRulebookTest, RemoveAll) {

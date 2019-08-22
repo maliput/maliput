@@ -36,8 +36,7 @@ struct IdVariant {
   drake::optional<RightOfWayRule::Id> r;
   drake::optional<SpeedLimitRule::Id> s;
   drake::optional<DirectionUsageRule::Id> d;
-  drake::optional<Rule::Id> dvr;
-  drake::optional<Rule::Id> rvr;
+  drake::optional<Rule::Id> rule;
 
   IdVariant() = default;
 
@@ -50,11 +49,8 @@ struct IdVariant {
   // NOLINTNEXTLINE(runtime/explicit)
   IdVariant(const DirectionUsageRule::Id& d_in) : d(d_in) {}
 
-  // Initializes an IdVariant with `dvr_in` as dvr.
-  static IdVariant FromDiscreteValueRuleId(const Rule::Id& dvr_in);
-
-  // Initializes an IdVariant with `rvr_in` as rvr.
-  static IdVariant FromRangeValueRuleId(const Rule::Id& rvr_in);
+  // NOLINTNEXTLINE(runtime/explicit)
+  IdVariant(const Rule::Id& rule_in) : rule(rule_in) {}
 
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const IdVariant& item) noexcept {
@@ -62,26 +58,12 @@ struct IdVariant {
     hash_append(hasher, item.r);
     hash_append(hasher, item.s);
     hash_append(hasher, item.d);
-    hash_append(hasher, item.dvr);
-    hash_append(hasher, item.rvr);
+    hash_append(hasher, item.rule);
   }
 };
 
-IdVariant IdVariant::FromDiscreteValueRuleId(const Rule::Id& dvr_in) {
-  IdVariant id_variant;
-  id_variant.dvr = dvr_in;
-  return id_variant;
-}
-
-IdVariant IdVariant::FromRangeValueRuleId(const Rule::Id& rvr_in) {
-  IdVariant id_variant;
-  id_variant.rvr = rvr_in;
-  return id_variant;
-}
-
 bool operator==(const IdVariant& lhs, const IdVariant& rhs) {
-  return (lhs.r == rhs.r) && (lhs.s == rhs.s) && (lhs.d == rhs.d) &&
-         (lhs.dvr && rhs.dvr) && (lhs.rvr == rhs.rvr);
+  return (lhs.r == rhs.r) && (lhs.s == rhs.s) && (lhs.d == rhs.d) && (lhs.rule == rhs.rule);
 }
 
 }  // namespace
@@ -115,30 +97,34 @@ class ManualRulebook::Impl {
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id) { RemoveAnyRule(id, &direction_usage_rules_); }
 
   void AddRule(const api::rules::DiscreteValueRule& rule) {
+    MALIPUT_THROW_UNLESS(discrete_value_rules_.find(rule.id()) == discrete_value_rules_.end());
+    MALIPUT_THROW_UNLESS(range_value_rules_.find(rule.id()) == range_value_rules_.end());
+
     MALIPUT_THROW_UNLESS(discrete_value_rules_.emplace(rule.id(), rule).second);
     index_->AddRule(rule);
   }
 
   void AddRule(const api::rules::RangeValueRule& rule) {
+    MALIPUT_THROW_UNLESS(discrete_value_rules_.find(rule.id()) == discrete_value_rules_.end());
+    MALIPUT_THROW_UNLESS(range_value_rules_.find(rule.id()) == range_value_rules_.end());
+
     MALIPUT_THROW_UNLESS(range_value_rules_.emplace(rule.id(), rule).second);
     index_->AddRule(rule);
   }
 
   void RemoveRule(const api::rules::Rule::Id& id) {
     if (discrete_value_rules_.find(id) != discrete_value_rules_.end()) {
-      MALIPUT_THROW_UNLESS(discrete_value_rules_.count(id) == 1);
       // Remove from index.
       index_->RemoveRule(discrete_value_rules_.at(id));
       // Remove from map.
       MALIPUT_THROW_UNLESS(discrete_value_rules_.erase(id) > 0);
     } else if(range_value_rules_.find(id) != range_value_rules_.end()) {
-      MALIPUT_THROW_UNLESS(range_value_rules_.count(id) == 1);
       // Remove from index.
       index_->RemoveRule(range_value_rules_.at(id));
       // Remove from map.
       MALIPUT_THROW_UNLESS(range_value_rules_.erase(id) > 0);
     } else {
-      MALIPUT_THROW_MESSAGE("Rule::Id: " + id.string() + " cannot be found.");
+      MALIPUT_THROW_MESSAGE("Unable to remove Rule: Rule::Id: " + id.string() + " cannot be found.");
     }
   }
 
@@ -152,10 +138,14 @@ class ManualRulebook::Impl {
           result.speed_limit.push_back(speed_limits_.at(*id.s));
         } else if (id.d) {
           result.direction_usage.push_back(direction_usage_rules_.at(*id.d));
-        } else if (id.dvr) {
-          result.discrete_value_rules.push_back(discrete_value_rules_.at(*id.dvr));
-        } else if (id.rvr) {
-          result.range_value_rules.push_back(range_value_rules_.at(*id.rvr));
+        } else if (id.rule) {
+          if (range_value_rules_.find(*id.rule) != range_value_rules_.end()) {
+            result.range_value_rules.push_back(range_value_rules_.at(*id.rule));
+          } else if (discrete_value_rules_.find(*id.rule) != discrete_value_rules_.end()) {
+            result.discrete_value_rules.push_back(discrete_value_rules_.at(*id.rule));
+          } else {
+            throw std::out_of_range("IdVariant::rule:" + id.rule->string() + " could not be found.");
+          }
         } else {
           std::stringstream s;
           s << "ManualRulebook: IdVariant is empty (LaneId: " << range.lane_id().string()
@@ -225,26 +215,30 @@ class ManualRulebook::Impl {
 
     void AddRule(const DiscreteValueRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-        AddRange(IdVariant::FromDiscreteValueRuleId(rule.id()), range);
+        AddRange(rule.id(), range);
       }
     }
 
     void RemoveRule(const DiscreteValueRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-        RemoveRanges(IdVariant::FromDiscreteValueRuleId(rule.id()), range.lane_id());
+        RemoveRanges(rule.id(), range.lane_id());
       }
     }
 
     void AddRule(const RangeValueRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-        AddRange(IdVariant::FromRangeValueRuleId(rule.id()), range);
+        AddRange(rule.id(), range);
       }
     }
 
     void RemoveRule(const RangeValueRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
+<<<<<<< Updated upstream
         RemoveRanges(IdVariant::FromRangeValueRuleId(rule.id()),
                      range.lane_id());
+=======
+        RemoveRanges(rule.id(), range.lane_id());
+>>>>>>> Stashed changes
       }
     }
 

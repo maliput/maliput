@@ -42,13 +42,13 @@ namespace test {
                                    const rules::RangeValueRule& a,
                                    const rules::RangeValueRule& b);
 
-/// Predicate-formatter which tests equality of a string.
+/// Predicate-formatter which tests equality of a std::string.
 ::testing::AssertionResult IsEqual(const char* a_expression,
                                    const char* b_expression,
                                    const std::string& a,
                                    const std::string& b);
 
-/// Predicate-formatter which tests equality of a vector of strings.
+/// Predicate-formatter which tests equality of a vector of std::strings.
 ::testing::AssertionResult IsEqual(const char* a_expression,
                                    const char* b_expression,
                                    const std::vector<std::string>& a,
