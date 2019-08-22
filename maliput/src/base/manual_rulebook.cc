@@ -179,6 +179,7 @@ class ManualRulebook::Impl {
                    std::back_inserter(result.discrete_value_rules), [](const auto& key_val) { return key_val.second; });
     std::transform(range_value_rules_.begin(), range_value_rules_.end(), std::back_inserter(result.range_value_rules),
                    [](const auto& key_val) { return key_val.second; });
+
     return result;
   }
 

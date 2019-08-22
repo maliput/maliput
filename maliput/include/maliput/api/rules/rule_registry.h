@@ -8,9 +8,9 @@
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 
-#include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {
 namespace api {
@@ -113,7 +113,6 @@ class RuleRegistry {
   std::map<Rule::TypeId, std::vector<RangeValueRule::Range>> range_rule_types_;
   std::map<Rule::TypeId, std::vector<std::string>> discrete_rule_types_;
 };
-
 
 }  // namespace rules
 }  // namespace api

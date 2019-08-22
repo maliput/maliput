@@ -59,8 +59,6 @@ drake::optional<TrafficLight> TrafficLightBook::DoGetTrafficLight(const TrafficL
   return impl_->DoGetTrafficLight(id);
 }
 
-std::vector<TrafficLight> TrafficLightBook::DoTrafficLights() const {
-  return impl_->DoTrafficLights();
-}
+std::vector<TrafficLight> TrafficLightBook::DoTrafficLights() const { return impl_->DoTrafficLights(); }
 
 }  // namespace maliput
