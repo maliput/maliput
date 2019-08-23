@@ -38,9 +38,8 @@ class MockLaneEndSet final : public LaneEndSet {
     MALIPUT_THROW_UNLESS(index != 0);
     return lane_end_;
   }
-  // { Mock members.
+
   LaneEnd lane_end_;
-  // } Mock members.
 };
 
 class MockBranchPoint final : public BranchPoint {
@@ -63,12 +62,11 @@ class MockBranchPoint final : public BranchPoint {
   drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd&) const override { return drake::nullopt; }
   const LaneEndSet* DoGetASide() const override { return lane_end_set_a_.get(); }
   const LaneEndSet* DoGetBSide() const override { return lane_end_set_b_.get(); }
-  // { Mock members.
+
   BranchPointId id_;
-  RoadGeometry* road_geometry_{nullptr};
+  RoadGeometry* road_geometry_{};
   std::unique_ptr<MockLaneEndSet> lane_end_set_a_;
   std::unique_ptr<MockLaneEndSet> lane_end_set_b_;
-  // } Mock members.
 };
 
 class MockLane final : public Lane {
@@ -103,12 +101,12 @@ class MockLane final : public Lane {
   const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which) const override { return nullptr; }
   const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override { return nullptr; }
   drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return drake::nullopt; }
-  // { Mock members.
+
   LaneId id_;
-  Segment* segment_{nullptr};
-  BranchPoint* start_bp_{nullptr};
-  BranchPoint* end_bp_{nullptr};
-  // } Mock members.
+  Segment* segment_{};
+  BranchPoint* start_bp_{};
+  BranchPoint* end_bp_{};
+
 };
 
 class MockSegment final : public Segment {
@@ -126,11 +124,10 @@ class MockSegment final : public Segment {
     MALIPUT_THROW_UNLESS(index == 0);
     return lane_.get();
   }
-  // { Mock members.
+
   SegmentId id_;
-  Junction* junction_{nullptr};
+  Junction* junction_{};
   std::unique_ptr<MockLane> lane_;
-  // } Mock members.
 };
 
 class MockJunction final : public Junction {
@@ -148,11 +145,10 @@ class MockJunction final : public Junction {
     return segment_.get();
   }
   const RoadGeometry* do_road_geometry() const override { return road_geometry_; }
-  // { Mock members.
+
   JunctionId id_;
-  RoadGeometry* road_geometry_{nullptr};
+  RoadGeometry* road_geometry_{};
   std::unique_ptr<MockSegment> segment_;
-  // } Mock members.
 };
 
 class MockIdIndex final : public RoadGeometry::IdIndex {
@@ -213,13 +209,12 @@ class MockRoadGeometry : public RoadGeometry {
   double do_angular_tolerance() const override { return 0; }
   double do_scale_length() const override { return 0; }
 
-  // { Mock members.
+
   const MockIdIndex mock_id_index_;
   RoadGeometryId id_;
   std::unique_ptr<MockJunction> junction_;
   std::unique_ptr<MockBranchPoint> start_bp_;
   std::unique_ptr<MockBranchPoint> end_bp_;
-  // } Mock members.
 };
 
 class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {

@@ -16,15 +16,15 @@ struct RoadNetworkValidatorOptions {
   /// Whether to check if the RoadGeometry hierarchy is correct.
   /// Hierarchy checks include:
   /// - At least one Junction in the RoadGeometry.
-  /// - At least one Segment lives in each Junction.
-  /// - At least one Lane lives in each Segment.
-  /// - At least two BranchPoints live in the RoadGeometry.
+  /// - At least one Segment in each Junction.
+  /// - At least one Lane in each Segment.
+  /// - At least two BranchPoints in the RoadGeometry.
   /// - Parent-children relations between RoadGeometry and Junctions, Junction
   ///   and Segments, Segment and Lanes, and RoadGeometry and BranchPoints are
   ///   correctly set.
   /// - Every Lane is attached to a BranchPoint at each end.
-  /// - Every BranchPoint's ASide and BSide are not nullptr.
-  /// - Every BranchPoint is not empty, i.e. either ASide or BSide have at
+  /// - Every BranchPoint's A-Side and B-Side are not nullptr.
+  /// - Every BranchPoint is not empty, i.e. either A-Side or B-Side have at
   ///   least one Lane.
   bool check_road_geometry_hierarchy{true};
 };
