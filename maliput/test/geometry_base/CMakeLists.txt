@@ -1,5 +1,5 @@
 ament_add_gtest(geometry_base_test geometry_base_test.cc)
-ament_add_gtest(brute_force_find_road_positions_test brute_force_find_road_positions_test.cc)
+ament_add_gmock(brute_force_find_road_positions_test brute_force_find_road_positions_test.cc)
 
 macro(add_dependencies_to_test target)
     if (TARGET ${target})
