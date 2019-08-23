@@ -10,12 +10,18 @@
 #include "drake/common/drake_optional.h"
 #include "drake/common/hash.h"
 
+#include "maliput/api/rules/rule.h"
+#include "maliput/common/maliput_throw.h"
+
 namespace maliput {
 
 using api::LaneId;
 using api::rules::DirectionUsageRule;
+using api::rules::DiscreteValueRule;
 using api::rules::LaneSRange;
+using api::rules::RangeValueRule;
 using api::rules::RightOfWayRule;
+using api::rules::Rule;
 using api::rules::SpeedLimitRule;
 using api::rules::SRange;
 
@@ -30,6 +36,9 @@ struct IdVariant {
   drake::optional<RightOfWayRule::Id> r;
   drake::optional<SpeedLimitRule::Id> s;
   drake::optional<DirectionUsageRule::Id> d;
+  drake::optional<Rule::Id> rule;
+
+  IdVariant() = default;
 
   // NOLINTNEXTLINE(runtime/explicit)
   IdVariant(const RightOfWayRule::Id& r_in) : r(r_in) {}
@@ -40,17 +49,21 @@ struct IdVariant {
   // NOLINTNEXTLINE(runtime/explicit)
   IdVariant(const DirectionUsageRule::Id& d_in) : d(d_in) {}
 
+  // NOLINTNEXTLINE(runtime/explicit)
+  IdVariant(const Rule::Id& rule_in) : rule(rule_in) {}
+
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const IdVariant& item) noexcept {
     using drake::hash_append;
     hash_append(hasher, item.r);
     hash_append(hasher, item.s);
     hash_append(hasher, item.d);
+    hash_append(hasher, item.rule);
   }
 };
 
 bool operator==(const IdVariant& lhs, const IdVariant& rhs) {
-  return (lhs.r == rhs.r) && (lhs.s == rhs.s) && (lhs.d == rhs.d);
+  return (lhs.r == rhs.r) && (lhs.s == rhs.s) && (lhs.d == rhs.d) && (lhs.rule == rhs.rule);
 }
 
 }  // namespace
@@ -66,6 +79,8 @@ class ManualRulebook::Impl {
     right_of_ways_.clear();
     speed_limits_.clear();
     direction_usage_rules_.clear();
+    discrete_value_rules_.clear();
+    range_value_rules_.clear();
     index_->RemoveAll();
   }
 
@@ -81,6 +96,36 @@ class ManualRulebook::Impl {
 
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id) { RemoveAnyRule(id, &direction_usage_rules_); }
 
+  void AddRule(const api::rules::DiscreteValueRule& rule) {
+    MALIPUT_THROW_UNLESS(range_value_rules_.find(rule.id()) == range_value_rules_.end());
+
+    MALIPUT_THROW_UNLESS(discrete_value_rules_.emplace(rule.id(), rule).second);
+    index_->AddRule(rule);
+  }
+
+  void AddRule(const api::rules::RangeValueRule& rule) {
+    MALIPUT_THROW_UNLESS(discrete_value_rules_.find(rule.id()) == discrete_value_rules_.end());
+
+    MALIPUT_THROW_UNLESS(range_value_rules_.emplace(rule.id(), rule).second);
+    index_->AddRule(rule);
+  }
+
+  void RemoveRule(const api::rules::Rule::Id& id) {
+    if (discrete_value_rules_.find(id) != discrete_value_rules_.end()) {
+      // Remove from index.
+      index_->RemoveRule(discrete_value_rules_.at(id));
+      // Remove from map.
+      MALIPUT_THROW_UNLESS(discrete_value_rules_.erase(id) > 0);
+    } else if (range_value_rules_.find(id) != range_value_rules_.end()) {
+      // Remove from index.
+      index_->RemoveRule(range_value_rules_.at(id));
+      // Remove from map.
+      MALIPUT_THROW_UNLESS(range_value_rules_.erase(id) > 0);
+    } else {
+      MALIPUT_THROW_MESSAGE("Unable to remove Rule: Rule::Id: " + id.string() + " cannot be found.");
+    }
+  }
+
   QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double tolerance) const {
     QueryResults result;
     for (const LaneSRange& range : ranges) {
@@ -91,6 +136,14 @@ class ManualRulebook::Impl {
           result.speed_limit.push_back(speed_limits_.at(*id.s));
         } else if (id.d) {
           result.direction_usage.push_back(direction_usage_rules_.at(*id.d));
+        } else if (id.rule) {
+          if (range_value_rules_.find(*id.rule) != range_value_rules_.end()) {
+            result.range_value_rules.push_back(range_value_rules_.at(*id.rule));
+          } else if (discrete_value_rules_.find(*id.rule) != discrete_value_rules_.end()) {
+            result.discrete_value_rules.push_back(discrete_value_rules_.at(*id.rule));
+          } else {
+            throw std::out_of_range("IdVariant::rule:" + id.rule->string() + " could not be found.");
+          }
         } else {
           std::stringstream s;
           s << "ManualRulebook: IdVariant is empty (LaneId: " << range.lane_id().string()
@@ -110,6 +163,11 @@ class ManualRulebook::Impl {
                    [](const auto& key_val) { return key_val.second; });
     std::transform(direction_usage_rules_.begin(), direction_usage_rules_.end(),
                    std::back_inserter(result.direction_usage), [](const auto& key_val) { return key_val.second; });
+    std::transform(discrete_value_rules_.begin(), discrete_value_rules_.end(),
+                   std::back_inserter(result.discrete_value_rules), [](const auto& key_val) { return key_val.second; });
+    std::transform(range_value_rules_.begin(), range_value_rules_.end(), std::back_inserter(result.range_value_rules),
+                   [](const auto& key_val) { return key_val.second; });
+
     return result;
   }
 
@@ -120,6 +178,10 @@ class ManualRulebook::Impl {
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const {
     return GetAnyRule(id, direction_usage_rules_);
   }
+
+  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const { return discrete_value_rules_.at(id); }
+
+  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const { return range_value_rules_.at(id); }
 
  private:
   // An index from LaneSRange to collections of rule ID's of all types.
@@ -135,19 +197,43 @@ class ManualRulebook::Impl {
 
     void AddRule(const RightOfWayRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-        AddRange(rule.id(), range);
+        AddRange(IdVariant(rule.id()), range);
       }
     }
 
     void RemoveRule(const RightOfWayRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
-        RemoveRanges(rule.id(), range.lane_id());
+        RemoveRanges(IdVariant(rule.id()), range.lane_id());
       }
     }
 
     void AddRule(const DirectionUsageRule& rule) { AddRange(rule.id(), rule.zone()); }
 
     void RemoveRule(const DirectionUsageRule& rule) { RemoveRanges(rule.id(), rule.zone().lane_id()); }
+
+    void AddRule(const DiscreteValueRule& rule) {
+      for (const LaneSRange& range : rule.zone().ranges()) {
+        AddRange(rule.id(), range);
+      }
+    }
+
+    void RemoveRule(const DiscreteValueRule& rule) {
+      for (const LaneSRange& range : rule.zone().ranges()) {
+        RemoveRanges(rule.id(), range.lane_id());
+      }
+    }
+
+    void AddRule(const RangeValueRule& rule) {
+      for (const LaneSRange& range : rule.zone().ranges()) {
+        AddRange(rule.id(), range);
+      }
+    }
+
+    void RemoveRule(const RangeValueRule& rule) {
+      for (const LaneSRange& range : rule.zone().ranges()) {
+        RemoveRanges(rule.id(), range.lane_id());
+      }
+    }
 
     std::vector<IdVariant> FindRules(const LaneSRange& range, double tolerance) {
       std::vector<IdVariant> result;
@@ -164,14 +250,10 @@ class ManualRulebook::Impl {
 
    private:
     // Add a single (ID, LaneSRange) association.
-    template <typename T>
-    void AddRange(const T& id, const LaneSRange& range) {
-      map_[range.lane_id()].emplace(id, range.s_range());
-    }
+    void AddRange(const IdVariant& id, const LaneSRange& range) { map_[range.lane_id()].emplace(id, range.s_range()); }
 
     // Removes all associations involving `id` and `lane_id`.
-    template <typename T>
-    void RemoveRanges(const T& id, const LaneId& lane_id) {
+    void RemoveRanges(const IdVariant& id, const LaneId& lane_id) {
       map_.at(lane_id).erase(id);
       if (map_[lane_id].empty()) {
         map_.erase(lane_id);
@@ -225,7 +307,9 @@ class ManualRulebook::Impl {
   IdIndex<api::rules::RightOfWayRule> right_of_ways_;
   IdIndex<api::rules::SpeedLimitRule> speed_limits_;
   IdIndex<api::rules::DirectionUsageRule> direction_usage_rules_;
-};
+  std::unordered_map<Rule::Id, DiscreteValueRule> discrete_value_rules_;
+  std::unordered_map<Rule::Id, RangeValueRule> range_value_rules_;
+};  // namespace maliput
 
 ManualRulebook::ManualRulebook() : impl_(std::make_unique<Impl>()) {}
 
@@ -245,6 +329,12 @@ void ManualRulebook::AddRule(const api::rules::DirectionUsageRule& rule) { impl_
 
 void ManualRulebook::RemoveRule(const api::rules::DirectionUsageRule::Id& id) { impl_->RemoveRule(id); }
 
+void ManualRulebook::AddRule(const api::rules::DiscreteValueRule& rule) { impl_->AddRule(rule); }
+
+void ManualRulebook::AddRule(const api::rules::RangeValueRule& rule) { impl_->AddRule(rule); }
+
+void ManualRulebook::RemoveRule(const api::rules::Rule::Id& id) { impl_->RemoveRule(id); }
+
 QueryResults ManualRulebook::DoFindRules(const std::vector<LaneSRange>& ranges, double tolerance) const {
   return impl_->DoFindRules(ranges, tolerance);
 }
@@ -256,5 +346,11 @@ RightOfWayRule ManualRulebook::DoGetRule(const RightOfWayRule::Id& id) const { r
 SpeedLimitRule ManualRulebook::DoGetRule(const SpeedLimitRule::Id& id) const { return impl_->DoGetRule(id); }
 
 DirectionUsageRule ManualRulebook::DoGetRule(const DirectionUsageRule::Id& id) const { return impl_->DoGetRule(id); }
+
+DiscreteValueRule ManualRulebook::DoGetDiscreteValueRule(const Rule::Id& id) const {
+  return impl_->DoGetDiscreteValueRule(id);
+}
+
+RangeValueRule ManualRulebook::DoGetRangeValueRule(const Rule::Id& id) const { return impl_->DoGetRangeValueRule(id); }
 
 }  // namespace maliput

@@ -8,6 +8,7 @@
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 
 namespace maliput {
@@ -32,7 +33,7 @@ class ManualRulebook : public api::rules::RoadRulebook {
   /// already exists in the ManualRulebook.
   void AddRule(const api::rules::RightOfWayRule& rule);
 
-  /// Removes the RightOfWayRule labeled by `id`.
+  /// Removes the RightOfWayRule with the specified `id`.
   ///
   /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::RightOfWayRule::Id& id);
@@ -43,7 +44,7 @@ class ManualRulebook : public api::rules::RoadRulebook {
   /// already exists in the ManualRulebook.
   void AddRule(const api::rules::SpeedLimitRule& rule);
 
-  /// Removes the SpeedLimitRule labeled by `id`.
+  /// Removes the SpeedLimitRule with the specified `id`.
   ///
   /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::SpeedLimitRule::Id& id);
@@ -54,10 +55,27 @@ class ManualRulebook : public api::rules::RoadRulebook {
   /// already exists in the ManualRulebook.
   void AddRule(const api::rules::DirectionUsageRule& rule);
 
-  /// Removes the DirectionUsageRule labeled by `id`.
+  /// Removes the DirectionUsageRule with the specified `id`.
   ///
   /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id);
+
+  /// Adds a new DiscreteValueRule.
+  ///
+  /// @throws maliput::common::assertion_error if a rule with the same ID
+  ///         already exists in the ManualRulebook.
+  void AddRule(const api::rules::DiscreteValueRule& rule);
+
+  /// Adds a new RangeValueRule.
+  ///
+  /// @throws maliput::common::assertion_error if a rule with the same ID
+  ///         already exists in the ManualRulebook.
+  void AddRule(const api::rules::RangeValueRule& rule);
+
+  /// Removes the Rule with the specified `id`.
+  ///
+  /// @throws maliput::common::assertion_error if no such rule exists.
+  void RemoveRule(const api::rules::Rule::Id& id);
 
  private:
   api::rules::RoadRulebook::QueryResults DoFindRules(const std::vector<api::rules::LaneSRange>& ranges,
@@ -66,6 +84,8 @@ class ManualRulebook : public api::rules::RoadRulebook {
   api::rules::RightOfWayRule DoGetRule(const api::rules::RightOfWayRule::Id& id) const override;
   api::rules::SpeedLimitRule DoGetRule(const api::rules::SpeedLimitRule::Id& id) const override;
   api::rules::DirectionUsageRule DoGetRule(const api::rules::DirectionUsageRule::Id& id) const override;
+  api::rules::DiscreteValueRule DoGetDiscreteValueRule(const api::rules::Rule::Id& id) const override;
+  api::rules::RangeValueRule DoGetRangeValueRule(const api::rules::Rule::Id& id) const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

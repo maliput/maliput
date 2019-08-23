@@ -7,6 +7,7 @@
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/maliput_throw.h"
 
@@ -33,7 +34,9 @@ class RoadRulebook {
   struct QueryResults {
     std::vector<RightOfWayRule> right_of_way;
     std::vector<SpeedLimitRule> speed_limit;
-    std::vector<rules::DirectionUsageRule> direction_usage;
+    std::vector<DirectionUsageRule> direction_usage;
+    std::vector<DiscreteValueRule> discrete_value_rules;
+    std::vector<RangeValueRule> range_value_rules;
   };
 
   /// Returns a QueryResults structure which contains any rules which are
@@ -69,6 +72,16 @@ class RoadRulebook {
   /// @throws std::out_of_range if `id` is unknown.
   DirectionUsageRule GetRule(const DirectionUsageRule::Id& id) const { return DoGetRule(id); }
 
+  /// Returns the DiscreteValueRule with the specified `id`.
+  ///
+  /// @throws std::out_of_range if `id` is unknown.
+  DiscreteValueRule GetDiscreteValueRule(const Rule::Id& id) const { return DoGetDiscreteValueRule(id); }
+
+  /// Returns the RangeValueRule with the specified `id`.
+  ///
+  /// @throws std::out_of_range if `id` is unknown.
+  RangeValueRule GetRangeValueRule(const Rule::Id& id) const { return DoGetRangeValueRule(id); }
+
  protected:
   RoadRulebook() = default;
 
@@ -82,6 +95,8 @@ class RoadRulebook {
   virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const = 0;
   virtual SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const = 0;
   virtual DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const = 0;
+  virtual DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const = 0;
+  virtual RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const = 0;
   //@}
 };
 
