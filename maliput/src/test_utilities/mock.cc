@@ -32,6 +32,7 @@ class MockLaneEndSet final : public LaneEndSet {
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockLaneEndSet)
   MockLaneEndSet() = default;
   void set_lane_end(const LaneEnd& lane_end) { lane_end_ = lane_end; }
+
  private:
   int do_size() const override { return 1; }
   const LaneEnd& do_get(int index) const override {
@@ -106,7 +107,6 @@ class MockLane final : public Lane {
   Segment* segment_{};
   BranchPoint* start_bp_{};
   BranchPoint* end_bp_{};
-
 };
 
 class MockSegment final : public Segment {
@@ -197,18 +197,15 @@ class MockRoadGeometry : public RoadGeometry {
     return i == 0 ? start_bp_.get() : end_bp_.get();
   }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*,
-                                GeoPosition*, double*) const override {
+  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*, GeoPosition*, double*) const override {
     return RoadPosition();
   }
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(
-      const GeoPosition&, double) const override {
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
     return {{RoadPosition(), GeoPosition(), 0.}};
   }
   double do_linear_tolerance() const override { return 0; }
   double do_angular_tolerance() const override { return 0; }
   double do_scale_length() const override { return 0; }
-
 
   const MockIdIndex mock_id_index_;
   RoadGeometryId id_;

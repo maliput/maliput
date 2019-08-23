@@ -68,7 +68,7 @@ void CheckRoadGeometryHierarchyConsistency(const RoadNetwork& road_network) {
   }
 }
 
-} // namespace
+}  // namespace
 
 void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValidatorOptions& options) {
   if (options.check_direction_usage_rule_coverage) {

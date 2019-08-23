@@ -33,12 +33,10 @@ GTEST_TEST(RoadNetworkValidatorTest, RuleCoverageTest) {
                            test::CreateTrafficLightBook(), test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
                            test::CreateRuleStateProvider(), test::CreatePhaseProvider());
 
-  RoadNetworkValidatorOptions options{
-      true /* check_direction_usage_rule_coverage */,
-      false /* check_road_geometry_invariants */,
-      false /* check_road_geometry_hierarchy */};
-  EXPECT_THROW(ValidateRoadNetwork(road_network, options),
-               maliput::common::assertion_error);
+  RoadNetworkValidatorOptions options{true /* check_direction_usage_rule_coverage */,
+                                      false /* check_road_geometry_invariants */,
+                                      false /* check_road_geometry_hierarchy */};
+  EXPECT_THROW(ValidateRoadNetwork(road_network, options), maliput::common::assertion_error);
 
   options.check_direction_usage_rule_coverage = false;
   EXPECT_NO_THROW(ValidateRoadNetwork(road_network, options));
@@ -54,18 +52,18 @@ class RoadGeometryHierarchyTest : public ::testing::TestWithParam<RoadGeometryBu
 
 std::vector<RoadGeometryBuildFlags> HierarchyTestParameters() {
   return {
-    // Throws because of missing Junction.
-    RoadGeometryBuildFlags{false, false, false, false, false, true},
-    // Throws because of missing Segment in Junction.
-    RoadGeometryBuildFlags{true, false, false, false, false, true},
-    // Throws because of missing Lane in Segment.
-    RoadGeometryBuildFlags{true, true, false, false, false, true},
-    // Throws because of missing BranchPoint.
-    RoadGeometryBuildFlags{true, true, true, false, false, true},
-    // Throws because of missing LaneEndSet in BranchPoint.
-    RoadGeometryBuildFlags{true, true, true, true, false, true},
-    // Does not throw, complete RoadGeometry.
-    RoadGeometryBuildFlags{true, true, true, true, true, false},
+      // Throws because of missing Junction.
+      RoadGeometryBuildFlags{false, false, false, false, false, true},
+      // Throws because of missing Segment in Junction.
+      RoadGeometryBuildFlags{true, false, false, false, false, true},
+      // Throws because of missing Lane in Segment.
+      RoadGeometryBuildFlags{true, true, false, false, false, true},
+      // Throws because of missing BranchPoint.
+      RoadGeometryBuildFlags{true, true, true, false, false, true},
+      // Throws because of missing LaneEndSet in BranchPoint.
+      RoadGeometryBuildFlags{true, true, true, true, false, true},
+      // Does not throw, complete RoadGeometry.
+      RoadGeometryBuildFlags{true, true, true, true, true, false},
   };
 }
 
@@ -74,9 +72,9 @@ TEST_P(RoadGeometryHierarchyTest, HierarchyTestThrows) {
                            test::CreateIntersectionBook(), test::CreatePhaseRingBook(), test::CreateRuleStateProvider(),
                            test::CreatePhaseProvider());
 
-  const RoadNetworkValidatorOptions options{
-      false /* check_direction_usage_rule_coverage */, false /* check_road_geometry_invariants */,
-      true /* check_road_geometry_hierarchy */};
+  const RoadNetworkValidatorOptions options{false /* check_direction_usage_rule_coverage */,
+                                            false /* check_road_geometry_invariants */,
+                                            true /* check_road_geometry_hierarchy */};
 
   if (build_flags_.expects_throw) {
     EXPECT_THROW({ ValidateRoadNetwork(road_network, options); }, maliput::common::assertion_error);
