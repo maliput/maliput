@@ -30,7 +30,7 @@ class GeoPositionMatcher : public MatcherInterface<const api::GeoPosition&> {
    //TODO implement GeoPosition comparison
    return false;
   }
-  
+
   void DescribeTo(std::ostream* os) const override {
    //TODO implement description
   }
@@ -47,6 +47,7 @@ Matcher<const api::GeoPosition&> Matches(const api::GeoPosition& geo_position, d
 class LaneMock final : public MockLane {
  public:
   explicit LaneMock(const api::LaneId& id) : MockLane(id) {}
+  MOCK_METHOD(api::LanePosition, DoToLanePosition, (const api::GeoPosition&, api::GeoPosition*, double*));
  
  private: 
   api::LanePosition DoToLanePosition(const api::GeoPosition& geo_pos, api::GeoPosition* nearest_point, double* distance) const override { 
@@ -113,15 +114,17 @@ GTEST_TEST(BruteForceTest, VerifyArgs) {
   double distance{};
   api::GeoPosition nearest_position;
   api::RoadGeometry* rg = local_rg.get();
-
+  auto segment0 = std::make_unique<MockSegment>(api::SegmentId("segment0"));
+  auto local_l1 = std::make_unique<LaneMock>(api::LaneId("l1"));
+  LaneMock* l1 = local_l1.get();
   ExpectationSet prebuild_expectations;
-  /*
+  
   prebuild_expectations += EXPECT_CALL(
-      *rg,
-      DoToLanePosition(Matches(api::GeoPosition(1, 2, 3)),
+      *l1,  //TODO replace rg with a mocklane
+      DoToLanePosition(Matches(api::GeoPosition(1, 2, 3), 0.01),
                        &nearest_position,
 		       &distance));
-  */
+  
 }
 /*
 GTEST_TEST(BruteForceTest, NondefaultConstructionAndAccessors) {
