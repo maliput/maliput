@@ -27,12 +27,22 @@ class GeoPositionMatcher : public MatcherInterface<const api::GeoPosition&> {
       : geo_position_(geo_position), tolerance_(tolerance) {}
 
   bool MatchAndExplain(const api::GeoPosition& other, MatchResultListener*) const override {
-   //TODO implement GeoPosition comparison
-   return false;
+   double delta{};
+
+   delta = std::abs(geo_position_.x() - other.x());
+   if (delta > tolerance_) return false;
+
+   delta = std::abs(geo_position_.y() - other.y());
+   if (delta > tolerance_) return false;
+
+   delta = std::abs(geo_position_.z() - other.z());
+   if (delta > tolerance_) return false;
+
+   return true;
   }
 
   void DescribeTo(std::ostream* os) const override {
-   //TODO implement description
+   *os << "is within tolerance: [" << tolerance_ << "] of all x, y, and z coordinates in: [" << geo_position_ << "]."; 
   }
 
  private:
@@ -57,8 +67,6 @@ class LaneMock final : public MockLane {
 };
 
 std::unique_ptr<MockRoadGeometry> CreateFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length) {
- //LaneMock l1
- //LaneMock lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"));	
  auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"));	
  auto lane1 = std::make_unique<LaneMock>(api::LaneId("lane1"));	
  auto lane2 = std::make_unique<LaneMock>(api::LaneId("lane2"));	
@@ -121,10 +129,12 @@ GTEST_TEST(BruteForceTest, VerifyArgs) {
   
   prebuild_expectations += EXPECT_CALL(
       *l1,  //TODO replace rg with a mocklane
-      DoToLanePosition(Matches(api::GeoPosition(1, 2, 3), 0.01),
+      DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), 0.01),
                        &nearest_position,
 		       &distance));
-  
+  //TODO need to mock BruteForce...
+  //EXPECT_CALL(*rg, BruteForceFindRoadPositionsStrategy(rg, api::GeoPosition(1., 2., 3.), 1.)).After(prebuild_expectations);
+
 }
 /*
 GTEST_TEST(BruteForceTest, NondefaultConstructionAndAccessors) {
