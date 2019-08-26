@@ -41,6 +41,15 @@ class Rule {
   /// "right of way rule", "direction usage rule", "vehicle usage rule", etc.
   using TypeId = TypeSpecificIdentifier<class Type>;
 
+  /// Rule enforcement severity description.
+  enum class Severity {
+    /// No vehicle should not travel on this lane in violation of this rule.
+    kStrict = 0,
+    /// Vehicles should avoid traveling against this rule but certain
+    /// exceptions apply.
+    kPreferred,
+  };
+
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
 
   /// Constructs a Rule.
@@ -50,11 +59,13 @@ class Rule {
   /// @param zone LaneSRoute to which this rule applies.
   /// @param related_rules A vector of related rules. The semantics vary based
   ///        on the specific rule type. Each ID must be unique.
+  /// @param severity The severity of the Rule.
   ///
   /// @throws maliput::common::assertion_error When any Rule::Id within
   ///         `related_rules` is duplicated.
-  Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone, const std::vector<Id>& related_rules)
-      : id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules) {
+  Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone, const std::vector<Id>& related_rules,
+       Severity severity)
+      : id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules), severity_(severity) {
     for (const Rule::Id& rule_id : related_rules_) {
       MALIPUT_THROW_UNLESS(std::count(related_rules_.begin(), related_rules_.end(), rule_id) == 1);
     }
@@ -70,11 +81,14 @@ class Rule {
 
   const std::vector<Id>& related_rules() const { return related_rules_; }
 
+  Severity severity() const { return severity_; }
+
  private:
   Id id_;
   TypeId type_id_;
   LaneSRoute zone_;
   std::vector<Id> related_rules_;
+  Severity severity_;
 };
 
 /// Describes a numeric range based rule.
@@ -106,6 +120,7 @@ class RangeValueRule : public Rule {
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
   /// @param related_rules A vector of related rules.
+  /// @param severity The severity of the Rule.
   /// @param ranges A vector of possible ranges that this rule could enforce.
   ///               The actual range that's enforced at any given time is
   ///               determined by a RangeValueRuleStateProvider. This vector
@@ -117,8 +132,8 @@ class RangeValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated Range
   ///         in `ranges`.
   RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                 const std::vector<Rule::Id> related_rules, const std::vector<Range>& ranges)
-      : Rule(id, type_id, zone, related_rules), ranges_(ranges) {
+                 const std::vector<Rule::Id> related_rules, Rule::Severity severity, const std::vector<Range>& ranges)
+      : Rule(id, type_id, zone, related_rules, severity), ranges_(ranges) {
     MALIPUT_THROW_UNLESS(!ranges_.empty());
     for (const Range& range : ranges_) {
       MALIPUT_THROW_UNLESS(range.min <= range.max);
@@ -148,6 +163,7 @@ class DiscreteValueRule : public Rule {
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
   /// @param related_rules A vector of related rules.
+  /// @param severity The severity of the Rule.
   /// @param values A vector of possible discrete values that this Rule could be
   ///               in. The actual value that's enforced at any given time is
   ///               determined by a DiscreteValueRuleStateProvider.  It must
@@ -156,8 +172,9 @@ class DiscreteValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated values
   ///         in `values`.
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                    const std::vector<Id> related_rules, const std::vector<std::string>& values)
-      : Rule(id, type_id, zone, related_rules), values_(values) {
+                    const std::vector<Id> related_rules, Rule::Severity severity,
+                    const std::vector<std::string>& values)
+      : Rule(id, type_id, zone, related_rules, severity), values_(values) {
     MALIPUT_THROW_UNLESS(!values_.empty());
     for (const std::string& value : values_) {
       MALIPUT_THROW_UNLESS(std::count(values_.begin(), values_.end(), value) == 1);

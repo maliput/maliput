@@ -20,6 +20,10 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const std::vector<rules::Rule::Id>& a, const std::vector<rules::Rule::Id>& b);
 
+/// Predicate-formatter which tests equality of Rule::Severity.
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, Rule::Severity a,
+                                   Rule::Severity b);
+
 /// Predicate-formatter which tests equality of RangeValueRule::Range.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const rules::RangeValueRule::Range& a, const rules::RangeValueRule::Range& b);

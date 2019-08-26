@@ -35,13 +35,12 @@ class MockRulebook final : public RoadRulebook {
       kZone,
       {DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"), DirectionUsageRule::State::Type::kWithS,
                                  DirectionUsageRule::State::Severity::kPreferred)}};
-  const RangeValueRule kRangeValueRule{Rule::Id("rvrt/rvr_id"),
-                                       Rule::TypeId("rvrt"),
-                                       LaneSRoute({kZone}),
-                                       {} /* related rules */,
-                                       {RangeValueRule::Range{"range_description", 123. /* min */, 456. /* max */}}};
-  const DiscreteValueRule kDiscreteValueRule{
-      Rule::Id("dvrt/dvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}), {} /* related rules */, {"value1", "value2"}};
+  const RangeValueRule kRangeValueRule{
+      Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"),
+      LaneSRoute({kZone}),     {} /* related rules */,
+      Rule::Severity::kStrict, {RangeValueRule::Range{"range_description", 123. /* min */, 456. /* max */}}};
+  const DiscreteValueRule kDiscreteValueRule{Rule::Id("dvrt/dvr_id"), Rule::TypeId("rvrt"),    LaneSRoute({kZone}),
+                                             {} /* related rules */,  Rule::Severity::kStrict, {"value1", "value2"}};
 
  private:
   QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double) const override {

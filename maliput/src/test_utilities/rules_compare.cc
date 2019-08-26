@@ -23,6 +23,11 @@ namespace test {
   return c.result();
 }
 
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, Rule::Severity a,
+                                   Rule::Severity b) {
+  return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
+}
+
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const std::string& a,
                                    const std::string& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
@@ -52,6 +57,7 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type_id(), b.type_id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.zone(), b.zone()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_rules(), b.related_rules()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.severity(), b.severity()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.values(), b.values()));
   return c.result();
 }
@@ -86,6 +92,7 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type_id(), b.type_id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.zone(), b.zone()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_rules(), b.related_rules()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.severity(), b.severity()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.ranges(), b.ranges()));
   return c.result();
 }
