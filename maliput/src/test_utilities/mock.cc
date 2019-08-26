@@ -446,14 +446,16 @@ DirectionUsageRule CreateDirectionUsageRule() {
 
 DiscreteValueRule CreateDiscreteValueRule() {
   return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
-                           Rule::Severity::kStrict, {"value1", "value2"});
+                           {{"value1", Rule::Severity::kStrict}, {"value2", Rule::Severity::kStrict}});
 }
 
-RangeValueRule::Range CreateRange() { return RangeValueRule::Range{"description", 123. /* min */, 456. /* max */}; }
+RangeValueRule::Range CreateRange() {
+  return RangeValueRule::Range{"description", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
+}
 
 RangeValueRule CreateRangeValueRule() {
   return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
-                        Rule::Severity::kStrict, {CreateRange()});
+                        {CreateRange()});
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {

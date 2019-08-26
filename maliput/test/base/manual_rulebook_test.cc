@@ -47,15 +47,21 @@ class ManualRulebookTest : public ::testing::Test {
 
   const Rule::Id kDiscreteValueRuleId{"dvrt/dvr_id"};
 
-  const DiscreteValueRule kDiscreteValueRule{kDiscreteValueRuleId,   Rule::TypeId("dvrt"),    LaneSRoute({kZone}),
-                                             {} /* related rules */, Rule::Severity::kStrict, {"value1", "value2"}};
+  const DiscreteValueRule kDiscreteValueRule{
+      kDiscreteValueRuleId,
+      Rule::TypeId("dvrt"),
+      LaneSRoute({kZone}),
+      {} /* related rules */,
+      {{"value1", Rule::Severity::kStrict}, {"value2", Rule::Severity::kStrict}}};
 
   const Rule::Id kRangeValueRuleId{"rvrt/rvr"};
 
   const RangeValueRule kRangeValueRule{
-      kRangeValueRuleId,       Rule::TypeId("rvrt"),
-      LaneSRoute({kZone}),     {} /* related_rules */,
-      Rule::Severity::kStrict, {RangeValueRule::Range{"description", 123. /* min */, 456. /* max */}}};
+      kRangeValueRuleId,
+      Rule::TypeId("rvrt"),
+      LaneSRoute({kZone}),
+      {} /* related_rules */,
+      {RangeValueRule::Range{"description", 123. /* min */, 456. /* max */, Rule::Severity::kStrict}}};
 };
 
 TEST_F(ManualRulebookTest, DefaultConstructor) { ManualRulebook dut; }
@@ -107,9 +113,12 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kRangeValueRule.id()), maliput::common::assertion_error);
 
-  const DiscreteValueRule kDiscreteValueRuleWithSameId{kRangeValueRuleId,       Rule::TypeId("dvrt"),
-                                                       LaneSRoute({kZone}),     {} /* related rules */,
-                                                       Rule::Severity::kStrict, {"value1", "value2"}};
+  const DiscreteValueRule kDiscreteValueRuleWithSameId{
+      kRangeValueRuleId,
+      Rule::TypeId("dvrt"),
+      LaneSRoute({kZone}),
+      {} /* related rules */,
+      {{"value1", Rule::Severity::kStrict}, {"value2", Rule::Severity::kStrict}}};
   dut.AddRule(kDiscreteValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
 }
@@ -126,9 +135,11 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
   EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()), maliput::common::assertion_error);
 
   const RangeValueRule kRangeValueRuleWithSameId{
-      kDiscreteValueRuleId,    Rule::TypeId("rvrt"),
-      LaneSRoute({kZone}),     {} /* related_rules */,
-      Rule::Severity::kStrict, {RangeValueRule::Range{"description", 123. /* min */, 456. /* max */}}};
+      kDiscreteValueRuleId,
+      Rule::TypeId("rvrt"),
+      LaneSRoute({kZone}),
+      {} /* related_rules */,
+      {RangeValueRule::Range{"description", 123. /* min */, 456. /* max */, Rule::Severity::kStrict}}};
   dut.AddRule(kRangeValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kDiscreteValueRule), maliput::common::assertion_error);
 }

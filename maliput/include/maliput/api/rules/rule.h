@@ -41,7 +41,7 @@ class Rule {
   /// "right of way rule", "direction usage rule", "vehicle usage rule", etc.
   using TypeId = TypeSpecificIdentifier<class Type>;
 
-  /// Rule enforcement severity description.
+  /// Rule state severity classification.
   enum class Severity {
     /// No vehicle should not travel on this lane in violation of this rule.
     kStrict = 0,
@@ -59,13 +59,11 @@ class Rule {
   /// @param zone LaneSRoute to which this rule applies.
   /// @param related_rules A vector of related rules. The semantics vary based
   ///        on the specific rule type. Each ID must be unique.
-  /// @param severity The severity of the Rule.
   ///
   /// @throws maliput::common::assertion_error When any Rule::Id within
   ///         `related_rules` is duplicated.
-  Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone, const std::vector<Id>& related_rules,
-       Severity severity)
-      : id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules), severity_(severity) {
+  Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone, const std::vector<Id>& related_rules)
+      : id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules) {
     for (const Rule::Id& rule_id : related_rules_) {
       MALIPUT_THROW_UNLESS(std::count(related_rules_.begin(), related_rules_.end(), rule_id) == 1);
     }
@@ -81,19 +79,17 @@ class Rule {
 
   const std::vector<Id>& related_rules() const { return related_rules_; }
 
-  Severity severity() const { return severity_; }
-
  private:
   Id id_;
   TypeId type_id_;
   LaneSRoute zone_;
   std::vector<Id> related_rules_;
-  Severity severity_;
 };
 
 /// Describes a numeric range based rule.
 ///
-/// Ranges are closed and continuous, defined by a minimum and maximum quantity.
+/// Ranges are closed and continuous, defined by a minimum and maximum quantity,
+/// and a severity.
 /// When only one extreme is formally defined, the other should take a
 /// semantically correct value. For example, if a speed limit only specifies a
 /// maximum value, the minimum value is typically zero.
@@ -104,7 +100,7 @@ class RangeValueRule : public Rule {
   /// Defines a range for a RangeValueRule.
   struct Range {
     bool operator==(const Range& other) const {
-      return min == other.min && max == other.max && description == other.description;
+      return min == other.min && max == other.max && description == other.description && severity == other.severity;
     }
 
     bool operator!=(const Range& other) const { return !(*this == other); }
@@ -112,6 +108,7 @@ class RangeValueRule : public Rule {
     std::string description;  ///< Semantics of the range quantity.
     double min{};             ///< Minimum value of the range.
     double max{};             ///< Maximum value of the range.
+    Rule::Severity severity;  ///< Severity of the range.
   };
 
   /// Constructs a range based Rule.
@@ -120,7 +117,6 @@ class RangeValueRule : public Rule {
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
   /// @param related_rules A vector of related rules.
-  /// @param severity The severity of the Rule.
   /// @param ranges A vector of possible ranges that this rule could enforce.
   ///               The actual range that's enforced at any given time is
   ///               determined by a RangeValueRuleStateProvider. This vector
@@ -132,8 +128,8 @@ class RangeValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated Range
   ///         in `ranges`.
   RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                 const std::vector<Rule::Id> related_rules, Rule::Severity severity, const std::vector<Range>& ranges)
-      : Rule(id, type_id, zone, related_rules, severity), ranges_(ranges) {
+                 const std::vector<Rule::Id> related_rules, const std::vector<Range>& ranges)
+      : Rule(id, type_id, zone, related_rules), ranges_(ranges) {
     MALIPUT_THROW_UNLESS(!ranges_.empty());
     for (const Range& range : ranges_) {
       MALIPUT_THROW_UNLESS(range.min <= range.max);
@@ -147,8 +143,9 @@ class RangeValueRule : public Rule {
   std::vector<Range> ranges_;
 };
 
-/// Describes a discrete value rule. Each discrete value is a std::string.
+/// Describes a discrete value rule.
 ///
+/// DiscreteValues are defined by a string value and a severity.
 /// Semantics of this rule are based on _all_ possible values that this
 /// Rule::TypeId could have (as specified by RuleRegistry::FindRuleByType()),
 /// not only the subset of values that a specific instance of this rule can
@@ -157,13 +154,22 @@ class DiscreteValueRule : public Rule {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DiscreteValueRule);
 
+  /// Defines a discrete value for a DiscreteValueRule.
+  struct DiscreteValue {
+    bool operator==(const DiscreteValue& other) const { return value == other.value && severity == other.severity; }
+
+    bool operator!=(const DiscreteValue& other) const { return !(*this == other); }
+
+    std::string value;        ///< Value of the DiscreteValue.
+    Rule::Severity severity;  ///< Severity of the DiscreteValue.
+  };
+
   /// Constructs a DiscreteValueRule.
   ///
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
   /// @param related_rules A vector of related rules.
-  /// @param severity The severity of the Rule.
   /// @param values A vector of possible discrete values that this Rule could be
   ///               in. The actual value that's enforced at any given time is
   ///               determined by a DiscreteValueRuleStateProvider.  It must
@@ -172,19 +178,18 @@ class DiscreteValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated values
   ///         in `values`.
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                    const std::vector<Id> related_rules, Rule::Severity severity,
-                    const std::vector<std::string>& values)
-      : Rule(id, type_id, zone, related_rules, severity), values_(values) {
+                    const std::vector<Id> related_rules, const std::vector<DiscreteValue>& values)
+      : Rule(id, type_id, zone, related_rules), values_(values) {
     MALIPUT_THROW_UNLESS(!values_.empty());
-    for (const std::string& value : values_) {
+    for (const DiscreteValue& value : values_) {
       MALIPUT_THROW_UNLESS(std::count(values_.begin(), values_.end(), value) == 1);
     }
   }
 
-  const std::vector<std::string>& values() const { return values_; }
+  const std::vector<DiscreteValue>& values() const { return values_; }
 
  private:
-  std::vector<std::string> values_;
+  std::vector<DiscreteValue> values_;
 };
 
 }  // namespace rules
