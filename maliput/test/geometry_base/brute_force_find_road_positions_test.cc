@@ -3,6 +3,9 @@
 /* clang-format on */
 // TODO(maddog@tri.global) Satisfy clang-format via rules tests directory reorg.
 
+#include <algorithm>
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -83,11 +86,27 @@ class LaneMock final : public MockLane {
   double distance;
 };
 
-std::unique_ptr<MockRoadGeometry> CreateFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length) {
+class RoadGeometryMock final : public MockRoadGeometry {
+ public:
+  explicit RoadGeometryMock(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length) : MockRoadGeometry(id, linear_tolerance, angular_tolerance, scale_length) {}
+  void set_lanes(std::vector<LaneMock*> lanes) { lanes_.assign(lanes.begin(), lanes.end()); }
+  std::vector<LaneMock*> get_lanes() { return lanes_; }
+ 
+ private:
+  std::vector<LaneMock*> lanes_;
+};
+
+std::unique_ptr<RoadGeometryMock> CreateFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length) {
+ auto road_geometry = std::make_unique<RoadGeometryMock>(id, linear_tolerance, angular_tolerance, scale_length);
+ 
  auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"));	
  auto lane1 = std::make_unique<LaneMock>(api::LaneId("lane1"));	
  auto lane2 = std::make_unique<LaneMock>(api::LaneId("lane2"));	
  
+ std::vector<LaneMock*> lanes{ lane0.get(), lane1.get(), lane2.get() };
+
+ road_geometry->set_lanes(lanes);
+
  auto segment0 = std::make_unique<MockSegment>(api::SegmentId("segment0"));
  auto segment1 = std::make_unique<MockSegment>(api::SegmentId("segment1"));
  
@@ -100,8 +119,6 @@ std::unique_ptr<MockRoadGeometry> CreateFullRoadGeometry(const api::RoadGeometry
 
  junction0->AddSegment(std::move(segment0)); 
  junction1->AddSegment(std::move(segment1)); 
-
- auto road_geometry = std::make_unique<MockRoadGeometry>(id, linear_tolerance, angular_tolerance, scale_length);
 
  road_geometry->AddJunction(std::move(junction0));
  road_geometry->AddJunction(std::move(junction1));
@@ -134,27 +151,29 @@ GTEST_TEST(BruteForceTest, NegativeRadius) {
    EXPECT_THROW(BruteForceFindRoadPositionsStrategy(rg2, api::GeoPosition(0., 0., 0.), -1.), std::exception);
 }
 
-GTEST_TEST(BruteForceTest, VerifyArgs) {
+GTEST_TEST(BruteForceTest, VerifyToLanePositiionArgs) {
   auto local_rg = CreateFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
   double distance{};
   api::GeoPosition nearest_position;
-  api::RoadGeometry* rg = local_rg.get();
-  auto segment0 = std::make_unique<MockSegment>(api::SegmentId("segment0"));
-  auto local_l1 = std::make_unique<LaneMock>(api::LaneId("l1"));
-  LaneMock* l1 = local_l1.get();
+  RoadGeometryMock* rg = local_rg.get();
+  
   ExpectationSet prebuild_expectations;
  
   auto local_bf = std::make_unique<BruteForceMocker>();
   BruteForceMocker* bf = local_bf.get();
-
-  prebuild_expectations += EXPECT_CALL(
-      *l1,
-      DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), 0.01),
-                       &nearest_position,
-		       &distance));
   
-  EXPECT_CALL(*bf, BruteForceFindStrategy(rg, api::GeoPosition(1., 2., 3.), 1.)).After(prebuild_expectations);
+  std::vector<LaneMock*> lanes = rg->get_lanes();
 
+  for(auto lane : lanes){
+    prebuild_expectations += EXPECT_CALL(
+        *lane,
+        DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), 0.01),
+                         &nearest_position,
+                         &distance));
+  }
+  EXPECT_CALL(*bf, BruteForceFindStrategy(rg, api::GeoPosition(1., 2., 3.), 1.)).After(prebuild_expectations);
+  
+  bf->BruteForceFindStrategy(rg, api::GeoPosition(1., 2., 3.), 1.);
 }
 /*
 GTEST_TEST(BruteForceTest, NondefaultConstructionAndAccessors) {
