@@ -31,12 +31,12 @@ class BruteForceInterface {
 
 class BruteForceWrapper : public BruteForceInterface {
  public:
-  std::vector<api::RoadPositionResult> BruteForceFindStrategy(const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius) {
+  std::vector<api::RoadPositionResult> BruteForceFindStrategy(const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius) override {
    return BruteForceFindRoadPositionsStrategy(rg, geo_position, radius);
   }
 };
 
-class BruteForceMocker : public BruteForceInterface {
+class BruteForceMocker : public BruteForceWrapper {
  public:
   MOCK_METHOD(std::vector<api::RoadPositionResult>, BruteForceFindStrategy, (const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius));
 };
@@ -142,7 +142,9 @@ MockRoadGeometry CreateFullRoadGeometry(const api::RoadGeometryId& id, double li
 }
 */
 GTEST_TEST(BruteForceTest, NullRoadGeometry) {
-   EXPECT_THROW(BruteForceFindRoadPositionsStrategy(nullptr, api::GeoPosition(0., 0., 0.), 0.), std::exception);
+   auto local_bf = std::make_unique<BruteForceMocker>();
+   BruteForceMocker* bf = local_bf.get();
+   EXPECT_THROW(bf->BruteForceFindStrategy(nullptr, api::GeoPosition(0., 0., 0.), 0.), std::exception);
 }
 
 GTEST_TEST(BruteForceTest, NegativeRadius) {
@@ -152,7 +154,36 @@ GTEST_TEST(BruteForceTest, NegativeRadius) {
 }
 
 GTEST_TEST(BruteForceTest, VerifyToLanePositiionArgs) {
-  auto local_rg = CreateFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
+  //auto local_rg = CreateFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
+ auto local_rg = std::make_unique<RoadGeometryMock>(api::RoadGeometryId("dut"), 1., 1., 1.);
+ 
+ auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"));	
+ auto lane1 = std::make_unique<LaneMock>(api::LaneId("lane1"));	
+ auto lane2 = std::make_unique<LaneMock>(api::LaneId("lane2"));	
+ 
+ std::vector<LaneMock*> lanes{ lane0.get(), lane1.get(), lane2.get() };
+
+ //road_geometry->set_lanes(lanes);
+
+ auto segment0 = std::make_unique<MockSegment>(api::SegmentId("segment0"));
+ auto segment1 = std::make_unique<MockSegment>(api::SegmentId("segment1"));
+ 
+ 
+
+ segment0->AddLane(std::move(lane0));
+ segment1->AddLane(std::move(lane1));
+ segment1->AddLane(std::move(lane2));
+
+ auto junction0 = std::make_unique<MockJunction>(api::JunctionId("junction0"));
+ auto junction1 = std::make_unique<MockJunction>(api::JunctionId("junction1"));
+
+ junction0->AddSegment(std::move(segment0)); 
+ junction1->AddSegment(std::move(segment1)); 
+
+ local_rg->AddJunction(std::move(junction0));
+ local_rg->AddJunction(std::move(junction1));
+  
+  
   double distance{};
   api::GeoPosition nearest_position;
   RoadGeometryMock* rg = local_rg.get();
@@ -162,8 +193,8 @@ GTEST_TEST(BruteForceTest, VerifyToLanePositiionArgs) {
   auto local_bf = std::make_unique<BruteForceMocker>();
   BruteForceMocker* bf = local_bf.get();
   
-  std::vector<LaneMock*> lanes = rg->get_lanes();
-
+  //std::vector<LaneMock*> lanes = rg->get_lanes();
+/*
   for(auto lane : lanes){
     prebuild_expectations += EXPECT_CALL(
         *lane,
@@ -171,7 +202,13 @@ GTEST_TEST(BruteForceTest, VerifyToLanePositiionArgs) {
                          &nearest_position,
                          &distance));
   }
-  EXPECT_CALL(*bf, BruteForceFindStrategy(rg, api::GeoPosition(1., 2., 3.), 1.)).After(prebuild_expectations);
+  */  
+  EXPECT_CALL(
+        *lanes[0],
+        DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), 0.01),
+                         &nearest_position,
+                         &distance));
+  EXPECT_CALL(*bf, BruteForceFindStrategy(rg, api::GeoPosition(1., 2., 3.), 1.));
   
   bf->BruteForceFindStrategy(rg, api::GeoPosition(1., 2., 3.), 1.);
 }
