@@ -21,6 +21,23 @@ namespace geometry_base {
 namespace test {
 namespace {
 
+class BruteForceInterface {
+ public:
+  virtual std::vector<api::RoadPositionResult> BruteForceFindStrategy(const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius) = 0;
+};
+
+class BruteForceWrapper : public BruteForceInterface {
+ public:
+  std::vector<api::RoadPositionResult> BruteForceFindStrategy(const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius) {
+   return BruteForceFindRoadPositionsStrategy(rg, geo_position, radius);
+  }
+};
+
+class BruteForceMocker : public BruteForceInterface {
+ public:
+  MOCK_METHOD(std::vector<api::RoadPositionResult>, BruteForceFindStrategy, (const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius));
+};
+
 class GeoPositionMatcher : public MatcherInterface<const api::GeoPosition&> {
  public:
   GeoPositionMatcher(const api::GeoPosition& geo_position, double tolerance)
@@ -126,14 +143,17 @@ GTEST_TEST(BruteForceTest, VerifyArgs) {
   auto local_l1 = std::make_unique<LaneMock>(api::LaneId("l1"));
   LaneMock* l1 = local_l1.get();
   ExpectationSet prebuild_expectations;
-  
+ 
+  auto local_bf = std::make_unique<BruteForceMocker>();
+  BruteForceMocker* bf = local_bf.get();
+
   prebuild_expectations += EXPECT_CALL(
-      *l1,  //TODO replace rg with a mocklane
+      *l1,
       DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), 0.01),
                        &nearest_position,
 		       &distance));
-  //TODO need to mock BruteForce...
-  //EXPECT_CALL(*rg, BruteForceFindRoadPositionsStrategy(rg, api::GeoPosition(1., 2., 3.), 1.)).After(prebuild_expectations);
+  
+  EXPECT_CALL(*bf, BruteForceFindStrategy(rg, api::GeoPosition(1., 2., 3.), 1.)).After(prebuild_expectations);
 
 }
 /*
