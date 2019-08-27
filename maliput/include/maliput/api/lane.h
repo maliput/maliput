@@ -72,6 +72,9 @@ class Lane {
   ///
   /// These are the lateral bounds for a position that is considered to be
   /// "staying in the lane".
+  ///
+  /// @see driveable_bounds(double s) that defines the whole "on-pavement"
+  /// surface.
   RBounds lane_bounds(double s) const { return do_lane_bounds(s); }
 
   /// Returns the driveable lateral (r) bounds of the lane as a function of s.
@@ -79,6 +82,9 @@ class Lane {
   /// These are the lateral bounds for a position that is considered to be
   /// "on pavement", reflecting the physical extent of the paved surface of
   /// the lane's segment.
+  ///
+  /// @see lane_bounds(double s) that defines what's considered to be "staying
+  /// in the lane"
   RBounds driveable_bounds(double s) const { return do_driveable_bounds(s); }
 
   /// Returns the elevation (`h`) bounds of the lane as a function of `(s, r)`.
