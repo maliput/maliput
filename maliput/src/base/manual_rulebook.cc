@@ -131,16 +131,16 @@ class ManualRulebook::Impl {
     for (const LaneSRange& range : ranges) {
       for (const IdVariant& id : index_->FindRules(range, tolerance)) {
         if (id.r) {
-          result.right_of_way.push_back(right_of_ways_.at(*id.r));
+          result.right_of_way.emplace(*id.r, right_of_ways_.at(*id.r));
         } else if (id.s) {
-          result.speed_limit.push_back(speed_limits_.at(*id.s));
+          result.speed_limit.emplace(*id.s, speed_limits_.at(*id.s));
         } else if (id.d) {
-          result.direction_usage.push_back(direction_usage_rules_.at(*id.d));
+          result.direction_usage.emplace(*id.d, direction_usage_rules_.at(*id.d));
         } else if (id.rule) {
           if (range_value_rules_.find(*id.rule) != range_value_rules_.end()) {
-            result.range_value_rules.push_back(range_value_rules_.at(*id.rule));
+            result.range_value_rules.emplace(*id.rule, range_value_rules_.at(*id.rule));
           } else if (discrete_value_rules_.find(*id.rule) != discrete_value_rules_.end()) {
-            result.discrete_value_rules.push_back(discrete_value_rules_.at(*id.rule));
+            result.discrete_value_rules.emplace(*id.rule, discrete_value_rules_.at(*id.rule));
           } else {
             throw std::out_of_range("IdVariant::rule:" + id.rule->string() + " could not be found.");
           }
@@ -157,17 +157,11 @@ class ManualRulebook::Impl {
 
   QueryResults DoRules() const {
     QueryResults result;
-    std::transform(right_of_ways_.begin(), right_of_ways_.end(), std::back_inserter(result.right_of_way),
-                   [](const auto& key_val) { return key_val.second; });
-    std::transform(speed_limits_.begin(), speed_limits_.end(), std::back_inserter(result.speed_limit),
-                   [](const auto& key_val) { return key_val.second; });
-    std::transform(direction_usage_rules_.begin(), direction_usage_rules_.end(),
-                   std::back_inserter(result.direction_usage), [](const auto& key_val) { return key_val.second; });
-    std::transform(discrete_value_rules_.begin(), discrete_value_rules_.end(),
-                   std::back_inserter(result.discrete_value_rules), [](const auto& key_val) { return key_val.second; });
-    std::transform(range_value_rules_.begin(), range_value_rules_.end(), std::back_inserter(result.range_value_rules),
-                   [](const auto& key_val) { return key_val.second; });
-
+    result.right_of_way.insert(right_of_ways_.begin(), right_of_ways_.end());
+    result.speed_limit.insert(speed_limits_.begin(), speed_limits_.end());
+    result.direction_usage.insert(direction_usage_rules_.begin(), direction_usage_rules_.end());
+    result.discrete_value_rules.insert(discrete_value_rules_.begin(), discrete_value_rules_.end());
+    result.range_value_rules.insert(range_value_rules_.begin(), range_value_rules_.end());
     return result;
   }
 

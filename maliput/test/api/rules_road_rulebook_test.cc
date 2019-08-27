@@ -48,17 +48,21 @@ class MockRulebook final : public RoadRulebook {
     QueryResults results;
     if ((!ranges.empty()) && (ranges[0].lane_id() == kZone.lane_id()) &&
         (ranges[0].s_range().s0() == kZone.s_range().s0()) && (ranges[0].s_range().s1() == kZone.s_range().s1())) {
-      results.right_of_way.push_back(kRightOfWay);
-      results.speed_limit.push_back(kSpeedLimit);
-      results.direction_usage.push_back(kDirectionUsage);
-      results.discrete_value_rules.push_back(kDiscreteValueRule);
-      results.range_value_rules.push_back(kRangeValueRule);
+      results.right_of_way.emplace(kRightOfWay.id(), kRightOfWay);
+      results.speed_limit.emplace(kSpeedLimit.id(), kSpeedLimit);
+      results.direction_usage.emplace(kDirectionUsage.id(), kDirectionUsage);
+      results.discrete_value_rules.emplace(kDiscreteValueRule.id(), kDiscreteValueRule);
+      results.range_value_rules.emplace(kRangeValueRule.id(), kRangeValueRule);
     }
     return results;
   }
 
   virtual QueryResults DoRules() const {
-    return QueryResults{{kRightOfWay}, {kSpeedLimit}, {kDirectionUsage}, {kDiscreteValueRule}, {kRangeValueRule}};
+    return QueryResults{{{kRightOfWay.id(), kRightOfWay}},
+                        {{kSpeedLimit.id(), kSpeedLimit}},
+                        {{kDirectionUsage.id(), kDirectionUsage}},
+                        {{kDiscreteValueRule.id(), kDiscreteValueRule}},
+                        {{kRangeValueRule.id(), kRangeValueRule}}};
   }
 
   virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const {

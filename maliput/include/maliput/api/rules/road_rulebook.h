@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
@@ -30,13 +31,13 @@ class RoadRulebook {
   virtual ~RoadRulebook() = default;
 
   /// Results of a FindRules() query.  Results are organized by type; an
-  /// empty vector indicates no applicable rules of that type are known.
+  /// empty map indicates no applicable rules of that type are known.
   struct QueryResults {
-    std::vector<RightOfWayRule> right_of_way;
-    std::vector<SpeedLimitRule> speed_limit;
-    std::vector<DirectionUsageRule> direction_usage;
-    std::vector<DiscreteValueRule> discrete_value_rules;
-    std::vector<RangeValueRule> range_value_rules;
+    std::map<RightOfWayRule::Id, RightOfWayRule> right_of_way;
+    std::map<SpeedLimitRule::Id, SpeedLimitRule> speed_limit;
+    std::map<DirectionUsageRule::Id, DirectionUsageRule> direction_usage;
+    std::map<DiscreteValueRule::Id, DiscreteValueRule> discrete_value_rules;
+    std::map<RangeValueRule::Id, RangeValueRule> range_value_rules;
   };
 
   /// Returns a QueryResults structure which contains any rules which are
