@@ -23,24 +23,7 @@ namespace maliput {
 namespace geometry_base {
 namespace test {
 namespace {
-/*
-class BruteForceInterface {
- public:
-  virtual std::vector<api::RoadPositionResult> BruteForceFindStrategy(const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius) = 0;
-};
 
-class BruteForceWrapper : public BruteForceInterface {
- public:
-  std::vector<api::RoadPositionResult> BruteForceFindStrategy(const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius) override {
-   return BruteForceFindRoadPositionsStrategy(rg, geo_position, radius);
-  }
-};
-
-class BruteForceMocker : public BruteForceWrapper {
- public:
-  MOCK_METHOD(std::vector<api::RoadPositionResult>, BruteForceFindStrategy, (const api::RoadGeometry* rg, const api::GeoPosition& geo_position, double radius));
-};
-*/
 class GeoPositionMatcher : public MatcherInterface<const api::GeoPosition&> {
  public:
   GeoPositionMatcher(const api::GeoPosition& geo_position, double tolerance)
@@ -126,21 +109,6 @@ std::unique_ptr<RoadGeometryMock> CreateFullRoadGeometry(const api::RoadGeometry
  return road_geometry;
 }
 
-/*
-class SegmentMock : public geometry_base::Segment {
- public:
-  explicit SegmentMock(const api::SegmentId& id) {
-   // TODO assign segment_ here
-   //segment_ = std::make_unique<geometry_base::Segment>(id);
-  }
- private:
-  std::unique_ptr<Segment> segment_;
-};
-
-MockRoadGeometry CreateFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length) {
-
-}
-*/
 GTEST_TEST(BruteForceTest, NullRoadGeometry) {
    EXPECT_THROW(BruteForceFindRoadPositionsStrategy(nullptr, api::GeoPosition(0., 0., 0.), 0.), std::exception);
 }
@@ -157,78 +125,19 @@ GTEST_TEST(BruteForceTest, VerifyToLanePositiionArgs) {
   api::GeoPosition nearest_position;
   
   RoadGeometryMock* rg = local_rg.get();
-  
-  // TODO set lanes
-  // may have issue with unique ptr/raw ptr comparison
-  /*
+ 
+  std::vector<LaneMock*> lanes = rg->get_lanes();
+
   for(auto lane : lanes){
-    prebuild_expectations += EXPECT_CALL(
+    EXPECT_CALL(
         *lane,
         DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), 0.01),
                          &nearest_position,
                          &distance));
   }
-  */
   BruteForceFindRoadPositionsStrategy(rg, api::GeoPosition(1., 2., 3.), 1.);
-}
-/*
-GTEST_TEST(BruteForceTest, NondefaultConstructionAndAccessors) {
-  {
-    const SRange dut(10., 50.);
-    EXPECT_EQ(dut.s0(), 10.);
-    EXPECT_EQ(dut.s1(), 50.);
-  }
-  // Inverted order is allowed and preserved:
-  {
-    SRange dut(79., 23.);
-    EXPECT_EQ(dut.s0(), 79.);
-    EXPECT_EQ(dut.s1(), 23.);
-  }
-}
 
-GTEST_TEST(BruteForceTest, Setters) {
-  SRange dut;
-  dut.set_s0(26.);
-  dut.set_s1(-90.);
-  EXPECT_EQ(dut.s0(), 26.);
-  EXPECT_EQ(dut.s1(), -90.);
 }
-
-GTEST_TEST(BruteForceTest, Copying) {
-  const SRange source(12., 24.);
-  const SRange dut(source);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
-}
-
-GTEST_TEST(BruteForceTest, Assignment) {
-  const SRange source(12., 24.);
-  SRange dut;
-  dut = source;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
-}
-
-GTEST_TEST(BruteForceTest, ConstructionAndAccessors) {
-  LaneSRange dut(LaneId("dut"), SRange(34., 0.));
-  EXPECT_EQ(dut.lane_id(), LaneId("dut"));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.s_range(), SRange(34., 0.)));
-
-  // Exercise convenient construction via initializer list for s_range.
-  EXPECT_NO_THROW(LaneSRange(LaneId("dut"), {0., 50.}));
-}
-
-GTEST_TEST(BruteForceTest, Copying) {
-  const LaneSRange source(LaneId("xxx"), SRange(20., 30.));
-  const LaneSRange dut(source);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
-}
-
-GTEST_TEST(LaneSRangeTest, Assignment) {
-  const LaneSRange source(LaneId("xxx"), SRange(20., 30.));
-  LaneSRange dut(LaneId("yyy"), SRange(40., 99.));  // e.g., "something else"
-  dut = source;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
-}
-*/
 }  // namespace
 }  // namespace test
 }  // namespace geometry_base
