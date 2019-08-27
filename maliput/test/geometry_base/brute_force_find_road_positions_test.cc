@@ -13,8 +13,11 @@
 #include "maliput/test_utilities/rules_test_utilities.h"
 #include "maliput/api/lane.h"
 
+using ::testing::_;
+using ::testing::An;
 using ::testing::Expectation;
 using ::testing::ExpectationSet;
+using ::testing::Invoke;
 using ::testing::Matcher;
 using ::testing::MatcherInterface;
 using ::testing::MatchResultListener;
@@ -60,11 +63,13 @@ Matcher<const api::GeoPosition&> Matches(const api::GeoPosition& geo_position, d
 
 class LaneMock final : public MockLane {
  public:
-  explicit LaneMock(const api::LaneId& id) : MockLane(id) {}
+  explicit LaneMock(const api::LaneId& id) : MockLane(id) {
+   ON_CALL(*this, DoToLanePosition(An<const api::GeoPosition&>(), _, _)).WillByDefault(Invoke(this, &LaneMock::MockDoToLanePosition));
+  }
   MOCK_METHOD(api::LanePosition, DoToLanePosition, (const api::GeoPosition&, api::GeoPosition*, double*));
  
  private: 
-  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_pos, api::GeoPosition* nearest_point, double* distance) const override { 
+  api::LanePosition MockDoToLanePosition(const api::GeoPosition& geo_pos, api::GeoPosition* nearest_point, double* distance) const { 
    return api::LanePosition(0, 0, 0);
   }
   double distance;
