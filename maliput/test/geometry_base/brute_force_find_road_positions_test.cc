@@ -36,7 +36,6 @@ class GeoPositionMatcher : public MatcherInterface<const api::GeoPosition&> {
    double delta{};
 
    delta = std::abs(geo_position_.x() - other.x());
-   std::cerr << "matching false----------------------------------" << std::endl;
    if (delta > tolerance_) return false;
 
    delta = std::abs(geo_position_.y() - other.y());
@@ -44,7 +43,6 @@ class GeoPositionMatcher : public MatcherInterface<const api::GeoPosition&> {
 
    delta = std::abs(geo_position_.z() - other.z());
    if (delta > tolerance_) return false;
-   std::cerr << "matching true----------------------------------" << std::endl;
    return true;
   }
 
