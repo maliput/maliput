@@ -33,9 +33,10 @@ add_subdirectory(resources)
 ##############################################################################
 
 if(BUILD_TESTING)
+  find_package(ament_cmake_clang_format REQUIRED)
   enable_testing()
   add_subdirectory(test)
-  add_test(NAME CLANGFORMAT COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/run_clang_format.sh)
+  ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
 endif()
 
 ##############################################################################

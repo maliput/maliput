@@ -22,6 +22,7 @@ if prereqs.tag_applies "default|all"; then
 
     prereqs.apt install --no-install-recommends \
                 ros-$DISTRO-ament-cmake \
+                ros-$DISTRO-ament-cmake-clang-format \
                 libpython3-dev
 
     if ! grep -q "^source /opt/ros/$DISTRO/setup.bash" ~/.bashrc; then
