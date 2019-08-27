@@ -6,13 +6,14 @@
 #include <algorithm>
 #include <vector>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
+#include "maliput/api/lane.h"
+#include "maliput/common/assertion_error.h"
+#include "maliput/test_utilities/maliput_types_compare.h"
 #include "maliput/test_utilities/mock_geometry.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
-#include "maliput/test_utilities/maliput_types_compare.h"
-#include "maliput/api/lane.h"
 
 using ::testing::_;
 using ::testing::An;
@@ -38,7 +39,7 @@ class GeoPositionMatcher : public MatcherInterface<const api::GeoPosition&> {
   }
 
   void DescribeTo(std::ostream* os) const override {
-   *os << "is within tolerance: [" << tolerance_ << "] of all x, y, and z coordinates in: [" << geo_position_ << "].";
+    *os << "is within tolerance: [" << tolerance_ << "] of all x, y, and z coordinates in: [" << geo_position_ << "].";
   }
 
  private:
@@ -53,7 +54,8 @@ Matcher<const api::GeoPosition&> Matches(const api::GeoPosition& geo_position, d
 class LaneMock final : public MockLane {
  public:
   explicit LaneMock(const api::LaneId& id) : MockLane(id) {
-    ON_CALL(*this, DoToLanePosition(An<const api::GeoPosition&>(), An<api::GeoPosition*>(), An<double*>())).WillByDefault(Invoke(this, &LaneMock::InternalDoToLanePosition));
+    ON_CALL(*this, DoToLanePosition(An<const api::GeoPosition&>(), An<api::GeoPosition*>(), An<double*>()))
+        .WillByDefault(Invoke(this, &LaneMock::InternalDoToLanePosition));
   }
 
   MOCK_CONST_METHOD3(DoToLanePosition, api::LanePosition(const api::GeoPosition&, api::GeoPosition*, double*));
@@ -65,7 +67,9 @@ class LaneMock final : public MockLane {
 
 class RoadGeometryMock final : public MockRoadGeometry {
  public:
-  explicit RoadGeometryMock(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length) : MockRoadGeometry(id, linear_tolerance, angular_tolerance, scale_length) {}
+  explicit RoadGeometryMock(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance,
+                            double scale_length)
+      : MockRoadGeometry(id, linear_tolerance, angular_tolerance, scale_length) {}
   void set_lanes(std::vector<LaneMock*> lanes) { lanes_.assign(lanes.begin(), lanes.end()); }
   std::vector<LaneMock*> get_lanes() { return lanes_; }
 
@@ -73,43 +77,44 @@ class RoadGeometryMock final : public MockRoadGeometry {
   std::vector<LaneMock*> lanes_;
 };
 
-std::unique_ptr<RoadGeometryMock> CreateFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length) {
- auto road_geometry = std::make_unique<RoadGeometryMock>(id, linear_tolerance, angular_tolerance, scale_length);
- std::vector<LaneMock*> lanes;
- 
- auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"));
- auto lane1 = std::make_unique<LaneMock>(api::LaneId("lane1"));
- auto lane2 = std::make_unique<LaneMock>(api::LaneId("lane2"));
+std::unique_ptr<RoadGeometryMock> CreateFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance,
+                                                         double angular_tolerance, double scale_length) {
+  auto road_geometry = std::make_unique<RoadGeometryMock>(id, linear_tolerance, angular_tolerance, scale_length);
+  std::vector<LaneMock*> lanes;
 
- auto segment0 = std::make_unique<MockSegment>(api::SegmentId("segment0"));
- auto segment1 = std::make_unique<MockSegment>(api::SegmentId("segment1"));
+  auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"));
+  auto lane1 = std::make_unique<LaneMock>(api::LaneId("lane1"));
+  auto lane2 = std::make_unique<LaneMock>(api::LaneId("lane2"));
 
- lanes.push_back(segment0->AddLane(std::move(lane0)));
- lanes.push_back(segment1->AddLane(std::move(lane1)));
- lanes.push_back(segment1->AddLane(std::move(lane2)));
+  auto segment0 = std::make_unique<MockSegment>(api::SegmentId("segment0"));
+  auto segment1 = std::make_unique<MockSegment>(api::SegmentId("segment1"));
 
- road_geometry->set_lanes(lanes);
+  lanes.push_back(segment0->AddLane(std::move(lane0)));
+  lanes.push_back(segment1->AddLane(std::move(lane1)));
+  lanes.push_back(segment1->AddLane(std::move(lane2)));
 
- auto junction0 = std::make_unique<MockJunction>(api::JunctionId("junction0"));
- auto junction1 = std::make_unique<MockJunction>(api::JunctionId("junction1"));
+  road_geometry->set_lanes(lanes);
 
- junction0->AddSegment(std::move(segment0));
- junction1->AddSegment(std::move(segment1));
+  auto junction0 = std::make_unique<MockJunction>(api::JunctionId("junction0"));
+  auto junction1 = std::make_unique<MockJunction>(api::JunctionId("junction1"));
 
- road_geometry->AddJunction(std::move(junction0));
- road_geometry->AddJunction(std::move(junction1));
+  junction0->AddSegment(std::move(segment0));
+  junction1->AddSegment(std::move(segment1));
 
- return road_geometry;
+  road_geometry->AddJunction(std::move(junction0));
+  road_geometry->AddJunction(std::move(junction1));
+
+  return road_geometry;
 }
 
 GTEST_TEST(BruteForceTest, NullRoadGeometry) {
-   EXPECT_THROW(BruteForceFindRoadPositionsStrategy(nullptr, api::GeoPosition(0., 0., 0.), 0.), std::exception);
+  EXPECT_THROW(BruteForceFindRoadPositionsStrategy(nullptr, api::GeoPosition(0., 0., 0.), 0.), common::assertion_error);
 }
 
 GTEST_TEST(BruteForceTest, NegativeRadius) {
-   std::unique_ptr<MockRoadGeometry> rg = CreateFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
-   MockRoadGeometry* rg2 = rg.get();
-   EXPECT_THROW(BruteForceFindRoadPositionsStrategy(rg2, api::GeoPosition(0., 0., 0.), -1.), std::exception);
+  std::unique_ptr<MockRoadGeometry> local_rg = CreateFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
+  MockRoadGeometry* rg = local_rg.get();
+  EXPECT_THROW(BruteForceFindRoadPositionsStrategy(rg, api::GeoPosition(0., 0., 0.), -1.), common::assertion_error);
 }
 
 GTEST_TEST(BruteForceTest, AllLanesCalled) {
@@ -120,7 +125,7 @@ GTEST_TEST(BruteForceTest, AllLanesCalled) {
 
   std::vector<LaneMock*> lanes = rg->get_lanes();
 
-  for(auto lane : lanes){
+  for (auto lane : lanes) {
     EXPECT_CALL(*lane, DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), tolerance), _, _));
   }
 
