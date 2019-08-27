@@ -67,6 +67,9 @@ class LaneMock final : public MockLane {
   MOCK_METHOD(api::LanePosition, DoToLanePosition, (const api::GeoPosition&, api::GeoPosition*, double*));
  
  private: 
+  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_pos, api::GeoPosition* nearest_point, double* distance) const override { 
+   return api::LanePosition(0, 0, 0);
+  }
   api::LanePosition MockDoToLanePosition(const api::GeoPosition& geo_pos, api::GeoPosition* nearest_point, double* distance) const { 
    return api::LanePosition(0, 0, 0);
   }
