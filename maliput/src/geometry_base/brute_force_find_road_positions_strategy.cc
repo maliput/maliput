@@ -16,7 +16,7 @@ std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrateg
   MALIPUT_THROW_UNLESS(radius >= 0.);
 
   std::vector<maliput::api::RoadPositionResult> road_position_results;
-  std::cerr <<"testing bruteforce ----------------------------------"<<std::endl;
+  
   for (int i = 0; i < rg->num_junctions(); ++i) {
     const maliput::api::Junction* junction = rg->junction(i);
     MALIPUT_THROW_UNLESS(junction != nullptr);
@@ -30,9 +30,8 @@ std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrateg
         maliput::api::GeoPosition nearest_position;
         const maliput::api::LanePosition lane_position =
             lane->ToLanePosition(geo_position, &nearest_position, &distance);
-	std::cerr<<"In lanes------------------------------"<<std::endl;
-	std::cerr<<"Lane id [] --------------------------------" << lane->id().string() <<std::endl;
-        if (radius == std::numeric_limits<double>::infinity() || distance <= radius) {
+
+	if (radius == std::numeric_limits<double>::infinity() || distance <= radius) {
           road_position_results.push_back({api::RoadPosition(lane, lane_position), nearest_position, distance});
         }
       }
