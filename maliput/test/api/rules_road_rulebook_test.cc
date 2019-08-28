@@ -46,7 +46,7 @@ class MockRulebook final : public RoadRulebook {
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {{"value1", Rule::Severity::kStrict}, {"value2", Rule::Severity::kPreferred}}};
+      {{"value1", Rule::Severity::kStrict}, {"value2", Rule::Severity::kBestEffort}}};
 
  private:
   QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double) const override {

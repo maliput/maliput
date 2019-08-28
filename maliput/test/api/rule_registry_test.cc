@@ -28,7 +28,7 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeC("RangeValueRuleTypeC");
   const RangeValueRule::Range kRangeA{"range_description_a", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
   const RangeValueRule::Range kRangeB{"range_description_b", 456. /* min */, 789. /* max */,
-                                      Rule::Severity::kPreferred};
+                                      Rule::Severity::kBestEffort};
 
   RuleRegistry dut;
   // Registers RangeValueRule types.
@@ -85,11 +85,11 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
 GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeA("DiscreteValueTypeA");
   const std::vector<DiscreteValueRule::DiscreteValue> kValuesA{{"ValueA1", Rule::Severity::kStrict},
-                                                               {"ValueA2", Rule::Severity::kPreferred}};
+                                                               {"ValueA2", Rule::Severity::kBestEffort}};
   const Rule::TypeId kTypeB("DiscreteValueRuleTypeB");
   const std::vector<DiscreteValueRule::DiscreteValue> kValuesB{{"ValueB1", Rule::Severity::kStrict},
                                                                {"ValueB2", Rule::Severity::kStrict},
-                                                               {"ValueB3", Rule::Severity::kPreferred}};
+                                                               {"ValueB3", Rule::Severity::kBestEffort}};
   const RangeValueRule::Range kRange{"range_description_a", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
 
   RuleRegistry dut;
@@ -151,7 +151,7 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   const LaneSRoute kZone({LaneSRange(LaneId("LaneId"), SRange(10., 20.))});
   const RangeValueRule::Range kRange{"range_description", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
   const RangeValueRule::Range kUnregisteredRange{"range_description", 456. /* min */, 789. /* max */,
-                                                 Rule::Severity::kPreferred};
+                                                 Rule::Severity::kBestEffort};
   const Rule::TypeId kDiscreteValueRuleType("DiscreteValueType");
   const Rule::Id kDiscreteValueRuleId("DiscreteValueType/DiscreteValueRuleId");
   const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{

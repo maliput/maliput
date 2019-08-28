@@ -43,12 +43,16 @@ class Rule {
 
   /// Rule state severity classification.
   enum class Severity {
-    /// No vehicle should not travel on this lane in violation of this rule.
+    /// This rule shall not be violated under any circumstance.
     kStrict = 0,
-    /// Vehicles should avoid traveling against this rule but certain
-    /// exceptions apply.
-    kPreferred,
+    /// Agents should try to adhere to this rule, but can violate it.
+    kBestEffort,
   };
+
+  // TODO(agalbachicar)   C++ 14 does not allow aggregate initialization in
+  //                      derived structures. When moving to C++ 17, common
+  //                      state attributes, e.g. `severity`, should be part
+  //                      of a Rule::State type.
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
 
@@ -88,8 +92,7 @@ class Rule {
 
 /// Describes a numeric range based rule.
 ///
-/// Ranges are closed and continuous, defined by a minimum and maximum quantity,
-/// and a severity.
+/// Ranges are closed and continuous, defined by a minimum and maximum quantity.
 /// When only one extreme is formally defined, the other should take a
 /// semantically correct value. For example, if a speed limit only specifies a
 /// maximum value, the minimum value is typically zero.
@@ -145,7 +148,7 @@ class RangeValueRule : public Rule {
 
 /// Describes a discrete value rule.
 ///
-/// DiscreteValues are defined by a string value and a severity.
+/// DiscreteValues are defined by a string value.
 /// Semantics of this rule are based on _all_ possible values that this
 /// Rule::TypeId could have (as specified by RuleRegistry::FindRuleByType()),
 /// not only the subset of values that a specific instance of this rule can

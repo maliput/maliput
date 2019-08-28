@@ -19,7 +19,7 @@ class RuleTest : public ::testing::Test {
   const LaneSRoute kZone{{LaneSRange(kLaneId, kSRange)}};
   const std::vector<Rule::Id> kRelatedRules{Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdC/RuleIdC")};
   const Rule::Severity kSeverityStrict{Rule::Severity::kStrict};
-  const Rule::Severity kSeverityPreferred{Rule::Severity::kPreferred};
+  const Rule::Severity kSeverityPreferred{Rule::Severity::kBestEffort};
 };
 
 // Evaluates RangeValueRule constructor.
@@ -85,7 +85,7 @@ GTEST_TEST(RangeTest, EqualOperator) {
   const RangeValueRule::Range range_3{"range_description_1", 123. /* min */, 789. /* max */, Rule::Severity::kStrict};
   const RangeValueRule::Range range_4{"range_description_4", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
   const RangeValueRule::Range range_5{"range_description_1", 123. /* min */, 456. /* max */,
-                                      Rule::Severity::kPreferred};
+                                      Rule::Severity::kBestEffort};
 
   EXPECT_TRUE(range_1 == range_1);
   EXPECT_FALSE(range_1 != range_1);
@@ -153,7 +153,7 @@ TEST_F(RuleTest, DiscreteValueRuleAccessors) {
 GTEST_TEST(DiscreteValueTest, EqualOperator) {
   const DiscreteValueRule::DiscreteValue discrete_value_1{"value_1", Rule::Severity::kStrict};
   const DiscreteValueRule::DiscreteValue discrete_value_2{"value_2", Rule::Severity::kStrict};
-  const DiscreteValueRule::DiscreteValue discrete_value_3{"value_1", Rule::Severity::kPreferred};
+  const DiscreteValueRule::DiscreteValue discrete_value_3{"value_1", Rule::Severity::kBestEffort};
 
   EXPECT_TRUE(discrete_value_1 == discrete_value_1);
   EXPECT_FALSE(discrete_value_1 != discrete_value_1);
