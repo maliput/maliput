@@ -1,7 +1,4 @@
-/* clang-format off to disable clang-format-includes */
 #include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
-/* clang-format on */
-// TODO(maddog@tri.global) Satisfy clang-format via rules tests directory reorg.
 
 #include <algorithm>
 #include <vector>
@@ -77,7 +74,7 @@ class RoadGeometryMock final : public MockRoadGeometry {
   std::vector<LaneMock*> lanes_;
 };
 
-std::unique_ptr<RoadGeometryMock> CreateFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance,
+std::unique_ptr<RoadGeometryMock> MakeFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance,
                                                          double angular_tolerance, double scale_length) {
   auto road_geometry = std::make_unique<RoadGeometryMock>(id, linear_tolerance, angular_tolerance, scale_length);
   std::vector<LaneMock*> lanes;
@@ -112,25 +109,22 @@ GTEST_TEST(BruteForceTest, NullRoadGeometry) {
 }
 
 GTEST_TEST(BruteForceTest, NegativeRadius) {
-  std::unique_ptr<MockRoadGeometry> local_rg = CreateFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
-  MockRoadGeometry* rg = local_rg.get();
-  EXPECT_THROW(BruteForceFindRoadPositionsStrategy(rg, api::GeoPosition(0., 0., 0.), -1.), common::assertion_error);
+  std::unique_ptr<MockRoadGeometry> rg = MakeFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
+  EXPECT_THROW(BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(0., 0., 0.), -1.), common::assertion_error);
 }
 
 GTEST_TEST(BruteForceTest, AllLanesCalled) {
   double tolerance{0.01};
-  auto local_rg = CreateFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
+  auto rg = MakeFullRoadGeometry(api::RoadGeometryId("dut"), 1., 1., 1.);
 
-  RoadGeometryMock* rg = local_rg.get();
-
-  std::vector<LaneMock*> lanes = rg->get_lanes();
+  const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
 
   for (auto lane : lanes) {
     EXPECT_CALL(*lane, DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), tolerance), _, _));
   }
 
-  std::vector<api::RoadPositionResult> results =
-      BruteForceFindRoadPositionsStrategy(rg, api::GeoPosition(1., 2., 3.), 1.);
+  const std::vector<api::RoadPositionResult> results =
+      BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), 1.);
 
   EXPECT_EQ(results.size(), 3);
   for (const auto road_position_result : results) {
