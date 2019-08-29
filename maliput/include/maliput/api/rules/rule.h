@@ -49,10 +49,13 @@ class Rule {
     kBestEffort,
   };
 
-  // TODO(agalbachicar)   C++ 14 does not allow aggregate initialization in
-  //                      derived structures. When moving to C++ 17, common
-  //                      state attributes, e.g. `severity`, should be part
-  //                      of a Rule::State type.
+  /// Defines a base state for a Rule.
+  struct State {
+    bool operator==(const State& other) const { return severity == other.severity; }
+    bool operator!=(const State& other) const { return !(*this == other); }
+
+    Severity severity;  ///< Severity of the Rule::State.
+  };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
 
@@ -101,17 +104,15 @@ class RangeValueRule : public Rule {
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RangeValueRule);
 
   /// Defines a range for a RangeValueRule.
-  struct Range {
+  struct Range : public Rule::State {
     bool operator==(const Range& other) const {
-      return min == other.min && max == other.max && description == other.description && severity == other.severity;
+      return min == other.min && max == other.max && description == other.description && Rule::State::operator==(other);
     }
-
     bool operator!=(const Range& other) const { return !(*this == other); }
 
     std::string description;  ///< Semantics of the range quantity.
     double min{};             ///< Minimum value of the range.
     double max{};             ///< Maximum value of the range.
-    Rule::Severity severity;  ///< Severity of the range.
   };
 
   /// Constructs a range based Rule.
@@ -146,6 +147,18 @@ class RangeValueRule : public Rule {
   std::vector<Range> ranges_;
 };
 
+/// Constructs a RangeValueRule::RangeValue.
+// TODO(...) Remove this once we switch to C++17 and can use aggregate initialization.
+inline RangeValueRule::Range MakeRange(const Rule::Severity& severity, const std::string& description, double min,
+                                       double max) {
+  RangeValueRule::Range range;
+  range.severity = severity;
+  range.description = description;
+  range.min = min;
+  range.max = max;
+  return range;
+}
+
 /// Describes a discrete value rule.
 ///
 /// DiscreteValues are defined by a string value.
@@ -158,13 +171,11 @@ class DiscreteValueRule : public Rule {
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DiscreteValueRule);
 
   /// Defines a discrete value for a DiscreteValueRule.
-  struct DiscreteValue {
-    bool operator==(const DiscreteValue& other) const { return value == other.value && severity == other.severity; }
-
+  struct DiscreteValue : public Rule::State {
+    bool operator==(const DiscreteValue& other) const { return value == other.value && Rule::State::operator==(other); }
     bool operator!=(const DiscreteValue& other) const { return !(*this == other); }
 
-    std::string value;        ///< Value of the DiscreteValue.
-    Rule::Severity severity;  ///< Severity of the DiscreteValue.
+    std::string value;  ///< Value of the DiscreteValue.
   };
 
   /// Constructs a DiscreteValueRule.
@@ -194,6 +205,15 @@ class DiscreteValueRule : public Rule {
  private:
   std::vector<DiscreteValue> values_;
 };
+
+/// Constructs a DiscreteValueRule::DiscreteValue.
+// TODO(...) Remove this once we switch to C++17 and can use aggregate initialization.
+inline DiscreteValueRule::DiscreteValue MakeDiscreteValue(const Rule::Severity& severity, const std::string& value) {
+  DiscreteValueRule::DiscreteValue discrete_value;
+  discrete_value.severity = severity;
+  discrete_value.value = value;
+  return discrete_value;
+}
 
 }  // namespace rules
 }  // namespace api

@@ -26,9 +26,8 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeA("RangeValueRuleTypeA");
   const Rule::TypeId kTypeB("RangeValueRuleTypeB");
   const Rule::TypeId kTypeC("RangeValueRuleTypeC");
-  const RangeValueRule::Range kRangeA{"range_description_a", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
-  const RangeValueRule::Range kRangeB{"range_description_b", 456. /* min */, 789. /* max */,
-                                      Rule::Severity::kBestEffort};
+  const RangeValueRule::Range kRangeA = MakeRange(Rule::Severity::kStrict, "range_description_a", 123., 456.);
+  const RangeValueRule::Range kRangeB = MakeRange(Rule::Severity::kBestEffort, "range_description_b", 456., 789.);
 
   RuleRegistry dut;
   // Registers RangeValueRule types.
@@ -36,7 +35,7 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   EXPECT_NO_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}));
   // Throws because of duplicated type ID.
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}), maliput::common::assertion_error);
-  EXPECT_THROW(dut.RegisterDiscreteValueRule(kTypeB, {{"SomeValue", Rule::Severity::kStrict}}),
+  EXPECT_THROW(dut.RegisterDiscreteValueRule(kTypeB, {MakeDiscreteValue(Rule::Severity::kStrict, "SomeValue")}),
                maliput::common::assertion_error);
   // Throws because of empty range vector.
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeC, {} /* ranges */), maliput::common::assertion_error);
@@ -84,20 +83,20 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
 // Evaluates queries after registering DiscreteValueRule types.
 GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeA("DiscreteValueTypeA");
-  const std::vector<DiscreteValueRule::DiscreteValue> kValuesA{{"ValueA1", Rule::Severity::kStrict},
-                                                               {"ValueA2", Rule::Severity::kBestEffort}};
+  const std::vector<DiscreteValueRule::DiscreteValue> kValuesA{
+      MakeDiscreteValue(Rule::Severity::kStrict, "ValueA1"), MakeDiscreteValue(Rule::Severity::kBestEffort, "ValueA2")};
   const Rule::TypeId kTypeB("DiscreteValueRuleTypeB");
-  const std::vector<DiscreteValueRule::DiscreteValue> kValuesB{{"ValueB1", Rule::Severity::kStrict},
-                                                               {"ValueB2", Rule::Severity::kStrict},
-                                                               {"ValueB3", Rule::Severity::kBestEffort}};
-  const RangeValueRule::Range kRange{"range_description_a", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
+  const std::vector<DiscreteValueRule::DiscreteValue> kValuesB{
+      MakeDiscreteValue(Rule::Severity::kStrict, "ValueB1"), MakeDiscreteValue(Rule::Severity::kStrict, "ValueB2"),
+      MakeDiscreteValue(Rule::Severity::kBestEffort, "ValueB3")};
+  const RangeValueRule::Range kRange = MakeRange(Rule::Severity::kStrict, "range_description_a", 123., 456.);
 
   RuleRegistry dut;
   // Registers DiscreteValueRule types.
   EXPECT_NO_THROW(dut.RegisterDiscreteValueRule(kTypeA, kValuesA));
   EXPECT_NO_THROW(dut.RegisterDiscreteValueRule(kTypeB, kValuesB));
   // Throws because of duplicated type ID.
-  EXPECT_THROW(dut.RegisterDiscreteValueRule(kTypeB, {{"SomeValue", Rule::Severity::kStrict}}),
+  EXPECT_THROW(dut.RegisterDiscreteValueRule(kTypeB, {MakeDiscreteValue(Rule::Severity::kStrict, "SomeValue")}),
                maliput::common::assertion_error);
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRange}), maliput::common::assertion_error);
   // Throws because of empty vector.
@@ -149,16 +148,18 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   const Rule::TypeId kRangeValueRuleType("RangeValueRuleType");
   const Rule::Id kRangeRuleId("RangeValueRuleType/RangeRuleId");
   const LaneSRoute kZone({LaneSRange(LaneId("LaneId"), SRange(10., 20.))});
-  const RangeValueRule::Range kRange{"range_description", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
-  const RangeValueRule::Range kUnregisteredRange{"range_description", 456. /* min */, 789. /* max */,
-                                                 Rule::Severity::kBestEffort};
+  const RangeValueRule::Range kRange = MakeRange(Rule::Severity::kStrict, "range_description", 123., 456.);
+  const RangeValueRule::Range kUnregisteredRange =
+      MakeRange(Rule::Severity::kBestEffort, "range_description", 456., 789.);
   const Rule::TypeId kDiscreteValueRuleType("DiscreteValueType");
   const Rule::Id kDiscreteValueRuleId("DiscreteValueType/DiscreteValueRuleId");
   const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{
-      {"Value1", Rule::Severity::kStrict}, {"Value2", Rule::Severity::kStrict}, {"Value3", Rule::Severity::kStrict}};
+      MakeDiscreteValue(Rule::Severity::kStrict, "Value1"), MakeDiscreteValue(Rule::Severity::kStrict, "Value2"),
+      MakeDiscreteValue(Rule::Severity::kStrict, "Value3")};
 
   const Rule::TypeId kUnregisteredRuleType("UnregisteredRuleType");
-  const DiscreteValueRule::DiscreteValue kUnregisteredDiscreteValue{"Value4", Rule::Severity::kStrict};
+  const DiscreteValueRule::DiscreteValue kUnregisteredDiscreteValue =
+      MakeDiscreteValue(Rule::Severity::kStrict, "Value4");
 
   RuleRegistry dut;
 
@@ -190,8 +191,8 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
                maliput::common::assertion_error);
 
   // Builds and evaluates a discrete value based rule.
-  const std::vector<DiscreteValueRule::DiscreteValue> kExpectedDiscreteValues{{"Value1", Rule::Severity::kStrict},
-                                                                              {"Value3", Rule::Severity::kStrict}};
+  const std::vector<DiscreteValueRule::DiscreteValue> kExpectedDiscreteValues{
+      MakeDiscreteValue(Rule::Severity::kStrict, "Value1"), MakeDiscreteValue(Rule::Severity::kStrict, "Value3")};
   const DiscreteValueRule discrete_value_rule = dut.BuildDiscreteValueRule(
       kDiscreteValueRuleId, kDiscreteValueRuleType, kZone, {} /* related rules */, kExpectedDiscreteValues);
   EXPECT_EQ(discrete_value_rule.id(), kDiscreteValueRuleId);

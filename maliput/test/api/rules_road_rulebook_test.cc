@@ -40,13 +40,13 @@ class MockRulebook final : public RoadRulebook {
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {RangeValueRule::Range{"range_description", 123. /* min */, 456. /* max */, Rule::Severity::kStrict}}};
+      {MakeRange(Rule::Severity::kStrict, "range_description", 123. /* min */, 456. /* max */)}};
   const DiscreteValueRule kDiscreteValueRule{
       Rule::Id("dvrt/dvr_id"),
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {{"value1", Rule::Severity::kStrict}, {"value2", Rule::Severity::kBestEffort}}};
+      {MakeDiscreteValue(Rule::Severity::kStrict, "value1"), MakeDiscreteValue(Rule::Severity::kBestEffort, "value2")}};
 
  private:
   QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double) const override {

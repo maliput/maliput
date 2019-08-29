@@ -25,8 +25,8 @@ class RuleTest : public ::testing::Test {
 // Evaluates RangeValueRule constructor.
 TEST_F(RuleTest, RangeValueRuleConstructor) {
   const std::vector<RangeValueRule::Range> kRanges{
-      {"range_description_1", 123. /* min */, 456. /* max */, kSeverityStrict},
-      {"range_description_2", 789. /* min */, 1234. /* max */, kSeverityPreferred},
+      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */),
+      MakeRange(kSeverityPreferred, "range_description_2", 789. /* min */, 1234. /* max */),
   };
 
   EXPECT_NO_THROW(RangeValueRule(kId, kTypeId, kZone, kRelatedRules, kRanges));
@@ -40,14 +40,14 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
                maliput::common::assertion_error);
   // Duplicated ranges.
   const std::vector<RangeValueRule::Range> kDuplicatedRanges{
-      {"range_description_1", 123. /* min */, 456. /* max */, kSeverityStrict},
-      {"range_description_1", 123. /* min */, 456. /* max */, kSeverityStrict},
+      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */),
+      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */),
   };
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */, kDuplicatedRanges),
                maliput::common::assertion_error);
   // RangeValueRule::Range::min is greater than RangeValueRule::Range::max.
   const std::vector<RangeValueRule::Range> kShiftedRanges{
-      {"range_description_3", 456. /* min */, 123. /* max */, kSeverityStrict}};
+      MakeRange(kSeverityStrict, "range_description_3", 456. /* min */, 123. /* max */)};
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */, kShiftedRanges),
                maliput::common::assertion_error);
 }
@@ -55,8 +55,8 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
 // Evaluates RangeValueRule accessors.
 TEST_F(RuleTest, RangeValueRuleAccessors) {
   const std::vector<RangeValueRule::Range> kRanges{
-      {"range_description_1", 123. /* min */, 456. /* max */, kSeverityStrict},
-      {"range_description_2", 789. /* min */, 1234. /* max */, kSeverityPreferred},
+      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */),
+      MakeRange(kSeverityPreferred, "range_description_2", 789. /* min */, 1234. /* max */),
   };
 
   const RangeValueRule dut(kId, kTypeId, kZone, kRelatedRules, kRanges);
@@ -80,12 +80,16 @@ TEST_F(RuleTest, RangeValueRuleAccessors) {
 // Evaluates the equal and not equal operator overloads for
 // RangeValueRule::Range.
 GTEST_TEST(RangeTest, EqualOperator) {
-  const RangeValueRule::Range range_1{"range_description_1", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
-  const RangeValueRule::Range range_2{"range_description_1", 456. /* min */, 456. /* max */, Rule::Severity::kStrict};
-  const RangeValueRule::Range range_3{"range_description_1", 123. /* min */, 789. /* max */, Rule::Severity::kStrict};
-  const RangeValueRule::Range range_4{"range_description_4", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
-  const RangeValueRule::Range range_5{"range_description_1", 123. /* min */, 456. /* max */,
-                                      Rule::Severity::kBestEffort};
+  const RangeValueRule::Range range_1 =
+      MakeRange(Rule::Severity::kStrict, "range_description_1", 123. /* min */, 456. /* max */);
+  const RangeValueRule::Range range_2 =
+      MakeRange(Rule::Severity::kStrict, "range_description_1", 456. /* min */, 456. /* max */);
+  const RangeValueRule::Range range_3 =
+      MakeRange(Rule::Severity::kStrict, "range_description_1", 123. /* min */, 789. /* max */);
+  const RangeValueRule::Range range_4 =
+      MakeRange(Rule::Severity::kStrict, "range_description_4", 123. /* min */, 456. /* max */);
+  const RangeValueRule::Range range_5 =
+      MakeRange(Rule::Severity::kBestEffort, "range_description_1", 123. /* min */, 456. /* max */);
 
   EXPECT_TRUE(range_1 == range_1);
   EXPECT_FALSE(range_1 != range_1);
@@ -105,8 +109,9 @@ GTEST_TEST(RangeTest, EqualOperator) {
 
 // Evaluates DiscreteValueRule constructor.
 TEST_F(RuleTest, DiscreteValueRuleConstructor) {
-  const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{{"rule_state_value_1", kSeverityStrict},
-                                                                      {"rule_state_value_2", kSeverityPreferred}};
+  const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{
+      MakeDiscreteValue(kSeverityStrict, "rule_state_value_1"),
+      MakeDiscreteValue(kSeverityPreferred, "rule_state_value_2")};
 
   EXPECT_NO_THROW(DiscreteValueRule(kId, kTypeId, kZone, {} /* related rules */, kDiscreteValues));
   EXPECT_NO_THROW(DiscreteValueRule(kId, kTypeId, kZone, kRelatedRules, kDiscreteValues));
@@ -120,15 +125,17 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
                maliput::common::assertion_error);
   // Duplicated ranges.
   const std::vector<DiscreteValueRule::DiscreteValue> kDuplicatedDiscreteValues{
-      {"rule_state_value_1", kSeverityStrict}, {"rule_state_value_1", kSeverityStrict}};
+      MakeDiscreteValue(kSeverityStrict, "rule_state_value_1"),
+      MakeDiscreteValue(kSeverityStrict, "rule_state_value_1")};
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, kRelatedRules, kDuplicatedDiscreteValues),
                maliput::common::assertion_error);
 }
 
 // Evaluates DiscreteValueRule accessors.
 TEST_F(RuleTest, DiscreteValueRuleAccessors) {
-  const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{{"rule_state_value_1", kSeverityStrict},
-                                                                      {"rule_state_value_2", kSeverityPreferred}};
+  const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{
+      MakeDiscreteValue(kSeverityStrict, "rule_state_value_1"),
+      MakeDiscreteValue(kSeverityPreferred, "rule_state_value_2")};
 
   const DiscreteValueRule dut(kId, kTypeId, kZone, kRelatedRules, kDiscreteValues);
 
@@ -151,9 +158,9 @@ TEST_F(RuleTest, DiscreteValueRuleAccessors) {
 // Evaluates the equal and not equal operator overloads for
 // DiscreteValueRule::DiscreteValue.
 GTEST_TEST(DiscreteValueTest, EqualOperator) {
-  const DiscreteValueRule::DiscreteValue discrete_value_1{"value_1", Rule::Severity::kStrict};
-  const DiscreteValueRule::DiscreteValue discrete_value_2{"value_2", Rule::Severity::kStrict};
-  const DiscreteValueRule::DiscreteValue discrete_value_3{"value_1", Rule::Severity::kBestEffort};
+  const DiscreteValueRule::DiscreteValue discrete_value_1 = MakeDiscreteValue(Rule::Severity::kStrict, "value_1");
+  const DiscreteValueRule::DiscreteValue discrete_value_2 = MakeDiscreteValue(Rule::Severity::kStrict, "value_2");
+  const DiscreteValueRule::DiscreteValue discrete_value_3 = MakeDiscreteValue(Rule::Severity::kBestEffort, "value_1");
 
   EXPECT_TRUE(discrete_value_1 == discrete_value_1);
   EXPECT_FALSE(discrete_value_1 != discrete_value_1);

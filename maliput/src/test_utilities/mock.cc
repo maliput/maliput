@@ -446,11 +446,12 @@ DirectionUsageRule CreateDirectionUsageRule() {
 
 DiscreteValueRule CreateDiscreteValueRule() {
   return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
-                           {{"value1", Rule::Severity::kStrict}, {"value2", Rule::Severity::kStrict}});
+                           {rules::MakeDiscreteValue(Rule::Severity::kStrict, "value1"),
+                            rules::MakeDiscreteValue(Rule::Severity::kStrict, "value2")});
 }
 
 RangeValueRule::Range CreateRange() {
-  return RangeValueRule::Range{"description", 123. /* min */, 456. /* max */, Rule::Severity::kStrict};
+  return MakeRange(Rule::Severity::kStrict, "description", 123. /* min */, 456. /* max */);
 }
 
 RangeValueRule CreateRangeValueRule() {
