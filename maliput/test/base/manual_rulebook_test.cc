@@ -32,6 +32,8 @@ class ManualRulebookTest : public ::testing::Test {
  protected:
   const LaneSRange kZone{LaneId("a"), {10., 20.}};
 
+  const Rule::RelatedRules kRelatedRules{};
+
   const RightOfWayRule kRightOfWay{
       RightOfWayRule::Id("rowr_id"),
       LaneSRoute({kZone}),
@@ -49,20 +51,18 @@ class ManualRulebookTest : public ::testing::Test {
 
   const Rule::Id kDiscreteValueRuleId{"dvrt/dvr_id"};
 
-  const DiscreteValueRule kDiscreteValueRule{
-      kDiscreteValueRuleId,
-      Rule::TypeId("dvrt"),
-      LaneSRoute({kZone}),
-      {} /* related rules */,
-      {MakeDiscreteValue(Rule::State::kStrict, "value1"), MakeDiscreteValue(Rule::State::kBestEffort, "value2")}};
+  const DiscreteValueRule kDiscreteValueRule{kDiscreteValueRuleId,
+                                             Rule::TypeId("dvrt"),
+                                             LaneSRoute({kZone}),
+                                             {MakeDiscreteValue(Rule::State::kStrict, kRelatedRules, "value1"),
+                                              MakeDiscreteValue(Rule::State::kBestEffort, kRelatedRules, "value2")}};
 
   const Rule::Id kRangeValueRuleId{"rvrt/rvr"};
 
   const RangeValueRule kRangeValueRule{kRangeValueRuleId,
                                        Rule::TypeId("rvrt"),
                                        LaneSRoute({kZone}),
-                                       {} /* related_rules */,
-                                       {MakeRange(Rule::State::kStrict, "description", 123., 456.)}};
+                                       {MakeRange(Rule::State::kStrict, kRelatedRules, "description", 123., 456.)}};
 };
 
 TEST_F(ManualRulebookTest, DefaultConstructor) { ManualRulebook dut; }
@@ -118,8 +118,8 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
       kRangeValueRuleId,
       Rule::TypeId("dvrt"),
       LaneSRoute({kZone}),
-      {} /* related rules */,
-      {MakeDiscreteValue(Rule::State::kStrict, "value1"), MakeDiscreteValue(Rule::State::kStrict, "value2")}};
+      {MakeDiscreteValue(Rule::State::kStrict, kRelatedRules, "value1"),
+       MakeDiscreteValue(Rule::State::kStrict, kRelatedRules, "value2")}};
   dut.AddRule(kDiscreteValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
 }
@@ -135,11 +135,12 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
   EXPECT_THROW({ dut.GetDiscreteValueRule(kDiscreteValueRule.id()); }, std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()), maliput::common::assertion_error);
 
-  const RangeValueRule kRangeValueRuleWithSameId{kDiscreteValueRuleId,
-                                                 Rule::TypeId("rvrt"),
-                                                 LaneSRoute({kZone}),
-                                                 {} /* related_rules */,
-                                                 {MakeRange(Rule::State::kStrict, "description", 123., 456.)}};
+  const RangeValueRule kRangeValueRuleWithSameId{
+      kDiscreteValueRuleId,
+      Rule::TypeId("rvrt"),
+      LaneSRoute({kZone}),
+      {MakeRange(Rule::State::kStrict, kRelatedRules, "description", 123., 456.)}};
+
   dut.AddRule(kRangeValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kDiscreteValueRule), maliput::common::assertion_error);
 }

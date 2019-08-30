@@ -23,6 +23,7 @@ namespace {
 class MockRulebook final : public RoadRulebook {
  public:
   const LaneSRange kZone{LaneId("some_lane"), {10., 20.}};
+  const Rule::RelatedRules kEmptyRelatedRules{};
   const RightOfWayRule kRightOfWay{
       RightOfWayRule::Id("rowr_id"),
       LaneSRoute({kZone}),
@@ -39,14 +40,13 @@ class MockRulebook final : public RoadRulebook {
       Rule::Id("rvrt/rvr_id"),
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
-      {} /* related rules */,
-      {MakeRange(Rule::State::kStrict, "range_description", 123. /* min */, 456. /* max */)}};
+      {MakeRange(Rule::State::kStrict, kEmptyRelatedRules, "range_description", 123. /* min */, 456. /* max */)}};
   const DiscreteValueRule kDiscreteValueRule{
       Rule::Id("dvrt/dvr_id"),
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
-      {} /* related rules */,
-      {MakeDiscreteValue(Rule::State::kStrict, "value1"), MakeDiscreteValue(Rule::State::kBestEffort, "value2")}};
+      {MakeDiscreteValue(Rule::State::kStrict, kEmptyRelatedRules, "value1"),
+       MakeDiscreteValue(Rule::State::kBestEffort, kEmptyRelatedRules, "value2")}};
 
  private:
   QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double) const override {

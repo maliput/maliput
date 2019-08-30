@@ -69,7 +69,7 @@ drake::optional<RuleRegistry::QueryResult> RuleRegistry::GetPossibleStatesOfRule
 }
 
 RangeValueRule RuleRegistry::BuildRangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id,
-                                                 const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
+                                                 const LaneSRoute& zone,
                                                  const std::vector<RangeValueRule::Range>& ranges) const {
   const auto range_rule_type = range_rule_types_.find(type_id);
   MALIPUT_THROW_UNLESS(range_rule_type != range_rule_types_.end());
@@ -77,11 +77,11 @@ RangeValueRule RuleRegistry::BuildRangeValueRule(const Rule::Id& id, const Rule:
     MALIPUT_THROW_UNLESS(HasValue(range_rule_type->second, range));
   }
 
-  return RangeValueRule(id, type_id, zone, related_rules, ranges);
+  return RangeValueRule(id, type_id, zone, ranges);
 }
 
 DiscreteValueRule RuleRegistry::BuildDiscreteValueRule(
-    const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone, const std::vector<Rule::Id>& related_rules,
+    const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
     const std::vector<DiscreteValueRule::DiscreteValue>& values) const {
   const auto discrete_rule_type = discrete_rule_types_.find(type_id);
   MALIPUT_THROW_UNLESS(discrete_rule_type != discrete_rule_types_.end());
@@ -89,7 +89,7 @@ DiscreteValueRule RuleRegistry::BuildDiscreteValueRule(
     MALIPUT_THROW_UNLESS(HasValue(discrete_rule_type->second, value_state));
   }
 
-  return DiscreteValueRule(id, type_id, zone, related_rules, values);
+  return DiscreteValueRule(id, type_id, zone, values);
 }
 
 }  // namespace rules

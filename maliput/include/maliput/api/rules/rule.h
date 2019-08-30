@@ -23,8 +23,6 @@ namespace rules {
 ///
 /// - range based (@see RangeValueRule).
 /// - discrete (@see DiscreteValueRule).
-///
-/// Finally, a Rule may point to other Rules via `related_rules`.
 class Rule {
  public:
   /// Used to specialize TypeSpecificIdentifier and define a unique TypeId.
@@ -40,6 +38,12 @@ class Rule {
   /// TypeId, assuming they really are the same type. Example types include
   /// "right of way rule", "direction usage rule", "vehicle usage rule", etc.
   using TypeId = TypeSpecificIdentifier<class Type>;
+
+  /// Alias of a map holding semantic groups of related rules. The semantics
+  /// vary based on the specific rule type. Each semantic group name must not
+  /// be an empty string. Each vector of Rule::Id must not be empty. Each
+  /// ID for each group must be unique.
+  using RelatedRules = std::map<std::string, std::vector<Id>>;
 
   /// Defines a base state for a Rule.
   struct State {
@@ -64,6 +68,7 @@ class Rule {
     /// semantics. See kStrict and kBestEffort for two commonly used severity
     /// levels.
     int severity{};
+    RelatedRules related_rules;  ///< RelatedRules of the Rule::State.
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
@@ -73,17 +78,10 @@ class Rule {
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
-  /// @param related_rules A vector of related rules. The semantics vary based
-  ///        on the specific rule type. Each ID must be unique.
   ///
   /// @throws maliput::common::assertion_error When any Rule::Id within
   ///         `related_rules` is duplicated.
-  Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone, const std::vector<Id>& related_rules)
-      : id_(id), type_id_(type_id), zone_(zone), related_rules_(related_rules) {
-    for (const Rule::Id& rule_id : related_rules_) {
-      MALIPUT_THROW_UNLESS(std::count(related_rules_.begin(), related_rules_.end(), rule_id) == 1);
-    }
-  }
+  Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone) : id_(id), type_id_(type_id), zone_(zone) {}
 
   virtual ~Rule() = default;
 
@@ -93,7 +91,12 @@ class Rule {
 
   const LaneSRoute& zone() const { return zone_; }
 
-  const std::vector<Id>& related_rules() const { return related_rules_; }
+ protected:
+  // Validates that `related_rules` requirements are met.
+  // @see RelatedRules alias definition for full type requirements.
+  // @throws maliput::assertion_error When any of the requirements in
+  //         `RelatedRules` are not met.
+  void ValidateRelatedRules(const RelatedRules& related_rules) const;
 
  protected:
   // Validates that `severity` is a non-negative quantity.
@@ -104,7 +107,6 @@ class Rule {
   Id id_;
   TypeId type_id_;
   LaneSRoute zone_;
-  std::vector<Id> related_rules_;
 };
 
 }  // namespace rules

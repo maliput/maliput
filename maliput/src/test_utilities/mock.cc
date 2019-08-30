@@ -446,18 +446,17 @@ DirectionUsageRule CreateDirectionUsageRule() {
 }
 
 DiscreteValueRule CreateDiscreteValueRule() {
-  return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
-                           {rules::MakeDiscreteValue(rules::Rule::State::kStrict, "value1"),
-                            rules::MakeDiscreteValue(rules::Rule::State::kStrict, "value2")});
+  return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(),
+                           {rules::MakeDiscreteValue(rules::Rule::State::kStrict, {} /* related rules */, "value1"),
+                            rules::MakeDiscreteValue(rules::Rule::State::kStrict, {} /* related rules */, "value2")});
 }
 
 RangeValueRule::Range CreateRange() {
-  return rules::MakeRange(rules::Rule::State::kStrict, "description", 123. /* min */, 456. /* max */);
+  return rules::MakeRange(0 /* severity */, {} /* related rules */, "description", 123. /* min */, 456. /* max */);
 }
 
 RangeValueRule CreateRangeValueRule() {
-  return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
-                        {CreateRange()});
+  return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {CreateRange()});
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
