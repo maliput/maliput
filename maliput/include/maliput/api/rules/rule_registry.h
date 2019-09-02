@@ -6,9 +6,10 @@
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/range_value_rule.h"
-#include "maliput/api/rules/regions.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {

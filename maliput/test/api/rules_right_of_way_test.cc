@@ -5,9 +5,10 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/api/rules/regions.h"
+#include "maliput/api/regions.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
+#include "maliput/test_utilities/regions_test_utilities.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -84,7 +85,7 @@ GTEST_TEST(RightOfWayRuleTest, Accessors) {
                            RightOfWayRule::ZoneType::kStopExcluded,
                            {api::test::NoYieldState(), api::test::YieldState()}, api::test::RelatedBulbGroups());
   EXPECT_EQ(dut.id(), RightOfWayRule::Id("dut_id"));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.zone(), api::test::CreateLaneSRoute()));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), api::test::CreateLaneSRoute()));
   EXPECT_EQ(dut.zone_type(), RightOfWayRule::ZoneType::kStopExcluded);
   EXPECT_EQ(dut.states().size(), 2);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states().at(RightOfWayRule::State::Id("s1")), api::test::NoYieldState()));

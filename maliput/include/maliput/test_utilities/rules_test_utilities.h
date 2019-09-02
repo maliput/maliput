@@ -8,7 +8,6 @@
 
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/traffic_lights.h"
 
 #include "drake/common/unused.h"
@@ -107,48 +106,6 @@ template <class T>
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                           const TypeSpecificIdentifier<T>& a, const TypeSpecificIdentifier<T>& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
-}
-
-/// Predicate-formatter which tests equality of SRange.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const SRange& a,
-                                          const SRange& b) {
-  drake::unused(a_expression, b_expression);
-  AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s0(), b.s0()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s1(), b.s1()));
-  return c.result();
-}
-
-/// Predicate-formatter which tests equality of LaneSRange.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const LaneSRange& a,
-                                          const LaneSRange& b) {
-  drake::unused(a_expression, b_expression);
-  AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.lane_id(), b.lane_id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s_range(), b.s_range()));
-  return c.result();
-}
-
-/// Predicate-formatter which tests equality of std::vector<LaneSRange>.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                          const std::vector<LaneSRange>& a, const std::vector<LaneSRange>& b) {
-  drake::unused(a_expression, b_expression);
-  AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
-  const int smallest = std::min(a.size(), b.size());
-  for (int i = 0; i < smallest; ++i) {
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a[i], b[i]));
-  }
-  return c.result();
-}
-
-/// Predicate-formatter which tests equality of LaneSRoute.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const LaneSRoute& a,
-                                          const LaneSRoute& b) {
-  drake::unused(a_expression, b_expression);
-  AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.ranges(), b.ranges()));
-  return c.result();
 }
 
 /// Predicate-formatter which tests equality of GeoPosition.

@@ -6,16 +6,16 @@
 
 #include "drake/common/drake_optional.h"
 
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/intersection.h"
 #include "maliput/base/intersection_book.h"
 #include "maliput/common/maliput_throw.h"
 
-using maliput::api::rules::LaneSRange;
-using maliput::api::rules::LaneSRoute;
+using maliput::api::LaneSRange;
+using maliput::api::LaneSRoute;
 using maliput::api::rules::Phase;
 using maliput::api::rules::PhaseRing;
 using maliput::api::rules::PhaseRingBook;

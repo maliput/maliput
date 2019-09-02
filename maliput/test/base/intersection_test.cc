@@ -26,8 +26,7 @@ class IntersectionTest : public ::testing::Test {
 
   const api::rules::PhaseRing dummy_ring_;
 
-  const std::vector<api::rules::LaneSRange> ranges_{
-      api::rules::LaneSRange(api::LaneId("road A"), api::rules::SRange(0, 100))};
+  const std::vector<api::LaneSRange> ranges_{api::LaneSRange(api::LaneId("road A"), api::SRange(0, 100))};
 };
 
 TEST_F(IntersectionTest, BasicTest) {

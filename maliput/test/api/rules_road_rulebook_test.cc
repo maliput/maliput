@@ -7,8 +7,8 @@
 
 #include "drake/common/drake_throw.h"
 
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/direction_usage_rule.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"

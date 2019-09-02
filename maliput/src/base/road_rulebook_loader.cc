@@ -7,8 +7,8 @@
 #include "yaml-cpp/yaml.h"
 
 #include "maliput/api/lane.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/direction_usage_rule.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/manual_rulebook.h"
 #include "maliput/common/logger.h"
@@ -16,12 +16,12 @@
 
 using maliput::api::Lane;
 using maliput::api::LaneId;
+using maliput::api::LaneSRange;
+using maliput::api::LaneSRoute;
+using maliput::api::SRange;
 using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
-using maliput::api::rules::LaneSRange;
-using maliput::api::rules::LaneSRoute;
 using maliput::api::rules::RightOfWayRule;
-using maliput::api::rules::SRange;
 using maliput::api::rules::TrafficLight;
 
 namespace YAML {

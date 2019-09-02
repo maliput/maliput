@@ -8,7 +8,6 @@
 
 namespace maliput {
 namespace api {
-namespace rules {
 
 /// Directed, inclusive longitudinal (s value) range from s0 to s1.
 class SRange {
@@ -85,6 +84,5 @@ class LaneSRoute {
   std::vector<LaneSRange> ranges_;
 };
 
-}  // namespace rules
 }  // namespace api
 }  // namespace maliput

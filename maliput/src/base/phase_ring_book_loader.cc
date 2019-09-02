@@ -6,9 +6,9 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/manual_phase_ring_book.h"
@@ -47,11 +47,11 @@ struct convert<maliput::api::rules::BulbState> {
 namespace maliput {
 namespace {
 
+using api::LaneSRange;
 using api::rules::Bulb;
 using api::rules::BulbGroup;
 using api::rules::BulbState;
 using api::rules::BulbStates;
-using api::rules::LaneSRange;
 using api::rules::Phase;
 using api::rules::PhaseRing;
 using api::rules::PhaseRingBook;

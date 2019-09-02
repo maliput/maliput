@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "drake/common/unused.h"
+#include "maliput/test_utilities/regions_test_utilities.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
@@ -24,7 +25,7 @@ namespace test {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.zone(), b.zone()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.zone(), b.zone()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.severity(), b.severity()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.max(), b.max()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.min(), b.min()));

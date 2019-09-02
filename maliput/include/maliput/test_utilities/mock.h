@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "maliput/api/intersection_book.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/discrete_value_rule.h"
@@ -10,7 +11,6 @@
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/range_value_rule.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/rule_state_provider.h"
@@ -65,11 +65,11 @@ struct TrafficLightBookBuildFlags {
   TrafficLightBuildFlags traffic_light_book_flags{};
 };
 
-/// Returns a rules::LaneSRoute containing an arbitrary route.
-rules::LaneSRoute CreateLaneSRoute();
+/// Returns a LaneSRoute containing an arbitrary route.
+LaneSRoute CreateLaneSRoute();
 
-/// Returns a rules::LaneSRange containing an arbitrary range.
-rules::LaneSRange CreateLaneSRange();
+/// Returns a LaneSRange containing an arbitrary range.
+LaneSRange CreateLaneSRange();
 
 /// Returns a rules::RightOfWayRule::State::YieldGroup of size two.
 rules::RightOfWayRule::State::YieldGroup YieldGroup2();

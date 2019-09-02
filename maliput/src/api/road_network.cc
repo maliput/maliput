@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "maliput/api/lane.h"
-#include "maliput/api/rules/regions.h"
+#include "maliput/api/regions.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {

@@ -5,8 +5,9 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/api/rules/regions.h"
+#include "maliput/api/regions.h"
 #include "maliput/common/assertion_error.h"
+#include "maliput/test_utilities/regions_test_utilities.h"
 #include "maliput/test_utilities/rules_speed_limit_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -35,7 +36,7 @@ GTEST_TEST(SpeedLimitRuleTest, Construction) {
 GTEST_TEST(SpeedLimitRuleTest, Accessors) {
   const SpeedLimitRule dut(SpeedLimitRule::Id("dut_id"), kZone, SpeedLimitRule::Severity::kStrict, 5., 8.);
   EXPECT_EQ(dut.id(), SpeedLimitRule::Id("dut_id"));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.zone(), kZone));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), kZone));
   EXPECT_EQ(dut.severity(), SpeedLimitRule::Severity::kStrict);
   EXPECT_EQ(dut.min(), 5.);
   EXPECT_EQ(dut.max(), 8.);
