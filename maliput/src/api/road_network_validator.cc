@@ -5,11 +5,16 @@
 
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace api {
 namespace {
+
+using rules::BulbGroup;
+using rules::TrafficLight;
 
 // Confirms full DirectionUsageRule coverage. This is determined by
 // verifying that each Lane within the RoadGeometry has an associated
@@ -68,6 +73,27 @@ void CheckRoadGeometryHierarchyConsistency(const RoadNetwork& road_network) {
   }
 }
 
+// Checks that TrafficLight::Ids and BulbGroup::Ids in RightOfWayRules
+// as RelatedBulbGroups have a supporting entity in TrafficLightBook.
+void CheckRelatedBulbGroups(const RoadNetwork& road_network) {
+  auto evaluate_related_bulb_group_existance = [&](const TrafficLight::Id& traffic_light_id,
+                                                   const BulbGroup::Id& bulb_group_id) {
+    const drake::optional<TrafficLight> traffic_light =
+        road_network.traffic_light_book()->GetTrafficLight(traffic_light_id);
+    MALIPUT_THROW_UNLESS(traffic_light.has_value());
+    MALIPUT_THROW_UNLESS(traffic_light->GetBulbGroup(bulb_group_id).has_value());
+  };
+
+  const rules::RoadRulebook::QueryResults result = road_network.rulebook()->Rules();
+  for (const auto& rule_id_to_rule : result.right_of_way) {
+    for (const auto& traffic_light_bulb_groups : rule_id_to_rule.second.related_bulb_groups()) {
+      for (const BulbGroup::Id& bulb_group_id : traffic_light_bulb_groups.second) {
+        evaluate_related_bulb_group_existance(traffic_light_bulb_groups.first, bulb_group_id);
+      }
+    }
+  }
+}
+
 }  // namespace
 
 void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValidatorOptions& options) {
@@ -79,6 +105,9 @@ void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValid
   }
   if (options.check_road_geometry_hierarchy) {
     CheckRoadGeometryHierarchyConsistency(road_network);
+  }
+  if (options.check_related_bulb_groups) {
+    CheckRelatedBulbGroups(road_network);
   }
 }
 

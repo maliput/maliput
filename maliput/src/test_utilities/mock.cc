@@ -20,6 +20,8 @@ namespace api {
 namespace test {
 namespace {
 
+using rules::Bulb;
+using rules::BulbGroup;
 using rules::DirectionUsageRule;
 using rules::DiscreteValueRule;
 using rules::Phase;
@@ -263,30 +265,67 @@ class MockRoadRulebook final : public rules::RoadRulebook {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadRulebook)
   MockRoadRulebook() {}
+  void set_right_of_way(const RightOfWayRule& rule) { right_of_way_rule_ = rule; }
+  void set_direction_usage(const DirectionUsageRule& rule) { direction_usage_rule_ = rule; }
+  void set_speed_limit(const SpeedLimitRule& rule) { speed_limit_rule_ = rule; }
+  void set_discrete_value_rule(const DiscreteValueRule& rule) { discrete_value_rule_ = rule; }
+  void set_range_value_rule(const RangeValueRule& rule) { range_value_rule_ = rule; }
 
  private:
-  QueryResults DoFindRules(const std::vector<rules::LaneSRange>&, double) const override {
-    return {{}, {}, {}, {}, {}};
+  QueryResults DoFindRules(const std::vector<rules::LaneSRange>&, double) const override { return DoRules(); }
+  QueryResults DoRules() const override {
+    QueryResults result;
+    if (right_of_way_rule_.has_value()) {
+      result.right_of_way.emplace(right_of_way_rule_->id(), *right_of_way_rule_);
+    }
+    if (direction_usage_rule_.has_value()) {
+      result.direction_usage.emplace(direction_usage_rule_->id(), *direction_usage_rule_);
+    }
+    if (speed_limit_rule_.has_value()) {
+      result.speed_limit.emplace(speed_limit_rule_->id(), *speed_limit_rule_);
+    }
+    if (discrete_value_rule_.has_value()) {
+      result.discrete_value_rules.emplace(discrete_value_rule_->id(), *discrete_value_rule_);
+    }
+    if (range_value_rule_.has_value()) {
+      result.range_value_rules.emplace(range_value_rule_->id(), *range_value_rule_);
+    }
+    return result;
   }
-  QueryResults DoRules() const override { return {{}, {}, {}, {}, {}}; }
-  RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override { return CreateRightOfWayRule(); }
-  SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override {
-    return SpeedLimitRule(rules::SpeedLimitRule::Id("some_id"), CreateLaneSRange(),
-                          rules::SpeedLimitRule::Severity::kStrict, 33., 77.);
-  }
-  DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return CreateDirectionUsageRule(); }
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override { return CreateDiscreteValueRule(); }
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override { return CreateRangeValueRule(); }
+  RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override { return *right_of_way_rule_; }
+  SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override { return *speed_limit_rule_; }
+  DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return *direction_usage_rule_; }
+  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override { return *discrete_value_rule_; }
+  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override { return *range_value_rule_; }
+
+  drake::optional<RightOfWayRule> right_of_way_rule_{};
+  drake::optional<DirectionUsageRule> direction_usage_rule_{};
+  drake::optional<SpeedLimitRule> speed_limit_rule_{};
+  drake::optional<DiscreteValueRule> discrete_value_rule_{};
+  drake::optional<RangeValueRule> range_value_rule_{};
 };
 
 class MockTrafficLightBook final : public rules::TrafficLightBook {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockTrafficLightBook)
-  MockTrafficLightBook() {}
+  MockTrafficLightBook() = default;
+  void set_traffic_light(const TrafficLight& traffic_light) { traffic_light_ = traffic_light; }
 
  private:
-  drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id&) const override { return drake::nullopt; }
-  std::vector<TrafficLight> DoTrafficLights() const override { return {}; }
+  drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id& id) const override {
+    if (traffic_light_.has_value() && traffic_light_->id() == id) {
+      return traffic_light_;
+    }
+    return {drake::nullopt};
+  }
+  std::vector<TrafficLight> DoTrafficLights() const override {
+    if (traffic_light_.has_value()) {
+      return {*traffic_light_};
+    }
+    return {};
+  }
+
+  drake::optional<TrafficLight> traffic_light_{};
 };
 
 class MockPhaseRingBook final : public rules::PhaseRingBook {
@@ -378,14 +417,22 @@ RightOfWayRule::State YieldState() {
   return RightOfWayRule::State(RightOfWayRule::State::Id("s2"), RightOfWayRule::State::Type::kGo, YieldGroup2());
 }
 
-rules::RightOfWayRule::RelatedBulbGroups RelatedBulbGroups() {
+RightOfWayRule::RelatedBulbGroups RelatedBulbGroups() {
   return rules::RightOfWayRule::RelatedBulbGroups{
       {rules::TrafficLight::Id("TrafficLightId"), {rules::BulbGroup::Id("BulbGroupId")}}};
 }
 
-RightOfWayRule CreateRightOfWayRule() {
-  return RightOfWayRule(RightOfWayRule::Id("mock_id"), CreateLaneSRoute(), RightOfWayRule::ZoneType::kStopExcluded,
-                        {NoYieldState(), YieldState()}, RelatedBulbGroups());
+RightOfWayRule CreateRightOfWayRule() { return CreateRightOfWayRule(RightOfWayBuildFlags{}); }
+
+RightOfWayRule CreateRightOfWayRule(const RightOfWayBuildFlags& build_flags) {
+  return RightOfWayRule(
+      RightOfWayRule::Id("mock_id"), CreateLaneSRoute(), RightOfWayRule::ZoneType::kStopExcluded,
+      {NoYieldState(), YieldState()},
+      build_flags.add_related_bulb_groups ? RelatedBulbGroups() : RightOfWayRule::RelatedBulbGroups{});
+}
+
+SpeedLimitRule CreateSpeedLimitRule() {
+  return SpeedLimitRule(SpeedLimitRule::Id("some_id"), CreateLaneSRange(), SpeedLimitRule::Severity::kStrict, 33., 77.);
 }
 
 DirectionUsageRule::State CreateDirectionUsageRuleState() {
@@ -455,9 +502,45 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& b
 
 std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry() { return std::make_unique<MockOneLaneRoadGeometry>(); }
 
-std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook() { return std::make_unique<MockRoadRulebook>(); }
+std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook() { return CreateRoadRulebook(RoadRulebookBuildFlags{}); }
 
-std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() { return std::make_unique<MockTrafficLightBook>(); }
+std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildFlags& build_flags) {
+  auto rulebook = std::make_unique<MockRoadRulebook>();
+  if (build_flags.add_right_of_way) {
+    rulebook->set_right_of_way(CreateRightOfWayRule(build_flags.right_of_way_build_flags));
+  }
+  if (build_flags.add_direction_usage) {
+    rulebook->set_direction_usage(CreateDirectionUsageRule());
+  }
+  if (build_flags.add_speed_limit) {
+    rulebook->set_speed_limit(CreateSpeedLimitRule());
+  }
+  return std::move(rulebook);
+}
+
+BulbGroup CreateBulbGroup(bool add_missing_bulb_group) {
+  return BulbGroup(
+      BulbGroup::Id{add_missing_bulb_group ? "MissingBulbGroupId" : "BulbGroupId"}, GeoPosition(), Rotation(),
+      {Bulb(Bulb::Id{"BulbId"}, GeoPosition(), Rotation(), rules::BulbColor::kRed, rules::BulbType::kRound)});
+}
+
+TrafficLight CreateTrafficLight(const TrafficLightBuildFlags& build_flags) {
+  return TrafficLight(
+      TrafficLight::Id(build_flags.add_missing_traffic_light ? "MissingTrafficLightId" : "TrafficLightId"),
+      GeoPosition(), Rotation(), {CreateBulbGroup(build_flags.add_missing_bulb_group)});
+}
+
+std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() {
+  return CreateTrafficLightBook(TrafficLightBookBuildFlags{});
+}
+
+std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook(const TrafficLightBookBuildFlags& build_flags) {
+  auto traffic_light_book = std::make_unique<MockTrafficLightBook>();
+  if (build_flags.add_traffic_light) {
+    traffic_light_book->set_traffic_light(CreateTrafficLight(build_flags.traffic_light_book_flags));
+  }
+  return std::move(traffic_light_book);
+}
 
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook() { return std::make_unique<MockPhaseRingBook>(); }
 
