@@ -23,7 +23,7 @@
 /// printed without any special handling.
 
 /// Code in this file is inspired by:
-/// https://github.com/RobotLocomotion/drake/blob/master/common/text_logging.hs
+/// https://github.com/RobotLocomotion/drake/blob/master/common/text_logging.h
 ///
 /// Drake's license follows:
 ///
@@ -61,11 +61,15 @@
 
 #include <string>
 
-#include "drake/common/text_logging.h"
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
+#include <spdlog/fmt/ostr.h>
+#include <spdlog/spdlog.h>
 
 namespace maliput {
 
-using Logger = drake::logging::logger;
+using Logger = spdlog::logger;
 
 /// Retrieve an instance of a logger to use for logging; for example:
 ///
@@ -82,8 +86,12 @@ Logger* log();
 /// `info`, `warn`, `err`, `critical`, `off`, or `unchanged` (not an enum, but
 /// useful for command-line).
 ///
-/// @return The string value of the previous log level. If SPDLOG is disabled,
-/// then this returns an empty string.
+/// @return The string value of the previous log level.
+///
+/// @throws maliput::common::assertion_error When `level` is not one of the
+///         predefined values for spdlog.
+/// @throws maliput::common::assertion_error When log()->level() is not one
+///         of the predefined values for spdlog.
 std::string set_log_level(const std::string& level);
 
 }  // namespace maliput
