@@ -15,14 +15,14 @@ void ManualDiscreteValueRuleStateProvider::SetState(const api::rules::Rule::Id& 
   states_.at(id) = state;
 }
 
-drake::optional<api::rules::DiscreteValueRuleStateProvider::DiscreteValueResult>
+drake::optional<api::rules::DiscreteValueRuleStateProvider::StateResult>
 ManualDiscreteValueRuleStateProvider::DoGetState(const api::rules::Rule::Id& id) const {
   const auto it = states_.find(id);
   if (it == states_.end()) {
     return drake::nullopt;
   }
-  return api::rules::DiscreteValueRuleStateProvider::DiscreteValueResult{it->second /* state_range */,
-                                                                         drake::nullopt /* next */};
+  return api::rules::DiscreteValueRuleStateProvider::StateResult{it->second /* state_range */,
+                                                                 drake::nullopt /* next */};
 }
 
 }  // namespace maliput

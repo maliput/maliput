@@ -26,7 +26,7 @@ GTEST_TEST(ManualRangeRuleStateProviderTest, BasicTest) {
 
   // Adds a state and evaluates the result.
   dut.AddState(kRuleId, kRangeState);
-  drake::optional<RangeValueRuleStateProvider::RangeValueResult> result = dut.GetState(kRuleId);
+  drake::optional<RangeValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
   EXPECT_EQ(result->state_range, kRangeState);
   EXPECT_EQ(result->next, drake::nullopt);

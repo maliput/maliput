@@ -17,14 +17,13 @@ void ManualRangeValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
   states_.at(id) = state;
 }
 
-drake::optional<api::rules::RangeValueRuleStateProvider::RangeValueResult>
-ManualRangeValueRuleStateProvider::DoGetState(const api::rules::Rule::Id& id) const {
+drake::optional<api::rules::RangeValueRuleStateProvider::StateResult> ManualRangeValueRuleStateProvider::DoGetState(
+    const api::rules::Rule::Id& id) const {
   auto it = states_.find(id);
   if (it == states_.end()) {
     return drake::nullopt;
   }
-  return api::rules::RangeValueRuleStateProvider::RangeValueResult{it->second /* state_range */,
-                                                                   drake::nullopt /* next */};
+  return api::rules::RangeValueRuleStateProvider::StateResult{it->second /* state_range */, drake::nullopt /* next */};
 }
 
 }  // namespace maliput

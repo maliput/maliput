@@ -30,7 +30,7 @@ class ManualRangeValueRuleStateProvider : public api::rules::RangeValueRuleState
   void SetState(const api::rules::Rule::Id& id, const api::rules::RangeValueRule::Range& state);
 
  private:
-  drake::optional<api::rules::RangeValueRuleStateProvider::RangeValueResult> DoGetState(
+  drake::optional<api::rules::RangeValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 
   std::unordered_map<api::rules::Rule::Id, api::rules::RangeValueRule::Range> states_;

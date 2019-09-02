@@ -13,12 +13,11 @@ class MockRangeValueRuleStateProvider : public RangeValueRuleStateProvider {
   static const Rule::Id kRuleId;
 
  private:
-  drake::optional<RangeValueResult> DoGetState(const Rule::Id& id) const override {
+  drake::optional<StateResult> DoGetState(const Rule::Id& id) const override {
     if (id == kRuleId) {
-      return RangeValueResult{
-          RangeValueRule::Range{"current_range_description", 56. /* min */, 78. /* max*/},
-          RangeValueResult::Next{RangeValueRule::Range{"next_range_description", 12. /* min */, 34. /* max*/},
-                                 {123.456} /* duration */}};
+      return StateResult{RangeValueRule::Range{"current_range_description", 56. /* min */, 78. /* max*/},
+                         StateResult::Next{RangeValueRule::Range{"next_range_description", 12. /* min */, 34. /* max*/},
+                                           {123.456} /* duration */}};
     }
     return {};
   }
@@ -28,7 +27,7 @@ const Rule::Id MockRangeValueRuleStateProvider::kRuleId{"RuleId"};
 
 GTEST_TEST(RangeValueRuleStateProviderTest, ExerciseInterface) {
   const MockRangeValueRuleStateProvider dut;
-  const drake::optional<RangeValueRuleStateProvider::RangeValueResult> result =
+  const drake::optional<RangeValueRuleStateProvider::StateResult> result =
       dut.GetState(MockRangeValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());

@@ -31,7 +31,7 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   void SetState(const api::rules::Rule::Id& id, const std::string& state);
 
  private:
-  drake::optional<api::rules::DiscreteValueRuleStateProvider::DiscreteValueResult> DoGetState(
+  drake::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 
   std::unordered_map<api::rules::Rule::Id, std::string> states_;

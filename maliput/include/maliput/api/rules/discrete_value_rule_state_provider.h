@@ -12,20 +12,19 @@ namespace rules {
 /// Abstract interface for the provider of DiscreteValueRule.
 class DiscreteValueRuleStateProvider {
  public:
-  /// Result returned by GetState(const Rule::Id).
-  struct DiscreteValueResult {
+  /// The state of a DiscreteValueRule, returned by GetState(const Rule::Id).
+  struct StateResult {
     /// Information about a subsequent state.
     struct Next {
-      /// State value.
       std::string state_value;
-      /// If known, estimated time until the transition to the state.
+      /// If known, estimated time until the transition to the state, relative
+      /// to when DiscreteValueRuleStateProvider::GetState() was called.
       drake::optional<double> duration_until;
     };
 
-    /// ID of the rule's current state value.
+    /// The rule's current state.
     std::string state_value;
-    /// Information about the rule's upcoming state if a state transition is
-    /// anticipated.
+    /// The rule's next state, if known.
     drake::optional<Next> next;
   };
 
@@ -35,21 +34,16 @@ class DiscreteValueRuleStateProvider {
 
   /// Gets the state of the DiscreteValueRule identified by `id`.
   ///
-  /// Returns a DiscreteValueResult struct bearing the string state of the
-  /// rule's current state. If a transition to a new state is anticipated,
-  /// DiscreteValueResult::next will be populated and bear the string of the
-  /// next state. If the time until the transition is known, then
-  /// DiscreteValueResult::next.duration_until will be populated with that
-  /// duration.
-  ///
-  /// Returns drake::nullopt if `id` is unrecognized.
-  drake::optional<DiscreteValueResult> GetState(const Rule::Id& id) const { return DoGetState(id); }
+  /// Returns a StateResult struct bearing the state of the rule's
+  /// current state identified by `id`. When `id` is unrecognized,
+  /// drake::nullopt is returned.
+  drake::optional<StateResult> GetState(const Rule::Id& id) const { return DoGetState(id); }
 
  protected:
   DiscreteValueRuleStateProvider() = default;
 
  private:
-  virtual drake::optional<DiscreteValueResult> DoGetState(const Rule::Id& id) const = 0;
+  virtual drake::optional<StateResult> DoGetState(const Rule::Id& id) const = 0;
 };
 
 }  // namespace rules

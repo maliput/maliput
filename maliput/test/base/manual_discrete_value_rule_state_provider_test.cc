@@ -23,7 +23,7 @@ GTEST_TEST(ManualDiscreteRuleStateProviderTest, BasicTest) {
 
   // Adds a state and evaluates the result.
   dut.AddState(kRuleId, kState);
-  drake::optional<DiscreteValueRuleStateProvider::DiscreteValueResult> result = dut.GetState(kRuleId);
+  drake::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
   EXPECT_EQ(result->state_value, kState);
   EXPECT_EQ(result->next, drake::nullopt);

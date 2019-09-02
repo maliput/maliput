@@ -13,10 +13,9 @@ class MockDiscreteValueRuleStateProvider : public DiscreteValueRuleStateProvider
   static const Rule::Id kRuleId;
 
  private:
-  drake::optional<DiscreteValueResult> DoGetState(const Rule::Id& id) const override {
+  drake::optional<StateResult> DoGetState(const Rule::Id& id) const override {
     if (id == kRuleId) {
-      return DiscreteValueResult{"current_state",
-                                 DiscreteValueResult::Next{"next_state" /* state_value */, {123.456} /* duration */}};
+      return StateResult{"current_state", StateResult::Next{"next_state" /* state_value */, {123.456} /* duration */}};
     }
     return {};
   }
@@ -26,7 +25,7 @@ const Rule::Id MockDiscreteValueRuleStateProvider::kRuleId{"RuleId"};
 
 GTEST_TEST(DiscreteValueRuleStateProviderTest, ExerciseInterface) {
   const MockDiscreteValueRuleStateProvider dut;
-  const drake::optional<DiscreteValueRuleStateProvider::DiscreteValueResult> result =
+  const drake::optional<DiscreteValueRuleStateProvider::StateResult> result =
       dut.GetState(MockDiscreteValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());

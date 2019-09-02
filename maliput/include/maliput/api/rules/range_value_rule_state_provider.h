@@ -13,19 +13,19 @@ namespace rules {
 class RangeValueRuleStateProvider {
  public:
   /// Result returned by GetState(const Rule::Id).
-  struct RangeValueResult {
+  struct StateResult {
     /// Information about a subsequent state.
     struct Next {
       /// State value.
       RangeValueRule::Range state_range;
-      /// If known, estimated time until the transition to the state.
+      /// If known, estimated time until the transition to the state, relative
+      /// to when RangeValueRuleStateProvider::GetState() was called.
       drake::optional<double> duration_until;
     };
 
-    /// ID of the rule's current state value.
+    /// The rule's current state.
     RangeValueRule::Range state_range;
-    /// Information about the rule's upcoming state if a state transition is
-    /// anticipated.
+    /// The rule's next state, if known.
     drake::optional<Next> next;
   };
 
@@ -35,21 +35,16 @@ class RangeValueRuleStateProvider {
 
   /// Gets the state of the RangeValueRule identified by `id`.
   ///
-  /// Returns a RangeValueResult struct bearing the RangeValueRule::Range state
-  /// of the rule's current state. If a transition to a new state is
-  /// anticipated, RangeValueResult::next will be populated and bear the
-  /// RangeValueRule::Range of the next state. If the time until the transition
-  /// is known, then RangeValueResult::next.duration_until will be populated
-  /// with that duration.
-  ///
-  /// Returns drake::nullopt if `id` is unrecognized.
-  drake::optional<RangeValueResult> GetState(const Rule::Id& id) const { return DoGetState(id); }
+  /// Returns a StateResult struct bearing the state of the rule's
+  /// current state identified by `id`. When `id` is unrecognized,
+  /// drake::nullopt is returned.
+  drake::optional<StateResult> GetState(const Rule::Id& id) const { return DoGetState(id); }
 
  protected:
   RangeValueRuleStateProvider() = default;
 
  private:
-  virtual drake::optional<RangeValueResult> DoGetState(const Rule::Id& id) const = 0;
+  virtual drake::optional<StateResult> DoGetState(const Rule::Id& id) const = 0;
 };
 
 }  // namespace rules
