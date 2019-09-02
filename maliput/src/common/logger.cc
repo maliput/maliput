@@ -39,7 +39,9 @@
 
 #include "maliput/common/logger.h"
 
+#include <algorithm>
 #include <memory>
+#include <unordered_map>
 #include <utility>
 
 #include "drake/common/never_destroyed.h"
@@ -81,51 +83,34 @@ Logger* log() {
 }
 
 std::string set_log_level(const std::string& level) {
+  const std::string kUnchanged{"unchanged"};
+  const std::unordered_map<std::string, spdlog::level::level_enum> kStringToSpdLogLevel{
+      {"trace", spdlog::level::trace}, {"debug", spdlog::level::debug}, {"info", spdlog::level::info},
+      {"warn", spdlog::level::warn},   {"err", spdlog::level::err},     {"critical", spdlog::level::critical},
+      {"off", spdlog::level::off},
+  };
+
   spdlog::level::level_enum prev_value = maliput::log()->level();
   spdlog::level::level_enum value{};
-  if (level == "trace") {
-    value = spdlog::level::trace;
-  } else if (level == "debug") {
-    value = spdlog::level::debug;
-  } else if (level == "info") {
-    value = spdlog::level::info;
-  } else if (level == "warn") {
-    value = spdlog::level::warn;
-  } else if (level == "err") {
-    value = spdlog::level::err;
-  } else if (level == "critical") {
-    value = spdlog::level::critical;
-  } else if (level == "off") {
-    value = spdlog::level::off;
-  } else if (level == "unchanged") {
+  if (level == kUnchanged) {
     value = prev_value;
+  } else if (kStringToSpdLogLevel.find(level) != kStringToSpdLogLevel.end()) {
+    value = kStringToSpdLogLevel.at(level);
   } else {
     MALIPUT_THROW_MESSAGE(fmt::format("Unknown spdlog level: <{}>.", level));
   }
+
   maliput::log()->set_level(value);
-  switch (prev_value) {
-    case spdlog::level::trace:
-      return "trace";
-    case spdlog::level::debug:
-      return "debug";
-    case spdlog::level::info:
-      return "info";
-    case spdlog::level::warn:
-      return "warn";
-    case spdlog::level::err:
-      return "err";
-    case spdlog::level::critical:
-      return "critical";
-    case spdlog::level::off:
-      return "off";
-    default: {
-      // N.B. `spdlog::level::level_enum` is not a `enum class`, so the
-      // compiler does not know that it has a closed set of values. For
-      // simplicity in linking, we do not use one of the `MALIPUT_ABORT()`
-      // options.
-      MALIPUT_THROW_MESSAGE(fmt::format("Unknown spdlog previous level: <{}>,", prev_value));
-    }
+  const auto it = std::find_if(kStringToSpdLogLevel.begin(), kStringToSpdLogLevel.end(),
+                               [prev_value](const auto& key_val) { return key_val.second == prev_value; });
+  if (it == kStringToSpdLogLevel.end()) {
+    // N.B. `spdlog::level::level_enum` is not a `enum class`, so the
+    // compiler does not know that it has a closed set of values. For
+    // simplicity in linking, we do not use one of the `MALIPUT_ABORT()`
+    // options.
+    MALIPUT_THROW_MESSAGE(fmt::format("Unknown spdlog previous level: <{}>,", prev_value));
   }
+  return it->first;
 }
 
 }  // namespace maliput
