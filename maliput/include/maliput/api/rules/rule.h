@@ -39,10 +39,10 @@ class Rule {
   /// "right of way rule", "direction usage rule", "vehicle usage rule", etc.
   using TypeId = TypeSpecificIdentifier<class Type>;
 
-  /// Alias of a map holding semantic groups of related rules. The semantics
-  /// vary based on the specific rule type. Each semantic group name must not
-  /// be an empty string. Each vector of Rule::Id must not be empty. Each
-  /// ID for each group must be unique.
+  /// Alias of a map holding groups of related rules. The name of each group is
+  /// specified by the key, and the semantics vary based on the specific rule
+  /// type. The semantic group name must not be an empty string. Each vector of
+  /// Rule::Id must not be empty and contain unique Rule::Ids.
   using RelatedRules = std::map<std::string, std::vector<Id>>;
 
   /// Defines a base state for a Rule.

@@ -452,7 +452,8 @@ DiscreteValueRule CreateDiscreteValueRule() {
 }
 
 RangeValueRule::Range CreateRange() {
-  return rules::MakeRange(0 /* severity */, {} /* related rules */, "description", 123. /* min */, 456. /* max */);
+  return rules::MakeRange(rules::Rule::State::kStrict, {} /* related rules */, "description", 123. /* min */,
+                          456. /* max */);
 }
 
 RangeValueRule CreateRangeValueRule() {
