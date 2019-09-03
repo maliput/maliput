@@ -20,11 +20,17 @@ using api::rules::DirectionUsageRule;
 using api::rules::DiscreteValueRule;
 using api::rules::LaneSRange;
 using api::rules::LaneSRoute;
+using api::rules::MakeDiscreteValue;
+using api::rules::MakeRange;
 using api::rules::RangeValueRule;
 using api::rules::RightOfWayRule;
 using api::rules::RoadRulebook;
 using api::rules::Rule;
 using api::rules::SpeedLimitRule;
+
+// Rule::State::severity severity levels.
+const int kSeverityStrict{0};
+const int kSeverityBestEffort{1};
 
 class ManualRulebookTest : public ::testing::Test {
  protected:
@@ -52,7 +58,7 @@ class ManualRulebookTest : public ::testing::Test {
       Rule::TypeId("dvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {MakeDiscreteValue(Rule::Severity::kStrict, "value1"), MakeDiscreteValue(Rule::Severity::kStrict, "value2")}};
+      {MakeDiscreteValue(kSeverityStrict, "value1"), MakeDiscreteValue(kSeverityBestEffort, "value2")}};
 
   const Rule::Id kRangeValueRuleId{"rvrt/rvr"};
 
@@ -60,7 +66,7 @@ class ManualRulebookTest : public ::testing::Test {
                                        Rule::TypeId("rvrt"),
                                        LaneSRoute({kZone}),
                                        {} /* related_rules */,
-                                       {MakeRange(Rule::Severity::kStrict, "description", 123., 456.)}};
+                                       {MakeRange(kSeverityStrict, "description", 123., 456.)}};
 };
 
 TEST_F(ManualRulebookTest, DefaultConstructor) { ManualRulebook dut; }
@@ -117,7 +123,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
       Rule::TypeId("dvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {MakeDiscreteValue(Rule::Severity::kStrict, "value1"), MakeDiscreteValue(Rule::Severity::kStrict, "value2")}};
+      {MakeDiscreteValue(kSeverityStrict, "value1"), MakeDiscreteValue(kSeverityStrict, "value2")}};
   dut.AddRule(kDiscreteValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
 }
@@ -137,7 +143,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
                                                  Rule::TypeId("rvrt"),
                                                  LaneSRoute({kZone}),
                                                  {} /* related_rules */,
-                                                 {MakeRange(Rule::Severity::kStrict, "description", 123., 456.)}};
+                                                 {MakeRange(kSeverityStrict, "description", 123., 456.)}};
   dut.AddRule(kRangeValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kDiscreteValueRule), maliput::common::assertion_error);
 }

@@ -41,20 +41,15 @@ class Rule {
   /// "right of way rule", "direction usage rule", "vehicle usage rule", etc.
   using TypeId = TypeSpecificIdentifier<class Type>;
 
-  /// Rule state severity classification.
-  enum class Severity {
-    /// This rule shall not be violated under any circumstance.
-    kStrict = 0,
-    /// Agents should try to adhere to this rule, but can violate it.
-    kBestEffort,
-  };
-
   /// Defines a base state for a Rule.
   struct State {
     bool operator==(const State& other) const { return severity == other.severity; }
     bool operator!=(const State& other) const { return !(*this == other); }
 
-    Severity severity;  ///< Severity of the Rule::State.
+    /// Severity of the Rule::State.
+    /// A non-negative quantity that states the enforcement priority. The smaller
+    /// it is, the higher the requirement to enforce it.
+    int severity{};
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
@@ -85,6 +80,11 @@ class Rule {
   const LaneSRoute& zone() const { return zone_; }
 
   const std::vector<Id>& related_rules() const { return related_rules_; }
+
+ protected:
+  // Validates that `severity` is a non-negative quantity.
+  // @throws maliput::assertion_error When `severity` is negative.
+  void ValidateSeverity(int severity) { MALIPUT_THROW_UNLESS(severity >= 0); }
 
  private:
   Id id_;
@@ -136,6 +136,7 @@ class RangeValueRule : public Rule {
       : Rule(id, type_id, zone, related_rules), ranges_(ranges) {
     MALIPUT_THROW_UNLESS(!ranges_.empty());
     for (const Range& range : ranges_) {
+      ValidateSeverity(range.severity);
       MALIPUT_THROW_UNLESS(range.min <= range.max);
       MALIPUT_THROW_UNLESS(std::count(ranges_.begin(), ranges_.end(), range) == 1);
     }
@@ -148,9 +149,9 @@ class RangeValueRule : public Rule {
 };
 
 /// Constructs a RangeValueRule::RangeValue.
-// TODO(...) Remove this once we switch to C++17 and can use aggregate initialization.
-inline RangeValueRule::Range MakeRange(const Rule::Severity& severity, const std::string& description, double min,
-                                       double max) {
+// TODO(https://github.com/ToyotaResearchInstitute/maliput/issues/121)
+// Remove this once we switch to C++17 and can use aggregate initialization.
+inline RangeValueRule::Range MakeRange(int severity, const std::string& description, double min, double max) {
   RangeValueRule::Range range;
   range.severity = severity;
   range.description = description;
@@ -196,6 +197,7 @@ class DiscreteValueRule : public Rule {
       : Rule(id, type_id, zone, related_rules), values_(values) {
     MALIPUT_THROW_UNLESS(!values_.empty());
     for (const DiscreteValue& value : values_) {
+      ValidateSeverity(value.severity);
       MALIPUT_THROW_UNLESS(std::count(values_.begin(), values_.end(), value) == 1);
     }
   }
@@ -207,8 +209,9 @@ class DiscreteValueRule : public Rule {
 };
 
 /// Constructs a DiscreteValueRule::DiscreteValue.
-// TODO(...) Remove this once we switch to C++17 and can use aggregate initialization.
-inline DiscreteValueRule::DiscreteValue MakeDiscreteValue(const Rule::Severity& severity, const std::string& value) {
+// TODO(https://github.com/ToyotaResearchInstitute/maliput/issues/121)
+// Remove this once we switch to C++17 and can use aggregate initialization.
+inline DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const std::string& value) {
   DiscreteValueRule::DiscreteValue discrete_value;
   discrete_value.severity = severity;
   discrete_value.value = value;

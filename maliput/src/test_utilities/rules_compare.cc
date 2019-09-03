@@ -23,11 +23,6 @@ namespace test {
   return c.result();
 }
 
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, Rule::Severity a,
-                                   Rule::Severity b) {
-  return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
-}
-
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const DiscreteValueRule::DiscreteValue& a,
                                    const DiscreteValueRule::DiscreteValue& b) {

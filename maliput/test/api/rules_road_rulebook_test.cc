@@ -18,6 +18,10 @@ namespace api {
 namespace rules {
 namespace {
 
+// Rule::State::severity severity levels.
+const int kSeverityStrict{0};
+const int kSeverityBestEffort{1};
+
 // This class does not provide any semblance of useful functionality.
 // It merely exercises the RoadRulebook abstract interface.
 class MockRulebook final : public RoadRulebook {
@@ -40,13 +44,13 @@ class MockRulebook final : public RoadRulebook {
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {MakeRange(Rule::Severity::kStrict, "range_description", 123. /* min */, 456. /* max */)}};
+      {MakeRange(kSeverityStrict, "range_description", 123. /* min */, 456. /* max */)}};
   const DiscreteValueRule kDiscreteValueRule{
       Rule::Id("dvrt/dvr_id"),
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {MakeDiscreteValue(Rule::Severity::kStrict, "value1"), MakeDiscreteValue(Rule::Severity::kBestEffort, "value2")}};
+      {MakeDiscreteValue(kSeverityStrict, "value1"), MakeDiscreteValue(kSeverityBestEffort, "value2")}};
 
  private:
   QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double) const override {

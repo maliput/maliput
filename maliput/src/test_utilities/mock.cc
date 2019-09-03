@@ -445,13 +445,13 @@ DirectionUsageRule CreateDirectionUsageRule() {
 }
 
 DiscreteValueRule CreateDiscreteValueRule() {
-  return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
-                           {rules::MakeDiscreteValue(Rule::Severity::kStrict, "value1"),
-                            rules::MakeDiscreteValue(Rule::Severity::kStrict, "value2")});
+  return DiscreteValueRule(
+      Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {} /* related rules */,
+      {rules::MakeDiscreteValue(0 /* severity */, "value1"), rules::MakeDiscreteValue(0 /* severity */, "value2")});
 }
 
 RangeValueRule::Range CreateRange() {
-  return MakeRange(Rule::Severity::kStrict, "description", 123. /* min */, 456. /* max */);
+  return rules::MakeRange(0 /* severity */, "description", 123. /* min */, 456. /* max */);
 }
 
 RangeValueRule CreateRangeValueRule() {
