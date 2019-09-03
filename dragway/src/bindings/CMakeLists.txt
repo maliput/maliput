@@ -2,7 +2,10 @@
 # Sources
 ##############################################################################
 
-pybind11_add_module(dragway_py dragway_py.cc)
+pybind11_add_module(dragway_py MODULE dragway_py.cc)
+if(PYTHON_IS_DEBUG)
+  target_compile_definitions(dragway_py PRIVATE Py_DEBUG)
+endif()
 
 set_target_properties(dragway_py PROPERTIES OUTPUT_NAME "dragway")
 

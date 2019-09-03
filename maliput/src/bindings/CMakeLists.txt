@@ -2,7 +2,10 @@
 # Sources
 ##############################################################################
 
-pybind11_add_module(api_py api_py.cc)
+pybind11_add_module(api_py MODULE api_py.cc)
+if(PYTHON_IS_DEBUG)
+  target_compile_definitions(api_py PRIVATE Py_DEBUG)
+endif()
 
 set_target_properties(api_py PROPERTIES OUTPUT_NAME "api")
 
