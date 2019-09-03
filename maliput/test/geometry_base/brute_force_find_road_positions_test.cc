@@ -26,6 +26,9 @@ namespace geometry_base {
 namespace test {
 namespace {
 
+const double KRadius{3.};
+const double KDistance{3.};
+
 class BruteForceTest : public ::testing::Test {
  protected:
   const double linear_tolerance{1.};
@@ -58,7 +61,7 @@ Matcher<const api::GeoPosition&> Matches(const api::GeoPosition& geo_position, d
 
 class LaneMock final : public MockLane {
  public:
-  explicit LaneMock(const api::LaneId& id, const double distance) : MockLane(id), distance_(distance) {
+  LaneMock(const api::LaneId& id, double distance) : MockLane(id), distance_(distance) {
     ON_CALL(*this, DoToLanePosition(An<const api::GeoPosition&>(), An<api::GeoPosition*>(), An<double*>()))
         .WillByDefault(Invoke(this, &LaneMock::InternalDoToLanePosition));
   }
@@ -67,8 +70,14 @@ class LaneMock final : public MockLane {
 
   api::LanePosition InternalDoToLanePosition(const api::GeoPosition&, api::GeoPosition* nearest_pos,
                                              double* distance) const {
-    *nearest_pos = api::GeoPosition(10., 11., 12.);
-    *distance = distance_;
+    if (nearest_pos) {
+      *nearest_pos = api::GeoPosition(10., 11., 12.);
+    }
+
+    if (distance) {
+      *distance = distance_;
+    }
+
     return api::LanePosition(4., 5., 6.);
   }
 
@@ -90,15 +99,18 @@ class RoadGeometryMock final : public MockRoadGeometry {
 
 std::unique_ptr<RoadGeometryMock> MakeOneLaneRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance,
                                                           double angular_tolerance, double scale_length,
-                                                          double distance) {
+                                                          double lane_distance) {
+  std::vector<LaneMock*> lanes;
   auto road_geometry = std::make_unique<RoadGeometryMock>(id, linear_tolerance, angular_tolerance, scale_length);
-  auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"), distance);
+  auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"), lane_distance);
   auto segment0 = std::make_unique<MockSegment>(api::SegmentId("segment0"));
   auto junction0 = std::make_unique<MockJunction>(api::JunctionId("junction0"));
 
-  segment0->AddLane(std::move(lane0));
+  lanes.push_back(segment0->AddLane(std::move(lane0)));
   junction0->AddSegment(std::move(segment0));
   road_geometry->AddJunction(std::move(junction0));
+
+  road_geometry->set_lanes(lanes);
 
   return road_geometry;
 }
@@ -108,9 +120,9 @@ std::unique_ptr<RoadGeometryMock> MakeFullRoadGeometry(const api::RoadGeometryId
   auto road_geometry = std::make_unique<RoadGeometryMock>(id, linear_tolerance, angular_tolerance, scale_length);
   std::vector<LaneMock*> lanes;
 
-  auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"), 3.);
-  auto lane1 = std::make_unique<LaneMock>(api::LaneId("lane1"), 3.);
-  auto lane2 = std::make_unique<LaneMock>(api::LaneId("lane2"), 3.);
+  auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"), KDistance);
+  auto lane1 = std::make_unique<LaneMock>(api::LaneId("lane1"), KDistance);
+  auto lane2 = std::make_unique<LaneMock>(api::LaneId("lane2"), KDistance);
 
   auto segment0 = std::make_unique<MockSegment>(api::SegmentId("segment0"));
   auto segment1 = std::make_unique<MockSegment>(api::SegmentId("segment1"));
@@ -134,20 +146,27 @@ std::unique_ptr<RoadGeometryMock> MakeFullRoadGeometry(const api::RoadGeometryId
 }
 
 TEST_F(BruteForceTest, LaneInAndOutRadius) {
-  double radius{3.};
-  double distance{3.};
-
-  std::unique_ptr<MockRoadGeometry> rg =
-      MakeOneLaneRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length, distance);
+  auto rg =
+      MakeOneLaneRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length, KDistance);
 
   std::vector<api::RoadPositionResult> results =
-      BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), radius);
+      BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), KRadius);
 
   EXPECT_EQ(results.size(), 1);
+  const api::LanePosition kExpectedLanePosition{4., 5., 6.};
+  const api::GeoPosition kExpectedGeoPosition{10., 11., 12.};
+  const double kExpectedDistance = 3.;
+  const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
+  api::LaneId id = results.front().road_position.lane->id();
 
-  distance++;
-  rg = MakeOneLaneRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length, distance);
-  results = BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), radius);
+  EXPECT_TRUE(id == lanes.front()->id());
+  api::test::IsLanePositionClose(results.front().road_position.pos, kExpectedLanePosition, kZeroTolerance);
+  api::test::IsGeoPositionClose(results.front().nearest_position, kExpectedGeoPosition, kZeroTolerance);
+  EXPECT_NEAR(results.front().distance, kExpectedDistance, kZeroTolerance);
+
+  rg = MakeOneLaneRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length,
+                               2. * KDistance);
+  results = BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), KRadius);
 
   EXPECT_EQ(results.size(), 0);
 }
