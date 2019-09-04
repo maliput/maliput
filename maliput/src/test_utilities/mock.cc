@@ -371,7 +371,8 @@ class MockIntersection final : public Intersection {
  private:
   drake::optional<rules::PhaseProvider::Result> Phase() const override { return drake::nullopt; }
 
-  void SetPhase(const api::rules::Phase::Id&) override {}
+  void SetPhase(const api::rules::Phase::Id&, const drake::optional<api::rules::Phase::Id>& next_phase = drake::nullopt,
+                const drake::optional<double>& duration_until = drake::nullopt) override {}
 };
 
 PhaseRing CreatePhaseRing() { return PhaseRing(PhaseRing::Id("mock"), {Phase(Phase::Id("mock"), {})}); }

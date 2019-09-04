@@ -42,7 +42,13 @@ class Intersection {
   /// Returns the current phase.
   virtual drake::optional<rules::PhaseProvider::Result> Phase() const = 0;
 
-  virtual void SetPhase(const api::rules::Phase::Id& phase_id) = 0;
+  /// Sets the current Phase and optionally the next Phase.
+  ///
+  /// @throws std::exception if @p duration_until is defined when @p next_phase
+  /// is undefined.
+  virtual void SetPhase(const api::rules::Phase::Id& phase_id,
+                        const drake::optional<api::rules::Phase::Id>& next_phase = drake::nullopt,
+                        const drake::optional<double>& duration_until = drake::nullopt) = 0;
 
   /// Returns the region. See constructor parameter @p region for more details.
   const std::vector<rules::LaneSRange>& region() const { return region_; }

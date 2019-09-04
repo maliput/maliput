@@ -31,6 +31,7 @@ class IntersectionTest : public ::testing::Test {
 };
 
 TEST_F(IntersectionTest, BasicTest) {
+  const double kDurationUntil{1};  // Arbitrary.
   const Intersection::Id intersection_id("foo");
   ManualPhaseProvider phase_provider;
   Intersection dut(intersection_id, ranges_, dummy_ring_, &phase_provider);
@@ -38,12 +39,17 @@ TEST_F(IntersectionTest, BasicTest) {
   EXPECT_EQ(dut.Phase(), drake::nullopt);
   phase_provider.AddPhaseRing(dummy_ring_.id(), dummy_phase_1_.id());
   EXPECT_EQ(dut.Phase()->id, dummy_phase_1_.id());
-  dut.SetPhase(dummy_phase_2_.id());
+  dut.SetPhase(dummy_phase_2_.id(), dummy_phase_1_.id(), kDurationUntil);
   EXPECT_EQ(dut.Phase()->id, dummy_phase_2_.id());
+  EXPECT_TRUE(dut.Phase()->next.has_value());
+  EXPECT_EQ(dut.Phase()->next->id, dummy_phase_1_.id());
+  EXPECT_TRUE(dut.Phase()->next->duration_until.has_value());
+  EXPECT_EQ(dut.Phase()->next->duration_until.value(), kDurationUntil);
   EXPECT_EQ(dut.region().size(), ranges_.size());
   EXPECT_EQ(dut.region().at(0).lane_id(), ranges_.at(0).lane_id());
   EXPECT_EQ(dut.ring_id(), dummy_ring_.id());
   EXPECT_EQ(dut.bulb_states(), drake::nullopt);
+  EXPECT_THROW(dut.SetPhase(dummy_phase_1_.id(), drake::nullopt, kDurationUntil), std::exception);
 }
 
 }  // namespace
