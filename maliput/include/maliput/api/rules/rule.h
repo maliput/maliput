@@ -60,8 +60,9 @@ class Rule {
 
     /// Severity of the Rule::State. A non-negative quantity that specifies the
     /// level of enforcement. The smaller it is, the more strictly the rule is
-    /// enforced. Each rule type can define its own set of level-of-enforcement
-    /// semantics.
+    /// enforced. Each rule type can define its own set of severity level
+    /// semantics. See kStrict and kBestEffort for two commonly used severity
+    /// levels.
     int severity{};
   };
 
