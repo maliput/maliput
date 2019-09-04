@@ -14,6 +14,10 @@ drake::optional<api::rules::PhaseProvider::Result> Intersection::Phase() const {
   return phase_provider_->GetPhase(ring_id());
 }
 
-void Intersection::SetPhase(const api::rules::Phase::Id& phase_id) { phase_provider_->SetPhase(ring_id(), phase_id); }
+void Intersection::SetPhase(const api::rules::Phase::Id& phase_id,
+                            const drake::optional<api::rules::Phase::Id>& next_phase,
+                            const drake::optional<double>& duration_until) {
+  phase_provider_->SetPhase(ring_id(), phase_id, next_phase, duration_until);
+}
 
 }  // namespace maliput
