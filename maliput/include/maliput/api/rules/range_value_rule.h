@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -51,15 +50,7 @@ class RangeValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated Range
   ///         in `ranges`.
   RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                 const std::vector<Rule::Id> related_rules, const std::vector<Range>& ranges)
-      : Rule(id, type_id, zone, related_rules), ranges_(ranges) {
-    MALIPUT_THROW_UNLESS(!ranges_.empty());
-    for (const Range& range : ranges_) {
-      ValidateSeverity(range.severity);
-      MALIPUT_THROW_UNLESS(range.min <= range.max);
-      MALIPUT_THROW_UNLESS(std::count(ranges_.begin(), ranges_.end(), range) == 1);
-    }
-  }
+                 const std::vector<Rule::Id> related_rules, const std::vector<Range>& ranges);
 
   const std::vector<Range>& ranges() const { return ranges_; }
 
@@ -69,14 +60,7 @@ class RangeValueRule : public Rule {
 
 /// Constructs a RangeValueRule::RangeValue.
 // TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
-inline RangeValueRule::Range MakeRange(int severity, const std::string& description, double min, double max) {
-  RangeValueRule::Range range;
-  range.severity = severity;
-  range.description = description;
-  range.min = min;
-  range.max = max;
-  return range;
-}
+RangeValueRule::Range MakeRange(int severity, const std::string& description, double min, double max);
 
 }  // namespace rules
 }  // namespace api

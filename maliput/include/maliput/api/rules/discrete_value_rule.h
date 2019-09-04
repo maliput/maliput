@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -45,14 +44,7 @@ class DiscreteValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated values
   ///         in `values`.
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                    const std::vector<Id> related_rules, const std::vector<DiscreteValue>& values)
-      : Rule(id, type_id, zone, related_rules), values_(values) {
-    MALIPUT_THROW_UNLESS(!values_.empty());
-    for (const DiscreteValue& value : values_) {
-      ValidateSeverity(value.severity);
-      MALIPUT_THROW_UNLESS(std::count(values_.begin(), values_.end(), value) == 1);
-    }
-  }
+                    const std::vector<Id> related_rules, const std::vector<DiscreteValue>& values);
 
   const std::vector<DiscreteValue>& values() const { return values_; }
 
@@ -62,12 +54,7 @@ class DiscreteValueRule : public Rule {
 
 /// Constructs a DiscreteValueRule::DiscreteValue.
 // TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
-inline DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const std::string& value) {
-  DiscreteValueRule::DiscreteValue discrete_value;
-  discrete_value.severity = severity;
-  discrete_value.value = value;
-  return discrete_value;
-}
+DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const std::string& value);
 
 }  // namespace rules
 }  // namespace api
