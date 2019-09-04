@@ -5,10 +5,11 @@
 
 #include "drake/common/drake_copyable.h"
 #include "maliput/api/rules/direction_usage_rule.h"
+#include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
-#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 
 namespace maliput {

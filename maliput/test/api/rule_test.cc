@@ -1,5 +1,5 @@
-
-#include "maliput/api/rules/rule.h"
+#include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/range_value_rule.h"
 
 #include <gtest/gtest.h>
 
