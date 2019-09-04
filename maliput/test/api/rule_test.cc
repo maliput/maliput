@@ -10,11 +10,6 @@ namespace api {
 namespace rules {
 namespace {
 
-// Rule::State::severity severity levels.
-const int kSeverityInvalid{-1};
-const int kSeverityStrict{0};
-const int kSeverityBestEffort{1};
-
 class RuleTest : public ::testing::Test {
  protected:
   const Rule::TypeId kTypeId{"RuleTypeIdA"};
@@ -28,14 +23,15 @@ class RuleTest : public ::testing::Test {
 // Evaluates RangeValueRule constructor.
 TEST_F(RuleTest, RangeValueRuleConstructor) {
   const std::vector<RangeValueRule::Range> kRanges{
-      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */),
-      MakeRange(kSeverityBestEffort, "range_description_2", 789. /* min */, 1234. /* max */),
+      MakeRange(Rule::State::kStrict, "range_description_1", 123. /* min */, 456. /* max */),
+      MakeRange(Rule::State::kBestEffort, "range_description_2", 789. /* min */, 1234. /* max */),
   };
 
   EXPECT_NO_THROW(RangeValueRule(kId, kTypeId, kZone, kRelatedRules, kRanges));
   EXPECT_NO_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */, kRanges));
 
   // Negative severity.
+  const int kSeverityInvalid{-1};
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */,
                               {MakeRange(kSeverityInvalid, "range_description_1", 123. /* min */, 456. /* max */)}),
                maliput::common::assertion_error);
@@ -47,14 +43,14 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
                maliput::common::assertion_error);
   // Duplicated ranges.
   const std::vector<RangeValueRule::Range> kDuplicatedRanges{
-      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */),
-      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */),
+      MakeRange(Rule::State::kStrict, "range_description_1", 123. /* min */, 456. /* max */),
+      MakeRange(Rule::State::kStrict, "range_description_1", 123. /* min */, 456. /* max */),
   };
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */, kDuplicatedRanges),
                maliput::common::assertion_error);
   // RangeValueRule::Range::min is greater than RangeValueRule::Range::max.
   const std::vector<RangeValueRule::Range> kShiftedRanges{
-      MakeRange(kSeverityStrict, "range_description_3", 456. /* min */, 123. /* max */)};
+      MakeRange(Rule::State::kStrict, "range_description_3", 456. /* min */, 123. /* max */)};
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* related rules */, kShiftedRanges),
                maliput::common::assertion_error);
 }
@@ -62,8 +58,8 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
 // Evaluates RangeValueRule accessors.
 TEST_F(RuleTest, RangeValueRuleAccessors) {
   const std::vector<RangeValueRule::Range> kRanges{
-      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */),
-      MakeRange(kSeverityBestEffort, "range_description_2", 789. /* min */, 1234. /* max */),
+      MakeRange(Rule::State::kStrict, "range_description_1", 123. /* min */, 456. /* max */),
+      MakeRange(Rule::State::kBestEffort, "range_description_2", 789. /* min */, 1234. /* max */),
   };
 
   const RangeValueRule dut(kId, kTypeId, kZone, kRelatedRules, kRanges);
@@ -88,15 +84,15 @@ TEST_F(RuleTest, RangeValueRuleAccessors) {
 // RangeValueRule::Range.
 GTEST_TEST(RangeTest, EqualOperator) {
   const RangeValueRule::Range range_1 =
-      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 456. /* max */);
+      MakeRange(Rule::State::kStrict, "range_description_1", 123. /* min */, 456. /* max */);
   const RangeValueRule::Range range_2 =
-      MakeRange(kSeverityStrict, "range_description_1", 456. /* min */, 456. /* max */);
+      MakeRange(Rule::State::kStrict, "range_description_1", 456. /* min */, 456. /* max */);
   const RangeValueRule::Range range_3 =
-      MakeRange(kSeverityStrict, "range_description_1", 123. /* min */, 789. /* max */);
+      MakeRange(Rule::State::kStrict, "range_description_1", 123. /* min */, 789. /* max */);
   const RangeValueRule::Range range_4 =
-      MakeRange(kSeverityStrict, "range_description_4", 123. /* min */, 456. /* max */);
+      MakeRange(Rule::State::kStrict, "range_description_4", 123. /* min */, 456. /* max */);
   const RangeValueRule::Range range_5 =
-      MakeRange(kSeverityBestEffort, "range_description_1", 123. /* min */, 456. /* max */);
+      MakeRange(Rule::State::kBestEffort, "range_description_1", 123. /* min */, 456. /* max */);
 
   EXPECT_TRUE(range_1 == range_1);
   EXPECT_FALSE(range_1 != range_1);
@@ -117,13 +113,14 @@ GTEST_TEST(RangeTest, EqualOperator) {
 // Evaluates DiscreteValueRule constructor.
 TEST_F(RuleTest, DiscreteValueRuleConstructor) {
   const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{
-      MakeDiscreteValue(kSeverityStrict, "rule_state_value_1"),
-      MakeDiscreteValue(kSeverityBestEffort, "rule_state_value_2")};
+      MakeDiscreteValue(Rule::State::kStrict, "rule_state_value_1"),
+      MakeDiscreteValue(Rule::State::kBestEffort, "rule_state_value_2")};
 
   EXPECT_NO_THROW(DiscreteValueRule(kId, kTypeId, kZone, {} /* related rules */, kDiscreteValues));
   EXPECT_NO_THROW(DiscreteValueRule(kId, kTypeId, kZone, kRelatedRules, kDiscreteValues));
 
   // Negative severity.
+  const int kSeverityInvalid{-1};
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {} /* related rules */,
                                  {MakeDiscreteValue(kSeverityInvalid, "rule_state_value")}),
                maliput::common::assertion_error);
@@ -136,8 +133,8 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
                maliput::common::assertion_error);
   // Duplicated ranges.
   const std::vector<DiscreteValueRule::DiscreteValue> kDuplicatedDiscreteValues{
-      MakeDiscreteValue(kSeverityStrict, "rule_state_value_1"),
-      MakeDiscreteValue(kSeverityStrict, "rule_state_value_1")};
+      MakeDiscreteValue(Rule::State::kStrict, "rule_state_value_1"),
+      MakeDiscreteValue(Rule::State::kStrict, "rule_state_value_1")};
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, kRelatedRules, kDuplicatedDiscreteValues),
                maliput::common::assertion_error);
 }
@@ -145,8 +142,8 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
 // Evaluates DiscreteValueRule accessors.
 TEST_F(RuleTest, DiscreteValueRuleAccessors) {
   const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{
-      MakeDiscreteValue(kSeverityStrict, "rule_state_value_1"),
-      MakeDiscreteValue(kSeverityBestEffort, "rule_state_value_2")};
+      MakeDiscreteValue(Rule::State::kStrict, "rule_state_value_1"),
+      MakeDiscreteValue(Rule::State::kBestEffort, "rule_state_value_2")};
 
   const DiscreteValueRule dut(kId, kTypeId, kZone, kRelatedRules, kDiscreteValues);
 
@@ -169,9 +166,9 @@ TEST_F(RuleTest, DiscreteValueRuleAccessors) {
 // Evaluates the equal and not equal operator overloads for
 // DiscreteValueRule::DiscreteValue.
 GTEST_TEST(DiscreteValueTest, EqualOperator) {
-  const DiscreteValueRule::DiscreteValue discrete_value_1 = MakeDiscreteValue(kSeverityStrict, "value_1");
-  const DiscreteValueRule::DiscreteValue discrete_value_2 = MakeDiscreteValue(kSeverityStrict, "value_2");
-  const DiscreteValueRule::DiscreteValue discrete_value_3 = MakeDiscreteValue(kSeverityBestEffort, "value_1");
+  const DiscreteValueRule::DiscreteValue discrete_value_1 = MakeDiscreteValue(Rule::State::kStrict, "value_1");
+  const DiscreteValueRule::DiscreteValue discrete_value_2 = MakeDiscreteValue(Rule::State::kStrict, "value_2");
+  const DiscreteValueRule::DiscreteValue discrete_value_3 = MakeDiscreteValue(Rule::State::kBestEffort, "value_1");
 
   EXPECT_TRUE(discrete_value_1 == discrete_value_1);
   EXPECT_FALSE(discrete_value_1 != discrete_value_1);

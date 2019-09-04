@@ -43,12 +43,25 @@ class Rule {
 
   /// Defines a base state for a Rule.
   struct State {
+    /// Defines common Rule severity levels. Specific rule types can choose to use
+    /// these, or define their own custom levels.
+    ///@{
+
+    /// Rule must always be obeyed.
+    static constexpr int kStrict{0};
+
+    /// Rule should be obeyed on a best-effort basis.
+    static constexpr int kBestEffort{1};
+
+    ///@}
+
     bool operator==(const State& other) const { return severity == other.severity; }
     bool operator!=(const State& other) const { return !(*this == other); }
 
-    /// Severity of the Rule::State.
-    /// A non-negative quantity that states the enforcement priority. The smaller
-    /// it is, the higher the requirement to enforce it.
+    /// Severity of the Rule::State. A non-negative quantity that specifies the
+    /// level of enforcement. The smaller it is, the more strictly the rule is
+    /// enforced. Each rule type can define its own set of level-of-enforcement
+    /// semantics.
     int severity{};
   };
 
@@ -149,8 +162,7 @@ class RangeValueRule : public Rule {
 };
 
 /// Constructs a RangeValueRule::RangeValue.
-// TODO(https://github.com/ToyotaResearchInstitute/maliput/issues/121)
-// Remove this once we switch to C++17 and can use aggregate initialization.
+// TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
 inline RangeValueRule::Range MakeRange(int severity, const std::string& description, double min, double max) {
   RangeValueRule::Range range;
   range.severity = severity;
@@ -209,8 +221,7 @@ class DiscreteValueRule : public Rule {
 };
 
 /// Constructs a DiscreteValueRule::DiscreteValue.
-// TODO(https://github.com/ToyotaResearchInstitute/maliput/issues/121)
-// Remove this once we switch to C++17 and can use aggregate initialization.
+// TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
 inline DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const std::string& value) {
   DiscreteValueRule::DiscreteValue discrete_value;
   discrete_value.severity = severity;

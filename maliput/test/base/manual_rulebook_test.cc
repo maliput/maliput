@@ -28,10 +28,6 @@ using api::rules::RoadRulebook;
 using api::rules::Rule;
 using api::rules::SpeedLimitRule;
 
-// Rule::State::severity severity levels.
-const int kSeverityStrict{0};
-const int kSeverityBestEffort{1};
-
 class ManualRulebookTest : public ::testing::Test {
  protected:
   const LaneSRange kZone{LaneId("a"), {10., 20.}};
@@ -58,7 +54,7 @@ class ManualRulebookTest : public ::testing::Test {
       Rule::TypeId("dvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {MakeDiscreteValue(kSeverityStrict, "value1"), MakeDiscreteValue(kSeverityBestEffort, "value2")}};
+      {MakeDiscreteValue(Rule::State::kStrict, "value1"), MakeDiscreteValue(Rule::State::kBestEffort, "value2")}};
 
   const Rule::Id kRangeValueRuleId{"rvrt/rvr"};
 
@@ -66,7 +62,7 @@ class ManualRulebookTest : public ::testing::Test {
                                        Rule::TypeId("rvrt"),
                                        LaneSRoute({kZone}),
                                        {} /* related_rules */,
-                                       {MakeRange(kSeverityStrict, "description", 123., 456.)}};
+                                       {MakeRange(Rule::State::kStrict, "description", 123., 456.)}};
 };
 
 TEST_F(ManualRulebookTest, DefaultConstructor) { ManualRulebook dut; }
@@ -123,7 +119,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
       Rule::TypeId("dvrt"),
       LaneSRoute({kZone}),
       {} /* related rules */,
-      {MakeDiscreteValue(kSeverityStrict, "value1"), MakeDiscreteValue(kSeverityStrict, "value2")}};
+      {MakeDiscreteValue(Rule::State::kStrict, "value1"), MakeDiscreteValue(Rule::State::kStrict, "value2")}};
   dut.AddRule(kDiscreteValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
 }
@@ -143,7 +139,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
                                                  Rule::TypeId("rvrt"),
                                                  LaneSRoute({kZone}),
                                                  {} /* related_rules */,
-                                                 {MakeRange(kSeverityStrict, "description", 123., 456.)}};
+                                                 {MakeRange(Rule::State::kStrict, "description", 123., 456.)}};
   dut.AddRule(kRangeValueRuleWithSameId);
   EXPECT_THROW(dut.AddRule(kDiscreteValueRule), maliput::common::assertion_error);
 }
