@@ -345,10 +345,10 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
   }
 };
 
-class MockRuleStateProvider final : public rules::RuleStateProvider {
+class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRuleStateProvider)
-  MockRuleStateProvider() {}
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRightOfWayRuleStateProvider)
+  MockRightOfWayRuleStateProvider() {}
 
  private:
   drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id&) const override { return drake::nullopt; }
@@ -555,8 +555,8 @@ std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook(const TrafficLig
 
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook() { return std::make_unique<MockPhaseRingBook>(); }
 
-std::unique_ptr<rules::RuleStateProvider> CreateRuleStateProvider() {
-  return std::make_unique<MockRuleStateProvider>();
+std::unique_ptr<rules::RightOfWayRuleStateProvider> CreateRightOfWayRuleStateProvider() {
+  return std::make_unique<MockRightOfWayRuleStateProvider>();
 }
 
 std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider() { return std::make_unique<MockPhaseProvider>(); }

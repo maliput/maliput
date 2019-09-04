@@ -8,12 +8,12 @@ namespace maliput {
 namespace api {
 namespace rules {
 
-/// Abstract interface for the provider of the state of various rules.
-class RuleStateProvider {
+/// Abstract interface for the provider of the RightOfWayRule.
+class RightOfWayRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RuleStateProvider)
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RightOfWayRuleStateProvider)
 
-  virtual ~RuleStateProvider() = default;
+  virtual ~RightOfWayRuleStateProvider() = default;
 
   /// Result returned by GetState(const RightOfWayRule::Id).
   struct RightOfWayResult {
@@ -47,7 +47,7 @@ class RuleStateProvider {
   drake::optional<RightOfWayResult> GetState(const RightOfWayRule::Id& id) const { return DoGetState(id); }
 
  protected:
-  RuleStateProvider() = default;
+  RightOfWayRuleStateProvider() = default;
 
  private:
   virtual drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id& id) const = 0;

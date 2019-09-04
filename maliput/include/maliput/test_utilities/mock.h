@@ -12,8 +12,8 @@
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/api/rules/road_rulebook.h"
-#include "maliput/api/rules/rule_state_provider.h"
 #include "maliput/api/rules/traffic_light_book.h"
 
 namespace maliput {
@@ -181,8 +181,8 @@ std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook(const TrafficLig
 /// Returns an arbitrary rules::PhaseRingBook.
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook();
 
-/// Returns an arbitrary rules::RuleStateProvider.
-std::unique_ptr<rules::RuleStateProvider> CreateRuleStateProvider();
+/// Returns an arbitrary rules::RightOfWayRuleStateProvider.
+std::unique_ptr<rules::RightOfWayRuleStateProvider> CreateRightOfWayRuleStateProvider();
 
 /// Returns an arbitrary rules::PhaseProvider.
 std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider();
