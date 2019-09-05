@@ -5,6 +5,7 @@
 
 #include "drake/common/drake_copyable.h"
 
+#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/rule.h"
 
 namespace maliput {
