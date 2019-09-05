@@ -5,7 +5,8 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/api/rules/rule.h"
+#include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/range_value_rule.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
