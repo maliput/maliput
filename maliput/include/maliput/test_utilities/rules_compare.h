@@ -34,13 +34,15 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::RangeValueRule& a,
                                    const rules::RangeValueRule& b);
 
-/// Predicate-formatter which tests equality of a std::string.
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const std::string& a,
-                                   const std::string& b);
-
-/// Predicate-formatter which tests equality of a vector of std::strings.
+/// Predicate-formatter which tests equality of a DiscreteValueRule::DiscreteValue.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const std::vector<std::string>& a, const std::vector<std::string>& b);
+                                   const DiscreteValueRule::DiscreteValue& a,
+                                   const DiscreteValueRule::DiscreteValue& b);
+
+/// Predicate-formatter which tests equality of a vector of DiscreteValueRule::DiscreteValues.
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const std::vector<DiscreteValueRule::DiscreteValue>& a,
+                                   const std::vector<DiscreteValueRule::DiscreteValue>& b);
 
 /// Predicate-formatter which tests equality of DiscreteValueRule.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,

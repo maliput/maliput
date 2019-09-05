@@ -9,6 +9,10 @@ namespace api {
 namespace rules {
 namespace test {
 
+// Rule::State::severity severity levels.
+const int kSeverityStrict{0};
+const int kSeverityBestEffort{1};
+
 // Evaluates queries to an empty RuleRegistry.
 GTEST_TEST(EmptyRuleRegistry, AccessorsTest) {
   const RuleRegistry dut;
@@ -26,8 +30,8 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeA("RangeValueRuleTypeA");
   const Rule::TypeId kTypeB("RangeValueRuleTypeB");
   const Rule::TypeId kTypeC("RangeValueRuleTypeC");
-  const RangeValueRule::Range kRangeA{"range_description_a", 123. /* min */, 456. /* max */};
-  const RangeValueRule::Range kRangeB{"range_description_b", 456. /* min */, 789. /* max */};
+  const RangeValueRule::Range kRangeA = MakeRange(kSeverityStrict, "range_description_a", 123., 456.);
+  const RangeValueRule::Range kRangeB = MakeRange(kSeverityBestEffort, "range_description_b", 456., 789.);
 
   RuleRegistry dut;
   // Registers RangeValueRule types.
@@ -35,7 +39,8 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   EXPECT_NO_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}));
   // Throws because of duplicated type ID.
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}), maliput::common::assertion_error);
-  EXPECT_THROW(dut.RegisterDiscreteValueRule(kTypeB, {"SomeValue"}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.RegisterDiscreteValueRule(kTypeB, {MakeDiscreteValue(kSeverityStrict, "SomeValue")}),
+               maliput::common::assertion_error);
   // Throws because of empty range vector.
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeC, {} /* ranges */), maliput::common::assertion_error);
   // Throws because of duplicated ranges.
@@ -82,31 +87,37 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
 // Evaluates queries after registering DiscreteValueRule types.
 GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeA("DiscreteValueTypeA");
-  const std::vector<std::string> kValuesA{"ValueA1", "ValueA2"};
+  const std::vector<DiscreteValueRule::DiscreteValue> kValuesA{MakeDiscreteValue(kSeverityStrict, "ValueA1"),
+                                                               MakeDiscreteValue(kSeverityBestEffort, "ValueA2")};
   const Rule::TypeId kTypeB("DiscreteValueRuleTypeB");
-  const std::vector<std::string> kValuesB{"ValueB1", "ValueB2", "ValueB3"};
-  const RangeValueRule::Range kRange{"range_description_a", 123. /* min */, 456. /* max */};
+  const std::vector<DiscreteValueRule::DiscreteValue> kValuesB{MakeDiscreteValue(kSeverityStrict, "ValueB1"),
+                                                               MakeDiscreteValue(kSeverityStrict, "ValueB2"),
+                                                               MakeDiscreteValue(kSeverityBestEffort, "ValueB3")};
+  const RangeValueRule::Range kRange = MakeRange(kSeverityStrict, "range_description_a", 123., 456.);
 
   RuleRegistry dut;
   // Registers DiscreteValueRule types.
   EXPECT_NO_THROW(dut.RegisterDiscreteValueRule(kTypeA, kValuesA));
   EXPECT_NO_THROW(dut.RegisterDiscreteValueRule(kTypeB, kValuesB));
   // Throws because of duplicated type ID.
-  EXPECT_THROW(dut.RegisterDiscreteValueRule(kTypeB, {"SomeValue"}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.RegisterDiscreteValueRule(kTypeB, {MakeDiscreteValue(kSeverityStrict, "SomeValue")}),
+               maliput::common::assertion_error);
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRange}), maliput::common::assertion_error);
   // Throws because of empty vector.
   EXPECT_THROW(dut.RegisterDiscreteValueRule(Rule::TypeId("SomeRuleType"), {}), maliput::common::assertion_error);
 
   EXPECT_TRUE(dut.RangeValueRuleTypes().empty());
 
-  const std::map<Rule::TypeId, std::vector<std::string>> kExpectedRuleTypes{{kTypeA, kValuesA}, {kTypeB, kValuesB}};
-  const std::map<Rule::TypeId, std::vector<std::string>> discrete_value_rule_types = dut.DiscreteValueRuleTypes();
+  const std::map<Rule::TypeId, std::vector<DiscreteValueRule::DiscreteValue>> kExpectedRuleTypes{{kTypeA, kValuesA},
+                                                                                                 {kTypeB, kValuesB}};
+  const std::map<Rule::TypeId, std::vector<DiscreteValueRule::DiscreteValue>> discrete_value_rule_types =
+      dut.DiscreteValueRuleTypes();
   EXPECT_EQ(discrete_value_rule_types.size(), kExpectedRuleTypes.size());
   for (const auto& rule_values : kExpectedRuleTypes) {
     const auto found_rule_values = discrete_value_rule_types.find(rule_values.first);
     EXPECT_NE(found_rule_values, discrete_value_rule_types.end());
     EXPECT_EQ(found_rule_values->second.size(), rule_values.second.size());
-    for (const std::string& value : found_rule_values->second) {
+    for (const DiscreteValueRule::DiscreteValue& value : found_rule_values->second) {
       EXPECT_NE(std::find(rule_values.second.begin(), rule_values.second.end(), value), rule_values.second.end());
     }
   }
@@ -118,7 +129,7 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   EXPECT_EQ(result->type_id, kTypeA);
   EXPECT_TRUE(result->discrete_values.has_value());
   EXPECT_EQ(result->discrete_values->size(), kValuesA.size());
-  for (const std::string& value : *result->discrete_values) {
+  for (const DiscreteValueRule::DiscreteValue& value : *result->discrete_values) {
     EXPECT_NE(std::find(kValuesA.begin(), kValuesA.end(), value), kValuesA.end());
   }
 
@@ -128,7 +139,7 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   EXPECT_EQ(result->type_id, kTypeB);
   EXPECT_TRUE(result->discrete_values.has_value());
   EXPECT_EQ(result->discrete_values->size(), kValuesB.size());
-  for (const std::string& value : *result->discrete_values) {
+  for (const DiscreteValueRule::DiscreteValue& value : *result->discrete_values) {
     EXPECT_NE(std::find(kValuesB.begin(), kValuesB.end(), value), kValuesB.end());
   }
 
@@ -141,15 +152,16 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   const Rule::TypeId kRangeValueRuleType("RangeValueRuleType");
   const Rule::Id kRangeRuleId("RangeValueRuleType/RangeRuleId");
   const LaneSRoute kZone({LaneSRange(LaneId("LaneId"), SRange(10., 20.))});
-  const RangeValueRule::Range kRange{"range_description", 123. /* min */, 456. /* max */};
-  const RangeValueRule::Range kUnregisteredRange{"range_description", 456. /* min */, 789. /* max */};
-
+  const RangeValueRule::Range kRange = MakeRange(kSeverityStrict, "range_description", 123., 456.);
+  const RangeValueRule::Range kUnregisteredRange = MakeRange(kSeverityBestEffort, "range_description", 456., 789.);
   const Rule::TypeId kDiscreteValueRuleType("DiscreteValueType");
   const Rule::Id kDiscreteValueRuleId("DiscreteValueType/DiscreteValueRuleId");
-  const std::vector<std::string> kDiscreteValues{"Value1", "Value2", "Value3"};
+  const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{MakeDiscreteValue(kSeverityStrict, "Value1"),
+                                                                      MakeDiscreteValue(kSeverityStrict, "Value2"),
+                                                                      MakeDiscreteValue(kSeverityStrict, "Value3")};
 
   const Rule::TypeId kUnregisteredRuleType("UnregisteredRuleType");
-  const std::string kUnregisteredDiscreteValue{"Value4"};
+  const DiscreteValueRule::DiscreteValue kUnregisteredDiscreteValue = MakeDiscreteValue(kSeverityStrict, "Value4");
 
   RuleRegistry dut;
 
@@ -181,8 +193,10 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
                maliput::common::assertion_error);
 
   // Builds and evaluates a discrete value based rule.
+  const std::vector<DiscreteValueRule::DiscreteValue> kExpectedDiscreteValues{
+      MakeDiscreteValue(kSeverityStrict, "Value1"), MakeDiscreteValue(kSeverityStrict, "Value3")};
   const DiscreteValueRule discrete_value_rule = dut.BuildDiscreteValueRule(
-      kDiscreteValueRuleId, kDiscreteValueRuleType, kZone, {} /* related rules */, {"Value1", "Value3"});
+      kDiscreteValueRuleId, kDiscreteValueRuleType, kZone, {} /* related rules */, kExpectedDiscreteValues);
   EXPECT_EQ(discrete_value_rule.id(), kDiscreteValueRuleId);
   EXPECT_EQ(discrete_value_rule.type_id(), kDiscreteValueRuleType);
   EXPECT_EQ(discrete_value_rule.zone().ranges().size(), 1);
@@ -191,14 +205,14 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   EXPECT_EQ(discrete_value_rule.zone().ranges()[0].s_range().s1(), kZone.ranges()[0].s_range().s1());
   EXPECT_EQ(discrete_value_rule.related_rules().size(), 0.);
   EXPECT_EQ(discrete_value_rule.related_rules().size(), 0.);
-  EXPECT_EQ(discrete_value_rule.values().size(), 2);
-  for (const std::string& discrete_state_value : {"Value1", "Value3"}) {
+  EXPECT_EQ(discrete_value_rule.values().size(), kExpectedDiscreteValues.size());
+  for (const DiscreteValueRule::DiscreteValue& discrete_state_value : kExpectedDiscreteValues) {
     EXPECT_NE(std::find(discrete_value_rule.values().begin(), discrete_value_rule.values().end(), discrete_state_value),
               discrete_value_rule.values().end());
   }
   // Unregistered type.
   EXPECT_THROW(dut.BuildDiscreteValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {} /* related rules */,
-                                          {"Value1", "Value3"}),
+                                          kExpectedDiscreteValues),
                maliput::common::assertion_error);
   // Unregistered discrete value for the type.
   EXPECT_THROW(dut.BuildDiscreteValueRule(kDiscreteValueRuleId, kDiscreteValueRuleType, kZone, {} /* related rules */,

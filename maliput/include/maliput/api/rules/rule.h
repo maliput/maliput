@@ -41,6 +41,31 @@ class Rule {
   /// "right of way rule", "direction usage rule", "vehicle usage rule", etc.
   using TypeId = TypeSpecificIdentifier<class Type>;
 
+  /// Defines a base state for a Rule.
+  struct State {
+    /// Defines common Rule severity levels. Specific rule types can choose to use
+    /// these, or define their own custom levels.
+    ///@{
+
+    /// Rule must always be obeyed.
+    static constexpr int kStrict{0};
+
+    /// Rule should be obeyed on a best-effort basis.
+    static constexpr int kBestEffort{1};
+
+    ///@}
+
+    bool operator==(const State& other) const { return severity == other.severity; }
+    bool operator!=(const State& other) const { return !(*this == other); }
+
+    /// Severity of the Rule::State. A non-negative quantity that specifies the
+    /// level of enforcement. The smaller it is, the more strictly the rule is
+    /// enforced. Each rule type can define its own set of severity level
+    /// semantics. See kStrict and kBestEffort for two commonly used severity
+    /// levels.
+    int severity{};
+  };
+
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
 
   /// Constructs a Rule.
@@ -70,6 +95,11 @@ class Rule {
 
   const std::vector<Id>& related_rules() const { return related_rules_; }
 
+ protected:
+  // Validates that `severity` is a non-negative quantity.
+  // @throws maliput::assertion_error When `severity` is negative.
+  void ValidateSeverity(int severity) { MALIPUT_THROW_UNLESS(severity >= 0); }
+
  private:
   Id id_;
   TypeId type_id_;
@@ -88,11 +118,10 @@ class RangeValueRule : public Rule {
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RangeValueRule);
 
   /// Defines a range for a RangeValueRule.
-  struct Range {
+  struct Range : public Rule::State {
     bool operator==(const Range& other) const {
-      return min == other.min && max == other.max && description == other.description;
+      return min == other.min && max == other.max && description == other.description && Rule::State::operator==(other);
     }
-
     bool operator!=(const Range& other) const { return !(*this == other); }
 
     std::string description;  ///< Semantics of the range quantity.
@@ -121,6 +150,7 @@ class RangeValueRule : public Rule {
       : Rule(id, type_id, zone, related_rules), ranges_(ranges) {
     MALIPUT_THROW_UNLESS(!ranges_.empty());
     for (const Range& range : ranges_) {
+      ValidateSeverity(range.severity);
       MALIPUT_THROW_UNLESS(range.min <= range.max);
       MALIPUT_THROW_UNLESS(std::count(ranges_.begin(), ranges_.end(), range) == 1);
     }
@@ -132,8 +162,20 @@ class RangeValueRule : public Rule {
   std::vector<Range> ranges_;
 };
 
-/// Describes a discrete value rule. Each discrete value is a std::string.
+/// Constructs a RangeValueRule::RangeValue.
+// TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
+inline RangeValueRule::Range MakeRange(int severity, const std::string& description, double min, double max) {
+  RangeValueRule::Range range;
+  range.severity = severity;
+  range.description = description;
+  range.min = min;
+  range.max = max;
+  return range;
+}
+
+/// Describes a discrete value rule.
 ///
+/// DiscreteValues are defined by a string value.
 /// Semantics of this rule are based on _all_ possible values that this
 /// Rule::TypeId could have (as specified by RuleRegistry::FindRuleByType()),
 /// not only the subset of values that a specific instance of this rule can
@@ -141,6 +183,14 @@ class RangeValueRule : public Rule {
 class DiscreteValueRule : public Rule {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DiscreteValueRule);
+
+  /// Defines a discrete value for a DiscreteValueRule.
+  struct DiscreteValue : public Rule::State {
+    bool operator==(const DiscreteValue& other) const { return value == other.value && Rule::State::operator==(other); }
+    bool operator!=(const DiscreteValue& other) const { return !(*this == other); }
+
+    std::string value;  ///< Value of the DiscreteValue.
+  };
 
   /// Constructs a DiscreteValueRule.
   ///
@@ -156,19 +206,29 @@ class DiscreteValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated values
   ///         in `values`.
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                    const std::vector<Id> related_rules, const std::vector<std::string>& values)
+                    const std::vector<Id> related_rules, const std::vector<DiscreteValue>& values)
       : Rule(id, type_id, zone, related_rules), values_(values) {
     MALIPUT_THROW_UNLESS(!values_.empty());
-    for (const std::string& value : values_) {
+    for (const DiscreteValue& value : values_) {
+      ValidateSeverity(value.severity);
       MALIPUT_THROW_UNLESS(std::count(values_.begin(), values_.end(), value) == 1);
     }
   }
 
-  const std::vector<std::string>& values() const { return values_; }
+  const std::vector<DiscreteValue>& values() const { return values_; }
 
  private:
-  std::vector<std::string> values_;
+  std::vector<DiscreteValue> values_;
 };
+
+/// Constructs a DiscreteValueRule::DiscreteValue.
+// TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
+inline DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const std::string& value) {
+  DiscreteValueRule::DiscreteValue discrete_value;
+  discrete_value.severity = severity;
+  discrete_value.value = value;
+  return discrete_value;
+}
 
 }  // namespace rules
 }  // namespace api

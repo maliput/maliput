@@ -23,13 +23,15 @@ namespace test {
   return c.result();
 }
 
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const std::string& a,
-                                   const std::string& b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const DiscreteValueRule::DiscreteValue& a,
+                                   const DiscreteValueRule::DiscreteValue& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const std::vector<std::string>& a, const std::vector<std::string>& b) {
+                                   const std::vector<DiscreteValueRule::DiscreteValue>& a,
+                                   const std::vector<DiscreteValueRule::DiscreteValue>& b) {
   drake::unused(a_expression);
   drake::unused(b_expression);
 

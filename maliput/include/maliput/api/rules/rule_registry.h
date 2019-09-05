@@ -1,8 +1,6 @@
 #pragma once
 
 #include <map>
-#include <string>
-#include <utility>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
@@ -34,7 +32,7 @@ class RuleRegistry {
     drake::optional<std::vector<RangeValueRule::Range>> range_values;
 
     /// Defines the possible discrete values of a discrete value rule type.
-    drake::optional<std::vector<std::string>> discrete_values;
+    drake::optional<std::vector<DiscreteValueRule::DiscreteValue>> discrete_values;
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RuleRegistry);
@@ -70,7 +68,8 @@ class RuleRegistry {
   ///         empty.
   /// @throws maliput::common::assertion_error When there are duplicated items
   ///         in `all_possible_values`.
-  void RegisterDiscreteValueRule(const Rule::TypeId& type_id, const std::vector<std::string>& all_possible_values);
+  void RegisterDiscreteValueRule(const Rule::TypeId& type_id,
+                                 const std::vector<DiscreteValueRule::DiscreteValue>& all_possible_values);
 
   /// @returns All of the registered RangeValueRule types and their possible
   ///          ranges.
@@ -78,7 +77,7 @@ class RuleRegistry {
 
   /// @returns All of the registered DiscreteValueRule types and their possible
   ///          values.
-  const std::map<Rule::TypeId, std::vector<std::string>>& DiscreteValueRuleTypes() const;
+  const std::map<Rule::TypeId, std::vector<DiscreteValueRule::DiscreteValue>>& DiscreteValueRuleTypes() const;
 
   /// Finds the possible states of a rule type by `type_id`.
   ///
@@ -107,11 +106,11 @@ class RuleRegistry {
   ///         not a possible value of a DiscreteValueRule of type `type_id`.
   DiscreteValueRule BuildDiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                                            const std::vector<Rule::Id>& related_rules,
-                                           const std::vector<std::string>& values) const;
+                                           const std::vector<DiscreteValueRule::DiscreteValue>& values) const;
 
  private:
   std::map<Rule::TypeId, std::vector<RangeValueRule::Range>> range_rule_types_;
-  std::map<Rule::TypeId, std::vector<std::string>> discrete_rule_types_;
+  std::map<Rule::TypeId, std::vector<DiscreteValueRule::DiscreteValue>> discrete_rule_types_;
 };
 
 }  // namespace rules
