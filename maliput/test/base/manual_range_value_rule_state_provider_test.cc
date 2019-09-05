@@ -6,6 +6,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/test_utilities/rules_compare.h"
+#include "maliput/test_utilities/rules_test_utilities.h"
+
 namespace maliput {
 namespace test {
 namespace {
@@ -18,7 +21,8 @@ GTEST_TEST(ManualRangeRuleStateProviderTest, BasicTest) {
   ManualRangeValueRuleStateProvider dut;
 
   const Rule::Id kRuleId("rule_type/rule_id");
-  const RangeValueRule::Range kRangeState{"range_description", 123. /* min */, 456. /* max */};
+  const RangeValueRule::Range kRangeState =
+      maliput::api::rules::MakeRange(Rule::State::kStrict, "range_description", 123. /* min */, 456. /* max */);
 
   // No rule with specified ID exists.
   EXPECT_FALSE(dut.GetState(kRuleId).has_value());
@@ -28,7 +32,7 @@ GTEST_TEST(ManualRangeRuleStateProviderTest, BasicTest) {
   dut.AddState(kRuleId, kRangeState);
   drake::optional<RangeValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
-  EXPECT_EQ(result->state_range, kRangeState);
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state_range, kRangeState));
   EXPECT_EQ(result->next, drake::nullopt);
 
   // Attempting to add duplicate state.

@@ -22,19 +22,19 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   ///
   /// @throws std::logic_error When a Rule::Id with an ID of @p id already
   ///         exists in this provider.
-  void AddState(const api::rules::Rule::Id& id, const std::string& initial_state);
+  void AddState(const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& initial_state);
 
   /// Sets the dynamic state of a DiscreteValueRule within this provider.
   ///
   /// @throws std::out_of_range if no dynamic state with @p id exists in this
   ///         provider.
-  void SetState(const api::rules::Rule::Id& id, const std::string& state);
+  void SetState(const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& state);
 
  private:
   drake::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 
-  std::unordered_map<api::rules::Rule::Id, std::string> states_;
+  std::unordered_map<api::rules::Rule::Id, api::rules::DiscreteValueRule::DiscreteValue> states_;
 };
 
 }  // namespace maliput

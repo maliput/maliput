@@ -2,6 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/test_utilities/rules_compare.h"
+#include "maliput/test_utilities/rules_test_utilities.h"
+
 namespace maliput {
 namespace api {
 namespace rules {
@@ -11,11 +14,14 @@ namespace {
 class MockDiscreteValueRuleStateProvider : public DiscreteValueRuleStateProvider {
  public:
   static const Rule::Id kRuleId;
+  static DiscreteValueRule::DiscreteValue MakeCurrentDiscreteValue();
+  static DiscreteValueRule::DiscreteValue MakeNextDiscreteValue();
 
  private:
   drake::optional<StateResult> DoGetState(const Rule::Id& id) const override {
     if (id == kRuleId) {
-      return StateResult{"current_state", StateResult::Next{"next_state" /* state_value */, {123.456} /* duration */}};
+      return StateResult{MakeCurrentDiscreteValue(),
+                         StateResult::Next{MakeNextDiscreteValue(), 123.456 /* duration */}};
     }
     return {};
   }
@@ -23,15 +29,23 @@ class MockDiscreteValueRuleStateProvider : public DiscreteValueRuleStateProvider
 
 const Rule::Id MockDiscreteValueRuleStateProvider::kRuleId{"RuleId"};
 
+DiscreteValueRule::DiscreteValue MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue() {
+  return MakeDiscreteValue(Rule::State::kStrict, "current_state");
+}
+
+DiscreteValueRule::DiscreteValue MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue() {
+  return MakeDiscreteValue(Rule::State::kStrict, "next_state");
+}
+
 GTEST_TEST(DiscreteValueRuleStateProviderTest, ExerciseInterface) {
   const MockDiscreteValueRuleStateProvider dut;
   const drake::optional<DiscreteValueRuleStateProvider::StateResult> result =
       dut.GetState(MockDiscreteValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());
-  EXPECT_EQ(result->state_value, "current_state");
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state_value, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue()));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_EQ(result->next->state_value, "next_state");
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state_value, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue()));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), 123.456);
 

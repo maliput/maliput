@@ -4,14 +4,16 @@
 
 namespace maliput {
 
-void ManualDiscreteValueRuleStateProvider::AddState(const api::rules::Rule::Id& id, const std::string& initial_state) {
+void ManualDiscreteValueRuleStateProvider::AddState(const api::rules::Rule::Id& id,
+                                                    const api::rules::DiscreteValueRule::DiscreteValue& initial_state) {
   auto result = states_.emplace(id, initial_state);
   if (!result.second) {
     throw std::logic_error("Attempted to add multiple rules with id " + id.string());
   }
 }
 
-void ManualDiscreteValueRuleStateProvider::SetState(const api::rules::Rule::Id& id, const std::string& state) {
+void ManualDiscreteValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
+                                                    const api::rules::DiscreteValueRule::DiscreteValue& state) {
   states_.at(id) = state;
 }
 

@@ -16,14 +16,14 @@ class DiscreteValueRuleStateProvider {
   struct StateResult {
     /// Information about a subsequent state.
     struct Next {
-      std::string state_value;
+      DiscreteValueRule::DiscreteValue state_value;
       /// If known, estimated time until the transition to the state, relative
       /// to when DiscreteValueRuleStateProvider::GetState() was called.
       drake::optional<double> duration_until;
     };
 
     /// The rule's current state.
-    std::string state_value;
+    DiscreteValueRule::DiscreteValue state_value;
     /// The rule's next state, if known.
     drake::optional<Next> next;
   };
