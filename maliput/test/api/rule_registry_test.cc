@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "maliput/common/assertion_error.h"
+#include "maliput/test_utilities/mock.h"
+#include "maliput/test_utilities/regions_test_utilities.h"
 #include "maliput/test_utilities/rules_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -10,10 +12,6 @@ namespace maliput {
 namespace api {
 namespace rules {
 namespace test {
-
-// Rule::State::severity severity levels.
-const int kSeverityStrict{0};
-const int kSeverityBestEffort{1};
 
 // Evaluates queries to an empty RuleRegistry.
 GTEST_TEST(EmptyRuleRegistry, AccessorsTest) {
@@ -32,11 +30,10 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeA("RangeValueRuleTypeA");
   const Rule::TypeId kTypeB("RangeValueRuleTypeB");
   const Rule::TypeId kTypeC("RangeValueRuleTypeC");
-  const Rule::RelatedRules kEmptyRelatedRules{};
   const RangeValueRule::Range kRangeA =
-      MakeRange(kSeverityStrict, kEmptyRelatedRules, "range_description_a", 123., 456.);
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "range_description_a", 123., 456.);
   const RangeValueRule::Range kRangeB =
-      MakeRange(kSeverityBestEffort, kEmptyRelatedRules, "range_description_b", 456., 789.);
+      MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "range_description_b", 456., 789.);
 
   RuleRegistry dut;
   // Registers RangeValueRule types.
@@ -45,7 +42,8 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   // Throws because of duplicated type ID.
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}), maliput::common::assertion_error);
   EXPECT_THROW(
-      dut.RegisterDiscreteValueRule(kTypeB, {MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "SomeValue")}),
+      dut.RegisterDiscreteValueRule(
+          kTypeB, {MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "SomeValue")}),
       maliput::common::assertion_error);
   // Throws because of empty range vector.
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeC, {} /* ranges */), maliput::common::assertion_error);
@@ -92,19 +90,17 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
 
 // Evaluates queries after registering DiscreteValueRule types.
 GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
-  const Rule::RelatedRules kEmptyRelatedRules{};
-
   const Rule::TypeId kTypeA("DiscreteValueTypeA");
   const std::vector<DiscreteValueRule::DiscreteValue> kValuesA{
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "ValueA1"),
-      MakeDiscreteValue(kSeverityBestEffort, kEmptyRelatedRules, "ValueA2")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "ValueA1"),
+      MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "ValueA2")};
   const Rule::TypeId kTypeB("DiscreteValueRuleTypeB");
   const std::vector<DiscreteValueRule::DiscreteValue> kValuesB{
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "ValueB1"),
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "ValueB2"),
-      MakeDiscreteValue(kSeverityBestEffort, kEmptyRelatedRules, "ValueB3")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "ValueB1"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "ValueB2"),
+      MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "ValueB3")};
   const RangeValueRule::Range kRange =
-      MakeRange(kSeverityStrict, kEmptyRelatedRules, "range_description_a", 123., 456.);
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "range_description_a", 123., 456.);
 
   RuleRegistry dut;
   // Registers DiscreteValueRule types.
@@ -112,7 +108,8 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   EXPECT_NO_THROW(dut.RegisterDiscreteValueRule(kTypeB, kValuesB));
   // Throws because of duplicated type ID.
   EXPECT_THROW(
-      dut.RegisterDiscreteValueRule(kTypeB, {MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "SomeValue")}),
+      dut.RegisterDiscreteValueRule(
+          kTypeB, {MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "SomeValue")}),
       maliput::common::assertion_error);
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRange}), maliput::common::assertion_error);
   // Throws because of empty vector.
@@ -161,24 +158,23 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
 
 // Registers RangeValueRules and DiscreteValueRules, then builds rules.
 GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
-  const Rule::RelatedRules kEmptyRelatedRules{};
-
   const Rule::TypeId kRangeValueRuleType("RangeValueRuleType");
   const Rule::Id kRangeRuleId("RangeValueRuleType/RangeRuleId");
   const LaneSRoute kZone({LaneSRange(LaneId("LaneId"), SRange(10., 20.))});
-  const RangeValueRule::Range kRange = MakeRange(kSeverityStrict, kEmptyRelatedRules, "range_description", 123., 456.);
+  const RangeValueRule::Range kRange =
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "range_description", 123., 456.);
   const RangeValueRule::Range kUnregisteredRange =
-      MakeRange(kSeverityBestEffort, kEmptyRelatedRules, "range_description", 456., 789.);
+      MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "range_description", 456., 789.);
   const Rule::TypeId kDiscreteValueRuleType("DiscreteValueType");
   const Rule::Id kDiscreteValueRuleId("DiscreteValueType/DiscreteValueRuleId");
   const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "Value1"),
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "Value2"),
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "Value3")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value1"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value2"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value3")};
 
   const Rule::TypeId kUnregisteredRuleType("UnregisteredRuleType");
   const DiscreteValueRule::DiscreteValue kUnregisteredDiscreteValue =
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "Value4");
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value4");
 
   RuleRegistry dut;
 
@@ -189,7 +185,7 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   const RangeValueRule range_value_rule = dut.BuildRangeValueRule(kRangeRuleId, kRangeValueRuleType, kZone, {kRange});
   EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
   EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.zone(), kZone));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(range_value_rule.zone(), kZone));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.ranges(), {kRange}));
 
   // Unregistered type.
@@ -201,13 +197,13 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
 
   // Builds and evaluates a discrete value based rule.
   const std::vector<DiscreteValueRule::DiscreteValue> kExpectedDiscreteValues{
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "Value1"),
-      MakeDiscreteValue(kSeverityStrict, kEmptyRelatedRules, "Value3")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value1"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value3")};
   const DiscreteValueRule discrete_value_rule =
       dut.BuildDiscreteValueRule(kDiscreteValueRuleId, kDiscreteValueRuleType, kZone, kExpectedDiscreteValues);
   EXPECT_EQ(discrete_value_rule.id(), kDiscreteValueRuleId);
   EXPECT_EQ(discrete_value_rule.type_id(), kDiscreteValueRuleType);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(discrete_value_rule.zone(), kZone));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(discrete_value_rule.zone(), kZone));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(discrete_value_rule.values(), kExpectedDiscreteValues));
 
   // Unregistered type.

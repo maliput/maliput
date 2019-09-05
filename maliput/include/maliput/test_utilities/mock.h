@@ -105,6 +105,12 @@ rules::DirectionUsageRule::State CreateDirectionUsageRuleState();
 /// Returns a rules::DirectionUsageRule containing an arbitrary state.
 rules::DirectionUsageRule CreateDirectionUsageRule();
 
+/// Returns an empty rules::Rule::RelatedRules.
+rules::Rule::RelatedRules CreateEmptyRelatedRules();
+
+/// Returns an arbitrary rules::Rule::RelatedRules.
+rules::Rule::RelatedRules CreateNonEmptyRelatedRules();
+
 /// Returns a rules::DiscreteValueRule containing an arbitrary state.
 rules::DiscreteValueRule CreateDiscreteValueRule();
 

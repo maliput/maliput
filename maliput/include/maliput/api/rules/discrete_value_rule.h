@@ -36,7 +36,6 @@ class DiscreteValueRule : public Rule {
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
-  /// @param related_rules A vector of related rules.
   /// @param values A vector of possible discrete values that this Rule could be
   ///               in. The actual value that's enforced at any given time is
   ///               determined by a DiscreteValueRuleStateProvider.  It must
@@ -45,7 +44,7 @@ class DiscreteValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated values
   ///         in `values`.
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                    const std::vector<Id> related_rules, const std::vector<DiscreteValue>& values);
+                    const std::vector<DiscreteValue>& values);
 
   const std::vector<DiscreteValue>& values() const { return values_; }
 
@@ -55,7 +54,8 @@ class DiscreteValueRule : public Rule {
 
 /// Constructs a DiscreteValueRule::DiscreteValue.
 // TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
-DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const std::string& value);
+DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const Rule::RelatedRules& related_rules,
+                                                   const std::string& value);
 
 }  // namespace rules
 }  // namespace api

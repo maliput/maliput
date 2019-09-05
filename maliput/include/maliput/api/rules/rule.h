@@ -41,7 +41,7 @@ class Rule {
 
   /// Alias of a map holding groups of related rules. The name of each group is
   /// specified by the key, and the semantics vary based on the specific rule
-  /// type. The semantic group name must not be an empty string. Each vector of
+  /// type. The group name must not be an empty string. Each vector of
   /// Rule::Id must not be empty and contain unique Rule::Ids.
   using RelatedRules = std::map<std::string, std::vector<Id>>;
 
@@ -59,7 +59,7 @@ class Rule {
 
     ///@}
 
-    bool operator==(const State& other) const { return severity == other.severity; }
+    bool operator==(const State& other) const;
     bool operator!=(const State& other) const { return !(*this == other); }
 
     /// Severity of the Rule::State. A non-negative quantity that specifies the
@@ -68,7 +68,7 @@ class Rule {
     /// semantics. See kStrict and kBestEffort for two commonly used severity
     /// levels.
     int severity{};
-    RelatedRules related_rules;  ///< RelatedRules of the Rule::State.
+    RelatedRules related_rules;
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
@@ -98,10 +98,9 @@ class Rule {
   //         `RelatedRules` are not met.
   void ValidateRelatedRules(const RelatedRules& related_rules) const;
 
- protected:
   // Validates that `severity` is a non-negative quantity.
   // @throws maliput::assertion_error When `severity` is negative.
-  void ValidateSeverity(int severity) { MALIPUT_THROW_UNLESS(severity >= 0); }
+  void ValidateSeverity(int severity) const { MALIPUT_THROW_UNLESS(severity >= 0); }
 
  private:
   Id id_;

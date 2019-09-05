@@ -445,14 +445,21 @@ DirectionUsageRule CreateDirectionUsageRule() {
   return DirectionUsageRule(DirectionUsageRule::Id("dur_id"), CreateLaneSRange(), {CreateDirectionUsageRuleState()});
 }
 
+rules::Rule::RelatedRules CreateEmptyRelatedRules() { return {}; }
+
+rules::Rule::RelatedRules CreateNonEmptyRelatedRules() {
+  return Rule::RelatedRules{{"RelatedRulesGroup", {Rule::Id("RuleTypeIdA/RuleIdA"), Rule::Id("RuleTypeIdB/RuleIdB")}}};
+}
+
 DiscreteValueRule CreateDiscreteValueRule() {
-  return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(),
-                           {rules::MakeDiscreteValue(rules::Rule::State::kStrict, {} /* related rules */, "value1"),
-                            rules::MakeDiscreteValue(rules::Rule::State::kStrict, {} /* related rules */, "value2")});
+  return DiscreteValueRule(
+      Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(),
+      {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value1"),
+       rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value2")});
 }
 
 RangeValueRule::Range CreateRange() {
-  return rules::MakeRange(rules::Rule::State::kStrict, {} /* related rules */, "description", 123. /* min */,
+  return rules::MakeRange(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "description", 123. /* min */,
                           456. /* max */);
 }
 
