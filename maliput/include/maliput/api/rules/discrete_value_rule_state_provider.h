@@ -3,27 +3,30 @@
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 
+#include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/rule.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 
-/// Abstract interface for the provider of DiscreteValueRule.
+/// Abstract interface for the state provider of DiscreteValueRules.
 class DiscreteValueRuleStateProvider {
  public:
-  /// The state of a DiscreteValueRule, returned by GetState(const Rule::Id).
+  /// The state of a DiscreteValueRule, returned by
+  /// DiscreteValueRuleStateProvider::GetState(const Rule::Id).
   struct StateResult {
-    /// Information about a subsequent state.
+    /// Information about the next state.
     struct Next {
-      DiscreteValueRule::DiscreteValue state_value;
-      /// If known, estimated time until the transition to the state, relative
-      /// to when DiscreteValueRuleStateProvider::GetState() was called.
+      DiscreteValueRule::DiscreteValue value_state;
+      /// If known, the estimated time until the transition to the next state,
+      /// relative to when DiscreteValueRuleStateProvider::GetState() was
+      /// called.
       drake::optional<double> duration_until;
     };
 
     /// The rule's current state.
-    DiscreteValueRule::DiscreteValue state_value;
+    DiscreteValueRule::DiscreteValue value_state;
     /// The rule's next state, if known.
     drake::optional<Next> next;
   };
@@ -34,9 +37,8 @@ class DiscreteValueRuleStateProvider {
 
   /// Gets the state of the DiscreteValueRule identified by `id`.
   ///
-  /// Returns a StateResult struct bearing the state of the rule's
-  /// current state identified by `id`. When `id` is unrecognized,
-  /// drake::nullopt is returned.
+  /// Returns a StateResult struct bearing the state of the rule with the
+  /// specified `id`. If `id` is unrecognized, drake::nullopt is returned.
   drake::optional<StateResult> GetState(const Rule::Id& id) const { return DoGetState(id); }
 
  protected:

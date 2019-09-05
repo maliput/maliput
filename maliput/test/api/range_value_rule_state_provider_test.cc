@@ -2,6 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/rules/range_value_rule.h"
+#include "maliput/api/rules/rule.h"
+#include "maliput/test_utilities/mock.h"
 #include "maliput/test_utilities/rules_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -29,11 +32,13 @@ class MockRangeValueRuleStateProvider : public RangeValueRuleStateProvider {
 const Rule::Id MockRangeValueRuleStateProvider::kRuleId{"RuleId"};
 
 RangeValueRule::Range MockRangeValueRuleStateProvider::MakeCurrentRange() {
-  return MakeRange(Rule::State::kStrict, "current_range_description", 56. /* min */, 78. /* max*/);
+  return MakeRange(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "current_range_description",
+                   56. /* min */, 78. /* max*/);
 }
 
 RangeValueRule::Range MockRangeValueRuleStateProvider::MakeNextRange() {
-  return MakeRange(Rule::State::kStrict, "next_range_description", 12. /* min */, 4. /* max*/);
+  return MakeRange(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "next_range_description",
+                   12. /* min */, 4. /* max*/);
 }
 
 GTEST_TEST(RangeValueRuleStateProviderTest, ExerciseInterface) {
@@ -42,9 +47,9 @@ GTEST_TEST(RangeValueRuleStateProviderTest, ExerciseInterface) {
       dut.GetState(MockRangeValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state_range, MockRangeValueRuleStateProvider::MakeCurrentRange()));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->range_state, MockRangeValueRuleStateProvider::MakeCurrentRange()));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state_range, MockRangeValueRuleStateProvider::MakeNextRange()));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->range_state, MockRangeValueRuleStateProvider::MakeNextRange()));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), 123.456);
 

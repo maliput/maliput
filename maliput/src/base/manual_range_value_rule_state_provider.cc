@@ -1,29 +1,58 @@
 #include "maliput/base/manual_range_value_rule_state_provider.h"
 
+#include <algorithm>
 #include <stdexcept>
+#include <string>
 
 namespace maliput {
 
-void ManualRangeValueRuleStateProvider::AddState(const api::rules::Rule::Id& id,
+void ManualRangeValueRuleStateProvider::ValidateRuleState(const api::rules::RangeValueRule& range_value_rule,
+                                                          const api::rules::RangeValueRule::Range& state) const {
+  if (std::find(range_value_rule.ranges().begin(), range_value_rule.ranges().end(), state) ==
+      range_value_rule.ranges().end()) {
+    MALIPUT_THROW_MESSAGE("Range is not in RangeValueRule " + range_value_rule.id().string() + "'s' ranges().");
+  }
+}
+
+void ManualRangeValueRuleStateProvider::Register(const api::rules::Rule::Id& id,
                                                  const api::rules::RangeValueRule::Range& initial_state) {
-  auto result = states_.emplace(id, initial_state);
+  const api::rules::RangeValueRule rule = rulebook_->GetRangeValueRule(id);
+  ValidateRuleState(rule, initial_state);
+
+  api::rules::RangeValueRuleStateProvider::StateResult state_result;
+  state_result.range_state = initial_state;
+  state_result.next = drake::nullopt;
+  auto result = states_.emplace(id, state_result);
   if (!result.second) {
     throw std::logic_error("Attempted to add multiple rules with id " + id.string());
   }
 }
 
 void ManualRangeValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
-                                                 const api::rules::RangeValueRule::Range& state) {
-  states_.at(id) = state;
+                                                 const api::rules::RangeValueRule::Range& state,
+                                                 const drake::optional<api::rules::RangeValueRule::Range>& next_state) {
+  if (states_.find(id) == states_.end()) {
+    throw std::out_of_range("Attempted to set state to an unregistered id " + id.string());
+  }
+  const api::rules::RangeValueRule rule = rulebook_->GetRangeValueRule(id);
+  ValidateRuleState(rule, state);
+  if (next_state.has_value()) {
+    ValidateRuleState(rule, *next_state);
+  }
+
+  api::rules::RangeValueRuleStateProvider::StateResult state_result;
+  state_result.range_state = state;
+  state_result.next = {{*next_state, drake::nullopt /* duration_until */}};
+  states_.at(id) = state_result;
 }
 
 drake::optional<api::rules::RangeValueRuleStateProvider::StateResult> ManualRangeValueRuleStateProvider::DoGetState(
     const api::rules::Rule::Id& id) const {
-  auto it = states_.find(id);
+  const auto it = states_.find(id);
   if (it == states_.end()) {
     return drake::nullopt;
   }
-  return api::rules::RangeValueRuleStateProvider::StateResult{it->second /* state_range */, drake::nullopt /* next */};
+  return it->second;
 }
 
 }  // namespace maliput

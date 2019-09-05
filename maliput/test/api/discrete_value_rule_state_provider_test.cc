@@ -2,6 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/rule.h"
+#include "maliput/test_utilities/mock.h"
 #include "maliput/test_utilities/rules_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -30,11 +33,11 @@ class MockDiscreteValueRuleStateProvider : public DiscreteValueRuleStateProvider
 const Rule::Id MockDiscreteValueRuleStateProvider::kRuleId{"RuleId"};
 
 DiscreteValueRule::DiscreteValue MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue() {
-  return MakeDiscreteValue(Rule::State::kStrict, "current_state");
+  return MakeDiscreteValue(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "current_state");
 }
 
 DiscreteValueRule::DiscreteValue MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue() {
-  return MakeDiscreteValue(Rule::State::kStrict, "next_state");
+  return MakeDiscreteValue(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "next_state");
 }
 
 GTEST_TEST(DiscreteValueRuleStateProviderTest, ExerciseInterface) {
@@ -43,9 +46,9 @@ GTEST_TEST(DiscreteValueRuleStateProviderTest, ExerciseInterface) {
       dut.GetState(MockDiscreteValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state_value, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue()));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->value_state, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue()));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state_value, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue()));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->value_state, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue()));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), 123.456);
 

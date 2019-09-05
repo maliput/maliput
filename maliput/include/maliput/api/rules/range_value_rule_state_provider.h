@@ -3,28 +3,30 @@
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
 
+#include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/rule.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 
-/// Abstract interface for the provider of RangeValueRule.
+/// Abstract interface for the state provider of RangeValueRules.
 class RangeValueRuleStateProvider {
  public:
-  /// Result returned by GetState(const Rule::Id).
+  /// The state of a RangeValueRule, returned by
+  /// RangeValueRuleStateProvider::GetState(const Rule::Id).
   struct StateResult {
-    /// Information about a subsequent state.
+    /// Information about the next state.
     struct Next {
-      /// State value.
-      RangeValueRule::Range state_range;
-      /// If known, estimated time until the transition to the state, relative
-      /// to when RangeValueRuleStateProvider::GetState() was called.
+      RangeValueRule::Range range_state;
+      /// If known, the estimated time until the transition to the next state,
+      /// relative to when RangeValueRuleStateProvider::GetState() was
+      /// called.
       drake::optional<double> duration_until;
     };
 
     /// The rule's current state.
-    RangeValueRule::Range state_range;
+    RangeValueRule::Range range_state;
     /// The rule's next state, if known.
     drake::optional<Next> next;
   };
@@ -35,9 +37,8 @@ class RangeValueRuleStateProvider {
 
   /// Gets the state of the RangeValueRule identified by `id`.
   ///
-  /// Returns a StateResult struct bearing the state of the rule's
-  /// current state identified by `id`. When `id` is unrecognized,
-  /// drake::nullopt is returned.
+  /// Returns a StateResult struct bearing the state of the rule with the
+  /// specified `id`. If `id` is unrecognized, drake::nullopt is returned.
   drake::optional<StateResult> GetState(const Rule::Id& id) const { return DoGetState(id); }
 
  protected:
