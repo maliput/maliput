@@ -36,6 +36,9 @@ class SRange {
   /// Returns the size of this SRange (i.e., |s1() - s0()|).
   double size() const { return std::fabs(s1() - s0()); }
 
+  /// Returns whether this SRange is in the direction of +s (i.e., s1() > s0()).
+  double WithS() const { return s1() > s0(); }
+
  private:
   double s0_{0.};
   double s1_{0.};
