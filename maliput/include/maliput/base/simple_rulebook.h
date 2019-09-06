@@ -5,8 +5,8 @@
 
 #include "drake/common/drake_copyable.h"
 
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/direction_usage_rule.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/speed_limit_rule.h"
@@ -61,7 +61,7 @@ class SimpleRulebook : public api::rules::RoadRulebook {
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id);
 
  private:
-  api::rules::RoadRulebook::QueryResults DoFindRules(const std::vector<api::rules::LaneSRange>& ranges,
+  api::rules::RoadRulebook::QueryResults DoFindRules(const std::vector<api::LaneSRange>& ranges,
                                                      double tolerance) const override;
   api::rules::RightOfWayRule DoGetRule(const api::rules::RightOfWayRule::Id& id) const override;
   api::rules::SpeedLimitRule DoGetRule(const api::rules::SpeedLimitRule::Id& id) const override;

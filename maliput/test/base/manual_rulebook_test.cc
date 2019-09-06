@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/api/rules/regions.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
@@ -16,10 +16,10 @@ namespace maliput {
 namespace {
 
 using api::LaneId;
+using api::LaneSRange;
+using api::LaneSRoute;
 using api::rules::DirectionUsageRule;
 using api::rules::DiscreteValueRule;
-using api::rules::LaneSRange;
-using api::rules::LaneSRoute;
 using api::rules::MakeDiscreteValue;
 using api::rules::MakeRange;
 using api::rules::RangeValueRule;

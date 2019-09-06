@@ -19,13 +19,11 @@ namespace test {
 namespace {
 
 using rules::DirectionUsageRule;
-using rules::LaneSRange;
 using rules::PhaseProvider;
 using rules::PhaseRingBook;
 using rules::RoadRulebook;
 using rules::RuleStateProvider;
 using rules::SpeedLimitRule;
-using rules::SRange;
 using rules::TrafficLightBook;
 
 GTEST_TEST(RoadNetworkValidatorTest, RuleCoverageTest) {

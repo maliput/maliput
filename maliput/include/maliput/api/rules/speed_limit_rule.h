@@ -2,7 +2,7 @@
 
 #include "drake/common/drake_copyable.h"
 
-#include "maliput/api/rules/regions.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_throw.h"
 

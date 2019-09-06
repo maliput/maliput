@@ -1,15 +1,14 @@
 /* clang-format off to disable clang-format-includes */
-#include "maliput/api/rules/regions.h"
+#include "maliput/api/regions.h"
 /* clang-format on */
 // TODO(maddog@tri.global) Satisfy clang-format via rules tests directory reorg.
 
 #include <gtest/gtest.h>
 
-#include "maliput/test_utilities/rules_test_utilities.h"
+#include "maliput/test_utilities/regions_test_utilities.h"
 
 namespace maliput {
 namespace api {
-namespace rules {
 namespace {
 
 GTEST_TEST(SRangeTest, DefaultConstructionAndAccessors) {
@@ -43,20 +42,20 @@ GTEST_TEST(SRangeTest, Setters) {
 GTEST_TEST(SRangeTest, Copying) {
   const SRange source(12., 24.);
   const SRange dut(source);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
 }
 
 GTEST_TEST(SRangeTest, Assignment) {
   const SRange source(12., 24.);
   SRange dut;
   dut = source;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
 }
 
 GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
   LaneSRange dut(LaneId("dut"), SRange(34., 0.));
   EXPECT_EQ(dut.lane_id(), LaneId("dut"));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.s_range(), SRange(34., 0.)));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.s_range(), SRange(34., 0.)));
 
   // Exercise convenient construction via initializer list for s_range.
   EXPECT_NO_THROW(LaneSRange(LaneId("dut"), {0., 50.}));
@@ -65,14 +64,14 @@ GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
 GTEST_TEST(LaneSRangeTest, Copying) {
   const LaneSRange source(LaneId("xxx"), SRange(20., 30.));
   const LaneSRange dut(source);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
 }
 
 GTEST_TEST(LaneSRangeTest, Assignment) {
   const LaneSRange source(LaneId("xxx"), SRange(20., 30.));
   LaneSRange dut(LaneId("yyy"), SRange(40., 99.));  // e.g., "something else"
   dut = source;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
 }
 
 class LaneSRouteTest : public ::testing::Test {
@@ -92,23 +91,22 @@ TEST_F(LaneSRouteTest, DefaultConstructionAndAccessors) {
 
 TEST_F(LaneSRouteTest, NondefaultConstructionAndAccessors) {
   const LaneSRoute dut(source_);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.ranges(), source_));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.ranges(), source_));
 }
 
 TEST_F(LaneSRouteTest, Copying) {
   const LaneSRoute dut_source(source_);
   const LaneSRoute dut(dut_source);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, dut_source));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, dut_source));
 }
 
 TEST_F(LaneSRouteTest, Assignment) {
   const LaneSRoute dut_source(source_);
   LaneSRoute dut;
   dut = dut_source;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, dut_source));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, dut_source));
 }
 
 }  // namespace
-}  // namespace rules
 }  // namespace api
 }  // namespace maliput

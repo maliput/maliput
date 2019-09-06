@@ -4,10 +4,10 @@
 
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {
@@ -32,7 +32,7 @@ class Intersection {
   /// part of the intersection.
   ///
   /// @param ring The PhaseRing that defines the phases within the intersection.
-  Intersection(const Id& id, const std::vector<rules::LaneSRange>& region, const rules::PhaseRing& ring);
+  Intersection(const Id& id, const std::vector<LaneSRange>& region, const rules::PhaseRing& ring);
 
   virtual ~Intersection() = default;
 
@@ -51,7 +51,7 @@ class Intersection {
                         const drake::optional<double>& duration_until = drake::nullopt) = 0;
 
   /// Returns the region. See constructor parameter @p region for more details.
-  const std::vector<rules::LaneSRange>& region() const { return region_; }
+  const std::vector<LaneSRange>& region() const { return region_; }
 
   /// Returns the rules::PhaseRing::Id of the rules::PhaseRing that applies to
   /// this intersection. See constructor parameter @p ring for more details.
@@ -63,7 +63,7 @@ class Intersection {
   // TODO(liang.fok) Add method for obtaining the intersection's bounding box.
  private:
   const Id id_;
-  const std::vector<rules::LaneSRange> region_;
+  const std::vector<LaneSRange> region_;
   const rules::PhaseRing ring_;
 };
 

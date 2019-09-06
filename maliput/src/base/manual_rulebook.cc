@@ -16,14 +16,14 @@
 namespace maliput {
 
 using api::LaneId;
+using api::LaneSRange;
+using api::SRange;
 using api::rules::DirectionUsageRule;
 using api::rules::DiscreteValueRule;
-using api::rules::LaneSRange;
 using api::rules::RangeValueRule;
 using api::rules::RightOfWayRule;
 using api::rules::Rule;
 using api::rules::SpeedLimitRule;
-using api::rules::SRange;
 
 using QueryResults = api::rules::RoadRulebook::QueryResults;
 

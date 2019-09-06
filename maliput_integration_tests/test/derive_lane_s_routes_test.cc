@@ -8,7 +8,7 @@
 #include "dragway_test_utilities/fixtures.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
-#include "maliput/api/rules/regions.h"
+#include "maliput/api/regions.h"
 #include "multilane_test_utilities/fixtures.h"
 
 namespace maliput {
@@ -19,9 +19,9 @@ using api::LaneId;
 using api::LanePosition;
 using api::RoadPosition;
 
-using api::rules::LaneSRange;
-using api::rules::LaneSRoute;
-using api::rules::SRange;
+using api::LaneSRange;
+using api::LaneSRoute;
+using api::SRange;
 
 using dragway::DragwayBasedTest;
 using multilane::BranchAndMergeBasedTest;

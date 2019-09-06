@@ -4,7 +4,6 @@ namespace maliput {
 namespace api {
 
 using rules::BulbStates;
-using rules::LaneSRange;
 using rules::PhaseProvider;
 using rules::PhaseRing;
 

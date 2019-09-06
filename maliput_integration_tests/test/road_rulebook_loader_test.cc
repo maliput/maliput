@@ -8,8 +8,8 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/lane.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/road_geometry.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/traffic_light_book_loader.h"
@@ -29,12 +29,12 @@ namespace {
 constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 
 using maliput::api::LaneId;
+using maliput::api::LaneSRange;
+using maliput::api::LaneSRoute;
+using maliput::api::SRange;
 using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
-using maliput::api::rules::LaneSRange;
-using maliput::api::rules::LaneSRoute;
 using maliput::api::rules::RightOfWayRule;
-using maliput::api::rules::SRange;
 using maliput::api::rules::TrafficLight;
 
 class TestLoading2x2IntersectionRules : public ::testing::Test {

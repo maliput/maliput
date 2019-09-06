@@ -1,5 +1,7 @@
 #include "maliput/test_utilities/rules_compare.h"
 
+#include "maliput/test_utilities/regions_test_utilities.h"
+
 #include <algorithm>
 
 #include "drake/common/unused.h"
@@ -52,7 +54,7 @@ namespace test {
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type_id(), b.type_id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.zone(), b.zone()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.zone(), b.zone()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_rules(), b.related_rules()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.values(), b.values()));
   return c.result();
@@ -86,7 +88,7 @@ namespace test {
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type_id(), b.type_id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.zone(), b.zone()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.zone(), b.zone()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_rules(), b.related_rules()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.ranges(), b.ranges()));
   return c.result();

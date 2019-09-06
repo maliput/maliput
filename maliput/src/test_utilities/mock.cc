@@ -8,8 +8,8 @@
 #include "maliput/api/intersection.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
-#include "maliput/api/rules/regions.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/segment.h"
 
@@ -272,7 +272,7 @@ class MockRoadRulebook final : public rules::RoadRulebook {
   void set_range_value_rule(const RangeValueRule& rule) { range_value_rule_ = rule; }
 
  private:
-  QueryResults DoFindRules(const std::vector<rules::LaneSRange>&, double) const override { return DoRules(); }
+  QueryResults DoFindRules(const std::vector<LaneSRange>&, double) const override { return DoRules(); }
   QueryResults DoRules() const override {
     QueryResults result;
     if (right_of_way_rule_.has_value()) {
@@ -400,11 +400,11 @@ class MockIntersectionBook final : public IntersectionBook {
 
 }  // namespace
 
-rules::LaneSRoute CreateLaneSRoute() {
-  return rules::LaneSRoute({rules::LaneSRange(LaneId("a"), {0., 9.}), rules::LaneSRange(LaneId("b"), {17., 12.})});
+LaneSRoute CreateLaneSRoute() {
+  return LaneSRoute({LaneSRange(LaneId("a"), {0., 9.}), LaneSRange(LaneId("b"), {17., 12.})});
 }
 
-rules::LaneSRange CreateLaneSRange() { return rules::LaneSRange(LaneId("a"), {0., 9.}); }
+LaneSRange CreateLaneSRange() { return LaneSRange(LaneId("a"), {0., 9.}); }
 
 RightOfWayRule::State::YieldGroup YieldGroup2() {
   return {RightOfWayRule::Id("other_rule_a"), RightOfWayRule::Id("other_rule_b")};
