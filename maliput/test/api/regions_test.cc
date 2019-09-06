@@ -59,6 +59,15 @@ GTEST_TEST(SRangeTest, Size) {
   EXPECT_EQ(dut2.size(), 7.);
 }
 
+GTEST_TEST(SRangeTest, WithS) {
+  const SRange dut1(2., 5.);
+  EXPECT_TRUE(dut1.WithS());
+  const SRange dut2(5., -2.);
+  EXPECT_FALSE(dut2.WithS());
+  const SRange dut3(6., 6.);
+  EXPECT_FALSE(dut3.WithS());
+}
+
 GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
   LaneSRange dut(LaneId("dut"), SRange(34., 0.));
   EXPECT_EQ(dut.lane_id(), LaneId("dut"));
