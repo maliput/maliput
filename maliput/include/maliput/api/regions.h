@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
@@ -31,6 +32,9 @@ class SRange {
 
   /// Sets s1 value.
   void set_s1(double s1) { s1_ = s1; }
+
+  /// Returns the size of this SRange (i.e., |s1() - s0()|).
+  double size() const { return std::fabs(s1() - s0()); }
 
  private:
   double s0_{0.};
