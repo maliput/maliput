@@ -52,6 +52,13 @@ GTEST_TEST(SRangeTest, Assignment) {
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
 }
 
+GTEST_TEST(SRangeTest, Size) {
+  const SRange dut1(2., 5.);
+  EXPECT_EQ(dut1.size(), 3.);
+  const SRange dut2(5., -2.);
+  EXPECT_EQ(dut2.size(), 7.);
+}
+
 GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
   LaneSRange dut(LaneId("dut"), SRange(34., 0.));
   EXPECT_EQ(dut.lane_id(), LaneId("dut"));
