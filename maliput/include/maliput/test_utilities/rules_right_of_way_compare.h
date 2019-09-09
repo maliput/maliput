@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/right_of_way_rule.h"
-#include "maliput/api/rules/rule_state_provider.h"
+#include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
@@ -40,8 +40,8 @@ namespace test {
 /// Predicate-formatter which tests equality of
 /// RuleStateProvider::RightOfWayResult.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const rules::RuleStateProvider::RightOfWayResult& a,
-                                   const rules::RuleStateProvider::RightOfWayResult& b);
+                                   const rules::RightOfWayRuleStateProvider::RightOfWayResult& a,
+                                   const rules::RightOfWayRuleStateProvider::RightOfWayResult& b);
 
 }  // namespace test
 }  // namespace rules

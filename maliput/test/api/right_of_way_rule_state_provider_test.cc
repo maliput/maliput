@@ -1,5 +1,5 @@
 /* clang-format off to disable clang-format-includes */
-#include "maliput/api/rules/rule_state_provider.h"
+#include "maliput/api/rules/right_of_way_rule_state_provider.h"
 /* clang-format on */
 // TODO(liang.fok) Satisfy clang-format via rules tests directory reorg.
 
@@ -12,7 +12,7 @@ namespace api {
 namespace rules {
 namespace {
 
-class RuleStateProviderTest : public ::testing::Test {
+class RightOfWayRuleStateProviderTest : public ::testing::Test {
  protected:
   const RightOfWayRule::Id kExistingId{"aye"};
   const RightOfWayRule::Id kNonExistingId{"nay"};
@@ -21,9 +21,9 @@ class RuleStateProviderTest : public ::testing::Test {
   const RightOfWayRule::State::Id kNextStateId{"next"};
   const double kDurationUntil{99.};
 
-  class MockStateProvider : public RuleStateProvider {
+  class MockStateProvider : public RightOfWayRuleStateProvider {
    public:
-    explicit MockStateProvider(const RuleStateProviderTest* fixture) : fixture_(fixture) {}
+    explicit MockStateProvider(const RightOfWayRuleStateProviderTest* fixture) : fixture_(fixture) {}
 
    private:
     drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id& id) const final {
@@ -34,12 +34,12 @@ class RuleStateProviderTest : public ::testing::Test {
       return drake::nullopt;
     }
 
-    const RuleStateProviderTest* const fixture_;
+    const RightOfWayRuleStateProviderTest* const fixture_;
   };
 };
 
-TEST_F(RuleStateProviderTest, ExerciseInterface) {
-  using Result = RuleStateProvider::RightOfWayResult;
+TEST_F(RightOfWayRuleStateProviderTest, ExerciseInterface) {
+  using Result = RightOfWayRuleStateProvider::RightOfWayResult;
 
   const MockStateProvider dut(this);
 

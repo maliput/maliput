@@ -1,4 +1,4 @@
-#include "maliput/base/phase_based_rule_state_provider.h"
+#include "maliput/base/phase_based_right_of_way_rule_state_provider.h"
 
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
@@ -11,15 +11,15 @@ using api::rules::PhaseProvider;
 using api::rules::PhaseRing;
 using api::rules::PhaseRingBook;
 using api::rules::RightOfWayRule;
-using api::rules::RuleStateProvider;
+using api::rules::RightOfWayRuleStateProvider;
 
-PhaseBasedRuleStateProvider::PhaseBasedRuleStateProvider(const PhaseRingBook* phase_ring_book,
-                                                         const PhaseProvider* phase_provider)
+PhaseBasedRightOfWayRuleStateProvider::PhaseBasedRightOfWayRuleStateProvider(const PhaseRingBook* phase_ring_book,
+                                                                             const PhaseProvider* phase_provider)
     : phase_ring_book_(phase_ring_book), phase_provider_(phase_provider) {
   MALIPUT_DEMAND(phase_ring_book_ != nullptr && phase_provider != nullptr);
 }
 
-drake::optional<RuleStateProvider::RightOfWayResult> PhaseBasedRuleStateProvider::DoGetState(
+drake::optional<RightOfWayRuleStateProvider::RightOfWayResult> PhaseBasedRightOfWayRuleStateProvider::DoGetState(
     const RightOfWayRule::Id& rule_id) const {
   drake::optional<PhaseRing> ring = phase_ring_book_->FindPhaseRing(rule_id);
   if (ring.has_value()) {

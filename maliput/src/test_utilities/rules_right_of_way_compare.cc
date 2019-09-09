@@ -115,8 +115,8 @@ namespace test {
 }
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const rules::RuleStateProvider::RightOfWayResult& a,
-                                   const rules::RuleStateProvider::RightOfWayResult& b) {
+                                   const rules::RightOfWayRuleStateProvider::RightOfWayResult& a,
+                                   const rules::RightOfWayRuleStateProvider::RightOfWayResult& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.current_id, b.current_id));
