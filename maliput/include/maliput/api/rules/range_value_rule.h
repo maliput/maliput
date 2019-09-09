@@ -39,7 +39,6 @@ class RangeValueRule : public Rule {
   /// @param id The Rule ID.
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
-  /// @param related_rules A vector of related rules.
   /// @param ranges A vector of possible ranges that this rule could enforce.
   ///               The actual range that's enforced at any given time is
   ///               determined by a RangeValueRuleStateProvider. This vector
@@ -51,7 +50,7 @@ class RangeValueRule : public Rule {
   /// @throws maliput::common::assertion_error When there are duplicated Range
   ///         in `ranges`.
   RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                 const std::vector<Rule::Id> related_rules, const std::vector<Range>& ranges);
+                 const std::vector<Range>& ranges);
 
   const std::vector<Range>& ranges() const { return ranges_; }
 
@@ -61,7 +60,8 @@ class RangeValueRule : public Rule {
 
 /// Constructs a RangeValueRule::RangeValue.
 // TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
-RangeValueRule::Range MakeRange(int severity, const std::string& description, double min, double max);
+RangeValueRule::Range MakeRange(int severity, const Rule::RelatedRules& related_rules, const std::string& description,
+                                double min, double max);
 
 }  // namespace rules
 }  // namespace api

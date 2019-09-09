@@ -12,20 +12,6 @@ namespace rules {
 namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const std::vector<rules::Rule::Id>& a, const std::vector<rules::Rule::Id>& b) {
-  drake::unused(a_expression);
-  drake::unused(b_expression);
-
-  AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
-  const int smallest = std::min(a.size(), b.size());
-  for (int i = 0; i < smallest; ++i) {
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.at(i), b.at(i)));
-  }
-  return c.result();
-}
-
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const DiscreteValueRule::DiscreteValue& a,
                                    const DiscreteValueRule::DiscreteValue& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
@@ -55,7 +41,6 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type_id(), b.type_id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.zone(), b.zone()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_rules(), b.related_rules()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.values(), b.values()));
   return c.result();
 }
@@ -89,7 +74,6 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type_id(), b.type_id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.zone(), b.zone()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.related_rules(), b.related_rules()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.ranges(), b.ranges()));
   return c.result();
 }

@@ -17,10 +17,6 @@ namespace test {
 // TODO(agalbachicar)  This should be replaced by a generic predicate
 //                     which handles anything with operator==.
 
-/// Predicate-formatter which tests equality of a vector of Rule::Ids.
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const std::vector<rules::Rule::Id>& a, const std::vector<rules::Rule::Id>& b);
-
 /// Predicate-formatter which tests equality of RangeValueRule::Range.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const rules::RangeValueRule::Range& a, const rules::RangeValueRule::Range& b);

@@ -12,6 +12,7 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
+#include "maliput/test_utilities/mock.h"
 
 namespace maliput {
 namespace api {
@@ -36,17 +37,13 @@ class MockRulebook final : public RoadRulebook {
       {DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"), DirectionUsageRule::State::Type::kWithS,
                                  DirectionUsageRule::State::Severity::kPreferred)}};
   const RangeValueRule kRangeValueRule{
-      Rule::Id("rvrt/rvr_id"),
-      Rule::TypeId("rvrt"),
-      LaneSRoute({kZone}),
-      {} /* related rules */,
-      {MakeRange(Rule::State::kStrict, "range_description", 123. /* min */, 456. /* max */)}};
+      Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}), {api::test::CreateRange()}};
   const DiscreteValueRule kDiscreteValueRule{
       Rule::Id("dvrt/dvr_id"),
       Rule::TypeId("rvrt"),
       LaneSRoute({kZone}),
-      {} /* related rules */,
-      {MakeDiscreteValue(Rule::State::kStrict, "value1"), MakeDiscreteValue(Rule::State::kBestEffort, "value2")}};
+      {MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "value1"),
+       MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "value2")}};
 
  private:
   QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double) const override {

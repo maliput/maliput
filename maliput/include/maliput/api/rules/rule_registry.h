@@ -96,7 +96,6 @@ class RuleRegistry {
   /// @throws maliput::common::assertion_error When an element in `ranges` is
   ///         not a possible range of a RangeValueRule of type `type_id`.
   RangeValueRule BuildRangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                                     const std::vector<Rule::Id>& related_rules,
                                      const std::vector<RangeValueRule::Range>& ranges) const;
 
   /// Builds a DiscreteValueRule.
@@ -107,7 +106,6 @@ class RuleRegistry {
   /// @throws maliput::common::assertion_error When an element in `values` is
   ///         not a possible value of a DiscreteValueRule of type `type_id`.
   DiscreteValueRule BuildDiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
-                                           const std::vector<Rule::Id>& related_rules,
                                            const std::vector<DiscreteValueRule::DiscreteValue>& values) const;
 
  private:

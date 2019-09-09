@@ -15,6 +15,7 @@ set(API_SOURCES
   rules/phase.cc
   rules/phase_ring.cc
   rules/range_value_rule.cc
+  rules/rule.cc
   rules/rule_registry.cc
   rules/traffic_lights.cc)
 
