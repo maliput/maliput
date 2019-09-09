@@ -46,21 +46,28 @@
 
 #include "drake/common/never_destroyed.h"
 
+#ifdef HAVE_SPDLOG
+
 #include <spdlog/sinks/dist_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
+
+#endif  // HAVE_SPDLOG
 
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
+
+#ifdef HAVE_SPDLOG
+
 namespace {
 
 // Returns the default logger.
 // @note This function assumes that it is mutexed, as in the
 // initializer of a static local.
-std::shared_ptr<Logger> onetime_create_log() {
+std::shared_ptr<logging::Logger> onetime_create_log() {
   // Check if anyone has already set up a logger named "console".  If so, we
   // will just return it; if not, we'll create our own default one.
-  std::shared_ptr<Logger> result(spdlog::get("console"));
+  std::shared_ptr<logging::Logger> result(spdlog::get("console"));
   if (!result) {
     // We wrap our stderr sink in a dist_sink so that users can atomically swap
     // out the sinks used by all maliput logging, via dist_sink_mt's APIs.
@@ -69,7 +76,7 @@ std::shared_ptr<Logger> onetime_create_log() {
     // thread can use this logger and have their messages be staggered by line,
     // instead of co-mingling their character bytes.
     wrapper->add_sink(std::make_shared<spdlog::sinks::stderr_sink_mt>());
-    result = std::make_shared<Logger>("console", std::move(wrapper));
+    result = std::make_shared<logging::Logger>("console", std::move(wrapper));
     result->set_level(spdlog::level::info);
   }
   return result;
@@ -77,12 +84,22 @@ std::shared_ptr<Logger> onetime_create_log() {
 
 }  // namespace
 
-Logger* log() {
-  static const drake::never_destroyed<std::shared_ptr<Logger>> g_logger(onetime_create_log());
+logging::Logger* log() {
+  static const drake::never_destroyed<std::shared_ptr<logging::Logger>> g_logger(onetime_create_log());
   return g_logger.access().get();
 }
 
-std::string set_log_level(const std::string& level) {
+logging::Sink* logging::get_dist_sink() {
+  // Extract the dist_sink_mt from Maliput's logger instance.
+  auto* sink = log()->sinks().empty() ? nullptr : log()->sinks().front().get();
+  auto* result = dynamic_cast<spdlog::sinks::dist_sink_mt*>(sink);
+  if (result == nullptr) {
+    MALIPUT_THROW_MESSAGE("spdlog sink configuration has unexpectedly changed.");
+  }
+  return result;
+}
+
+std::string logging::set_log_level(const std::string& level) {
   const std::string kUnchanged{"unchanged"};
   const std::unordered_map<std::string, spdlog::level::level_enum> kStringToSpdLogLevel{
       {"trace", spdlog::level::trace}, {"debug", spdlog::level::debug}, {"info", spdlog::level::info},
@@ -112,5 +129,21 @@ std::string set_log_level(const std::string& level) {
   }
   return it->first;
 }
+
+#else  // HAVE_SPDLOG
+
+logging::Logger* log() {
+  static logging::Logger g_logger;  // A do-nothing logger instance.
+  return &g_logger;
+}
+
+logging::Sink* logging::get_dist_sink() {
+  static logging::Sink g_sink;  // An empty sink instance.
+  return &g_sink;
+}
+
+std::string logging::set_log_level(const std::string&) { return ""; }
+
+#endif  // HAVE_SPDLOG
 
 }  // namespace maliput
