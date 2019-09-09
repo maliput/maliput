@@ -10,8 +10,8 @@ namespace maliput {
 namespace test {
 namespace {
 
-using maliput::api::rules::RightOfWayRule;
-using maliput::api::rules::RightOfWayRuleStateProvider;
+using api::rules::RightOfWayRule;
+using api::rules::RightOfWayRuleStateProvider;
 
 GTEST_TEST(ManualRightOfWayRuleStateProviderTest, BasicTest) {
   ManualRightOfWayRuleStateProvider dut;
