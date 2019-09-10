@@ -10,6 +10,7 @@
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/segment.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_throw.h"
@@ -154,6 +155,27 @@ class RoadGeometry {
   /// Return value with size() == 0 indicates success.
   std::vector<std::string> CheckInvariants() const;
 
+  /// Samples `lane_s_route` at `path_length_sampling_rate` and converts those
+  /// LanePositions into GeoPositions.
+  ///
+  /// When `path_lenght_sampling_rate` is smaller than linear_tolerance, linear_tolerance
+  /// will be used instead. When `path_lenght_sampling_rate` is bigger than total
+  /// `lane_s_route` length (accumulated length of all LaneSRoute::ranges()) the minimum
+  /// will be considered and two samples are taken.
+  /// When total `lane_s_route`'s length is not an integral multiple of `path_lenght_sampling_rate`,
+  /// the last sampling step will be the remaining distance long only.
+  ///
+  /// @param lane_s_route A lane route.
+  /// @param path_length_sampling_rate The `s` coordinate sampling rate to sample `lane_s_route`. It must be postive.
+  /// @returns A vector of GeoPositions which result of mapping to the inertial frame
+  ///                the samples of LanePositions.
+  /// @throws maliput::assertion_error When `path_length_sampling_rate` is not postive.
+  /// @throws maliput::assertion_error When any LaneSRange in `lane_s_route.ranges()` refers to
+  ///                an unknown Lane.
+  std::vector<GeoPosition> SampleAheadWaypoints(const LaneSRoute& lane_route, double path_length_sampling_rate) const {
+    return DoSampleAheadWaypoints(lane_route, path_length_sampling_rate);
+  }
+
  protected:
   RoadGeometry() = default;
 
@@ -184,6 +206,8 @@ class RoadGeometry {
   virtual double do_angular_tolerance() const = 0;
 
   virtual double do_scale_length() const = 0;
+
+  virtual std::vector<GeoPosition> DoSampleAheadWaypoints(const LaneSRoute&, double path_length_sampling_rate) const;
   ///@}
 };
 
