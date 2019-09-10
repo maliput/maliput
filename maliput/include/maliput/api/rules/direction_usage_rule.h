@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <unordered_map>
 #include <vector>
 
@@ -142,6 +143,9 @@ class DirectionUsageRule final {
   LaneSRange zone_;
   std::unordered_map<State::Id, State> states_;
 };
+
+std::ostream& operator<<(std::ostream& out, const DirectionUsageRule::State::Type& type);
+std::ostream& operator<<(std::ostream& out, const DirectionUsageRule::State::Severity& severity);
 
 }  // namespace rules
 }  // namespace api
