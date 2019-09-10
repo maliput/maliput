@@ -36,16 +36,18 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   /// Registers a DiscreteValueRule with this provider.
   ///
   /// @throws std::logic_error When @p id already registered.
-  /// @throws std::out_of_range When @p id is unrecognized by `rulebook`.
+  /// @throws std::out_of_range When @p id is unrecognized by the `rulebook`
+  ///         specified at time of construction.
   /// @throws maliput::common::assertion_error When @p initial_state does not
   ///         match any state in DiscreteValueRule::values().
   void Register(const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& initial_state);
 
-  /// Sets the state, and optionally the next state as well, of a
-  /// DiscreteValueRule within this provider.
+  /// Sets the state, and optionally the next state, of a DiscreteValueRule
+  /// within this provider.
   ///
   /// @throws std::out_of_range When @p id is not registered.
-  /// @throws std::out_of_range When @p id is unrecognized by `rulebook`.
+  /// @throws std::out_of_range When @p id is unrecognized by the `rulebook`
+  ///         specified at time of construction.
   /// @throws maliput::common::assertion_error When @p initial_state does not
   ///         match any state in DiscreteValueRule::values().
   /// @throws maliput::common::assertion_error When @p next_state.value_state does

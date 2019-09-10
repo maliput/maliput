@@ -14,7 +14,7 @@ namespace rules {
 class RangeValueRuleStateProvider {
  public:
   /// The state of a RangeValueRule, returned by
-  /// RangeValueRuleStateProvider::GetState(const Rule::Id).
+  /// RangeValueRuleStateProvider::GetState(const Rule::Id&).
   struct StateResult {
     /// Information about the next state.
     struct Next {

@@ -37,13 +37,14 @@ class ManualRangeValueRuleStateProvider : public api::rules::RangeValueRuleState
   ///
   /// @throws std::logic_error When @p id already registered within this
   ///         provider.
-  /// @throws std::out_of_range When @p id is unrecognized by `rulebook`.
+  /// @throws std::out_of_range When @p id is unrecognized by the `rulebook`
+  ///         specified at time of construction.
   /// @throws maliput::common::assertion_error When @p initial_state does not
   ///         match any state in RangeValueRule::ranges().
   void Register(const api::rules::Rule::Id& id, const api::rules::RangeValueRule::Range& initial_state);
 
-  /// Sets the state, and optionally the next state as well, of a
-  /// RangeValueRule within this provider.
+  /// Sets the state, and optionally the next state, of a RangeValueRule
+  /// within this provider.
   ///
   /// @throws std::out_of_range When @p id is not registered within this
   ///         provider.

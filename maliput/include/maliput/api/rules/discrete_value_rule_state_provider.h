@@ -14,14 +14,13 @@ namespace rules {
 class DiscreteValueRuleStateProvider {
  public:
   /// The state of a DiscreteValueRule, returned by
-  /// DiscreteValueRuleStateProvider::GetState(const Rule::Id).
+  /// DiscreteValueRuleStateProvider::GetState(const Rule::Id&).
   struct StateResult {
     /// Information about the next state.
     struct Next {
       DiscreteValueRule::DiscreteValue value_state;
       /// If known, the estimated time until the transition to the next state,
-      /// relative to when DiscreteValueRuleStateProvider::GetState() was
-      /// called.
+      /// relative to when DiscreteValueRuleStateProvider::GetState() was called.
       drake::optional<double> duration_until;
     };
 
