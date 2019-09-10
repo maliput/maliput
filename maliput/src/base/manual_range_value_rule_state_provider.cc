@@ -14,42 +14,10 @@ void ManualRangeValueRuleStateProvider::ValidateRuleState(const api::rules::Rang
   }
 }
 
-void ManualRangeValueRuleStateProvider::Register(const api::rules::Rule::Id& id,
-                                                 const api::rules::RangeValueRule::Range& initial_state,
-                                                 const drake::optional<api::rules::RangeValueRule::Range>& next_state,
-                                                 const drake::optional<double>& duration_until) {
-  const api::rules::RangeValueRule rule = rulebook_->GetRangeValueRule(id);
-  ValidateRuleState(rule, initial_state);
-  if (next_state.has_value()) {
-    ValidateRuleState(rule, *next_state);
-    if (duration_until.has_value()) {
-      MALIPUT_THROW_UNLESS(*duration_until > 0.);
-    }
-  } else {
-    MALIPUT_THROW_UNLESS(!duration_until.has_value());
-  }
-
-  api::rules::RangeValueRuleStateProvider::StateResult state_result;
-  state_result.range_state = initial_state;
-  if (next_state.has_value()) {
-    state_result.next = {{*next_state, duration_until}};
-  } else {
-    state_result.next = drake::nullopt;
-  }
-
-  auto result = states_.emplace(id, state_result);
-  if (!result.second) {
-    throw std::logic_error("Attempted to add multiple rules with id " + id.string());
-  }
-}
-
 void ManualRangeValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
                                                  const api::rules::RangeValueRule::Range& state,
                                                  const drake::optional<api::rules::RangeValueRule::Range>& next_state,
                                                  const drake::optional<double>& duration_until) {
-  if (states_.find(id) == states_.end()) {
-    throw std::out_of_range("Attempted to set state to an unregistered id " + id.string());
-  }
   const api::rules::RangeValueRule rule = rulebook_->GetRangeValueRule(id);
   ValidateRuleState(rule, state);
   if (next_state.has_value()) {
@@ -67,7 +35,7 @@ void ManualRangeValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
     state_result.next = {{*next_state, duration_until}};
   }
 
-  states_.at(id) = state_result;
+  states_[id] = state_result;
 }
 
 drake::optional<api::rules::RangeValueRuleStateProvider::StateResult> ManualRangeValueRuleStateProvider::DoGetState(

@@ -33,36 +33,6 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
 
   ~ManualDiscreteValueRuleStateProvider() override = default;
 
-  /// Registers a DiscreteValueRule with this provider.
-  ///
-  /// @p next_state and @p duration_until are not managed by this
-  /// provider, i.e. it is client's responsibility to govern transitions from
-  /// @p initial_state to @p next_state after @p duration_until (if provided)
-  /// time.
-  ///
-  /// @param id DiscreteValueRule's ID. It must be recognized by the `rulebook`
-  ///        specified at time of construction.
-  /// @param initial_state The initial state of the rule. It must be one in
-  ///        DiscreteValueRule::values().
-  /// @param next_state The optional next state of the rule. It must be one in
-  ///        DiscreteValueRule::values().
-  /// @param duration_until If known, the estimated time until the transition to
-  ///        the next state, relative to when this method is called. When
-  ///        provided, it must be positive and @p next_state must not be nullopt.
-  ///
-  /// @throws std::logic_error When @p id already registered.
-  /// @throws std::out_of_range When @p id is unrecognized by the `rulebook`
-  ///         specified at time of construction.
-  /// @throws maliput::common::assertion_error When @p initial_state does not
-  ///         match any state in DiscreteValueRule::values().
-  /// @throws maliput::common::assertion_error When @p next_state does not
-  ///         match any state in DiscreteValueRule::values().
-  /// @throws maliput::common::assertion_error When @p duration_until is not
-  ///         positive or it is provided when @p next_state is nullopt.
-  void Register(const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& initial_state,
-                const drake::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
-                const drake::optional<double>& duration_until);
-
   /// Sets the state, and optionally the next state, of a DiscreteValueRule
   /// within this provider.
   ///
@@ -80,7 +50,6 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   ///        the next state, relative to when this method is called. When
   ///        provided, it must be positive and @p next_state must not be nullopt.
   ///
-  /// @throws std::logic_error When @p id already registered.
   /// @throws std::out_of_range When @p id is unrecognized by the `rulebook`
   ///         specified at time of construction.
   /// @throws maliput::common::assertion_error When @p state does not

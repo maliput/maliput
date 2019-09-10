@@ -48,36 +48,8 @@ TEST_F(ManualDiscreteRuleStateProviderTest, ConstructorConstraints) {
   EXPECT_NO_THROW(ManualDiscreteValueRuleStateProvider(road_rulebook_.get()));
 }
 
-TEST_F(ManualDiscreteRuleStateProviderTest, RegisterTest) {
-  ManualDiscreteValueRuleStateProvider dut(road_rulebook_.get());
-
-  // No rule with specified ID exists.
-  EXPECT_FALSE(dut.GetState(kRuleId).has_value());
-
-  // Tries to register a state to an invalid Rule::Id.
-  EXPECT_THROW(dut.Register(kUnknownRuleId, kStateA, {}, {}), std::out_of_range);
-  // Tries to register an invalid state.
-  EXPECT_THROW(dut.Register(kRuleId, kInvalidState, {}, {}), maliput::common::assertion_error);
-  // Tries to register an invalid next state.
-  EXPECT_THROW(dut.Register(kRuleId, kStateA, {kInvalidState}, {}), maliput::common::assertion_error);
-  // Tries to register a duration when next state is nullopt.
-  EXPECT_THROW(dut.Register(kRuleId, kStateA, {}, {kDurationUntil}), maliput::common::assertion_error);
-  // Tries to register a negative duration until.
-  EXPECT_THROW(dut.Register(kRuleId, kStateA, {kStateB}, {-kDurationUntil}), maliput::common::assertion_error);
-
-  // Registers a valid state.
-  EXPECT_NO_THROW(dut.Register(kRuleId, kStateA, {}, {}));
-  const drake::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
-  EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->value_state, kStateA));
-  EXPECT_EQ(result->next, drake::nullopt);
-
-  EXPECT_THROW(dut.Register(kRuleId, kStateA, {}, {}), std::logic_error);
-}
-
 TEST_F(ManualDiscreteRuleStateProviderTest, SetStateTest) {
   ManualDiscreteValueRuleStateProvider dut(road_rulebook_.get());
-  dut.Register(kRuleId, kStateA, {}, {});
 
   // Tries to set the state to an unknown Rule::Id in `rulebook_`.
   EXPECT_THROW(dut.SetState(kUnknownRuleId, kStateA, {}, {}), std::out_of_range);
