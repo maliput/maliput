@@ -159,7 +159,7 @@ class RoadGeometry {
   /// LanePositions into GeoPositions.
   ///
   /// When `path_lenght_sampling_rate` is smaller than linear_tolerance, linear_tolerance
-  /// will be used instead. When `path_lenght_sampling_rate` is bigger than total
+  /// will be used instead. When `path_length_sampling_rate` is bigger than total
   /// `lane_s_route` length (accumulated length of all LaneSRoute::ranges()) the minimum
   /// will be considered and two samples are taken.
   /// When total `lane_s_route`'s length is not an integral multiple of `path_lenght_sampling_rate`,

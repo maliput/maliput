@@ -223,8 +223,7 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
 std::vector<GeoPosition> RoadGeometry::DoSampleAheadWaypoints(const LaneSRoute& route,
                                                               double path_length_sampling_rate) const {
   MALIPUT_THROW_UNLESS(path_length_sampling_rate > 0.);
-  const double linear_tolerance_ = linear_tolerance();
-  path_length_sampling_rate = std::max(linear_tolerance_, std::min(path_length_sampling_rate, route.length()));
+  path_length_sampling_rate = std::max(linear_tolerance(), std::min(path_length_sampling_rate, route.length()));
   std::vector<GeoPosition> waypoints;
   const RoadGeometry::IdIndex& id = ById();
   const std::vector<LaneSRange>& ranges = route.ranges();
@@ -234,8 +233,7 @@ std::vector<GeoPosition> RoadGeometry::DoSampleAheadWaypoints(const LaneSRoute& 
     MALIPUT_THROW_UNLESS(lane != nullptr);
     const SRange lane_s_range = range.s_range();
 
-    double start_s = previous_s_difference + lane_s_range.s0();
-    double step_accumulator = start_s + path_length_sampling_rate;
+    double step_accumulator = previous_s_difference + lane_s_range.s0() + path_length_sampling_rate;
 
     while (step_accumulator <= lane_s_range.s1()) {
       waypoints.emplace_back(lane->ToGeoPosition(LanePosition(step_accumulator, 0.0, 0.0)));
@@ -243,9 +241,15 @@ std::vector<GeoPosition> RoadGeometry::DoSampleAheadWaypoints(const LaneSRoute& 
     }
     previous_s_difference = step_accumulator - lane_s_range.s1() - path_length_sampling_rate;
   }
-  if (std::abs(previous_s_difference) > linear_tolerance_) {
+  if (std::abs(previous_s_difference) > linear_tolerance()) {
     const Lane* last_lane = id.GetLane(ranges.back().lane_id());
-    waypoints.emplace_back(last_lane->ToGeoPosition(LanePosition(last_lane->length(), 0.0, 0.0)));
+    MALIPUT_THROW_UNLESS(last_lane != nullptr);
+    waypoints.emplace_back(last_lane->ToGeoPosition(LanePosition(ranges.back().s_range().s1(), 0.0, 0.0)));
+  }
+  if (waypoints.size() == 1) {
+    const Lane* first_lane = id.GetLane(ranges.front().lane_id());
+    MALIPUT_THROW_UNLESS(first_lane != nullptr);
+    waypoints.emplace_back(first_lane->ToGeoPosition(LanePosition(ranges.front().s_range().s0(), 0.0, 0.0)));
   }
   return waypoints;
 }

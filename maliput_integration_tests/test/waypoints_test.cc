@@ -66,7 +66,6 @@ GTEST_TEST(WaypointsTest, Waypoints) {
 
   std::unique_ptr<const RoadGeometry> rg = Load(multilane::BuilderFactory(), kMultilaneYaml);
   ASSERT_NE(rg, nullptr);
-  const double kRoadGeometryLinearTolerance = rg->linear_tolerance();
   const maliput::api::Lane* lane_one = rg->junction(0)->segment(0)->lane(0);
   const maliput::api::Lane* lane_two = rg->junction(1)->segment(0)->lane(0);
 
@@ -81,12 +80,12 @@ GTEST_TEST(WaypointsTest, Waypoints) {
   ASSERT_EQ(waypoints.size(), 4);
   EXPECT_TRUE(
       api::test::IsGeoPositionClose(GeoPosition(waypoints[0].x() + kSampleSStep, waypoints[0].y(), waypoints[0].z()),
-                                    waypoints[1], kRoadGeometryLinearTolerance));
+                                    waypoints[1], kLinearTolerance));
   EXPECT_TRUE(api::test::IsGeoPositionClose(
       GeoPosition(waypoints[0].x() + 2.0 * kSampleSStep, waypoints[0].y(), waypoints[0].z()), waypoints[2],
-      kRoadGeometryLinearTolerance));
+      kLinearTolerance));
   EXPECT_TRUE(api::test::IsGeoPositionClose(GeoPosition(waypoints[2].x() + 2.0, waypoints[0].y(), waypoints[0].z()),
-                                            waypoints[3], kRoadGeometryLinearTolerance));
+                                            waypoints[3], kLinearTolerance));
 
   const LaneSRange shorter_than_sample_step_range_one{lane_one->id(), {4., 4.}};
   const LaneSRange shorter_than_sample_step_range_two{lane_two->id(), {1., 2.}};
@@ -98,10 +97,10 @@ GTEST_TEST(WaypointsTest, Waypoints) {
   EXPECT_EQ(shorter_route.length(), 1.0);
   const double kSampleSStepBiggerThanTotalRouteLength = 15.0;
   waypoints = rg->SampleAheadWaypoints(shorter_route, kSampleSStepBiggerThanTotalRouteLength);
-  ASSERT_EQ(waypoints.size(), 1);
+  ASSERT_EQ(waypoints.size(), 2);
   EXPECT_TRUE(api::test::IsGeoPositionClose(
       lane_two->ToGeoPosition(LanePosition(shorter_than_sample_step_range_two.s_range().s1(), 0.0, 0.0)), waypoints[0],
-      kRoadGeometryLinearTolerance));
+      kLinearTolerance));
 
   const LaneSRange non_existent_range_lane{LaneId("non-existent"), {0., 2.0}};
   const LaneSRoute non_existent_route{std::vector<LaneSRange>{non_existent_range_lane}};
@@ -110,11 +109,11 @@ GTEST_TEST(WaypointsTest, Waypoints) {
   const double kNegativeStep = -1.0;
   EXPECT_THROW(rg->SampleAheadWaypoints(route, kNegativeStep), maliput::common::assertion_error);
 
-  const double step_smaller_than_linear_tolerance = kRoadGeometryLinearTolerance / 2.0;
-  const LaneSRange linear_tolerance_range{lane_one->id(), {0., kRoadGeometryLinearTolerance}};
+  const double step_smaller_than_linear_tolerance = kLinearTolerance / 2.0;
+  const LaneSRange linear_tolerance_range{lane_one->id(), {0., kLinearTolerance}};
   const LaneSRoute route_with_linear_tolerance_lane{std::vector<LaneSRange>{linear_tolerance_range}};
   waypoints = rg->SampleAheadWaypoints(route_with_linear_tolerance_lane, step_smaller_than_linear_tolerance);
-  EXPECT_EQ(waypoints.size(), 1);
+  EXPECT_EQ(waypoints.size(), 2);
 };
 
 }  // namespace
