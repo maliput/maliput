@@ -15,29 +15,29 @@ namespace maliput {
 namespace test {
 namespace {
 
-using maliput::api::rules::DiscreteValueRule;
-using maliput::api::rules::DiscreteValueRuleStateProvider;
-using maliput::api::rules::MakeDiscreteValue;
-using maliput::api::rules::RoadRulebook;
-using maliput::api::rules::Rule;
+using api::rules::DiscreteValueRule;
+using api::rules::DiscreteValueRuleStateProvider;
+using api::rules::MakeDiscreteValue;
+using api::rules::RoadRulebook;
+using api::rules::Rule;
 
 class ManualDiscreteRuleStateProviderTest : public ::testing::Test {
  protected:
   const Rule::Id kRuleId{"dvrt/dvr_id"};
   const Rule::Id kUnknownRuleId{"dvrt/unknown_id"};
   const DiscreteValueRule::DiscreteValue kStateA{
-      MakeDiscreteValue(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "value1")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "value1")};
   const DiscreteValueRule::DiscreteValue kStateB{
-      MakeDiscreteValue(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "value2")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "value2")};
   const DiscreteValueRule::DiscreteValue kInvalidState{
-      MakeDiscreteValue(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "invalid_state")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "invalid_state")};
   const double kDurationUntil{10.};
 
   void SetUp() override {
     const maliput::api::test::RoadRulebookBuildFlags kRulebookBuildFlags{
         false /* add_right_of_way */, {} /* right_of_way_build_flags */,  false /* add_direction_usage */,
         false /* add_speed_limit */,  true /* add_discrete_value_rule */, false /* add_range_value_rule */};
-    road_rulebook_ = maliput::api::test::CreateRoadRulebook(kRulebookBuildFlags);
+    road_rulebook_ = api::test::CreateRoadRulebook(kRulebookBuildFlags);
   }
 
   std::unique_ptr<RoadRulebook> road_rulebook_;

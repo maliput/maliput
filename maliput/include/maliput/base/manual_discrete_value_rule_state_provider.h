@@ -14,7 +14,7 @@
 namespace maliput {
 
 /// An implementation of a manual api::rules::DiscreteValueRuleStateProvider.
-/// This enables clients to directly add and set the states of
+/// This enables clients to directly set the states of
 /// api::rules::DiscreteValueRule instances.
 class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRuleStateProvider {
  public:
@@ -25,7 +25,7 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   /// @param rulebook A rulebook pointer to validate Rule::Id and their states.
   ///        It must not be nullptr.
   ///
-  /// @throws maliput::common::assertion_error When `rulebook` is nullptr.
+  /// @throws common::assertion_error When `rulebook` is nullptr.
   explicit ManualDiscreteValueRuleStateProvider(const api::rules::RoadRulebook* rulebook)
       : api::rules::DiscreteValueRuleStateProvider(), rulebook_(rulebook) {
     MALIPUT_THROW_UNLESS(rulebook_ != nullptr);
@@ -33,11 +33,13 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
 
   ~ManualDiscreteValueRuleStateProvider() override = default;
 
-  /// Sets the state, and optionally the next state, of a DiscreteValueRule
-  /// within this provider.
+  /// Sets the state, and optionally the next state and duration until the next
+  /// state, of a DiscreteValueRule.
+  ///
+  /// If @p id is new, a new entry is added to this provider.
   ///
   /// @p next_state and @p duration_until are not managed by this
-  /// provider, i.e. it is client's responsibility to govern transitions from
+  /// provider, i.e. it is the client's responsibility to govern transitions from
   /// @p state to @p next_state after @p duration_until (if provided) time.
   ///
   /// @param id DiscreteValueRule's ID. It must be recognized by the `rulebook`
@@ -52,12 +54,12 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   ///
   /// @throws std::out_of_range When @p id is unrecognized by the `rulebook`
   ///         specified at time of construction.
-  /// @throws maliput::common::assertion_error When @p state does not
-  ///         match any state in DiscreteValueRule::values().
-  /// @throws maliput::common::assertion_error When @p next_state does not
-  ///         match any state in DiscreteValueRule::values().
-  /// @throws maliput::common::assertion_error When @p duration_until is not
-  ///         positive or it is provided when @p next_state is nullopt.
+  /// @throws common::assertion_error When @p state does not match any state
+  ///         in DiscreteValueRule::values().
+  /// @throws common::assertion_error When @p next_state does not match any
+  ///         state in DiscreteValueRule::values().
+  /// @throws common::assertion_error When @p duration_until is not positive or
+  ///         it is provided when @p next_state is nullopt.
   void SetState(const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& state,
                 const drake::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
                 const drake::optional<double>& duration_until);
@@ -66,7 +68,7 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   drake::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 
-  // @throws maliput::common::assertion_error When @p state is unrecognized in
+  // @throws common::assertion_error When @p state is unrecognized in
   //         @p discrete_value_rule's values.
   void ValidateRuleState(const api::rules::DiscreteValueRule& discrete_value_rule,
                          const api::rules::DiscreteValueRule::DiscreteValue& state) const;

@@ -15,26 +15,26 @@ namespace maliput {
 namespace test {
 namespace {
 
-using maliput::api::rules::MakeRange;
-using maliput::api::rules::RangeValueRule;
-using maliput::api::rules::RangeValueRuleStateProvider;
-using maliput::api::rules::RoadRulebook;
-using maliput::api::rules::Rule;
+using api::rules::MakeRange;
+using api::rules::RangeValueRule;
+using api::rules::RangeValueRuleStateProvider;
+using api::rules::RoadRulebook;
+using api::rules::Rule;
 
 class ManualRangeValueRuleStateProviderTest : public ::testing::Test {
  protected:
   const Rule::Id kRuleId{"rvrt/rvr_id"};
   const Rule::Id kUnknownRuleId{"rvrt/unknown_id"};
-  const RangeValueRule::Range kRangeA{maliput::api::test::CreateRange()};
-  const RangeValueRule::Range kInvalidRange{MakeRange(
-      Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "invalid", 456. /* min */, 789. /* max */)};
+  const RangeValueRule::Range kRangeA{api::test::CreateRange()};
+  const RangeValueRule::Range kInvalidRange{
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "invalid", 456. /* min */, 789. /* max */)};
   const double kDurationUntil{10.};
 
   void SetUp() override {
     const maliput::api::test::RoadRulebookBuildFlags kRulebookBuildFlags{
         false /* add_right_of_way */, {} /* right_of_way_build_flags */,   false /* add_direction_usage */,
         false /* add_speed_limit */,  false /* add_discrete_value_rule */, true /* add_range_value_rule */};
-    road_rulebook_ = maliput::api::test::CreateRoadRulebook(kRulebookBuildFlags);
+    road_rulebook_ = api::test::CreateRoadRulebook(kRulebookBuildFlags);
   }
 
   std::unique_ptr<RoadRulebook> road_rulebook_;
