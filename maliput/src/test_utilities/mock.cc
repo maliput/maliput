@@ -1,5 +1,6 @@
 #include "maliput/test_utilities/mock.h"
 
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -295,8 +296,18 @@ class MockRoadRulebook final : public rules::RoadRulebook {
   RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override { return *right_of_way_rule_; }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override { return *speed_limit_rule_; }
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return *direction_usage_rule_; }
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override { return *discrete_value_rule_; }
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override { return *range_value_rule_; }
+  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+    if (discrete_value_rule_.has_value() && discrete_value_rule_->id() == id) {
+      return *discrete_value_rule_;
+    }
+    throw std::out_of_range("Unknown Id.");
+  }
+  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+    if (range_value_rule_.has_value() && range_value_rule_->id() == id) {
+      return *range_value_rule_;
+    }
+    throw std::out_of_range("Unknown Id.");
+  }
 
   drake::optional<RightOfWayRule> right_of_way_rule_{};
   drake::optional<DirectionUsageRule> direction_usage_rule_{};
@@ -464,7 +475,7 @@ RangeValueRule::Range CreateRange() {
 }
 
 RangeValueRule CreateRangeValueRule() {
-  return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(), {CreateRange()});
+  return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), CreateLaneSRoute(), {CreateRange()});
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
@@ -525,6 +536,12 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildF
   }
   if (build_flags.add_speed_limit) {
     rulebook->set_speed_limit(CreateSpeedLimitRule());
+  }
+  if (build_flags.add_discrete_value_rule) {
+    rulebook->set_discrete_value_rule(CreateDiscreteValueRule());
+  }
+  if (build_flags.add_range_value_rule) {
+    rulebook->set_range_value_rule(CreateRangeValueRule());
   }
   return std::move(rulebook);
 }

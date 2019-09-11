@@ -47,6 +47,8 @@ struct RoadRulebookBuildFlags {
   RightOfWayBuildFlags right_of_way_build_flags{};
   bool add_direction_usage{false};
   bool add_speed_limit{true};
+  bool add_discrete_value_rule{false};
+  bool add_range_value_rule{false};
 };
 
 /// Holds TrafficLight build configurations.
@@ -155,6 +157,10 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook();
 /// is created with CreateDirectionUsageRule().
 /// When `build_flags.add_speed_limit` is true, a SpeedLimitRule is created
 /// with CreateSpeedLimitRule.
+/// When `build_flags.add_discrete_value` is true, a DiscreteValueRule
+/// is created with CreateDiscreteValueRule().
+/// When `build_flags.add_range_value` is true, a RangeValueRule
+/// is created with CreateRangeValueRule().
 std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildFlags& build_flags);
 
 /// Returns an arbitrary rules::BulbGroup.

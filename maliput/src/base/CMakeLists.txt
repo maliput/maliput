@@ -6,7 +6,9 @@ set(BASE_SOURCES
   intersection.cc
   intersection_book.cc
   intersection_book_loader.cc
+  manual_discrete_value_rule_state_provider.cc
   manual_phase_provider.cc
+  manual_range_value_rule_state_provider.cc
   manual_right_of_way_rule_state_provider.cc
   manual_phase_ring_book.cc
   manual_rulebook.cc
