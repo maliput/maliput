@@ -21,13 +21,15 @@ class RangeValueRuleStateProvider {
       RangeValueRule::Range range_state;
       /// If known, the estimated time until the transition to the next state,
       /// relative to when RangeValueRuleStateProvider::GetState() was
-      /// called.
+      /// called. Users should treat this as advisory since it is tentative and
+      /// subject to change at any point in time.
       drake::optional<double> duration_until;
     };
 
     /// The rule's current state.
     RangeValueRule::Range range_state;
-    /// The rule's next state, if known.
+    /// The rule's next state, if known. Users should treat this as advisory
+    /// since it is tentative and subject to change at any point in time.
     drake::optional<Next> next;
   };
 
