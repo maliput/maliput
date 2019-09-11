@@ -14,6 +14,7 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/api/rules/road_rulebook.h"
+#include "maliput/api/rules/rule_registry.h"
 #include "maliput/api/rules/traffic_light_book.h"
 
 namespace maliput {
@@ -189,6 +190,9 @@ std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider();
 
 /// Returns an arbitrary IntersectionBook.
 std::unique_ptr<IntersectionBook> CreateIntersectionBook();
+
+/// Returns an arbitrary rules::RuleRegistry.
+std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry();
 
 }  // namespace test
 }  // namespace api

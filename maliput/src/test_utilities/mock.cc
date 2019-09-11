@@ -563,6 +563,8 @@ std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider() { return std::make_u
 
 std::unique_ptr<IntersectionBook> CreateIntersectionBook() { return std::make_unique<MockIntersectionBook>(); }
 
+std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry() { return std::make_unique<rules::RuleRegistry>(); }
+
 }  // namespace test
 }  // namespace api
 }  // namespace maliput
