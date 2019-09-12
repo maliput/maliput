@@ -11,6 +11,7 @@
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/api/rules/road_rulebook.h"
+#include "maliput/api/rules/rule_registry.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/api/rules/traffic_light_book.h"
 
@@ -33,7 +34,7 @@ class RoadNetwork {
               std::unique_ptr<IntersectionBook> intersection_book,
               std::unique_ptr<rules::PhaseRingBook> phase_ring_book,
               std::unique_ptr<rules::RightOfWayRuleStateProvider> right_of_way_rule_state_provider,
-              std::unique_ptr<rules::PhaseProvider> phase_provider);
+              std::unique_ptr<rules::PhaseProvider> phase_provider, std::unique_ptr<rules::RuleRegistry> rule_registry);
 
   virtual ~RoadNetwork() = default;
 
@@ -53,6 +54,8 @@ class RoadNetwork {
 
   const rules::PhaseProvider* phase_provider() const { return phase_provider_.get(); }
 
+  const rules::RuleRegistry* rule_registry() const { return rule_registry_.get(); }
+
  private:
   std::unique_ptr<const RoadGeometry> road_geometry_;
   std::unique_ptr<const rules::RoadRulebook> rulebook_;
@@ -61,6 +64,7 @@ class RoadNetwork {
   std::unique_ptr<rules::PhaseRingBook> phase_ring_book_;
   std::unique_ptr<rules::RightOfWayRuleStateProvider> right_of_way_rule_state_provider_;
   std::unique_ptr<rules::PhaseProvider> phase_provider_;
+  std::unique_ptr<rules::RuleRegistry> rule_registry_;
 };
 
 }  // namespace api
