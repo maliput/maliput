@@ -13,8 +13,10 @@ namespace api {
 namespace {
 
 using rules::DirectionUsageRule;
+using rules::DiscreteValueRuleStateProvider;
 using rules::PhaseProvider;
 using rules::PhaseRingBook;
+using rules::RangeValueRuleStateProvider;
 using rules::RightOfWayRuleStateProvider;
 using rules::RoadRulebook;
 using rules::Rule;
@@ -33,6 +35,8 @@ class RoadNetworkTest : public ::testing::Test {
     right_of_way_rule_state_provider_ = test::CreateRightOfWayRuleStateProvider();
     phase_provider_ = test::CreatePhaseProvider();
     rule_registry_ = test::CreateRuleRegistry();
+    discrete_value_rule_state_provider_ = test::CreateDiscreteValueRuleStateProvider();
+    range_value_rule_state_provider_ = test::CreateRangeValueRuleStateProvider();
 
     road_geometry_ptr_ = road_geometry_.get();
     road_rulebook_ptr_ = road_rulebook_.get();
@@ -42,6 +46,8 @@ class RoadNetworkTest : public ::testing::Test {
     right_of_way_rule_state_provider_ptr_ = right_of_way_rule_state_provider_.get();
     phase_provider_ptr_ = phase_provider_.get();
     rule_registry_ptr_ = rule_registry_.get();
+    discrete_value_rule_state_provider_ptr_ = discrete_value_rule_state_provider_.get();
+    range_value_rule_state_provider_ptr_ = range_value_rule_state_provider_.get();
   }
 
   std::unique_ptr<RoadGeometry> road_geometry_;
@@ -52,6 +58,8 @@ class RoadNetworkTest : public ::testing::Test {
   std::unique_ptr<RightOfWayRuleStateProvider> right_of_way_rule_state_provider_;
   std::unique_ptr<PhaseProvider> phase_provider_;
   std::unique_ptr<RuleRegistry> rule_registry_;
+  std::unique_ptr<DiscreteValueRuleStateProvider> discrete_value_rule_state_provider_;
+  std::unique_ptr<RangeValueRuleStateProvider> range_value_rule_state_provider_;
 
   RoadGeometry* road_geometry_ptr_{};
   RoadRulebook* road_rulebook_ptr_{};
@@ -61,49 +69,70 @@ class RoadNetworkTest : public ::testing::Test {
   RightOfWayRuleStateProvider* right_of_way_rule_state_provider_ptr_{};
   PhaseProvider* phase_provider_ptr_{};
   RuleRegistry* rule_registry_ptr_{};
+  DiscreteValueRuleStateProvider* discrete_value_rule_state_provider_ptr_{};
+  RangeValueRuleStateProvider* range_value_rule_state_provider_ptr_{};
 };
 
 TEST_F(RoadNetworkTest, MissingParameters) {
   EXPECT_THROW(
       RoadNetwork(nullptr, std::move(road_rulebook_), std::move(traffic_light_book_), std::move(intersection_book_),
                   std::move(phase_ring_book_), std::move(right_of_way_rule_state_provider_), std::move(phase_provider_),
-                  std::move(rule_registry_)),
+                  std::move(rule_registry_), std::move(discrete_value_rule_state_provider_),
+                  std::move(range_value_rule_state_provider_)),
       std::exception);
   EXPECT_THROW(
       RoadNetwork(std::move(road_geometry_), nullptr, std::move(traffic_light_book_), std::move(intersection_book_),
                   std::move(phase_ring_book_), std::move(right_of_way_rule_state_provider_), std::move(phase_provider_),
-                  std::move(rule_registry_)),
+                  std::move(rule_registry_), std::move(discrete_value_rule_state_provider_),
+                  std::move(range_value_rule_state_provider_)),
       std::exception);
   EXPECT_THROW(RoadNetwork(std::move(road_geometry_), std::move(road_rulebook_), nullptr, std::move(intersection_book_),
                            std::move(phase_ring_book_), std::move(right_of_way_rule_state_provider_),
-                           std::move(phase_provider_), std::move(rule_registry_)),
+                           std::move(phase_provider_), std::move(rule_registry_),
+                           std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_)),
                std::exception);
   EXPECT_THROW(RoadNetwork(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
                            nullptr, std::move(phase_ring_book_), std::move(right_of_way_rule_state_provider_),
-                           std::move(phase_provider_), std::move(rule_registry_)),
+                           std::move(phase_provider_), std::move(rule_registry_),
+                           std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_)),
                std::exception);
   EXPECT_THROW(RoadNetwork(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
                            std::move(intersection_book_), nullptr, std::move(right_of_way_rule_state_provider_),
-                           std::move(phase_provider_), std::move(rule_registry_)),
+                           std::move(phase_provider_), std::move(rule_registry_),
+                           std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_)),
                std::exception);
   EXPECT_THROW(RoadNetwork(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
                            std::move(intersection_book_), std::move(phase_ring_book_), nullptr,
-                           std::move(phase_provider_), std::move(rule_registry_)),
+                           std::move(phase_provider_), std::move(rule_registry_),
+                           std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_)),
                std::exception);
   EXPECT_THROW(RoadNetwork(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
                            std::move(intersection_book_), std::move(phase_ring_book_),
-                           std::move(right_of_way_rule_state_provider_), nullptr, std::move(rule_registry_)),
+                           std::move(right_of_way_rule_state_provider_), nullptr, std::move(rule_registry_),
+                           std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_)),
                std::exception);
   EXPECT_THROW(RoadNetwork(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
                            std::move(intersection_book_), std::move(phase_ring_book_),
-                           std::move(right_of_way_rule_state_provider_), std::move(phase_provider_), nullptr),
+                           std::move(right_of_way_rule_state_provider_), std::move(phase_provider_), nullptr,
+                           std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_)),
+               std::exception);
+  EXPECT_THROW(RoadNetwork(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
+                           std::move(intersection_book_), std::move(phase_ring_book_),
+                           std::move(right_of_way_rule_state_provider_), std::move(phase_provider_),
+                           std::move(rule_registry_), nullptr, std::move(range_value_rule_state_provider_)),
+               std::exception);
+  EXPECT_THROW(RoadNetwork(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
+                           std::move(intersection_book_), std::move(phase_ring_book_),
+                           std::move(right_of_way_rule_state_provider_), std::move(phase_provider_),
+                           std::move(rule_registry_), std::move(discrete_value_rule_state_provider_), nullptr),
                std::exception);
 }
 
 TEST_F(RoadNetworkTest, InstantiateAndUseAccessors) {
   RoadNetwork dut(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
                   std::move(intersection_book_), std::move(phase_ring_book_),
-                  std::move(right_of_way_rule_state_provider_), std::move(phase_provider_), std::move(rule_registry_));
+                  std::move(right_of_way_rule_state_provider_), std::move(phase_provider_), std::move(rule_registry_),
+                  std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_));
 
   EXPECT_EQ(dut.road_geometry(), road_geometry_ptr_);
   EXPECT_EQ(dut.rulebook(), road_rulebook_ptr_);
@@ -113,12 +142,15 @@ TEST_F(RoadNetworkTest, InstantiateAndUseAccessors) {
   EXPECT_EQ(dut.right_of_way_rule_state_provider(), right_of_way_rule_state_provider_ptr_);
   EXPECT_EQ(dut.phase_provider(), phase_provider_ptr_);
   EXPECT_EQ(dut.rule_registry(), rule_registry_ptr_);
+  EXPECT_EQ(dut.discrete_value_rule_state_provider(), discrete_value_rule_state_provider_ptr_);
+  EXPECT_EQ(dut.range_value_rule_state_provider(), range_value_rule_state_provider_ptr_);
 }
 
 TEST_F(RoadNetworkTest, TestMemberMethodAccess) {
   RoadNetwork dut(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
                   std::move(intersection_book_), std::move(phase_ring_book_),
-                  std::move(right_of_way_rule_state_provider_), std::move(phase_provider_), std::move(rule_registry_));
+                  std::move(right_of_way_rule_state_provider_), std::move(phase_provider_), std::move(rule_registry_),
+                  std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_));
 
   auto intersection = dut.intersection_book()->GetIntersection(Intersection::Id("Mock"));
   EXPECT_NE(intersection, nullptr);
@@ -130,6 +162,8 @@ TEST_F(RoadNetworkTest, TestMemberMethodAccess) {
   dut.right_of_way_rule_state_provider()->GetState(rules::RightOfWayRule::Id("Mock"));
   dut.phase_provider()->GetPhase(rules::PhaseRing::Id("Mock"));
   dut.rule_registry()->GetPossibleStatesOfRuleType(rules::Rule::TypeId("Mock"));
+  dut.discrete_value_rule_state_provider()->GetState(rules::Rule::Id("Mock"));
+  dut.range_value_rule_state_provider()->GetState(rules::Rule::Id("Mock"));
 }
 
 }  // namespace

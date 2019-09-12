@@ -16,7 +16,9 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
                          std::unique_ptr<rules::PhaseRingBook> phase_ring_book,
                          std::unique_ptr<rules::RightOfWayRuleStateProvider> right_of_way_rule_state_provider,
                          std::unique_ptr<rules::PhaseProvider> phase_provider,
-                         std::unique_ptr<rules::RuleRegistry> rule_registry)
+                         std::unique_ptr<rules::RuleRegistry> rule_registry,
+                         std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
+                         std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider)
     : road_geometry_(std::move(road_geometry)),
       rulebook_(std::move(rulebook)),
       traffic_light_book_(std::move(traffic_light_book)),
@@ -24,7 +26,9 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
       phase_ring_book_(std::move(phase_ring_book)),
       right_of_way_rule_state_provider_(std::move(right_of_way_rule_state_provider)),
       phase_provider_(std::move(phase_provider)),
-      rule_registry_(std::move(rule_registry)) {
+      rule_registry_(std::move(rule_registry)),
+      discrete_value_rule_state_provider_(std::move(discrete_value_rule_state_provider)),
+      range_value_rule_state_provider_(std::move(range_value_rule_state_provider)) {
   MALIPUT_THROW_UNLESS(road_geometry_.get() != nullptr);
   MALIPUT_THROW_UNLESS(rulebook_.get() != nullptr);
   MALIPUT_THROW_UNLESS(traffic_light_book_.get() != nullptr);
@@ -33,6 +37,8 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
   MALIPUT_THROW_UNLESS(right_of_way_rule_state_provider_.get() != nullptr);
   MALIPUT_THROW_UNLESS(phase_provider_.get() != nullptr);
   MALIPUT_THROW_UNLESS(rule_registry_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(discrete_value_rule_state_provider_.get() != nullptr);
+  MALIPUT_THROW_UNLESS(range_value_rule_state_provider_.get() != nullptr);
 }
 
 }  // namespace api

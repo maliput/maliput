@@ -409,6 +409,28 @@ class MockIntersectionBook final : public IntersectionBook {
   MockIntersection intersection_;
 };
 
+class MockDiscreteValueRuleStateProvider : public rules::DiscreteValueRuleStateProvider {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockDiscreteValueRuleStateProvider);
+  MockDiscreteValueRuleStateProvider() = default;
+
+ private:
+  drake::optional<rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(const Rule::Id&) const override {
+    return drake::nullopt;
+  }
+};
+
+class MockRangeValueRuleStateProvider : public rules::RangeValueRuleStateProvider {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRangeValueRuleStateProvider);
+  MockRangeValueRuleStateProvider() = default;
+
+ private:
+  drake::optional<rules::RangeValueRuleStateProvider::StateResult> DoGetState(const Rule::Id&) const override {
+    return drake::nullopt;
+  }
+};
+
 }  // namespace
 
 LaneSRoute CreateLaneSRoute() {
@@ -581,6 +603,14 @@ std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider() { return std::make_u
 std::unique_ptr<IntersectionBook> CreateIntersectionBook() { return std::make_unique<MockIntersectionBook>(); }
 
 std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry() { return std::make_unique<rules::RuleRegistry>(); }
+
+std::unique_ptr<rules::DiscreteValueRuleStateProvider> CreateDiscreteValueRuleStateProvider() {
+  return std::make_unique<MockDiscreteValueRuleStateProvider>();
+}
+
+std::unique_ptr<rules::RangeValueRuleStateProvider> CreateRangeValueRuleStateProvider() {
+  return std::make_unique<MockRangeValueRuleStateProvider>();
+}
 
 }  // namespace test
 }  // namespace api
