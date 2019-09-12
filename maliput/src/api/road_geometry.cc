@@ -227,6 +227,12 @@ std::vector<GeoPosition> RoadGeometry::DoSampleAheadWaypoints(const LaneSRoute& 
   std::vector<GeoPosition> waypoints;
   const RoadGeometry::IdIndex& id = ById();
   const std::vector<LaneSRange>& ranges = route.ranges();
+
+  /// Sample first point
+  const Lane* first_lane = id.GetLane(ranges.front().lane_id());
+  MALIPUT_THROW_UNLESS(first_lane != nullptr);
+  waypoints.emplace_back(first_lane->ToGeoPosition(LanePosition(ranges.front().s_range().s0(), 0.0, 0.0)));
+
   double previous_s_difference = 0.0;
   for (const auto& range : ranges) {
     const Lane* lane = id.GetLane(range.lane_id());
@@ -245,11 +251,6 @@ std::vector<GeoPosition> RoadGeometry::DoSampleAheadWaypoints(const LaneSRoute& 
     const Lane* last_lane = id.GetLane(ranges.back().lane_id());
     MALIPUT_THROW_UNLESS(last_lane != nullptr);
     waypoints.emplace_back(last_lane->ToGeoPosition(LanePosition(ranges.back().s_range().s1(), 0.0, 0.0)));
-  }
-  if (waypoints.size() == 1) {
-    const Lane* first_lane = id.GetLane(ranges.front().lane_id());
-    MALIPUT_THROW_UNLESS(first_lane != nullptr);
-    waypoints.emplace_back(first_lane->ToGeoPosition(LanePosition(ranges.front().s_range().s0(), 0.0, 0.0)));
   }
   return waypoints;
 }
