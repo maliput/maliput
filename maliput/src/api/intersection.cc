@@ -13,7 +13,7 @@ Intersection::Intersection(const Id& id, const std::vector<LaneSRange>& region, 
 const drake::optional<BulbStates> Intersection::bulb_states() const {
   drake::optional<PhaseProvider::Result> phase_result = Phase();
   if (phase_result.has_value()) {
-    const rules::Phase::Id phase_id = phase_result->id;
+    const rules::Phase::Id phase_id = phase_result->state;
     const rules::Phase& phase = ring_.phases().at(phase_id);
     return phase.bulb_states();
   }

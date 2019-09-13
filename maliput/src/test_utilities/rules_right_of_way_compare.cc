@@ -119,10 +119,10 @@ namespace test {
                                    const rules::RightOfWayRuleStateProvider::RightOfWayResult& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.current_id, b.current_id));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.state, b.state));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next.has_value(), b.next.has_value()));
   if (a.next.has_value() && b.next.has_value()) {
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->id, b.next->id));
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->state, b.next->state));
     MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->duration_until.has_value(), b.next->duration_until.has_value()));
     if (a.next->duration_until.has_value() && b.next->duration_until.has_value()) {
       MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next->duration_until.value(), b.next->duration_until.value()));

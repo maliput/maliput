@@ -66,9 +66,9 @@ TEST_F(ManualDiscreteRuleStateProviderTest, SetStateTest) {
   EXPECT_NO_THROW(dut.SetState(kRuleId, kStateA, {kStateB}, {kDurationUntil}));
   const drake::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->value_state, kStateA));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kStateA));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->value_state, kStateB));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, kStateB));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), kDurationUntil);
 }

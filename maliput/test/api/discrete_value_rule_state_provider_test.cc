@@ -46,9 +46,9 @@ GTEST_TEST(DiscreteValueRuleStateProviderTest, ExerciseInterface) {
       dut.GetState(MockDiscreteValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->value_state, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue()));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue()));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->value_state, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue()));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue()));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), 123.456);
 

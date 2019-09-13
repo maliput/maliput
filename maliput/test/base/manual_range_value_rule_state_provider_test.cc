@@ -63,9 +63,9 @@ TEST_F(ManualRangeValueRuleStateProviderTest, SetStateTest) {
   EXPECT_NO_THROW(dut.SetState(kRuleId, kRangeA, {kRangeA}, {kDurationUntil}));
   const drake::optional<RangeValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->range_state, kRangeA));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kRangeA));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->range_state, kRangeA));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, kRangeA));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), kDurationUntil);
 }

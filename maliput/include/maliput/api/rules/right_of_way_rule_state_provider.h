@@ -2,7 +2,9 @@
 
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/state_provider_result.h"
 
 namespace maliput {
 namespace api {
@@ -16,22 +18,7 @@ class RightOfWayRuleStateProvider {
   virtual ~RightOfWayRuleStateProvider() = default;
 
   /// Result returned by GetState(const RightOfWayRule::Id).
-  struct RightOfWayResult {
-    /// Information about a subsequent State.
-    struct Next {
-      /// ID of the State.
-      RightOfWayRule::State::Id id;
-      /// If known, estimated time until the transition to the State.
-      drake::optional<double> duration_until;
-    };
-
-    /// ID of the rule's current State.
-    RightOfWayRule::State::Id current_id;
-
-    /// Information about the rule's upcoming State if a state transition
-    /// is anticipated.
-    drake::optional<Next> next;
-  };
+  using RightOfWayResult = StateProviderResult<RightOfWayRule::State::Id>;
 
   /// Gets the state of the RightOfWayRule identified by `id`.
   ///

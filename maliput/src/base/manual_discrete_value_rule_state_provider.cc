@@ -32,7 +32,7 @@ void ManualDiscreteValueRuleStateProvider::SetState(
   }
 
   api::rules::DiscreteValueRuleStateProvider::StateResult state_result;
-  state_result.value_state = state;
+  state_result.state = state;
   if (next_state.has_value()) {
     state_result.next = {{*next_state, duration_until}};
   }
