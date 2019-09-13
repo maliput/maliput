@@ -74,6 +74,10 @@ BulbGroup::BulbGroup(const BulbGroup::Id& id, const GeoPosition& position_traffi
       orientation_traffic_light_(orientation_traffic_light),
       bulbs_(bulbs) {
   MALIPUT_THROW_UNLESS(bulbs_.size() > 0);
+  for (const Bulb& bulb : bulbs_) {
+    MALIPUT_THROW_UNLESS(std::count_if(bulbs_.begin(), bulbs_.end(),
+                                       [bulb_id = bulb.id()](const Bulb& b) { return bulb_id == b.id(); }) == 1);
+  }
 }
 
 drake::optional<Bulb> BulbGroup::GetBulb(const Bulb::Id& id) const {
@@ -90,7 +94,14 @@ TrafficLight::TrafficLight(const TrafficLight::Id& id, const GeoPosition& positi
     : id_(id),
       position_road_network_(position_road_network),
       orientation_road_network_(orientation_road_network),
-      bulb_groups_(bulb_groups) {}
+      bulb_groups_(bulb_groups) {
+  for (const BulbGroup bulb_group : bulb_groups_) {
+    MALIPUT_THROW_UNLESS(
+        std::count_if(bulb_groups_.begin(), bulb_groups_.end(), [bulb_group_id = bulb_group.id()](const BulbGroup& bg) {
+          return bulb_group_id == bg.id();
+        }) == 1);
+  }
+}
 
 drake::optional<BulbGroup> TrafficLight::GetBulbGroup(const BulbGroup::Id& id) const {
   for (const auto& bulb_group : bulb_groups_) {

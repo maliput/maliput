@@ -12,6 +12,7 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
@@ -173,6 +174,17 @@ GTEST_TEST(BulbGroupConstructorTest, InvalidGroupSize) {
                std::exception);
 }
 
+GTEST_TEST(BulbGroupConstructorTest, DuplicatedBulbIds) {
+  const Bulb::Id kBulbId("same_bulb_id");
+  const Bulb kRedBulb(kBulbId, GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kRed, BulbType::kRound);
+  const Bulb kGreenBulb(kBulbId, GeoPosition(0, 0, 0.3), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen,
+                        BulbType::kRound);
+
+  EXPECT_THROW(
+      BulbGroup(BulbGroup::Id("dut_id"), GeoPosition(1, 2, 3), Rotation::FromRpy(0, 0, 0), {kRedBulb, kGreenBulb}),
+      common::assertion_error);
+}
+
 class BulbGroupTest : public ::testing::Test {
  public:
   BulbGroupTest()
@@ -215,6 +227,21 @@ TEST_F(BulbGroupTest, Assignment) {
                 {red_arrow_bulb, green_arrow_bulb});
   dut = bulb_group_;
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, bulb_group_));
+}
+
+GTEST_TEST(TrafficLightConstructorTest, DuplicatedBulbGroupIds) {
+  const Bulb kRedBulb(Bulb::Id("red_bulb"), GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kRed,
+                      BulbType::kRound);
+  const Bulb kGreenBulb(Bulb::Id("green_bulb"), GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen,
+                        BulbType::kRound);
+
+  const BulbGroup::Id kBulbGroupId("same_bulb_group_id");
+  const BulbGroup kBulbGroupA(kBulbGroupId, GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), {kRedBulb});
+  const BulbGroup kBulbGroupB(kBulbGroupId, GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), {kGreenBulb});
+
+  EXPECT_THROW(TrafficLight(TrafficLight::Id("traffic_light_id"), GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0),
+                            {kBulbGroupA, kBulbGroupB}),
+               common::assertion_error);
 }
 
 class TrafficLightTest : public ::testing::Test {
