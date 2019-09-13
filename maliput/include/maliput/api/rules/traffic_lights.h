@@ -73,7 +73,9 @@ class Bulb final {
 
   /// Constructs a Bulb instance.
   ///
-  /// @param id The bulb's unique ID.
+  /// @param id The bulb's ID. It must be unique in the context of the BulbGroup
+  ///        that contains it. @see UniqueBulbId to uniquely identify a Bulb in
+  ///        the world.
   ///
   /// @param position_bulb_group The linear offset of this bulb's frame relative
   /// to the frame of the bulb group that contains it. The origin of this bulb's
@@ -175,7 +177,8 @@ class BulbGroup final {
 
   /// Constructs a BulbGroup instance.
   ///
-  /// @param id The bulb group's unique ID.
+  /// @param id The bulb group's ID. It must be unique in the context of the
+  ///        TrafficLight that contains it.
   ///
   /// @param position_traffic_light The linear offset of this bulb group's frame
   /// relative to the frame of the traffic light that contains it. The origin of
@@ -189,7 +192,11 @@ class BulbGroup final {
   /// when facing the +X direction.
   ///
   /// @param bulbs The bulbs that are part of this BulbGroup. There must be at
-  /// least one bulb within this group.
+  /// least one bulb within this group. There must not be Bulbs with the same
+  /// Bulb::Id.
+  ///
+  /// @throws common::assertion_error When there are Bulbs with the same
+  /// Bulb::Id in @p bulbs.
   BulbGroup(const Id& id, const GeoPosition& position_traffic_light, const Rotation& orientation_traffic_light,
             const std::vector<Bulb>& bulbs);
 
@@ -239,7 +246,8 @@ class TrafficLight final {
 
   /// Constructs a TrafficLight instance.
   ///
-  /// @param id The traffic light's unique ID.
+  /// @param id The traffic light's ID. It must be unique in the context of
+  ///        the TrafficLightBook that contains it.
   ///
   /// @param position_road_network The linear offset of the traffic light's
   /// frame relative to the road network's frame. The traffic light frame's
@@ -255,6 +263,10 @@ class TrafficLight final {
   /// light and bulb group should ideally match, if possible.
   ///
   /// @param bulb_groups The bulb groups that are part of this traffic light.
+  /// There must not be BulbGroups with the same BulbGroup::Ids.
+  ///
+  /// @throws common::assertion_error When there are BulbGroups with the same
+  /// BulbGroup::Id in @p bulb_groups.
   TrafficLight(const Id& id, const GeoPosition& position_road_network, const Rotation& orientation_road_network,
                const std::vector<BulbGroup>& bulb_groups);
 
