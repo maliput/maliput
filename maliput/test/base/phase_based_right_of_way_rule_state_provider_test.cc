@@ -48,9 +48,9 @@ GTEST_TEST(PhaseBasedRightOfWayRuleStateProviderTest, BasicTest) {
     for (const auto& test : test_cases) {
       drake::optional<RightOfWayRuleStateProvider::RightOfWayResult> result = dut.GetState(test.rule);
       EXPECT_TRUE(result.has_value());
-      EXPECT_EQ(result->current_id, test.result.current_id);
+      EXPECT_EQ(result->state, test.result.state);
       if (test.result.next) {
-        EXPECT_EQ(result->next->id, test.result.next->id);
+        EXPECT_EQ(result->next->state, test.result.next->state);
         if (test.result.next->duration_until) {
           EXPECT_EQ(*result->next->duration_until, *test.result.next->duration_until);
         } else {

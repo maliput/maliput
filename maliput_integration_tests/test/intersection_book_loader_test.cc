@@ -64,7 +64,7 @@ TEST_F(TestLoading2x2IntersectionIntersectionBook, LoadFromFile) {
   Intersection* intersection = book->GetIntersection(Intersection::Id("2x2Intersection"));
   EXPECT_NE(intersection, nullptr);
   EXPECT_TRUE(intersection->Phase().has_value());
-  EXPECT_EQ(intersection->Phase()->id, Phase::Id("NorthSouthPhase"));
+  EXPECT_EQ(intersection->Phase()->state, Phase::Id("NorthSouthPhase"));
   EXPECT_TRUE(intersection->Phase()->next.has_value());
   EXPECT_GT(intersection->region().size(), 0);
   EXPECT_EQ(intersection->ring_id(), PhaseRing::Id("2x2Intersection"));

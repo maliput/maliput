@@ -37,11 +37,11 @@ TEST_F(IntersectionTest, BasicTest) {
   EXPECT_EQ(dut.id(), intersection_id);
   EXPECT_EQ(dut.Phase(), drake::nullopt);
   phase_provider.AddPhaseRing(dummy_ring_.id(), dummy_phase_1_.id());
-  EXPECT_EQ(dut.Phase()->id, dummy_phase_1_.id());
+  EXPECT_EQ(dut.Phase()->state, dummy_phase_1_.id());
   dut.SetPhase(dummy_phase_2_.id(), dummy_phase_1_.id(), kDurationUntil);
-  EXPECT_EQ(dut.Phase()->id, dummy_phase_2_.id());
+  EXPECT_EQ(dut.Phase()->state, dummy_phase_2_.id());
   EXPECT_TRUE(dut.Phase()->next.has_value());
-  EXPECT_EQ(dut.Phase()->next->id, dummy_phase_1_.id());
+  EXPECT_EQ(dut.Phase()->next->state, dummy_phase_1_.id());
   EXPECT_TRUE(dut.Phase()->next->duration_until.has_value());
   EXPECT_EQ(dut.Phase()->next->duration_until.value(), kDurationUntil);
   EXPECT_EQ(dut.region().size(), ranges_.size());

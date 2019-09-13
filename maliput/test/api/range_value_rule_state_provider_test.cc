@@ -47,9 +47,9 @@ GTEST_TEST(RangeValueRuleStateProviderTest, ExerciseInterface) {
       dut.GetState(MockRangeValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->range_state, MockRangeValueRuleStateProvider::MakeCurrentRange()));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, MockRangeValueRuleStateProvider::MakeCurrentRange()));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->range_state, MockRangeValueRuleStateProvider::MakeNextRange()));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, MockRangeValueRuleStateProvider::MakeNextRange()));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), 123.456);
 

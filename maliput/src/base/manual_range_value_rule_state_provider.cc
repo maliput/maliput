@@ -30,7 +30,7 @@ void ManualRangeValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
   }
 
   api::rules::RangeValueRuleStateProvider::StateResult state_result;
-  state_result.range_state = state;
+  state_result.state = state;
   if (next_state.has_value()) {
     state_result.next = {{*next_state, duration_until}};
   }

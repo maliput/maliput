@@ -25,12 +25,12 @@ drake::optional<RightOfWayRuleStateProvider::RightOfWayResult> PhaseBasedRightOf
   if (ring.has_value()) {
     const drake::optional<PhaseProvider::Result> phase_result = phase_provider_->GetPhase(ring->id());
     if (phase_result.has_value()) {
-      const Phase::Id phase_id = phase_result->id;
+      const Phase::Id phase_id = phase_result->state;
       const Phase& phase = ring->phases().at(phase_id);
       const RightOfWayRule::State::Id state_id = phase.rule_states().at(rule_id);
       drake::optional<RightOfWayResult::Next> next = drake::nullopt;
       if (phase_result->next.has_value()) {
-        const Phase::Id next_phase_id = phase_result->next->id;
+        const Phase::Id next_phase_id = phase_result->next->state;
         const Phase& next_phase = ring->phases().at(next_phase_id);
         const RightOfWayRule::State::Id next_state_id = next_phase.rule_states().at(rule_id);
         next = RightOfWayResult::Next{next_state_id, phase_result->next->duration_until};

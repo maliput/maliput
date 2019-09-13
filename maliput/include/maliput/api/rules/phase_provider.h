@@ -2,8 +2,10 @@
 
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/state_provider_result.h"
 
 namespace maliput {
 namespace api {
@@ -18,21 +20,7 @@ class PhaseProvider {
   virtual ~PhaseProvider() = default;
 
   /// Result returned by GetPhase().
-  struct Result {
-    /// Information about a subsequent phase.
-    struct Next {
-      /// ID of the next phase.
-      Phase::Id id;
-      /// If known, estimated time until the transition to the next phase.
-      drake::optional<double> duration_until;
-    };
-
-    /// ID of the current phase.
-    Phase::Id id;
-    /// Information about the upcoming phase if a phase transition is
-    /// anticipated.
-    drake::optional<Next> next;
-  };
+  using Result = StateProviderResult<Phase::Id>;
 
   /// Gets the phase within a specified PhaseRing. Returns drake::nullopt if
   /// @p id is unrecognized.

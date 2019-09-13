@@ -5,6 +5,7 @@
 
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/api/rules/state_provider_result.h"
 
 namespace maliput {
 namespace api {
@@ -15,23 +16,7 @@ class RangeValueRuleStateProvider {
  public:
   /// The state of a RangeValueRule, returned by
   /// RangeValueRuleStateProvider::GetState(const Rule::Id&).
-  struct StateResult {
-    /// Information about the next state.
-    struct Next {
-      RangeValueRule::Range range_state;
-      /// If known, the estimated time until the transition to the next state,
-      /// relative to when RangeValueRuleStateProvider::GetState() was
-      /// called. Users should treat this as advisory since it is tentative and
-      /// subject to change at any point in time.
-      drake::optional<double> duration_until;
-    };
-
-    /// The rule's current state.
-    RangeValueRule::Range range_state;
-    /// The rule's next state, if known. Users should treat this as advisory
-    /// since it is tentative and subject to change at any point in time.
-    drake::optional<Next> next;
-  };
+  using StateResult = StateProviderResult<RangeValueRule::Range>;
 
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RangeValueRuleStateProvider)
 
