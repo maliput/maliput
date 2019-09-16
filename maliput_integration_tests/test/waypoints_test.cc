@@ -76,16 +76,14 @@ GTEST_TEST(WaypointsTest, Waypoints) {
   EXPECT_EQ(route.length(), 14.0);
   const double kSampleSStep{4.0};
   std::vector<GeoPosition> waypoints = rg->SampleAheadWaypoints(route, kSampleSStep);
+  std::vector<GeoPosition> expected_waypoints{GeoPosition(1.0, 0.0, 0.0), GeoPosition(5.0, 0.0, 0.0),
+                                              GeoPosition(9.0, 0.0, 0.0), GeoPosition(13.0, 0.0, 0.0),
+                                              GeoPosition(15.0, 0.0, 0.0)};
 
   ASSERT_EQ(waypoints.size(), 5);
-  EXPECT_TRUE(
-      api::test::IsGeoPositionClose(GeoPosition(waypoints[1].x() + kSampleSStep, waypoints[1].y(), waypoints[1].z()),
-                                    waypoints[2], kLinearTolerance));
-  EXPECT_TRUE(api::test::IsGeoPositionClose(
-      GeoPosition(waypoints[0].x() + 14, waypoints[0].y(), waypoints[0].z()), waypoints[4],
-      kLinearTolerance));
-  EXPECT_TRUE(api::test::IsGeoPositionClose(GeoPosition(waypoints[3].x() + 2.0, waypoints[0].y(), waypoints[0].z()),
-                                            waypoints[4], kLinearTolerance));
+  for (int i = 0; i < waypoints.size(); ++i) {
+    EXPECT_TRUE(api::test::IsGeoPositionClose(waypoints[i], expected_waypoints[i], kLinearTolerance));
+  }
 
   const LaneSRange shorter_than_sample_step_range_one{lane_one->id(), {5., 5.}};
   const LaneSRange shorter_than_sample_step_range_two{lane_two->id(), {0., 2.}};
@@ -97,10 +95,14 @@ GTEST_TEST(WaypointsTest, Waypoints) {
   EXPECT_EQ(shorter_route.length(), 2.0);
   const double kSampleSStepBiggerThanTotalRouteLength = 15.0;
   waypoints = rg->SampleAheadWaypoints(shorter_route, kSampleSStepBiggerThanTotalRouteLength);
+  expected_waypoints = {
+      GeoPosition(5.0, 0.0, 0.0),
+      GeoPosition(7.0, 0.0, 0.0),
+  };
   ASSERT_EQ(waypoints.size(), 2);
-  EXPECT_TRUE(api::test::IsGeoPositionClose(
-      lane_two->ToGeoPosition(LanePosition(shorter_than_sample_step_range_two.s_range().s1(), 0.0, 0.0)), waypoints[1],
-      kLinearTolerance));
+  for (int i = 0; i < waypoints.size(); ++i) {
+    EXPECT_TRUE(api::test::IsGeoPositionClose(waypoints[i], expected_waypoints[i], kLinearTolerance));
+  }
 
   const LaneSRange non_existent_range_lane{LaneId("non-existent"), {0., 2.0}};
   const LaneSRoute non_existent_route{std::vector<LaneSRange>{non_existent_range_lane}};
@@ -112,8 +114,15 @@ GTEST_TEST(WaypointsTest, Waypoints) {
   const double step_smaller_than_linear_tolerance = kLinearTolerance / 2.0;
   const LaneSRange linear_tolerance_range{lane_one->id(), {0., kLinearTolerance}};
   const LaneSRoute route_with_linear_tolerance_lane{std::vector<LaneSRange>{linear_tolerance_range}};
+  expected_waypoints = {
+      GeoPosition(0.0, 0.0, 0.0),
+      GeoPosition(kLinearTolerance, 0.0, 0.0),
+  };
   waypoints = rg->SampleAheadWaypoints(route_with_linear_tolerance_lane, step_smaller_than_linear_tolerance);
   EXPECT_EQ(waypoints.size(), 2);
+  for (int i = 0; i < waypoints.size(); ++i) {
+    EXPECT_TRUE(api::test::IsGeoPositionClose(waypoints[i], expected_waypoints[i], kLinearTolerance));
+  }
 };
 
 }  // namespace
