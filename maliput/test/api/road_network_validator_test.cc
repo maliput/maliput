@@ -30,7 +30,8 @@ GTEST_TEST(RoadNetworkValidatorTest, RuleCoverageTest) {
   RoadNetwork road_network(test::CreateOneLaneRoadGeometry(), test::CreateRoadRulebook(),
                            test::CreateTrafficLightBook(), test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
                            test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
-                           test::CreateRuleRegistry());
+                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+                           test::CreateRangeValueRuleStateProvider());
 
   RoadNetworkValidatorOptions options{true /* check_direction_usage_rule_coverage */,
                                       false /* check_road_geometry_invariants */,
@@ -70,7 +71,8 @@ TEST_P(RoadGeometryHierarchyTest, HierarchyTestThrows) {
   RoadNetwork road_network(CreateRoadGeometry(build_flags_), test::CreateRoadRulebook(), test::CreateTrafficLightBook(),
                            test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
                            test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
-                           test::CreateRuleRegistry());
+                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+                           test::CreateRangeValueRuleStateProvider());
 
   const RoadNetworkValidatorOptions options{
       false /* check_direction_usage_rule_coverage */, false /* check_road_geometry_invariants */,
@@ -125,7 +127,8 @@ TEST_P(RelatedBulbGroupsTest, ChecksRelatedBulGroupsRelation) {
                            test::CreateTrafficLightBook(build_flags_.traffic_light_book_build_flags),
                            test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
                            test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
-                           test::CreateRuleRegistry());
+                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+                           test::CreateRangeValueRuleStateProvider());
 
   const RoadNetworkValidatorOptions options{
       false /* check_direction_usage_rule_coverage */, false /* check_road_geometry_invariants */,

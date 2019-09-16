@@ -7,10 +7,12 @@
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/discrete_value_rule_state_provider.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/range_value_rule.h"
+#include "maliput/api/rules/range_value_rule_state_provider.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/api/rules/road_rulebook.h"
@@ -199,6 +201,12 @@ std::unique_ptr<IntersectionBook> CreateIntersectionBook();
 
 /// Returns an arbitrary rules::RuleRegistry.
 std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry();
+
+/// Returns an arbitrary rules::DiscreteValueRuleStateProvider.
+std::unique_ptr<rules::DiscreteValueRuleStateProvider> CreateDiscreteValueRuleStateProvider();
+
+/// Returns an arbitrary rules::RangeValueRuleStateProvider.
+std::unique_ptr<rules::RangeValueRuleStateProvider> CreateRangeValueRuleStateProvider();
 
 }  // namespace test
 }  // namespace api

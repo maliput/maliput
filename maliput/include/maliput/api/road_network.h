@@ -7,8 +7,10 @@
 #include "maliput/api/intersection_book.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/direction_usage_rule.h"
+#include "maliput/api/rules/discrete_value_rule_state_provider.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring_book.h"
+#include "maliput/api/rules/range_value_rule_state_provider.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/rule_registry.h"
@@ -34,7 +36,9 @@ class RoadNetwork {
               std::unique_ptr<IntersectionBook> intersection_book,
               std::unique_ptr<rules::PhaseRingBook> phase_ring_book,
               std::unique_ptr<rules::RightOfWayRuleStateProvider> right_of_way_rule_state_provider,
-              std::unique_ptr<rules::PhaseProvider> phase_provider, std::unique_ptr<rules::RuleRegistry> rule_registry);
+              std::unique_ptr<rules::PhaseProvider> phase_provider, std::unique_ptr<rules::RuleRegistry> rule_registry,
+              std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
+              std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider);
 
   virtual ~RoadNetwork() = default;
 
@@ -56,6 +60,14 @@ class RoadNetwork {
 
   const rules::RuleRegistry* rule_registry() const { return rule_registry_.get(); }
 
+  const rules::DiscreteValueRuleStateProvider* discrete_value_rule_state_provider() const {
+    return discrete_value_rule_state_provider_.get();
+  }
+
+  const rules::RangeValueRuleStateProvider* range_value_rule_state_provider() const {
+    return range_value_rule_state_provider_.get();
+  }
+
  private:
   std::unique_ptr<const RoadGeometry> road_geometry_;
   std::unique_ptr<const rules::RoadRulebook> rulebook_;
@@ -65,6 +77,8 @@ class RoadNetwork {
   std::unique_ptr<rules::RightOfWayRuleStateProvider> right_of_way_rule_state_provider_;
   std::unique_ptr<rules::PhaseProvider> phase_provider_;
   std::unique_ptr<rules::RuleRegistry> rule_registry_;
+  std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider_;
+  std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider_;
 };
 
 }  // namespace api
