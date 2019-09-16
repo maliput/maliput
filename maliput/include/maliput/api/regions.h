@@ -58,6 +58,8 @@ class LaneSRange {
   /// Gets the SRange.
   SRange s_range() const { return s_range_; }
 
+  double length() const { return s_range_.size(); }
+
  private:
   LaneId lane_id_;
   SRange s_range_;
@@ -82,6 +84,11 @@ class LaneSRoute {
 
   /// Returns the sequence of LaneSRanges.
   const std::vector<LaneSRange>& ranges() const { return ranges_; }
+
+  double length() const {
+    return std::accumulate(ranges_.cbegin(), ranges_.cend(), 0.,
+                           [](const double acc, const LaneSRange& lane_range) { return acc + lane_range.length(); });
+  }
 
   // TODO(maddog@tri.global)  Implement a "CheckInvariants()" method which
   //                          ensures contiguity (with respect to a specified

@@ -9,6 +9,8 @@
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
+#include "maliput/api/lane_data.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
 
@@ -216,6 +218,41 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
   // TODO(maddog@tri.global)  Implement this.
 
   return failures;
+}
+
+std::vector<GeoPosition> RoadGeometry::DoSampleAheadWaypoints(const LaneSRoute& route,
+                                                              double path_length_sampling_rate) const {
+  MALIPUT_THROW_UNLESS(path_length_sampling_rate > 0.);
+  path_length_sampling_rate = std::max(linear_tolerance(), std::min(path_length_sampling_rate, route.length()));
+  std::vector<GeoPosition> waypoints;
+  const RoadGeometry::IdIndex& id = ById();
+  const std::vector<LaneSRange>& ranges = route.ranges();
+
+  /// Sample first point
+  const Lane* first_lane = id.GetLane(ranges.front().lane_id());
+  MALIPUT_THROW_UNLESS(first_lane != nullptr);
+  waypoints.emplace_back(first_lane->ToGeoPosition(LanePosition(ranges.front().s_range().s0(), 0.0, 0.0)));
+
+  double previous_s_difference = 0.0;
+  for (const auto& range : ranges) {
+    const Lane* lane = id.GetLane(range.lane_id());
+    MALIPUT_THROW_UNLESS(lane != nullptr);
+    const SRange lane_s_range = range.s_range();
+
+    double step_accumulator = previous_s_difference + lane_s_range.s0() + path_length_sampling_rate;
+
+    while (step_accumulator <= lane_s_range.s1()) {
+      waypoints.emplace_back(lane->ToGeoPosition(LanePosition(step_accumulator, 0.0, 0.0)));
+      step_accumulator += path_length_sampling_rate;
+    }
+    previous_s_difference = step_accumulator - lane_s_range.s1() - path_length_sampling_rate;
+  }
+  if (std::abs(previous_s_difference) > linear_tolerance()) {
+    const Lane* last_lane = id.GetLane(ranges.back().lane_id());
+    MALIPUT_THROW_UNLESS(last_lane != nullptr);
+    waypoints.emplace_back(last_lane->ToGeoPosition(LanePosition(ranges.back().s_range().s1(), 0.0, 0.0)));
+  }
+  return waypoints;
 }
 
 }  // namespace api
