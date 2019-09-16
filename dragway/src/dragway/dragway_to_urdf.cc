@@ -48,7 +48,7 @@ namespace {
 
 int exec(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  maliput::set_log_level(FLAGS_spdlog_level);
+  maliput::logging::set_log_level(FLAGS_spdlog_level);
 
   RoadGeometry road_geometry(api::RoadGeometryId{"Dragway with " + std::to_string(FLAGS_num_lanes) + " lanes."},
                              FLAGS_num_lanes, FLAGS_length, FLAGS_lane_width, FLAGS_shoulder_width,

@@ -1,3 +1,4 @@
+ament_add_gtest(logger_test logger_test.cc)
 ament_add_gtest(maliput_abort_test maliput_abort_test.cc)
 ament_add_gtest(maliput_throw_test maliput_throw_test.cc)
 
@@ -21,5 +22,6 @@ macro(add_dependencies_to_test target)
     endif()
 endmacro()
 
+add_dependencies_to_test(logger_test)
 add_dependencies_to_test(maliput_abort_test)
 add_dependencies_to_test(maliput_throw_test)

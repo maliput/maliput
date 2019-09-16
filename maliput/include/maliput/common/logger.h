@@ -61,15 +61,94 @@
 
 #include <string>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
+/// @note spdlog support is provided by Drake's installation.
+///       @def HAVE_SPDLOG is a preprocessor macro set by Drake's cmake
+///       configuration for spdlog at bundling time and available when
+///       incorporating Drake as a dependency with it.
+///       @see https://github.com/RobotLocomotion/drake/blob/master/tools/workspace/spdlog/package-create-cps.py#L28
+
+#ifdef HAVE_SPDLOG
 
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
 
+#else  // HAVE_SPDLOG
+
+#include "drake/common/drake_copyable.h"
+
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
+#endif  // HAVE_SPDLOG
+
 namespace maliput {
 
+#ifdef HAVE_SPDLOG
+
+namespace logging {
+
 using Logger = spdlog::logger;
+
+using Sink = spdlog::sinks::sink;
+
+/// True only if spdlog is enabled in this build.
+constexpr bool kHaveSpdlog = true;
+
+}  // namespace logging
+
+#else  // HAVE_SPDLOG
+namespace logging {
+constexpr bool kHaveSpdlog = false;
+
+/// A stubbed-out version of `spdlog::logger`.
+/// Implements only those methods that we expect to use, as
+/// spdlog's API does change from time to time.
+class Logger {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Logger)
+
+  Logger() = default;
+
+  template <typename... Args>
+  void trace(const char*, const Args&...) {}
+  template <typename... Args>
+  void debug(const char*, const Args&...) {}
+  template <typename... Args>
+  void info(const char*, const Args&...) {}
+  template <typename... Args>
+  void warn(const char*, const Args&...) {}
+  template <typename... Args>
+  void error(const char*, const Args&...) {}
+  template <typename... Args>
+  void critical(const char*, const Args&...) {}
+
+  template <typename T>
+  void trace(const T&) {}
+  template <typename T>
+  void debug(const T&) {}
+  template <typename T>
+  void info(const T&) {}
+  template <typename T>
+  void warn(const T&) {}
+  template <typename T>
+  void error(const T&) {}
+  template <typename T>
+  void critical(const T&) {}
+};
+
+// A stubbed-out version of `spdlog::sinks::sink`.
+class Sink {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Sink)
+  Sink() = default;
+};
+
+}  // namespace logging
+
+#define SPDLOG_TRACE(logger, ...)
+#define SPDLOG_DEBUG(logger, ...)
+
+#endif  // HAVE_SPDLOG
 
 /// Retrieve an instance of a logger to use for logging; for example:
 ///
@@ -78,7 +157,16 @@ using Logger = spdlog::logger;
 /// </pre>
 ///
 /// See the logger.h documentation for a short tutorial.
-Logger* log();
+logging::Logger* log();
+
+namespace logging {
+
+/// (Advanced) Retrieves the default sink for all Maliput logs.
+/// When spdlog is enabled, the return value can be cast to
+/// spdlog::sinks::dist_sink_mt and thus allows consumers of Maliput
+/// to redirect Maliput's text logs to locations other than the default
+/// of stderr.  When spdlog is disabled, the return value is an empty class.
+Sink* get_dist_sink();
 
 /// Invokes `maliput::log()->set_level(level)`.
 ///
@@ -86,7 +174,8 @@ Logger* log();
 /// `info`, `warn`, `err`, `critical`, `off`, or `unchanged` (not an enum, but
 /// useful for command-line).
 ///
-/// @return The string value of the previous log level.
+/// @return The string value of the previous log level. When spdlog is
+///         disabled, an empty string is returned.
 ///
 /// @throws maliput::common::assertion_error When `level` is not one of the
 ///         predefined values for spdlog.
@@ -94,4 +183,5 @@ Logger* log();
 ///         of the predefined values for spdlog.
 std::string set_log_level(const std::string& level);
 
+}  // namespace logging
 }  // namespace maliput
