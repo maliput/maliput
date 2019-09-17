@@ -67,6 +67,13 @@ bool Bulb::IsValidState(const BulbState& bulb_state) const {
   return std::find(states_.begin(), states_.end(), bulb_state) != states_.end();
 }
 
+GeoPosition Bulb::WorldFramePosition() const {
+  MALIPUT_THROW_UNLESS(bulb_group_ != nullptr);
+
+  return GeoPosition::FromXyz(bulb_group_->WorldFramePosition().xyz() +
+                              bulb_group_->orientation_traffic_light().matrix() * position_bulb_group_.xyz());
+}
+
 BulbGroup::BulbGroup(const BulbGroup::Id& id, const GeoPosition& position_traffic_light,
                      const Rotation& orientation_traffic_light, const std::vector<Bulb>& bulbs)
     : id_(id),
@@ -77,6 +84,7 @@ BulbGroup::BulbGroup(const BulbGroup::Id& id, const GeoPosition& position_traffi
   for (const Bulb& bulb : bulbs_) {
     MALIPUT_THROW_UNLESS(std::count_if(bulbs_.begin(), bulbs_.end(),
                                        [bulb_id = bulb.id()](const Bulb& b) { return bulb_id == b.id(); }) == 1);
+    BulbGroupAttorney::SetBulbGroupToBulb(this, const_cast<Bulb*>(&bulb));
   }
 }
 
@@ -87,6 +95,15 @@ drake::optional<Bulb> BulbGroup::GetBulb(const Bulb::Id& id) const {
     }
   }
   return drake::nullopt;
+}
+
+
+GeoPosition BulbGroup::WorldFramePosition() const {
+  MALIPUT_THROW_UNLESS(traffic_light_ != nullptr);
+
+  return GeoPosition::FromXyz(
+      traffic_light_->position_road_network().xyz() +
+      traffic_light_->orientation_road_network().matrix() * position_traffic_light_.xyz());
 }
 
 TrafficLight::TrafficLight(const TrafficLight::Id& id, const GeoPosition& position_road_network,
@@ -100,6 +117,7 @@ TrafficLight::TrafficLight(const TrafficLight::Id& id, const GeoPosition& positi
         std::count_if(bulb_groups_.begin(), bulb_groups_.end(), [bulb_group_id = bulb_group.id()](const BulbGroup& bg) {
           return bulb_group_id == bg.id();
         }) == 1);
+    TrafficLightAttorney::SetTrafficLightToBulbGroup(this, const_cast<BulbGroup*>(&bulb_group));
   }
 }
 
@@ -111,6 +129,15 @@ drake::optional<BulbGroup> TrafficLight::GetBulbGroup(const BulbGroup::Id& id) c
   }
   return drake::nullopt;
 }
+
+void BulbGroupAttorney::SetBulbGroupToBulb(const BulbGroup* bulb_group, Bulb* bulb) {
+  bulb->set_bulb_group(bulb_group);
+}
+
+void TrafficLightAttorney::SetTrafficLightToBulbGroup(const TrafficLight* traffic_light, BulbGroup* bulb_group) {
+  bulb_group->set_traffic_light(traffic_light);
+}
+
 
 }  // namespace rules
 }  // namespace api

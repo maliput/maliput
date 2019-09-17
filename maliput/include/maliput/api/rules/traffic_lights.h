@@ -40,6 +40,8 @@ enum class BulbState { kOff = 0, kOn, kBlinking };
 /// Maps BulbState enums to string representations.
 std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper();
 
+class BulbGroup;
+
 /// Models a bulb within a bulb group.
 class Bulb final {
  public:
@@ -154,7 +156,37 @@ class Bulb final {
   /// Returns the bounding box of the bulb.
   const BoundingBox& bounding_box() const { return bounding_box_; }
 
+  /// Returns the World Frame Position of this bulb by transforming parent's
+  /// BulbGroup frame and its parent TrafficLight frame with this bulb's
+  /// nominal pose into World Frame.
+  ///
+  /// @throws common::assertion_error When this Bulb has not been assigned
+  ///         to any BulbGroup.
+  /// @throws common::assertion_error When this BulbGroup has not been
+  ///         assigned to any TrafficLight.
+  GeoPosition WorldFramePosition() const;
+
+  /// Returns parent BulbGroup pointer.
+  ///
+  /// At parent BulbGroup construct time, the parent will set the pointer to
+  /// this bulb via BulbGroupAttorney.
+  /// In case this bulb is not contained by any BulbGroup, the return value
+  /// will be nullptr.
+  const BulbGroup* bulb_group() const { return bulb_group_; }
+
  private:
+  // Sets parent BulbGroup pointer.
+  //
+  // @throws common::assertion_error When `bulb_group` is nullptr.
+  void set_bulb_group(const BulbGroup* bulb_group) {
+    MALIPUT_THROW_UNLESS(bulb_group != nullptr);
+    bulb_group_ = bulb_group;
+  }
+
+  // Used to register a reference to the parent BulbGroup, at parent's
+  // construct time via the attorney-client idiom.
+  friend class BulbGroupAttorney;
+
   Id id_;
   GeoPosition position_bulb_group_;
   Rotation orientation_bulb_group_;
@@ -163,7 +195,10 @@ class Bulb final {
   drake::optional<double> arrow_orientation_rad_ = drake::nullopt;
   std::vector<BulbState> states_;
   BoundingBox bounding_box_;
+  const BulbGroup* bulb_group_{};
 };
+
+class TrafficLight;
 
 /// Models a group of bulbs within a traffic light. All of the bulbs within a
 /// group should share the same approximate orientation. However, this is not
@@ -217,11 +252,39 @@ class BulbGroup final {
   /// Gets the specified Bulb. Returns drake::nullopt if @p id is unrecognized.
   drake::optional<Bulb> GetBulb(const Bulb::Id& id) const;
 
+  /// Returns the World Frame Position of this bulb by transforming parent's
+  /// TrafficLight frame with this bulb group's nominal pose into World Frame.
+  ///
+  /// @throws common::assertion_error When this BulbGroup has not been assigned
+  ///         to any TrafficLight.
+  GeoPosition WorldFramePosition() const;
+
+  /// Returns parent TrafficLight pointer.
+  ///
+  /// At parent TrafficLight construct time, the parent will set the pointer to
+  /// this bulb via TrafficLightAttorney.
+  /// In case this bulb group is not contained by any TrafficLight, the return
+  /// value will be nullptr.
+  const TrafficLight* traffic_light() const { return traffic_light_; }
+
  private:
+  // Sets parent BulbGroup pointer.
+  //
+  // @throws common::assertion_error When `bulb_group` is nullptr.
+  void set_traffic_light(const TrafficLight* traffic_light) {
+    MALIPUT_THROW_UNLESS(traffic_light != nullptr);
+    traffic_light_ = traffic_light;
+  }
+
+  // Used to register a reference to the parent BulbGroup, at parent's
+  // construct time via the attorney-client idiom.
+  friend class TrafficLightAttorney;
+
   Id id_;
   GeoPosition position_traffic_light_;
   Rotation orientation_traffic_light_;
   std::vector<Bulb> bulbs_;
+  const TrafficLight* traffic_light_{};
 };
 
 /// Models a traffic light. A traffic light is a physical signaling device
@@ -290,6 +353,32 @@ class TrafficLight final {
   GeoPosition position_road_network_;
   Rotation orientation_road_network_;
   std::vector<BulbGroup> bulb_groups_;
+};
+
+/// Allows BulbGroup registration in its Bulbs via the
+/// client-attorney idiom.
+class BulbGroupAttorney final {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BulbGroupAttorney)
+  BulbGroupAttorney() = delete;
+
+ private:
+  friend class BulbGroup;
+
+  static void SetBulbGroupToBulb(const BulbGroup* bulb_group, Bulb* bulb);
+};
+
+/// Allows TrafficLight registration in its BulbGroups via the
+/// client-attorney idiom.
+class TrafficLightAttorney final {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLightAttorney)
+  TrafficLightAttorney() = delete;
+
+ private:
+  friend class TrafficLight;
+
+  static void SetTrafficLightToBulbGroup(const TrafficLight* traffic_light, BulbGroup* bulb_group);
 };
 
 /// Uniquely identifies a bulb in the world. This consists of the concatenation
