@@ -161,8 +161,10 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   const Rule::TypeId kRangeValueRuleType("RangeValueRuleType");
   const Rule::Id kRangeRuleId("RangeValueRuleType/RangeRuleId");
   const LaneSRoute kZone({LaneSRange(LaneId("LaneId"), SRange(10., 20.))});
-  const RangeValueRule::Range kRange =
+  const RangeValueRule::Range kRangeA =
       MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "range_description", 123., 456.);
+  const RangeValueRule::Range kRangeB =
+      MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(), "range_description", 123., 456.);
   const RangeValueRule::Range kUnregisteredRange =
       MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "range_description", 456., 789.);
   const Rule::TypeId kDiscreteValueRuleType("DiscreteValueType");
@@ -178,18 +180,25 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
 
   RuleRegistry dut;
 
-  dut.RegisterRangeValueRule(kRangeValueRuleType, {kRange});
+  dut.RegisterRangeValueRule(kRangeValueRuleType, {kRangeA});
   dut.RegisterDiscreteValueRule(kDiscreteValueRuleType, kDiscreteValues);
 
   // Builds and evaluates a RangeValueRule.
-  const RangeValueRule range_value_rule = dut.BuildRangeValueRule(kRangeRuleId, kRangeValueRuleType, kZone, {kRange});
+  RangeValueRule range_value_rule = dut.BuildRangeValueRule(kRangeRuleId, kRangeValueRuleType, kZone, {kRangeA});
   EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
   EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(range_value_rule.zone(), kZone));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.ranges(), {kRange}));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.ranges(), {kRangeA}));
+
+  // Builds and evaluates a RangeValueRule of the same type but with non-empty RelatedRules.
+  range_value_rule = dut.BuildRangeValueRule(kRangeRuleId, kRangeValueRuleType, kZone, {kRangeB});
+  EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
+  EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(range_value_rule.zone(), kZone));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.ranges(), {kRangeB}));
 
   // Unregistered type.
-  EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {kRange}),
+  EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {kRangeA}),
                maliput::common::assertion_error);
   // Unregistered range.
   EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {kUnregisteredRange}),
@@ -198,8 +207,8 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   // Builds and evaluates a discrete value based rule.
   const std::vector<DiscreteValueRule::DiscreteValue> kExpectedDiscreteValues{
       MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value1"),
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value3")};
-  const DiscreteValueRule discrete_value_rule =
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(), "Value3")};
+  DiscreteValueRule discrete_value_rule =
       dut.BuildDiscreteValueRule(kDiscreteValueRuleId, kDiscreteValueRuleType, kZone, kExpectedDiscreteValues);
   EXPECT_EQ(discrete_value_rule.id(), kDiscreteValueRuleId);
   EXPECT_EQ(discrete_value_rule.type_id(), kDiscreteValueRuleType);

@@ -9,11 +9,24 @@ namespace api {
 namespace rules {
 namespace {
 
-// Convenient function to validate that `item` exists in `v`.
-// @return true When `item` is in `v`.
-template <typename T>
-bool HasValue(const std::vector<T>& v, const T& item) {
-  return std::find(v.begin(), v.end(), item) != v.end();
+// Convenient function to validate that `discrete_value` exists in `discrete_values`.
+// It does not check RelatedRules as it is customized by backends at build time.
+// @return true When `discrete_value` is in `discrete_values`.
+bool HasValue(const std::vector<DiscreteValueRule::DiscreteValue>& discrete_values,
+              const DiscreteValueRule::DiscreteValue& discrete_value) {
+  return std::find_if(discrete_values.begin(), discrete_values.end(), [discrete_value](const auto& dv) {
+           return dv.severity == discrete_value.severity && dv.value == discrete_value.value;
+         }) != discrete_values.end();
+}
+
+// Convenient function to validate that `range` exists in `ranges`.
+// It does not check RelatedRules as it is customized by backends at build time.
+// @return true When `range` is in `ranges`.
+bool HasValue(const std::vector<RangeValueRule::Range>& ranges, const RangeValueRule::Range& range) {
+  return std::find_if(ranges.begin(), ranges.end(), [range](const auto& r) {
+           return r.severity == range.severity && r.min == range.min && r.max == range.max &&
+                  r.description == range.description;
+         }) != ranges.end();
 }
 
 }  // namespace
