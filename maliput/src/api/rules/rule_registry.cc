@@ -9,7 +9,7 @@ namespace api {
 namespace rules {
 namespace {
 
-// Convenient function to validate that `discrete_value` exists in `discrete_values`.
+// Convenience function to validate that `discrete_value` exists in `discrete_values`.
 // It does not check RelatedRules as it is customized by backends at build time.
 // @return true When `discrete_value` is in `discrete_values`.
 bool HasValue(const std::vector<DiscreteValueRule::DiscreteValue>& discrete_values,
@@ -19,7 +19,7 @@ bool HasValue(const std::vector<DiscreteValueRule::DiscreteValue>& discrete_valu
          }) != discrete_values.end();
 }
 
-// Convenient function to validate that `range` exists in `ranges`.
+// Convenience function to validate that `range` exists in `ranges`.
 // It does not check RelatedRules as it is customized by backends at build time.
 // @return true When `range` is in `ranges`.
 bool HasValue(const std::vector<RangeValueRule::Range>& ranges, const RangeValueRule::Range& range) {
