@@ -20,18 +20,18 @@ namespace maliput {
 namespace dragway {
 
 Lane::Lane(const Segment* segment, const api::LaneId& id, int index, double length, double y_offset,
-           const api::RBounds& lane_bounds, const api::RBounds& driveable_bounds, const api::HBounds& elevation_bounds)
+           const api::RBounds& lane_bounds, const api::RBounds& segment_bounds, const api::HBounds& elevation_bounds)
     : segment_(segment),
       id_(id),
       index_(index),
       length_(length),
       y_offset_(y_offset),
       lane_bounds_(lane_bounds),
-      driveable_bounds_(driveable_bounds),
+      segment_bounds_(segment_bounds),
       elevation_bounds_(elevation_bounds) {
   MALIPUT_DEMAND(segment != nullptr);
-  MALIPUT_DEMAND(lane_bounds_.min() >= driveable_bounds_.min());
-  MALIPUT_DEMAND(lane_bounds_.max() <= driveable_bounds_.max());
+  MALIPUT_DEMAND(lane_bounds_.min() >= segment_bounds_.min());
+  MALIPUT_DEMAND(lane_bounds_.max() <= segment_bounds_.max());
   // TODO(liang.fok) Consider initializing this variable in the constructor's
   // initializer list so branch_point_ can be declared `const`.
   branch_point_ = make_unique<BranchPoint>(api::BranchPointId(id.string() + "_Branch_Point"), this,
@@ -60,7 +60,7 @@ drake::optional<api::LaneEnd> Lane::DoGetDefaultBranch(api::LaneEnd::Which which
 
 api::RBounds Lane::do_lane_bounds(double) const { return lane_bounds_; }
 
-api::RBounds Lane::do_driveable_bounds(double) const { return driveable_bounds_; }
+api::RBounds Lane::do_segment_bounds(double) const { return segment_bounds_; }
 
 api::HBounds Lane::do_elevation_bounds(double, double) const { return elevation_bounds_; }
 
@@ -110,8 +110,8 @@ api::LanePositionT<T> Lane::ImplDoToLanePositionT(const api::GeoPositionT<T>& ge
 
   const T min_x{0.};
   const T max_x{length_};
-  const T min_y{driveable_bounds_.min() + y_offset_};
-  const T max_y{driveable_bounds_.max() + y_offset_};
+  const T min_y{segment_bounds_.min() + y_offset_};
+  const T max_y{segment_bounds_.max() + y_offset_};
   const T min_z{elevation_bounds_.min()};
   const T max_z{elevation_bounds_.max()};
 

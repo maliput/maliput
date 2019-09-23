@@ -36,11 +36,11 @@ class Lane : public api::Lane {
   /// @param index Lane's index to identify it when querying parent @p segment.
   ///        It must be positive.
   /// @param lane_bounds nominal bounds of the lane, uniform along the entire
-  ///        reference path, which must be a subset of @p driveable_bounds
-  /// @param driveable_bounds driveable bounds of the lane, uniform along the
+  ///        reference path, which must be a subset of @p segment_bounds
+  /// @param segment_bounds segment bounds of the lane, uniform along the
   ///        entire reference path
   /// @param elevation_bounds elevation bounds of the lane, uniform along the
-  ///        entire driveable surface
+  ///        entire segment surface
   /// @param road_curve The trajectory of the Lane over parent @p segment's
   ///        surface.
   /// @param r0 The lateral displacement with respect to the @p road_curve's
@@ -49,19 +49,18 @@ class Lane : public api::Lane {
   /// @note The override Lane::ToLanePosition() is currently restricted to
   /// lanes in which superelevation and elevation change are both zero.
   Lane(const api::LaneId& id, const api::Segment* segment, int index, const api::RBounds& lane_bounds,
-       const api::RBounds& driveable_bounds, const api::HBounds& elevation_bounds, const RoadCurve* road_curve,
-       double r0)
+       const api::RBounds& segment_bounds, const api::HBounds& elevation_bounds, const RoadCurve* road_curve, double r0)
       : id_(id),
         segment_(segment),
         index_(index),
         lane_bounds_(lane_bounds),
-        driveable_bounds_(driveable_bounds),
+        segment_bounds_(segment_bounds),
         elevation_bounds_(elevation_bounds),
         road_curve_(road_curve),
         r0_(r0) {
     MALIPUT_DEMAND(index_ >= 0);
-    MALIPUT_DEMAND(lane_bounds_.min() >= driveable_bounds_.min());
-    MALIPUT_DEMAND(lane_bounds_.max() <= driveable_bounds_.max());
+    MALIPUT_DEMAND(lane_bounds_.min() >= segment_bounds_.min());
+    MALIPUT_DEMAND(lane_bounds_.max() <= segment_bounds_.max());
     MALIPUT_DEMAND(road_curve != nullptr);
     s_from_p_at_r0_ = road_curve_->OptimizeCalcSFromP(r0_);
     p_from_s_at_r0_ = road_curve_->OptimizeCalcPFromS(r0_);
@@ -121,7 +120,7 @@ class Lane : public api::Lane {
 
   api::RBounds do_lane_bounds(double) const override { return lane_bounds_; }
 
-  api::RBounds do_driveable_bounds(double) const override { return driveable_bounds_; }
+  api::RBounds do_segment_bounds(double) const override { return segment_bounds_; }
 
   api::HBounds do_elevation_bounds(double, double) const override { return elevation_bounds_; }
 
@@ -142,7 +141,7 @@ class Lane : public api::Lane {
   BranchPoint* end_bp_{};
 
   const api::RBounds lane_bounds_;
-  const api::RBounds driveable_bounds_;
+  const api::RBounds segment_bounds_;
   const api::HBounds elevation_bounds_;
   const RoadCurve* road_curve_{};
   const double r0_;

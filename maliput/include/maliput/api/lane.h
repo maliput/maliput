@@ -73,31 +73,30 @@ class Lane {
   /// These are the lateral bounds for a position that is considered to be
   /// "staying in the lane".
   ///
-  /// @see driveable_bounds(double s) that defines the whole "on-pavement"
-  /// surface.
+  /// @see segment_bounds(double s) that defines the whole surface.
   RBounds lane_bounds(double s) const { return do_lane_bounds(s); }
 
-  /// Returns the driveable lateral (r) bounds of the lane as a function of s.
+  /// Returns the lateral segment (r) bounds of the lane as a function of s.
   ///
   /// These are the lateral bounds for a position that is considered to be
-  /// "on pavement", reflecting the physical extent of the paved surface of
-  /// the lane's segment.
+  /// "on segment", reflecting the physical extent of the surface of the
+  /// lane's segment.
   ///
   /// @see lane_bounds(double s) that defines what's considered to be "staying
-  /// in the lane"
-  RBounds driveable_bounds(double s) const { return do_driveable_bounds(s); }
+  /// in the lane".
+  RBounds segment_bounds(double s) const { return do_segment_bounds(s); }
 
   /// Returns the elevation (`h`) bounds of the lane as a function of `(s, r)`.
   ///
   /// These are the elevation bounds for a position that is considered to be
-  /// within the volume modelled by the RoadGeometry.
+  /// within the volume modeled by the RoadGeometry.
   HBounds elevation_bounds(double s, double r) const { return do_elevation_bounds(s, r); }
 
   /// Returns the GeoPosition corresponding to the given LanePosition.
   ///
   /// @pre The s component of @p lane_pos must be in domain [0, Lane::length()].
   /// @pre The r component of @p lane_pos must be in domain [Rmin, Rmax]
-  ///      derived from Lane::driveable_bounds().
+  ///      derived from Lane::segment_bounds().
   //
   // TODO(jadecastro): Generalize `Lane::ToGeoPosition` (and possibly others)
   // with another member function `Lane::ToGeoPositionT<T>()`.
@@ -132,7 +131,7 @@ class Lane {
   /// Determines the LanePosition corresponding to GeoPosition @p geo_pos.
   ///
   /// The return value is the LanePosition of the point within the Lane's
-  /// driveable-bounds which is closest to @p geo_pos (as measured by the
+  /// segment-bounds which is closest to @p geo_pos (as measured by the
   /// Cartesian metric in the world frame).  If @p nearest_point is non-null,
   /// then it will be populated with the GeoPosition of that nearest point.  If
   /// @p distance is non-null, then it will be populated with the Cartesian
@@ -244,7 +243,7 @@ class Lane {
 
   virtual RBounds do_lane_bounds(double s) const = 0;
 
-  virtual RBounds do_driveable_bounds(double s) const = 0;
+  virtual RBounds do_segment_bounds(double s) const = 0;
 
   virtual HBounds do_elevation_bounds(double s, double r) const = 0;
 

@@ -80,7 +80,7 @@ class RoadGeometry final : public api::RoadGeometry {
   double do_scale_length() const final { return scale_length_; }
 
   // Returns true iff `geo_pos` is "on" the dragway. It is on the dragway iff
-  // `geo_pos.x` and `geo_pos.y` fall within the dragway's driveable region.
+  // `geo_pos.x` and `geo_pos.y` fall within the dragway's segment surface.
   bool IsGeoPositionOnDragway(const api::GeoPosition& geo_pos) const;
 
   // Returns the index of the lane on which the provided `geo_pos` resides. This

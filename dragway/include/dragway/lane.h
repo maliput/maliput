@@ -23,7 +23,7 @@ class Segment;
   <pre>
                      lane_bounds
         |<------------------------------->|
-                 driveable_bounds
+                   segment_bounds
     |<--------------------------------------->|
 
     -------------------------------------------  ———  s = length()
@@ -91,16 +91,16 @@ class Lane final : public api::Lane {
   /// negative otherwise.
   ///
   /// @param lane_bounds nominal bounds of the lane, uniform along the entire
-  ///        reference path, which must be a subset of @p driveable_bounds.
+  ///        reference path, which must be a subset of @p segment_bounds.
   ///
-  /// @param driveable_bounds The driveable bounds of the lane, uniform along
-  ///        the entire reference path.
+  /// @param segment_bounds The segment bounds of the lane, uniform along the
+  ///        entire reference path.
   ///
   /// @param elevation_bounds The elevation bounds of the lane, uniform along
   ///        the entire reference path.
   ///
   Lane(const Segment* segment, const api::LaneId& id, int index, double length, double y_offset,
-       const api::RBounds& lane_bounds, const api::RBounds& driveable_bounds, const api::HBounds& elevation_bounds);
+       const api::RBounds& lane_bounds, const api::RBounds& segment_bounds, const api::HBounds& elevation_bounds);
 
   ~Lane() final = default;
 
@@ -140,7 +140,7 @@ class Lane final : public api::Lane {
 
   api::RBounds do_lane_bounds(double) const final;
 
-  api::RBounds do_driveable_bounds(double) const final;
+  api::RBounds do_segment_bounds(double) const final;
 
   api::HBounds do_elevation_bounds(double, double) const final;
 
@@ -178,7 +178,7 @@ class Lane final : public api::Lane {
   const double length_{};
   const double y_offset_{};
   const api::RBounds lane_bounds_;
-  const api::RBounds driveable_bounds_;
+  const api::RBounds segment_bounds_;
   const api::HBounds elevation_bounds_;
 
   // The following variable is actually `const` after construction.

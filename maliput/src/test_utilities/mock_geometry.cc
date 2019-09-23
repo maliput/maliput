@@ -28,7 +28,7 @@ api::RBounds MockLane::do_lane_bounds(double) const {
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
-api::RBounds MockLane::do_driveable_bounds(double) const {
+api::RBounds MockLane::do_segment_bounds(double) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }

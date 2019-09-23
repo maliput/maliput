@@ -11,10 +11,10 @@ Lane* Segment::NewLane(api::LaneId id, double r0, const api::RBounds& lane_bound
   if (lanes_.size() != 0) {
     MALIPUT_DEMAND(r0 > lanes_.back()->r0());
   }
-  const api::RBounds driveable_bounds(r_min_ - r0, r_max_ - r0);
-  MALIPUT_DEMAND(lane_bounds.min() >= driveable_bounds.min() && lane_bounds.max() <= driveable_bounds.max());
+  const api::RBounds segment_bounds(r_min_ - r0, r_max_ - r0);
+  MALIPUT_DEMAND(lane_bounds.min() >= segment_bounds.min() && lane_bounds.max() <= segment_bounds.max());
   auto lane_ =
-      std::make_unique<Lane>(id, this, index, lane_bounds, driveable_bounds, elevation_bounds_, road_curve_.get(), r0);
+      std::make_unique<Lane>(id, this, index, lane_bounds, segment_bounds, elevation_bounds_, road_curve_.get(), r0);
   lanes_.push_back(std::move(lane_));
   Lane* result = lanes_.back().get();
   register_lane_(result);
