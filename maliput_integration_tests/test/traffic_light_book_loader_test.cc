@@ -27,6 +27,7 @@ using api::rules::BulbState;
 using api::rules::BulbType;
 using api::rules::TrafficLight;
 using api::rules::TrafficLightBook;
+using api::rules::UniqueBulbId;
 constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 
 class TestLoading2x2IntersectionTrafficLightbook : public ::testing::Test {
@@ -39,18 +40,30 @@ class TestLoading2x2IntersectionTrafficLightbook : public ::testing::Test {
             {BulbGroup(
                 BulbGroup::Id("SouthFacingBulbs"), GeoPosition(0, 0, 0),
                 Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
-                {Bulb(Bulb::Id("RedBulb"), GeoPosition(0, 0, 0.3937),
-                      Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)), BulbColor::kRed, BulbType::kRound,
-                      drake::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()),
-                 Bulb(Bulb::Id("YellowBulb"), GeoPosition(0, 0, 0),
-                      Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)), BulbColor::kYellow, BulbType::kRound,
-                      drake::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()),
-                 Bulb(Bulb::Id("GreenBulb"), GeoPosition(0, 0, -0.3937),
-                      Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)), BulbColor::kGreen, BulbType::kRound,
-                      drake::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()),
-                 Bulb(Bulb::Id("YellowLeftArrowBulb"), GeoPosition(0, -0.3937, -0.3937),
-                      Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)), BulbColor::kYellow, BulbType::kArrow,
-                      3.14, std::vector<BulbState>({BulbState::kOff, BulbState::kBlinking}), Bulb::BoundingBox())})}) {}
+                {Bulb(Bulb::Id("RedBulb"),
+                      UniqueBulbId(TrafficLight::Id("SouthFacing"), BulbGroup::Id("SouthFacingBulbs"),
+                                   Bulb::Id("RedBulb")),
+                      GeoPosition(0, 0, 0.3937), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
+                      BulbColor::kRed, BulbType::kRound, drake::nullopt,
+                      std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()),
+                 Bulb(Bulb::Id("YellowBulb"),
+                      UniqueBulbId(TrafficLight::Id("SouthFacing"), BulbGroup::Id("SouthFacingBulbs"),
+                                   Bulb::Id("YellowBulb")),
+                      GeoPosition(0, 0, 0), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
+                      BulbColor::kYellow, BulbType::kRound, drake::nullopt,
+                      std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()),
+                 Bulb(Bulb::Id("GreenBulb"),
+                      UniqueBulbId(TrafficLight::Id("SouthFacing"), BulbGroup::Id("SouthFacingBulbs"),
+                                   Bulb::Id("GreenBulb")),
+                      GeoPosition(0, 0, -0.3937), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
+                      BulbColor::kGreen, BulbType::kRound, drake::nullopt,
+                      std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()),
+                 Bulb(Bulb::Id("YellowLeftArrowBulb"),
+                      UniqueBulbId(TrafficLight::Id("SouthFacing"), BulbGroup::Id("SouthFacingBulbs"),
+                                   Bulb::Id("YellowLeftArrowBulb")),
+                      GeoPosition(0, -0.3937, -0.3937), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
+                      BulbColor::kYellow, BulbType::kArrow, 3.14,
+                      std::vector<BulbState>({BulbState::kOff, BulbState::kBlinking}), Bulb::BoundingBox())})}) {}
 
   const std::string filepath_;
   const TrafficLight south_facing_;

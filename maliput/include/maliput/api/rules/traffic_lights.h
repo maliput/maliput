@@ -40,6 +40,9 @@ enum class BulbState { kOff = 0, kOn, kBlinking };
 /// Maps BulbState enums to string representations.
 std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper();
 
+/// Forward declaration of `UniqueBulbId` to be used by `Bulb`.
+struct UniqueBulbId;
+
 /// Models a bulb within a bulb group.
 class Bulb final {
  public:
@@ -74,8 +77,11 @@ class Bulb final {
   /// Constructs a Bulb instance.
   ///
   /// @param id The bulb's ID. It must be unique in the context of the BulbGroup
-  ///        that contains it. @see UniqueBulbId to uniquely identify a Bulb in
-  ///        the world.
+  /// that contains it. @see UniqueBulbId to uniquely identify a Bulb in the world.
+  ///
+  /// @param unique_id The bulb's unique ID in the entire TrafficLightBook.
+  /// Uniqueness enforcement is delegated to TrafficLightBook loader / builder.
+  /// `unique_id.bulb_id` must be equal to @p id.
   ///
   /// @param position_bulb_group The linear offset of this bulb's frame relative
   /// to the frame of the bulb group that contains it. The origin of this bulb's
@@ -109,14 +115,19 @@ class Bulb final {
   ///
   /// @param bounding_box The bounding box of the bulb. See BoundingBox for
   /// details about the default value.
-  Bulb(const Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
-       const BulbColor& color, const BulbType& type,
+  ///
+  /// @throws common::assertion_error When `unique_id.bulb_id != id`.
+  Bulb(const Id& id, const UniqueBulbId& unique_id, const GeoPosition& position_bulb_group,
+       const Rotation& orientation_bulb_group, const BulbColor& color, const BulbType& type,
        const drake::optional<double>& arrow_orientation_rad = drake::nullopt,
        const drake::optional<std::vector<BulbState>>& states = drake::nullopt,
        BoundingBox bounding_box = BoundingBox());
 
-  /// Returns this Bulb instance's unique identifier.
+  /// Returns this Bulb instance's ID.
   const Id& id() const { return id_; }
+
+  /// Returns this Bulb instance's unique identifier.
+  UniqueBulbId unique_id() const;
 
   /// Returns the linear offset of this bulb's frame relative to the frame of
   /// the bulb group that contains it.
@@ -156,6 +167,7 @@ class Bulb final {
 
  private:
   Id id_;
+  std::string unique_id_str_;
   GeoPosition position_bulb_group_;
   Rotation orientation_bulb_group_;
   BulbColor color_ = BulbColor::kRed;
@@ -197,6 +209,8 @@ class BulbGroup final {
   ///
   /// @throws common::assertion_error When there are Bulbs with the same
   /// Bulb::Id in @p bulbs.
+  /// @throws common::assertion_error When any of the Bulbs in @p bulbs has a
+  /// UniqueBulbId whose `bulb_group_id` is different from @p id.
   BulbGroup(const Id& id, const GeoPosition& position_traffic_light, const Rotation& orientation_traffic_light,
             const std::vector<Bulb>& bulbs);
 
@@ -267,6 +281,9 @@ class TrafficLight final {
   ///
   /// @throws common::assertion_error When there are BulbGroups with the same
   /// BulbGroup::Id in @p bulb_groups.
+  /// @throws common::assertion_error When any of the Bulbs contained in each
+  /// BulbGroup of @p bulb_groups has a UniqueBulbId whose `traffic_light_id`
+  /// is different from @p id.
   TrafficLight(const Id& id, const GeoPosition& position_road_network, const Rotation& orientation_road_network,
                const std::vector<BulbGroup>& bulb_groups);
 
@@ -308,9 +325,23 @@ struct UniqueBulbId {
                const Bulb::Id& bulb_id_in)
       : traffic_light_id(traffic_light_id_in), bulb_group_id(bulb_group_id_in), bulb_id(bulb_id_in) {}
 
-  /// Returns the string representation of the %TypeSpecificIdentifier.
+  /// Constructs a UniqueBulbId from @p str.
+  ///
+  /// @param str The string representation of a UniqueBulbId that results from
+  /// calling `to_string()` to other UniqueBulbId. It must follow the format:
+  /// "`traffic_light_id.string()`-`bulb_group_id.string()`-`bulb_group_id.string()`".
+  ///
+  /// @throws common::assertion_error When @p str does not follow the
+  /// specified format.
+  explicit UniqueBulbId(const std::string& str);
+
+  /// Returns the string representation of this UniqueBulbId following the
+  /// format:
+  /// "`traffic_light_id.string()`-`bulb_group_id.string()`-`bulb_group_id.string()`"
+  ///
+  /// @see delimiter() as it provides the "-" string in between IDs.
   const std::string to_string() const {
-    return traffic_light_id.string() + "-" + bulb_group_id.string() + "-" + bulb_id.string();
+    return traffic_light_id.string() + delimiter() + bulb_group_id.string() + delimiter() + bulb_id.string();
   }
 
   /// Tests for equality with another UniqueBulbId.
@@ -330,6 +361,9 @@ struct UniqueBulbId {
     hash_append(hasher, id.bulb_group_id);
     hash_append(hasher, id.bulb_id);
   }
+
+  /// Returns "-", the string delimiter to separate IDs.
+  static const std::string delimiter();
 
   TrafficLight::Id traffic_light_id;
   BulbGroup::Id bulb_group_id;

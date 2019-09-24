@@ -568,16 +568,19 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildF
   return std::move(rulebook);
 }
 
-BulbGroup CreateBulbGroup(bool add_missing_bulb_group) {
+BulbGroup CreateBulbGroup(bool add_missing_bulb_group, const rules::TrafficLight::Id& traffic_light_id) {
+  const BulbGroup::Id bulb_group_id{add_missing_bulb_group ? "MissingBulbGroupId" : "BulbGroupId"};
+  const Bulb::Id bulb_id{"BulbId"};
+  const rules::UniqueBulbId unique_id(traffic_light_id, bulb_group_id, bulb_id);
+
   return BulbGroup(
-      BulbGroup::Id{add_missing_bulb_group ? "MissingBulbGroupId" : "BulbGroupId"}, GeoPosition(), Rotation(),
-      {Bulb(Bulb::Id{"BulbId"}, GeoPosition(), Rotation(), rules::BulbColor::kRed, rules::BulbType::kRound)});
+      bulb_group_id, GeoPosition(), Rotation(),
+      {Bulb(bulb_id, unique_id, GeoPosition(), Rotation(), rules::BulbColor::kRed, rules::BulbType::kRound)});
 }
 
 TrafficLight CreateTrafficLight(const TrafficLightBuildFlags& build_flags) {
-  return TrafficLight(
-      TrafficLight::Id(build_flags.add_missing_traffic_light ? "MissingTrafficLightId" : "TrafficLightId"),
-      GeoPosition(), Rotation(), {CreateBulbGroup(build_flags.add_missing_bulb_group)});
+  const TrafficLight::Id id(build_flags.add_missing_traffic_light ? "MissingTrafficLightId" : "TrafficLightId");
+  return TrafficLight(id, GeoPosition(), Rotation(), {CreateBulbGroup(build_flags.add_missing_bulb_group, id)});
 }
 
 std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() {
