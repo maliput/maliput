@@ -15,8 +15,8 @@
 #    Typing "C-c C-e l o" will even open it for you.
 
 #+TITLE: maliput: Modeling Road Networks for Simulation
-#+AUTHOR: Matt Marjanović and Chien-Liang Fok
-#+DATE: March 26, 2019
+#+AUTHOR: Matt Marjanović, Chien-Liang Fok and Agustin Alba Chicar
+#+DATE: September 25, 2019
 
 This document describes =maliput=, a model of road networks for use in
 agent and traffic simulations.  At the core of =maliput= is a
@@ -253,7 +253,7 @@ implied by these labels.[fn::Travel restrictions on a =Lane= are
 indicated by road rule annotations, described later in
 Section [[Rules of the Road: =RoadRulebook=]].]
 
-A =Lane= is bounded laterally by $r \in B_\text{segment}(s)$, where
+A =Lane= is bounded laterally by /segment bounds/, $r \in B_\text{segment}(s)$, where
 \[
 B_\text{segment}: s \mapsto [r_\text{min}, r_\text{max}] \text{ s.t. } r_\text{min}<=0 \text{ and } r_\text{max}>=0
 \]
@@ -263,16 +263,16 @@ is intended to
 represent the full lateral extent of the =Segment= including
 all adjacent =Lanes=.
 # TODO(maddog@tri.global) This begs for a picture.
-A =Lane= is also characterized by /nominal bounds/
+A =Lane= is also characterized by /nominal bounds/, $r \in B_\text{nominal}(s)$, where
 \[
 B_\text{nominal}: s \mapsto [r_\text{min}, r_\text{max}] \text{ s.t. } B_\text{nominal} \subseteq B_\text{segment}
 \]
 which indicate what is considered to be "in" that specific travel lane
 (e.g., between the stripes).
 
-A =Lane= is bounded in height by $h \in H_\text{segment}(s,r)$, where
+A =Lane= is bounded in height by $h \in H_\text{lane}(s,r)$, where
 \[
-H_\text{segment}: (s,r) \mapsto [h_\text{min}, h_\text{max}] \text{ s.t. } h_\text{min}<=0 \text{ and } h_\text{max}>=0
+H_\text{lane}: (s,r) \mapsto [h_\text{min}, h_\text{max}] \text{ s.t. } h_\text{min}<=0 \text{ and } h_\text{max}>=0
 \]
 defines inclusive min/max bounds which depend on $s$ and $r$.  These define
 the valid domain of $h$, which represents the full extent of the volume
@@ -288,7 +288,7 @@ lines") is basically a parallel curve to the centerline $C_L$.  Thus,
 the shape of $C_L$ and/or the road surface may
 produce limits to $(r,h)$ before such a curve develops a cusp.
 The current definitions of $B_\text{segment}$ and
-$H_\text{segment}$ conflate the bounds of the /segment/ volume
+$H_\text{lane}$ conflate the bounds of the /segment/ volume
 (e.g., pavement and free space under bridges) with the bounds of the
 /modelled/ volume (e.g., the bounds on $r$ and $h$ which maintain
 $G^1$ continuity, avoiding cusps).  Hence, the road surface may continue
@@ -461,7 +461,7 @@ that are better localized.
     * segment $r$ bounds,
       $B_\text{segment}: (s) \mapsto [r_\text{min}, r_\text{max}]$
     * segment $h$ bounds,
-      $H_\text{segment}: (s,r) \mapsto [h_\text{min}, h_\text{max}]$
+      $H_\text{lane}: (s,r) \mapsto [h_\text{min}, h_\text{max}]$
     * embedding $W_L: (s,r,h) \mapsto (x,y,z)$
     * inverse $W_L^{-1}: (x,y,z) \mapsto (s,r,h)$
     * =Lane=-frame orientation

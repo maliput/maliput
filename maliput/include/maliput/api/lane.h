@@ -89,7 +89,10 @@ class Lane {
   /// Returns the elevation (`h`) bounds of the lane as a function of `(s, r)`.
   ///
   /// These are the elevation bounds for a position that is considered to be
-  /// within the volume modeled by the RoadGeometry.
+  /// within the Lane's volume modeled by the RoadGeometry.
+  ///
+  /// `s` is within [0, `length()`] of this Lane and `r` is within
+  /// `lane_bounds(s)`.
   HBounds elevation_bounds(double s, double r) const { return do_elevation_bounds(s, r); }
 
   /// Returns the GeoPosition corresponding to the given LanePosition.
