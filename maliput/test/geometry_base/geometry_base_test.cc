@@ -70,7 +70,7 @@ GTEST_TEST(GeometryBaseLaneTest, UnimplementedMethods) {
   // Ensure that the not-actually-implemented methods throw an exception.
   EXPECT_THROW(dut.length(), std::exception);
   EXPECT_THROW(dut.lane_bounds(0.), std::exception);
-  EXPECT_THROW(dut.driveable_bounds(0.), std::exception);
+  EXPECT_THROW(dut.segment_bounds(0.), std::exception);
   EXPECT_THROW(dut.elevation_bounds(0., 0.), std::exception);
   EXPECT_THROW(dut.ToGeoPosition(api::LanePosition()), std::exception);
   EXPECT_THROW(dut.GetOrientation(api::LanePosition()), std::exception);

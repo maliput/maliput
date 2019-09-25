@@ -101,7 +101,7 @@ drake::Vector3<double> ArcRoadCurve::ToCurveFrame(const drake::Vector3<double>& 
   const double p = d_theta_nearest_unwrapped / std::abs(d_theta_);
   // Compute r (its direction depends on the direction of the +s-coordinate)
   const double r_unsaturated = (d_theta_ >= 0.) ? radius_ - v.norm() : v.norm() - radius_;
-  // Saturate r within drivable bounds.
+  // Saturate r within segment bounds.
   const double r = drake::math::saturate(r_unsaturated, r_min, r_max);
 
   // Calculate the (uniform) road elevation.
@@ -125,7 +125,7 @@ bool ArcRoadCurve::IsValid(double r_min, double r_max, const api::HBounds& heigh
   //                          arc angle >= 2π).
   drake::unused(height_bounds);
   MALIPUT_DEMAND(r_min <= r_max);
-  // Whether or not user code pays attention to driveable_bounds, at least
+  // Whether or not user code pays attention to segment_bounds, at least
   // ensure that bounds are sane.  Given the singularity at the center of
   // the arc, it is not well-defined to consider parallel curves offset
   // from the reference by a distance greater than or equal to the

@@ -64,9 +64,9 @@ bool RoadGeometry::IsGeoPositionOnDragway(const api::GeoPosition& geo_pos) const
   const Lane* lane = dynamic_cast<const Lane*>(junction_.segment(0)->lane(0));
   MALIPUT_DEMAND(lane != nullptr);
   const double length = lane->length();
-  const api::RBounds lane_driveable_bounds = lane->driveable_bounds(0 /* s */);
-  const double min_y = lane->y_offset() + lane_driveable_bounds.min();
-  const double max_y = lane->y_offset() + lane_driveable_bounds.max();
+  const api::RBounds lane_segment_bounds = lane->segment_bounds(0 /* s */);
+  const double min_y = lane->y_offset() + lane_segment_bounds.min();
+  const double max_y = lane->y_offset() + lane_segment_bounds.max();
 
   if (geo_pos.x() < 0 || geo_pos.x() > length || geo_pos.y() > max_y || geo_pos.y() < min_y) {
     maliput::log()->trace(
@@ -95,7 +95,7 @@ int RoadGeometry::GetLaneIndex(const api::GeoPosition& geo_pos) const {
     // index of the right-most lane in `result`.
     if (lane->to_right() == nullptr) {
       if (geo_pos.y() <= lane->y_offset() + lane->lane_bounds(0).min() &&
-          geo_pos.y() >= lane->y_offset() + lane->driveable_bounds(0).min()) {
+          geo_pos.y() >= lane->y_offset() + lane->segment_bounds(0).min()) {
         result = i;
         lane_found = true;
       }
@@ -105,7 +105,7 @@ int RoadGeometry::GetLaneIndex(const api::GeoPosition& geo_pos) const {
     // index of the left-most lane in `result`.
     if (lane->to_left() == nullptr) {
       if (geo_pos.y() >= lane->y_offset() + lane->lane_bounds(0).max() &&
-          geo_pos.y() <= lane->y_offset() + lane->driveable_bounds(0).max()) {
+          geo_pos.y() <= lane->y_offset() + lane->segment_bounds(0).max()) {
         result = i;
         lane_found = true;
       }
@@ -124,7 +124,7 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos
                                                  api::GeoPosition* nearest_position, double* distance) const {
   drake::unused(hint);
 
-  // Computes the dragway's (x,y) driveable region coordinates.
+  // Computes the dragway's (x,y) segment surface coordinates.
   MALIPUT_DEMAND(junction_.num_segments() > 0);
   const api::Segment* segment = junction_.segment(0);
   MALIPUT_DEMAND(segment != nullptr);
@@ -132,9 +132,9 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos
   const Lane* lane = dynamic_cast<const Lane*>(segment->lane(0));
   MALIPUT_DEMAND(lane != nullptr);
   const double length = lane->length();
-  const api::RBounds lane_driveable_bounds = lane->driveable_bounds(0 /* s */);
-  const double min_y = lane->y_offset() + lane_driveable_bounds.min();
-  const double max_y = lane->y_offset() + lane_driveable_bounds.max();
+  const api::RBounds lane_segment_bounds = lane->segment_bounds(0 /* s */);
+  const double min_y = lane->y_offset() + lane_segment_bounds.min();
+  const double max_y = lane->y_offset() + lane_segment_bounds.max();
   const double min_x = 0;
   const double max_x = length;
   const double min_z = lane->elevation_bounds(0, 0).min();
@@ -142,7 +142,7 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos
 
   /*
       A figure of a typical dragway is shown below. The minimum and maximum
-      values of the dragway's driveable region are demarcated.
+      values of the dragway' segment surface are demarcated.
 
                             X
               Y = max_y     ^      Y = min_y
@@ -166,7 +166,7 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos
 
       The (x, y) coordinate of the closest point is basically the (x, y)
       coordinates of the provide `geo_pos` clamped by the minimum and maximum
-      values of of the dragway's driveable region. This can be encoded as
+      values of of the dragway' segment surface. This can be encoded as
       follows.
   */
   api::GeoPosition closest_position;

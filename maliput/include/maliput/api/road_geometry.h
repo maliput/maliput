@@ -114,7 +114,7 @@ class RoadGeometry {
   }
 
   /// Obtains all RoadPositions within @p radius of @p geo_position. Only Lanes
-  /// whose driveable regions include points that are within @p radius of
+  /// whose segment regions include points that are within @p radius of
   /// @p geo_position are included in the search. For each of these Lanes,
   /// include the RoadPosition or RoadPositions with the minimum distance to
   /// @p geo_position in the returned result.

@@ -34,12 +34,12 @@ class MaliputDragwayLaneTest : public ::testing::Test {
         min_z_(0.),
         max_z_(maximum_height_) {}
 
-  // Contains expected driveable r_min, driveable r_max, and y_offset parameters
+  // Contains expected segment r_min, segment r_max, and y_offset parameters
   // of a Dragway Lane.
   struct ExpectedLaneParameters {
     double y_offset{};
-    double driveable_r_min{};
-    double driveable_r_max{};
+    double segment_r_min{};
+    double segment_r_max{};
     double elevation_min{};
     double elevation_max{};
   };
@@ -64,16 +64,16 @@ class MaliputDragwayLaneTest : public ::testing::Test {
     ExpectedLaneParameters result{};
     if (num_lanes == 1) {
       result.y_offset = 0.0;
-      result.driveable_r_min = -3.5;
-      result.driveable_r_max = 3.5;
+      result.segment_r_min = -3.5;
+      result.segment_r_max = 3.5;
     } else if ((num_lanes == 2) && (lane_index == 0)) {
       result.y_offset = -3.0;
-      result.driveable_r_min = -3.5;
-      result.driveable_r_max = 9.5;
+      result.segment_r_min = -3.5;
+      result.segment_r_max = 9.5;
     } else if ((num_lanes == 2) && (lane_index == 1)) {
       result.y_offset = 3.0;
-      result.driveable_r_min = -9.5;
-      result.driveable_r_max = 3.5;
+      result.segment_r_min = -9.5;
+      result.segment_r_max = 3.5;
     } else {
       throw std::runtime_error("GetExpectedLaneParameters: bad input");
     }
@@ -95,18 +95,18 @@ class MaliputDragwayLaneTest : public ::testing::Test {
 
     EXPECT_EQ(lane->length(), length_);
 
-    // Tests Lane::driveable_bounds().
+    // Tests Lane::segment_bounds().
     for (double s = 0; s < length_; s += length_ / 100) {
-      const api::RBounds driveable_bounds = lane->driveable_bounds(s);
+      const api::RBounds segment_bounds = lane->segment_bounds(s);
       EXPECT_TRUE(api::test::IsRBoundsClose(
-          driveable_bounds, api::RBounds(expected.driveable_r_min, expected.driveable_r_max), kLinearTolerance));
+          segment_bounds, api::RBounds(expected.segment_r_min, expected.segment_r_max), kLinearTolerance));
     }
 
     // Tests Lane::elevation_bounds().
     for (double s = 0; s < length_; s += length_ / 10) {
-      const api::RBounds driveable_bounds = lane->driveable_bounds(s);
-      const api::HBounds elevation_bounds0 = lane->elevation_bounds(s, driveable_bounds.min());
-      const api::HBounds elevation_bounds1 = lane->elevation_bounds(s, driveable_bounds.max());
+      const api::RBounds segment_bounds = lane->segment_bounds(s);
+      const api::HBounds elevation_bounds0 = lane->elevation_bounds(s, segment_bounds.min());
+      const api::HBounds elevation_bounds1 = lane->elevation_bounds(s, segment_bounds.max());
       EXPECT_TRUE(api::test::IsHBoundsClose(
           elevation_bounds0, api::HBounds(expected.elevation_min, expected.elevation_max), kLinearTolerance));
       EXPECT_TRUE(api::test::IsHBoundsClose(
@@ -120,9 +120,9 @@ class MaliputDragwayLaneTest : public ::testing::Test {
     // (s, r, h). Instead we pick points in a grid that spans the (s, r, h)
     // state space and only check those points in the hopes that they are
     // representative of the entire state space.
-    const double driveable_width = expected.driveable_r_max - expected.driveable_r_min;
+    const double segment_width = expected.segment_r_max - expected.segment_r_min;
     for (double s = 0; s < length_; s += length_ / 20) {
-      for (double r = expected.driveable_r_min; r <= expected.driveable_r_max; r += driveable_width / 20) {
+      for (double r = expected.segment_r_min; r <= expected.segment_r_max; r += segment_width / 20) {
         for (double h = expected.elevation_min; h < expected.elevation_max;
              h += (expected.elevation_max - expected.elevation_min) * 0.1) {
           const api::LanePosition lane_position(s, r, h);
@@ -235,7 +235,7 @@ class MaliputDragwayLaneTest : public ::testing::Test {
   void PopulateGeoPositionTestCases() {
     /*
       A figure of the one-lane dragway is shown below. The minimum and maximum
-      values of the dragway's driveable region are demarcated.
+      values of the dragway' segment surface are demarcated.
 
       X
       Y = max_y ^  Y = min_y
@@ -261,7 +261,7 @@ class MaliputDragwayLaneTest : public ::testing::Test {
     */
 
     // Defines the test case values for x and y. Points both far away and close
-    // to the driveable area are evaluated, with a focus on edge cases.
+    // to the segment area are evaluated, with a focus on edge cases.
     std::vector<double> x_values{min_x_ - 10.,   min_x_ - 1e-10, min_x_,         min_x_ + 1e-10, (max_x_ + min_x_) / 2.,
                                  max_x_ - 1e-10, max_x_,         max_x_ + 1e-10, max_x_ + 10.};
     std::vector<double> y_values{min_y_ - 10.,   min_y_ - 1e-10, min_y_,         min_y_ + 1e-10, (max_y_ + min_y_) / 2.,
@@ -307,7 +307,7 @@ class MaliputDragwayLaneTest : public ::testing::Test {
 
   // The following linear tolerance was empirically derived on a 64-bit Ubuntu
   // system. It is necessary due to inaccuracies in floating point calculations
-  // and different ways of computing the driveable r_min and r_max.
+  // and different ways of computing the segment r_min and r_max.
   const double kLinearTolerance = 1e-15;
 
   const double kAngularTolerance = std::numeric_limits<double>::epsilon();
@@ -324,8 +324,8 @@ class MaliputDragwayLaneTest : public ::testing::Test {
 
                x
                ^
-      |<-------|------->|    driveable r_max / r_min
-      | |<-----|----->| |    lane      r_max / r_min
+      |<-------|------->|    segment r_max / r_min
+      | |<-----|----->| |    lane    r_max / r_min
       -------------------    s = length_
       | |      ^      | |
       | |      :      | |
@@ -354,9 +354,9 @@ TEST_F(MaliputDragwayLaneTest, SingleLane) {
                               x
                               ^
                               |
-              |<-------|--------------------->|  lane 1 driveable r_max / r_min
-              |<---------------------|------->|  lane 0 driveable r_max / r_min
-              | |<-----|----->|<-----|----->| |  lane             r_max / r_min
+              |<-------|--------------------->|  lane 1 segment r_max / r_min
+              |<---------------------|------->|  lane 0 segment r_max / r_min
+              | |<-----|----->|<-----|----->| |  lane           r_max / r_min
               ----------------|----------------  s = length_
               | |      ^      |      ^      | |
               | |      :      |      :      | |
@@ -383,7 +383,7 @@ TEST_F(MaliputDragwayLaneTest, TwoLaneDragway) {
 
 // Tests dragway::RoadGeometry::ToRoadPosition() using a two-lane dragway where
 // the x,y projection of all geographic positions provided to it are in the
-// road's driveable region. This unit test also verifies that
+// road' segment region. This unit test also verifies that
 // dragway::RoadGeometry::IsGeoPositionOnDragway() does not incorrectly return
 // false.
 TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOnRoad) {
@@ -436,13 +436,13 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOnRoad) {
 
 // Tests dragway::RoadGeometry::ToRoadPosition() using a two-lane dragway where
 // the x,y projection of all geographic positions provided to it may be outside
-// of the road's driveable region. This unit test also verifies that
+// of the road' segment region. This unit test also verifies that
 // dragway::RoadGeometry::IsGeoPositionOnDragway() does not incorrectly return
 // false.
 TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
   MakeDragway(2 /* num lanes */);
 
-  // Computes the bounds of the road's driveable region.
+  // Computes the bounds of the road' segment region.
   const double x_max = length_;
   const double x_min = 0;
   const double y_max = lane_width_ + shoulder_width_;
@@ -450,7 +450,7 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
   const double z_min = 0;
   const double z_max = maximum_height_;
 
-  // Spot checks a region that is a superset of the road's driveable bounds with
+  // Spot checks a region that is a superset of the road' segment bounds with
   // a focus on edge cases.
   const double test_x_min = x_min - 10;
   const double test_x_max = x_max + 10;
@@ -460,7 +460,7 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
   const double test_z_max = z_max + 10;
 
   // Defines the test case values for x and y. Points both far away and close to
-  // the driveable area are evaluated.
+  // the segment area are evaluated.
   const std::vector<double> x_test_cases{test_x_min, x_min - 1e-10, x_max + 1e-10, test_x_max};
   const std::vector<double> y_test_cases{test_y_min, y_min - 1e-10, y_max + 1e-10, test_y_max};
   const std::vector<double> z_test_cases{test_z_min, z_min - 1e-10, z_max + 1e-10, test_z_max};
@@ -526,19 +526,19 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
 TEST_F(MaliputDragwayLaneTest, TestToRoadPositionNullptr) {
   MakeDragway(2 /* num lanes */);
 
-  // Case 1: The provided geo_pos is in the driveable region.
+  // Case 1: The provided geo_pos is in the segment surface.
   EXPECT_NO_THROW(road_geometry_->ToRoadPosition(api::GeoPosition(length_ / 2 /* x */, 0 /* y */, 0 /* z */),
                                                  nullptr /* hint */, nullptr /* nearest_position */,
                                                  nullptr /* distance */));
 
-  // Case 2: The provided geo_pos is beyond the driveable region.
+  // Case 2: The provided geo_pos is beyond the segment surface.
   EXPECT_NO_THROW(road_geometry_->ToRoadPosition(api::GeoPosition(length_ + 1e-10 /* x */, 0 /* y */, 0 /* z */),
                                                  nullptr /* hint */, nullptr /* nearest_position */,
                                                  nullptr /* distance */));
 }
 
 // Tests dragway::Lane::ToLanePosition() using geographic positions whose
-// projections onto the XY plane reside within the lane's driveable region.
+// projections onto the XY plane reside within the lane's region.
 TEST_F(MaliputDragwayLaneTest, TestToLanePosition) {
   MakeDragway(1 /* num lanes */);
   PopulateGeoPositionTestCases();
@@ -875,7 +875,7 @@ class MaliputDragwayFindRoadPositionTest : public ::testing::TestWithParam<FindR
 
   // The following linear tolerance was empirically derived on a 64-bit Ubuntu
   // system. It is necessary due to inaccuracies in floating point calculations
-  // and different ways of computing the driveable r_min and r_max.
+  // and different ways of computing the segment r_min and r_max.
   const double kLinearTolerance = 1e-15;
 
   const double kAngularTolerance = std::numeric_limits<double>::epsilon();

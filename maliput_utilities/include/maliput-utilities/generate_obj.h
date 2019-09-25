@@ -105,7 +105,7 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
 /// Wavefront MTL file named [@p dirpath]/[@p fileroot].mtl, containing
 /// descriptions of materials referenced by the OBJ file.
 ///
-/// The produced mesh covers the area within the driveable-bounds of the
+/// The produced mesh covers the area within the segment-bounds of the
 /// road surface described by the RoadGeometry.
 void GenerateObjFile(const api::RoadGeometry* road_geometry, const std::string& dirpath, const std::string& fileroot,
                      const ObjFeatures& features);

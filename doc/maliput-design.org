@@ -15,8 +15,8 @@
 #    Typing "C-c C-e l o" will even open it for you.
 
 #+TITLE: maliput: Modeling Road Networks for Simulation
-#+AUTHOR: Matt Marjanović and Chien-Liang Fok
-#+DATE: March 26, 2019
+#+AUTHOR: Matt Marjanović, Chien-Liang Fok and Agustin Alba Chicar
+#+DATE: September 25, 2019
 
 This document describes =maliput=, a model of road networks for use in
 agent and traffic simulations.  At the core of =maliput= is a
@@ -253,26 +253,26 @@ implied by these labels.[fn::Travel restrictions on a =Lane= are
 indicated by road rule annotations, described later in
 Section [[Rules of the Road: =RoadRulebook=]].]
 
-A =Lane= is bounded laterally by $r \in B_\text{driveable}(s)$, where
+A =Lane= is bounded laterally by /segment bounds/, $r \in B_\text{segment}(s)$, where
 \[
-B_\text{driveable}: s \mapsto [r_\text{min}, r_\text{max}] \text{ s.t. } r_\text{min}<=0 \text{ and } r_\text{max}>=0
+B_\text{segment}: s \mapsto [r_\text{min}, r_\text{max}] \text{ s.t. } r_\text{min}<=0 \text{ and } r_\text{max}>=0
 \]
 defines inclusive min/max bounds which depend only on $s$.  These are
-the /driveable bounds/ for the =Lane=, the valid domain of $r$, which
+the /segment bounds/ for the =Lane=, the valid domain of $r$, which
 is intended to
-represent the full lateral extent of the paved, driveable asphalt including
-all adjacent =Lanes= in the same =Segment=.
+represent the full lateral extent of the =Segment= including
+all adjacent =Lanes=.
 # TODO(maddog@tri.global) This begs for a picture.
-A =Lane= is also characterized by /nominal bounds/
+A =Lane= is also characterized by /nominal bounds/, $r \in B_\text{nominal}(s)$, where
 \[
-B_\text{nominal}: s \mapsto [r_\text{min}, r_\text{max}] \text{ s.t. } B_\text{nominal} \subseteq B_\text{driveable}
+B_\text{nominal}: s \mapsto [r_\text{min}, r_\text{max}] \text{ s.t. } B_\text{nominal} \subseteq B_\text{segment}
 \]
 which indicate what is considered to be "in" that specific travel lane
 (e.g., between the stripes).
 
-A =Lane= is bounded in height by $h \in H_\text{driveable}(s,r)$, where
+A =Lane= is bounded in height by $h \in H_\text{lane}(s,r)$, where
 \[
-H_\text{driveable}: (s,r) \mapsto [h_\text{min}, h_\text{max}] \text{ s.t. } h_\text{min}<=0 \text{ and } h_\text{max}>=0
+H_\text{lane}: (s,r) \mapsto [h_\text{min}, h_\text{max}] \text{ s.t. } h_\text{min}<=0 \text{ and } h_\text{max}>=0
 \]
 defines inclusive min/max bounds which depend on $s$ and $r$.  These define
 the valid domain of $h$, which represents the full extent of the volume
@@ -287,8 +287,8 @@ curve with constant non-zero $(r,h)$ (imagine $r$ and $h$ "grid
 lines") is basically a parallel curve to the centerline $C_L$.  Thus,
 the shape of $C_L$ and/or the road surface may
 produce limits to $(r,h)$ before such a curve develops a cusp.
-The current definitions of $B_\text{driveable}$ and
-$H_\text{driveable}$ conflate the bounds of the /driveable/ volume
+The current definitions of $B_\text{segment}$ and
+$H_\text{lane}$ conflate the bounds of the /segment/ volume
 (e.g., pavement and free space under bridges) with the bounds of the
 /modelled/ volume (e.g., the bounds on $r$ and $h$ which maintain
 $G^1$ continuity, avoiding cusps).  Hence, the road surface may continue
@@ -370,12 +370,12 @@ into =Segments=.  The basic idea is that a =Segment= corresponds to a
 longitudinal stretch of pavement, and each =Lane= in that =Segment=
 presents a different $(s,r,h)$ parameterization of that same pavement.
 
-We would like for the driveable-bounds of each =Lane= to map to the
+We would like for the segment-bounds of each =Lane= to map to the
 same extent of physical space in the World frame, but that isn't always
 possible due to the geometric constraints of parallel curves.  However,
-we do require that the union of the driveable-bounds of all =Lanes=
+we do require that the union of the segment-bounds of all =Lanes=
 in a =Segment= is simply-connected.  This means that:
- * a =Segment= doesn't have any "holes" in its driveable space (e.g.,
+ * a =Segment= doesn't have any "holes" in its segment space (e.g.,
    no impassable monument in the middle of the road);
  * it is always possible to drive from a position in one =Lane=-frame
    to a position in another =Lane=-frame, though it may require
@@ -414,12 +414,12 @@ such as on-ramps, exit ramps, traffic circles, and a road that splits
 to go around an impassable monument.
 
 =Segments= which map to intersecting volumes in the World frame (in
-terms of the union of the driveable-bounds of their =Lanes=) are
+terms of the union of the segment-bounds of their =Lanes=) are
 grouped together into a =Junction=.  The primary (sole?) purpose of a
 =Junction= is to indicate that objects in its component =Segments= may
 spatially interact with each other (e.g., collide!).  Conversely, if
 two =Segments= belong to two distinct =Junctions=, then objects within
-their respective driveable-bounds should /not/ be touching.  (Note
+their respective segment-bounds should /not/ be touching.  (Note
 that in considering intersection, we ignore the overlaps
 that may occur where =Segments= join end-to-end via their =Lanes=.)
 
@@ -458,10 +458,10 @@ that are better localized.
 *** =Lane=
     * nominal $r$ bounds,
       $B_\text{nominal}: (s) \mapsto [r_\text{min}, r_\text{max}]$
-    * driveable $r$ bounds,
-      $B_\text{driveable}: (s) \mapsto [r_\text{min}, r_\text{max}]$
-    * driveable $h$ bounds,
-      $H_\text{driveable}: (s,r) \mapsto [h_\text{min}, h_\text{max}]$
+    * segment $r$ bounds,
+      $B_\text{segment}: (s) \mapsto [r_\text{min}, r_\text{max}]$
+    * segment $h$ bounds,
+      $H_\text{lane}: (s,r) \mapsto [h_\text{min}, h_\text{max}]$
     * embedding $W_L: (s,r,h) \mapsto (x,y,z)$
     * inverse $W_L^{-1}: (x,y,z) \mapsto (s,r,h)$
     * =Lane=-frame orientation

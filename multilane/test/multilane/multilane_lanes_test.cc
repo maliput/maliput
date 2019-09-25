@@ -71,7 +71,7 @@ TEST_P(MultilaneLanesParamTest, FlatLineLane) {
 
   EXPECT_TRUE(
       api::test::IsRBoundsClose(l1->lane_bounds(0.), api::RBounds(-kHalfLaneWidth, kHalfLaneWidth), kVeryExact));
-  EXPECT_TRUE(api::test::IsRBoundsClose(l1->driveable_bounds(0.), api::RBounds(-kHalfWidth, kHalfWidth), kVeryExact));
+  EXPECT_TRUE(api::test::IsRBoundsClose(l1->segment_bounds(0.), api::RBounds(-kHalfWidth, kHalfWidth), kVeryExact));
   EXPECT_TRUE(api::test::IsHBoundsClose(l1->elevation_bounds(0., 0.), api::HBounds(0., kMaxHeight), kVeryExact));
 
   EXPECT_TRUE(api::test::IsGeoPositionClose(
@@ -338,7 +338,7 @@ TEST_P(MultilaneLanesParamTest, CorkScrewLane) {
 
   EXPECT_TRUE(
       api::test::IsRBoundsClose(l1->lane_bounds(0.), api::RBounds(-kHalfLaneWidth, kHalfLaneWidth), kVeryExact));
-  EXPECT_TRUE(api::test::IsRBoundsClose(l1->driveable_bounds(0.), api::RBounds(-kHalfWidth, kHalfWidth), kVeryExact));
+  EXPECT_TRUE(api::test::IsRBoundsClose(l1->segment_bounds(0.), api::RBounds(-kHalfWidth, kHalfWidth), kVeryExact));
   EXPECT_TRUE(api::test::IsHBoundsClose(l1->elevation_bounds(0., 0.), api::HBounds(0., kMaxHeight), kVeryExact));
 
   const api::IsoLaneVelocity lane_velocity(1., 10., 100.);
@@ -412,7 +412,7 @@ TEST_P(MultilaneLanesParamTest, FlatArcLane) {
 
   EXPECT_TRUE(
       api::test::IsRBoundsClose(l2->lane_bounds(0.), api::RBounds(-kHalfLaneWidth, kHalfLaneWidth), kVeryExact));
-  EXPECT_TRUE(api::test::IsRBoundsClose(l2->driveable_bounds(0.), api::RBounds(-kHalfWidth, kHalfWidth), kVeryExact));
+  EXPECT_TRUE(api::test::IsRBoundsClose(l2->segment_bounds(0.), api::RBounds(-kHalfWidth, kHalfWidth), kVeryExact));
   EXPECT_TRUE(api::test::IsHBoundsClose(l2->elevation_bounds(0., 0.), api::HBounds(0., kMaxHeight), kVeryExact));
   // Recall that the arc has center (100, -75).
   const drake::Vector3<double> geo_center(100., -75., 0.);
@@ -851,13 +851,13 @@ TEST_F(MultilaneMultipleLanesTest, MultipleLineLanes) {
   }
 
   // Checks api::LanePosition conversion to api::GeoPosition in the Segment's
-  // RoadCurve, which is outside the driveable bounds, to verify that it
+  // RoadCurve, which is outside the segment bounds, to verify that it
   // saturates.
   for (const Lane* lane : lanes) {
     for (const double p : p_vector) {
       const api::GeoPosition geo_point =
           api::GeoPosition::FromXyz(drake::Vector3<double>(100., -75., 0.) + (p * lane_length) * s_vector);
-      const double expected_r = lane->driveable_bounds(0.).min();
+      const double expected_r = lane->segment_bounds(0.).min();
       api::GeoPosition nearest_position;
       double distance{};
       EXPECT_TRUE(api::test::IsLanePositionClose(lane->ToLanePosition(geo_point, &nearest_position, &distance),
@@ -978,7 +978,7 @@ TEST_F(MultilaneMultipleLanesTest, MultipleArcLanes) {
   }
 
   // Checks api::LanePosition conversion to api::GeoPosition in the Segment's
-  // RoadCurve, which is outside the driveable bounds, to verify that it
+  // RoadCurve, which is outside the segment bounds, to verify that it
   // saturates.
   for (size_t i = 0; i < lanes.size(); i++) {
     const Lane* lane = lanes[i];
@@ -987,7 +987,7 @@ TEST_F(MultilaneMultipleLanesTest, MultipleArcLanes) {
       const double effective_angle = p * kDTheta + kTheta0;
       const api::GeoPosition geo_point = api::GeoPosition::FromXyz(
           kGeoCenter + kRadius * drake::Vector3<double>(std::cos(effective_angle), std::sin(effective_angle), 0.));
-      const double expected_r = lane->driveable_bounds(0.).min();
+      const double expected_r = lane->segment_bounds(0.).min();
       api::GeoPosition nearest_position;
       double distance{};
       EXPECT_TRUE(api::test::IsLanePositionClose(lane->ToLanePosition(geo_point, &nearest_position, &distance),

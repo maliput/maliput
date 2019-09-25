@@ -55,11 +55,11 @@ GTEST_TEST(MultilaneSegmentsTest, MultipleLanes) {
   EXPECT_EQ(rg.CheckInvariants(), std::vector<std::string>());
 
   EXPECT_TRUE(api::test::IsRBoundsClose(l0->lane_bounds(0.), {-8., kHalfLaneWidth}, kZeroTolerance));
-  EXPECT_TRUE(api::test::IsRBoundsClose(l0->driveable_bounds(0.), {-8., 32.}, kZeroTolerance));
+  EXPECT_TRUE(api::test::IsRBoundsClose(l0->segment_bounds(0.), {-8., 32.}, kZeroTolerance));
   EXPECT_TRUE(api::test::IsRBoundsClose(l1->lane_bounds(0.), {-kHalfLaneWidth, kHalfLaneWidth}, kZeroTolerance));
-  EXPECT_TRUE(api::test::IsRBoundsClose(l1->driveable_bounds(0.), {-23., 17.}, kZeroTolerance));
+  EXPECT_TRUE(api::test::IsRBoundsClose(l1->segment_bounds(0.), {-23., 17.}, kZeroTolerance));
   EXPECT_TRUE(api::test::IsRBoundsClose(l2->lane_bounds(0.), {-kHalfLaneWidth, 2.}, kZeroTolerance));
-  EXPECT_TRUE(api::test::IsRBoundsClose(l2->driveable_bounds(0.), {-38., 2.}, kZeroTolerance));
+  EXPECT_TRUE(api::test::IsRBoundsClose(l2->segment_bounds(0.), {-38., 2.}, kZeroTolerance));
 }
 
 }  // namespace

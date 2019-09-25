@@ -92,7 +92,7 @@ class MockLane final : public Lane {
   const Lane* do_to_right() const override { return nullptr; };
   double do_length() const override { return 100; };
   RBounds do_lane_bounds(double) const override { return RBounds(-1, 1); };
-  RBounds do_driveable_bounds(double) const override { return RBounds(-1, 1); };
+  RBounds do_segment_bounds(double) const override { return RBounds(-1, 1); };
   HBounds do_elevation_bounds(double, double) const override { return HBounds(0, 10); };
   GeoPosition DoToGeoPosition(const LanePosition&) const override { return GeoPosition(0, 0, 0); }
   LanePosition DoToLanePosition(const GeoPosition&, GeoPosition*, double*) const override {

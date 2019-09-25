@@ -24,7 +24,7 @@ using multilane::ArcOffset;
 using Which = api::LaneEnd::Which;
 
 const double kVeryExact{1e-11};
-const double kWidth{2.};   // Lane and drivable width.
+const double kWidth{2.};   // Half lane width, used to feed the BuilderFactory.
 const double kHeight{5.};  // Elevation bound.
 
 const api::Lane* GetLaneByJunctionId(const api::RoadGeometry& rg, const std::string& junction_id, int segment_index,

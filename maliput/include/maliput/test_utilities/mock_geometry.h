@@ -108,7 +108,7 @@ class MockLane : public geometry_base::Lane {
  private:
   double do_length() const override;
   api::RBounds do_lane_bounds(double) const override;
-  api::RBounds do_driveable_bounds(double) const override;
+  api::RBounds do_segment_bounds(double) const override;
   api::HBounds do_elevation_bounds(double, double) const override;
   api::GeoPosition DoToGeoPosition(const api::LanePosition& lane_pos) const override;
   api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const override;

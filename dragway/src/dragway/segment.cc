@@ -26,10 +26,10 @@ Segment::Segment(Junction* junction, int num_lanes, double length, double lane_w
 
   for (int i = 0; i < num_lanes; ++i) {
     const double y_offset = y_min + shoulder_width + i * lane_width + lane_width / 2;
-    const api::RBounds driveable_bounds({y_min - y_offset, y_max - y_offset});
+    const api::RBounds segment_bounds({y_min - y_offset, y_max - y_offset});
 
     auto lane = std::make_unique<Lane>(this, api::LaneId("Dragway_Lane_" + std::to_string(i)), i, length, y_offset,
-                                       lane_bounds, driveable_bounds, elevation_bounds);
+                                       lane_bounds, segment_bounds, elevation_bounds);
     lanes_.push_back(move(lane));
   }
 

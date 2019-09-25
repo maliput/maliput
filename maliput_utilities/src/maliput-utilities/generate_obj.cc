@@ -78,7 +78,7 @@ std::string FormatMaterial(const Material& mat) {
 // Starting at the minimum of `grid_unit` and the distance in s-coordinates i.e.
 // arc-length, to the `lane`'s end along the center line, increase `step_s`
 // until the distance between its ends in world's coordinates along the center,
-// left most and right most lines of the `lane`'s driveable
+// left most and right most lines of the `lane`'s segment
 // surface is bigger than `grid_unit` or the end of the `lane` is reached.
 double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_unit) {
   DRAKE_DEMAND(lane != nullptr);
@@ -135,15 +135,15 @@ double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_
 // covering the left and right side of the road, considering the grid_unit
 // as a tolerance between patches. Bigger tolerance, worst quality but less
 // vertices.
-void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_driveable_bounds,
+void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_segment_bounds,
                                const std::function<double(double, double)>& elevation) {
   const double s_max = lane->length();
   for (double s0 = 0, s1; s0 < s_max; s0 = s1) {
     const double step_increment = ComputeSampleStep(lane, s0, grid_unit);
     s1 = s0 + step_increment;
 
-    const api::RBounds rb0 = use_driveable_bounds ? lane->driveable_bounds(s0) : lane->lane_bounds(s0);
-    const api::RBounds rb1 = use_driveable_bounds ? lane->driveable_bounds(s1) : lane->lane_bounds(s1);
+    const api::RBounds rb0 = use_segment_bounds ? lane->segment_bounds(s0) : lane->lane_bounds(s0);
+    const api::RBounds rb1 = use_segment_bounds ? lane->segment_bounds(s1) : lane->lane_bounds(s1);
     //
     // (s1,r10) o <-- o (s1,r11)
     //          | \   ^
@@ -163,7 +163,7 @@ void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid
   }
 }
 
-void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_driveable_bounds,
+void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_segment_bounds,
                              const std::function<double(double, double)>& elevation) {
   const double linear_tolerance = lane->segment()->junction()->road_geometry()->linear_tolerance();
   const double s_max = lane->length();
@@ -173,8 +173,8 @@ void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_u
       s1 = s_max;
     }
 
-    const api::RBounds rb0 = use_driveable_bounds ? lane->driveable_bounds(s0) : lane->lane_bounds(s0);
-    const api::RBounds rb1 = use_driveable_bounds ? lane->driveable_bounds(s1) : lane->lane_bounds(s1);
+    const api::RBounds rb0 = use_segment_bounds ? lane->segment_bounds(s0) : lane->lane_bounds(s0);
+    const api::RBounds rb1 = use_segment_bounds ? lane->segment_bounds(s1) : lane->lane_bounds(s1);
 
     // Left side of lane (r >= 0).
     {
@@ -231,20 +231,20 @@ void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_u
 // (4-vertex faces) which are added to @p mesh.  The quads are quadrilaterals in
 // the (s,r) space of the lane.
 //
-// @param mesh  the GeoMesh which will receive the quads
-// @param lane  the api::Lane to cover with quads
-// @param grid_unit  size of each quad (length of edge in s and r dimensions)
-// @param use_driveable_bounds  if true, use the lane's driveable_bounds()
+// @param mesh  the GeoMesh which will receive the quads.
+// @param lane  the api::Lane to cover with quads.
+// @param grid_unit  size of each quad (length of edge in s and r dimensions).
+// @param use_segment_bounds  if true, use the lane' segment_bounds()
 //        to determine the lateral extent of the coverage; otherwise, use
-//        lane_bounds()
+//        lane_bounds().
 // @param elevation a function taking `(s, r)` as parameters and returning
-//        the corresponding elevation `h`, to yield a quad vertex `(s, r, h)`
-void CoverLaneWithQuads(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_driveable_bounds,
+//        the corresponding elevation `h`, to yield a quad vertex `(s, r, h)`.
+void CoverLaneWithQuads(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_segment_bounds,
                         const std::function<double(double, double)>& elevation, bool optimize_generation) {
   if (optimize_generation) {
-    GenerateOptimizedRoadMesh(mesh, lane, grid_unit, use_driveable_bounds, elevation);
+    GenerateOptimizedRoadMesh(mesh, lane, grid_unit, use_segment_bounds, elevation);
   } else {
-    GeneratePreciseRoadMesh(mesh, lane, grid_unit, use_driveable_bounds, elevation);
+    GeneratePreciseRoadMesh(mesh, lane, grid_unit, use_segment_bounds, elevation);
   }
 }
 
@@ -582,19 +582,19 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
           ? linear_tolerance
           : PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
   {
-    // Lane 0 should be as good as any other for driveable-bounds.
-    GeoMesh driveable_mesh;
-    CoverLaneWithQuads(&driveable_mesh, segment->lane(0), base_grid_unit, true /*use_driveable_bounds*/,
+    // Lane 0 should be as good as any other for segment-bounds.
+    GeoMesh segment_mesh;
+    CoverLaneWithQuads(&segment_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [](double, double) { return 0.; }, features.off_grid_mesh_generation);
-    asphalt_mesh->AddFacesFrom(SimplifyMesh(driveable_mesh, features));
+    asphalt_mesh->AddFacesFrom(SimplifyMesh(segment_mesh, features));
   }
 
   if (features.draw_elevation_bounds) {
     GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
-    CoverLaneWithQuads(&upper_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_driveable_bounds*/,
+    CoverLaneWithQuads(&upper_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).max(); },
                        features.off_grid_mesh_generation);
-    CoverLaneWithQuads(&lower_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_driveable_bounds*/,
+    CoverLaneWithQuads(&lower_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).min(); },
                        features.off_grid_mesh_generation);
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
@@ -605,7 +605,7 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
     const double grid_unit = PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
-      CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /*use_driveable_bounds*/,
+      CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /*use_segment_bounds*/,
                          [&features](double, double) { return features.lane_haze_elevation; },
                          features.off_grid_mesh_generation);
       lane_mesh->AddFacesFrom(SimplifyMesh(haze_mesh, features));

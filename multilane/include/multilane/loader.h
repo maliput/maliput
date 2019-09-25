@@ -186,7 +186,7 @@ std::unique_ptr<const api::RoadGeometry> LoadFile(const BuilderFactoryBase& buil
 /// - _LS_ and _RS_ are default left and right shoulders are extra spaces
 ///   added to the right of the last lane and left to the first lane
 ///   respectively.
-///   Their purpose is to increase driveable bounds. Both must be non negative.
+///   Their purpose is to increase segment bounds. Both must be non negative.
 /// - _EB\_MIN_ and _EB\_MAX_ define minimum and maximum height values of the
 ///   road’s volume. The minimum value must be non positive, thus the maximum
 ///   must be non negative.
