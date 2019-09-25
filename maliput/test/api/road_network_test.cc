@@ -10,6 +10,7 @@
 
 namespace maliput {
 namespace api {
+namespace test {
 namespace {
 
 using rules::DirectionUsageRule;
@@ -166,6 +167,41 @@ TEST_F(RoadNetworkTest, TestMemberMethodAccess) {
   dut.range_value_rule_state_provider()->GetState(rules::Rule::Id("Mock"));
 }
 
+TEST_F(RoadNetworkTest, ToRoadPosition) {
+  const RoadNetwork dut(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
+                        std::move(intersection_book_), std::move(phase_ring_book_),
+                        std::move(right_of_way_rule_state_provider_), std::move(phase_provider_),
+                        std::move(rule_registry_), std::move(discrete_value_rule_state_provider_),
+                        std::move(range_value_rule_state_provider_));
+
+  const auto filter_always_true = [](const RoadPositionResult&) { return true; };
+  const auto filter_always_false = [](const RoadPositionResult&) { return false; };
+  const RoadPosition* kHint = reinterpret_cast<const RoadPosition*>(0xDeadBeef);
+
+  // MockRoadGeometry returns a default constructed RoadPosition, the following evaluates that the method actually uses
+  // the filter to return nullopt or not.
+  EXPECT_TRUE(dut.ToRoadPosition(GeoPosition(0., 0., 0.), kHint, filter_always_true).has_value());
+  EXPECT_FALSE(dut.ToRoadPosition(GeoPosition(0., 0., 0.), kHint, filter_always_false).has_value());
+}
+
+TEST_F(RoadNetworkTest, FindRoadPositions) {
+  const RoadNetwork dut(std::move(road_geometry_), std::move(road_rulebook_), std::move(traffic_light_book_),
+                        std::move(intersection_book_), std::move(phase_ring_book_),
+                        std::move(right_of_way_rule_state_provider_), std::move(phase_provider_),
+                        std::move(rule_registry_), std::move(discrete_value_rule_state_provider_),
+                        std::move(range_value_rule_state_provider_));
+
+  const auto filter_always_true = [](const RoadPositionResult&) { return true; };
+  const auto filter_always_false = [](const RoadPositionResult&) { return false; };
+  const double kRadius{1.};
+
+  // MockRoadGeometry returns a vector with only one default constructed RoadPositionResult. The following evaluates
+  // that the method actually uses to remove from the vector the values because of the filter.
+  EXPECT_FALSE(dut.FindRoadPositions(GeoPosition(0., 0., 0.), kRadius, filter_always_true).empty());
+  EXPECT_TRUE(dut.FindRoadPositions(GeoPosition(0., 0., 0.), kRadius, filter_always_false).empty());
+}
+
 }  // namespace
+}  // namespace test
 }  // namespace api
 }  // namespace maliput
