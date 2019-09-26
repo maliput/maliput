@@ -47,8 +47,8 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
       : geometry_base::RoadGeometry(id, linear_tolerance, angular_tolerance, scale_length) {}
 
  private:
-  api::RoadPosition DoToRoadPosition(const api::GeoPosition& geo_position, const api::RoadPosition* hint,
-                                     api::GeoPosition* nearest_position, double* distance) const override;
+  api::RoadPositionResult DoToRoadPosition(const api::GeoPosition& geo_position,
+                                           const drake::optional<api::RoadPosition>& hint) const override;
 
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::GeoPosition& geo_position,
                                                            double radius) const override;

@@ -120,8 +120,8 @@ int RoadGeometry::GetLaneIndex(const api::GeoPosition& geo_pos) const {
   return result;
 }
 
-api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos, const api::RoadPosition* hint,
-                                                 api::GeoPosition* nearest_position, double* distance) const {
+api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos,
+                                                       const drake::optional<api::RoadPosition>& hint) const {
   drake::unused(hint);
 
   // Computes the dragway's (x,y) segment surface coordinates.
@@ -174,21 +174,14 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos
   closest_position.set_y(drake::math::saturate(geo_pos.y(), min_y, max_y));
   closest_position.set_z(drake::math::saturate(geo_pos.z(), min_z, max_z));
 
-  if (distance != nullptr) {
-    *distance = (geo_pos.xyz() - closest_position.xyz()).norm();
-  }
-
-  if (nearest_position != nullptr) {
-    *nearest_position = closest_position;
-  }
-
   const int closest_lane_index = GetLaneIndex(closest_position);
   const Lane* closest_lane = dynamic_cast<const Lane*>(junction_.segment(0)->lane(closest_lane_index));
   MALIPUT_DEMAND(closest_lane != nullptr);
   const api::LanePosition closest_lane_position(closest_position.x() /* s */,
                                                 closest_position.y() - closest_lane->y_offset() /* r */,
                                                 closest_position.z() /* h */);
-  return api::RoadPosition(closest_lane, closest_lane_position);
+  return api::RoadPositionResult{api::RoadPosition(closest_lane, closest_lane_position), closest_position,
+                                 (geo_pos.xyz() - closest_position.xyz()).norm()};
 }
 
 std::vector<api::RoadPositionResult> RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,

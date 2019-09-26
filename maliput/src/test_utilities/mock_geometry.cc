@@ -7,8 +7,8 @@ namespace maliput {
 namespace geometry_base {
 namespace test {
 
-api::RoadPosition MockRoadGeometry::DoToRoadPosition(const api::GeoPosition&, const api::RoadPosition*,
-                                                     api::GeoPosition*, double*) const {
+api::RoadPositionResult MockRoadGeometry::DoToRoadPosition(const api::GeoPosition&,
+                                                           const drake::optional<api::RoadPosition>&) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }

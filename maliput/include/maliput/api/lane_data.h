@@ -330,14 +330,15 @@ struct RoadPosition {
   LanePosition pos;
 };
 
-/// Included in the return result of RoadGeometry::FindRoadPositions().
+/// Included in the return result of RoadGeometry::FindRoadPositions()
+/// and RoadGeometry::ToRoadPosition().
 struct RoadPositionResult {
   /// The candidate RoadPosition.
   RoadPosition road_position;
   /// The position that exactly corresponds to `road_position`.
   GeoPosition nearest_position;
   /// The distance between `nearest_position` and the `geo_position` supplied
-  /// to RoadGeometry::FindRoadPositions().
+  /// to RoadGeometry::FindRoadPositions() or RoadGeometry::ToRoadPosition().
   double distance{};
 };
 

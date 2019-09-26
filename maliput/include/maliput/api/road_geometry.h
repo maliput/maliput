@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
+#include "drake/common/drake_optional.h"
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
@@ -69,23 +70,22 @@ class RoadGeometry {
 
   /// Determines the RoadPosition corresponding to GeoPosition @p geo_position.
   ///
-  /// If @p hint is non-null, its value is used to help determine the result.
+  /// If @p hint is provided, its value is used to help determine the result.
   ///
-  /// The return value is the RoadPosition of the point in the RoadGeometry's
-  /// manifold which is, in the world frame, closest to @p geo_position.  If
-  /// @p nearest_position is non-null, then it will be populated with the
-  /// GeoPosition of that nearest point.  If @p distance is non-null, then it
-  /// will be populated with the Cartesian distance from @p geo_position to
-  /// that nearest point.
+  /// Returns a RoadPositionResult. Its RoadPosition is the point in the
+  /// RoadGeometry's manifold which is, in the world frame, closest to
+  /// @p geo_position. Its GeoPosition is world frame conversion of the
+  /// RoadPosition and its distance is the Cartesian distance from
+  /// @p geo_position to the nearest point.
   ///
   /// This method guarantees that its result satisfies the condition that
   /// `result.lane->ToGeoPosition(result.pos)` is within `linear_tolerance()`
-  /// of `*nearest_position`.
+  /// of the returned GeoPosition.
   ///
   /// The map from RoadGeometry to the world frame is not onto (as a bounded
   /// RoadGeometry cannot completely cover the unbounded Cartesian universe).
   /// If @p geo_position does represent a point contained within the volume
-  /// of the RoadGeometry, then result @p distance is guaranteed to be less
+  /// of the RoadGeometry, then result distance is guaranteed to be less
   /// than or equal to `linear_tolerance()`.
   ///
   /// The map from RoadGeometry to world frame is not necessarily one-to-one.
@@ -108,9 +108,9 @@ class RoadGeometry {
   //                          of an entity some small dT in the past, then one
   //                          might expect an updated RoadPosition which is
   //                          nearby (e.g., on the same Lane).
-  RoadPosition ToRoadPosition(const GeoPosition& geo_position, const RoadPosition* hint, GeoPosition* nearest_position,
-                              double* distance) const {
-    return DoToRoadPosition(geo_position, hint, nearest_position, distance);
+  RoadPositionResult ToRoadPosition(const GeoPosition& geo_position,
+                                    const drake::optional<RoadPosition>& hint = drake::nullopt) const {
+    return DoToRoadPosition(geo_position, hint);
   }
 
   /// Obtains all RoadPositions within @p radius of @p geo_position. Only Lanes
@@ -196,8 +196,8 @@ class RoadGeometry {
 
   virtual const IdIndex& DoById() const = 0;
 
-  virtual RoadPosition DoToRoadPosition(const GeoPosition& geo_pos, const RoadPosition* hint,
-                                        GeoPosition* nearest_position, double* distance) const = 0;
+  virtual RoadPositionResult DoToRoadPosition(const GeoPosition& geo_position,
+                                              const drake::optional<RoadPosition>& hint) const = 0;
 
   virtual std::vector<RoadPositionResult> DoFindRoadPositions(const GeoPosition& geo_position, double radius) const = 0;
 
