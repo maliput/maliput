@@ -203,11 +203,11 @@ class MockRoadGeometry : public RoadGeometry {
     return i == 0 ? start_bp_.get() : end_bp_.get();
   }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*, GeoPosition*, double*) const override {
-    return RoadPosition();
+  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const drake::optional<RoadPosition>&) const override {
+    return RoadPositionResult();
   }
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
-    return {{RoadPosition(), GeoPosition(), 0.}};
+    return {{RoadPositionResult()}};
   }
   double do_linear_tolerance() const override { return 0; }
   double do_angular_tolerance() const override { return 0; }
@@ -250,11 +250,11 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   int do_num_branch_points() const override { return 1; }
   const BranchPoint* do_branch_point(int) const override { return nullptr; }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  RoadPosition DoToRoadPosition(const GeoPosition&, const RoadPosition*, GeoPosition*, double*) const override {
-    return RoadPosition();
+  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const drake::optional<RoadPosition>&) const override {
+    return api::RoadPositionResult();
   }
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
-    return {{RoadPosition(), GeoPosition(), 0.}};
+    return {api::RoadPositionResult()};
   }
   double do_linear_tolerance() const override { return 0; }
   double do_angular_tolerance() const override { return 0; }

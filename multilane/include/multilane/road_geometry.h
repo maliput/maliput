@@ -51,16 +51,18 @@ class RoadGeometry : public api::RoadGeometry {
 
   const IdIndex& DoById() const override { return id_index_; }
 
-  // Returns a RoadPosition for a lane containing the provided `geo_position`.
+  // Returns a RoadPositionResult for a lane containing the provided
+  // `geo_position`.
   // Either if there is or not a containing lane, the position is returned for
   // the lane whose centerline curve is closest to `geo_position`. In other
   // words, for the lane whose LanePosition makes the r coordinate be the
-  // smallest. If `hint` is non-null, then the search is restricted to the
-  // `hint->lane` and lanes adjacent to `hint->lane`.
+  // smallest.
+  // When `hint` is provided, the search is restricted to the `hint->lane`
+  // and lanes adjacent to `hint->lane`.
   // TODO(agalbachicar) Take into account `h` coordinate to return by minimum
   //                    `h` and then minimum `r`.
-  api::RoadPosition DoToRoadPosition(const api::GeoPosition& geo_position, const api::RoadPosition* hint,
-                                     api::GeoPosition* nearest_position, double* distance) const override;
+  api::RoadPositionResult DoToRoadPosition(const api::GeoPosition& geo_position,
+                                           const drake::optional<api::RoadPosition>& hint) const override;
 
   // TODO(agalbachicar) Needs implementation.
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::GeoPosition& geo_position,

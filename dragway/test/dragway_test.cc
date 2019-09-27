@@ -394,16 +394,14 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOnRoad) {
   for (double x = 0; x <= length_; x += length_ / 2) {
     for (double y = -lane_width_ - shoulder_width_; y <= 0; y += (lane_width_ + shoulder_width_) / 2) {
       for (double z = 0; z <= maximum_height_; z += maximum_height_ / 2.) {
-        api::GeoPosition nearest_position;
-        double distance;
-        const api::RoadPosition road_position =
-            road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position, &distance);
+        const api::RoadPositionResult result = road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z));
         const api::Lane* expected_lane = road_geometry_->junction(0)->segment(0)->lane(0);
-        EXPECT_TRUE(api::test::IsGeoPositionClose(nearest_position, api::GeoPosition(x, y, z), kLinearTolerance));
-        EXPECT_DOUBLE_EQ(distance, 0);
-        EXPECT_EQ(road_position.lane, expected_lane);
-        EXPECT_TRUE(api::test::IsLanePositionClose(road_position.pos, api::LanePosition(x, y + lane_width_ / 2, z),
-                                                   kLinearTolerance));
+        EXPECT_TRUE(
+            api::test::IsGeoPositionClose(result.nearest_position, api::GeoPosition(x, y, z), kLinearTolerance));
+        EXPECT_DOUBLE_EQ(result.distance, 0);
+        EXPECT_EQ(result.road_position.lane, expected_lane);
+        EXPECT_TRUE(api::test::IsLanePositionClose(result.road_position.pos,
+                                                   api::LanePosition(x, y + lane_width_ / 2, z), kLinearTolerance));
       }
     }
   }
@@ -413,21 +411,19 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOnRoad) {
   for (double x = 0; x <= length_; x += length_ / 2) {
     for (double y = 0; y <= lane_width_ + shoulder_width_; y += (lane_width_ + shoulder_width_) / 2) {
       for (double z = 0; z <= maximum_height_; z += maximum_height_ / 2.) {
-        api::GeoPosition nearest_position;
-        double distance;
-        const api::RoadPosition road_position =
-            road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position, &distance);
+        const api::RoadPositionResult result = road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z));
         const int lane_index = (y == 0 ? 0 : 1);
         const api::Lane* expected_lane = road_geometry_->junction(0)->segment(0)->lane(lane_index);
-        EXPECT_TRUE(api::test::IsGeoPositionClose(nearest_position, api::GeoPosition(x, y, z), kLinearTolerance));
-        EXPECT_DOUBLE_EQ(distance, 0);
-        EXPECT_EQ(road_position.lane, expected_lane);
+        EXPECT_TRUE(
+            api::test::IsGeoPositionClose(result.nearest_position, api::GeoPosition(x, y, z), kLinearTolerance));
+        EXPECT_DOUBLE_EQ(result.distance, 0);
+        EXPECT_EQ(result.road_position.lane, expected_lane);
         if (y == 0) {
-          EXPECT_TRUE(api::test::IsLanePositionClose(road_position.pos, api::LanePosition(x, y + lane_width_ / 2, z),
-                                                     kLinearTolerance));
+          EXPECT_TRUE(api::test::IsLanePositionClose(result.road_position.pos,
+                                                     api::LanePosition(x, y + lane_width_ / 2, z), kLinearTolerance));
         } else {
-          EXPECT_TRUE(api::test::IsLanePositionClose(road_position.pos, api::LanePosition(x, y - lane_width_ / 2, z),
-                                                     kLinearTolerance));
+          EXPECT_TRUE(api::test::IsLanePositionClose(result.road_position.pos,
+                                                     api::LanePosition(x, y - lane_width_ / 2, z), kLinearTolerance));
         }
       }
     }
@@ -470,16 +466,13 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
   for (const auto x : x_test_cases) {
     for (const auto y : y_test_cases) {
       for (const auto z : z_test_cases) {
-        api::GeoPosition nearest_position;
-        double distance;
-        const api::RoadPosition road_position =
-            road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z), nullptr /* hint */, &nearest_position, &distance);
-        EXPECT_LE(nearest_position.x(), x_max);
-        EXPECT_GE(nearest_position.x(), x_min);
-        EXPECT_LE(nearest_position.y(), y_max);
-        EXPECT_GE(nearest_position.y(), y_min);
-        EXPECT_LE(nearest_position.z(), z_max);
-        EXPECT_GE(nearest_position.z(), z_min);
+        const api::RoadPositionResult result = road_geometry_->ToRoadPosition(api::GeoPosition(x, y, z));
+        EXPECT_LE(result.nearest_position.x(), x_max);
+        EXPECT_GE(result.nearest_position.x(), x_min);
+        EXPECT_LE(result.nearest_position.y(), y_max);
+        EXPECT_GE(result.nearest_position.y(), y_min);
+        EXPECT_LE(result.nearest_position.z(), z_max);
+        EXPECT_GE(result.nearest_position.z(), z_min);
 
         api::GeoPosition expected_nearest_position;
         expected_nearest_position.set_x(x);
@@ -504,37 +497,22 @@ TEST_F(MaliputDragwayLaneTest, TestToRoadPositionOffRoad) {
           expected_nearest_position.set_z(z_max);
         }
 
-        EXPECT_TRUE(api::test::IsGeoPositionClose(nearest_position, expected_nearest_position, kLinearTolerance));
+        EXPECT_TRUE(
+            api::test::IsGeoPositionClose(result.nearest_position, expected_nearest_position, kLinearTolerance));
         // TODO(maddog@tri.global)  Should test for explicit correct distance.
-        EXPECT_LT(0, distance);
+        EXPECT_LT(0, result.distance);
         const int expected_lane_index = (y > 0 ? 1 : 0);
         const Lane* expected_lane =
             dynamic_cast<const Lane*>(road_geometry_->junction(0)->segment(0)->lane(expected_lane_index));
-        EXPECT_EQ(road_position.lane, expected_lane);
+        EXPECT_EQ(result.road_position.lane, expected_lane);
         EXPECT_TRUE(api::test::IsLanePositionClose(
-            road_position.pos,
+            result.road_position.pos,
             api::LanePosition(expected_nearest_position.x(), expected_nearest_position.y() - expected_lane->y_offset(),
                               expected_nearest_position.z()),
             kLinearTolerance));
       }
     }
   }
-}
-
-// Tests that dragway::RoadGeometry::ToRoadPosition() can be called with
-// parameters `nearest_position` and `distance` set to `nullptr`.
-TEST_F(MaliputDragwayLaneTest, TestToRoadPositionNullptr) {
-  MakeDragway(2 /* num lanes */);
-
-  // Case 1: The provided geo_pos is in the segment surface.
-  EXPECT_NO_THROW(road_geometry_->ToRoadPosition(api::GeoPosition(length_ / 2 /* x */, 0 /* y */, 0 /* z */),
-                                                 nullptr /* hint */, nullptr /* nearest_position */,
-                                                 nullptr /* distance */));
-
-  // Case 2: The provided geo_pos is beyond the segment surface.
-  EXPECT_NO_THROW(road_geometry_->ToRoadPosition(api::GeoPosition(length_ + 1e-10 /* x */, 0 /* y */, 0 /* z */),
-                                                 nullptr /* hint */, nullptr /* nearest_position */,
-                                                 nullptr /* distance */));
 }
 
 // Tests dragway::Lane::ToLanePosition() using geographic positions whose

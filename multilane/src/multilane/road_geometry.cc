@@ -13,83 +13,69 @@ namespace multilane {
 
 namespace {
 
-// Updates `road_position`, `distance` and `nearest_position` (when it's
-// not nullptr) after computing ToLanePosition on the `lane` with `geo_position`
-// when:
+// Evaluates if the result of `lane->ToLanePosition()` using `geo_position`
+// provides a closer api::RoadPositionResult than `road_position_result`.
 //
-// - The new computed distance is smaller than `*distance` by
-// `linear_tolerance`.
-// - The new computed distance is the same as previous `*distance` (difference
-// falls within `linear_tolerance`) and either the new LanePosition and previous
-// `road_position->pos` fall within lane's lane bounds or none do but the new
-// computed LanePosition minimizes the `r` coordinate.
-// - The new computed distance is the same as previous `*distance` (difference
-// falls within `linear_tolerance`) and the new LanePosition falls within lane's
-// lane bounds but `road_position->pos` does not.
+// _Closer_ means:
+// - When the distance result of `lane->ToLanePosition()` is smaller than
+//   `road_position_result.distance` by more than `linear_tolerance`.
+// - When distances are equal, if both positions fall within their
+//   respective lane's lane bounds or none do, the new r-coordinate
+//   is smaller than `road_position_result.road_position.pos.r()`.
+// - When the new position falls within `lane`'s lane bounds and
+//   `road_position_result.road_position.pos` doesn't.
+//
+// When any of the previous conditions is met, an api::RoadPositionResult
+// is returned using `lane`, and the results of calling `ToLanePosition()`
+// on it. Otherwise, it returns the original `road_position_result`.
 //
 // The following preconditions should be met:
 //
 // `lane` must not be nullptr.
-// `road_position` must not be nullptr.
-// `distance` must not be nullptr.
-void GetPositionIfSmallerDistance(const api::GeoPosition& geo_position, const double linear_tolerance,
-                                  const api::Lane* const lane, api::RoadPosition* const road_position,
-                                  double* const distance, api::GeoPosition* const nearest_position) {
+const api::RoadPositionResult EvaluateRoadPositionResult(const api::GeoPosition& geo_position,
+                                                         const double linear_tolerance, const api::Lane* const lane,
+                                                         const api::RoadPositionResult& road_position_result) {
   MALIPUT_DEMAND(lane != nullptr);
-  MALIPUT_DEMAND(road_position != nullptr);
-  MALIPUT_DEMAND(distance != nullptr);
 
-  double new_distance{};
-  api::GeoPosition new_nearest_position{};
-  const api::LanePosition lane_position = lane->ToLanePosition(geo_position, &new_nearest_position, &new_distance);
+  api::RoadPositionResult new_road_position_result;
+  new_road_position_result.road_position =
+      api::RoadPosition{lane, lane->ToLanePosition(geo_position, &new_road_position_result.nearest_position,
+                                                   &new_road_position_result.distance)};
 
-  // Replaces return values.
-  auto replace_values = [&]() {
-    *distance = new_distance;
-    *road_position = api::RoadPosition{lane, lane_position};
-    if (nearest_position != nullptr) {
-      *nearest_position = new_nearest_position;
-    }
-  };
+  const double delta = new_road_position_result.distance - road_position_result.distance;
+  if (delta > linear_tolerance) {  // new_distance is bigger than *distance, so this LanePosition is discarded.
+    return road_position_result;
+  }
+  if (delta < -linear_tolerance) {  // It is a better match.
+    return new_road_position_result;
+  }
 
   auto is_within_lane_bounds = [](double r, const api::RBounds& lane_bounds) {
     return r >= lane_bounds.min() && r < lane_bounds.max();
   };
-
-  const double delta = new_distance - *distance;
-
-  if (delta > linear_tolerance) {
-    // new_distance is bigger than *distance, so this LanePosition is discarded.
-    return;
-  }
-  if (delta < -linear_tolerance) {
-    // It is a better match.
-    replace_values();
-    return;
-  }
-
   // They are almost equal so it is worth checking the `r` coordinate and the
   // lane bounds.
-  // When `lane_position.r()` is within lane bounds, and the
-  // `road_position->pos` is within its own lane bounds, or when none of these
-  // are within their lane bounds, the LanePosition with the minimum `r`
-  // coordinate will be eligible to become the new `road_position->pos`.
-  // When `lane_position.r()` is within lane bounds and the `road_position->pos`
-  // is not within its own lane bounds, the `lane_position` is eligible to
-  // become the new `road_position->pos`.
-  const api::RBounds lane_bounds = lane->lane_bounds(lane_position.s());
-  const api::RBounds road_lane_bounds = road_position->lane->lane_bounds(road_position->pos.s());
-  if ((is_within_lane_bounds(lane_position.r(), lane_bounds) &&
-       is_within_lane_bounds(road_position->pos.r(), road_lane_bounds)) ||
-      (!is_within_lane_bounds(lane_position.r(), lane_bounds) &&
-       !is_within_lane_bounds(road_position->pos.r(), road_lane_bounds))) {
-    if (std::abs(lane_position.r()) < std::abs(road_position->pos.r())) {
-      replace_values();
+  // When both r-coordinates fall within lane bounds or outside, the position
+  // with the minimum absolute r-coordinate prevails.
+  // When the new r-coordinate is within lane bounds, and the previous position
+  // does not fall within lane bounds, the new result prevails.
+  const api::RBounds new_lane_bounds = lane->lane_bounds(new_road_position_result.road_position.pos.s());
+  const api::RBounds current_lane_bounds =
+      road_position_result.road_position.lane->lane_bounds(road_position_result.road_position.pos.s());
+  const bool is_new_within_lane_bounds =
+      is_within_lane_bounds(new_road_position_result.road_position.pos.r(), new_lane_bounds);
+  const bool is_current_within_lane_bounds =
+      is_within_lane_bounds(road_position_result.road_position.pos.r(), current_lane_bounds);
+  if ((is_new_within_lane_bounds && is_current_within_lane_bounds) ||
+      (!is_new_within_lane_bounds && !is_current_within_lane_bounds)) {
+    if (std::abs(new_road_position_result.road_position.pos.r()) <
+        std::abs(road_position_result.road_position.pos.r())) {
+      return new_road_position_result;
     }
-  } else if (is_within_lane_bounds(lane_position.r(), lane_bounds) &&
-             !is_within_lane_bounds(road_position->pos.r(), road_lane_bounds)) {
-    replace_values();
+  } else if (is_new_within_lane_bounds && !is_current_within_lane_bounds) {
+    return new_road_position_result;
   }
+  return road_position_result;
 }
 
 }  // namespace
@@ -114,10 +100,9 @@ const api::Junction* RoadGeometry::do_junction(int index) const { return junctio
 
 const api::BranchPoint* RoadGeometry::do_branch_point(int index) const { return branch_points_[index].get(); }
 
-api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_position, const api::RoadPosition* hint,
-                                                 api::GeoPosition* nearest_position, double* distance) const {
-  api::RoadPosition road_position{};
-  double min_distance{};
+api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_position,
+                                                       const drake::optional<api::RoadPosition>& hint) const {
+  api::RoadPositionResult road_position_result;
 
   // If a `hint` is supplied, simply use the `hint` lane; otherwise, search
   // through the any adjacent ongoing lanes for positions with smaller
@@ -125,18 +110,20 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos
   //
   // Note that this can be made more robust by extending this with a search that
   // extends beyond only adjacent lanes.
-  if (hint != nullptr) {
+  if (hint.has_value()) {
     MALIPUT_DEMAND(hint->lane != nullptr);
-    road_position = {hint->lane, hint->lane->ToLanePosition(geo_position, nearest_position, &min_distance)};
-    if (min_distance != 0.) {
+    road_position_result.road_position =
+        api::RoadPosition{hint->lane, hint->lane->ToLanePosition(geo_position, &road_position_result.nearest_position,
+                                                                 &road_position_result.distance)};
+    if (road_position_result.distance != 0.) {
       // Loop through ongoing lanes at both ends of the current lane, to find
       // the position associated with the first found containing lane or the
       // distance-minimizing position.
       for (const auto which_end : {api::LaneEnd::kStart, api::LaneEnd::kFinish}) {
         const api::LaneEndSet* ends = hint->lane->GetOngoingBranches(which_end);
         for (int i = 0; i < ends->size(); ++i) {
-          GetPositionIfSmallerDistance(geo_position, linear_tolerance_, ends->get(i).lane, &road_position,
-                                       &min_distance, nearest_position);
+          road_position_result =
+              EvaluateRoadPositionResult(geo_position, linear_tolerance_, ends->get(i).lane, road_position_result);
         }
       }
     }
@@ -149,21 +136,22 @@ api::RoadPosition RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos
     MALIPUT_DEMAND(junction(0)->num_segments() > 0);
     MALIPUT_DEMAND(junction(0)->segment(0)->num_lanes() > 0);
     const api::Lane* lane = this->junction(0)->segment(0)->lane(0);
-    road_position = {lane, lane->ToLanePosition(geo_position, nearest_position, &min_distance)};
+    road_position_result.road_position = api::RoadPosition{
+        lane,
+        lane->ToLanePosition(geo_position, &road_position_result.nearest_position, &road_position_result.distance)};
     for (int i = 0; i < num_junctions(); ++i) {
       const api::Junction* junction = this->junction(i);
       for (int j = 0; j < junction->num_segments(); ++j) {
         const api::Segment* segment = junction->segment(j);
         for (int k = 0; k < segment->num_lanes(); ++k) {
-          GetPositionIfSmallerDistance(geo_position, linear_tolerance_, segment->lane(k), &road_position, &min_distance,
-                                       nearest_position);
+          road_position_result =
+              EvaluateRoadPositionResult(geo_position, linear_tolerance_, segment->lane(k), road_position_result);
         }
       }
     }
   }
 
-  if (distance != nullptr) *distance = min_distance;
-  return road_position;
+  return road_position_result;
 }
 
 std::vector<api::RoadPositionResult> RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,

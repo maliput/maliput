@@ -65,8 +65,8 @@ class RoadGeometry final : public api::RoadGeometry {
 
   const IdIndex& DoById() const override { return id_index_; }
 
-  api::RoadPosition DoToRoadPosition(const api::GeoPosition& geo_position, const api::RoadPosition* hint,
-                                     api::GeoPosition* nearest_position, double* distance) const final;
+  api::RoadPositionResult DoToRoadPosition(const api::GeoPosition& geo_position,
+                                           const drake::optional<api::RoadPosition>& hint) const final;
 
   // Forwards the call to
   // maliput::geometry_base::BruteForceFindRoadPositionsStrategy().

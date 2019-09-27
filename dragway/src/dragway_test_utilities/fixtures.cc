@@ -14,9 +14,9 @@ DragwayBasedTest::DragwayBasedTest()
     : dragway_(RoadGeometryId("my_dragway"), kNumLanes, kLength, kLaneWidth, kShoulderWidth, kMaxHeight,
                std::numeric_limits<double>::epsilon() /* linear_tolerance */,
                std::numeric_limits<double>::epsilon() /* angular_tolerance */),
-      right_lane_(dragway_.ToRoadPosition(GeoPosition(0, -kLaneWidth, 0), nullptr, nullptr, nullptr).lane),
-      center_lane_(dragway_.ToRoadPosition(GeoPosition(0, 0, 0), nullptr, nullptr, nullptr).lane),
-      left_lane_(dragway_.ToRoadPosition(GeoPosition(0, kLaneWidth, 0), nullptr, nullptr, nullptr).lane) {}
+      right_lane_(dragway_.ToRoadPosition(GeoPosition(0, -kLaneWidth, 0)).road_position.lane),
+      center_lane_(dragway_.ToRoadPosition(GeoPosition(0, 0, 0)).road_position.lane),
+      left_lane_(dragway_.ToRoadPosition(GeoPosition(0, kLaneWidth, 0)).road_position.lane) {}
 
 void DragwayBasedTest::SetUp() {
   ASSERT_TRUE(right_lane_->to_left());
