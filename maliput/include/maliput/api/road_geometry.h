@@ -74,7 +74,7 @@ class RoadGeometry {
   ///
   /// Returns a RoadPositionResult. Its RoadPosition is the point in the
   /// RoadGeometry's manifold which is, in the world frame, closest to
-  /// @p geo_position. Its GeoPosition is world frame conversion of the
+  /// @p geo_position. Its GeoPosition is the world frame equivalent of the
   /// RoadPosition and its distance is the Cartesian distance from
   /// @p geo_position to the nearest point.
   ///

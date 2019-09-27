@@ -27,7 +27,7 @@ namespace {
 //
 // When any of the previous conditions is met, an api::RoadPositionResult
 // is returned using `lane`, and the results of calling `ToLanePosition()`
-// on it. Otherwise, it returns `road_position_result`.
+// on it. Otherwise, it returns the original `road_position_result`.
 //
 // The following preconditions should be met:
 //
