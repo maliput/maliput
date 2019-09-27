@@ -61,6 +61,17 @@ struct ObjFeatures {
   std::vector<api::SegmentId> highlighted_segments;
 };
 
+enum MeshMaterial {
+  Asphalt,
+  Lane,
+  Marker,
+  HBounds,
+  BranchPointGlow,
+  GrayedAsphalt,
+  GrayedLane,
+  GrayedMarker
+};
+
 /// Material information for built meshes.
 struct Material {
   std::string name;
@@ -73,6 +84,22 @@ struct Material {
   friend bool operator==(const Material& matA, const Material& matB) { return matA.name == matB.name; }
 
   friend bool operator==(const Material& matA, const std::string& name) { return matA.name == name; }
+};
+
+// Mesh information for all Segments, Lanes, BranchPoints
+struct RoadGeometryMeshes {
+  std::map<api::SegmentId, std::pair<mesh::GeoMesh, Material>> segment_asphalt_mesh;
+  std::map<api::SegmentId, std::pair<mesh::GeoMesh, Material>> segment_grayed_asphalt_mesh;
+  
+  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_asphalt_mesh;
+  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_lane_mesh;
+  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_marker_mesh;
+  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_grayed_asphalt_mesh;
+  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_grayed_lane_mesh;
+  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_grayed_marker_mesh;
+  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_h_bounds_mesh;
+
+  std::map<api::BranchPointId, std::pair<mesh::GeoMesh, Material>> branch_point_mesh;
 };
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
