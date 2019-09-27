@@ -133,32 +133,32 @@ class Lane {
 
   /// Determines the LanePosition corresponding to GeoPosition @p geo_pos.
   ///
-  /// The return value is the LanePosition of the point within the Lane's
-  /// segment-bounds which is closest to @p geo_pos (as measured by the
-  /// Cartesian metric in the world frame).  If @p nearest_point is non-null,
-  /// then it will be populated with the GeoPosition of that nearest point.  If
-  /// @p distance is non-null, then it will be populated with the Cartesian
-  /// distance from @p geo_pos to that nearest point.
+  /// The return value is a LanePositionResult bearing the lane frame point
+  /// within the Lane' segment-bounds which is closest to @p geo_pos (as
+  /// measured by the Cartesian metric in the world frame).
+  /// `LanePositionResult::nearest_position` will be populated with the
+  /// GeoPosition that corresponds to the LanePosition the result contains.
+  /// `LanePositionResult::distance` will be populated with the Cartesian
+  /// distance from @p geo_pos to that nearest point the result contains.
   ///
   /// This method guarantees that its result satisfies the condition that
-  /// `ToGeoPosition(result)` is within `linear_tolerance()` of
-  /// `*nearest_position`.
-  LanePosition ToLanePosition(const GeoPosition& geo_pos, GeoPosition* nearest_point, double* distance) const {
-    return DoToLanePosition(geo_pos, nearest_point, distance);
-  }
+  /// `ToGeoPosition(result.lane_position)` is within `linear_tolerance()`
+  ///  of `result.nearest_position`.
+  LanePositionResult ToLanePosition(const GeoPosition& geo_pos) const { return DoToLanePosition(geo_pos); }
 
   /// Generalization of ToLanePosition to arbitrary scalar types, where the
-  /// structures `LanePositionT<T>` and `GeoPositionT<T>` are used in place of
-  /// `LanePosition` and `GeoPosition`, respectively.
+  /// structures `LanePositionResultT<T>` and `GeoPositionT<T>` are used in
+  /// place of `LanePositionResult` and `GeoPosition`, respectively.
   ///
   /// When the arguments are of type drake::AutoDiffXd, the return value is a
-  /// LanePositionT<drake::AutoDiffXd> containing the same partial derivatives as those
-  /// appearing in geo_pos.  The provided geo_pos must be internally consistent;
-  /// the x, y, and z variables must have derivatives of equal size, and where
-  /// the i-th derivative of one variable is taken with respect to the same
-  /// quantity as the i-th derviative of another variable.  If either @p
-  /// nearest_point or @p distance are non-null, they will also contain @p
-  /// geo_pos's partial derivatives.
+  /// LanePositionResultT<drake::AutoDiffXd> containing the same partial
+  /// derivatives as those appearing in `geo_pos`. The provided geo_pos must
+  /// be internally consistent; the x, y, and z variables must have derivatives
+  /// of equal size, and where the i-th derivative of one variable is taken
+  /// with respect to the same quantity as the i-th derivative of another
+  /// variable.
+  /// Result nearest position and distance will also contain @p geo_pos's
+  /// partial derivatives.
   ///
   /// Instantiated templates for the following kinds of T's are provided:
   ///
@@ -174,11 +174,11 @@ class Lane {
   // TODO(jadecastro): Consider having the client enforce the geo_pos drake::AutoDiffXd
   // coherency contract rather than api::Lane.  Reevaluate this once an AutoDiff
   // consumer for api::ToLanePositionT() exists.
-
+  //
   // TODO(jadecastro): Apply this implementation in all the subclasses of
   // `api::Lane`.
   template <typename T>
-  LanePositionT<T> ToLanePositionT(const GeoPositionT<T>& geo_pos, GeoPositionT<T>* nearest_point, T* distance) const;
+  LanePositionResultT<T> ToLanePositionT(const GeoPositionT<T>& geo_pos) const;
 
   // TODO(maddog@tri.global) Method to convert LanePosition to that of
   //                         another Lane.  (Should assert that both
@@ -252,8 +252,7 @@ class Lane {
 
   virtual GeoPosition DoToGeoPosition(const LanePosition& lane_pos) const = 0;
 
-  virtual LanePosition DoToLanePosition(const GeoPosition& geo_pos, GeoPosition* nearest_point,
-                                        double* distance) const = 0;
+  virtual LanePositionResult DoToLanePosition(const GeoPosition& geo_pos) const = 0;
 
   virtual Rotation DoGetOrientation(const LanePosition& lane_pos) const = 0;
 
@@ -275,9 +274,8 @@ class Lane {
   }
 
   // drake::AutoDiffXd overload of DoToLanePosition().
-  virtual LanePositionT<drake::AutoDiffXd> DoToLanePositionAutoDiff(const GeoPositionT<drake::AutoDiffXd>&,
-                                                                    GeoPositionT<drake::AutoDiffXd>*,
-                                                                    drake::AutoDiffXd*) const {
+  virtual LanePositionResultT<drake::AutoDiffXd> DoToLanePositionAutoDiff(
+      const GeoPositionT<drake::AutoDiffXd>&) const {
     MALIPUT_THROW_MESSAGE(
         "DoToLanePosition has been instantiated with drake::AutoDiffXd arguments, "
         "but a Lane backend has not overridden its drake::AutoDiffXd specialization.");
@@ -293,9 +291,8 @@ class Lane {
   }
 
   // drake::symbolic::Expression overload of DoToLanePosition().
-  virtual LanePositionT<drake::symbolic::Expression> DoToLanePositionSymbolic(
-      const GeoPositionT<drake::symbolic::Expression>&, GeoPositionT<drake::symbolic::Expression>*,
-      drake::symbolic::Expression*) const {
+  virtual LanePositionResultT<drake::symbolic::Expression> DoToLanePositionSymbolic(
+      const GeoPositionT<drake::symbolic::Expression>&) const {
     MALIPUT_THROW_MESSAGE(
         "DoToLanePosition has been instantiated with drake::symbolic::Expression "
         "arguments, but a Lane backend has not overridden its "

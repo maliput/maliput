@@ -292,6 +292,29 @@ class LanePositionT {
 // Alias for the double scalar type.
 using LanePosition = LanePositionT<double>;
 
+/// Included in the return result of Lane::ToLanePosition().
+///
+/// Instantiated templates for the following kinds of T's are provided:
+///
+/// - double
+/// - drake::AutoDiffXd
+/// - drake::symbolic::Expression
+///
+/// They are already available to link against in the containing library.
+template <typename T>
+struct LanePositionResultT {
+  /// The candidate LanePosition.
+  LanePositionT<T> lane_position;
+  /// The position that exactly corresponds to `lane_position`.
+  GeoPositionT<T> nearest_position;
+  /// The distance between `nearest_position` and the `geo_position` supplied
+  /// to Lane::ToLanePosition().
+  T distance;
+};
+
+// Alias for the double scalar type.
+using LanePositionResult = LanePositionResultT<double>;
+
 /// Streams a string representation of @p lane_position into @p out. Returns
 /// @p out. This method is provided for the purposes of debugging or
 /// text-logging. It is not intended for serialization.

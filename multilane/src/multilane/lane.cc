@@ -69,8 +69,7 @@ api::LanePosition Lane::DoEvalMotionDerivatives(const api::LanePosition& positio
   return api::LanePosition(ds_dsigma * velocity.sigma_v, velocity.rho_v, velocity.eta_v);
 }
 
-api::LanePosition Lane::DoToLanePosition(const api::GeoPosition& geo_position, api::GeoPosition* nearest_position,
-                                         double* distance) const {
+api::LanePositionResult Lane::DoToLanePosition(const api::GeoPosition& geo_position) const {
   // Computes the lateral extents of the surface in terms of the definition of
   // the reference curve. It implies a translation of the segment bounds
   // center by the lane by r0 distance.
@@ -85,16 +84,9 @@ api::LanePosition Lane::DoToLanePosition(const api::GeoPosition& geo_position, a
   const api::LanePosition lane_position =
       api::LanePosition(s, lane_position_in_segment_curve_frame[1] - r0_, lane_position_in_segment_curve_frame[2]);
 
-  const api::GeoPosition nearest = ToGeoPosition(lane_position);
-  if (nearest_position != nullptr) {
-    *nearest_position = nearest;
-  }
+  const api::GeoPosition nearest_position = ToGeoPosition(lane_position);
 
-  if (distance != nullptr) {
-    *distance = (nearest.xyz() - geo_position.xyz()).norm();
-  }
-
-  return lane_position;
+  return api::LanePositionResult{lane_position, nearest_position, (nearest_position.xyz() - geo_position.xyz()).norm()};
 }
 
 }  // namespace multilane

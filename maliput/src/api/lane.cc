@@ -27,48 +27,44 @@ GeoPositionT<drake::symbolic::Expression> Lane::ToGeoPositionT<drake::symbolic::
 }
 
 template <>
-LanePositionT<double> Lane::ToLanePositionT<double>(const GeoPositionT<double>& geo_pos,
-                                                    GeoPositionT<double>* nearest_point, double* distance) const {
-  return DoToLanePosition(geo_pos, nearest_point, distance);
+LanePositionResultT<double> Lane::ToLanePositionT<double>(const GeoPositionT<double>& geo_pos) const {
+  return DoToLanePosition(geo_pos);
 }
 
 template <>
-LanePositionT<drake::AutoDiffXd> Lane::ToLanePositionT<drake::AutoDiffXd>(
-    const GeoPositionT<drake::AutoDiffXd>& geo_pos, GeoPositionT<drake::AutoDiffXd>* nearest_point,
-    drake::AutoDiffXd* distance) const {
+LanePositionResultT<drake::AutoDiffXd> Lane::ToLanePositionT<drake::AutoDiffXd>(
+    const GeoPositionT<drake::AutoDiffXd>& geo_pos) const {
   // Fail fast if geo_pos contains derivatives of inconsistent sizes.
   const Eigen::VectorXd deriv = geo_pos.x().derivatives();
   MALIPUT_THROW_UNLESS(deriv.size() == geo_pos.y().derivatives().size());
   MALIPUT_THROW_UNLESS(deriv.size() == geo_pos.z().derivatives().size());
 
-  LanePositionT<drake::AutoDiffXd> result = DoToLanePositionAutoDiff(geo_pos, nearest_point, distance);
+  LanePositionResultT<drake::AutoDiffXd> result = DoToLanePositionAutoDiff(geo_pos);
 
   // If the partial derivatives of result, nearest_point and distance are not of
   // the same dimension as those in geo_pos, pad them with zeros of the same
   // dismension as those in geo_pos.
-  drake::Vector3<drake::AutoDiffXd> srh = result.srh();
+  drake::Vector3<drake::AutoDiffXd> srh = result.lane_position.srh();
   Eigen::internal::make_coherent(srh.x().derivatives(), deriv);
   Eigen::internal::make_coherent(srh.y().derivatives(), deriv);
   Eigen::internal::make_coherent(srh.z().derivatives(), deriv);
-  result.set_srh(srh);
-  if (nearest_point != nullptr) {
-    drake::Vector3<drake::AutoDiffXd> xyz = nearest_point->xyz();
-    Eigen::internal::make_coherent(xyz.x().derivatives(), deriv);
-    Eigen::internal::make_coherent(xyz.y().derivatives(), deriv);
-    Eigen::internal::make_coherent(xyz.z().derivatives(), deriv);
-    nearest_point->set_xyz(xyz);
-  }
-  if (distance != nullptr) {
-    Eigen::internal::make_coherent(distance->derivatives(), deriv);
-  }
+  result.lane_position.set_srh(srh);
+
+  drake::Vector3<drake::AutoDiffXd> xyz = result.nearest_position.xyz();
+  Eigen::internal::make_coherent(xyz.x().derivatives(), deriv);
+  Eigen::internal::make_coherent(xyz.y().derivatives(), deriv);
+  Eigen::internal::make_coherent(xyz.z().derivatives(), deriv);
+  result.nearest_position.set_xyz(xyz);
+
+  Eigen::internal::make_coherent(result.distance.derivatives(), deriv);
+
   return result;
 }
 
 template <>
-LanePositionT<drake::symbolic::Expression> Lane::ToLanePositionT<drake::symbolic::Expression>(
-    const GeoPositionT<drake::symbolic::Expression>& geo_pos, GeoPositionT<drake::symbolic::Expression>* nearest_point,
-    drake::symbolic::Expression* distance) const {
-  return DoToLanePositionSymbolic(geo_pos, nearest_point, distance);
+LanePositionResultT<drake::symbolic::Expression> Lane::ToLanePositionT<drake::symbolic::Expression>(
+    const GeoPositionT<drake::symbolic::Expression>& geo_pos) const {
+  return DoToLanePositionSymbolic(geo_pos);
 }
 
 }  // namespace api

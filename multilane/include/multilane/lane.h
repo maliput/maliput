@@ -131,8 +131,7 @@ class Lane : public api::Lane {
   api::LanePosition DoEvalMotionDerivatives(const api::LanePosition& position,
                                             const api::IsoLaneVelocity& velocity) const override;
 
-  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_position, api::GeoPosition* nearest_position,
-                                     double* distance) const override;
+  api::LanePositionResult DoToLanePosition(const api::GeoPosition& geo_position) const override;
 
   const api::LaneId id_;
   const api::Segment* segment_{};

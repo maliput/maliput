@@ -157,20 +157,16 @@ class Lane final : public api::Lane {
   api::GeoPositionT<drake::symbolic::Expression> DoToGeoPositionSymbolic(
       const api::LanePositionT<drake::symbolic::Expression>& lane_pos) const final;
 
-  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_pos, api::GeoPosition* nearest_point,
-                                     double* distance) const final;
+  api::LanePositionResult DoToLanePosition(const api::GeoPosition& geo_pos) const final;
 
-  api::LanePositionT<drake::AutoDiffXd> DoToLanePositionAutoDiff(const api::GeoPositionT<drake::AutoDiffXd>& geo_pos,
-                                                                 api::GeoPositionT<drake::AutoDiffXd>* nearest_point,
-                                                                 drake::AutoDiffXd* distance) const final;
+  api::LanePositionResultT<drake::AutoDiffXd> DoToLanePositionAutoDiff(
+      const api::GeoPositionT<drake::AutoDiffXd>& geo_pos) const final;
 
-  api::LanePositionT<drake::symbolic::Expression> DoToLanePositionSymbolic(
-      const api::GeoPositionT<drake::symbolic::Expression>& geo_pos,
-      api::GeoPositionT<drake::symbolic::Expression>* nearest_point, drake::symbolic::Expression* distance) const final;
+  api::LanePositionResultT<drake::symbolic::Expression> DoToLanePositionSymbolic(
+      const api::GeoPositionT<drake::symbolic::Expression>& geo_pos) const final;
 
   template <typename T>
-  api::LanePositionT<T> ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos, api::GeoPositionT<T>* nearest_point,
-                                              T* distance) const;
+  api::LanePositionResultT<T> ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos) const;
 
   const Segment* segment_{};  // The segment to which this lane belongs.
   const api::LaneId id_;

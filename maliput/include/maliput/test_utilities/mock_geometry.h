@@ -114,8 +114,7 @@ class MockLane : public geometry_base::Lane {
   api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const override;
   api::LanePosition DoEvalMotionDerivatives(const api::LanePosition& position,
                                             const api::IsoLaneVelocity& velocity) const override;
-  api::LanePosition DoToLanePosition(const api::GeoPosition& geo_position, api::GeoPosition* nearest_position,
-                                     double* distance) const override;
+  api::LanePositionResult DoToLanePosition(const api::GeoPosition& geo_position) const override;
 };
 
 }  // namespace test

@@ -53,7 +53,7 @@ api::LanePosition MockLane::DoEvalMotionDerivatives(const api::LanePosition&, co
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
-api::LanePosition MockLane::DoToLanePosition(const api::GeoPosition&, api::GeoPosition*, double*) const {
+api::LanePositionResult MockLane::DoToLanePosition(const api::GeoPosition&) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }

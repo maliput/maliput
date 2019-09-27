@@ -62,23 +62,14 @@ Matcher<const api::GeoPosition&> Matches(const api::GeoPosition& geo_position, d
 class LaneMock final : public MockLane {
  public:
   LaneMock(const api::LaneId& id, double distance) : MockLane(id), distance_(distance) {
-    ON_CALL(*this, DoToLanePosition(An<const api::GeoPosition&>(), An<api::GeoPosition*>(), An<double*>()))
+    ON_CALL(*this, DoToLanePosition(An<const api::GeoPosition&>()))
         .WillByDefault(Invoke(this, &LaneMock::InternalDoToLanePosition));
   }
 
-  MOCK_CONST_METHOD3(DoToLanePosition, api::LanePosition(const api::GeoPosition&, api::GeoPosition*, double*));
+  MOCK_CONST_METHOD1(DoToLanePosition, api::LanePositionResult(const api::GeoPosition&));
 
-  api::LanePosition InternalDoToLanePosition(const api::GeoPosition&, api::GeoPosition* nearest_pos,
-                                             double* distance) const {
-    if (nearest_pos) {
-      *nearest_pos = api::GeoPosition(10., 11., 12.);
-    }
-
-    if (distance) {
-      *distance = distance_;
-    }
-
-    return api::LanePosition(4., 5., 6.);
+  api::LanePositionResult InternalDoToLanePosition(const api::GeoPosition&) const {
+    return api::LanePositionResult{api::LanePosition(4., 5., 6.), api::GeoPosition(10., 11., 12.), distance_};
   }
 
  private:
@@ -188,7 +179,7 @@ TEST_F(BruteForceTest, AllLanesCalled) {
   const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
 
   for (auto lane : lanes) {
-    EXPECT_CALL(*lane, DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), kZeroTolerance), _, _));
+    EXPECT_CALL(*lane, DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), kZeroTolerance)));
   }
 
   const std::vector<api::RoadPositionResult> results =
