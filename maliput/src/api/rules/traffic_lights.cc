@@ -33,16 +33,19 @@ std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper()
   return result;
 }
 
-Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
-           const BulbColor& color, const BulbType& type, const drake::optional<double>& arrow_orientation_rad,
-           const drake::optional<std::vector<BulbState>>& states, BoundingBox bounding_box)
+Bulb::Bulb(const Bulb::Id& id, const UniqueBulbId& unique_id, const GeoPosition& position_bulb_group,
+           const Rotation& orientation_bulb_group, const BulbColor& color, const BulbType& type,
+           const drake::optional<double>& arrow_orientation_rad, const drake::optional<std::vector<BulbState>>& states,
+           BoundingBox bounding_box)
     : id_(id),
+      unique_id_str_(unique_id.to_string()),
       position_bulb_group_(position_bulb_group),
       orientation_bulb_group_(orientation_bulb_group),
       color_(color),
       type_(type),
       arrow_orientation_rad_(arrow_orientation_rad),
       bounding_box_(std::move(bounding_box)) {
+  MALIPUT_THROW_UNLESS(unique_id.bulb_id == id_);
   MALIPUT_THROW_UNLESS(type_ != BulbType::kArrow || arrow_orientation_rad_ != drake::nullopt);
   if (type_ != BulbType::kArrow) {
     MALIPUT_THROW_UNLESS(arrow_orientation_rad_ == drake::nullopt);
@@ -67,6 +70,8 @@ bool Bulb::IsValidState(const BulbState& bulb_state) const {
   return std::find(states_.begin(), states_.end(), bulb_state) != states_.end();
 }
 
+UniqueBulbId Bulb::unique_id() const { return UniqueBulbId(unique_id_str_); }
+
 BulbGroup::BulbGroup(const BulbGroup::Id& id, const GeoPosition& position_traffic_light,
                      const Rotation& orientation_traffic_light, const std::vector<Bulb>& bulbs)
     : id_(id),
@@ -77,6 +82,7 @@ BulbGroup::BulbGroup(const BulbGroup::Id& id, const GeoPosition& position_traffi
   for (const Bulb& bulb : bulbs_) {
     MALIPUT_THROW_UNLESS(std::count_if(bulbs_.begin(), bulbs_.end(),
                                        [bulb_id = bulb.id()](const Bulb& b) { return bulb_id == b.id(); }) == 1);
+    MALIPUT_THROW_UNLESS(bulb.unique_id().bulb_group_id == id_);
   }
 }
 
@@ -100,6 +106,9 @@ TrafficLight::TrafficLight(const TrafficLight::Id& id, const GeoPosition& positi
         std::count_if(bulb_groups_.begin(), bulb_groups_.end(), [bulb_group_id = bulb_group.id()](const BulbGroup& bg) {
           return bulb_group_id == bg.id();
         }) == 1);
+    for (const Bulb& bulb : bulb_group.bulbs()) {
+      MALIPUT_THROW_UNLESS(bulb.unique_id().traffic_light_id == id_);
+    }
   }
 }
 
@@ -111,6 +120,21 @@ drake::optional<BulbGroup> TrafficLight::GetBulbGroup(const BulbGroup::Id& id) c
   }
   return drake::nullopt;
 }
+
+UniqueBulbId::UniqueBulbId(const std::string& str) : UniqueBulbId() {
+  size_t delimiter_index = str.find_first_of(delimiter());
+  MALIPUT_THROW_UNLESS(delimiter_index != std::string::npos);
+  traffic_light_id = TrafficLight::Id(str.substr(0, delimiter_index));
+
+  const std::string remaining_str = str.substr(++delimiter_index);
+  delimiter_index = remaining_str.find_first_of(delimiter());
+  MALIPUT_THROW_UNLESS(delimiter_index != std::string::npos);
+  bulb_group_id = BulbGroup::Id(remaining_str.substr(0, delimiter_index));
+
+  bulb_id = Bulb::Id(remaining_str.substr(++delimiter_index));
+}
+
+const std::string UniqueBulbId::delimiter() { return "-"; }
 
 }  // namespace rules
 }  // namespace api
