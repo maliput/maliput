@@ -1,6 +1,5 @@
 #include "maliput/api/road_network.h"
 
-#include <algorithm>
 #include <utility>
 
 #include "maliput/api/lane.h"
@@ -40,27 +39,6 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
   MALIPUT_THROW_UNLESS(rule_registry_.get() != nullptr);
   MALIPUT_THROW_UNLESS(discrete_value_rule_state_provider_.get() != nullptr);
   MALIPUT_THROW_UNLESS(range_value_rule_state_provider_.get() != nullptr);
-}
-
-drake::optional<RoadPositionResult> RoadNetwork::ToRoadPosition(
-    const GeoPosition& geo_position, const RoadPosition* hint,
-    const std::function<bool(const RoadPositionResult&)>& filter) const {
-  RoadPositionResult result;
-  result.road_position =
-      road_geometry_->ToRoadPosition(geo_position, hint, &(result.nearest_position), &(result.distance));
-  if (filter(result)) {
-    return result;
-  }
-  return drake::nullopt;
-}
-
-std::vector<RoadPositionResult> RoadNetwork::FindRoadPositions(
-    const GeoPosition& geo_position, double radius,
-    const std::function<bool(const RoadPositionResult&)>& filter) const {
-  std::vector<RoadPositionResult> result = road_geometry_->FindRoadPositions(geo_position, radius);
-  // TODO(agalbachicar)   If this code is ever moved to C++17, use std::not_fn() instead.
-  result.erase(std::remove_if(result.begin(), result.end(), std::not1(filter)), result.end());
-  return result;
 }
 
 }  // namespace api

@@ -1,4 +1,5 @@
 ament_add_gmock(brute_force_find_road_positions_test brute_force_find_road_positions_test.cc)
+ament_add_gtest(filter_positions_test filter_positions_test.cc)
 ament_add_gtest(geometry_base_test geometry_base_test.cc)
 
 macro(add_dependencies_to_test target)
@@ -24,4 +25,5 @@ macro(add_dependencies_to_test target)
 endmacro()
 
 add_dependencies_to_test(brute_force_find_road_positions_test)
+add_dependencies_to_test(filter_positions_test)
 add_dependencies_to_test(geometry_base_test)

@@ -4,6 +4,7 @@
 set(SOURCES
     branch_point.cc
     brute_force_find_road_positions_strategy.cc
+    filter_positions.cc
     junction.cc
     lane.cc
     road_geometry.cc
