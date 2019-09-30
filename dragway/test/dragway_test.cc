@@ -745,10 +745,12 @@ TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic2) {
   const drake::symbolic::Variable x{"x"};
   const drake::symbolic::Variable y{"y"};
   const drake::symbolic::Variable z{"z"};
+  const drake::symbolic::Variable d{"distance"};
   const double v_x = 1.0;
   const double v_y = 2.0;
   const double v_z = 0.0;
-  drake::symbolic::Environment env{{{x, v_x}, {y, v_y}, {z, v_z}}};
+  const double v_d = 0.0;
+  drake::symbolic::Environment env{{{x, v_x}, {y, v_y}, {z, v_z}, {d, v_d}}};
 
   const api::LanePositionResultT<drake::symbolic::Expression> symbolic_result{
       lane_->ToLanePositionT<drake::symbolic::Expression>(api::GeoPositionT<drake::symbolic::Expression>{x, y, z})};
@@ -765,12 +767,12 @@ TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic2) {
   EXPECT_EQ(symbolic_result.distance.Evaluate(env), double_result.distance);
 
   // These values (1.0, 2.0, 0.0) lie on the lane. Therefore we have 1) a zero
-  // distance and 2) the symbolic_gp evaluated with those values is (1.0, 2.0,
+  // distance and 2) the nearest_position evaluated with those values is (1.0, 2.0,
   // 0.0).
-  EXPECT_EQ(symbolic_result.distance, 0.0);
   EXPECT_TRUE(symbolic_result.nearest_position.x().Evaluate(env) == v_x &&
               symbolic_result.nearest_position.y().Evaluate(env) == v_y &&
-              symbolic_result.nearest_position.z().Evaluate(env) == v_z);
+              symbolic_result.nearest_position.z().Evaluate(env) == v_z &&
+              symbolic_result.distance.Evaluate(env) == v_d);
 }
 
 TEST_F(MaliputDragwayLaneTest, ToGeoPositionSymbolic) {
