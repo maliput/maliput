@@ -130,7 +130,7 @@ class TestMaliput(unittest.TestCase):
         lane_pos_result_expected = \
             LanePositionResult(LanePosition(1., 0., 3.), GeoPosition(0., 0., 0.), 0.)
         self.assertTrue(np.allclose(lane_pos_result.lane_position.srh(),
-                                    lane_pos_result_expected_expected.srh()))
+                                    lane_pos_result_expected.lane_position.srh()))
         self.assertTrue(np.allclose(lane_pos_result.nearest_position.xyz(), geo_pos.xyz()))
         self.assertTrue(lane_pos_result.distance == lane_pos_result_expected.distance)
 
