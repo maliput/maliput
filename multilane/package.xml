@@ -8,6 +8,7 @@
   <license>TODO</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>ament_cmake_doxygen</build_depend>
 
   <depend>drake_vendor</depend>
   <depend>maliput</depend>
