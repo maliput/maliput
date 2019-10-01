@@ -10,6 +10,7 @@
 
 namespace maliput {
 namespace api {
+namespace test {
 namespace {
 
 using rules::DirectionUsageRule;
@@ -167,5 +168,6 @@ TEST_F(RoadNetworkTest, TestMemberMethodAccess) {
 }
 
 }  // namespace
+}  // namespace test
 }  // namespace api
 }  // namespace maliput
