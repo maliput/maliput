@@ -303,12 +303,14 @@ using LanePosition = LanePositionT<double>;
 /// They are already available to link against in the containing library.
 template <typename T>
 struct LanePositionResultT {
-  /// The candidate LanePosition.
+  /// The candidate LanePosition within the Lane' segment-bounds which
+  /// is closest to a `geo_position` supplied to Lane::ToLanePosition()
+  /// (measured by the Cartesian metric in the world frame).
   LanePositionT<T> lane_position;
   /// The position that exactly corresponds to `lane_position`.
   GeoPositionT<T> nearest_position;
-  /// The distance between `nearest_position` and the `geo_position` supplied
-  /// to Lane::ToLanePosition().
+  /// The Cartesian distance between `nearest_position` and the
+  /// `geo_position` supplied to Lane::ToLanePosition().
   T distance;
 };
 

@@ -115,7 +115,7 @@ api::LanePositionResultT<T> Lane::ImplDoToLanePositionT(const api::GeoPositionT<
   const T y = geo_pos.y();
   const T z = geo_pos.z();
 
-  api::LanePositionResultT<T> result{};
+  api::LanePositionResultT<T> result;
 
   result.nearest_position = {saturate(x, min_x, max_x), saturate(y, min_y, max_y), saturate(z, min_z, max_z)};
 

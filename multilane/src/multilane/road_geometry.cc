@@ -14,7 +14,7 @@ namespace multilane {
 namespace {
 
 // Converts `result` and `lane` into an api::RoadPositionResult.
-// `nearest_position` and `distance` are direct mappings, and the
+// `result.nearest_position` and `result.distance` are direct mappings, and the
 // api::RoadPosition is built with `lane` and `result.lane_position`.
 api::RoadPositionResult FromLanePositionResult(const api::Lane* const lane, const api::LanePositionResult& result) {
   return {api::RoadPosition{lane, result.lane_position}, result.nearest_position, result.distance};

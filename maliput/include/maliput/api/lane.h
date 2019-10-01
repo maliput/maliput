@@ -133,14 +133,6 @@ class Lane {
 
   /// Determines the LanePosition corresponding to GeoPosition @p geo_pos.
   ///
-  /// The return value is a LanePositionResult bearing the lane frame point
-  /// within the Lane' segment-bounds which is closest to @p geo_pos (as
-  /// measured by the Cartesian metric in the world frame).
-  /// `LanePositionResult::nearest_position` will be populated with the
-  /// GeoPosition that corresponds to the LanePosition the result contains.
-  /// `LanePositionResult::distance` will be populated with the Cartesian
-  /// distance from @p geo_pos to that nearest point the result contains.
-  ///
   /// This method guarantees that its result satisfies the condition that
   /// `ToGeoPosition(result.lane_position)` is within `linear_tolerance()`
   ///  of `result.nearest_position`.
