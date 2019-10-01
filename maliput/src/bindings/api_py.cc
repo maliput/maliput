@@ -32,6 +32,14 @@ PYBIND11_MODULE(api, m) {
       .def(py::init<double, double, double>(), py::arg("s"), py::arg("r"), py::arg("h"))
       .def("srh", &api::LanePosition::srh, py::return_value_policy::reference_internal);
 
+  py::class_<api::LanePositionResult>(m, "LanePositionResult")
+      .def(py::init<>())
+      .def(py::init<const api::LanePosition&, const api::GeoPosition&, double>(), py::arg("lane_position"),
+           py::arg("nearest_position"), py::arg("distance"))
+      .def_readwrite("lane_position", &api::LanePositionResult::lane_position)
+      .def_readwrite("nearest_position", &api::LanePositionResult::nearest_position)
+      .def_readwrite("distance", &api::LanePositionResult::distance);
+
   py::class_<api::RoadPosition> road_position(m, "RoadPosition");
   road_position  // BR
       .def(py::init<>())

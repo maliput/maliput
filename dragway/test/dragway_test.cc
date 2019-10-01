@@ -524,10 +524,7 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePosition) {
   for (const double x : x_test_cases_) {
     for (const double y : y_test_cases_) {
       for (const double z : z_test_cases_) {
-        api::GeoPosition nearest_position;
-        double distance;
-        const api::LanePosition lane_position =
-            lane_->ToLanePosition(api::GeoPosition(x, y, z), &nearest_position, &distance);
+        const api::LanePositionResult result = lane_->ToLanePosition(api::GeoPosition(x, y, z));
         api::GeoPosition expected_nearest_position(x, y, z);
         if (x < min_x_) {
           expected_nearest_position.set_x(min_x_);
@@ -548,11 +545,12 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePosition) {
           expected_nearest_position.set_z(max_z_);
         }
 
-        EXPECT_TRUE(api::test::IsGeoPositionClose(nearest_position, expected_nearest_position, kLinearTolerance));
+        EXPECT_TRUE(
+            api::test::IsGeoPositionClose(result.nearest_position, expected_nearest_position, kLinearTolerance));
         // TODO(maddog@tri.global)  Should test for explicit correct distance.
-        EXPECT_GE(distance, 0);
+        EXPECT_GE(result.distance, 0);
         EXPECT_TRUE(api::test::IsLanePositionClose(
-            lane_position,
+            result.lane_position,
             api::LanePosition(expected_nearest_position.x(), expected_nearest_position.y() - lane_->y_offset(),
                               expected_nearest_position.z()),
             kLinearTolerance));
@@ -570,9 +568,6 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePositionAutoDiff) {
   for (const double x : x_test_cases_) {
     for (const double y : y_test_cases_) {
       for (const double z : z_test_cases_) {
-        drake::AutoDiffXd distance(0.);
-        api::GeoPositionT<drake::AutoDiffXd> nearest_position;
-
         // Define the partial derivatives with respect to geo_position's
         // x-axis.  That is, seed geo_position with the partial derivatives
         // ∂x/∂x = 1, ∂y/∂x = 0., ∂z/∂x = 0, etc.
@@ -583,17 +578,15 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePositionAutoDiff) {
         api::GeoPositionT<drake::AutoDiffXd> geo_position{x_autodiff, y_autodiff, z_autodiff};
 
         // Compute LanePositionT with and without the I/O arguments.
-        const api::LanePositionT<drake::AutoDiffXd> lane_position =
-            lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position, &nearest_position, &distance);
-        const api::LanePositionT<drake::AutoDiffXd> lane_position_nullargs =
-            lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position, nullptr, nullptr);
+        const api::LanePositionResultT<drake::AutoDiffXd> result =
+            lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position);
 
         std::vector<drake::Vector3<double>> positional_derivatives{drake::Vector3<double>::Zero(),   // s
                                                                    drake::Vector3<double>::Zero(),   // r
                                                                    drake::Vector3<double>::Zero()};  // h
         for (int i{0}; i < 3; ++i) positional_derivatives[i](i) = 1.;
 
-        if (distance == 0.) {
+        if (result.distance == 0.) {
           // `geo_position` is within the interior or on the boundary.
           //
           // For the x-coordinate, expect the following derivatives for
@@ -602,13 +595,12 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePositionAutoDiff) {
           // axis).  Verify that the derivatives of nearest position are the
           // same as for geo_position.
           for (int i{0}; i < 3; ++i) {
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], lane_position.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], lane_position_nullargs.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], nearest_position.xyz()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], result.lane_position.srh()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], result.nearest_position.xyz()(i).derivatives()));
           }
           // Expect ∂/∂x(distance) = 0., as distance remains unchanged when
           // on the boundary or within the interior of the lane.
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>::Zero(), distance.derivatives()));
+          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>::Zero(), result.distance.derivatives()));
         } else {
           // `geo_position` is outside of the lane.  In this case, the
           // derivatives for distance and position depend on the region in
@@ -660,21 +652,20 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePositionAutoDiff) {
           // ∂/∂x(NP.r()) should always be zero.  Similar principles apply
           // in cases where z ≠ 0.
           const drake::Vector3<double> derivative_candidates(
-              (x < min_x_) ? (x - min_x_) / distance.value() : (x - max_x_) / distance.value(),
-              (y < min_y_) ? (y - min_y_) / distance.value() : (y - max_y_) / distance.value(),
-              (z < min_z_) ? (z - min_z_) / distance.value() : (z - max_z_) / distance.value());
+              (x < min_x_) ? (x - min_x_) / result.distance.value() : (x - max_x_) / result.distance.value(),
+              (y < min_y_) ? (y - min_y_) / result.distance.value() : (y - max_y_) / result.distance.value(),
+              (z < min_z_) ? (z - min_z_) / result.distance.value() : (z - max_z_) / result.distance.value());
           drake::Vector3<double> distance_derivatives = drake::Vector3<double>::Zero();
 
           for (int index : GetTransgressedBoundaries(geo_position)) {
             distance_derivatives(index) = derivative_candidates(index);
             positional_derivatives[index](index) = 0.;  // (entry was = 1).
           }
-          EXPECT_TRUE(CompareMatrices(distance_derivatives, distance.derivatives(),
+          EXPECT_TRUE(CompareMatrices(distance_derivatives, result.distance.derivatives(),
                                       1e-15 /* account for small numerical errors */));
           for (int i{0}; i < 3; ++i) {
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], lane_position.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], lane_position_nullargs.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], nearest_position.xyz()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], result.lane_position.srh()(i).derivatives()));
+            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], result.nearest_position.xyz()(i).derivatives()));
           }
         }
       }
@@ -705,8 +696,7 @@ TEST_F(MaliputDragwayLaneTest, ThrowIfLanePosHasMismatchedDerivatives) {
   drake::AutoDiffXd z{7., drake::Vector1<double>(1.)};
   api::GeoPositionT<drake::AutoDiffXd> geo_position(x, y, z);
 
-  EXPECT_THROW(lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position, nullptr, nullptr),
-               maliput::common::assertion_error);
+  EXPECT_THROW(lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position), common::assertion_error);
 }
 
 TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic1) {
@@ -723,32 +713,27 @@ TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic1) {
   const double v_z = -0.5;
   drake::symbolic::Environment env{{{x, v_x}, {y, v_y}, {z, v_z}}};
 
-  // Computes symbolic gp and distance.
-  api::GeoPositionT<drake::symbolic::Expression> symbolic_gp;
-  drake::symbolic::Expression symbolic_distance{0.0};
-  const api::LanePositionT<drake::symbolic::Expression> symbolic_lp{lane_->ToLanePositionT<drake::symbolic::Expression>(
-      api::GeoPositionT<drake::symbolic::Expression>{x, y, z}, &symbolic_gp, &symbolic_distance)};
+  const api::LanePositionResultT<drake::symbolic::Expression> symbolic_result{
+      lane_->ToLanePositionT<drake::symbolic::Expression>(api::GeoPositionT<drake::symbolic::Expression>{x, y, z})};
 
-  // Computes gp and distance (of double).
-  api::GeoPosition gp;
-  double distance{0.0};
-  const api::LanePosition lp{lane_->ToLanePosition(api::GeoPosition{v_x, v_y, v_z}, &gp, &distance)};
+  const api::LanePositionResult double_result{lane_->ToLanePosition(api::GeoPosition{v_x, v_y, v_z})};
 
-  EXPECT_EQ(symbolic_lp.s().Evaluate(env), lp.s());
-  EXPECT_EQ(symbolic_lp.r().Evaluate(env), lp.r());
-  EXPECT_EQ(symbolic_lp.h().Evaluate(env), lp.h());
+  EXPECT_EQ(symbolic_result.lane_position.s().Evaluate(env), double_result.lane_position.s());
+  EXPECT_EQ(symbolic_result.lane_position.r().Evaluate(env), double_result.lane_position.r());
+  EXPECT_EQ(symbolic_result.lane_position.h().Evaluate(env), double_result.lane_position.h());
 
-  EXPECT_EQ(symbolic_gp.x().Evaluate(env), gp.x());
-  EXPECT_EQ(symbolic_gp.y().Evaluate(env), gp.y());
-  EXPECT_EQ(symbolic_gp.z().Evaluate(env), gp.z());
-  EXPECT_EQ(symbolic_distance.Evaluate(env), distance);
+  EXPECT_EQ(symbolic_result.nearest_position.x().Evaluate(env), double_result.nearest_position.x());
+  EXPECT_EQ(symbolic_result.nearest_position.y().Evaluate(env), double_result.nearest_position.y());
+  EXPECT_EQ(symbolic_result.nearest_position.z().Evaluate(env), double_result.nearest_position.z());
+  EXPECT_EQ(symbolic_result.distance.Evaluate(env), double_result.distance);
 
   // These values (1.0, 2.0, -0.5) lie outside the lane. Therefore, 1) we have a
   // positive distance and 2) the symbolic_gp evaluated with those values is
   // different from (1.0, 2.0, -0.5).
-  EXPECT_GT(distance, 0.0);
-  EXPECT_FALSE(symbolic_gp.x().Evaluate(env) == v_x && symbolic_gp.y().Evaluate(env) == v_y &&
-               symbolic_gp.z().Evaluate(env) == v_z);
+  EXPECT_GT(double_result.distance, 0.0);
+  EXPECT_FALSE(symbolic_result.nearest_position.x().Evaluate(env) == v_x &&
+               symbolic_result.nearest_position.y().Evaluate(env) == v_y &&
+               symbolic_result.nearest_position.z().Evaluate(env) == v_z);
 }
 
 TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic2) {
@@ -760,38 +745,34 @@ TEST_F(MaliputDragwayLaneTest, ToLanePositionSymbolic2) {
   const drake::symbolic::Variable x{"x"};
   const drake::symbolic::Variable y{"y"};
   const drake::symbolic::Variable z{"z"};
+  const drake::symbolic::Variable d{"distance"};
   const double v_x = 1.0;
   const double v_y = 2.0;
   const double v_z = 0.0;
-  drake::symbolic::Environment env{{{x, v_x}, {y, v_y}, {z, v_z}}};
+  const double v_d = 0.0;
+  drake::symbolic::Environment env{{{x, v_x}, {y, v_y}, {z, v_z}, {d, v_d}}};
 
-  // Computes symbolic gp and distance.
-  api::GeoPositionT<drake::symbolic::Expression> symbolic_gp;
-  drake::symbolic::Expression symbolic_distance{0.0};
+  const api::LanePositionResultT<drake::symbolic::Expression> symbolic_result{
+      lane_->ToLanePositionT<drake::symbolic::Expression>(api::GeoPositionT<drake::symbolic::Expression>{x, y, z})};
 
-  const api::LanePositionT<drake::symbolic::Expression> symbolic_lp{lane_->ToLanePositionT<drake::symbolic::Expression>(
-      api::GeoPositionT<drake::symbolic::Expression>{x, y, z}, &symbolic_gp, &symbolic_distance)};
+  const api::LanePositionResult double_result{lane_->ToLanePosition(api::GeoPosition{v_x, v_y, v_z})};
 
-  // Computes gp and distance (of double).
-  api::GeoPosition gp;
-  double distance{0.0};
-  const api::LanePosition lp{lane_->ToLanePosition(api::GeoPosition{v_x, v_y, v_z}, &gp, &distance)};
+  EXPECT_EQ(symbolic_result.lane_position.s().Evaluate(env), double_result.lane_position.s());
+  EXPECT_EQ(symbolic_result.lane_position.r().Evaluate(env), double_result.lane_position.r());
+  EXPECT_EQ(symbolic_result.lane_position.h().Evaluate(env), double_result.lane_position.h());
 
-  EXPECT_EQ(symbolic_lp.s().Evaluate(env), lp.s());
-  EXPECT_EQ(symbolic_lp.r().Evaluate(env), lp.r());
-  EXPECT_EQ(symbolic_lp.h().Evaluate(env), lp.h());
-
-  EXPECT_EQ(symbolic_gp.x().Evaluate(env), gp.x());
-  EXPECT_EQ(symbolic_gp.y().Evaluate(env), gp.y());
-  EXPECT_EQ(symbolic_gp.z().Evaluate(env), gp.z());
-  EXPECT_EQ(symbolic_distance.Evaluate(env), distance);
+  EXPECT_EQ(symbolic_result.nearest_position.x().Evaluate(env), double_result.nearest_position.x());
+  EXPECT_EQ(symbolic_result.nearest_position.y().Evaluate(env), double_result.nearest_position.y());
+  EXPECT_EQ(symbolic_result.nearest_position.z().Evaluate(env), double_result.nearest_position.z());
+  EXPECT_EQ(symbolic_result.distance.Evaluate(env), double_result.distance);
 
   // These values (1.0, 2.0, 0.0) lie on the lane. Therefore we have 1) a zero
-  // distance and 2) the symbolic_gp evaluated with those values is (1.0, 2.0,
+  // distance and 2) the nearest_position evaluated with those values is (1.0, 2.0,
   // 0.0).
-  EXPECT_EQ(distance, 0.0);
-  EXPECT_TRUE(symbolic_gp.x().Evaluate(env) == v_x && symbolic_gp.y().Evaluate(env) == v_y &&
-              symbolic_gp.z().Evaluate(env) == v_z);
+  EXPECT_TRUE(symbolic_result.nearest_position.x().Evaluate(env) == v_x &&
+              symbolic_result.nearest_position.y().Evaluate(env) == v_y &&
+              symbolic_result.nearest_position.z().Evaluate(env) == v_z &&
+              symbolic_result.distance.Evaluate(env) == v_d);
 }
 
 TEST_F(MaliputDragwayLaneTest, ToGeoPositionSymbolic) {

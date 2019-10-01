@@ -13,6 +13,13 @@ namespace multilane {
 
 namespace {
 
+// Converts `result` and `lane` into an api::RoadPositionResult.
+// `result.nearest_position` and `result.distance` are direct mappings, and the
+// api::RoadPosition is built with `lane` and `result.lane_position`.
+api::RoadPositionResult FromLanePositionResult(const api::Lane* const lane, const api::LanePositionResult& result) {
+  return {api::RoadPosition{lane, result.lane_position}, result.nearest_position, result.distance};
+}
+
 // Evaluates if the result of `lane->ToLanePosition()` using `geo_position`
 // provides a closer api::RoadPositionResult than `road_position_result`.
 //
@@ -37,10 +44,8 @@ const api::RoadPositionResult EvaluateRoadPositionResult(const api::GeoPosition&
                                                          const api::RoadPositionResult& road_position_result) {
   MALIPUT_DEMAND(lane != nullptr);
 
-  api::RoadPositionResult new_road_position_result;
-  new_road_position_result.road_position =
-      api::RoadPosition{lane, lane->ToLanePosition(geo_position, &new_road_position_result.nearest_position,
-                                                   &new_road_position_result.distance)};
+  const api::RoadPositionResult new_road_position_result =
+      FromLanePositionResult(lane, lane->ToLanePosition(geo_position));
 
   const double delta = new_road_position_result.distance - road_position_result.distance;
   if (delta > linear_tolerance) {  // new_distance is bigger than *distance, so this LanePosition is discarded.
@@ -112,9 +117,7 @@ api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& g
   // extends beyond only adjacent lanes.
   if (hint.has_value()) {
     MALIPUT_DEMAND(hint->lane != nullptr);
-    road_position_result.road_position =
-        api::RoadPosition{hint->lane, hint->lane->ToLanePosition(geo_position, &road_position_result.nearest_position,
-                                                                 &road_position_result.distance)};
+    road_position_result = FromLanePositionResult(hint->lane, hint->lane->ToLanePosition(geo_position));
     if (road_position_result.distance != 0.) {
       // Loop through ongoing lanes at both ends of the current lane, to find
       // the position associated with the first found containing lane or the
@@ -136,9 +139,7 @@ api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& g
     MALIPUT_DEMAND(junction(0)->num_segments() > 0);
     MALIPUT_DEMAND(junction(0)->segment(0)->num_lanes() > 0);
     const api::Lane* lane = this->junction(0)->segment(0)->lane(0);
-    road_position_result.road_position = api::RoadPosition{
-        lane,
-        lane->ToLanePosition(geo_position, &road_position_result.nearest_position, &road_position_result.distance)};
+    road_position_result = FromLanePositionResult(lane, lane->ToLanePosition(geo_position));
     for (int i = 0; i < num_junctions(); ++i) {
       const api::Junction* junction = this->junction(i);
       for (int j = 0; j < junction->num_segments(); ++j) {

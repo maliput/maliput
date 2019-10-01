@@ -23,6 +23,7 @@ using api::Lane;
 using api::LaneEnd;
 using api::LaneId;
 using api::LanePosition;
+using api::LanePositionResult;
 using api::RBounds;
 using api::RoadGeometry;
 
@@ -174,18 +175,16 @@ TEST_F(Test2x2Intersection, CheckLaneNamesAndPositions) {
        {GeoPosition(-kHalfLaneWidth, kEntryDistance, 0), GeoPosition(-0.64, 1.66, 0),
         GeoPosition(kEntryDistance, -kHalfLaneWidth, 0)}},
   };
-  double distance{};
-  GeoPosition closest_point;
   for (const auto& test_case : test_cases) {
     const Lane* lane = dut_->ById().GetLane(test_case.id);
     EXPECT_NE(lane, nullptr);
     EXPECT_NEAR(lane->length(), test_case.length, dut_->linear_tolerance());
     for (const auto& geo_position : test_case.geo_positions) {
-      const LanePosition lane_position = lane->ToLanePosition(geo_position, &closest_point, &distance);
-      EXPECT_NEAR(distance, 0, dut_->linear_tolerance());
-      const RBounds lane_bounds = lane->lane_bounds(lane_position.s());
-      EXPECT_TRUE(lane_bounds.min() <= lane_position.r());
-      EXPECT_TRUE(lane_bounds.max() >= lane_position.r());
+      const LanePositionResult result = lane->ToLanePosition(geo_position);
+      EXPECT_NEAR(result.distance, 0, dut_->linear_tolerance());
+      const RBounds lane_bounds = lane->lane_bounds(result.lane_position.s());
+      EXPECT_TRUE(lane_bounds.min() <= result.lane_position.r());
+      EXPECT_TRUE(lane_bounds.max() >= result.lane_position.r());
     }
   }
 }

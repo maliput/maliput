@@ -28,11 +28,10 @@ std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrateg
         MALIPUT_THROW_UNLESS(lane != nullptr);
         double distance{};
         maliput::api::GeoPosition nearest_position;
-        const maliput::api::LanePosition lane_position =
-            lane->ToLanePosition(geo_position, &nearest_position, &distance);
-
-        if (radius == std::numeric_limits<double>::infinity() || distance <= radius) {
-          road_position_results.push_back({api::RoadPosition(lane, lane_position), nearest_position, distance});
+        const maliput::api::LanePositionResult result = lane->ToLanePosition(geo_position);
+        if (radius == std::numeric_limits<double>::infinity() || result.distance <= radius) {
+          road_position_results.push_back(
+              {api::RoadPosition(lane, result.lane_position), result.nearest_position, result.distance});
         }
       }
     }

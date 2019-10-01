@@ -86,26 +86,22 @@ api::Rotation Lane::DoGetOrientation(const api::LanePosition&) const {
   return api::Rotation();  // Default is Identity.
 }
 
-api::LanePosition Lane::DoToLanePosition(const api::GeoPosition& geo_pos, api::GeoPosition* nearest_point,
-                                         double* distance) const {
-  return ImplDoToLanePositionT<double>(geo_pos, nearest_point, distance);
+api::LanePositionResult Lane::DoToLanePosition(const api::GeoPosition& geo_pos) const {
+  return ImplDoToLanePositionT<double>(geo_pos);
 }
 
-api::LanePositionT<drake::AutoDiffXd> Lane::DoToLanePositionAutoDiff(
-    const api::GeoPositionT<drake::AutoDiffXd>& geo_pos, api::GeoPositionT<drake::AutoDiffXd>* nearest_point,
-    drake::AutoDiffXd* distance) const {
-  return ImplDoToLanePositionT<drake::AutoDiffXd>(geo_pos, nearest_point, distance);
+api::LanePositionResultT<drake::AutoDiffXd> Lane::DoToLanePositionAutoDiff(
+    const api::GeoPositionT<drake::AutoDiffXd>& geo_pos) const {
+  return ImplDoToLanePositionT<drake::AutoDiffXd>(geo_pos);
 }
 
-api::LanePositionT<drake::symbolic::Expression> Lane::DoToLanePositionSymbolic(
-    const api::GeoPositionT<drake::symbolic::Expression>& geo_pos,
-    api::GeoPositionT<drake::symbolic::Expression>* nearest_point, drake::symbolic::Expression* distance) const {
-  return ImplDoToLanePositionT<drake::symbolic::Expression>(geo_pos, nearest_point, distance);
+api::LanePositionResultT<drake::symbolic::Expression> Lane::DoToLanePositionSymbolic(
+    const api::GeoPositionT<drake::symbolic::Expression>& geo_pos) const {
+  return ImplDoToLanePositionT<drake::symbolic::Expression>(geo_pos);
 }
 
 template <typename T>
-api::LanePositionT<T> Lane::ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos,
-                                                  api::GeoPositionT<T>* nearest_point, T* distance) const {
+api::LanePositionResultT<T> Lane::ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos) const {
   using drake::math::saturate;
 
   const T min_x{0.};
@@ -119,44 +115,43 @@ api::LanePositionT<T> Lane::ImplDoToLanePositionT(const api::GeoPositionT<T>& ge
   const T y = geo_pos.y();
   const T z = geo_pos.z();
 
-  api::GeoPositionT<T> closest_point{saturate(x, min_x, max_x), saturate(y, min_y, max_y), saturate(z, min_z, max_z)};
-  if (nearest_point != nullptr) {
-    *nearest_point = closest_point;
-  }
+  api::LanePositionResultT<T> result;
 
-  if (distance != nullptr) {
-    const T distance_unsat = (geo_pos.xyz() - closest_point.xyz()).norm();
+  result.nearest_position = {saturate(x, min_x, max_x), saturate(y, min_y, max_y), saturate(z, min_z, max_z)};
 
-    // N.B. Under AutoDiff, the partial derivative of the distance with respect
-    // to position is undefined (i.e. NaN) when distance.value() = 0.  This
-    // implementation replaces those NaN values with numbers that are consistent
-    // with the geometry such that the following hold:
-    //
-    // Let v be any coordinate x, y, or z.
-    //
-    // 1) Within the interior of the lane volume, ∂/∂v(distance) = 0, since
-    // distance is invariant to perturbations in v.
-    //
-    // 2) On the exterior of the lane, ∂/∂v(distance) is identical to
-    // ∂/∂v(distance_unsat).
-    //
-    // 3) On the boundary, ∂/∂v(distance) has two solutions: zero or
-    // ∂/∂v(distance_unsat), depending on whether the derivative at the boundary
-    // is evaluated when approached from the exterior or interior.  This
-    // implementation chooses the derivatives taken from within the interior
-    // (zero) in order to remain consistent with the derivatives of
-    // nearest_point and the returned LanePositionT.
-    //
-    // We want to make sure that ∂/∂x(distance) = 0 when distance = 0 (not
-    // ∂/∂x(distance) = ∂/∂x(distance_unsat). The max function in
-    // common/autodiffxd.h returns the first argument when the two arguments
-    // have the same value. As a result, one should not change the order of the
-    // arguments in the max function below.
-    using std::max;
-    *distance = max(T(0.), distance_unsat);
-  }
+  const T distance_unsat = (geo_pos.xyz() - result.nearest_position.xyz()).norm();
+  // N.B. Under AutoDiff, the partial derivative of the distance with respect
+  // to position is undefined (i.e. NaN) when distance.value() = 0.  This
+  // implementation replaces those NaN values with numbers that are consistent
+  // with the geometry such that the following hold:
+  //
+  // Let v be any coordinate x, y, or z.
+  //
+  // 1) Within the interior of the lane volume, ∂/∂v(distance) = 0, since
+  // distance is invariant to perturbations in v.
+  //
+  // 2) On the exterior of the lane, ∂/∂v(distance) is identical to
+  // ∂/∂v(distance_unsat).
+  //
+  // 3) On the boundary, ∂/∂v(distance) has two solutions: zero or
+  // ∂/∂v(distance_unsat), depending on whether the derivative at the boundary
+  // is evaluated when approached from the exterior or interior.  This
+  // implementation chooses the derivatives taken from within the interior
+  // (zero) in order to remain consistent with the derivatives of
+  // nearest_point and the returned LanePositionT.
+  //
+  // We want to make sure that ∂/∂x(distance) = 0 when distance = 0 (not
+  // ∂/∂x(distance) = ∂/∂x(distance_unsat). The max function in
+  // common/autodiffxd.h returns the first argument when the two arguments
+  // have the same value. As a result, one should not change the order of the
+  // arguments in the max function below.
+  using std::max;
+  result.distance = max(T(0.), distance_unsat);
 
-  return {closest_point.x(), closest_point.y() - T(y_offset_), closest_point.z()};
+  result.lane_position = {result.nearest_position.x(), result.nearest_position.y() - T(y_offset_),
+                          result.nearest_position.z()};
+
+  return result;
 }
 
 }  // namespace dragway

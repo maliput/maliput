@@ -7,6 +7,7 @@ import numpy as np
 import pydrake.systems.framework as framework
 from maliput.api import (
     LanePosition,
+    LanePositionResult,
     GeoPosition,
     RoadGeometry,
     RoadGeometryId,
@@ -125,14 +126,12 @@ class TestMaliput(unittest.TestCase):
                                     geo_pos_expected.xyz()))
 
         geo_pos = GeoPosition(1., kLaneWidth / 2., 3.)
-        nearest_pos = GeoPosition(0., 0., 0.)
-        distance = 0.
-        lane_pos_result = \
-            lane_1.ToLanePosition(geo_pos, nearest_pos, distance)
-        lane_pos_expected = LanePosition(1., 0., 3.)
-        self.assertTrue(np.allclose(lane_pos_result.srh(),
-                                    lane_pos_expected.srh()))
-        self.assertTrue(np.allclose(nearest_pos.xyz(), geo_pos.xyz()))
-        self.assertTrue(distance == 0.)
+        lane_pos_result = lane_1.ToLanePosition(geo_pos)
+        lane_pos_result_expected = \
+            LanePositionResult(LanePosition(1., 0., 3.), GeoPosition(0., 0., 0.), 0.)
+        self.assertTrue(np.allclose(lane_pos_result.lane_position.srh(),
+                                    lane_pos_result_expected.lane_position.srh()))
+        self.assertTrue(np.allclose(lane_pos_result.nearest_position.xyz(), geo_pos.xyz()))
+        self.assertTrue(lane_pos_result.distance == lane_pos_result_expected.distance)
 
     # TODO(jadecastro) Add more maliput backends as needed.
