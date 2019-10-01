@@ -39,6 +39,7 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
   /// @param id the ID of the RoadGeometry
   /// @param linear_tolerance the linear tolerance
   /// @param angular_tolerance the angular tolerance
+  /// @param scale_length the scale length
   ///
   /// @throws std::exception if either `linear_tolerance` or
   ///         `angular_tolerance` or `scale_length` is non-positive.

@@ -12,11 +12,11 @@
 namespace maliput {
 namespace api {
 
-/// %TypeSpecificIdentifier<T> represents an identifier specifically identifying
+/// TypeSpecificIdentifier<T> represents an identifier specifically identifying
 /// an entity of type `T`.
 ///
 /// A new %TypeSpecificIdentifier is constructed from a non-empty string;
-/// TypeSpecificIdentifiers constructed from equal strings are considered to
+/// %TypeSpecificIdentifiers constructed from equal strings are considered to
 /// be equal.  There is currently no other semantic value attributed to the
 /// contents of the string.
 ///
@@ -40,7 +40,7 @@ class TypeSpecificIdentifier {
  public:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(TypeSpecificIdentifier);
 
-  /// The type whose instances are identified by this TypeSpecificIdentifier.
+  /// The type whose instances are identified by this %TypeSpecificIdentifier.
   typedef T identified_type;
 
   /// Constructs a %TypeSpecificIdentifier from the given `string`.

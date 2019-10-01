@@ -1,12 +1,12 @@
 // clang-format off
 
-/// @file filesystem.hh
+/// @file filesystem.h
 ///
 /// Code in this file is inspired by:
 /// https://github.com/psiorx/spruce-pod/blob/master/src/spruce.hh
 ///
 /// Code license follows:
-/// Copyright (c) 2014, Joseph Davis (@josephdavisco)
+/// Copyright (c) 2014, Joseph Davis (\@josephdavisco)
 /// All rights reserved.
 ///
 /// Redistribution and use in source and binary forms, with or without

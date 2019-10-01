@@ -14,8 +14,7 @@ class RoadGeometry;
 namespace multilane {
 
 /// Loads the `input` string as a maliput_multilane_builder document using the
-/// provided `builder_factory`. See
-/// @ref automotive/multilane/loader.h "loader.h" for further details.
+/// provided `builder_factory`.
 ///
 /// Application code must use a BuilderFactory reference. It is provided so that
 /// the @ref maliput::multilane::Builder "Builder" to be created can be

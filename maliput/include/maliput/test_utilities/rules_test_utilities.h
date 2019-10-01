@@ -26,7 +26,7 @@ namespace test {
 ///
 /// Instead of invocations of `EXPECT_*()` or `ASSERT_*()` within a test
 /// subroutine, predicate-assertion functions are invoked and the resulting
-/// ::testing::AssertionResult instances should be collected by an instance
+/// \::testing\::AssertionResult instances should be collected by an instance
 /// of AssertionResultCollector.  At the end of the subroutine, an
 /// AssertionResult, representing the `and` of all the collected results,
 /// can be extracted from the collector.

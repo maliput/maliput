@@ -123,10 +123,12 @@ class RightOfWayRule final {
   /// Constructs a RightOfWayRule.
   ///
   /// @param id the unique ID of this rule (in the RoadRulebook)
-  /// @param controlled_zone LaneSRoute to which this rule applies
-  /// @param type the static semantics of this rule
-  /// @param related_bulb_groups The related bulb groups. All IDs present within
-  ///        the supplied map are assumed to be valid.
+  /// @param zone to which this rule applies
+  /// @param zone_type describing whether or not stopping within the zone is allowed
+  /// @param states one or more States, each of which indicate the possible
+  ///        right-of-way semantics for a vehicle traversing the zone
+  /// @param related_bulb_groups The related bulb groups. All IDs present within the
+  ///        supplied map are assumed to be valid.
   ///
   /// @throws maliput::common::assertion_error if `states` is empty or if
   ///         `states` contains duplicate State::Id's.

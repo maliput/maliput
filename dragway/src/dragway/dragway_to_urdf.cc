@@ -1,7 +1,8 @@
 /**
- @file Instantiates a dragway with a user-specified number of lanes and outputs
- a URDF model of it.
- **/
+ * @file dragway_to_urdf.cc
+ * Instantiates a dragway with a user-specified number of lanes and outputs
+ * a URDF model of it.
+ */
 
 #include <gflags/gflags.h>
 
