@@ -61,16 +61,7 @@ struct ObjFeatures {
   std::vector<api::SegmentId> highlighted_segments;
 };
 
-enum MeshMaterial {
-  Asphalt,
-  Lane,
-  Marker,
-  HBounds,
-  BranchPointGlow,
-  GrayedAsphalt,
-  GrayedLane,
-  GrayedMarker
-};
+enum MeshMaterial { Asphalt, Lane, Marker, HBounds, BranchPointGlow, GrayedAsphalt, GrayedLane, GrayedMarker };
 
 /// Material information for built meshes.
 struct Material {
@@ -90,7 +81,7 @@ struct Material {
 struct RoadGeometryMeshes {
   std::map<api::SegmentId, std::pair<mesh::GeoMesh, Material>> segment_asphalt_mesh;
   std::map<api::SegmentId, std::pair<mesh::GeoMesh, Material>> segment_grayed_asphalt_mesh;
-  
+
   std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_asphalt_mesh;
   std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_lane_mesh;
   std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_marker_mesh;
@@ -101,6 +92,31 @@ struct RoadGeometryMeshes {
 
   std::map<api::BranchPointId, std::pair<mesh::GeoMesh, Material>> branch_point_mesh;
 };
+
+/// Builds a map of meshes based on `features` properties and the RoadGeometry.
+///
+/// @param road_geometry  the api::RoadGeometry to model.
+/// @param features  parameters for constructing the mesh.
+/// @return A pair with of a mesh and the corresponding material
+std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
+                                             const api::LaneId& lane_id, const MeshMaterial& mesh_material);
+
+/// Builds a map of meshes based on `features` properties and the RoadGeometry.
+///
+/// @param road_geometry  the api::RoadGeometry to model.
+/// @param features  parameters for constructing the mesh.
+/// @return A pair with of a mesh and the corresponding material
+std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
+                                             const api::BranchPointId& branch_point_id,
+                                             const MeshMaterial& mesh_material);
+
+/// Builds a map of meshes based on `features` properties and the RoadGeometry.
+///
+/// @param road_geometry  the api::RoadGeometry to model.
+/// @param features  parameters for constructing the mesh.
+/// @return A pair with of a mesh and the corresponding material
+std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
+                                             const api::SegmentId& segment_id, const MeshMaterial& mesh_material);
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
 ///
