@@ -659,6 +659,8 @@ Material GetMaterialFromMesh(const MeshMaterial mesh_material) {
 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::LaneId& lane_id, const MeshMaterial& mesh_material) {
+  MALIPUT_THROW_UNLESS(mesh_material != BranchPointGlow);
+
   GeoMesh mesh;
   const api::RoadGeometry::IdIndex& roadIndex = rg->ById();
   const api::Lane* lane = roadIndex.GetLane(lane_id);
@@ -716,6 +718,8 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::BranchPointId& branch_point_id,
                                              const MeshMaterial& mesh_material) {
+  MALIPUT_THROW_UNLESS(mesh_material == BranchPointGlow);
+
   GeoMesh mesh;
   const api::RoadGeometry::IdIndex& roadIndex = rg->ById();
   const api::BranchPoint* branch_point = roadIndex.GetBranchPoint(branch_point_id);
@@ -754,6 +758,45 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
   Material material = GetMaterialFromMesh(mesh_material);
 
   return std::make_pair(std::move(mesh), material);
+}
+
+RoadGeometryMeshes BuildRoadGeometryMeshes(const api::RoadGeometry* rg, const ObjFeatures& features) {
+  RoadGeometryMeshes meshes;
+
+  for (int ji = 0; ji < rg->num_junctions(); ++ji) {
+    const api::Junction* junction = rg->junction(ji);
+    for (int si = 0; si < junction->num_segments(); ++si) {
+      const api::Segment* segment = junction->segment(si);
+      if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
+        meshes.segment_asphalt_mesh[segment->id()] = BuildMesh(rg, features, segment->id(), Asphalt);
+        for (int li = 0; li < segment->num_lanes(); ++li) {
+          const api::Lane* lane = segment->lane(li);
+          meshes.lane_asphalt_mesh[lane->id()] = BuildMesh(rg, features, lane->id(), Asphalt);
+          meshes.lane_lane_mesh[lane->id()] = BuildMesh(rg, features, lane->id(), Lane);
+          meshes.lane_marker_mesh[lane->id()] = BuildMesh(rg, features, lane->id(), Marker);
+          meshes.lane_hbounds_mesh[lane->id()] = BuildMesh(rg, features, lane->id(), HBounds);
+        }
+      } else {
+        meshes.segment_asphalt_mesh[segment->id()] = BuildMesh(rg, features, segment->id(), GrayedAsphalt);
+        for (int li = 0; li < segment->num_lanes(); ++li) {
+          const api::Lane* lane = segment->lane(li);
+          meshes.lane_asphalt_mesh[lane->id()] = BuildMesh(rg, features, lane->id(), GrayedAsphalt);
+          meshes.lane_lane_mesh[lane->id()] = BuildMesh(rg, features, lane->id(), GrayedLane);
+          meshes.lane_marker_mesh[lane->id()] = BuildMesh(rg, features, lane->id(), GrayedMarker);
+          meshes.lane_hbounds_mesh[lane->id()] = BuildMesh(rg, features, lane->id(), HBounds);
+        }
+      }
+    }
+  }
+
+  if (features.draw_branch_points) {
+    for (int bpi = 0; bpi < rg->num_branch_points(); ++bpi) {
+      const api::BranchPoint* branch_point = rg->branch_point(bpi);
+      meshes.branch_point_mesh[branch_point->id()] = BuildMesh(rg, features, branch_point->id(), BranchPointGlow);
+    }
+  }
+
+  return meshes;
 }
 
 std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* rg,
