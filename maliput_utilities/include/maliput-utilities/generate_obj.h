@@ -88,7 +88,7 @@ struct RoadGeometryMeshes {
   std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_grayed_asphalt_mesh;
   std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_grayed_lane_mesh;
   std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_grayed_marker_mesh;
-  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_h_bounds_mesh;
+  std::map<api::LaneId, std::pair<mesh::GeoMesh, Material>> lane_hbounds_mesh;
 
   std::map<api::BranchPointId, std::pair<mesh::GeoMesh, Material>> branch_point_mesh;
 };
