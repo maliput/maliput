@@ -7,10 +7,11 @@
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
+
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
-#include "maliput/geometry_base/passkey.h"
+#include "maliput/common/passkey.h"
 #include "maliput/geometry_base/segment.h"
 
 namespace maliput {
@@ -67,7 +68,7 @@ class Junction : public api::Junction {
   // @pre `segment_indexing_callback` is non-empty.
   // @pre `lane_indexing_callback` is non-empty.
   // @pre Parent RoadGeometry and the callbacks have not already been set.
-  void AttachToRoadGeometry(Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry,
+  void AttachToRoadGeometry(common::Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry,
                             const std::function<void(const api::Segment*)>& segment_indexing_callback,
                             const std::function<void(const api::Lane*)>& lane_indexing_callback);
 #endif  // DRAKE_DOXYGEN_CXX

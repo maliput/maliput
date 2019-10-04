@@ -1,7 +1,7 @@
 #pragma once
 
 namespace maliput {
-namespace geometry_base {
+namespace common {
 
 /// Simple generic implementation of the "Passkey Idiom".
 ///
@@ -27,5 +27,5 @@ class Passkey {
   Passkey& operator=(const Passkey&) = delete;
 };
 
-}  // namespace geometry_base
+}  // namespace common
 }  // namespace maliput

@@ -7,7 +7,7 @@
 namespace maliput {
 namespace geometry_base {
 
-void Lane::AttachToSegment(Passkey<Segment>, const api::Segment* segment, int index) {
+void Lane::AttachToSegment(common::Passkey<Segment>, const api::Segment* segment, int index) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(segment != nullptr);
   MALIPUT_THROW_UNLESS(index >= 0);
@@ -19,7 +19,7 @@ void Lane::AttachToSegment(Passkey<Segment>, const api::Segment* segment, int in
   index_ = index;
 }
 
-void Lane::SetStartBranchPoint(Passkey<BranchPoint>, BranchPoint* branch_point) {
+void Lane::SetStartBranchPoint(common::Passkey<BranchPoint>, BranchPoint* branch_point) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(branch_point != nullptr);
   // Preconditions
@@ -28,7 +28,7 @@ void Lane::SetStartBranchPoint(Passkey<BranchPoint>, BranchPoint* branch_point) 
   start_branch_point_ = branch_point;
 }
 
-void Lane::SetFinishBranchPoint(Passkey<BranchPoint>, BranchPoint* branch_point) {
+void Lane::SetFinishBranchPoint(common::Passkey<BranchPoint>, BranchPoint* branch_point) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(branch_point != nullptr);
   // Preconditions
