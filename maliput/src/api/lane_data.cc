@@ -29,7 +29,7 @@ T GeoPositionT<T>::Distance(const GeoPositionT<T>& geo_position) const {
   return (this->xyz() - geo_position.xyz()).norm();
 }
 
-GeoPosition Rotation::Apply(const GeoPosition& in) const {
+GeoPosition Rotation::Apply(const GeoPosition& geo_position) const {
   const double sa = std::sin(this->roll());
   const double ca = std::cos(this->roll());
   const double sb = std::sin(this->pitch());
@@ -38,17 +38,17 @@ GeoPosition Rotation::Apply(const GeoPosition& in) const {
   const double cg = std::cos(this->yaw());
   // clang-format off
   return GeoPosition(
-        ((cb*cg) * in.x()) +
-        ((-ca*sg + sa*sb*cg) * in.y()) +
-        ((sa*sg + ca*sb*cg) * in.z()),
+        ((cb*cg) * geo_position.x()) +
+        ((-ca*sg + sa*sb*cg) * geo_position.y()) +
+        ((sa*sg + ca*sb*cg) * geo_position.z()),
 
-        ((cb*sg) * in.x()) +
-        ((ca*cg + sa*sb*sg) * in.y()) +
-        ((-sa*cg + ca*sb*sg) * in.z()),
+        ((cb*sg) * geo_position.x()) +
+        ((ca*cg + sa*sb*sg) * geo_position.y()) +
+        ((-sa*cg + ca*sb*sg) * geo_position.z()),
 
-        ((-sb) * in.x()) +
-        ((sa*cb) * in.y()) +
-        ((ca*cb) * in.z()));
+        ((-sb) * geo_position.x()) +
+        ((sa*cb) * geo_position.y()) +
+        ((ca*cb) * geo_position.z()));
   // clang-format on
 }
 

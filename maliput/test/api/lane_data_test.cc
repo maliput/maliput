@@ -296,66 +296,63 @@ TEST_F(RotationTest, QuaternionSetter) {
                                twist_pitch_, twist_yaw_, twist_matrix_);
 }
 
-GTEST_TEST(Rotation, Apply) {
-  // Check the `Apply` method.
+GTEST_TEST(Rotation, ApplyTest) {
   // Test compared to the following python script.
   // >>> import math as m
   // >>> import numpy as np
-  // >>>
-  // >>> def rotM (angles):
-  // >>>   ca_x = m.cos(angles.item(0))
-  // >>>   sa_x = m.sin(angles.item(0))
-  // >>>   ca_y = m.cos(angles.item(1))
-  // >>>   sa_y = m.sin(angles.item(1))
-  // >>>   ca_z = m.cos(angles.item(2))
-  // >>>   sa_z = m.sin(angles.item(2))
-  // >>>   #build rotation matrix per axis
-  // >>>   rx = np.matrix([[1, 0, 0], [0, ca_x, -sa_x], [0, sa_x, ca_x]])
-  // >>>   ry = np.matrix([[ca_y, 0, sa_y], [0, 1, 0], [-sa_y, 0, ca_y]])
-  // >>>   rz = np.matrix([[ca_z, -sa_z, 0], [sa_z, ca_z, 0], [0, 0, 1]])
-  // >>>   return (rz * ry * rx)
-  // >>> rotation = np.matrix([[1.75],[2.91],[0.38]])
-  // >>> vector = np.matrix([[15.],[33.],[148.]])
-  // >>> print (rotM(rotation)*vector)
-  const double kAngularTolerance = 1e-5;
+  // >>> def rotation_matrix (roll, pitch ,yaw):
+  // >>>     ca_r = m.cos(roll)
+  // >>>     sa_r = m.sin(roll)
+  // >>>     ca_p = m.cos(pitch)
+  // >>>     sa_p = m.sin(pitch)
+  // >>>     ca_y = m.cos(yaw)
+  // >>>     sa_y = m.sin(yaw)
+  // >>>     #build rotation matrix per axis
+  // >>>     rx = np.matrix([[1, 0, 0], [0, ca_r, -sa_r], [0, sa_r, ca_r]])
+  // >>>     ry = np.matrix([[ca_p, 0, sa_p], [0, 1, 0], [-sa_p, 0, ca_p]])
+  // >>>     rz = np.matrix([[ca_y, -sa_y, 0], [sa_y, ca_y, 0], [0, 0, 1]])
+  // >>>     return (rz * ry * rx)
+  // >>> rot_mat = rotation_matrix(1.75,2.91,0.38)
+  // >>> geo_position = np.matrix([[15.],[33.],[148.]])
+  // >>> print (rot_mat*geo_position)
+  const double kRotationTolerance = 1e-5;
   const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
-  const GeoPosition geo_po_s = dut.Apply({15., 33., 148.});
+  const GeoPosition geo_position = dut.Apply({15., 33., 148.});
   EXPECT_TRUE(
-      test::IsGeoPositionClose(geo_po_s, GeoPosition{43.93919835, -145.60056097, -9.37141893}, kAngularTolerance));
+      test::IsGeoPositionClose(geo_position, GeoPosition{43.93919835, -145.60056097, -9.37141893}, kRotationTolerance));
 }
 
-GTEST_TEST(Rotation, DistanceMethod) {
-  // Check the `Distance` method.
+GTEST_TEST(Rotation, DistanceTest) {
   // Test compared to the following python script.
   // >>> import math as m
   // >>> import numpy as np
-  // >>> def rotM (angles):
-  // >>>     ca_x = m.cos(angles.item(0))
-  // >>>     sa_x = m.sin(angles.item(0))
-  // >>>     ca_y = m.cos(angles.item(1))
-  // >>>     sa_y = m.sin(angles.item(1))
-  // >>>     ca_z = m.cos(angles.item(2))
-  // >>>     sa_z = m.sin(angles.item(2))
+  // >>> def rotation_matrix (roll, pitch ,yaw):
+  // >>>     ca_r = m.cos(roll)
+  // >>>     sa_r = m.sin(roll)
+  // >>>     ca_p = m.cos(pitch)
+  // >>>     sa_p = m.sin(pitch)
+  // >>>     ca_y = m.cos(yaw)
+  // >>>     sa_y = m.sin(yaw)
   // >>>     #build rotation matrix per axis
-  // >>>     rx = np.matrix([[1, 0, 0], [0, ca_x, -sa_x], [0, sa_x, ca_x]])
-  // >>>     ry = np.matrix([[ca_y, 0, sa_y], [0, 1, 0], [-sa_y, 0, ca_y]])
-  // >>>     rz = np.matrix([[ca_z, -sa_z, 0], [sa_z, ca_z, 0], [0, 0, 1]])
+  // >>>     rx = np.matrix([[1, 0, 0], [0, ca_r, -sa_r], [0, sa_r, ca_r]])
+  // >>>     ry = np.matrix([[ca_p, 0, sa_p], [0, 1, 0], [-sa_p, 0, ca_p]])
+  // >>>     rz = np.matrix([[ca_y, -sa_y, 0], [sa_y, ca_y, 0], [0, 0, 1]])
   // >>>     return (rz * ry * rx)
-  // >>> rotation_a = np.matrix([[1.75],[2.91],[0.38]])
-  // >>> rotation_b = np.matrix([[3.1],[0.1],[2.2]])
-  // >>> a_s = rotM(rotation_a) * np.matrix([[1.],[0.],[0.]])
-  // >>> a_r = rotM(rotation_a) * np.matrix([[0.],[1.],[0.]])
-  // >>> a_h = rotM(rotation_a) * np.matrix([[0.],[0.],[1.]])
-  // >>> b_s = rotM(rotation_b) * np.matrix([[1.],[0.],[0.]])
-  // >>> b_r = rotM(rotation_b) * np.matrix([[0.],[1.],[0.]])
-  // >>> b_h = rotM(rotation_b) * np.matrix([[0.],[0.],[1.]])
+  // >>> rot_mat_a = rotation_matrix(1.75,2.91,0.38)
+  // >>> rot_mat_b = rotation_matrix(3.1,0.1,2.2)
+  // >>> a_s = rot_mat_a * np.matrix([[1.],[0.],[0.]])
+  // >>> a_r = rot_mat_a * np.matrix([[0.],[1.],[0.]])
+  // >>> a_h = rot_mat_a * np.matrix([[0.],[0.],[1.]])
+  // >>> b_s = rot_mat_b * np.matrix([[1.],[0.],[0.]])
+  // >>> b_r = rot_mat_b * np.matrix([[0.],[1.],[0.]])
+  // >>> b_h = rot_mat_b * np.matrix([[0.],[0.],[1.]])
   // >>> ds = m.acos(np.dot(np.transpose(a_s), b_s))
   // >>> dr = m.acos(np.dot(np.transpose(a_r), b_r))
   // >>> dh = m.acos(np.dot(np.transpose(a_h), b_h))
   // >>> print(m.sqrt(ds**2 + dr**2 + dh**2 ))
-  const double kAngularTolerance = 1e-10;
+  const double kRotationTolerance = 1e-10;
   const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
-  EXPECT_NEAR(dut.Distance(Rotation::FromRpy(3.1, 0.1, 2.2)), 2.55482853419, kAngularTolerance);
+  EXPECT_NEAR(dut.Distance(Rotation::FromRpy(3.1, 0.1, 2.2)), 2.55482853419, kRotationTolerance);
 }
 #undef CHECK_ALL_ROTATION_ACCESSORS
 
