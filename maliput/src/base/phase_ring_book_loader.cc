@@ -118,7 +118,7 @@ RuleStates CreateDefaultRuleStates(const std::unordered_map<RightOfWayRule::Id, 
 void ConfirmBulbsExist(const BulbGroup& bulb_group, const YAML::Node& bulbs_node) {
   for (const auto& bulb_group_pair : bulbs_node) {
     const Bulb::Id bulb_id(bulb_group_pair.first.as<std::string>());
-    MALIPUT_THROW_UNLESS(bulb_group.GetBulb(bulb_id) != drake::nullopt);
+    MALIPUT_THROW_UNLESS(bulb_group.GetBulb(bulb_id) != nullptr);
   }
 }
 
@@ -130,27 +130,26 @@ drake::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light
     result = BulbStates();
     for (const auto& traffic_light_pair : traffic_light_states_node) {
       const TrafficLight::Id traffic_light_id(traffic_light_pair.first.as<std::string>());
-      const drake::optional<TrafficLight> traffic_light = traffic_light_book->GetTrafficLight(traffic_light_id);
-      MALIPUT_THROW_UNLESS(traffic_light.has_value());
+      const TrafficLight* traffic_light = traffic_light_book->GetTrafficLight(traffic_light_id);
+      MALIPUT_THROW_UNLESS(traffic_light != nullptr);
       const YAML::Node& bulb_group_node = traffic_light_pair.second;
       MALIPUT_THROW_UNLESS(bulb_group_node.IsDefined());
       MALIPUT_THROW_UNLESS(bulb_group_node.IsMap());
       for (const auto& bulb_group_pair : bulb_group_node) {
         const BulbGroup::Id bulb_group_id(bulb_group_pair.first.as<std::string>());
-        const drake::optional<BulbGroup> bulb_group = traffic_light->GetBulbGroup(bulb_group_id);
-        MALIPUT_THROW_UNLESS(bulb_group.has_value());
+        const BulbGroup* bulb_group = traffic_light->GetBulbGroup(bulb_group_id);
+        MALIPUT_THROW_UNLESS(bulb_group != nullptr);
         const YAML::Node& bulbs_node = bulb_group_pair.second;
         MALIPUT_THROW_UNLESS(bulbs_node.IsDefined());
         MALIPUT_THROW_UNLESS(bulbs_node.IsMap());
         ConfirmBulbsExist(*bulb_group, bulbs_node);
-        for (const auto& bulb : bulb_group->bulbs()) {
-          BulbState bulb_state = bulb.GetDefaultState();
-          const UniqueBulbId unique_bulb_id{traffic_light_id, bulb_group_id, bulb.id()};
-          const YAML::Node& bulb_state_node = bulbs_node[bulb.id().string()];
+        for (const Bulb* bulb : bulb_group->bulbs()) {
+          BulbState bulb_state = bulb->GetDefaultState();
+          const YAML::Node& bulb_state_node = bulbs_node[bulb->id().string()];
           if (bulb_state_node.IsDefined()) {
             bulb_state = bulb_state_node.as<BulbState>();
           }
-          (*result)[unique_bulb_id] = bulb_state;
+          (*result)[bulb->unique_id()] = bulb_state;
         }
       }
     }

@@ -1,5 +1,6 @@
 #include "maliput/base/traffic_light_book_loader.h"
 
+#include <memory>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -214,13 +215,11 @@ struct convert<std::vector<BulbState>> {
 namespace maliput {
 namespace {
 
-Bulb BuildBulb(const YAML::Node& bulb_node, const TrafficLight::Id& traffic_light_id,
-               const BulbGroup::Id& bulb_group_id) {
+std::unique_ptr<Bulb> BuildBulb(const YAML::Node& bulb_node) {
   MALIPUT_THROW_UNLESS(bulb_node.IsDefined());
   MALIPUT_THROW_UNLESS(bulb_node.IsMap());
   MALIPUT_THROW_UNLESS(bulb_node["ID"].IsDefined());
   const Bulb::Id id(bulb_node["ID"].as<std::string>());
-  const UniqueBulbId unique_id(traffic_light_id, bulb_group_id, id);
 
   const YAML::Node& pose_node = bulb_node["Pose"];
   MALIPUT_THROW_UNLESS(pose_node.IsDefined());
@@ -258,11 +257,11 @@ Bulb BuildBulb(const YAML::Node& bulb_node, const TrafficLight::Id& traffic_ligh
     bulb_states = states_node.as<std::vector<BulbState>>();
   }
 
-  return Bulb(id, unique_id, position_bulb_group, orientation_bulb_group, color, type, arrow_orientation_rad,
-              bulb_states, bounding_box);
+  return std::make_unique<Bulb>(id, position_bulb_group, orientation_bulb_group, color, type, arrow_orientation_rad,
+                                bulb_states, bounding_box);
 }
 
-BulbGroup BuildBulbGroup(const YAML::Node& bulb_group_node, const TrafficLight::Id& traffic_light_id) {
+std::unique_ptr<BulbGroup> BuildBulbGroup(const YAML::Node& bulb_group_node) {
   MALIPUT_THROW_UNLESS(bulb_group_node.IsDefined());
   MALIPUT_THROW_UNLESS(bulb_group_node.IsMap());
   MALIPUT_THROW_UNLESS(bulb_group_node["ID"].IsDefined());
@@ -277,14 +276,14 @@ BulbGroup BuildBulbGroup(const YAML::Node& bulb_group_node, const TrafficLight::
   const YAML::Node& bulbs_node = bulb_group_node["Bulbs"];
   MALIPUT_THROW_UNLESS(bulbs_node.IsDefined());
   MALIPUT_THROW_UNLESS(bulbs_node.IsSequence());
-  std::vector<Bulb> bulbs;
+  std::vector<std::unique_ptr<Bulb>> bulbs;
   for (const YAML::Node& bulb_node : bulbs_node) {
-    bulbs.push_back(BuildBulb(bulb_node, traffic_light_id, id));
+    bulbs.push_back(std::move(BuildBulb(bulb_node)));
   }
-  return BulbGroup(id, position_traffic_light, orientation_traffic_light, bulbs);
+  return std::make_unique<BulbGroup>(id, position_traffic_light, orientation_traffic_light, std::move(bulbs));
 }
 
-TrafficLight BuildTrafficLight(const YAML::Node& traffic_light_node) {
+std::unique_ptr<TrafficLight> BuildTrafficLight(const YAML::Node& traffic_light_node) {
   MALIPUT_THROW_UNLESS(traffic_light_node.IsMap());
   const TrafficLight::Id id(traffic_light_node["ID"].as<std::string>());
   const YAML::Node& pose_node = traffic_light_node["Pose"];
@@ -298,11 +297,11 @@ TrafficLight BuildTrafficLight(const YAML::Node& traffic_light_node) {
   const YAML::Node& bulb_groups_node = traffic_light_node["BulbGroups"];
   MALIPUT_THROW_UNLESS(bulb_groups_node.IsDefined());
   MALIPUT_THROW_UNLESS(bulb_groups_node.IsSequence());
-  std::vector<BulbGroup> bulb_groups;
+  std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
   for (const YAML::Node& bulb_group_node : bulb_groups_node) {
-    bulb_groups.push_back(BuildBulbGroup(bulb_group_node, id));
+    bulb_groups.push_back(std::move(BuildBulbGroup(bulb_group_node)));
   }
-  return TrafficLight(id, position_road_network, orientation_road_network, bulb_groups);
+  return std::make_unique<TrafficLight>(id, position_road_network, orientation_road_network, std::move(bulb_groups));
 }
 
 std::unique_ptr<api::rules::TrafficLightBook> BuildFrom(const YAML::Node& root_node) {
@@ -312,7 +311,7 @@ std::unique_ptr<api::rules::TrafficLightBook> BuildFrom(const YAML::Node& root_n
   MALIPUT_THROW_UNLESS(traffic_lights_node.IsSequence());
   auto result = std::make_unique<TrafficLightBook>();
   for (const YAML::Node& traffic_light_node : traffic_lights_node) {
-    result->AddTrafficLight(BuildTrafficLight(traffic_light_node));
+    result->AddTrafficLight(std::move(BuildTrafficLight(traffic_light_node)));
   }
   return result;
 }

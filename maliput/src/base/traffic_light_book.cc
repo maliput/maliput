@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <utility>
 
-#include "drake/common/drake_throw.h"
-
 namespace maliput {
 
 using api::rules::TrafficLight;
@@ -17,48 +15,46 @@ class TrafficLightBook::Impl {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
 
-  Impl() {}
-  ~Impl() {}
+  Impl() = default;
+  ~Impl() = default;
 
-  void AddTrafficLight(const TrafficLight& traffic_light) {
-    auto result = book_.emplace(traffic_light.id(), traffic_light);
+  void AddTrafficLight(std::unique_ptr<const TrafficLight> traffic_light) {
+    MALIPUT_THROW_UNLESS(traffic_light.get() != nullptr);
+    const TrafficLight::Id id = traffic_light->id();
+    auto result = book_.emplace(id, std::move(traffic_light));
     if (!result.second) {
-      throw std::logic_error(
-          "Attempted to add multiple TrafficLight instances "
-          "with ID " +
-          traffic_light.id().string());
+      throw std::logic_error("Attempted to add multiple TrafficLight instances with ID: " + id.string());
     }
   }
 
-  std::vector<TrafficLight> DoTrafficLights() const {
-    std::vector<TrafficLight> result;
+  std::vector<const TrafficLight*> DoTrafficLights() const {
+    std::vector<const TrafficLight*> result;
     std::transform(book_.begin(), book_.end(), std::back_inserter(result),
-                   [](const auto& key_value) { return key_value.second; });
+                   [](const auto& key_value) { return key_value.second.get(); });
     return result;
   }
 
-  drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id& id) const {
+  const TrafficLight* DoGetTrafficLight(const TrafficLight::Id& id) const {
     auto it = book_.find(id);
-    if (it == book_.end()) {
-      return drake::nullopt;
-    }
-    return it->second;
+    return it == book_.end() ? nullptr : it->second.get();
   }
 
  private:
-  std::unordered_map<TrafficLight::Id, const TrafficLight> book_;
+  std::unordered_map<TrafficLight::Id, std::unique_ptr<const TrafficLight>> book_;
 };
 
 TrafficLightBook::TrafficLightBook() : impl_(std::make_unique<Impl>()) {}
 
 TrafficLightBook::~TrafficLightBook() = default;
 
-void TrafficLightBook::AddTrafficLight(const TrafficLight& traffic_light) { impl_->AddTrafficLight(traffic_light); }
+void TrafficLightBook::AddTrafficLight(std::unique_ptr<const TrafficLight> traffic_light) {
+  impl_->AddTrafficLight(std::move(traffic_light));
+}
 
-drake::optional<TrafficLight> TrafficLightBook::DoGetTrafficLight(const TrafficLight::Id& id) const {
+const TrafficLight* TrafficLightBook::DoGetTrafficLight(const TrafficLight::Id& id) const {
   return impl_->DoGetTrafficLight(id);
 }
 
-std::vector<TrafficLight> TrafficLightBook::DoTrafficLights() const { return impl_->DoTrafficLights(); }
+std::vector<const TrafficLight*> TrafficLightBook::DoTrafficLights() const { return impl_->DoTrafficLights(); }
 
 }  // namespace maliput

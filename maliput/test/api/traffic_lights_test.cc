@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -13,6 +14,7 @@
 #include <gtest/gtest.h>
 
 #include "maliput/common/assertion_error.h"
+#include "maliput/test_utilities/mock.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
@@ -78,58 +80,46 @@ GTEST_TEST(BulbStateTest, MapperTest) {
 }
 
 GTEST_TEST(BulbConstructorTest, ArrowWithoutOrientation) {
-  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"),
-                    UniqueBulbId(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), Bulb::Id("other_dut_id")),
-                    GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen, BulbType::kArrow),
+  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"), GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen,
+                    BulbType::kArrow),
                std::exception);
 }
 
 GTEST_TEST(BulbConstructorTest, NonArrowWithOrientation) {
-  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"),
-                    UniqueBulbId(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), Bulb::Id("other_dut_id")),
-                    GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen, BulbType::kRound,
-                    0 /* arrow_orientation_rad */),
+  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"), GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen,
+                    BulbType::kRound, 0 /* arrow_orientation_rad */),
                std::exception);
 }
 
-GTEST_TEST(BulbConstructorTest, BadUniqueBulbId) {
-  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"),
-                    UniqueBulbId(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), Bulb::Id("wrong_dut_id")),
-                    GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen, BulbType::kRound,
-                    0 /* arrow_orientation_rad */),
-               common::assertion_error);
-}
-
 GTEST_TEST(BulbConstructorTest, EmptyAndNullOptStateVector) {
-  const std::vector<Bulb> test_cases = {
-      Bulb(Bulb::Id("empty_state_vector"),
-           UniqueBulbId(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), Bulb::Id("empty_state_vector")),
-           GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
-           drake::nullopt /* arrow_orientation_rad */, {} /* states */),
-      Bulb(Bulb::Id("drake::nullopt_state_vector"),
-           UniqueBulbId(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), Bulb::Id("drake::nullopt_state_vector")),
-           GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
-           drake::nullopt /* arrow_orientation_rad */, drake::nullopt /* states */)};
+  std::vector<std::unique_ptr<Bulb>> test_cases;
+  test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("empty_state_vector"), GeoPosition(0, 0, 0),
+                                              Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
+                                              drake::nullopt /* arrow_orientation_rad */, std::vector<BulbState>{}));
+  test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("drake::nullopt_state_vector"), GeoPosition(0, 0, 0),
+                                              Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
+                                              drake::nullopt /* arrow_orientation_rad */, drake::nullopt /* states */));
+
   for (const auto& test_case : test_cases) {
-    EXPECT_EQ(test_case.states().size(), 2);
-    EXPECT_EQ(test_case.GetDefaultState(), BulbState::kOff);
-    EXPECT_TRUE(test_case.IsValidState(BulbState::kOff));
-    EXPECT_TRUE(test_case.IsValidState(BulbState::kOn));
-    EXPECT_FALSE(test_case.IsValidState(BulbState::kBlinking));
+    EXPECT_EQ(test_case->states().size(), 2);
+    EXPECT_EQ(test_case->GetDefaultState(), BulbState::kOff);
+    EXPECT_TRUE(test_case->IsValidState(BulbState::kOff));
+    EXPECT_TRUE(test_case->IsValidState(BulbState::kOn));
+    EXPECT_FALSE(test_case->IsValidState(BulbState::kBlinking));
   }
 }
 
 class BulbTest : public ::testing::Test {
  public:
   BulbTest()
-      : bulb_(Bulb::Id("dut_id"), UniqueBulbId(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), Bulb::Id("dut_id")),
-              GeoPosition(1, 2, 3), Rotation::FromRpy(4, 5, 6), BulbColor::kRed, BulbType::kRound) {}
+      : bulb_(Bulb::Id("dut_id"), GeoPosition(1, 2, 3), Rotation::FromRpy(4, 5, 6), BulbColor::kRed, BulbType::kRound) {
+  }
   const Bulb bulb_;
 };
 
 TEST_F(BulbTest, Accessors) {
   EXPECT_EQ(bulb_.id(), Bulb::Id("dut_id"));
-  EXPECT_EQ(bulb_.unique_id(), UniqueBulbId(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), Bulb::Id("dut_id")));
+  EXPECT_THROW(bulb_.unique_id(), common::assertion_error);
   EXPECT_EQ(bulb_.position_bulb_group(), GeoPosition(1, 2, 3));
   EXPECT_EQ(bulb_.orientation_bulb_group().matrix(), Rotation::FromRpy(4, 5, 6).matrix());
   EXPECT_EQ(bulb_.color(), BulbColor::kRed);
@@ -142,20 +132,6 @@ TEST_F(BulbTest, Accessors) {
   EXPECT_TRUE(bulb_.IsValidState(BulbState::kOn));
   EXPECT_FALSE(bulb_.IsValidState(BulbState::kBlinking));
   MALIPUT_IS_EQUAL(bulb_.bounding_box(), Bulb::BoundingBox());
-}
-
-TEST_F(BulbTest, Copying) {
-  const Bulb dut(bulb_);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, bulb_));
-}
-
-TEST_F(BulbTest, Assignment) {
-  Bulb dut(Bulb::Id("other_dut_id"),
-           UniqueBulbId(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), Bulb::Id("other_dut_id")),
-           GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen, BulbType::kArrow,
-           0 /* arrow_orientation_rad */, std::vector<BulbState>{BulbState::kBlinking});
-  dut = bulb_;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, bulb_));
 }
 
 GTEST_TEST(DefaultBulbStateTest, CorrectDefaultAndIsValidStateQueries) {
@@ -178,10 +154,9 @@ GTEST_TEST(DefaultBulbStateTest, CorrectDefaultAndIsValidStateQueries) {
                                             {{BulbState::kOn}, BulbState::kOn},
                                             {{BulbState::kOff}, BulbState::kOff}};
   const Bulb::Id b_id("id");
-  const UniqueBulbId unique_id(TrafficLight::Id("tl_id"), BulbGroup::Id("bg_id"), b_id);
   for (const auto& test_case : test_cases) {
-    const Bulb dut(b_id, unique_id, GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen,
-                   BulbType::kRound, drake::nullopt /* arrow_orientation_rad */, test_case.states);
+    const Bulb dut(b_id, GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
+                   drake::nullopt /* arrow_orientation_rad */, test_case.states);
     EXPECT_EQ(dut.GetDefaultState(), test_case.default_state);
     for (const auto& state : test_case.states) {
       EXPECT_TRUE(dut.IsValidState(state));
@@ -197,7 +172,6 @@ class BulbGroupConstructorTest : public ::testing::Test {
   const GeoPosition kZeroPosition{0., 0., 0.};
   const Rotation kZeroRotation{Rotation::FromRpy(0, 0, 0)};
   const Bulb::Id kBulbId{"bulb_id"};
-  const TrafficLight::Id kTrafficLightId{"tl_id"};
 };
 
 TEST_F(BulbGroupConstructorTest, InvalidGroupSize) {
@@ -205,71 +179,57 @@ TEST_F(BulbGroupConstructorTest, InvalidGroupSize) {
 }
 
 TEST_F(BulbGroupConstructorTest, DuplicatedBulbIds) {
-  const Bulb kRedBulb(kBulbId, UniqueBulbId(kTrafficLightId, kDutId, kBulbId), kZeroPosition, kZeroRotation,
-                      BulbColor::kRed, BulbType::kRound);
-  const Bulb kGreenBulb(kBulbId, UniqueBulbId(kTrafficLightId, kDutId, kBulbId), GeoPosition(0, 0, 0.3), kZeroRotation,
-                        BulbColor::kGreen, BulbType::kRound);
-
-  EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, {kRedBulb, kGreenBulb}), common::assertion_error);
+  std::vector<std::unique_ptr<Bulb>> bulbs;
+  bulbs.push_back(std::make_unique<Bulb>(kBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
+  bulbs.push_back(
+      std::make_unique<Bulb>(kBulbId, GeoPosition(0, 0, 0.3), kZeroRotation, BulbColor::kGreen, BulbType::kRound));
+  EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, std::move(bulbs)), common::assertion_error);
 }
 
-TEST_F(BulbGroupConstructorTest, WrongBulbGroupIdInUniqueBulbId) {
-  const Bulb bulb(kBulbId, UniqueBulbId(kTrafficLightId, BulbGroup::Id("other_dut_id"), kBulbId), kZeroPosition,
-                  kZeroRotation, BulbColor::kRed, BulbType::kRound);
+TEST_F(BulbGroupConstructorTest, NullBulb) {
+  std::vector<std::unique_ptr<Bulb>> bulbs;
+  bulbs.push_back(std::make_unique<Bulb>(kBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
+  bulbs.push_back({});
 
-  EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, {bulb}), common::assertion_error);
+  EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, std::move(bulbs)), common::assertion_error);
 }
 
 class BulbGroupTest : public ::testing::Test {
  public:
-  BulbGroupTest()
-      : red_bulb_(Bulb::Id("red_bulb"), UniqueBulbId(kTrafficLightId, kBulbGroupId, Bulb::Id("red_bulb")),
-                  GeoPosition(0, 0, -0.25), Rotation::FromRpy(0, 0, 0), BulbColor::kRed, BulbType::kRound),
-        yellow_bulb_(Bulb::Id("yellow_bulb"), UniqueBulbId(kTrafficLightId, kBulbGroupId, Bulb::Id("yellow_bulb")),
-                     GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kYellow, BulbType::kRound),
-        green_bulb_(Bulb::Id("green_bulb"), UniqueBulbId(kTrafficLightId, kBulbGroupId, Bulb::Id("green_bulb")),
-                    GeoPosition(0, 0, 0.25), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound),
-        bulb_group_(kBulbGroupId, GeoPosition(1, 2, 3), Rotation::FromRpy(4, 5, 6),
-                    {red_bulb_, yellow_bulb_, green_bulb_}) {}
-
-  const TrafficLight::Id kTrafficLightId{"test_traffic_light"};
   const BulbGroup::Id kBulbGroupId{"test_bulb_group"};
-  const Bulb red_bulb_;
-  const Bulb yellow_bulb_;
-  const Bulb green_bulb_;
-  const BulbGroup bulb_group_;
+  const GeoPosition kBulbGroupPosition{1., 2., 3.};
+  const Rotation kBulbGroupRotation{Rotation::FromRpy(4., 5., 6.)};
+
+  BulbGroupTest() {
+    std::vector<std::unique_ptr<Bulb>> bulbs;
+    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("red_bulb"), GeoPosition(0, 0, -0.25), Rotation::FromRpy(0, 0, 0),
+                                           BulbColor::kRed, BulbType::kRound));
+    red_bulb_ptr_ = bulbs.back().get();
+
+    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("yellow_bulb"), GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0),
+                                           BulbColor::kYellow, BulbType::kRound));
+    yellow_bulb_ptr_ = bulbs.back().get();
+
+    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("green_bulb"), GeoPosition(0, 0, 0.25), Rotation::FromRpy(0, 0, 0),
+                                           BulbColor::kGreen, BulbType::kRound));
+    green_bulb_ptr_ = bulbs.back().get();
+
+    bulb_group_ = std::make_unique<BulbGroup>(kBulbGroupId, kBulbGroupPosition, kBulbGroupRotation, std::move(bulbs));
+  }
+
+  const Bulb* red_bulb_ptr_{};
+  const Bulb* yellow_bulb_ptr_{};
+  const Bulb* green_bulb_ptr_{};
+  std::unique_ptr<BulbGroup> bulb_group_;
 };
 
 TEST_F(BulbGroupTest, Accessors) {
-  EXPECT_EQ(bulb_group_.id(), kBulbGroupId);
-  EXPECT_EQ(bulb_group_.position_traffic_light(), GeoPosition(1, 2, 3));
-  EXPECT_EQ(bulb_group_.orientation_traffic_light().matrix(), Rotation::FromRpy(4, 5, 6).matrix());
-  EXPECT_EQ(bulb_group_.bulbs().size(), 3);
-  EXPECT_EQ(bulb_group_.GetBulb(Bulb::Id("unknown_bulb")), drake::nullopt);
-  EXPECT_NE(bulb_group_.GetBulb(Bulb::Id("red_bulb")), drake::nullopt);
-}
-
-TEST_F(BulbGroupTest, Copying) {
-  const BulbGroup dut(bulb_group_);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, bulb_group_));
-}
-
-TEST_F(BulbGroupTest, Assignment) {
-  const BulbGroup::Id other_bulb_group_id{"other_dut_id"};
-
-  const Bulb red_arrow_bulb(Bulb::Id("red_arrow_bulb"),
-                            UniqueBulbId(kTrafficLightId, other_bulb_group_id, Bulb::Id("red_arrow_bulb")),
-                            GeoPosition(1, 2, 3), Rotation::FromRpy(4, 5, 6), BulbColor::kRed, BulbType::kArrow,
-                            0 /* arrow_orientation_rad */);
-  const Bulb green_arrow_bulb(Bulb::Id("green_arrow_bulb"),
-                              UniqueBulbId(kTrafficLightId, other_bulb_group_id, Bulb::Id("green_arrow_bulb")),
-                              GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen, BulbType::kArrow,
-                              M_PI / 2. /* arrow_orientation_rad */);
-
-  BulbGroup dut(other_bulb_group_id, GeoPosition(13, 14, 15), Rotation::FromRpy(17, 18, 19),
-                {red_arrow_bulb, green_arrow_bulb});
-  dut = bulb_group_;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, bulb_group_));
+  EXPECT_EQ(bulb_group_->id(), kBulbGroupId);
+  EXPECT_EQ(bulb_group_->position_traffic_light(), kBulbGroupPosition);
+  EXPECT_EQ(bulb_group_->orientation_traffic_light().matrix(), kBulbGroupRotation.matrix());
+  EXPECT_EQ(bulb_group_->bulbs().size(), 3);
+  EXPECT_EQ(bulb_group_->GetBulb(Bulb::Id("unknown_bulb")), nullptr);
+  EXPECT_EQ(bulb_group_->GetBulb(Bulb::Id("red_bulb")), red_bulb_ptr_);
 }
 
 class TrafficLightConstructorTest : public ::testing::Test {
@@ -283,92 +243,75 @@ class TrafficLightConstructorTest : public ::testing::Test {
 };
 
 TEST_F(TrafficLightConstructorTest, DuplicatedBulbGroupIds) {
-  const Bulb kRedBulb(kRedBulbId, UniqueBulbId(kDutId, kBulbGroupId, kRedBulbId), kZeroPosition, kZeroRotation,
-                      BulbColor::kRed, BulbType::kRound);
-  const Bulb kGreenBulb(kGreenBulbId, UniqueBulbId(kDutId, kBulbGroupId, kGreenBulbId), kZeroPosition, kZeroRotation,
-                        BulbColor::kGreen, BulbType::kRound);
-  const BulbGroup kBulbGroupA(kBulbGroupId, kZeroPosition, kZeroRotation, {kRedBulb});
-  const BulbGroup kBulbGroupB(kBulbGroupId, kZeroPosition, kZeroRotation, {kGreenBulb});
-
-  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, {kBulbGroupA, kBulbGroupB}), common::assertion_error);
+  std::vector<std::unique_ptr<BulbGroup>> bulb_group;
+  bulb_group.push_back(std::move(api::test::CreateBulbGroup(false /* add_missing_bulb_group */)));
+  bulb_group.push_back(std::move(api::test::CreateBulbGroup(false /* add_missing_bulb_group */)));
+  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)), common::assertion_error);
 }
 
-TEST_F(TrafficLightConstructorTest, WrongTrafficLightIdInUniqueBulbId) {
-  const TrafficLight::Id kWrongTrafficLightId("wrong_traffic_light_id");
-
-  const Bulb kRedBulb(kRedBulbId, UniqueBulbId(kWrongTrafficLightId, kBulbGroupId, kRedBulbId), kZeroPosition,
-                      kZeroRotation, BulbColor::kRed, BulbType::kRound);
-  const BulbGroup kBulbGroup(kBulbGroupId, kZeroPosition, kZeroRotation, {kRedBulb});
-
-  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, {kBulbGroup}), common::assertion_error);
+TEST_F(TrafficLightConstructorTest, NullBulbGroup) {
+  std::vector<std::unique_ptr<Bulb>> bulbs;
+  std::vector<std::unique_ptr<BulbGroup>> bulb_group;
+  bulbs.push_back(std::make_unique<Bulb>(kRedBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
+  bulb_group.push_back(std::make_unique<BulbGroup>(kBulbGroupId, kZeroPosition, kZeroRotation, std::move(bulbs)));
+  bulb_group.push_back({});
+  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)), common::assertion_error);
 }
 
 class TrafficLightTest : public ::testing::Test {
  public:
-  TrafficLightTest()
-      : north_bulb_(
-            Bulb::Id("north_bulb"),
-            UniqueBulbId(TrafficLight::Id("four_way_stop"), BulbGroup::Id("north_group"), Bulb::Id("north_bulb")),
-            GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kRed, BulbType::kRound),
-        south_bulb_(
-            Bulb::Id("south_bulb"),
-            UniqueBulbId(TrafficLight::Id("four_way_stop"), BulbGroup::Id("south_group"), Bulb::Id("south_bulb")),
-            GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kRed, BulbType::kRound),
-        east_bulb_(Bulb::Id("east_bulb"),
-                   UniqueBulbId(TrafficLight::Id("four_way_stop"), BulbGroup::Id("east_group"), Bulb::Id("east_bulb")),
-                   GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kRed, BulbType::kRound),
-        west_bulb_(Bulb::Id("west_bulb"),
-                   UniqueBulbId(TrafficLight::Id("four_way_stop"), BulbGroup::Id("west_group"), Bulb::Id("west_bulb")),
-                   GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kRed, BulbType::kRound),
-        north_bulb_group_(BulbGroup::Id("north_group"), GeoPosition(0, 0.1, 0), Rotation::FromRpy(0, 0, M_PI_2),
-                          {north_bulb_}),
-        south_bulb_group_(BulbGroup::Id("south_group"), GeoPosition(0, -0.1, 0), Rotation::FromRpy(0, 0, -M_PI_2),
-                          {south_bulb_}),
-        east_bulb_group_(BulbGroup::Id("east_group"), GeoPosition(0.1, 0, 0), Rotation::FromRpy(0, 0, 0), {east_bulb_}),
-        west_bulb_group_(BulbGroup::Id("west_group"), GeoPosition(-0.1, 0, 0), Rotation::FromRpy(0, 0, M_PI),
-                         {west_bulb_}),
-        traffic_light_(TrafficLight::Id("four_way_stop"), GeoPosition(0, 0, 5), Rotation::FromRpy(0, 0, 0),
-                       {north_bulb_group_, south_bulb_group_, east_bulb_group_, west_bulb_group_}) {}
+  const GeoPosition kZeroPosition{0., 0., 0.};
+  const Rotation kZeroRotation{Rotation::FromRpy(0., 0., 0.)};
+  const GeoPosition kTrafficLightPosition{0, 0, 5};
+  const Rotation kTrafficLightRotation{kZeroRotation};
+  const TrafficLight::Id kId{"four_way_stop"};
 
-  const Bulb north_bulb_;
-  const Bulb south_bulb_;
-  const Bulb east_bulb_;
-  const Bulb west_bulb_;
+  TrafficLightTest() {
+    std::vector<std::unique_ptr<Bulb>> bulbs;
+    std::vector<std::unique_ptr<BulbGroup>> bulb_group;
 
-  const BulbGroup north_bulb_group_;
-  const BulbGroup south_bulb_group_;
-  const BulbGroup east_bulb_group_;
-  const BulbGroup west_bulb_group_;
+    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("north_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
+                                           BulbType::kRound));
+    bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("north_group"), GeoPosition(0, 0.1, 0),
+                                                     Rotation::FromRpy(0, 0, M_PI_2), std::move(bulbs)));
+    north_bulb_group_ = bulb_group.back().get();
 
-  const TrafficLight traffic_light_;
+    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("south_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
+                                           BulbType::kRound));
+    bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("south_group"), GeoPosition(0, -0.1, 0),
+                                                     Rotation::FromRpy(0, 0, -M_PI_2), std::move(bulbs)));
+    south_bulb_group_ = bulb_group.back().get();
+
+    bulbs.push_back(
+        std::make_unique<Bulb>(Bulb::Id("east_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
+    bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("east_group"), GeoPosition(0.1, 0., 0),
+                                                     kZeroRotation, std::move(bulbs)));
+    east_bulb_group_ = bulb_group.back().get();
+
+    bulbs.push_back(
+        std::make_unique<Bulb>(Bulb::Id("west_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
+    bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("west_group"), GeoPosition(-0.1, 0., 0),
+                                                     Rotation::FromRpy(0, 0, M_PI), std::move(bulbs)));
+    west_bulb_group_ = bulb_group.back().get();
+
+    traffic_light_ =
+        std::make_unique<TrafficLight>(kId, kTrafficLightPosition, kTrafficLightRotation, std::move(bulb_group));
+  }
+
+  const BulbGroup* north_bulb_group_{};
+  const BulbGroup* south_bulb_group_{};
+  const BulbGroup* east_bulb_group_{};
+  const BulbGroup* west_bulb_group_{};
+  std::unique_ptr<const TrafficLight> traffic_light_;
 };
 
 TEST_F(TrafficLightTest, Accessors) {
-  EXPECT_EQ(traffic_light_.id(), TrafficLight::Id("four_way_stop"));
-  EXPECT_EQ(traffic_light_.position_road_network(), GeoPosition(0, 0, 5));
-  EXPECT_EQ(traffic_light_.orientation_road_network().matrix(), Rotation::FromRpy(0, 0, 0).matrix());
-  EXPECT_EQ(traffic_light_.bulb_groups().size(), 4);
-  EXPECT_EQ(traffic_light_.GetBulbGroup(BulbGroup::Id("unknown_bulb_group")), drake::nullopt);
-  EXPECT_NE(traffic_light_.GetBulbGroup(BulbGroup::Id("north_group")), drake::nullopt);
-}
-
-TEST_F(TrafficLightTest, Copying) {
-  const TrafficLight dut(traffic_light_);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, traffic_light_));
-}
-
-TEST_F(TrafficLightTest, Assignment) {
-  const Bulb green_arrow_bulb(Bulb::Id("green_arrow_bulb"),
-                              UniqueBulbId(TrafficLight::Id("other_traffic_light"), BulbGroup::Id("other_bulb_group"),
-                                           Bulb::Id("green_arrow_bulb")),
-                              GeoPosition(-1, -2, -3), Rotation::FromRpy(-4, -5, -6), BulbColor::kGreen,
-                              BulbType::kArrow, M_PI_2 /* arrow_orientation_rad */);
-  const BulbGroup bulb_group(BulbGroup::Id("other_bulb_group"), GeoPosition(13, 14, 15), Rotation::FromRpy(17, 18, 19),
-                             {green_arrow_bulb});
-  TrafficLight dut(TrafficLight::Id("other_traffic_light"), GeoPosition(10, 11, 12), Rotation::FromRpy(1, 2, 3),
-                   {bulb_group});
-  dut = traffic_light_;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, traffic_light_));
+  EXPECT_EQ(traffic_light_->id(), kId);
+  EXPECT_EQ(traffic_light_->position_road_network(), kTrafficLightPosition);
+  EXPECT_EQ(traffic_light_->orientation_road_network().matrix(), kTrafficLightRotation.matrix());
+  EXPECT_EQ(traffic_light_->bulb_groups().size(), 4);
+  EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("unknown_bulb_group")), nullptr);
+  EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("north_group")), north_bulb_group_);
 }
 
 GTEST_TEST(UniqueBulbIdTest, DefaultConstructor) {
@@ -376,18 +319,6 @@ GTEST_TEST(UniqueBulbIdTest, DefaultConstructor) {
   EXPECT_EQ(dut.traffic_light_id, TrafficLight::Id("default"));
   EXPECT_EQ(dut.bulb_group_id, BulbGroup::Id("default"));
   EXPECT_EQ(dut.bulb_id, Bulb::Id("default"));
-}
-
-GTEST_TEST(UniqueBulbIdTest, StringConstructor) {
-  const UniqueBulbId dut("Foo-Bar-Baz");
-  EXPECT_EQ(dut.traffic_light_id, TrafficLight::Id("Foo"));
-  EXPECT_EQ(dut.bulb_group_id, BulbGroup::Id("Bar"));
-  EXPECT_EQ(dut.bulb_id, Bulb::Id("Baz"));
-
-  EXPECT_THROW(UniqueBulbId("FooBarBaz"), common::assertion_error);
-  EXPECT_THROW(UniqueBulbId("Foo-BarBaz"), common::assertion_error);
-  EXPECT_THROW(UniqueBulbId("FooBar-Baz"), common::assertion_error);
-  EXPECT_THROW(UniqueBulbId(""), common::assertion_error);
 }
 
 GTEST_TEST(UniqueBulbIdTest, Usage) {

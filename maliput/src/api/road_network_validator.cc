@@ -78,10 +78,9 @@ void CheckRoadGeometryHierarchyConsistency(const RoadNetwork& road_network) {
 void CheckRelatedBulbGroups(const RoadNetwork& road_network) {
   auto evaluate_related_bulb_group_existance = [&](const TrafficLight::Id& traffic_light_id,
                                                    const BulbGroup::Id& bulb_group_id) {
-    const drake::optional<TrafficLight> traffic_light =
-        road_network.traffic_light_book()->GetTrafficLight(traffic_light_id);
-    MALIPUT_THROW_UNLESS(traffic_light.has_value());
-    MALIPUT_THROW_UNLESS(traffic_light->GetBulbGroup(bulb_group_id).has_value());
+    const TrafficLight* traffic_light = road_network.traffic_light_book()->GetTrafficLight(traffic_light_id);
+    MALIPUT_THROW_UNLESS(traffic_light != nullptr);
+    MALIPUT_THROW_UNLESS(traffic_light->GetBulbGroup(bulb_group_id) != nullptr);
   };
 
   const rules::RoadRulebook::QueryResults result = road_network.rulebook()->Rules();

@@ -172,7 +172,7 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildF
 /// "MissingBulbGroupId". Otherwise, ID is "BulbGroupId".
 /// `traffic_light_id` is the rules::TrafficLight::Id to set to the
 /// rules::Bulb's rules::UniqueBulbId.
-rules::BulbGroup CreateBulbGroup(bool add_missing_bulb_group, const rules::TrafficLight::Id& traffic_light_id);
+std::unique_ptr<rules::BulbGroup> CreateBulbGroup(bool add_missing_bulb_group);
 
 /// Returns an arbitrary rules::TrafficLight.
 ///
@@ -181,7 +181,7 @@ rules::BulbGroup CreateBulbGroup(bool add_missing_bulb_group, const rules::Traff
 /// is "TrafficLightId".
 /// BulbGroup creation is done via
 /// `CreateBulbGroup(build_flags.add_missing_bulb_group)`.
-rules::TrafficLight CreateTrafficLight(const TrafficLightBuildFlags& build_flags);
+std::unique_ptr<rules::TrafficLight> CreateTrafficLight(const TrafficLightBuildFlags& build_flags);
 
 /// Returns an arbitrary rules::TrafficLightBook.
 std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook();

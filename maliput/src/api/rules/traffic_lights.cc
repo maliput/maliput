@@ -33,19 +33,16 @@ std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper()
   return result;
 }
 
-Bulb::Bulb(const Bulb::Id& id, const UniqueBulbId& unique_id, const GeoPosition& position_bulb_group,
-           const Rotation& orientation_bulb_group, const BulbColor& color, const BulbType& type,
-           const drake::optional<double>& arrow_orientation_rad, const drake::optional<std::vector<BulbState>>& states,
-           BoundingBox bounding_box)
+Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
+           const BulbColor& color, const BulbType& type, const drake::optional<double>& arrow_orientation_rad,
+           const drake::optional<std::vector<BulbState>>& states, BoundingBox bounding_box)
     : id_(id),
-      unique_id_str_(unique_id.to_string()),
       position_bulb_group_(position_bulb_group),
       orientation_bulb_group_(orientation_bulb_group),
       color_(color),
       type_(type),
       arrow_orientation_rad_(arrow_orientation_rad),
       bounding_box_(std::move(bounding_box)) {
-  MALIPUT_THROW_UNLESS(unique_id.bulb_id == id_);
   MALIPUT_THROW_UNLESS(type_ != BulbType::kArrow || arrow_orientation_rad_ != drake::nullopt);
   if (type_ != BulbType::kArrow) {
     MALIPUT_THROW_UNLESS(arrow_orientation_rad_ == drake::nullopt);
@@ -70,68 +67,78 @@ bool Bulb::IsValidState(const BulbState& bulb_state) const {
   return std::find(states_.begin(), states_.end(), bulb_state) != states_.end();
 }
 
-UniqueBulbId Bulb::unique_id() const { return UniqueBulbId(unique_id_str_); }
+UniqueBulbId Bulb::unique_id() const {
+  MALIPUT_THROW_UNLESS(bulb_group_ != nullptr);
+  MALIPUT_THROW_UNLESS(bulb_group_->traffic_light() != nullptr);
+  return UniqueBulbId(bulb_group_->traffic_light()->id(), bulb_group_->id(), id_);
+}
 
 BulbGroup::BulbGroup(const BulbGroup::Id& id, const GeoPosition& position_traffic_light,
-                     const Rotation& orientation_traffic_light, const std::vector<Bulb>& bulbs)
+                     const Rotation& orientation_traffic_light, std::vector<std::unique_ptr<Bulb>> bulbs)
     : id_(id),
       position_traffic_light_(position_traffic_light),
       orientation_traffic_light_(orientation_traffic_light),
-      bulbs_(bulbs) {
+      bulbs_(std::move(bulbs)) {
   MALIPUT_THROW_UNLESS(bulbs_.size() > 0);
-  for (const Bulb& bulb : bulbs_) {
+  MALIPUT_THROW_UNLESS(std::find_if(bulbs_.begin(), bulbs_.end(), [](const auto& bulb) { return bulb == nullptr; }) ==
+                       bulbs_.end());
+  for (auto& bulb : bulbs_) {
     MALIPUT_THROW_UNLESS(std::count_if(bulbs_.begin(), bulbs_.end(),
-                                       [bulb_id = bulb.id()](const Bulb& b) { return bulb_id == b.id(); }) == 1);
-    MALIPUT_THROW_UNLESS(bulb.unique_id().bulb_group_id == id_);
+                                       [bulb_id = bulb->id()](const auto& b) { return bulb_id == b->id(); }) == 1);
+    bulb->SetBulbGroup({}, this);
   }
 }
 
-drake::optional<Bulb> BulbGroup::GetBulb(const Bulb::Id& id) const {
+const Bulb* BulbGroup::GetBulb(const Bulb::Id& id) const {
   for (const auto& bulb : bulbs_) {
-    if (bulb.id() == id) {
-      return bulb;
+    if (bulb->id() == id) {
+      return bulb.get();
     }
   }
-  return drake::nullopt;
+  return nullptr;
+}
+
+std::vector<const Bulb*> BulbGroup::bulbs() const {
+  std::vector<const Bulb*> bulb_ptrs;
+  for (const auto& bulb : bulbs_) {
+    bulb_ptrs.emplace_back(bulb.get());
+  }
+  return bulb_ptrs;
 }
 
 TrafficLight::TrafficLight(const TrafficLight::Id& id, const GeoPosition& position_road_network,
-                           const Rotation& orientation_road_network, const std::vector<BulbGroup>& bulb_groups)
+                           const Rotation& orientation_road_network,
+                           std::vector<std::unique_ptr<BulbGroup>> bulb_groups)
     : id_(id),
       position_road_network_(position_road_network),
       orientation_road_network_(orientation_road_network),
-      bulb_groups_(bulb_groups) {
-  for (const BulbGroup bulb_group : bulb_groups_) {
+      bulb_groups_(std::move(bulb_groups)) {
+  MALIPUT_THROW_UNLESS(std::find_if(bulb_groups_.begin(), bulb_groups_.end(), [](const auto& bulb_group) {
+                         return bulb_group == nullptr;
+                       }) == bulb_groups_.end());
+  for (auto& bulb_group : bulb_groups_) {
     MALIPUT_THROW_UNLESS(
-        std::count_if(bulb_groups_.begin(), bulb_groups_.end(), [bulb_group_id = bulb_group.id()](const BulbGroup& bg) {
-          return bulb_group_id == bg.id();
-        }) == 1);
-    for (const Bulb& bulb : bulb_group.bulbs()) {
-      MALIPUT_THROW_UNLESS(bulb.unique_id().traffic_light_id == id_);
-    }
+        std::count_if(bulb_groups_.begin(), bulb_groups_.end(),
+                      [bulb_group_id = bulb_group->id()](const auto& bg) { return bulb_group_id == bg->id(); }) == 1);
+    bulb_group->SetTrafficLight({}, this);
   }
 }
 
-drake::optional<BulbGroup> TrafficLight::GetBulbGroup(const BulbGroup::Id& id) const {
+std::vector<const BulbGroup*> TrafficLight::bulb_groups() const {
+  std::vector<const BulbGroup*> bulb_group_ptrs;
   for (const auto& bulb_group : bulb_groups_) {
-    if (bulb_group.id() == id) {
-      return bulb_group;
-    }
+    bulb_group_ptrs.emplace_back(bulb_group.get());
   }
-  return drake::nullopt;
+  return bulb_group_ptrs;
 }
 
-UniqueBulbId::UniqueBulbId(const std::string& str) : UniqueBulbId() {
-  size_t delimiter_index = str.find_first_of(delimiter());
-  MALIPUT_THROW_UNLESS(delimiter_index != std::string::npos);
-  traffic_light_id = TrafficLight::Id(str.substr(0, delimiter_index));
-
-  const std::string remaining_str = str.substr(++delimiter_index);
-  delimiter_index = remaining_str.find_first_of(delimiter());
-  MALIPUT_THROW_UNLESS(delimiter_index != std::string::npos);
-  bulb_group_id = BulbGroup::Id(remaining_str.substr(0, delimiter_index));
-
-  bulb_id = Bulb::Id(remaining_str.substr(++delimiter_index));
+const BulbGroup* TrafficLight::GetBulbGroup(const BulbGroup::Id& id) const {
+  for (const auto& bulb_group : bulb_groups_) {
+    if (bulb_group->id() == id) {
+      return bulb_group.get();
+    }
+  }
+  return nullptr;
 }
 
 const std::string UniqueBulbId::delimiter() { return "-"; }
