@@ -11,8 +11,8 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/passkey.h"
 #include "maliput/geometry_base/lane.h"
-#include "maliput/geometry_base/passkey.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -66,7 +66,7 @@ class Segment : public api::Segment {
   //
   // @pre `junction` is non-null.
   // @pre Parent Junction has not already been set.
-  void AttachToJunction(Passkey<Junction>, const api::Junction* junction);
+  void AttachToJunction(common::Passkey<Junction>, const api::Junction* junction);
 
   // Sets the lane indexing callback.
   // This may only be called, once, by a Junction.
@@ -76,7 +76,7 @@ class Segment : public api::Segment {
   //
   // @pre `callback` is non-empty.
   // @pre The lane indexing callback has not already been set.
-  void SetLaneIndexingCallback(Passkey<Junction>, const std::function<void(const api::Lane*)>& callback);
+  void SetLaneIndexingCallback(common::Passkey<Junction>, const std::function<void(const api::Lane*)>& callback);
 #endif  // DRAKE_DOXYGEN_CXX
 
   ~Segment() override = default;

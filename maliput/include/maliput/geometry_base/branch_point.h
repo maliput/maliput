@@ -9,8 +9,8 @@
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/passkey.h"
 #include "maliput/geometry_base/lane_end_set.h"
-#include "maliput/geometry_base/passkey.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -58,7 +58,7 @@ class BranchPoint : public api::BranchPoint {
   //
   // @pre `road_geometry` is non-null.
   // @pre Parent RoadGeometry has not already been set.
-  void AttachToRoadGeometry(Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry);
+  void AttachToRoadGeometry(common::Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry);
 #endif  // DRAKE_DOXYGEN_CXX
 
  private:

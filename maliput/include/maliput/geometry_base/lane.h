@@ -5,7 +5,7 @@
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/segment.h"
-#include "maliput/geometry_base/passkey.h"
+#include "maliput/common/passkey.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -46,7 +46,7 @@ class Lane : public api::Lane {
   // @pre `segment` is non-null.
   // @pre `index` is non-negative.
   // @pre Parent Segment and the index have not already been set.
-  void AttachToSegment(Passkey<Segment>, const api::Segment* segment, int index);
+  void AttachToSegment(common::Passkey<Segment>, const api::Segment* segment, int index);
 
   // Notifies Lane of the BranchPoint for its "start" end.
   // This may only be called, once, by a BranchPoint.
@@ -55,7 +55,7 @@ class Lane : public api::Lane {
   //
   // @pre `branch_point` is non-null.
   // @pre The "start" BranchPoint has not already been set.
-  void SetStartBranchPoint(Passkey<BranchPoint>, BranchPoint* branch_point);
+  void SetStartBranchPoint(common::Passkey<BranchPoint>, BranchPoint* branch_point);
 
   // Notifies Lane of the BranchPoint for its "finish" end.
   // This may only be called, once, by a BranchPoint.
@@ -64,7 +64,7 @@ class Lane : public api::Lane {
   //
   // @pre `branch_point` is non-null.
   // @pre The "finish" BranchPoint has not already been set.
-  void SetFinishBranchPoint(Passkey<BranchPoint>, BranchPoint* branch_point);
+  void SetFinishBranchPoint(common::Passkey<BranchPoint>, BranchPoint* branch_point);
 #endif  // DRAKE_DOXYGEN_CXX
 
   ~Lane() override = default;

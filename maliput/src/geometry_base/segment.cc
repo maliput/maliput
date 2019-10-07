@@ -7,7 +7,7 @@ namespace geometry_base {
 
 const api::Junction* Segment::do_junction() const { return junction_; }
 
-void Segment::AttachToJunction(Passkey<Junction>, const api::Junction* junction) {
+void Segment::AttachToJunction(common::Passkey<Junction>, const api::Junction* junction) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(junction != nullptr);
   // Preconditions
@@ -16,7 +16,8 @@ void Segment::AttachToJunction(Passkey<Junction>, const api::Junction* junction)
   junction_ = junction;
 }
 
-void Segment::SetLaneIndexingCallback(Passkey<Junction>, const std::function<void(const api::Lane*)>& callback) {
+void Segment::SetLaneIndexingCallback(common::Passkey<Junction>,
+                                      const std::function<void(const api::Lane*)>& callback) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(!!callback);
   // Preconditions
