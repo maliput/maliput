@@ -214,7 +214,7 @@ TYPED_TEST(GeoPositionTest, VectorArithmeticOperators) {
   EXPECT_TRUE(dut == GeoPositionT<T>(T(3.), T(6.), T(9.)));
 }
 
-GTEST_TEST(GeoPosition, DistanceOperator) {
+GTEST_TEST(GeoPosition, DistanceTest) {
   // Check the `Distance` method.
   // Test compared to the following python script.
   // >>> import math as m
@@ -297,7 +297,7 @@ TEST_F(RotationTest, QuaternionSetter) {
 }
 
 GTEST_TEST(Rotation, ApplyTest) {
-  // Test compared to the following python script.
+  // Results in this test were derived with the following Python script:
   // >>> import math as m
   // >>> import numpy as np
   // >>> def rotation_matrix (roll, pitch ,yaw):
@@ -315,7 +315,7 @@ GTEST_TEST(Rotation, ApplyTest) {
   // >>> rot_mat = rotation_matrix(1.75,2.91,0.38)
   // >>> geo_position = np.matrix([[15.],[33.],[148.]])
   // >>> print (rot_mat*geo_position)
-  const double kRotationTolerance = 1e-5;
+  const double kRotationTolerance = 1e-8;
   const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
   const GeoPosition geo_position = dut.Apply({15., 33., 148.});
   EXPECT_TRUE(
@@ -323,7 +323,7 @@ GTEST_TEST(Rotation, ApplyTest) {
 }
 
 GTEST_TEST(Rotation, DistanceTest) {
-  // Test compared to the following python script.
+  // Results in this test were derived with the following Python script:
   // >>> import math as m
   // >>> import numpy as np
   // >>> def rotation_matrix (roll, pitch ,yaw):
@@ -350,7 +350,7 @@ GTEST_TEST(Rotation, DistanceTest) {
   // >>> dr = m.acos(np.dot(np.transpose(a_r), b_r))
   // >>> dh = m.acos(np.dot(np.transpose(a_h), b_h))
   // >>> print(m.sqrt(ds**2 + dr**2 + dh**2 ))
-  const double kRotationTolerance = 1e-10;
+  const double kRotationTolerance = 1e-11;
   const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
   EXPECT_NEAR(dut.Distance(Rotation::FromRpy(3.1, 0.1, 2.2)), 2.55482853419, kRotationTolerance);
 }

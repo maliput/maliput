@@ -53,11 +53,11 @@ GeoPosition Rotation::Apply(const GeoPosition& geo_position) const {
 }
 
 double Rotation::Distance(const Rotation& rot) const {
-  // Compute transformed unit vectors of a frame.
+  // Compute transformed unit vectors of a frame A.
   const GeoPosition as = this->Apply({1., 0., 0.});
   const GeoPosition ar = this->Apply({0., 1., 0.});
   const GeoPosition ah = this->Apply({0., 0., 1.});
-  // Compute transformed unit vectors of b frame.
+  // Compute transformed unit vectors of b frame B.
   const GeoPosition bs = rot.Apply({1., 0., 0.});
   const GeoPosition br = rot.Apply({0., 1., 0.});
   const GeoPosition bh = rot.Apply({0., 0., 1.});
