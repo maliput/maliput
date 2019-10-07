@@ -105,7 +105,7 @@ class GeoPositionT {
     return {drake::ExtractDoubleOrThrow(xyz_.x()), drake::ExtractDoubleOrThrow(xyz_.y()),
             drake::ExtractDoubleOrThrow(xyz_.z())};
   }
-  // Return the Cartesian distance to geo_position.
+  /// Return the Cartesian distance to geo_position.
   T Distance(const GeoPositionT<T>& geo_position) const;
 
  private:
