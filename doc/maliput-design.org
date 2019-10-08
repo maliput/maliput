@@ -54,7 +54,7 @@ answer questions such as "How close am I to the edge of the lane?" and
 =maliput= is intended to be agnostic of the data source for a road network.
 Concrete implementations for different data sources will expose the same
 abstract interface.  Some networks may be completely synthetic (constructed
-by hand, or even procedurally), others will be created from measurments
+by hand, or even procedurally), others will be created from measurements
 of real-life roads.
 
 We expect to have implementations to support:
@@ -246,7 +246,7 @@ The space of the =Lane= is bounded in $s$ by $s \in [0,
 s_\text{max}]$.  $s_\text{max}$ is called the /length/ of the =Lane=
 and is in fact the path-length of the centerline $C_L$ (in both the
 =Lane=-frame and the =World=-frame).  The $s=0$ end of a =Lane= is
-labelled the /start end/, and the $s=s_\text{max}$ end is the /finish
+labeled the /start end/, and the $s=s_\text{max}$ end is the /finish
 end/.  However, a =Lane= is just a stretch of pavement with no
 preferred travel direction, and there is no direction of travel
 implied by these labels.[fn::Travel restrictions on a =Lane= are
@@ -276,7 +276,7 @@ H_\text{lane}: (s,r) \mapsto [h_\text{min}, h_\text{max}] \text{ s.t. } h_\text{
 \]
 defines inclusive min/max bounds which depend on $s$ and $r$.  These define
 the valid domain of $h$, which represents the full extent of the volume
-(above and possibly below the road surface) modelled by the =Lane=.
+(above and possibly below the road surface) modeled by the =Lane=.
 Typically, $h_\text{min}$ is zero, but having $h_\text{min}<0$ allows a
 =Lane= to describe the location of subterranean features (e.g., measurements
 made by ground-penetrating radar).
@@ -290,7 +290,7 @@ produce limits to $(r,h)$ before such a curve develops a cusp.
 The current definitions of $B_\text{segment}$ and
 $H_\text{lane}$ conflate the bounds of the /segment/ volume
 (e.g., pavement and free space under bridges) with the bounds of the
-/modelled/ volume (e.g., the bounds on $r$ and $h$ which maintain
+/modeled/ volume (e.g., the bounds on $r$ and $h$ which maintain
 $G^1$ continuity, avoiding cusps).  Hence, the road surface may continue
 into regions that cannot be properly represented by the parameterization
 of a given =Lane=.
@@ -329,11 +329,11 @@ and the conditions on $r$ and $h$ being path-lengths, this implies that:
 Given point (2) above, one can imagine multiple =Lanes= converging on one
 side of a =BranchPoint=, flowing smoothly through it, and diverging into
 other =Lanes= on the other side.  If one considers the
-"outward-travelling tangent vector"[fn::At the /finish/ end of a =Lane=,
+"outward-traveling tangent vector"[fn::At the /finish/ end of a =Lane=,
 this is just the tangent of $C_L$; at the /start/ end of a =Lane=, it's
 the negative of the tangent, pointing in the $-s$ direction instead of
 the $+s$ direction.] of each =Lane=, then the =Lanes= can be grouped by
-common orientation of outward-travelling tangent vector into at most two
+common orientation of outward-traveling tangent vector into at most two
 groups.  Thus, a =BranchPoint= fundamentally has two sides to it.  The
 sides are arbitrary, so we label them with the arbitrary names "A" and
 "B".  With respect to a specific =Lane= $J$, regardless of which side $J$
@@ -341,7 +341,7 @@ is on (be it A or B):
  * the =Lanes= on the "same side" as $J$ are the /confluent lanes/ of $J$;
  * the =Lanes= on the "other side" are the /ongoing lanes/ of $J$.
 
-# TODO: figure with sample branch-point topoloties:
+# TODO: figure with sample branch-point topologies:
 # * 1:1 --- simple continuation of one lane onto another;
 # * 1:2 --- a split of one lane to two;
 # * 1:3 --- a split of one to three, e.g., paths through an intersection
@@ -837,7 +837,7 @@ many of the constraints involved in constructing a valid =RoadGeometry=.
 A =RoadRulebook= (Figure [[fig:road-rulebook]]) expresses the semantic
 "rules of the road" for a road network, as rule elements associated to
 components of a =RoadGeometry=.  In a real, physical road network, road
-rules are typically signalled to users via signs or striping, though
+rules are typically signaled to users via signs or striping, though
 some rules are expected to be prior knowledge (e.g., "We drive on the
 right-hand side here.").  =RoadRulebook= abstracts away from both the
 physical artifacts and the symbolic state of such signals, and directly
@@ -857,7 +857,7 @@ We define three levels of knowledge of rules of the road:
    miles per hour; a dashed-yellow lane separation line.
  * /Semantic/ is the intended rules of the road, whether from implicit
    knowledge, or conveyed via symbols and signals.  E.g., cars
-   travelling forward through the intersection must stop, but
+   traveling forward through the intersection must stop, but
    left-turning cars may proceed; the speed limit for a specific
    stretch of road is 45 mph; lane-change to the left in order to pass
    is permitted.
@@ -966,7 +966,7 @@ green will not magically clear an intersection.  Even after acquiring
 the right-of-way, a vehicle should still respect the physical reality
 of its environment and operate in a safe manner.] when operating on
 intersecting regions of the road network.  In the real world, such
-rules are typically signalled by stop signs, yield signs, and traffic
+rules are typically signaled by stop signs, yield signs, and traffic
 lights, or are understood as implicit knowledge of the local laws
 (e.g., "vehicle on the right has priority at uncontrolled
 intersections").
@@ -1139,7 +1139,7 @@ dynamic signal-controlled intersection:
     eastbound traffic turning north.
   * "Right Turn on Red" is allowed (which affects both northbound and
     westbound vehicles).
-  * In the signalling cycle, eastbound traffic has both a protected-left
+  * In the signaling cycle, eastbound traffic has both a protected-left
     (green arrow) phase and a permitted-left (flashing yellow arrow) phase.
   * There are a total of seven zones (paths) traversing the intersection
     (illustrated by the seven arrows).
