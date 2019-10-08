@@ -16,6 +16,33 @@ namespace {
 using rules::BulbGroup;
 using rules::TrafficLight;
 
+// Given a `LaneSRoute` this method checks the G1 contiguity
+// between of all its `LaneSRange`.
+void CheckLaneSRouteContiguity(const RoadGeometry* road_geometry, const LaneSRoute& rule_route) {
+  for (int i = 0; i < rule_route.ranges().size() - 1; ++i) {  // Iterating through the lanes of a rule.
+    const LaneSRange lane_range_a = rule_route.ranges()[i];
+    const LaneSRange lane_range_b = rule_route.ranges()[i + 1];
+    if (!IsContiguous(lane_range_a, lane_range_b, road_geometry)) {
+      MALIPUT_THROW_MESSAGE("Lanes are not contiguous");
+    }
+  }
+}
+
+// Checks the contiguity between lanes, for both
+// linear and angular tolerance.
+// @throws common::assertion_error When any of the RoadGeometry's tolerances is not met.
+void CheckContiguityBetweenLanes(const RoadNetwork& road_network) {
+  const rules::RoadRulebook::QueryResults rules = road_network.rulebook()->Rules();
+  const RoadGeometry* const road_geometry = road_network.road_geometry();
+  for (const std::pair<rules::DiscreteValueRule::Id, rules::DiscreteValueRule>& key_value :
+       rules.discrete_value_rules) {
+    CheckLaneSRouteContiguity(road_geometry, key_value.second.zone());
+  }
+  for (const std::pair<rules::RangeValueRule::Id, rules::RangeValueRule>& key_value : rules.range_value_rules) {
+    CheckLaneSRouteContiguity(road_geometry, key_value.second.zone());
+  }
+}
+
 // Confirms full DirectionUsageRule coverage. This is determined by
 // verifying that each Lane within the RoadGeometry has an associated
 // DirectionUsageRule. In the future, this check could be made even more
@@ -108,6 +135,9 @@ void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValid
   }
   if (options.check_related_bulb_groups) {
     CheckRelatedBulbGroups(road_network);
+  }
+  if (options.check_contiguity_rule_zones) {
+    CheckContiguityBetweenLanes(road_network);
   }
 }
 

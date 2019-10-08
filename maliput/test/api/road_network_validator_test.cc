@@ -35,14 +35,15 @@ GTEST_TEST(RoadNetworkValidatorTest, RuleCoverageTest) {
 
   RoadNetworkValidatorOptions options{true /* check_direction_usage_rule_coverage */,
                                       false /* check_road_geometry_invariants */,
-                                      false /* check_road_geometry_hierarchy */, false /* check_related_bulb_groups */};
-  EXPECT_THROW(ValidateRoadNetwork(road_network, options), maliput::common::assertion_error);
+                                      false /* check_road_geometry_hierarchy */, false /* check_related_bulb_groups */,
+                                      false /* check_contiguity_rule_zones*/};
+  EXPECT_THROW(ValidateRoadNetwork(road_network, options), common::assertion_error);
 
   options.check_direction_usage_rule_coverage = false;
   EXPECT_NO_THROW(ValidateRoadNetwork(road_network, options));
 }
 
-// Tests RoadGeometry hierarchy by evaluating partially incomplete RoadGeometries
+// Tests RoadGeometry hierarchy by evaluating partially incomplete RoadGeometries.
 class RoadGeometryHierarchyTest : public ::testing::TestWithParam<RoadGeometryBuildFlags> {
  protected:
   void SetUp() override { build_flags_ = GetParam(); }
@@ -76,10 +77,10 @@ TEST_P(RoadGeometryHierarchyTest, HierarchyTestThrows) {
 
   const RoadNetworkValidatorOptions options{
       false /* check_direction_usage_rule_coverage */, false /* check_road_geometry_invariants */,
-      true /* check_road_geometry_hierarchy */, false /* check_related_bulb_groups */};
-
+      true /* check_road_geometry_hierarchy */, false /* check_related_bulb_groups */,
+      false /* check_contiguity_rule_zones*/};
   if (build_flags_.expects_throw) {
-    EXPECT_THROW(ValidateRoadNetwork(road_network, options), maliput::common::assertion_error);
+    EXPECT_THROW(ValidateRoadNetwork(road_network, options), common::assertion_error);
   } else {
     ValidateRoadNetwork(road_network, options);
     EXPECT_NO_THROW(ValidateRoadNetwork(road_network, options));
@@ -132,10 +133,10 @@ TEST_P(RelatedBulbGroupsTest, ChecksRelatedBulGroupsRelation) {
 
   const RoadNetworkValidatorOptions options{
       false /* check_direction_usage_rule_coverage */, false /* check_road_geometry_invariants */,
-      false /* check_road_geometry_hierarchy */, true /* check_related_bulb_groups */};
-
+      false /* check_road_geometry_hierarchy */, true /* check_related_bulb_groups */,
+      false /* check_contiguity_rule_zones*/};
   if (build_flags_.expects_throw) {
-    EXPECT_THROW(ValidateRoadNetwork(road_network, options), maliput::common::assertion_error);
+    EXPECT_THROW(ValidateRoadNetwork(road_network, options), common::assertion_error);
   } else {
     ValidateRoadNetwork(road_network, options);
     EXPECT_NO_THROW(ValidateRoadNetwork(road_network, options));
@@ -144,6 +145,94 @@ TEST_P(RelatedBulbGroupsTest, ChecksRelatedBulGroupsRelation) {
 
 INSTANTIATE_TEST_CASE_P(RelatedBulbGroupsTestGroup, RelatedBulbGroupsTest,
                         ::testing::ValuesIn(RelatedBulbGroupsTestParameters()));
+
+// Tests the G1 contiguity in Rule's LaneSRoutes.
+class ContiguityBetweenLanesTest : public ::testing::TestWithParam<RoadNetworkContiguityBuildFlags> {
+ protected:
+  void SetUp() override { build_flags_ = GetParam(); }
+
+  RoadNetworkContiguityBuildFlags build_flags_;
+};
+
+std::vector<RoadNetworkContiguityBuildFlags> ContiguityTestParameters() {
+  // RoadGeometry's angular and linear tolerance.
+  // Its value is based on the Cartesian distance between non-contiguous lane endpoints
+  // which are created in this test.
+  const double linear_tolerance = 1e-3;
+  // Its value is based on the angular distance used for non-contiguous lane endpoints
+  // which are created in this test.
+  const double angular_tolerance = 1e-3;
+  return {
+      // Without DiscreteValueRule or RangeValueRule.
+      // Does not throw.
+      // { @
+      RoadNetworkContiguityBuildFlags{{false, false, linear_tolerance, angular_tolerance}, {false, false}, false},
+      RoadNetworkContiguityBuildFlags{{false, true, linear_tolerance, angular_tolerance}, {false, false}, false},
+      RoadNetworkContiguityBuildFlags{{true, false, linear_tolerance, angular_tolerance}, {false, false}, false},
+      RoadNetworkContiguityBuildFlags{{true, true, linear_tolerance, angular_tolerance}, {false, false}, false},
+      // } @
+
+      // Adding a RangeValueRule.
+      // { @
+      // Contiguous LaneSRoute with a RangeValueRule.
+      RoadNetworkContiguityBuildFlags{{false, false, linear_tolerance, angular_tolerance}, {false, true}, false},
+      // Throws because it does not meet the angular tolerance.
+      RoadNetworkContiguityBuildFlags{{false, true, linear_tolerance, angular_tolerance}, {false, true}, true},
+      // Throws because it does not meet the linear tolerance.
+      RoadNetworkContiguityBuildFlags{{true, false, linear_tolerance, angular_tolerance}, {false, true}, true},
+      // Throws because it does not meet neither the linear tolerance nor the angular tolerance.
+      RoadNetworkContiguityBuildFlags{{true, true, linear_tolerance, angular_tolerance}, {false, true}, true},
+      // } @
+
+      // Adding a DiscreteValueRule.
+      // { @
+      // Contiguous LaneSRoute with a DiscreteValueRule.
+      RoadNetworkContiguityBuildFlags{{false, false, linear_tolerance, angular_tolerance}, {true, false}, false},
+      // Throws because it does not meet angular tolerance.
+      RoadNetworkContiguityBuildFlags{{false, true, linear_tolerance, angular_tolerance}, {true, false}, true},
+      // Throws because it does not meet linear tolerance.
+      RoadNetworkContiguityBuildFlags{{true, false, linear_tolerance, angular_tolerance}, {true, false}, true},
+      // Throws because it does not meet neither the linear tolerance nor the angular tolerance.
+      RoadNetworkContiguityBuildFlags{{true, true, linear_tolerance, angular_tolerance}, {true, false}, true},
+      // } @
+
+      // Adding DiscreteValueRule and RangeValueRule.
+      // { @
+      // Contiguous LaneSRoute with a DiscreteValueRule and RangeValueRule.
+      RoadNetworkContiguityBuildFlags{{false, false, linear_tolerance, angular_tolerance}, {true, true}, false},
+      // Throws because it does not meet angular tolerance.
+      RoadNetworkContiguityBuildFlags{{false, true, linear_tolerance, angular_tolerance}, {true, true}, true},
+      // Throws because it does not meet linear tolerance.
+      RoadNetworkContiguityBuildFlags{{true, false, linear_tolerance, angular_tolerance}, {true, true}, true},
+      // Throws because it does not meet neither the linear tolerance nor the angular tolerance.
+      RoadNetworkContiguityBuildFlags{{true, true, linear_tolerance, angular_tolerance}, {true, true}, true},
+      // } @
+  };
+}
+
+TEST_P(ContiguityBetweenLanesTest, ChecksContiguityBetweenLanes) {
+  RoadNetwork road_network(test::CreateMockContiguousRoadGeometry(build_flags_.rg_contiguity_build_flags),
+                           test::CreateMockContiguousRoadRulebook(build_flags_.rulebook_contiguity_build_flags),
+                           test::CreateTrafficLightBook(), test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
+                           test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
+                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+                           test::CreateRangeValueRuleStateProvider());
+
+  const RoadNetworkValidatorOptions options{
+      false /* check_direction_usage_rule_coverage */, false /* check_road_geometry_invariants */,
+      false /* check_road_geometry_hierarchy */, false /* check_related_bulb_groups */,
+      true /* check_contiguity_rule_zones*/};
+
+  if (build_flags_.expects_throw) {
+    EXPECT_THROW(ValidateRoadNetwork(road_network, options), common::assertion_error);
+  } else {
+    ValidateRoadNetwork(road_network, options);
+    EXPECT_NO_THROW(ValidateRoadNetwork(road_network, options));
+  }
+}
+
+INSTANTIATE_TEST_CASE_P(ContiguityBetweenLanesTestGroup, ContiguityBetweenLanesTest,
+                        ::testing::ValuesIn(ContiguityTestParameters()));
 
 }  // namespace
 }  // namespace test

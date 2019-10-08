@@ -35,6 +35,33 @@ struct RoadGeometryBuildFlags {
   bool expects_throw{false};
 };
 
+/// Holds RoadGeometry contiguity build configuration.
+/// @see CreateMockContiguousRoadGeometry() docstring for full details on how this
+///      structure pairs with the function.
+struct RoadGeometryContiguityBuildFlags {
+  bool add_linear_mismatch{false};
+  bool add_angular_mismatch{false};
+  double linear_tolerance{0};
+  double angular_tolerance{0};
+};
+
+/// Holds RoadRulebook contiguity build configuration.
+/// @see CreateMockContiguousRoadRulebook() docstring for full details on how this
+///      structure pairs with the function.
+struct RoadRulebookContiguityBuildFlags {
+  bool add_discrete_value_rule{false};
+  bool add_range_value_rule{false};
+};
+
+/// Holds RoadNetwork contiguity build configuration.
+/// @see CreateMockContiguousRoadGeometry() and CreateMockContiguousRoadRulebook() docstring
+///      for full details on how this structure pairs with the function
+struct RoadNetworkContiguityBuildFlags {
+  RoadGeometryContiguityBuildFlags rg_contiguity_build_flags{};
+  RoadRulebookContiguityBuildFlags rulebook_contiguity_build_flags{};
+  bool expects_throw{false};
+};
+
 /// Holds RightOfWayRule build configurations.
 /// @see CreateRightOfWayRule() docstring for full details on
 ///      how this structure pairs with the function.
@@ -119,11 +146,17 @@ rules::Rule::RelatedRules CreateNonEmptyRelatedRules();
 /// Returns a rules::DiscreteValueRule containing an arbitrary state.
 rules::DiscreteValueRule CreateDiscreteValueRule();
 
+/// Returns a rules::DiscreteValueRule containing an arbitrary state.
+rules::DiscreteValueRule CreateDiscreteValueRuleForContiguityTest();
+
 /// Returns a rules::RangeValueRule::Range.
 rules::RangeValueRule::Range CreateRange();
 
 /// Returns a rules::RangeValueRule containing an arbitrary state.
 rules::RangeValueRule CreateRangeValueRule();
+
+/// Returns a rules::RangeValueRule containing an arbitrary state.
+rules::RangeValueRule CreateRangeValueRuleForContiguityTest();
 
 /// Returns an arbitrary RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateRoadGeometry();
@@ -141,6 +174,17 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry();
 //
 // @returns A MockRoadGeometry pointer.
 std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& build_flags);
+
+/// Builds a RoadGeometry based on `build_flags` configuration.
+///
+/// When `build.flags.add_linear_mismatch` is true, end of first lane and start of second lane will be
+/// separated by more than linear_tolerance.
+/// When `build_flags.add_angular_mismatch` is true, heading angular distance
+/// between the end of the first lane and the start of the second lane will be bigger than
+/// angular_tolerance.
+///
+/// @returns A MockRoadGeometry pointer.
+std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometryContiguityBuildFlags& build_flags);
 
 /// Returns an arbitrary one-lane RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry();
@@ -165,6 +209,15 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook();
 /// When `build_flags.add_range_value` is true, a RangeValueRule
 /// is created with CreateRangeValueRule().
 std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildFlags& build_flags);
+
+/// Returns an arbitrary rules::RoadRulebook.
+///
+/// When `build_flags.add_discrete_value` is true, a DiscreteValueRule
+/// is created with CreateDiscreteValueRuleForContiguityTest().
+/// When `build_flags.add_range_value` is true, a RangeValueRule
+/// is created with CreateRangeValueRuleForContiguityTest().
+std::unique_ptr<rules::RoadRulebook> CreateMockContiguousRoadRulebook(
+    const RoadRulebookContiguityBuildFlags& build_flags);
 
 /// Returns an arbitrary rules::BulbGroup.
 ///
