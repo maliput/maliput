@@ -7,6 +7,7 @@
 
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
+#include "maliput/test_utilities/maliput_types_compare.h"
 
 namespace maliput {
 namespace api {
@@ -213,6 +214,16 @@ TYPED_TEST(GeoPositionTest, VectorArithmeticOperators) {
   EXPECT_TRUE(dut == GeoPositionT<T>(T(3.), T(6.), T(9.)));
 }
 
+GTEST_TEST(GeoPosition, DistanceTest) {
+  // Check the `Distance` method.
+  // Test compared to the following python script.
+  // >>> import math as m
+  // >>> print(m.sqrt((66-25)**2 + ((90-85)**2) + ((-25-12)**2)))
+  const double kLinearTolerance = 1e-15;
+  using T = double;
+  const GeoPositionT<T> dut(T(25.), T(85.), T(12.));
+  EXPECT_NEAR(dut.Distance({66.0, 90.0, -25.0}), 55.452682532047085, kLinearTolerance);
+}
 // An arbitrary very small number (that passes the tests).
 const double kRotationTolerance = 1e-15;
 
@@ -285,6 +296,66 @@ TEST_F(RotationTest, QuaternionSetter) {
                                twist_pitch_, twist_yaw_, twist_matrix_);
 }
 
+GTEST_TEST(Rotation, ApplyTest) {
+  // Results in this test were derived with the following Python script:
+  // >>> import math as m
+  // >>> import numpy as np
+  // >>> def rotation_matrix (roll, pitch ,yaw):
+  // >>>     ca_r = m.cos(roll)
+  // >>>     sa_r = m.sin(roll)
+  // >>>     ca_p = m.cos(pitch)
+  // >>>     sa_p = m.sin(pitch)
+  // >>>     ca_y = m.cos(yaw)
+  // >>>     sa_y = m.sin(yaw)
+  // >>>     #build rotation matrix per axis
+  // >>>     rx = np.matrix([[1, 0, 0], [0, ca_r, -sa_r], [0, sa_r, ca_r]])
+  // >>>     ry = np.matrix([[ca_p, 0, sa_p], [0, 1, 0], [-sa_p, 0, ca_p]])
+  // >>>     rz = np.matrix([[ca_y, -sa_y, 0], [sa_y, ca_y, 0], [0, 0, 1]])
+  // >>>     return (rz * ry * rx)
+  // >>> rot_mat = rotation_matrix(1.75,2.91,0.38)
+  // >>> geo_position = np.matrix([[15.],[33.],[148.]])
+  // >>> print (rot_mat*geo_position)
+  // Tolerance has been empirically found for these testing values.
+  const double kRotationTolerance = 1e-8;
+  const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
+  const GeoPosition geo_position = dut.Apply({15., 33., 148.});
+  EXPECT_TRUE(
+      test::IsGeoPositionClose(geo_position, GeoPosition{43.93919835, -145.60056097, -9.37141893}, kRotationTolerance));
+}
+
+GTEST_TEST(Rotation, DistanceTest) {
+  // Results in this test were derived with the following Python script:
+  // >>> import math as m
+  // >>> import numpy as np
+  // >>> def rotation_matrix (roll, pitch ,yaw):
+  // >>>     ca_r = m.cos(roll)
+  // >>>     sa_r = m.sin(roll)
+  // >>>     ca_p = m.cos(pitch)
+  // >>>     sa_p = m.sin(pitch)
+  // >>>     ca_y = m.cos(yaw)
+  // >>>     sa_y = m.sin(yaw)
+  // >>>     #build rotation matrix per axis
+  // >>>     rx = np.matrix([[1, 0, 0], [0, ca_r, -sa_r], [0, sa_r, ca_r]])
+  // >>>     ry = np.matrix([[ca_p, 0, sa_p], [0, 1, 0], [-sa_p, 0, ca_p]])
+  // >>>     rz = np.matrix([[ca_y, -sa_y, 0], [sa_y, ca_y, 0], [0, 0, 1]])
+  // >>>     return (rz * ry * rx)
+  // >>> rot_mat_a = rotation_matrix(1.75,2.91,0.38)
+  // >>> rot_mat_b = rotation_matrix(3.1,0.1,2.2)
+  // >>> a_s = rot_mat_a * np.matrix([[1.],[0.],[0.]])
+  // >>> a_r = rot_mat_a * np.matrix([[0.],[1.],[0.]])
+  // >>> a_h = rot_mat_a * np.matrix([[0.],[0.],[1.]])
+  // >>> b_s = rot_mat_b * np.matrix([[1.],[0.],[0.]])
+  // >>> b_r = rot_mat_b * np.matrix([[0.],[1.],[0.]])
+  // >>> b_h = rot_mat_b * np.matrix([[0.],[0.],[1.]])
+  // >>> ds = m.acos(np.dot(np.transpose(a_s), b_s))
+  // >>> dr = m.acos(np.dot(np.transpose(a_r), b_r))
+  // >>> dh = m.acos(np.dot(np.transpose(a_h), b_h))
+  // >>> print(m.sqrt(ds**2 + dr**2 + dh**2 ))
+  // Tolerance has been empirically found for these testing values.
+  const double kRotationTolerance = 1e-11;
+  const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
+  EXPECT_NEAR(dut.Distance(Rotation::FromRpy(3.1, 0.1, 2.2)), 2.55482853419, kRotationTolerance);
+}
 #undef CHECK_ALL_ROTATION_ACCESSORS
 
 GTEST_TEST(RBoundsTest, DefaultConstructor) {

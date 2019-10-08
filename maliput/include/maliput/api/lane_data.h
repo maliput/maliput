@@ -51,69 +51,6 @@ struct LaneEnd {
 /// text-logging. It is not intended for serialization.
 std::ostream& operator<<(std::ostream& out, const LaneEnd::Which& which_end);
 
-/// A 3-dimensional rotation.
-class Rotation {
- public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rotation)
-
-  /// Default constructor, creating an identity Rotation.
-  Rotation() : quaternion_(drake::Quaternion<double>::Identity()) {}
-
-  /// Constructs a Rotation from a quaternion @p quaternion (which will be
-  /// normalized).
-  static Rotation FromQuat(const drake::Quaternion<double>& quaternion) { return Rotation(quaternion.normalized()); }
-
-  /// Constructs a Rotation from @p rpy, a vector of `[roll, pitch, yaw]`,
-  /// expressing a roll around X, followed by pitch around Y,
-  /// followed by yaw around Z (with all angles in radians).
-  static Rotation FromRpy(const drake::Vector3<double>& rpy) {
-    return Rotation(drake::math::RollPitchYaw<double>(rpy).ToQuaternion());
-  }
-
-  /// Constructs a Rotation expressing a @p roll around X, followed by
-  /// @p pitch around Y, followed by @p yaw around Z (with all angles
-  /// in radians).
-  static Rotation FromRpy(double roll, double pitch, double yaw) {
-    return FromRpy(drake::Vector3<double>(roll, pitch, yaw));
-  }
-
-  /// Provides a quaternion representation of the rotation.
-  const drake::Quaternion<double>& quat() const { return quaternion_; }
-
-  /// Sets value from a Quaternion @p quaternion (which will be normalized).
-  void set_quat(const drake::Quaternion<double>& quaternion) { quaternion_ = quaternion.normalized(); }
-
-  /// Provides a 3x3 rotation matrix representation of "this" rotation.
-  drake::Matrix3<double> matrix() const { return drake::math::RotationMatrix<double>(quaternion_).matrix(); }
-
-  /// Provides a representation of rotation as a vector of angles
-  /// `[roll, pitch, yaw]` (in radians).
-  drake::math::RollPitchYaw<double> rpy() const { return drake::math::RollPitchYaw<double>(quaternion_); }
-
-  // TODO(maddog@tri.global)  Deprecate and/or remove roll()/pitch()/yaw(),
-  //                          since they hide the call to rpy(), and since
-  //                          most call-sites should probably be using something
-  //                          else (e.g., quaternion) anyway.
-  /// Returns the roll component of the Rotation (in radians).
-  double roll() const { return rpy().roll_angle(); }
-
-  /// Returns the pitch component of the Rotation (in radians).
-  double pitch() const { return rpy().pitch_angle(); }
-
-  /// Returns the yaw component of the Rotation (in radians).
-  double yaw() const { return rpy().yaw_angle(); }
-
- private:
-  explicit Rotation(const drake::Quaternion<double>& quat) : quaternion_(quat) {}
-
-  drake::Quaternion<double> quaternion_;
-};
-
-/// Streams a string representation of @p rotation into @p out. Returns
-/// @p out. This method is provided for the purposes of debugging or
-/// text-logging. It is not intended for serialization.
-std::ostream& operator<<(std::ostream& out, const Rotation& rotation);
-
 /// A position in 3-dimensional geographical Cartesian space, i.e., in the world
 /// frame, consisting of three components x, y, and z.
 ///
@@ -168,6 +105,8 @@ class GeoPositionT {
     return {drake::ExtractDoubleOrThrow(xyz_.x()), drake::ExtractDoubleOrThrow(xyz_.y()),
             drake::ExtractDoubleOrThrow(xyz_.z())};
   }
+  /// Return the Cartesian distance to geo_position.
+  T Distance(const GeoPositionT<T>& geo_position) const;
 
  private:
   explicit GeoPositionT(const drake::Vector3<T>& xyz) : xyz_(xyz) {}
@@ -226,6 +165,80 @@ GeoPositionT<T> operator*(const GeoPositionT<T>& lhs, double rhs) {
   result *= rhs;
   return GeoPositionT<T>::FromXyz(result);
 }
+
+/// A 3-dimensional rotation.
+class Rotation {
+ public:
+  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rotation)
+
+  /// Default constructor, creating an identity Rotation.
+  Rotation() : quaternion_(drake::Quaternion<double>::Identity()) {}
+
+  /// Constructs a Rotation from a quaternion @p quaternion (which will be
+  /// normalized).
+  static Rotation FromQuat(const drake::Quaternion<double>& quaternion) { return Rotation(quaternion.normalized()); }
+
+  /// Constructs a Rotation from @p rpy, a vector of `[roll, pitch, yaw]`,
+  /// expressing a roll around X, followed by pitch around Y,
+  /// followed by yaw around Z (with all angles in radians).
+  static Rotation FromRpy(const drake::Vector3<double>& rpy) {
+    return Rotation(drake::math::RollPitchYaw<double>(rpy).ToQuaternion());
+  }
+
+  /// Constructs a Rotation expressing a @p roll around X, followed by
+  /// @p pitch around Y, followed by @p yaw around Z (with all angles
+  /// in radians).
+  static Rotation FromRpy(double roll, double pitch, double yaw) {
+    return FromRpy(drake::Vector3<double>(roll, pitch, yaw));
+  }
+
+  /// Provides a quaternion representation of the rotation.
+  const drake::Quaternion<double>& quat() const { return quaternion_; }
+
+  /// Sets value from a Quaternion @p quaternion (which will be normalized).
+  void set_quat(const drake::Quaternion<double>& quaternion) { quaternion_ = quaternion.normalized(); }
+
+  /// Provides a 3x3 rotation matrix representation of "this" rotation.
+  drake::Matrix3<double> matrix() const { return drake::math::RotationMatrix<double>(quaternion_).matrix(); }
+
+  /// Provides a representation of rotation as a vector of angles
+  /// `[roll, pitch, yaw]` (in radians).
+  drake::math::RollPitchYaw<double> rpy() const { return drake::math::RollPitchYaw<double>(quaternion_); }
+
+  // TODO(maddog@tri.global)  Deprecate and/or remove roll()/pitch()/yaw(),
+  //                          since they hide the call to rpy(), and since
+  //                          most call-sites should probably be using something
+  //                          else (e.g., quaternion) anyway.
+  /// Returns the roll component of the Rotation (in radians).
+  double roll() const { return rpy().roll_angle(); }
+
+  /// Returns the pitch component of the Rotation (in radians).
+  double pitch() const { return rpy().pitch_angle(); }
+
+  /// Returns the yaw component of the Rotation (in radians).
+  double yaw() const { return rpy().yaw_angle(); }
+
+  /// Returns the rotated `geo_position` GeoPosition in the World Frame.
+  GeoPosition Apply(const GeoPosition& geo_position) const;
+
+  /// Let $R_1$ be `this` rotation description, and let `rot` be $R_2$, another
+  /// rotation description in the World Frame. Let $F_W_1$ and $F_W_2$ be the
+  /// versors describing the basis of the World Frame. Then, let $F_R_1$ and
+  /// $F_R_2$ be the rotated $F_W_1$ and $F_W_2$ by $R_1$ and $R_2$ respectively.
+  /// This method returns the root square sum of each angle between
+  /// versors in $F_R_1$ and $F_R_2$.
+  double Distance(const Rotation& rot) const;
+
+ private:
+  explicit Rotation(const drake::Quaternion<double>& quat) : quaternion_(quat) {}
+
+  drake::Quaternion<double> quaternion_;
+};
+
+/// Streams a string representation of @p rotation into @p out. Returns
+/// @p out. This method is provided for the purposes of debugging or
+/// text-logging. It is not intended for serialization.
+std::ostream& operator<<(std::ostream& out, const Rotation& rotation);
 
 /// A 3-dimensional position in a `Lane`-frame, consisting of three components:
 ///

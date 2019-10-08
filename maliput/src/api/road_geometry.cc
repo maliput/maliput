@@ -57,54 +57,6 @@ Rotation OrientationOutFromLane(const LaneEnd& lane_end) {
   MALIPUT_ABORT_MESSAGE("lane_end is neither LaneEnd::kStart nor LaneEnd::kFinish");
 }
 
-// Return the Cartesian distance between two GeoPositions.
-double Distance(const GeoPosition& a, const GeoPosition& b) { return (a.xyz() - b.xyz()).norm(); }
-
-// Apply a Rotation to a 3-vector (generically represented by a GeoPosition).
-// TODO(maddog@tri.global)  This should probably be a method of Rotation, and or
-//                          consolidated with something else somehow.
-GeoPosition Rotate(const Rotation& rot, const GeoPosition& in) {
-  const double sa = std::sin(rot.roll());
-  const double ca = std::cos(rot.roll());
-  const double sb = std::sin(rot.pitch());
-  const double cb = std::cos(rot.pitch());
-  const double sg = std::sin(rot.yaw());
-  const double cg = std::cos(rot.yaw());
-  // clang-format off
-  return GeoPosition(
-        ((cb*cg) * in.x()) +
-        ((-ca*sg + sa*sb*cg) * in.y()) +
-        ((sa*sg + ca*sb*cg) * in.z()),
-
-        ((cb*sg) * in.x()) +
-        ((ca*cg + sa*sb*sg) * in.y()) +
-        ((-sa*cg + ca*sb*sg) * in.z()),
-
-        ((-sb) * in.x()) +
-        ((sa*cb) * in.y()) +
-        ((ca*cb) * in.z()));
-  // clang-format on
-}
-
-// Return a distance measure (in radians) for two rotations that reflects
-// the difference in frame orientations represented by the rotations.
-double Distance(const Rotation& a, const Rotation& b) {
-  // Compute transformed unit vectors of a frame.
-  GeoPosition as = Rotate(a, {1., 0., 0.});
-  GeoPosition ar = Rotate(a, {0., 1., 0.});
-  GeoPosition ah = Rotate(a, {0., 0., 1.});
-  // Compute transformed unit vectors of b frame.
-  GeoPosition bs = Rotate(b, {1., 0., 0.});
-  GeoPosition br = Rotate(b, {0., 1., 0.});
-  GeoPosition bh = Rotate(b, {0., 0., 1.});
-  // Compute angles between pairs of unit vectors.
-  double ds = std::acos(as.xyz().dot(bs.xyz()));
-  double dr = std::acos(ar.xyz().dot(br.xyz()));
-  double dh = std::acos(ah.xyz().dot(bh.xyz()));
-
-  return std::sqrt((ds * ds) + (dr * dr) + (dh * dh));
-}
-
 }  // namespace
 
 std::vector<std::string> RoadGeometry::CheckInvariants() const {
@@ -182,7 +134,7 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     const auto test_geo_position = [&](const LaneEndSet& ends) {
       for (int bi = 0; bi < ends.size(); ++bi) {
         const LaneEnd le = ends.get(bi);
-        const double d = Distance(ref_geo, LaneEndGeoPosition(le));
+        const double d = ref_geo.Distance(LaneEndGeoPosition(le));
         if (d > linear_tolerance()) {
           std::stringstream ss;
           ss << "Lane " << le.lane->id().string() << ((le.end == LaneEnd::kStart) ? "[start]" : "[end]")
@@ -200,7 +152,7 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     const auto test_orientation = [&](const LaneEndSet& ends, const Rotation& reference) {
       for (int bi = 0; bi < ends.size(); ++bi) {
         const LaneEnd le = ends.get(bi);
-        const double d = Distance(reference, OrientationOutFromLane(le));
+        const double d = reference.Distance(OrientationOutFromLane(le));
         if (d > angular_tolerance()) {
           std::stringstream ss;
           ss << "Lane " << le.lane->id().string() << ((le.end == LaneEnd::kStart) ? "[start]" : "[end]")
