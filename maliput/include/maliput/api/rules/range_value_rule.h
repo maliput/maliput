@@ -29,6 +29,13 @@ class RangeValueRule : public Rule {
     }
     bool operator!=(const Range& other) const { return !(*this == other); }
 
+    /// Returns true when this range is _less_ than `other`.
+    ///
+    /// It compares severity, description, min and max in the described order.
+    ///
+    /// Used for strict ordering in collections such as `std::set`.
+    bool operator<(const Range& other) const;
+
     std::string description;  ///< Semantics of the range quantity.
     double min{};             ///< Minimum value of the range.
     double max{};             ///< Maximum value of the range.

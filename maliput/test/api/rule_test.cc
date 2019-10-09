@@ -131,6 +131,37 @@ GTEST_TEST(RangeTest, EqualOperator) {
   EXPECT_FALSE(range_1 == range_5);
 }
 
+// Evaluates the less operator of RangeValueRule::Range.
+GTEST_TEST(RangeTest, LessOperator) {
+  const RangeValueRule::Range range_1 = MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                                                  "range_description", 123. /* min */, 456. /* max */);
+  const RangeValueRule::Range range_2 = MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(),
+                                                  "range_description_1", 123. /* min */, 456. /* max */);
+  const RangeValueRule::Range range_3 = MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                                                  "range_description_long", 123. /* min */, 456. /* max */);
+  const RangeValueRule::Range range_4 = MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                                                  "range_description", 456. /* min */, 456. /* max */);
+  const RangeValueRule::Range range_5 = MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                                                  "range_description", 123. /* min */, 789. /* max */);
+  const RangeValueRule::Range range_6 = MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(),
+                                                  "range_description", 123. /* min */, 456. /* max */);
+
+  // Ranges are equal.
+  EXPECT_FALSE(range_1 < range_1);
+  // Evaluates by `severity`.
+  EXPECT_TRUE(range_1 < range_2);
+  // Evaluates by `description`.
+  EXPECT_TRUE(range_1 < range_3);
+  // Evaluates by `min`.
+  EXPECT_TRUE(range_1 < range_4);
+  // Evaluates by `max`.
+  EXPECT_TRUE(range_1 < range_5);
+  // Ranges are equal for this operator, because `related_rules` is not taken
+  // into account.
+  EXPECT_FALSE(range_1 < range_6);
+  EXPECT_FALSE(range_6 < range_1);
+}
+
 // Evaluates DiscreteValueRule constructor.
 TEST_F(RuleTest, DiscreteValueRuleConstructor) {
   const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{
