@@ -31,6 +31,8 @@ struct RoadNetworkValidatorOptions {
   /// supporting TrafficLight objects in TrafficLightBook and BulbGroups are
   /// within the right TrafficLights.
   bool check_related_bulb_groups{true};
+  /// Whether to check if rule zones are G1 contiguous.
+  bool check_contiguity_rule_zones{true};
 };
 
 /// Validates a RoadNetwork.

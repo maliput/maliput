@@ -80,6 +80,9 @@ class MockLane final : public Lane {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
   MockLane(const LaneId& id) : Lane(), id_(id) {}
+  MockLane(const LaneId& id, const GeoPosition& start_gp, const Rotation& start_rot, const GeoPosition& end_gp,
+           const Rotation& end_rot)
+      : Lane(), id_(id), start_gp_(start_gp), start_rot_(start_rot), end_gp_(end_gp), end_rot_(end_rot) {}
   void set_segment(Segment* segment) { segment_ = segment; }
   void set_start_bp(BranchPoint* start_bp) { start_bp_ = start_bp; }
   void set_end_bp(BranchPoint* end_bp) { end_bp_ = end_bp; }
@@ -94,9 +97,13 @@ class MockLane final : public Lane {
   RBounds do_lane_bounds(double) const override { return RBounds(-1, 1); };
   RBounds do_segment_bounds(double) const override { return RBounds(-1, 1); };
   HBounds do_elevation_bounds(double, double) const override { return HBounds(0, 10); };
-  GeoPosition DoToGeoPosition(const LanePosition&) const override { return GeoPosition(0, 0, 0); }
-  LanePositionResult DoToLanePosition(const GeoPosition&) const override { return LanePositionResult(); }
-  Rotation DoGetOrientation(const LanePosition&) const override { return Rotation(); }
+  GeoPosition DoToGeoPosition(const LanePosition& lane_pos) const override {
+    return lane_pos.s() ? end_gp_ : start_gp_;
+  }
+  LanePositionResult DoToLanePosition(const GeoPosition& geo_pos) const override { return LanePositionResult(); }
+  Rotation DoGetOrientation(const LanePosition& lane_pos) const override {
+    return lane_pos.s() ? end_rot_ : start_rot_;
+  }
   LanePosition DoEvalMotionDerivatives(const LanePosition&, const IsoLaneVelocity&) const override {
     return LanePosition(0, 0, 0);
   }
@@ -111,6 +118,10 @@ class MockLane final : public Lane {
   Segment* segment_{};
   BranchPoint* start_bp_{};
   BranchPoint* end_bp_{};
+  GeoPosition start_gp_{};
+  GeoPosition end_gp_{};
+  Rotation start_rot_{};
+  Rotation end_rot_{};
 };
 
 class MockSegment final : public Segment {
@@ -159,34 +170,41 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIdIndex);
   MockIdIndex() = default;
+  void add_lane_to_map(const LaneId& id, const Lane* lane) { lane_map_.emplace(id, lane); }
 
  private:
-  const Lane* DoGetLane(const LaneId& lane_id) const override { return nullptr; }
+  const Lane* DoGetLane(const LaneId& lane_id) const override {
+    auto it = lane_map_.find(lane_id);
+    return (it == lane_map_.end()) ? nullptr : it->second;
+  }
   const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
   const Segment* DoGetSegment(const SegmentId& segment_id) const override { return nullptr; }
   const Junction* DoGetJunction(const JunctionId& junction_id) const override { return nullptr; }
   const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
 
-  const std::unordered_map<LaneId, const Lane*> lane_map_;
+  std::unordered_map<LaneId, const Lane*> lane_map_;
 };
 
 class MockRoadGeometry : public RoadGeometry {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry)
   MockRoadGeometry(const RoadGeometryId& id) : id_(id) {}
+  MockRoadGeometry(const RoadGeometryId& id, const double& linear_tolerance, const double& angular_tolerance)
+      : id_(id), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
 
-  void set_junction(std::unique_ptr<MockJunction> junction) { junction_ = std::move(junction); }
+  void add_junction(std::unique_ptr<MockJunction> junction) { junctions_.push_back(std::move(junction)); }
   void set_start_bp(std::unique_ptr<MockBranchPoint> start_bp) { start_bp_ = std::move(start_bp); }
   void set_end_bp(std::unique_ptr<MockBranchPoint> end_bp) { end_bp_ = std::move(end_bp); }
   MockBranchPoint* start_bp() { return start_bp_.get(); }
   MockBranchPoint* end_bp() { return end_bp_.get(); }
+  MockIdIndex* GetIdIndex() { return &mock_id_index_; }
 
  private:
   RoadGeometryId do_id() const override { return id_; }
-  int do_num_junctions() const override { return junction_ != nullptr ? 1 : 0; }
+  int do_num_junctions() const override { return junctions_.size(); }
   const Junction* do_junction(int i) const override {
-    MALIPUT_THROW_UNLESS(i == 0);
-    return junction_.get();
+    MALIPUT_THROW_UNLESS(i < junctions_.size());
+    return junctions_[i].get();
   }
   int do_num_branch_points() const override {
     if (start_bp_ != nullptr && end_bp_ != nullptr) {
@@ -207,13 +225,15 @@ class MockRoadGeometry : public RoadGeometry {
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
     return {{RoadPositionResult()}};
   }
-  double do_linear_tolerance() const override { return 0; }
-  double do_angular_tolerance() const override { return 0; }
+  double do_linear_tolerance() const override { return linear_tolerance_; }
+  double do_angular_tolerance() const override { return angular_tolerance_; }
   double do_scale_length() const override { return 0; }
 
-  const MockIdIndex mock_id_index_;
+  MockIdIndex mock_id_index_;
   RoadGeometryId id_;
-  std::unique_ptr<MockJunction> junction_;
+  double linear_tolerance_{0};
+  double angular_tolerance_{0};
+  std::vector<std::unique_ptr<MockJunction>> junctions_;
   std::unique_ptr<MockBranchPoint> start_bp_;
   std::unique_ptr<MockBranchPoint> end_bp_;
 };
@@ -260,7 +280,7 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   MockOneLaneIdIndex mock_id_index_;
 };
 
-class MockRoadRulebook final : public rules::RoadRulebook {
+class MockRoadRulebook : public rules::RoadRulebook {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadRulebook)
   MockRoadRulebook() {}
@@ -310,6 +330,52 @@ class MockRoadRulebook final : public rules::RoadRulebook {
   drake::optional<RightOfWayRule> right_of_way_rule_{};
   drake::optional<DirectionUsageRule> direction_usage_rule_{};
   drake::optional<SpeedLimitRule> speed_limit_rule_{};
+  drake::optional<DiscreteValueRule> discrete_value_rule_{};
+  drake::optional<RangeValueRule> range_value_rule_{};
+};
+
+// Creates rules
+// based on CreateMockContiguousRoadGeometry() info.
+class MockContiguityRoadRulebook final : public rules::RoadRulebook {
+ public:
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockContiguityRoadRulebook)
+  MockContiguityRoadRulebook() {}
+
+  void set_discrete_value_rule(const DiscreteValueRule& rule) { discrete_value_rule_ = rule; }
+  void set_range_value_rule(const RangeValueRule& rule) { range_value_rule_ = rule; }
+
+ private:
+  QueryResults DoFindRules(const std::vector<LaneSRange>&, double) const override { return DoRules(); }
+  QueryResults DoRules() const override {
+    QueryResults result;
+    if (discrete_value_rule_.has_value()) {
+      result.discrete_value_rules.emplace(discrete_value_rule_->id(), *discrete_value_rule_);
+    }
+    if (range_value_rule_.has_value()) {
+      result.range_value_rules.emplace(range_value_rule_->id(), *range_value_rule_);
+    }
+    return result;
+  }
+
+  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+    if (discrete_value_rule_.has_value() && discrete_value_rule_->id() == id) {
+      return *discrete_value_rule_;
+    }
+    throw std::out_of_range("Unknown Id.");
+  }
+  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+    if (range_value_rule_.has_value() && range_value_rule_->id() == id) {
+      return *range_value_rule_;
+    }
+    throw std::out_of_range("Unknown Id.");
+  }
+
+  RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const override { throw std::out_of_range("Unknown Id."); }
+  SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const override { throw std::out_of_range("Unknown Id."); }
+  DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const override {
+    throw std::out_of_range("Unknown Id.");
+  }
+
   drake::optional<DiscreteValueRule> discrete_value_rule_{};
   drake::optional<RangeValueRule> range_value_rule_{};
 };
@@ -488,6 +554,13 @@ DiscreteValueRule CreateDiscreteValueRule() {
       {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value1"),
        rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value2")});
 }
+DiscreteValueRule CreateDiscreteValueRuleForContiguityTest() {
+  return DiscreteValueRule(
+      Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"),
+      LaneSRoute({LaneSRange(LaneId("mock_a"), {0., 10.}), LaneSRange(LaneId("mock_b"), {0., 10.})}),
+      {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value1"),
+       rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value2")});
+}
 
 RangeValueRule::Range CreateRange() {
   return rules::MakeRange(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "description", 123. /* min */,
@@ -496,6 +569,12 @@ RangeValueRule::Range CreateRange() {
 
 RangeValueRule CreateRangeValueRule() {
   return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), CreateLaneSRoute(), {CreateRange()});
+}
+
+RangeValueRule CreateRangeValueRuleForContiguityTest() {
+  return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"),
+                        LaneSRoute({LaneSRange(LaneId("mock_a"), {0., 10.}), LaneSRange(LaneId("mock_b"), {0., 10.})}),
+                        {CreateRange()});
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
@@ -537,9 +616,87 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& b
       }
       junction->set_segment(std::move(segment));
     }
-    rg->set_junction(std::move(junction));
+    rg->add_junction(std::move(junction));
   }
   return std::move(rg);
+}
+// Creates a RoadGeometry with two Junctions. Each Junction will have a Segment and a Lane.
+// Lanes' geometry will be created in accordance to `build_flags`.
+std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometryContiguityBuildFlags& build_flags) {
+  // Creates the road geometry.
+  auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"), build_flags.linear_tolerance,
+                                               build_flags.angular_tolerance);
+  // Creates the Junctions.
+  auto junction_a = std::make_unique<MockJunction>(JunctionId("mock_a"));
+  junction_a->set_road_geometry(rg.get());
+  auto junction_b = std::make_unique<MockJunction>(JunctionId("mock_b"));
+  junction_b->set_road_geometry(rg.get());
+  // Creates the Segments.
+  auto segment_a = std::make_unique<MockSegment>(SegmentId("mock_a"));
+  segment_a->set_junction(junction_a.get());
+  auto segment_b = std::make_unique<MockSegment>(SegmentId("mock_b"));
+  segment_b->set_junction(junction_b.get());
+  // Creates the start and end points of the Lanes.
+  GeoPosition start_gp_a;
+  GeoPosition end_gp_a;
+  GeoPosition start_gp_b;
+  GeoPosition end_gp_b;
+  Rotation start_rot_a;
+  Rotation end_rot_a;
+  Rotation start_rot_b;
+  Rotation end_rot_b;
+
+  if (build_flags.add_linear_mismatch) {
+    // Assign different positions for the lane 1 end and lane 2 start.
+    start_gp_a = GeoPosition(0, 0, 0);
+    end_gp_a = GeoPosition(10, 0, 0);
+    start_gp_b = GeoPosition(11, 0, 0);
+    end_gp_b = GeoPosition(21, 0, 0);
+  } else {
+    // Assign same position for the lane 1 end and lane 2 start.
+    start_gp_a = GeoPosition(0, 0, 0);
+    end_gp_a = GeoPosition(10, 0, 0);
+    start_gp_b = GeoPosition(10, 0, 0);
+    end_gp_b = GeoPosition(20, 0, 0);
+  }
+  if (build_flags.add_angular_mismatch) {
+    // Assign different rotations for the lane 1 end and lane 2 start.
+    start_rot_a = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
+    end_rot_a = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
+    start_rot_b = Rotation(Rotation::FromRpy(0.0, 0.0, M_PI / 2.0));
+    end_rot_b = Rotation(Rotation::FromRpy(0.0, 0.0, M_PI / 2.0));
+  } else {
+    // Assign same rotation for the lane 1 end and lane 2 start.
+    start_rot_a = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
+    end_rot_a = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
+    start_rot_b = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
+    end_rot_b = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
+  }
+  auto lane_a = std::make_unique<MockLane>(LaneId("mock_a"), start_gp_a, start_rot_a, end_gp_a, end_rot_a);
+  auto lane_b = std::make_unique<MockLane>(LaneId("mock_b"), start_gp_b, start_rot_b, end_gp_b, end_rot_b);
+  lane_a->set_segment(segment_a.get());
+  lane_b->set_segment(segment_b.get());
+  rg->GetIdIndex()->add_lane_to_map(lane_a->id(), lane_a.get());
+  rg->GetIdIndex()->add_lane_to_map(lane_b->id(), lane_b.get());
+  segment_a->set_lane(std::move(lane_a));
+  segment_b->set_lane(std::move(lane_b));
+  junction_b->set_segment(std::move(segment_b));
+  junction_a->set_segment(std::move(segment_a));
+  rg->add_junction(std::move(junction_a));
+  rg->add_junction(std::move(junction_b));
+  return std::move(rg);
+}
+// Creates a Road Rulebook for contiguity test according to the building flags.
+std::unique_ptr<rules::RoadRulebook> CreateMockContiguousRoadRulebook(
+    const RoadRulebookContiguityBuildFlags& build_flags) {
+  auto rulebook = std::make_unique<MockContiguityRoadRulebook>();
+  if (build_flags.add_discrete_value_rule) {
+    rulebook->set_discrete_value_rule(CreateDiscreteValueRuleForContiguityTest());
+  }
+  if (build_flags.add_range_value_rule) {
+    rulebook->set_range_value_rule(CreateRangeValueRuleForContiguityTest());
+  }
+  return std::move(rulebook);
 }
 
 std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry() { return std::make_unique<MockOneLaneRoadGeometry>(); }

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <cmath>
 #include <vector>
 
@@ -9,6 +8,8 @@
 
 namespace maliput {
 namespace api {
+
+class RoadGeometry;
 
 /// Directed, inclusive longitudinal (s value) range from s0 to s1.
 class SRange {
@@ -97,6 +98,22 @@ class LaneSRoute {
  private:
   std::vector<LaneSRange> ranges_;
 };
+
+/// Evaluates whether `lane_range_a` end point is G1 contiguous with `lane_range_b` start pose.
+///
+/// @param lane_range_a A LaneSRange in `road_geometry`. Its ID must belong to a `road_geometry`'s
+/// Lane.
+/// @param lane_range_b A LaneSRange in `road_geometry`. Its ID must belong to a `road_geometry`'s
+/// Lane.
+/// @param road_geometry The RoadGeometry where `lane_range_a` and `lane_range_b` are contained. It must not
+/// be nullptr.
+/// @returns True When `lane_range_a` end pose and `lane_range_b` start pose are within linear and
+/// angular tolerance in the World Frame. Otherwise, it returns false.
+///
+/// @throws common::assertion_error When `lane_range_a`'s Lane is not found in `road_geometry`.
+/// @throws common::assertion_error When `lane_range_b`'s Lane is not found in `road_geometry`.
+/// @throws common::assertion_error When `road_geometry` is nullptr.
+bool IsContiguous(const LaneSRange& lane_range_a, const LaneSRange& lane_range_b, const RoadGeometry* road_geometry);
 
 }  // namespace api
 }  // namespace maliput

@@ -5,6 +5,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/assertion_error.h"
+#include "maliput/common/maliput_throw.h"
+#include "maliput/test_utilities/mock.h"
 #include "maliput/test_utilities/regions_test_utilities.h"
 
 namespace maliput {
@@ -122,6 +125,101 @@ TEST_F(LaneSRouteTest, Assignment) {
   dut = dut_source;
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, dut_source));
 }
+
+// Holds RoadGeometry build configuration.
+struct RoadGeometryBuildFlags {
+  test::RoadGeometryContiguityBuildFlags rg_contiguity_build_flags{};
+  bool expects_throw{false};
+};
+
+// Tests IsContiguous function with valid values.
+class IsContiguousValidValuesTest : public ::testing::TestWithParam<RoadGeometryBuildFlags> {
+ protected:
+  void SetUp() override { build_flags_ = GetParam(); }
+
+  RoadGeometryBuildFlags build_flags_;
+};
+
+std::vector<RoadGeometryBuildFlags> ContiguityValidValuesTestParameters() {
+  // RoadGeometry's angular and linear tolerance.
+  // Its value is based on the Cartesian distance between non-contiguous lane endpoints
+  // which are created in this test.
+  const double linear_tolerance = 1e-3;
+  // Its value is based on the angular distance used for non-contiguous lane endpoints
+  // which are created in this test.
+  const double angular_tolerance = 1e-3;
+  return {
+      // Contiguous LaneSRoute.
+      RoadGeometryBuildFlags{{false, false, linear_tolerance, angular_tolerance}, false},
+      // Throws because it does not meet angular tolerance.
+      RoadGeometryBuildFlags{{false, true, linear_tolerance, angular_tolerance}, true},
+      // Throws because it does not meet linear tolerance.
+      RoadGeometryBuildFlags{{true, false, linear_tolerance, angular_tolerance}, true},
+      // Throws because it does not meet neither the linear tolerance nor the angular tolerance.
+      RoadGeometryBuildFlags{{true, true, linear_tolerance, angular_tolerance}, true},
+  };
+}
+
+TEST_P(IsContiguousValidValuesTest, ChecksIsContiguousFunctionWithValidValues) {
+  std::unique_ptr<RoadGeometry> road_geometry;
+  road_geometry = test::CreateMockContiguousRoadGeometry(build_flags_.rg_contiguity_build_flags);
+  LaneSRange lane_range_a(LaneId("mock_a"), {0., 10.});
+  LaneSRange lane_range_b(LaneId("mock_b"), {0., 10.});
+  if (build_flags_.expects_throw) {
+    EXPECT_FALSE(IsContiguous(lane_range_a, lane_range_b, road_geometry.get()));
+  } else {
+    EXPECT_TRUE(IsContiguous(lane_range_a, lane_range_b, road_geometry.get()));
+  }
+}
+
+INSTANTIATE_TEST_CASE_P(IsContiguousFunctionTestGroup, IsContiguousValidValuesTest,
+                        ::testing::ValuesIn(ContiguityValidValuesTestParameters()));
+
+// Holds RoadGeometry build configuration.
+struct InvalidArgumentsBuildFlags {
+  bool add_null_road_geometry{false};
+  bool add_null_lane_a{false};
+  bool add_null_lane_b{false};
+  bool expects_throw{false};
+};
+
+// Tests IsContiguous function with invalid values.
+class IsContiguousInvalidArgumentsTest : public ::testing::TestWithParam<InvalidArgumentsBuildFlags> {
+ protected:
+  void SetUp() override { build_flags_ = GetParam(); }
+
+  InvalidArgumentsBuildFlags build_flags_;
+};
+
+std::vector<InvalidArgumentsBuildFlags> ContiguityInvalidValuesTestParameters() {
+  return {
+      // Contiguous LaneSRoute.
+      InvalidArgumentsBuildFlags{false, false, false, false},
+      // Throws because of invalid `lane_range_a` pointer.
+      InvalidArgumentsBuildFlags{false, true, false, true},
+      // Throws because of invalid `lane_range_b` pointer.
+      InvalidArgumentsBuildFlags{false, false, true, true},
+      // Throws because of invalid `road_geometry` pointer.
+      InvalidArgumentsBuildFlags{true, false, false, true},
+  };
+}
+
+TEST_P(IsContiguousInvalidArgumentsTest, ChecksIsContiguousFunctionWithInvalidValues) {
+  std::unique_ptr<RoadGeometry> road_geometry;
+  road_geometry = test::CreateMockContiguousRoadGeometry({false, false, 0., 0.});
+  const LaneSRange lane_range_a{build_flags_.add_null_lane_a ? LaneId("mock_null") : LaneId("mock_a"), {0., 10.}};
+  const LaneSRange lane_range_b{build_flags_.add_null_lane_b ? LaneId("mock_null") : LaneId("mock_b"), {0., 10.}};
+  const RoadGeometry* road_geometry_ptr = build_flags_.add_null_road_geometry ? nullptr : road_geometry.get();
+
+  if (build_flags_.expects_throw) {
+    EXPECT_THROW(IsContiguous(lane_range_a, lane_range_b, road_geometry_ptr), common::assertion_error);
+  } else {
+    EXPECT_NO_THROW(IsContiguous(lane_range_a, lane_range_b, road_geometry_ptr));
+  }
+}
+
+INSTANTIATE_TEST_CASE_P(IsContiguousFunctionTestGroup, IsContiguousInvalidArgumentsTest,
+                        ::testing::ValuesIn(ContiguityInvalidValuesTestParameters()));
 
 }  // namespace
 }  // namespace api

@@ -16,6 +16,38 @@ namespace {
 using rules::BulbGroup;
 using rules::TrafficLight;
 
+// Given a `LaneSRoute` this method checks the G1 contiguity
+// between of all its `LaneSRange`.
+void CheckLaneSRouteContiguity(const RoadGeometry* road_geometry, const LaneSRoute& lane_s_route) {
+  for (int i = 0; i < lane_s_route.ranges().size() - 1; ++i) {  // Iterating through the lanes of a rule.
+    const LaneSRange lane_range_a = lane_s_route.ranges()[i];
+    const LaneSRange lane_range_b = lane_s_route.ranges()[i + 1];
+    if (!IsContiguous(lane_range_a, lane_range_b, road_geometry)) {
+      MALIPUT_THROW_MESSAGE("LaneSRange(id: " + lane_range_a.lane_id().string() +
+                            ", s0:  " + std::to_string(lane_range_a.s_range().s0()) +
+                            ", s1: " + std::to_string(lane_range_a.s_range().s1()) +
+                            ") is not G1 contiguous with "
+                            "LaneSRange(id: " +
+                            lane_range_b.lane_id().string() + ", s0:  " + std::to_string(lane_range_b.s_range().s0()) +
+                            ", s1: " + std::to_string(lane_range_b.s_range().s1()) + ").");
+    }
+  }
+}
+
+// Evaluates G1 contiguity for all rule zones.
+// @throws common::assertion_error When any rule zone is not G1 contiguous.
+void CheckContiguityBetweenLanes(const RoadNetwork& road_network) {
+  const rules::RoadRulebook::QueryResults rules = road_network.rulebook()->Rules();
+  const RoadGeometry* const road_geometry = road_network.road_geometry();
+  for (const std::pair<rules::DiscreteValueRule::Id, rules::DiscreteValueRule>& key_value :
+       rules.discrete_value_rules) {
+    CheckLaneSRouteContiguity(road_geometry, key_value.second.zone());
+  }
+  for (const std::pair<rules::RangeValueRule::Id, rules::RangeValueRule>& key_value : rules.range_value_rules) {
+    CheckLaneSRouteContiguity(road_geometry, key_value.second.zone());
+  }
+}
+
 // Confirms full DirectionUsageRule coverage. This is determined by
 // verifying that each Lane within the RoadGeometry has an associated
 // DirectionUsageRule. In the future, this check could be made even more
@@ -108,6 +140,9 @@ void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValid
   }
   if (options.check_related_bulb_groups) {
     CheckRelatedBulbGroups(road_network);
+  }
+  if (options.check_contiguity_rule_zones) {
+    CheckContiguityBetweenLanes(road_network);
   }
 }
 
