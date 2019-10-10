@@ -334,7 +334,7 @@ class MockRoadRulebook : public rules::RoadRulebook {
   drake::optional<RangeValueRule> range_value_rule_{};
 };
 
-// Creates hardcoded rules
+// Creates rules.
 // based on CreateMockContiguousRoadGeometry() info.
 class MockContiguityRoadRulebook final : public rules::RoadRulebook {
  public:

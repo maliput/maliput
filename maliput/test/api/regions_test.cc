@@ -176,7 +176,7 @@ INSTANTIATE_TEST_CASE_P(IsContiguousFunctionTestGroup, IsContiguousValidValuesTe
                         ::testing::ValuesIn(ContiguityValidValuesTestParameters()));
 
 // Holds RoadGeometry build configuration.
-struct AlterRoadGeometryBuildFlags {
+struct InvalidArgumentsBuildFlags {
   bool add_null_road_geometry{false};
   bool add_null_lane_a{false};
   bool add_null_lane_b{false};
@@ -184,58 +184,41 @@ struct AlterRoadGeometryBuildFlags {
 };
 
 // Tests IsContiguous function with invalid values.
-class IsContiguousInvalidValuesTest : public ::testing::TestWithParam<AlterRoadGeometryBuildFlags> {
+class IsContiguousInvalidArgumentsTest : public ::testing::TestWithParam<InvalidArgumentsBuildFlags> {
  protected:
   void SetUp() override { build_flags_ = GetParam(); }
 
-  AlterRoadGeometryBuildFlags build_flags_;
+  InvalidArgumentsBuildFlags build_flags_;
 };
 
-std::vector<AlterRoadGeometryBuildFlags> ContiguityInvalidValuesTestParameters() {
+std::vector<InvalidArgumentsBuildFlags> ContiguityInvalidValuesTestParameters() {
   return {
       // Contiguous LaneSRoute.
-      AlterRoadGeometryBuildFlags{false, false, false, false},
+      InvalidArgumentsBuildFlags{false, false, false, false},
       // Throws because of invalid `lane_range_a` pointer.
-      AlterRoadGeometryBuildFlags{false, false, true, true},
+      InvalidArgumentsBuildFlags{false, true, false, true},
       // Throws because of invalid `lane_range_b` pointer.
-      AlterRoadGeometryBuildFlags{false, true, false, true},
-      // Throws because of invalid `lane_range_a` and `lane_range_b` pointers.
-      AlterRoadGeometryBuildFlags{false, true, true, true},
+      InvalidArgumentsBuildFlags{false, false, true, true},
       // Throws because of invalid `road_geometry` pointer.
-      AlterRoadGeometryBuildFlags{true, false, false, true},
-      // Throws because of invalid `road_geometry` and `lane_range_a` pointers.
-      AlterRoadGeometryBuildFlags{true, false, true, true},
-      // Throws because of invalid `road_geometry` and `lane_range_b` pointers.
-      AlterRoadGeometryBuildFlags{true, true, false, true},
-      // Throws because of invalid `road_geometry`, `lane_range_a` and `lane_range_b` pointers.
-      AlterRoadGeometryBuildFlags{true, true, true, true},
+      InvalidArgumentsBuildFlags{true, false, false, true},
   };
 }
 
-TEST_P(IsContiguousInvalidValuesTest, ChecksIsContiguousFunctionWithInvalidValues) {
+TEST_P(IsContiguousInvalidArgumentsTest, ChecksIsContiguousFunctionWithInvalidValues) {
   std::unique_ptr<RoadGeometry> road_geometry;
   road_geometry = test::CreateMockContiguousRoadGeometry({false, false, 0., 0.});
-  LaneSRange lane_range_b(LaneId("mock_b"), {0., 10.});
-  LaneSRange lane_range_a(LaneId("mock_a"), {0., 10.});
+  const LaneSRange lane_range_a{build_flags_.add_null_lane_a ? LaneId("mock_null") : LaneId("mock_a"), {0., 10.}};
+  const LaneSRange lane_range_b{build_flags_.add_null_lane_b ? LaneId("mock_null") : LaneId("mock_b"), {0., 10.}};
+  const RoadGeometry* road_geometry_ptr = build_flags_.add_null_road_geometry ? nullptr : road_geometry.get();
 
-  if (build_flags_.add_null_road_geometry) {
-    road_geometry = nullptr;
-  }
-  if (build_flags_.add_null_lane_a) {
-    lane_range_a = LaneSRange{LaneId("mock_null"), {0., 10.}};
-  }
-  if (build_flags_.add_null_lane_b) {
-    lane_range_b = LaneSRange{LaneId("mock_null"), {0., 10.}};
-  }
-  if ((build_flags_.add_null_road_geometry || build_flags_.add_null_lane_a || build_flags_.add_null_lane_b) &&
-      build_flags_.expects_throw) {
-    EXPECT_THROW(IsContiguous(lane_range_a, lane_range_b, road_geometry.get()), common::assertion_error);
+  if (build_flags_.expects_throw) {
+    EXPECT_THROW(IsContiguous(lane_range_a, lane_range_b, road_geometry_ptr), common::assertion_error);
   } else {
-    EXPECT_NO_THROW(IsContiguous(lane_range_a, lane_range_b, road_geometry.get()));
+    EXPECT_NO_THROW(IsContiguous(lane_range_a, lane_range_b, road_geometry_ptr));
   }
 }
 
-INSTANTIATE_TEST_CASE_P(IsContiguousFunctionTestGroup, IsContiguousInvalidValuesTest,
+INSTANTIATE_TEST_CASE_P(IsContiguousFunctionTestGroup, IsContiguousInvalidArgumentsTest,
                         ::testing::ValuesIn(ContiguityInvalidValuesTestParameters()));
 
 }  // namespace
