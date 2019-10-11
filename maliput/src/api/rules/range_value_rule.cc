@@ -18,6 +18,25 @@ RangeValueRule::RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, 
   }
 }
 
+bool RangeValueRule::Range::operator<(const RangeValueRule::Range& other) const {
+  if (severity < other.severity) {
+    return true;
+  } else if (severity > other.severity) {
+    return false;
+  } else if (description < other.description) {
+    return true;
+  } else if (description > other.description) {
+    return false;
+  } else if (min < other.min) {
+    return true;
+  } else if (min > other.min) {
+    return false;
+  } else if (max < other.max) {
+    return true;
+  }
+  return false;
+}
+
 RangeValueRule::Range MakeRange(int severity, const Rule::RelatedRules& related_rules, const std::string& description,
                                 double min, double max) {
   RangeValueRule::Range range;
