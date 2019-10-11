@@ -230,6 +230,7 @@ TEST_F(BulbGroupTest, Accessors) {
   EXPECT_EQ(bulb_group_->bulbs().size(), 3);
   EXPECT_EQ(bulb_group_->GetBulb(Bulb::Id("unknown_bulb")), nullptr);
   EXPECT_EQ(bulb_group_->GetBulb(Bulb::Id("red_bulb")), red_bulb_ptr_);
+  EXPECT_THROW(bulb_group_->unique_id(), common::assertion_error);
 }
 
 class TrafficLightConstructorTest : public ::testing::Test {
@@ -312,6 +313,13 @@ TEST_F(TrafficLightTest, Accessors) {
   EXPECT_EQ(traffic_light_->bulb_groups().size(), 4);
   EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("unknown_bulb_group")), nullptr);
   EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("north_group")), north_bulb_group_);
+}
+
+TEST_F(TrafficLightTest, UniqueIds) {
+  EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("north_group"))->unique_id(),
+            UniqueBulbGroupId(kId, BulbGroup::Id("north_group")));
+  EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("north_group"))->GetBulb(Bulb::Id("north_bulb"))->unique_id(),
+            UniqueBulbId(kId, BulbGroup::Id("north_group"), Bulb::Id("north_bulb")));
 }
 
 GTEST_TEST(UniqueBulbIdTest, DefaultConstructor) {
@@ -416,6 +424,96 @@ GTEST_TEST(UniqueBulbIdTest, Usage) {
 }
 
 GTEST_TEST(UniqueBulbIdTest, Delimiter) { EXPECT_EQ(UniqueBulbId::delimiter(), "-"); }
+
+GTEST_TEST(UniqueBulbGroupIdTest, DefaultConstructor) {
+  const UniqueBulbGroupId dut;
+  EXPECT_EQ(dut.traffic_light_id(), TrafficLight::Id("default"));
+  EXPECT_EQ(dut.bulb_group_id(), BulbGroup::Id("default"));
+}
+
+GTEST_TEST(UniqueBulbGroupIdTest, Usage) {
+  const std::string traffic_light_name{"MyTrafficLight"};
+  const std::string bulb_group_name{"MyBulbGroup"};
+
+  const TrafficLight::Id traffic_light_id(traffic_light_name);
+  const BulbGroup::Id bulb_group_id(bulb_group_name);
+
+  const UniqueBulbGroupId dut(traffic_light_id, bulb_group_id);
+
+  // A mismatch of just one internal ID results in the UniqueBulbGroupId no
+  // longer matching.
+  EXPECT_NE(dut, UniqueBulbGroupId(TrafficLight::Id("foo"), bulb_group_id));
+  EXPECT_NE(dut, UniqueBulbGroupId(traffic_light_id, BulbGroup::Id("foo")));
+
+  const std::string dut_string = dut.string();
+  for (const auto& name : {traffic_light_name, bulb_group_name}) {
+    EXPECT_NE(dut_string.find(name), std::string::npos);
+  }
+
+  const UniqueBulbGroupId copied_dut = dut;
+  EXPECT_EQ(copied_dut, dut);
+
+  UniqueBulbGroupId assigned_dut{TrafficLight::Id("foo"), BulbGroup::Id("bar")};
+  EXPECT_NE(assigned_dut, dut);
+  assigned_dut = dut;
+  EXPECT_EQ(assigned_dut, dut);
+
+  const int kOne{1};  // Used as mock value by the following collections.
+  std::unordered_map<UniqueBulbGroupId, int> unordered_map;
+  unordered_map.emplace(std::make_pair(dut, kOne));
+  EXPECT_NE(unordered_map.find(dut), unordered_map.end());
+  EXPECT_EQ(unordered_map.at(dut), kOne);
+  const UniqueBulbGroupId other_dut(TrafficLight::Id("foo"), BulbGroup::Id("bar"));
+  EXPECT_EQ(unordered_map.find(other_dut), unordered_map.end());
+
+  std::map<UniqueBulbGroupId, int> ordered_map;
+  ordered_map.emplace(std::make_pair(dut, kOne));
+  EXPECT_NE(ordered_map.find(dut), ordered_map.end());
+  EXPECT_EQ(ordered_map.at(dut), kOne);
+  EXPECT_EQ(ordered_map.find(other_dut), ordered_map.end());
+
+  // Tests the std::less<UniqueBulbGroupId>() operator.
+  auto make_less = [](const std::string& s) -> std::string {
+    std::string c = s;
+    // Letter "L" is considered less than letter  "M" because its ASCII code is
+    // less (0x4C vs. 0x4D).
+    std::replace(c.begin(), c.end(), 'M', 'L');
+    return c;
+  };
+  auto make_more = [](const std::string& s) -> std::string {
+    std::string c = s;
+    // Letter "N" is greater than "M" because its ASCII code is higher (0x4E vs.
+    // 0x4D).
+    std::replace(c.begin(), c.end(), 'M', 'N');
+    return c;
+  };
+  const TrafficLight::Id less_traffic_light_id(make_less(traffic_light_name));
+  const TrafficLight::Id more_traffic_light_id(make_more(traffic_light_name));
+  const BulbGroup::Id less_bulb_group_id(make_less(bulb_group_name));
+  const BulbGroup::Id more_bulb_group_id(make_more(bulb_group_name));
+
+  const std::less<UniqueBulbGroupId> less;
+
+  const std::vector<UniqueBulbGroupId> less_set{{less_traffic_light_id, bulb_group_id},
+                                                {less_traffic_light_id, less_bulb_group_id},
+                                                {less_traffic_light_id, more_bulb_group_id},
+                                                {traffic_light_id, less_bulb_group_id}};
+
+  for (const auto& test_case : less_set) {
+    EXPECT_TRUE(less(test_case, dut));
+  }
+
+  const std::vector<UniqueBulbGroupId> not_less_set{dut,
+                                                    {more_traffic_light_id, less_bulb_group_id},
+                                                    {more_traffic_light_id, more_bulb_group_id},
+                                                    {traffic_light_id, more_bulb_group_id}};
+
+  for (const auto& test_case : not_less_set) {
+    EXPECT_FALSE(less(test_case, dut));
+  }
+}
+
+GTEST_TEST(UniqueBulbGroupIdTest, Delimiter) { EXPECT_EQ(UniqueBulbGroupId::delimiter(), "-"); }
 
 }  // namespace
 }  // namespace rules
