@@ -737,11 +737,11 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
     case HBounds: {
       if (features.draw_elevation_bounds) {
         GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
-        CoverLaneWithQuads(&upper_h_bounds_mesh, segment->lane(0), base_grid_unit, false /*use_lane_bounds*/,
-                           [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).max(); },
+        CoverLaneWithQuads(&upper_h_bounds_mesh, lane, base_grid_unit, false /*use_lane_bounds*/,
+                           [&lane](double s, double r) { return lane->elevation_bounds(s, r).max(); },
                            features.off_grid_mesh_generation);
-        CoverLaneWithQuads(&lower_h_bounds_mesh, segment->lane(0), base_grid_unit, false /*use_lane_bounds*/,
-                           [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).min(); },
+        CoverLaneWithQuads(&lower_h_bounds_mesh, lane, base_grid_unit, false /*use_lane_bounds*/,
+                           [&lane](double s, double r) { return lane->elevation_bounds(s, r).min(); },
                            features.off_grid_mesh_generation);
         mesh.AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
         mesh.AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
@@ -807,22 +807,27 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
     for (int si = 0; si < junction->num_segments(); ++si) {
       const api::Segment* segment = junction->segment(si);
       if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
-        meshes.segment_asphalt_mesh[segment->id().string()] = BuildMesh(rg, features, segment->id(), Asphalt);
+        meshes.segment_asphalt_mesh["asphalt_" + segment->id().string()] =
+            BuildMesh(rg, features, segment->id(), Asphalt);
         for (int li = 0; li < segment->num_lanes(); ++li) {
           const api::Lane* lane = segment->lane(li);
-          meshes.lane_asphalt_mesh[lane->id().string()] = BuildMesh(rg, features, lane->id(), Asphalt);
-          meshes.lane_lane_mesh[lane->id().string()] = BuildMesh(rg, features, lane->id(), Lane);
-          meshes.lane_marker_mesh[lane->id().string()] = BuildMesh(rg, features, lane->id(), Marker);
-          meshes.lane_hbounds_mesh[lane->id().string()] = BuildMesh(rg, features, lane->id(), HBounds);
+          meshes.lane_asphalt_mesh["asphalt_" + lane->id().string()] = BuildMesh(rg, features, lane->id(), Asphalt);
+          meshes.lane_lane_mesh["lane_" + lane->id().string()] = BuildMesh(rg, features, lane->id(), Lane);
+          meshes.lane_marker_mesh["marker_" + lane->id().string()] = BuildMesh(rg, features, lane->id(), Marker);
+          meshes.lane_hbounds_mesh["hbounds_" + lane->id().string()] = BuildMesh(rg, features, lane->id(), HBounds);
         }
       } else {
-        meshes.segment_asphalt_mesh[segment->id().string()] = BuildMesh(rg, features, segment->id(), GrayedAsphalt);
+        meshes.segment_grayed_asphalt_mesh["grayed_asphalt_" + segment->id().string()] =
+            BuildMesh(rg, features, segment->id(), GrayedAsphalt);
         for (int li = 0; li < segment->num_lanes(); ++li) {
           const api::Lane* lane = segment->lane(li);
-          meshes.lane_asphalt_mesh[lane->id().string()] = BuildMesh(rg, features, lane->id(), GrayedAsphalt);
-          meshes.lane_lane_mesh[lane->id().string()] = BuildMesh(rg, features, lane->id(), GrayedLane);
-          meshes.lane_marker_mesh[lane->id().string()] = BuildMesh(rg, features, lane->id(), GrayedMarker);
-          meshes.lane_hbounds_mesh[lane->id().string()] = BuildMesh(rg, features, lane->id(), HBounds);
+          meshes.lane_grayed_asphalt_mesh["grayed_asphalt_" + lane->id().string()] =
+              BuildMesh(rg, features, lane->id(), GrayedAsphalt);
+          meshes.lane_grayed_lane_mesh["grayed_lane_" + lane->id().string()] =
+              BuildMesh(rg, features, lane->id(), GrayedLane);
+          meshes.lane_grayed_marker_mesh["grayed_marker_" + lane->id().string()] =
+              BuildMesh(rg, features, lane->id(), GrayedMarker);
+          meshes.lane_hbounds_mesh["hbounds_" + lane->id().string()] = BuildMesh(rg, features, lane->id(), HBounds);
         }
       }
     }
@@ -831,7 +836,7 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
   if (features.draw_branch_points) {
     for (int bpi = 0; bpi < rg->num_branch_points(); ++bpi) {
       const api::BranchPoint* branch_point = rg->branch_point(bpi);
-      meshes.branch_point_mesh[branch_point->id().string()] =
+      meshes.branch_point_mesh["branch_point_" + branch_point->id().string()] =
           BuildMesh(rg, features, branch_point->id(), BranchPointGlow);
     }
   }
