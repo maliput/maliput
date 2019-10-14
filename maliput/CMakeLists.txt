@@ -52,7 +52,9 @@ endif()
 
 if(BUILD_DOCS)
   find_package(ament_cmake_doxygen REQUIRED)
-  ament_doxygen_generate(CONFIG_OVERLAY doc/Doxyfile.overlay.in)
+  ament_doxygen_generate(doxygen_maliput
+    CONFIG_OVERLAY doc/Doxyfile.overlay.in
+  )
 endif()
 
 ##############################################################################

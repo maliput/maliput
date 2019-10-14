@@ -52,7 +52,7 @@ endif()
 
 if(BUILD_DOCS)
   find_package(ament_cmake_doxygen REQUIRED)
-  ament_doxygen_generate(
+  ament_doxygen_generate(doxygen_dragway
     CONFIG_OVERLAY doc/Doxyfile.overlay.in
     DEPENDENCIES maliput maliput-utilities
   )
