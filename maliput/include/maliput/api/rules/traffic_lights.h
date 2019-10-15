@@ -129,7 +129,7 @@ class Bulb final {
 
   /// Returns this Bulb instance's unique identifier.
   ///
-  /// @throws common::assertion_error When neither the parent BulbGroup and
+  /// @throws common::assertion_error When the parent BulbGroup and
   /// TrafficLight have not been registered. @see SetBulbGroup() and @see
   /// BulbGroup::SetTrafficLight().
   UniqueBulbId unique_id() const;
@@ -176,7 +176,7 @@ class Bulb final {
   /// returns nullptr.
   const BulbGroup* bulb_group() const { return bulb_group_; }
 
-  /// Sets the parent TrafficLight pointer.
+  /// Sets the parent BulbGroup pointer.
   /// This method is thought to be called once by @p bulb_group at
   /// its construct time.
   ///
@@ -229,7 +229,7 @@ class BulbGroup final {
   ///
   /// @param bulbs The bulbs that are part of this BulbGroup. There must be at
   /// least one bulb within this group. There must not be Bulbs with the same
-  /// Bulb::Id. There must not be any nullptr bulb.
+  /// Bulb::Id. Null bulbs are not allowed.
   ///
   /// @throws common::assertion_error When there are Bulbs with the same
   /// Bulb::Id in @p bulbs.
@@ -318,8 +318,8 @@ class TrafficLight final {
   /// light and bulb group should ideally match, if possible.
   ///
   /// @param bulb_groups The bulb groups that are part of this traffic light.
-  /// There must not be BulbGroups with the same BulbGroup::Ids. There must not
-  /// be any nullptr bulb group.
+  /// There must not be BulbGroups with the same BulbGroup::Ids. Null bulb
+  /// groups are not allowed.
   ///
   /// @throws common::assertion_error When there are BulbGroups with the same
   /// BulbGroup::Id in @p bulb_groups.

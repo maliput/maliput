@@ -157,7 +157,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
 }
 
 /// Predicate-formatter which tests equality of const Bulb*.
-/// Note that pointers are not evaluated but the contents they refer to.
+/// Note that pointers are not evaluated but the contents they refer to are.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Bulb* a,
                                           const Bulb* b) {
   drake::unused(a_expression, b_expression);
@@ -180,7 +180,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
 }
 
 /// Predicate-formatter which tests equality of std::vector<const Bulb*>.
-/// Note that pointers are not evaluated but the contents they refer to.
+/// Note that pointers are not evaluated but the contents they refer to are.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                           const std::vector<const Bulb*>& a, const std::vector<const Bulb*>& b) {
   drake::unused(a_expression, b_expression);
@@ -194,7 +194,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
 }
 
 /// Predicate-formatter which tests equality of const BulbGroup*.
-/// Note that pointers are not evaluated but the contents they refer to.
+/// Note that pointers are not evaluated but the contents they refer to are.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbGroup* a,
                                           const BulbGroup* b) {
   drake::unused(a_expression, b_expression);
@@ -207,7 +207,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
 }
 
 /// Predicate-formatter which tests equality of const TrafficLight*.
-/// Note that pointers are not evaluated but the contents they refer to.
+/// Note that pointers are not evaluated but the contents they refer to are.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const TrafficLight* a,
                                           const TrafficLight* b) {
   drake::unused(a_expression, b_expression);
