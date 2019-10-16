@@ -156,31 +156,33 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
   return c.result();
 }
 
-/// Predicate-formatter which tests equality of Bulb.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Bulb& a,
-                                          const Bulb& b) {
+/// Predicate-formatter which tests equality of const Bulb*.
+/// Note that pointers are not evaluated but the contents they refer to are.
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Bulb* a,
+                                          const Bulb* b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.position_bulb_group(), b.position_bulb_group()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_bulb_group(), b.orientation_bulb_group()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.color(), b.color()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type(), b.type()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.arrow_orientation_rad(), b.arrow_orientation_rad()));
-  const std::vector<BulbState>& a_states = a.states();
-  const std::vector<BulbState>& b_states = b.states();
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->id(), b->id()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->position_bulb_group(), b->position_bulb_group()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->orientation_bulb_group(), b->orientation_bulb_group()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->color(), b->color()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->type(), b->type()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->arrow_orientation_rad(), b->arrow_orientation_rad()));
+  const std::vector<BulbState>& a_states = a->states();
+  const std::vector<BulbState>& b_states = b->states();
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a_states.size(), b_states.size()));
   int smallest = std::min(a_states.size(), b_states.size());
   for (int i = 0; i < smallest; ++i) {
     MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a_states[i], b_states[i]));
   }
-  MALIPUT_IS_EQUAL(a.bounding_box(), b.bounding_box());
+  MALIPUT_IS_EQUAL(a->bounding_box(), b->bounding_box());
   return c.result();
 }
 
-/// Predicate-formatter which tests equality of std::vector<Bulb>.
+/// Predicate-formatter which tests equality of std::vector<const Bulb*>.
+/// Note that pointers are not evaluated but the contents they refer to are.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                          const std::vector<Bulb>& a, const std::vector<Bulb>& b) {
+                                          const std::vector<const Bulb*>& a, const std::vector<const Bulb*>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
@@ -191,28 +193,30 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
   return c.result();
 }
 
-/// Predicate-formatter which tests equality of BulbGroup.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbGroup& a,
-                                          const BulbGroup& b) {
+/// Predicate-formatter which tests equality of const BulbGroup*.
+/// Note that pointers are not evaluated but the contents they refer to are.
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbGroup* a,
+                                          const BulbGroup* b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.position_traffic_light(), b.position_traffic_light()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_traffic_light(), b.orientation_traffic_light()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.bulbs(), b.bulbs()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->id(), b->id()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->position_traffic_light(), b->position_traffic_light()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->orientation_traffic_light(), b->orientation_traffic_light()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->bulbs(), b->bulbs()));
   return c.result();
 }
 
-/// Predicate-formatter which tests equality of TrafficLight.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const TrafficLight& a,
-                                          const TrafficLight& b) {
+/// Predicate-formatter which tests equality of const TrafficLight*.
+/// Note that pointers are not evaluated but the contents they refer to are.
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const TrafficLight* a,
+                                          const TrafficLight* b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.position_road_network(), b.position_road_network()));
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.orientation_road_network(), b.orientation_road_network()));
-  const std::vector<BulbGroup>& bulb_groups_a = a.bulb_groups();
-  const std::vector<BulbGroup>& bulb_groups_b = b.bulb_groups();
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->id(), b->id()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->position_road_network(), b->position_road_network()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->orientation_road_network(), b->orientation_road_network()));
+  const std::vector<const BulbGroup*> bulb_groups_a = a->bulb_groups();
+  const std::vector<const BulbGroup*> bulb_groups_b = b->bulb_groups();
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(bulb_groups_a.size(), bulb_groups_b.size()));
   const int smallest = std::min(bulb_groups_a.size(), bulb_groups_b.size());
   for (int i = 0; i < smallest; ++i) {

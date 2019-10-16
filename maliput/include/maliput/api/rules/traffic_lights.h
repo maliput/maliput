@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -10,6 +11,7 @@
 #include "drake/common/hash.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/passkey.h"
 
 namespace maliput {
 namespace api {
@@ -43,10 +45,13 @@ std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper()
 /// Forward declaration of `UniqueBulbId` to be used by `Bulb`.
 struct UniqueBulbId;
 
+/// Forward declaration of `BulbGroup` to be used by `Bulb`.
+class BulbGroup;
+
 /// Models a bulb within a bulb group.
 class Bulb final {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Bulb);
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Bulb);
 
   /// Unique identifier for a Bulb.
   using Id = TypeSpecificIdentifier<class Bulb>;
@@ -78,10 +83,6 @@ class Bulb final {
   ///
   /// @param id The bulb's ID. It must be unique in the context of the BulbGroup
   /// that contains it. @see UniqueBulbId to uniquely identify a Bulb in the world.
-  ///
-  /// @param unique_id The bulb's unique ID in the entire TrafficLightBook.
-  /// Uniqueness enforcement is delegated to TrafficLightBook loader / builder.
-  /// `unique_id.bulb_id` must be equal to @p id.
   ///
   /// @param position_bulb_group The linear offset of this bulb's frame relative
   /// to the frame of the bulb group that contains it. The origin of this bulb's
@@ -117,8 +118,8 @@ class Bulb final {
   /// details about the default value.
   ///
   /// @throws common::assertion_error When `unique_id.bulb_id != id`.
-  Bulb(const Id& id, const UniqueBulbId& unique_id, const GeoPosition& position_bulb_group,
-       const Rotation& orientation_bulb_group, const BulbColor& color, const BulbType& type,
+  Bulb(const Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
+       const BulbColor& color, const BulbType& type,
        const drake::optional<double>& arrow_orientation_rad = drake::nullopt,
        const drake::optional<std::vector<BulbState>>& states = drake::nullopt,
        BoundingBox bounding_box = BoundingBox());
@@ -127,6 +128,10 @@ class Bulb final {
   const Id& id() const { return id_; }
 
   /// Returns this Bulb instance's unique identifier.
+  ///
+  /// @throws common::assertion_error When the parent BulbGroup and
+  /// TrafficLight have not been registered. @see SetBulbGroup() and @see
+  /// BulbGroup::SetTrafficLight().
   UniqueBulbId unique_id() const;
 
   /// Returns the linear offset of this bulb's frame relative to the frame of
@@ -165,9 +170,24 @@ class Bulb final {
   /// Returns the bounding box of the bulb.
   const BoundingBox& bounding_box() const { return bounding_box_; }
 
+  /// Returns the parent BulbGroup of the bulb.
+  ///
+  /// When this bulb has not been registered in a BulbGroup, this method
+  /// returns nullptr.
+  const BulbGroup* bulb_group() const { return bulb_group_; }
+
+  /// Sets the parent BulbGroup pointer.
+  /// This method is thought to be called once by @p bulb_group at
+  /// its construct time.
+  ///
+  /// @throws common::assertion_error When @p bulb_group is nullptr.
+  void SetBulbGroup(common::Passkey<BulbGroup>, const BulbGroup* bulb_group) {
+    MALIPUT_THROW_UNLESS(bulb_group != nullptr);
+    bulb_group_ = bulb_group;
+  }
+
  private:
   Id id_;
-  std::string unique_id_str_;
   GeoPosition position_bulb_group_;
   Rotation orientation_bulb_group_;
   BulbColor color_ = BulbColor::kRed;
@@ -175,14 +195,18 @@ class Bulb final {
   drake::optional<double> arrow_orientation_rad_ = drake::nullopt;
   std::vector<BulbState> states_;
   BoundingBox bounding_box_;
+  const BulbGroup* bulb_group_{};
 };
+
+/// Forward declaration of `TrafficLight` to be used by `BulbGroup`.
+class TrafficLight;
 
 /// Models a group of bulbs within a traffic light. All of the bulbs within a
 /// group should share the same approximate orientation. However, this is not
 /// programmatically enforced.
 class BulbGroup final {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(BulbGroup);
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BulbGroup);
 
   /// Unique identifier for a BulbGroup.
   using Id = TypeSpecificIdentifier<BulbGroup>;
@@ -205,14 +229,14 @@ class BulbGroup final {
   ///
   /// @param bulbs The bulbs that are part of this BulbGroup. There must be at
   /// least one bulb within this group. There must not be Bulbs with the same
-  /// Bulb::Id.
+  /// Bulb::Id. Null bulbs are not allowed.
   ///
   /// @throws common::assertion_error When there are Bulbs with the same
   /// Bulb::Id in @p bulbs.
-  /// @throws common::assertion_error When any of the Bulbs in @p bulbs has a
-  /// UniqueBulbId whose `bulb_group_id` is different from @p id.
+  /// @throws common::assertion_error When any of the Bulbs in @p bulbs is
+  /// nullptr.
   BulbGroup(const Id& id, const GeoPosition& position_traffic_light, const Rotation& orientation_traffic_light,
-            const std::vector<Bulb>& bulbs);
+            std::vector<std::unique_ptr<Bulb>> bulbs);
 
   /// Returns this BulbGroup instance's unique identifier.
   const Id& id() const { return id_; }
@@ -226,16 +250,33 @@ class BulbGroup final {
   const Rotation& orientation_traffic_light() const { return orientation_traffic_light_; }
 
   /// Returns the bulbs contained within this bulb group.
-  const std::vector<Bulb>& bulbs() const { return bulbs_; }
+  std::vector<const Bulb*> bulbs() const;
 
-  /// Gets the specified Bulb. Returns drake::nullopt if @p id is unrecognized.
-  drake::optional<Bulb> GetBulb(const Bulb::Id& id) const;
+  /// Gets the specified Bulb. Returns nullptr if @p id is unrecognized.
+  const Bulb* GetBulb(const Bulb::Id& id) const;
+
+  /// Returns the parent TrafficLight of the bulb group.
+  ///
+  /// When this bulb group has not been registered in a TrafficLight,
+  /// this method returns nullptr.
+  const TrafficLight* traffic_light() const { return traffic_light_; }
+
+  /// Sets the parent TrafficLight pointer.
+  /// This method is thought to be called once by @p traffic_light at
+  /// its construct time.
+  ///
+  /// @throws common::assertion_error When @p traffic_light is nullptr.
+  void SetTrafficLight(common::Passkey<TrafficLight>, const TrafficLight* traffic_light) {
+    MALIPUT_THROW_UNLESS(traffic_light != nullptr);
+    traffic_light_ = traffic_light;
+  }
 
  private:
   Id id_;
   GeoPosition position_traffic_light_;
   Rotation orientation_traffic_light_;
-  std::vector<Bulb> bulbs_;
+  std::vector<std::unique_ptr<Bulb>> bulbs_;
+  const TrafficLight* traffic_light_{};
 };
 
 /// Models a traffic light. A traffic light is a physical signaling device
@@ -253,7 +294,7 @@ class BulbGroup final {
 /// not have access to right-of-way rules.
 class TrafficLight final {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(TrafficLight);
+  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLight);
 
   /// Unique identifier for a traffic light.
   using Id = TypeSpecificIdentifier<TrafficLight>;
@@ -277,15 +318,15 @@ class TrafficLight final {
   /// light and bulb group should ideally match, if possible.
   ///
   /// @param bulb_groups The bulb groups that are part of this traffic light.
-  /// There must not be BulbGroups with the same BulbGroup::Ids.
+  /// There must not be BulbGroups with the same BulbGroup::Ids. Null bulb
+  /// groups are not allowed.
   ///
   /// @throws common::assertion_error When there are BulbGroups with the same
   /// BulbGroup::Id in @p bulb_groups.
-  /// @throws common::assertion_error When any of the Bulbs contained in each
-  /// BulbGroup of @p bulb_groups has a UniqueBulbId whose `traffic_light_id`
-  /// is different from @p id.
+  /// @throws common::assertion_error When any of the BulbGroup in
+  /// @p bulb_groups is nullptr.
   TrafficLight(const Id& id, const GeoPosition& position_road_network, const Rotation& orientation_road_network,
-               const std::vector<BulbGroup>& bulb_groups);
+               std::vector<std::unique_ptr<BulbGroup>> bulb_groups);
 
   /// Returns this traffic light's unique identifier.
   const Id& id() const { return id_; }
@@ -297,16 +338,16 @@ class TrafficLight final {
   const Rotation& orientation_road_network() const { return orientation_road_network_; }
 
   /// Returns the bulb groups contained within this traffic light.
-  const std::vector<BulbGroup>& bulb_groups() const { return bulb_groups_; }
+  std::vector<const BulbGroup*> bulb_groups() const;
 
-  /// Gets the specified BulbGroup. Returns drake::nullopt if @p id is unrecognized.
-  drake::optional<BulbGroup> GetBulbGroup(const BulbGroup::Id& id) const;
+  /// Gets the specified BulbGroup. Returns nullptr if @p id is unrecognized.
+  const BulbGroup* GetBulbGroup(const BulbGroup::Id& id) const;
 
  private:
   Id id_;
   GeoPosition position_road_network_;
   Rotation orientation_road_network_;
-  std::vector<BulbGroup> bulb_groups_;
+  std::vector<std::unique_ptr<BulbGroup>> bulb_groups_;
 };
 
 /// Uniquely identifies a bulb in the world. This consists of the concatenation
@@ -324,16 +365,6 @@ struct UniqueBulbId {
   UniqueBulbId(const TrafficLight::Id& traffic_light_id_in, const BulbGroup::Id& bulb_group_id_in,
                const Bulb::Id& bulb_id_in)
       : traffic_light_id(traffic_light_id_in), bulb_group_id(bulb_group_id_in), bulb_id(bulb_id_in) {}
-
-  /// Constructs a UniqueBulbId from @p str.
-  ///
-  /// @param str The string representation of a UniqueBulbId that results from
-  /// calling `to_string()` to other UniqueBulbId. It must follow the format:
-  /// "`traffic_light_id.string()`-`bulb_group_id.string()`-`bulb_group_id.string()`".
-  ///
-  /// @throws common::assertion_error When @p str does not follow the
-  /// specified format.
-  explicit UniqueBulbId(const std::string& str);
 
   /// Returns the string representation of this UniqueBulbId following the
   /// format:

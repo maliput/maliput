@@ -384,23 +384,15 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockTrafficLightBook)
   MockTrafficLightBook() = default;
-  void set_traffic_light(const TrafficLight& traffic_light) { traffic_light_ = traffic_light; }
+  void set_traffic_light(std::unique_ptr<TrafficLight> traffic_light) { traffic_light_ = std::move(traffic_light); }
 
  private:
-  drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id& id) const override {
-    if (traffic_light_.has_value() && traffic_light_->id() == id) {
-      return traffic_light_;
-    }
-    return {drake::nullopt};
+  const TrafficLight* DoGetTrafficLight(const TrafficLight::Id& id) const override {
+    return (traffic_light_.get() != nullptr && traffic_light_->id() == id) ? traffic_light_.get() : nullptr;
   }
-  std::vector<TrafficLight> DoTrafficLights() const override {
-    if (traffic_light_.has_value()) {
-      return {*traffic_light_};
-    }
-    return {};
-  }
+  std::vector<const TrafficLight*> DoTrafficLights() const override { return {traffic_light_.get()}; }
 
-  drake::optional<TrafficLight> traffic_light_{};
+  std::unique_ptr<TrafficLight> traffic_light_{};
 };
 
 class MockPhaseRingBook final : public rules::PhaseRingBook {
@@ -723,19 +715,19 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildF
   return std::move(rulebook);
 }
 
-BulbGroup CreateBulbGroup(bool add_missing_bulb_group, const rules::TrafficLight::Id& traffic_light_id) {
+std::unique_ptr<BulbGroup> CreateBulbGroup(bool add_missing_bulb_group) {
   const BulbGroup::Id bulb_group_id{add_missing_bulb_group ? "MissingBulbGroupId" : "BulbGroupId"};
-  const Bulb::Id bulb_id{"BulbId"};
-  const rules::UniqueBulbId unique_id(traffic_light_id, bulb_group_id, bulb_id);
-
-  return BulbGroup(
-      bulb_group_id, GeoPosition(), Rotation(),
-      {Bulb(bulb_id, unique_id, GeoPosition(), Rotation(), rules::BulbColor::kRed, rules::BulbType::kRound)});
+  std::vector<std::unique_ptr<Bulb>> bulbs;
+  bulbs.push_back(std::make_unique<Bulb>(Bulb::Id{"BulbId"}, GeoPosition(), Rotation(), rules::BulbColor::kRed,
+                                         rules::BulbType::kRound));
+  return std::make_unique<BulbGroup>(bulb_group_id, GeoPosition(), Rotation(), std::move(bulbs));
 }
 
-TrafficLight CreateTrafficLight(const TrafficLightBuildFlags& build_flags) {
+std::unique_ptr<TrafficLight> CreateTrafficLight(const TrafficLightBuildFlags& build_flags) {
   const TrafficLight::Id id(build_flags.add_missing_traffic_light ? "MissingTrafficLightId" : "TrafficLightId");
-  return TrafficLight(id, GeoPosition(), Rotation(), {CreateBulbGroup(build_flags.add_missing_bulb_group, id)});
+  std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
+  bulb_groups.push_back(std::move(std::move(CreateBulbGroup(build_flags.add_missing_bulb_group))));
+  return std::make_unique<TrafficLight>(id, GeoPosition(), Rotation(), std::move(bulb_groups));
 }
 
 std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() {

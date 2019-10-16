@@ -24,12 +24,12 @@ class TrafficLightBook : public api::rules::TrafficLightBook {
   ///
   /// @throws std::exception if an api::rules::TrafficLight with the same ID
   /// already exists.
-  void AddTrafficLight(const api::rules::TrafficLight& traffic_light);
+  void AddTrafficLight(std::unique_ptr<const api::rules::TrafficLight> traffic_light);
 
  private:
-  drake::optional<api::rules::TrafficLight> DoGetTrafficLight(const api::rules::TrafficLight::Id& id) const override;
+  const api::rules::TrafficLight* DoGetTrafficLight(const api::rules::TrafficLight::Id& id) const override;
 
-  std::vector<api::rules::TrafficLight> DoTrafficLights() const override;
+  std::vector<const api::rules::TrafficLight*> DoTrafficLights() const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

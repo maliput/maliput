@@ -200,11 +200,11 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
   // BulbGroup::Ids.
   void EvaluateRelatedBulbGroups(const RightOfWayRule& rule, const api::rules::TrafficLightBook* traffic_light_book) {
     for (const auto& traffic_light_bulb_groups : rule.related_bulb_groups()) {
-      const drake::optional<api::rules::TrafficLight> traffic_light =
+      const api::rules::TrafficLight* traffic_light =
           traffic_light_book->GetTrafficLight(traffic_light_bulb_groups.first);
-      EXPECT_TRUE(traffic_light.has_value());
+      EXPECT_NE(traffic_light, nullptr);
       for (const api::rules::BulbGroup::Id& bulb_group_id : traffic_light_bulb_groups.second) {
-        EXPECT_TRUE(traffic_light->GetBulbGroup(bulb_group_id).has_value());
+        EXPECT_NE(traffic_light->GetBulbGroup(bulb_group_id), nullptr);
       }
     }
   }

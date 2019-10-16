@@ -20,18 +20,18 @@ class TrafficLightBook {
   virtual ~TrafficLightBook() = default;
 
   /// Returns all TrafficLights in this book.
-  std::vector<TrafficLight> TrafficLights() const { return DoTrafficLights(); }
+  std::vector<const TrafficLight*> TrafficLights() const { return DoTrafficLights(); }
 
-  /// Gets the specified TrafficLight. Returns drake::nullopt if @p id is unrecognized.
-  drake::optional<TrafficLight> GetTrafficLight(const TrafficLight::Id& id) const { return DoGetTrafficLight(id); }
+  /// Gets the specified TrafficLight. Returns nullptr if @p id is unrecognized.
+  const TrafficLight* GetTrafficLight(const TrafficLight::Id& id) const { return DoGetTrafficLight(id); }
 
  protected:
   TrafficLightBook() = default;
 
  private:
-  virtual drake::optional<TrafficLight> DoGetTrafficLight(const TrafficLight::Id& id) const = 0;
+  virtual const TrafficLight* DoGetTrafficLight(const TrafficLight::Id& id) const = 0;
 
-  virtual std::vector<TrafficLight> DoTrafficLights() const = 0;
+  virtual std::vector<const TrafficLight*> DoTrafficLights() const = 0;
 };
 
 }  // namespace rules
