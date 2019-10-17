@@ -69,6 +69,8 @@ class DirectionUsageRule final {
       kNoUse,
       /// This lane is used to define a parking area.
       kParking,
+      /// There is no defined direction of travel on this lane.
+      kUndefined,
     };
 
     /// Constructs a State instance.
