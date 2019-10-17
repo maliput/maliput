@@ -69,7 +69,7 @@ class DirectionUsageRule final {
       kNoUse,
       /// This lane is used to define a parking area.
       kParking,
-      /// Travel on this lane is undefined.
+      /// There is no defined direction of travel on this lane.
       kUndefined,
     };
 

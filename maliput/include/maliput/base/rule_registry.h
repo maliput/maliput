@@ -6,12 +6,14 @@
 #include "maliput/api/rules/discrete_value_rule.h"
 
 namespace maliput {
-/// Builds a DirectionUsageRule type.
-/// Each DiscreteValue corresponds with one possible state of DirectionUsageRule:
-/// kWithS, kAgainstS, kBidirectional, kBidirectionalTurnOnly, kNoUse, kParking.  .
-/// This set api::rules::Rule::State:kStrict to all api::rules::DiscreteValueRule::DiscreteValue.
-/// @return A std::pair conformed by a api::rules::Rule::TypeId with value DirectionUsageRuleType and a vector of
-/// api::rules::DiscreteValueRule::DiscreteValue.
+/// Returns DirectionUsage rule type.
+/// Rule::TypeId is equal to "DirectionUsageRuleType".
+/// Discrete values are listed below:
+///
+/// - WithS: Travel should proceed in the direction of the +S axis.
+///  - ...
+///
+/// With api::rules::Rule::State::kStrict strictness level.
 std::pair<api::rules::Rule::TypeId, std::vector<api::rules::DiscreteValueRule::DiscreteValue>>
 BuildDirectionUsageRuleType();
 
