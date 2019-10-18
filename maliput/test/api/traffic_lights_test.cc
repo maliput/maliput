@@ -316,9 +316,9 @@ TEST_F(TrafficLightTest, Accessors) {
 
 GTEST_TEST(UniqueBulbIdTest, DefaultConstructor) {
   const UniqueBulbId dut;
-  EXPECT_EQ(dut.traffic_light_id, TrafficLight::Id("default"));
-  EXPECT_EQ(dut.bulb_group_id, BulbGroup::Id("default"));
-  EXPECT_EQ(dut.bulb_id, Bulb::Id("default"));
+  EXPECT_EQ(dut.traffic_light_id(), TrafficLight::Id("default"));
+  EXPECT_EQ(dut.bulb_group_id(), BulbGroup::Id("default"));
+  EXPECT_EQ(dut.bulb_id(), Bulb::Id("default"));
 }
 
 GTEST_TEST(UniqueBulbIdTest, Usage) {
@@ -338,7 +338,7 @@ GTEST_TEST(UniqueBulbIdTest, Usage) {
   EXPECT_NE(dut, (UniqueBulbId{traffic_light_id, BulbGroup::Id("foo"), bulb_id}));
   EXPECT_NE(dut, (UniqueBulbId{traffic_light_id, bulb_group_id, Bulb::Id("foo")}));
 
-  const std::string dut_string = dut.to_string();
+  const std::string dut_string = dut.string();
   for (const auto& name : {traffic_light_name, bulb_group_name, bulb_name}) {
     EXPECT_NE(dut_string.find(name), std::string::npos);
   }
