@@ -83,4 +83,7 @@ api::rules::Rule::TypeId VehicleStopInZoneBehaviorRuleTypeId();
 /// empty.
 api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleType();
 
+/// Returns a string contaning the key of one type of related rule.
+std::string YieldGroup();
+
 }  // namespace maliput
