@@ -79,16 +79,14 @@ struct Material {
 
 // Mesh information for all Segments, Lanes, BranchPoints
 struct RoadGeometryMesh {
-  std::map<std::string, std::pair<mesh::GeoMesh, Material>> segment_asphalt_mesh;
-  std::map<std::string, std::pair<mesh::GeoMesh, Material>> segment_grayed_asphalt_mesh;
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> asphalt_mesh;
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> grayed_asphalt_mesh;
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> hbounds_mesh;
 
-  std::map<std::string, std::pair<mesh::GeoMesh, Material>> lane_asphalt_mesh;
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> lane_lane_mesh;
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> lane_marker_mesh;
-  std::map<std::string, std::pair<mesh::GeoMesh, Material>> lane_grayed_asphalt_mesh;
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> lane_grayed_lane_mesh;
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> lane_grayed_marker_mesh;
-  std::map<std::string, std::pair<mesh::GeoMesh, Material>> lane_hbounds_mesh;
 
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> branch_point_mesh;
 };
