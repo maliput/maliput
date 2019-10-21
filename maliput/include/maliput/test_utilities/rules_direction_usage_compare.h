@@ -15,6 +15,7 @@ namespace test {
 // TODO(andrew.best@tri.global)  This should be replaced by a generic predicate
 //                               which handles anything with operator==.
 // Issue #10950 tracks this improvement.
+
 /// Predicate-formatter which tests equality of DirectionUsageRule::State::Type.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    DirectionUsageRule::State::Type a, DirectionUsageRule::State::Type b);

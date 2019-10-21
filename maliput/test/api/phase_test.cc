@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/test_utilities/phases_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {

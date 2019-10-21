@@ -13,6 +13,7 @@
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
+#include "maliput/test_utilities/traffic_lights_compare.h"
 #include "multilane/builder.h"
 #include "multilane/loader.h"
 

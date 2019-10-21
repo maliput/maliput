@@ -7,10 +7,12 @@ set(TEST_UTILS_SOURCES
   maliput_types_compare.cc
   mock.cc
   mock_geometry.cc
+  phases_compare.cc
   rules_compare.cc
   rules_direction_usage_compare.cc
   rules_right_of_way_compare.cc
-  rules_speed_limit_compare.cc)
+  rules_speed_limit_compare.cc
+  traffic_lights_compare.cc)
 
 add_library(maliput_test_utilities ${TEST_UTILS_SOURCES})
 
