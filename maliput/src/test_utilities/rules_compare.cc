@@ -78,18 +78,6 @@ namespace test {
   return c.result();
 }
 
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& a,
-                                   const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& b) {
-  drake::unused(a_expression, b_expression);
-  AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
-  for (const auto& discrete_value_rule_state : a) {
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(b.at(discrete_value_rule_state.first), discrete_value_rule_state.second));
-  }
-  return c.result();
-}
-
 }  // namespace test
 }  // namespace rules
 }  // namespace api

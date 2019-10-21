@@ -12,6 +12,7 @@ namespace maliput {
 using api::rules::Phase;
 using api::rules::PhaseRing;
 using api::rules::RightOfWayRule;
+using api::rules::Rule;
 
 class ManualPhaseRingBook::Impl {
  public:
@@ -23,18 +24,20 @@ class ManualPhaseRingBook::Impl {
   void AddPhaseRing(const PhaseRing& ring) {
     auto result = ring_book_.emplace(ring.id(), ring);
     if (!result.second) {
-      throw std::logic_error(
-          "Attempted to add multiple PhaseRing instances "
-          "with ID " +
-          ring.id().string());
+      throw std::logic_error("Attempted to add multiple PhaseRing instances with ID " + ring.id().string());
     }
     const Phase& phase = ring.phases().begin()->second;
     for (const auto& element : phase.rule_states()) {
-      auto r = rule_book_.emplace(element.first, ring.id());
+      auto r = right_of_way_rule_book_.emplace(element.first, ring.id());
       if (!r.second) {
         throw std::logic_error("RightOfWayRule with ID " + element.first.string() +
-                               " is part of more than "
-                               "one PhaseRing.");
+                               " is part of more than one PhaseRing.");
+      }
+    }
+    for (const auto& element : phase.discrete_value_rule_states()) {
+      auto r = rule_book_.emplace(element.first, ring.id());
+      if (!r.second) {
+        throw std::logic_error("Rule with ID " + element.first.string() + " is part of more than one PhaseRing.");
       }
     }
   }
@@ -47,6 +50,9 @@ class ManualPhaseRingBook::Impl {
     MALIPUT_THROW_UNLESS(ring_book_.erase(ring_id) == 1);
     const Phase& phase = ring->phases().begin()->second;
     for (const auto& element : phase.rule_states()) {
+      MALIPUT_THROW_UNLESS(right_of_way_rule_book_.erase(element.first) == 1);
+    }
+    for (const auto& element : phase.discrete_value_rule_states()) {
       MALIPUT_THROW_UNLESS(rule_book_.erase(element.first) == 1);
     }
   }
@@ -69,6 +75,14 @@ class ManualPhaseRingBook::Impl {
   }
 
   drake::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
+    auto it = right_of_way_rule_book_.find(rule_id);
+    if (it == right_of_way_rule_book_.end()) {
+      return drake::nullopt;
+    }
+    return ring_book_.at(it->second);
+  }
+
+  drake::optional<PhaseRing> DoFindPhaseRing(const Rule::Id& rule_id) const {
     auto it = rule_book_.find(rule_id);
     if (it == rule_book_.end()) {
       return drake::nullopt;
@@ -78,7 +92,8 @@ class ManualPhaseRingBook::Impl {
 
  private:
   std::unordered_map<PhaseRing::Id, const PhaseRing> ring_book_;
-  std::unordered_map<RightOfWayRule::Id, const PhaseRing::Id> rule_book_;
+  std::unordered_map<RightOfWayRule::Id, const PhaseRing::Id> right_of_way_rule_book_;
+  std::unordered_map<Rule::Id, const PhaseRing::Id> rule_book_;
 };
 
 ManualPhaseRingBook::ManualPhaseRingBook() : impl_(std::make_unique<Impl>()) {}
@@ -96,6 +111,10 @@ drake::optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(const PhaseRing::
 }
 
 drake::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
+  return impl_->DoFindPhaseRing(rule_id);
+}
+
+drake::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(const Rule::Id& rule_id) const {
   return impl_->DoFindPhaseRing(rule_id);
 }
 

@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/phases_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -21,6 +22,10 @@ class PhaseTest : public ::testing::Test {
       : id_("test_id"),
         rule_states_{{RightOfWayRule::Id("northbound-forward"), RightOfWayRule::State::Id("GO")},
                      {RightOfWayRule::Id("southbound-left-turn"), RightOfWayRule::State::Id("STOP")}},
+        discrete_value_rule_states_{{Rule::Id("RightOfWayRuleType/northbound-forward"),
+                                     MakeDiscreteValue(Rule::State::kStrict, {} /* related_rules */, "Go")},
+                                    {Rule::Id("RightOfWayRuleType/southbound-left-turn"),
+                                     MakeDiscreteValue(Rule::State::kStrict, {} /* related_rules */, "Stop")}},
         bulb_states_{
             {{{TrafficLight::Id("major-intersection"), BulbGroup::Id("northbound"), Bulb::Id("forward-green")},
               BulbState::kOn},
@@ -30,10 +35,11 @@ class PhaseTest : public ::testing::Test {
               BulbState::kOff},
              {{TrafficLight::Id("major-intersection"), BulbGroup::Id("southbound"), Bulb::Id("left-turn-red")},
               BulbState::kOn}}},
-        phase_{id_, rule_states_, bulb_states_} {}
+        phase_{id_, rule_states_, discrete_value_rule_states_, bulb_states_} {}
 
   const Phase::Id id_;
   const RuleStates rule_states_;
+  const DiscreteValueRuleStates discrete_value_rule_states_;
   const drake::optional<BulbStates> bulb_states_;
   const Phase phase_;
 };
@@ -41,9 +47,10 @@ class PhaseTest : public ::testing::Test {
 TEST_F(PhaseTest, Accessors) {
   for (const drake::optional<BulbStates>& bulb_states :
        std::vector<drake::optional<BulbStates>>{drake::nullopt, bulb_states_}) {
-    Phase dut(id_, rule_states_, bulb_states);
+    Phase dut(id_, rule_states_, discrete_value_rule_states_, bulb_states);
     EXPECT_EQ(dut.id(), id_);
     EXPECT_EQ(dut.rule_states(), rule_states_);
+    EXPECT_EQ(dut.discrete_value_rule_states(), discrete_value_rule_states_);
     EXPECT_EQ(dut.bulb_states(), bulb_states);
   }
 }
@@ -54,7 +61,7 @@ TEST_F(PhaseTest, Copying) {
 }
 
 TEST_F(PhaseTest, Assignment) {
-  Phase dut(Phase::Id("other_dut_id"), RuleStates());
+  Phase dut(Phase::Id("other_dut_id"), RuleStates(), discrete_value_rule_states_);
   dut = phase_;
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, phase_));
 }

@@ -5,6 +5,8 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/lane.h"
+#include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/rule.h"
 
 namespace maliput {
 namespace {
@@ -12,14 +14,21 @@ namespace {
 class IntersectionTest : public ::testing::Test {
  public:
   IntersectionTest()
-      : dummy_phase_1_(api::rules::Phase::Id("dummy_phase_1"), rule_states_1_),
-        dummy_phase_2_(api::rules::Phase::Id("dummy_phase_2"), rule_states_2_),
+      : dummy_phase_1_(api::rules::Phase::Id("dummy_phase_1"), rule_states_1_, discrete_value_rule_states_1_),
+        dummy_phase_2_(api::rules::Phase::Id("dummy_phase_2"), rule_states_2_, discrete_value_rule_states_2_),
         dummy_ring_(api::rules::PhaseRing::Id("dummy_ring"), {dummy_phase_1_, dummy_phase_2_}) {}
 
   const api::rules::RuleStates rule_states_1_{
       {api::rules::RightOfWayRule::Id("dummy_rule"), api::rules::RightOfWayRule::State::Id("GO")}};
   const api::rules::RuleStates rule_states_2_{
       {api::rules::RightOfWayRule::Id("dummy_rule"), api::rules::RightOfWayRule::State::Id("STOP")}};
+
+  const api::rules::DiscreteValueRuleStates discrete_value_rule_states_1_{
+      {api::rules::Rule::Id("dummy_rule"),
+       api::rules::MakeDiscreteValue(api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, "Go")}};
+  const api::rules::DiscreteValueRuleStates discrete_value_rule_states_2_{
+      {api::rules::Rule::Id("dummy_rule"),
+       api::rules::MakeDiscreteValue(api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, "Stop")}};
 
   const api::rules::Phase dummy_phase_1_;
   const api::rules::Phase dummy_phase_2_;

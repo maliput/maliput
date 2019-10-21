@@ -22,6 +22,17 @@ namespace test {
   return c.result();
 }
 
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const DiscreteValueRuleStates& a,
+                                   const DiscreteValueRuleStates& b) {
+  drake::unused(a_expression, b_expression);
+  AssertionResultCollector c;
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
+  for (const auto& discrete_value_rule_state : a) {
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(b.at(discrete_value_rule_state.first), discrete_value_rule_state.second));
+  }
+  return c.result();
+}
+
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const drake::optional<BulbStates>& a, const drake::optional<BulbStates>& b) {
   drake::unused(a_expression, b_expression);
@@ -41,6 +52,7 @@ namespace test {
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.rule_states(), b.rule_states()));
+  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.discrete_value_rule_states(), b.discrete_value_rule_states()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.bulb_states(), b.bulb_states()));
   return c.result();
 }

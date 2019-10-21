@@ -410,6 +410,8 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
   drake::optional<rules::PhaseRing> DoFindPhaseRing(const rules::RightOfWayRule::Id&) const override {
     return drake::nullopt;
   }
+
+  drake::optional<rules::PhaseRing> DoFindPhaseRing(const rules::Rule::Id&) const override { return drake::nullopt; }
 };
 
 class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateProvider {
@@ -442,7 +444,7 @@ class MockIntersection final : public Intersection {
                 const drake::optional<double>& duration_until = drake::nullopt) override {}
 };
 
-PhaseRing CreatePhaseRing() { return PhaseRing(PhaseRing::Id("mock"), {Phase(Phase::Id("mock"), {})}); }
+PhaseRing CreatePhaseRing() { return PhaseRing(PhaseRing::Id("mock"), {Phase(Phase::Id("mock"), {}, {})}); }
 
 class MockIntersectionBook final : public IntersectionBook {
  public:

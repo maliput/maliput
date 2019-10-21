@@ -22,6 +22,10 @@ void VerifyAllPhasesHaveSameCoverage(const std::vector<Phase>& phases) {
     for (const auto& s : phase.rule_states()) {
       MALIPUT_THROW_UNLESS(r.rule_states().count(s.first) == 1);
     }
+    MALIPUT_THROW_UNLESS(phase.discrete_value_rule_states().size() == r.discrete_value_rule_states().size());
+    for (const auto& s : phase.discrete_value_rule_states()) {
+      MALIPUT_THROW_UNLESS(r.discrete_value_rule_states().count(s.first) == 1);
+    }
     // Require both set of bulb states to be defined or undefined together.
     MALIPUT_THROW_UNLESS((r.bulb_states() == drake::nullopt && phase.bulb_states() == drake::nullopt) ||
                          (r.bulb_states() != drake::nullopt && phase.bulb_states() != drake::nullopt));

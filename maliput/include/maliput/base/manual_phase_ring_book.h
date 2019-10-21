@@ -43,6 +43,8 @@ class ManualPhaseRingBook : public api::rules::PhaseRingBook {
 
   drake::optional<api::rules::PhaseRing> DoFindPhaseRing(const api::rules::RightOfWayRule::Id& rule_id) const override;
 
+  drake::optional<api::rules::PhaseRing> DoFindPhaseRing(const api::rules::Rule::Id& rule_id) const override;
+
   class Impl;
   std::unique_ptr<Impl> impl_;
 };
