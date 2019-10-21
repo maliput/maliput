@@ -62,10 +62,14 @@
 #include <string>
 
 /// @note spdlog support is provided by Drake's installation.
-///       @def HAVE_SPDLOG is a preprocessor macro set by Drake's cmake
-///       configuration for spdlog at bundling time and available when
-///       incorporating Drake as a dependency with it.
-///       @see https://github.com/RobotLocomotion/drake/blob/master/tools/workspace/spdlog/package-create-cps.py#L28
+
+#ifdef DOXYGEN
+/// A preprocessor macro set by Drake's cmake
+/// configuration for spdlog at bundling time and available when
+/// incorporating Drake as a dependency with it.
+/// @see https://github.com/RobotLocomotion/drake/blob/master/tools/workspace/spdlog/package-create-cps.py#L28
+#define HAVE_SPDLOG
+#endif
 
 #ifdef HAVE_SPDLOG
 

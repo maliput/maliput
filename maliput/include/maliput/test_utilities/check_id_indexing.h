@@ -11,8 +11,8 @@ namespace test {
 /// Walks the object graph of @p road_geometry and checks that every
 /// component can be found via `ById().Get*(const *Id& id)` methods.
 ///
-/// @return ::testing::AssertionSuccess() when all objects are found,
-/// otherwise ::testing::AssertionFailure().
+/// @return \::testing\::AssertionSuccess() when all objects are found,
+/// otherwise \::testing\::AssertionFailure().
 ::testing::AssertionResult CheckIdIndexing(const RoadGeometry* road_geometry);
 
 }  // namespace test

@@ -46,6 +46,17 @@ if(BUILD_TESTING)
 endif()
 
 ##############################################################################
+# Docs
+##############################################################################
+
+if(BUILD_DOCS)
+  find_package(ament_cmake_doxygen REQUIRED)
+  ament_doxygen_generate(doxygen_maliput_utilities
+    CONFIG_OVERLAY doc/Doxyfile.overlay.in
+    DEPENDENCIES maliput multilane)
+endif()
+
+##############################################################################
 # Export
 ##############################################################################
 

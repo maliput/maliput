@@ -14,8 +14,8 @@ class RoadGeometry;
 namespace multilane {
 
 /// Loads the `input` string as a maliput_multilane_builder document using the
-/// provided `builder_factory`. See
-/// @ref automotive/multilane/loader.h "loader.h" for further details.
+/// provided `builder_factory`. See @ref include/multilane/loader.h "loader.h"
+/// documentation for further details.
 ///
 /// Application code must use a BuilderFactory reference. It is provided so that
 /// the @ref maliput::multilane::Builder "Builder" to be created can be
@@ -23,8 +23,8 @@ namespace multilane {
 std::unique_ptr<const api::RoadGeometry> Load(const BuilderFactoryBase& builder_factory, const std::string& input);
 
 /// Loads the named file as a maliput_multilane_builder document using the
-/// provided `builder_factory`. See
-/// @ref automotive/multilane/loader.h "loader.h" for further details.
+/// provided `builder_factory`. See @ref include/multilane/loader.h "loader.h"
+/// documentation for further details.
 ///
 /// Application code must use a BuilderFactory reference. It is provided so that
 /// the @ref maliput::multilane::Builder "Builder" to be created can be

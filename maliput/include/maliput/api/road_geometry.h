@@ -172,8 +172,9 @@ class RoadGeometry {
   /// @throws maliput::assertion_error When `path_length_sampling_rate` is not positive.
   /// @throws maliput::assertion_error When any LaneSRange in `lane_s_route.ranges()` refers to
   ///                an unknown Lane.
-  std::vector<GeoPosition> SampleAheadWaypoints(const LaneSRoute& lane_route, double path_length_sampling_rate) const {
-    return DoSampleAheadWaypoints(lane_route, path_length_sampling_rate);
+  std::vector<GeoPosition> SampleAheadWaypoints(const LaneSRoute& lane_s_route,
+                                                double path_length_sampling_rate) const {
+    return DoSampleAheadWaypoints(lane_s_route, path_length_sampling_rate);
   }
 
  protected:

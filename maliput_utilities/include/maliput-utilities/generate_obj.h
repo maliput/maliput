@@ -77,7 +77,7 @@ struct Material {
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
 ///
-/// @param road_geometry  the api::RoadGeometry to model.
+/// @param road_geometry the api::RoadGeometry to model.
 /// @param features  parameters for constructing the mesh.
 /// @return A map with the meshes. Keys will be std::string objects in the
 /// following list:
@@ -89,7 +89,7 @@ struct Material {
 ///   - grayed_asphalt
 ///   - grayed_lane
 ///   - grayed_marker
-std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* rg,
+std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* road_geometry,
                                                                       const ObjFeatures& features);
 
 /// Generates a Wavefront OBJ model of the road surface of an api::RoadGeometry.

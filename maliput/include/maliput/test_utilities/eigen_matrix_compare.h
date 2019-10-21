@@ -12,18 +12,14 @@
 enum class MatrixCompareType { absolute, relative };
 
 /**
- * Compares two matrices to determine whether they are equal to within a certain
- * threshold.
+ * Assert that two matrices @p m1 and @p m2 are equal down to a certain @p tolerance.
  *
  * @param m1 The first matrix to compare.
  * @param m2 The second matrix to compare.
  * @param tolerance The tolerance for determining equivalence.
- * @param compare_type Whether the tolereance is absolute or relative.
- * @param explanation A pointer to a string variable for saving an explanation
- * of why @p m1 and @p m2 are unequal. This parameter is drake::optional and defaults
- * to `nullptr`. If this is `nullptr` and @p m1 and @p m2 are not equal, an
- * explanation is logged as an error message.
- * @return true if the two matrices are equal based on the specified tolerance.
+ * @param compare_type Whether the tolerance is absolute or relative.
+ * @return \::testing\::AssertionSuccess if the two matrices are equal based on the specified
+ * tolerance, \::testing\::AssertionFailure otherwise.
  */
 template <typename DerivedA, typename DerivedB>
 ::testing::AssertionResult CompareMatrices(const Eigen::MatrixBase<DerivedA>& m1, const Eigen::MatrixBase<DerivedB>& m2,
