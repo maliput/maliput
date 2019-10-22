@@ -96,6 +96,7 @@ struct RoadGeometryMesh {
 /// @param road_geometry  the api::RoadGeometry to model.
 /// @param features  parameters for constructing the mesh.
 /// @return A pair with of a mesh and the corresponding material
+/// @throws if @p mesh_material is not one of Lane's valid mesh materials
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::LaneId& lane_id, const MaterialType& mesh_material);
 
@@ -113,6 +114,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 /// @param road_geometry  the api::RoadGeometry to model.
 /// @param features  parameters for constructing the mesh.
 /// @return A pair with of a mesh and the corresponding material
+/// @throws if @p mesh_material is not one of Segment's valid mesh materials
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::SegmentId& segment_id, const MaterialType& mesh_material);
 
@@ -121,6 +123,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 /// @param road_geometry  the api::RoadGeometry to model.
 /// @param features  parameters for constructing the mesh.
 /// @return A RoadGeometryMesh with all segment, lane, and branch point meshes
+/// @throws if @p mesh_material is not one of BranchPoint's valid mesh materials
 RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFeatures& features);
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
