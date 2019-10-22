@@ -657,6 +657,31 @@ bool IsSegmentRenderedNormally(const api::SegmentId& id, const std::vector<api::
   return false;
 }
 
+// Generates an id for the lane mesh
+//
+// @param id   the id of the lane
+std::string LaneKey(const api::LaneId& id) { return "lane_" + id.string(); }
+
+// Generates an id for the marker mesh
+//
+// @param id   the id of the lane
+std::string MarkerKey(const api::LaneId& id) { return "marker_" + id.string(); }
+
+// Generates an id for the grayed lane mesh
+//
+// @param id   the id of the lane
+std::string GrayedLaneKey(const api::LaneId& id) { return "grayed_lane_" + id.string(); }
+
+// Generates an id for the grayed marker mesh
+//
+// @param id   the id of the lane
+std::string GrayedMarkerKey(const api::LaneId& id) { return "grayed_marker_" + id.string(); }
+
+// Generates an id for the branch point mesh
+//
+// @param id   the id of the branch point
+std::string BranchPointKey(const api::BranchPointId& id) { return "branch_point_" + id.string(); }
+
 }  // namespace
 
 Material GetMaterialFromMesh(const MaterialType mesh_material) {
@@ -682,6 +707,7 @@ Material GetMaterialFromMesh(const MaterialType mesh_material) {
 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::LaneId& lane_id, const MaterialType& mesh_material) {
+  MALIPUT_DEMAND(rg != nullptr);
   MALIPUT_THROW_UNLESS(mesh_material != BranchPointGlow);
 
   GeoMesh mesh;
@@ -752,6 +778,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::BranchPointId& branch_point_id,
                                              const MaterialType& mesh_material) {
+  MALIPUT_DEMAND(rg != nullptr);
   MALIPUT_THROW_UNLESS(mesh_material == BranchPointGlow);
 
   GeoMesh mesh;
@@ -771,6 +798,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::SegmentId& segment_id, const MaterialType& mesh_material) {
+  MALIPUT_DEMAND(rg != nullptr);
   MALIPUT_THROW_UNLESS(mesh_material == Asphalt || mesh_material == GrayedAsphalt);
 
   GeoMesh mesh;
@@ -791,16 +819,6 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 
   return std::make_pair(std::move(mesh), material);
 }
-
-std::string LaneKey(const api::LaneId& id) { return "lane_" + id.string(); }
-
-std::string MarkerKey(const api::LaneId& id) { return "marker_" + id.string(); }
-
-std::string GrayedLaneKey(const api::LaneId& id) { return "grayed_lane_" + id.string(); }
-
-std::string GrayedMarkerKey(const api::LaneId& id) { return "grayed_marker_" + id.string(); }
-
-std::string BranchPointKey(const api::BranchPointId& id) { return "branch_point_" + id.string(); }
 
 RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFeatures& features) {
   RoadGeometryMesh meshes;
