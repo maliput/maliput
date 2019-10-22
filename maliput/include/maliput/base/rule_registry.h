@@ -4,58 +4,83 @@
 #include <vector>
 
 #include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/rule_registry.h"
 
 namespace maliput {
 
-/// Returns DirectionUsage rule type.
-/// Rule::TypeId is equal to "DirectionUsageRuleType".
-/// Values follow:
+/// Returns a Rule::TypeId whose string representation is
+/// "Direction Usage Rule Type".
+api::rules::Rule::TypeId DirectionUsageRuleTypeId();
+
+/// Returns a direction usage rule type and its possible discrete values.
+/// Rule::TypeId is initialized via DirectionUsageRuleTypeId().
+/// Values:
 ///
-/// - WithS: Travel should proceed in the direction of the +S axis.
-/// - AgainstS: Travel should proceed opposite the +S axis direction.
-/// - Bidirectional: Travel is allowed both with the lane direction(+S) or against it.
-/// - BidirectionalTurnOnly: Travel is allowed both with the lane direction(+S) or against it but should be limited in
-///                          duration, e.g. when approaching turns.
+/// - WithS: travel should proceed in the direction of the +S axis.
+/// - AgainstS: travel should proceed opposite the +S axis direction.
+/// - Bidirectional: travel is allowed both with the lane direction(+S) or
+///   against it.
+/// - BidirectionalTurnOnly: travel is allowed both with the lane direction(+S)
+///   or against it but should be limited in duration, e.g. when approaching
+///   turns.
 /// - NoUse: Travel on this lane is prohibited.
 /// - Parking: This lane is used to define a parking area.
 /// - Undefined: There is no defined direction of travel on this lane.
 ///
-/// With api::rules::Rule::State::kStrict strictness level.
-std::pair<api::rules::Rule::TypeId, std::vector<api::rules::DiscreteValueRule::DiscreteValue>>
-BuildDirectionUsageRuleType();
+/// With api::rules::Rule::State::kStrict strictness level. RelatedRules are
+/// empty.
+api::rules::DiscreteValueRuleTypeAndValues BuildDirectionUsageRuleType();
 
-/// Returns RightOfWay rule type.
-/// Rule::TypeId is equal to "RighOfWayRuleType".
+/// Returns a Rule::TypeId whose string representation is
+/// "Right-Of-Way Rule Type".
+api::rules::Rule::TypeId RightOfWayRuleTypeId();
+
+/// Returns a right-of-way rule type and its possible discrete values.
+/// Rule::TypeId is initialized via RightOfWayRuleTypeId().
 /// Discrete values are the combination of values and two strictness levels.
-/// Values follow:
+/// Values:
 ///
-/// - kGo: The vehicle has right-of-way and may proceed if safe to do so.
-/// - kStop: The vehicle does not have right-of-way and must stop.
-/// - kStopThenGo: The vehicle must come to complete stop before entering
+/// - Go: the vehicle has right-of-way and may proceed across the rule's zone.
+/// - Stop: the vehicle does not have right-of-way and must stop prior to
+///   entering the rule's zone.
+/// - StopThenGo: the vehicle must come to complete stop before entering
 ///   controlled zone, but may then proceed if safe.
 ///
 /// Strictness levels are:
 ///
 /// - api::rules::Rule::State::kStrict
 /// - api::rules::Rule::State::kBestEffort
-std::pair<api::rules::Rule::TypeId, std::vector<api::rules::DiscreteValueRule::DiscreteValue>>
-BuildRightOfWayRuleType();
+///
+/// RelatedRules are empty.
+api::rules::DiscreteValueRuleTypeAndValues BuildRightOfWayRuleType();
 
-/// Returns VehicleStopInZoneBehavior rule type.
-/// Rule::TypeId is equal to "VehicleStopInZoneBehaviorRuleType".
-/// Values follow:
+/// Returns a Rule::TypeId whose string representation is
+/// "Vehicle Stop In Zone Behavior Rule Type".
+api::rules::Rule::TypeId VehicleStopInZoneBehaviorRuleTypeId();
+
+/// Returns a vehicle stop in zone behavior rule type and its possible discrete
+/// values.
+/// Rule::TypeId is initialized via VehicleStopInZoneBehaviorRuleTypeId().
+/// Values:
 ///
-/// - DoNotStop: The vehicle is not allowed to stop.
-/// - 5MinuteParking: The vehicle is not allowed to park for five minutes.
-/// - 30MinuteParking: The vehicle is not allowed to park for thirty minutes.
-/// - 45MinuteParking: The vehicle is not allowed to park for forty-five minutes.
-/// - 1HourParking: The vehicle is not allowed to park for one hour.
-/// - 2HourParking: The vehicle is not allowed to park for two hours.
-/// - 4HourParking: The vehicles is not allowed to park for four hours.
-/// - UnrestrictedParking: vehicles are allowed to park without any restriction.
+/// - DoNotStop: the vehicle is not allowed to stop.
+/// - 5MinuteStop: the vehicle is not allowed to park for more than five
+///   minutes.
+/// - 30MinuteStop: the vehicle is not allowed to park for more than five
+///   thirty minutes.
+/// - 45MinuteStop: the vehicle is not allowed to park for more than five
+///   forty-five minutes.
+/// - 1HourStop: the vehicle is not allowed to park for more than five
+///   one hour.
+/// - 2HourStop: the vehicle is not allowed to park for more than five
+///   two hours.
+/// - 4HourStop: the vehicles is not allowed to park for more than five
+///   four hours.
+/// - UnrestrictedParking: vehicles are allowed to park without any duration
+///   restriction.
 ///
-/// With api::rules::Rule::State::kStrict strictness level.
-std::pair<api::rules::Rule::TypeId, std::vector<api::rules::DiscreteValueRule::DiscreteValue>>
-BuildVehicleStopInZoneBehaviorRuleType();
+/// With api::rules::Rule::State::kStrict strictness level. RelatedRules are
+/// empty.
+api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleType();
 
 }  // namespace maliput

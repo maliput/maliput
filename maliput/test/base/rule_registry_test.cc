@@ -1,5 +1,7 @@
 #include "maliput/base/rule_registry.h"
 
+#include <algorithm>
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -13,13 +15,24 @@ namespace maliput {
 namespace test {
 namespace {
 
-// Holds the information to evaluate the rule type build by `builder` function.
+GTEST_TEST(DirectionUsageRuleTypeIdTest, Initialization) {
+  EXPECT_EQ(DirectionUsageRuleTypeId().string(), "Direction Usage Rule Type");
+}
+
+GTEST_TEST(RightOfWayRuleTypeIdTest, Initialization) {
+  EXPECT_EQ(RightOfWayRuleTypeId().string(), "Right-Of-Way Rule Type");
+}
+
+GTEST_TEST(VehicleStopInZoneBehaviorRuleTypeIdTest, Initialization) {
+  EXPECT_EQ(VehicleStopInZoneBehaviorRuleTypeId().string(), "Vehicle Stop In Zone Behavior Rule Type");
+}
+
+// Holds the information to evaluate the rule type built by `builder` function.
 struct BuildDiscreteValueRuleTypeExpectedValues {
   std::string type_id;
   std::vector<int> severities;
   std::vector<std::string> values;
-  std::function<std::pair<api::rules::Rule::TypeId, std::vector<api::rules::DiscreteValueRule::DiscreteValue>>()>
-      builder;
+  std::function<api::rules::DiscreteValueRuleTypeAndValues()> builder;
 };
 
 // Tests build rule type functions.
@@ -38,19 +51,15 @@ class BuildDiscreteValueRuleTypeTest : public ::testing::TestWithParam<BuildDisc
 
 std::vector<BuildDiscreteValueRuleTypeExpectedValues> BuildDiscreteValueRuleTypeTestParameters() {
   return {
-      {"DirectionUsageRuleType",
+      {DirectionUsageRuleTypeId().string(),
        {api::rules::Rule::State::kStrict},
        {"WithS", "AgainstS", "Bidirectional", "BidirectionalTurnOnly", "NoUse", "Parking", "Undefined"},
        BuildDirectionUsageRuleType},
-      {"RightOfWayRuleType",
+      {RightOfWayRuleTypeId().string(),
        {api::rules::Rule::State::kStrict, api::rules::Rule::State::kBestEffort},
-       {
-           "Go",
-           "Stop",
-           "StopAndGo",
-       },
+       {"Go", "Stop", "StopAndGo"},
        BuildRightOfWayRuleType},
-      {"VehicleStopInZoneBehaviorRuleType",
+      {VehicleStopInZoneBehaviorRuleTypeId().string(),
        {api::rules::Rule::State::kStrict},
        {"DoNotStop", "5MinuteParking", "30MinuteParking", "45MinuteParking", "1HourParking", "2HourParking",
         "4HourParking", "UnconstrainedParking"},
@@ -59,8 +68,7 @@ std::vector<BuildDiscreteValueRuleTypeExpectedValues> BuildDiscreteValueRuleType
 }
 
 TEST_P(BuildDiscreteValueRuleTypeTest, EvaluateRuleTypes) {
-  const std::pair<api::rules::Rule::TypeId, std::vector<api::rules::DiscreteValueRule::DiscreteValue>> dut =
-      expectation_.builder();
+  const api::rules::DiscreteValueRuleTypeAndValues dut = expectation_.builder();
 
   EXPECT_EQ(dut.first, api::rules::Rule::TypeId(expectation_.type_id));
   for (const int severity : expectation_.severities) {

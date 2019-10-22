@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <utility>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
@@ -15,6 +16,12 @@
 namespace maliput {
 namespace api {
 namespace rules {
+
+/// Convenient alias for clients that define DiscreteValueRule types.
+using DiscreteValueRuleTypeAndValues = std::pair<Rule::TypeId, std::vector<DiscreteValueRule::DiscreteValue>>;
+
+/// Convenient alias for clients that define RangeValueRule types.
+using RangeValueRuleTypeAndValues = std::pair<Rule::TypeId, std::vector<RangeValueRule::Range>>;
 
 /// A registry for Rule types.
 ///
