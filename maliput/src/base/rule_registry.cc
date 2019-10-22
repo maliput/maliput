@@ -18,4 +18,8 @@ BuildDirectionUsageRuleType() {
        api::rules::MakeDiscreteValue(api::rules::Rule::State::kStrict, empty_related_rules, "Undefined")}};
 }
 
+maliput::api::rules::Rule::TypeId DirectionUsageRuleTypeId() {
+  return maliput::api::rules::Rule::TypeId("DirectionUsageRuleType");
+}
+
 }  // namespace maliput

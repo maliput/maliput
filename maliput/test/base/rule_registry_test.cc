@@ -26,6 +26,11 @@ GTEST_TEST(BuildDirectionUsageRuleTypeTest, BasicTest) {
   }
 }
 
+GTEST_TEST(DirectionUsageRuleTypeIdTest, BasicTest) {
+  const maliput::api::rules::Rule::TypeId dut{DirectionUsageRuleTypeId()};
+  EXPECT_EQ(dut, api::rules::Rule::TypeId("DirectionUsageRuleType"));
+}
+
 }  // namespace
 }  // namespace test
 }  // namespace maliput

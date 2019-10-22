@@ -23,4 +23,8 @@ namespace maliput {
 std::pair<api::rules::Rule::TypeId, std::vector<api::rules::DiscreteValueRule::DiscreteValue>>
 BuildDirectionUsageRuleType();
 
+/// @returns a maliput::api::rules::Rule::TypeId initialized with
+/// "DirectionUsageRuleType".
+maliput::api::rules::Rule::TypeId DirectionUsageRuleTypeId();
+
 }  // namespace maliput
