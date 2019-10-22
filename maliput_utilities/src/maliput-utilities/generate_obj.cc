@@ -820,16 +820,6 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
   return std::make_pair(std::move(mesh), material);
 }
 
-std::string LaneKey(const api::LaneId& id) { return "lane_" + id.string(); }
-
-std::string MarkerKey(const api::LaneId& id) { return "marker_" + id.string(); }
-
-std::string GrayedLaneKey(const api::LaneId& id) { return "grayed_lane_" + id.string(); }
-
-std::string GrayedMarkerKey(const api::LaneId& id) { return "grayed_marker_" + id.string(); }
-
-std::string BranchPointKey(const api::BranchPointId& id) { return "branch_point_" + id.string(); }
-
 RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFeatures& features) {
   RoadGeometryMesh meshes;
 
