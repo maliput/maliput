@@ -76,13 +76,13 @@ class TypeSpecificIdentifier {
 
 namespace std {
 
-/// Specialization of std::hash for TypeSpecificIdentifier<T>.
+/// Specialization of std::hash for maliput::api::TypeSpecificIdentifier<T>.
 template <typename T>
 struct hash<maliput::api::TypeSpecificIdentifier<T>> : public drake::DefaultHash {};
 
-/// Specialization of std::less for TypeSpecificIdentifier<T> providing a
-/// strict ordering over TypeSpecificIdentifier<T> suitable for use with ordered
-/// containers.
+/// Specialization of std::less for maliput::api::TypeSpecificIdentifier<T>
+/// providing a strict ordering over maliput::api::TypeSpecificIdentifier<T>
+/// suitable for use with ordered containers.
 template <typename T>
 struct less<maliput::api::TypeSpecificIdentifier<T>> {
   bool operator()(const maliput::api::TypeSpecificIdentifier<T>& lhs,

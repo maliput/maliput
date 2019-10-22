@@ -11,6 +11,7 @@
 #include "drake/common/hash.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/api/unique_id.h"
 #include "maliput/common/passkey.h"
 
 namespace maliput {
@@ -353,31 +354,32 @@ class TrafficLight final {
 /// Uniquely identifies a bulb in the world. This consists of the concatenation
 /// of the bulb's ID, the ID of the bulb group that contains the bulb, and the
 /// the ID of the traffic light that contains the bulb group.
-struct UniqueBulbId {
+///
+/// String representation of this ID is:
+/// "`traffic_light_id().string()`-`bulb_group_id.string()`-`bulb_group_id.string()`"
+///
+/// @see UniqueBulbId::delimiter() as it provides the "-" string in between IDs.
+class UniqueBulbId : public UniqueId {
+ public:
   /// A default constructor. This was originally intended for use by
   /// boost::python bindings in downstream projects.
   UniqueBulbId()
-      : traffic_light_id(TrafficLight::Id("default")),
-        bulb_group_id(BulbGroup::Id("default")),
-        bulb_id(Bulb::Id("default")){};
+      : UniqueId("default" + delimiter() + "default" + delimiter() + "default"),
+        traffic_light_id_(TrafficLight::Id("default")),
+        bulb_group_id_(BulbGroup::Id("default")),
+        bulb_id_(Bulb::Id("default")){};
 
   /// Constructs a UniqueBulbId.
-  UniqueBulbId(const TrafficLight::Id& traffic_light_id_in, const BulbGroup::Id& bulb_group_id_in,
-               const Bulb::Id& bulb_id_in)
-      : traffic_light_id(traffic_light_id_in), bulb_group_id(bulb_group_id_in), bulb_id(bulb_id_in) {}
-
-  /// Returns the string representation of this UniqueBulbId following the
-  /// format:
-  /// "`traffic_light_id.string()`-`bulb_group_id.string()`-`bulb_group_id.string()`"
-  ///
-  /// @see delimiter() as it provides the "-" string in between IDs.
-  const std::string to_string() const {
-    return traffic_light_id.string() + delimiter() + bulb_group_id.string() + delimiter() + bulb_id.string();
-  }
+  UniqueBulbId(const TrafficLight::Id& traffic_light_id, const BulbGroup::Id& bulb_group_id, const Bulb::Id& bulb_id)
+      : UniqueId(traffic_light_id.string() + delimiter() + bulb_group_id.string() + delimiter() + bulb_id.string()),
+        traffic_light_id_(traffic_light_id),
+        bulb_group_id_(bulb_group_id),
+        bulb_id_(bulb_id) {}
 
   /// Tests for equality with another UniqueBulbId.
   bool operator==(const UniqueBulbId& rhs) const {
-    return traffic_light_id == rhs.traffic_light_id && bulb_group_id == rhs.bulb_group_id && bulb_id == rhs.bulb_id;
+    return traffic_light_id_ == rhs.traffic_light_id_ && bulb_group_id_ == rhs.bulb_group_id_ &&
+           bulb_id_ == rhs.bulb_id_;
   }
 
   /// Tests for inequality with another UniqueBulbId, specifically
@@ -388,17 +390,24 @@ struct UniqueBulbId {
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const UniqueBulbId& id) noexcept {
     using drake::hash_append;
-    hash_append(hasher, id.traffic_light_id);
-    hash_append(hasher, id.bulb_group_id);
-    hash_append(hasher, id.bulb_id);
+    hash_append(hasher, id.traffic_light_id_);
+    hash_append(hasher, id.bulb_group_id_);
+    hash_append(hasher, id.bulb_id_);
   }
+
+  const TrafficLight::Id traffic_light_id() const { return traffic_light_id_; }
+
+  const BulbGroup::Id bulb_group_id() const { return bulb_group_id_; }
+
+  const Bulb::Id bulb_id() const { return bulb_id_; }
 
   /// Returns "-", the string delimiter to separate IDs.
   static const std::string delimiter();
 
-  TrafficLight::Id traffic_light_id;
-  BulbGroup::Id bulb_group_id;
-  Bulb::Id bulb_id;
+ private:
+  TrafficLight::Id traffic_light_id_;
+  BulbGroup::Id bulb_group_id_;
+  Bulb::Id bulb_id_;
 };
 
 }  // namespace rules
@@ -417,15 +426,15 @@ struct hash<maliput::api::rules::UniqueBulbId> : public drake::DefaultHash {};
 template <>
 struct less<maliput::api::rules::UniqueBulbId> {
   bool operator()(const maliput::api::rules::UniqueBulbId& lhs, const maliput::api::rules::UniqueBulbId& rhs) const {
-    if (lhs.traffic_light_id.string() < rhs.traffic_light_id.string()) {
+    if (lhs.traffic_light_id().string() < rhs.traffic_light_id().string()) {
       return true;
     }
-    if (lhs.traffic_light_id.string() > rhs.traffic_light_id.string()) {
+    if (lhs.traffic_light_id().string() > rhs.traffic_light_id().string()) {
       return false;
     }
-    if (lhs.bulb_group_id.string() < rhs.bulb_group_id.string()) return true;
-    if (lhs.bulb_group_id.string() > rhs.bulb_group_id.string()) return false;
-    return lhs.bulb_id.string() < rhs.bulb_id.string();
+    if (lhs.bulb_group_id().string() < rhs.bulb_group_id().string()) return true;
+    if (lhs.bulb_group_id().string() > rhs.bulb_group_id().string()) return false;
+    return lhs.bulb_id().string() < rhs.bulb_id().string();
   }
 };
 
