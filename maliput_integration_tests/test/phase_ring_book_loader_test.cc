@@ -14,6 +14,7 @@
 #include "maliput/base/road_rulebook_loader.h"
 #include "maliput/base/traffic_light_book_loader.h"
 #include "maliput/common/filesystem.h"
+#include "maliput/test_utilities/phases_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 #include "multilane/builder.h"
 #include "multilane/loader.h"

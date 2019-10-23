@@ -4,6 +4,7 @@
 
 #include "maliput/api/lane_data.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
+#include "maliput/test_utilities/traffic_lights_compare.h"
 
 namespace maliput {
 namespace {

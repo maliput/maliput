@@ -19,6 +19,9 @@ namespace test {
 /// literal expressions for `e1` and `e2` will be provided to `IsEqual()`.
 #define MALIPUT_REGIONS_IS_EQUAL(e1, e2) ::maliput::api::test::IsEqual(#e1, #e2, e1, e2)
 
+// TODO(agalbachicar)  This should be replaced by a generic predicate
+//                     which handles anything with operator==.
+
 /// Predicate-formatter which tests equality of SRange.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const SRange& a,
                                           const SRange& b) {

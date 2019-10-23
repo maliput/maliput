@@ -13,6 +13,7 @@ namespace test {
 
 // TODO(maddog@tri.global)  This should be replaced by a generic predicate
 //                          which handles anything with operator==.
+
 /// Predicate-formatter which tests equality of RightOfWayRule::ZoneType.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    rules::RightOfWayRule::ZoneType a, rules::RightOfWayRule::ZoneType b);
