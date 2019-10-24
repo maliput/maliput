@@ -14,8 +14,8 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/traffic_lights.h"
-#include "maliput/base/traffic_light_book_loader.h"
 #include "maliput/base/rule_registry.h"
+#include "maliput/base/traffic_light_book_loader.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
@@ -230,16 +230,16 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
 
     EXPECT_NE(rulebook, nullptr);
     // Check that discrete value rule from vehicle stop in zone behaviour rule type was created.
-    const DiscreteValueRule vehicle_stop_in_zone_discrete_rule = rulebook->GetDiscreteValueRule(
-        GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.id()));
+    const DiscreteValueRule vehicle_stop_in_zone_discrete_rule =
+        rulebook->GetDiscreteValueRule(GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.id()));
     // Compare values.
     EXPECT_TRUE(right_of_way_rule.zone().length() == vehicle_stop_in_zone_discrete_rule.zone().length());
     EXPECT_TRUE(vehicle_stop_in_zone_discrete_rule.values().size() == 1);
     EXPECT_TRUE(Rule::State::kStrict == vehicle_stop_in_zone_discrete_rule.values()[0].severity);
     EXPECT_TRUE(vehicle_stop_in_zone_discrete_rule.values()[0].related_rules.size() == 0);
-    EXPECT_EQ(right_of_way_rule.zone_type() == RightOfWayRule::ZoneType::kStopExcluded
-                  ? "DoNotStop" : "UnconstrainedParking",
-              vehicle_stop_in_zone_discrete_rule.values()[0].value);
+    EXPECT_EQ(
+        right_of_way_rule.zone_type() == RightOfWayRule::ZoneType::kStopExcluded ? "DoNotStop" : "UnconstrainedParking",
+        vehicle_stop_in_zone_discrete_rule.values()[0].value);
 
     // Check that discrete value rule from right of way rule type was created.
     const DiscreteValueRule right_of_way_discrete_rule =
@@ -259,12 +259,10 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
       EXPECT_EQ(discrete_value_ptr->related_rules.at(VehicleStopInZoneBehaviorRuleTypeId().string())[0],
                 GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.id()));
       for (const auto yield_id : state.second.yield_to()) {
-        auto it = std::find(
-                discrete_value_ptr->related_rules.at(YieldGroup()).begin(), 
-                discrete_value_ptr->related_rules.at(YieldGroup()).end(), 
-                GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
-        EXPECT_NE(it,
-            discrete_value_ptr->related_rules.at(YieldGroup()).end());        
+        auto it = std::find(discrete_value_ptr->related_rules.at(YieldGroup()).begin(),
+                            discrete_value_ptr->related_rules.at(YieldGroup()).end(),
+                            GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
+        EXPECT_NE(it, discrete_value_ptr->related_rules.at(YieldGroup()).end());
       }
     }
   }
