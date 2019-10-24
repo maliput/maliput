@@ -54,6 +54,6 @@ api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleTyp
       GenerateEveryCombination({api::rules::Rule::State::kStrict}, state_values));
 }
 
-std::string YieldGroup() { return "YieldGroup"; }
+std::string RightOfWayYieldGroup() { return "YieldGroup"; }
 
 }  // namespace maliput
