@@ -809,7 +809,6 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
       features.off_grid_mesh_generation
           ? linear_tolerance
           : PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
-  
   GeoMesh segment_mesh;
   CoverLaneWithQuads(&segment_mesh, segment->lane(0), base_grid_unit, true /* use_segment_bounds */,
                      [](double, double) { return 0.; }, features.off_grid_mesh_generation);
