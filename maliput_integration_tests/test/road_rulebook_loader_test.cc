@@ -218,7 +218,7 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
     return maliput::api::rules::Rule::Id(rule_type_id.string() + "/" + right_of_way_rule_id.string());
   }
 
-  // Verifies that for each RightOfWayRule two DiscreteValueRule of types Right-Of-Way and
+  // Verifies that for each RightOfWayRule two DiscreteValueRules of types Right-Of-Way and
   // Vehicle Stop In Zone Behavior Rule Types are created.
   void VerifyDiscreteValueRuleEquivalents(const api::rules::RoadRulebook* rulebook,
                                           const RightOfWayRule& right_of_way_rule) {
@@ -233,21 +233,21 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
     const DiscreteValueRule vehicle_stop_in_zone_discrete_rule =
         rulebook->GetDiscreteValueRule(GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.id()));
     // Compare values.
-    EXPECT_DOUBLE_EQ(right_of_way_rule.zone().length(), vehicle_stop_in_zone_discrete_rule.zone().length());
+    EXPECT_DOUBLE_EQ(vehicle_stop_in_zone_discrete_rule.zone().length(), right_of_way_rule.zone().length());
     EXPECT_EQ(vehicle_stop_in_zone_discrete_rule.values().size(), 1);
-    EXPECT_EQ(Rule::State::kStrict, {vehicle_stop_in_zone_discrete_rule.values()[0].severity});
+    EXPECT_EQ(vehicle_stop_in_zone_discrete_rule.values()[0].severity, {Rule::State::kStrict});
     EXPECT_TRUE(vehicle_stop_in_zone_discrete_rule.values()[0].related_rules.empty());
     if (right_of_way_rule.zone_type() == RightOfWayRule::ZoneType::kStopExcluded) {
-      EXPECT_EQ("DoNotStop", vehicle_stop_in_zone_discrete_rule.values()[0].value);
+      EXPECT_EQ(vehicle_stop_in_zone_discrete_rule.values()[0].value, "DoNotStop");
     } else {
-      EXPECT_EQ("UnconstrainedParking", vehicle_stop_in_zone_discrete_rule.values()[0].value);
+      EXPECT_EQ(vehicle_stop_in_zone_discrete_rule.values()[0].value, "UnconstrainedParking");
     }
 
     // Check that discrete value rule from the right of way rule type was created.
     const DiscreteValueRule right_of_way_discrete_rule =
         rulebook->GetDiscreteValueRule(GetRuleIdFrom(RightOfWayRuleTypeId(), right_of_way_rule.id()));
 
-    EXPECT_DOUBLE_EQ(right_of_way_rule.zone().length(), right_of_way_discrete_rule.zone().length());
+    EXPECT_DOUBLE_EQ(right_of_way_discrete_rule.zone().length(), right_of_way_rule.zone().length());
     // Check the matching between right of way rules and discrete value rules.
     for (const auto& state : right_of_way_rule.states()) {
       // Check if the state of the RightOfWayRule has correspondence with the value of the DiscreteValueRule.
