@@ -83,4 +83,8 @@ api::rules::Rule::TypeId VehicleStopInZoneBehaviorRuleTypeId();
 /// empty.
 api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleType();
 
+/// Returns "YieldGroup", which is the key used in DiscreteValue::RelatedRules
+/// by Right-Of-Way rules to yield to other rules.
+std::string RightOfWayYieldGroup();
+
 }  // namespace maliput

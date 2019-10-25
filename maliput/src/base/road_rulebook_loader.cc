@@ -9,8 +9,10 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/direction_usage_rule.h"
+#include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/manual_rulebook.h"
+#include "maliput/base/rule_registry.h"
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_throw.h"
 
@@ -21,7 +23,9 @@ using maliput::api::LaneSRoute;
 using maliput::api::SRange;
 using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
+using maliput::api::rules::DiscreteValueRule;
 using maliput::api::rules::RightOfWayRule;
+using maliput::api::rules::Rule;
 using maliput::api::rules::TrafficLight;
 
 namespace YAML {
@@ -279,6 +283,46 @@ RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry, const
 
   return RightOfWayRule(rule_id, zone, BuildRightOfWayZoneType(rule_node), states, BuildRelatedBulbGroups(rule_node));
 }
+
+Rule::Id GetRuleIdFrom(const Rule::TypeId& rule_type_id, const RightOfWayRule::Id& right_of_way_rule_id) {
+  return maliput::api::rules::Rule::Id(rule_type_id.string() + "/" + right_of_way_rule_id.string());
+}
+
+DiscreteValueRule BuildVehicleStopInZoneBehaviourDiscreteValueRule(const RightOfWayRule& right_of_way_rule) {
+  return DiscreteValueRule(GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.id()),
+                           VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.zone(),
+                           {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{},
+                                              right_of_way_rule.zone_type() == RightOfWayRule::ZoneType::kStopExcluded
+                                                  ? "DoNotStop"
+                                                  : "UnconstrainedParking")});
+}
+
+DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& right_of_way_rule,
+                                                       const DiscreteValueRule::Id& vehicle_stop_in_zone_rule_id) {
+  const std::unordered_map<RightOfWayRule::State::Type, std::string> right_of_way_rule_state_types{
+      {RightOfWayRule::State::Type::kGo, "Go"},
+      {RightOfWayRule::State::Type::kStop, "Stop"},
+      {RightOfWayRule::State::Type::kStopThenGo, "StopThenGo"},
+  };
+  std::vector<DiscreteValueRule::DiscreteValue> discrete_values;
+  for (const auto& state : right_of_way_rule.states()) {
+    Rule::RelatedRules related_rules;
+    related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{VehicleStopInZoneBehaviorRuleTypeId().string(),
+                                                                        {vehicle_stop_in_zone_rule_id}});
+    std::vector<Rule::Id> rule_ids{};
+    for (const auto& yield_id : state.second.yield_to()) {
+      rule_ids.push_back(GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
+    }
+    if (rule_ids.size()) {
+      related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{RightOfWayYieldGroup(), rule_ids});
+    }
+    discrete_values.push_back(api::rules::MakeDiscreteValue(Rule::State::kStrict, related_rules,
+                                                            right_of_way_rule_state_types.at(state.second.type())));
+  }
+  return DiscreteValueRule(GetRuleIdFrom(RightOfWayRuleTypeId(), right_of_way_rule.id()), RightOfWayRuleTypeId(),
+                           right_of_way_rule.zone(), discrete_values);
+}
+
 }  // namespace
 
 // DirectionUsageRule loading
@@ -325,7 +369,13 @@ std::unique_ptr<api::rules::RoadRulebook> BuildFrom(const api::RoadGeometry* roa
   MALIPUT_THROW_UNLESS(right_of_way_rules_node.IsSequence());
   std::unique_ptr<ManualRulebook> rulebook = std::make_unique<ManualRulebook>();
   for (const YAML::Node& right_of_way_rule_node : right_of_way_rules_node) {
-    rulebook->AddRule(BuildRightOfWayRule(road_geometry, right_of_way_rule_node));
+    const RightOfWayRule right_of_way_rule{BuildRightOfWayRule(road_geometry, right_of_way_rule_node)};
+    const DiscreteValueRule vehicle_stop_in_zone_behaviour_discrete_value_rule{
+        BuildVehicleStopInZoneBehaviourDiscreteValueRule(right_of_way_rule)};
+    rulebook->AddRule(right_of_way_rule);
+    rulebook->AddRule(vehicle_stop_in_zone_behaviour_discrete_value_rule);
+    rulebook->AddRule(BuildRightOfWayTypeDiscreteValueRule(right_of_way_rule,
+                                                           vehicle_stop_in_zone_behaviour_discrete_value_rule.id()));
   }
   const YAML::Node& direction_usage_rules_node = rulebook_node["DirectionUsageRules"];
   MALIPUT_THROW_UNLESS(direction_usage_rules_node.IsDefined());
