@@ -16,7 +16,8 @@ std::vector<maliput::api::rules::Rule::Id> GetCurrentYieldGroup(
     const maliput::api::rules::DiscreteValueRule& discrete_value_rule,
     const maliput::api::rules::DiscreteValueRuleStateProvider* state_provider) {
   MALIPUT_THROW_UNLESS(state_provider != nullptr);
-  drake::optional<maliput::api::rules::DiscreteValueRuleStateProvider::StateResult> state_result{
+  MALIPUT_THROW_UNLESS(discrete_value_rule.type_id() == RightOfWayRuleTypeId());
+  const drake::optional<maliput::api::rules::DiscreteValueRuleStateProvider::StateResult> state_result{
       state_provider->GetState(discrete_value_rule.id())};
   MALIPUT_THROW_UNLESS(state_result != drake::nullopt);
   return GetYieldGroup(state_result->state);

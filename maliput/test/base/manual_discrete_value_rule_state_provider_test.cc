@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include <map>
+
 #include <gtest/gtest.h>
 
 #include "maliput/api/regions.h"
@@ -102,17 +104,18 @@ class GetCurrentYieldGroupTest : public ::testing::Test {
   void SetUp() override {
     road_rulebook_ = std::make_unique<ManualRulebook>();
     road_rulebook_->AddRule(DiscreteValueRule{kRuleId, kTypeId, kLaneSRoute, {kStateDiscreteValue}});
-    discrete_value_rule_state_provider.reset(new maliput::ManualDiscreteValueRuleStateProvider(road_rulebook_.get()));
-    discrete_value_rule_state_provider->SetState(kRuleId, kStateDiscreteValue, drake::nullopt, drake::nullopt);
+    discrete_value_rule_state_provider_ = std::make_unique<ManualDiscreteValueRuleStateProvider>(road_rulebook_.get());
+    discrete_value_rule_state_provider_->SetState(kRuleId, kStateDiscreteValue, drake::nullopt, drake::nullopt);
   }
+
   std::unique_ptr<ManualRulebook> road_rulebook_;
-  std::unique_ptr<maliput::ManualDiscreteValueRuleStateProvider> discrete_value_rule_state_provider;
+  std::unique_ptr<maliput::ManualDiscreteValueRuleStateProvider> discrete_value_rule_state_provider_;
 };
 
 // Tests GetCurrentYieldGroup function.
 TEST_F(GetCurrentYieldGroupTest, GetCurrentYieldGroup) {
-  const DiscreteValueRule discrete_value_rule{road_rulebook_->GetDiscreteValueRule(kRuleId)};
-  std::vector<Rule::Id> dut{GetCurrentYieldGroup(discrete_value_rule, discrete_value_rule_state_provider.get())};
+  const std::vector<Rule::Id> dut{
+      GetCurrentYieldGroup(road_rulebook_->GetDiscreteValueRule(kRuleId), discrete_value_rule_state_provider_.get())};
 
   EXPECT_EQ(dut.size(), expected_yield_group.size());
   for (const auto& expected_yield_id : expected_yield_group) {
