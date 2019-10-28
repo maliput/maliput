@@ -16,6 +16,7 @@ set(BASE_SOURCES
   phase_ring_book_loader.cc
   road_rulebook_loader.cc
   rule_registry.cc
+  rule_tools.cc
   traffic_light_book.cc
   traffic_light_book_loader.cc
   )
