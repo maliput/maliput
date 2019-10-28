@@ -106,6 +106,11 @@ std::vector<const Bulb*> BulbGroup::bulbs() const {
   return bulb_ptrs;
 }
 
+UniqueBulbGroupId BulbGroup::unique_id() const {
+  MALIPUT_THROW_UNLESS(traffic_light_ != nullptr);
+  return UniqueBulbGroupId(traffic_light_->id(), id_);
+}
+
 TrafficLight::TrafficLight(const TrafficLight::Id& id, const GeoPosition& position_road_network,
                            const Rotation& orientation_road_network,
                            std::vector<std::unique_ptr<BulbGroup>> bulb_groups)
@@ -142,6 +147,8 @@ const BulbGroup* TrafficLight::GetBulbGroup(const BulbGroup::Id& id) const {
 }
 
 const std::string UniqueBulbId::delimiter() { return "-"; }
+
+const std::string UniqueBulbGroupId::delimiter() { return "-"; }
 
 }  // namespace rules
 }  // namespace api

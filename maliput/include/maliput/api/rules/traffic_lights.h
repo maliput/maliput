@@ -199,6 +199,9 @@ class Bulb final {
   const BulbGroup* bulb_group_{};
 };
 
+/// Forward declaration of `UniqueBulbGroupId` to be used by `BulbGroup`.
+struct UniqueBulbGroupId;
+
 /// Forward declaration of `TrafficLight` to be used by `BulbGroup`.
 class TrafficLight;
 
@@ -215,7 +218,8 @@ class BulbGroup final {
   /// Constructs a BulbGroup instance.
   ///
   /// @param id The bulb group's ID. It must be unique in the context of the
-  ///        TrafficLight that contains it.
+  /// TrafficLight that contains it. @see UniqueBulbGroupId to uniquely identify
+  /// a BulbGroup in the world.
   ///
   /// @param position_traffic_light The linear offset of this bulb group's frame
   /// relative to the frame of the traffic light that contains it. The origin of
@@ -241,6 +245,12 @@ class BulbGroup final {
 
   /// Returns this BulbGroup instance's unique identifier.
   const Id& id() const { return id_; }
+
+  /// Returns this BulbGroup instance's unique identifier.
+  ///
+  /// @throws common::assertion_error When the parent TrafficLight has not been
+  /// registered. @see SetTrafficLight().
+  UniqueBulbGroupId unique_id() const;
 
   /// Returns the linear offset of this bulb group's frame relative to the
   /// frame of the traffic light that contains it.
@@ -410,6 +420,59 @@ class UniqueBulbId : public UniqueId {
   Bulb::Id bulb_id_;
 };
 
+/// Uniquely identifies a bulb group in the world. This consists of the
+/// concatenation of the ID of the bulb group, and the ID of the traffic
+/// light that contains the bulb group.
+///
+/// String representation of this ID is:
+/// "`traffic_light_id().string()`-`bulb_group_id.string()`"
+///
+/// @see UniqueBulbGroupId::delimiter() as it provides the "-" string in between
+/// IDs.
+class UniqueBulbGroupId : public UniqueId {
+ public:
+  /// A default constructor. This was originally intended for use by
+  /// boost::python bindings in downstream projects.
+  UniqueBulbGroupId()
+      : UniqueId("default" + delimiter() + "default"),
+        traffic_light_id_(TrafficLight::Id("default")),
+        bulb_group_id_(BulbGroup::Id("default")) {}
+
+  /// Constructs a UniqueBulbGroupId.
+  UniqueBulbGroupId(const TrafficLight::Id& traffic_light_id, const BulbGroup::Id& bulb_group_id)
+      : UniqueId(traffic_light_id.string() + delimiter() + bulb_group_id.string()),
+        traffic_light_id_(traffic_light_id),
+        bulb_group_id_(bulb_group_id) {}
+
+  /// Tests for equality with another UniqueBulbGroupId.
+  bool operator==(const UniqueBulbGroupId& rhs) const {
+    return traffic_light_id_ == rhs.traffic_light_id_ && bulb_group_id_ == rhs.bulb_group_id_;
+  }
+
+  /// Tests for inequality with another UniqueBulbGroupId, specifically
+  /// returning the opposite of operator==().
+  bool operator!=(const UniqueBulbGroupId& rhs) const { return !(*this == rhs); }
+
+  TrafficLight::Id traffic_light_id() const { return traffic_light_id_; }
+
+  BulbGroup::Id bulb_group_id() const { return bulb_group_id_; }
+
+  /// Implements the @ref hash_append concept.
+  template <class HashAlgorithm>
+  friend void hash_append(HashAlgorithm& hasher, const UniqueBulbGroupId& id) noexcept {
+    using drake::hash_append;
+    hash_append(hasher, id.traffic_light_id_);
+    hash_append(hasher, id.bulb_group_id_);
+  }
+
+  /// Returns "-", the string delimiter to separate IDs.
+  static const std::string delimiter();
+
+ private:
+  TrafficLight::Id traffic_light_id_;
+  BulbGroup::Id bulb_group_id_;
+};
+
 }  // namespace rules
 }  // namespace api
 }  // namespace maliput
@@ -435,6 +498,27 @@ struct less<maliput::api::rules::UniqueBulbId> {
     if (lhs.bulb_group_id().string() < rhs.bulb_group_id().string()) return true;
     if (lhs.bulb_group_id().string() > rhs.bulb_group_id().string()) return false;
     return lhs.bulb_id().string() < rhs.bulb_id().string();
+  }
+};
+
+/// Specialization of std::hash for maliput::api::rules::UniqueBulbGroupId.
+template <>
+struct hash<maliput::api::rules::UniqueBulbGroupId> : public drake::DefaultHash {};
+
+/// Specialization of std::less for maliput::api::rules::UniqueBulbGroupId
+/// providing a strict ordering over maliput::api::rules::UniqueBulbGroupId
+/// suitable for use with ordered containers.
+template <>
+struct less<maliput::api::rules::UniqueBulbGroupId> {
+  bool operator()(const maliput::api::rules::UniqueBulbGroupId& lhs,
+                  const maliput::api::rules::UniqueBulbGroupId& rhs) const {
+    if (lhs.traffic_light_id().string() < rhs.traffic_light_id().string()) {
+      return true;
+    }
+    if (lhs.traffic_light_id().string() > rhs.traffic_light_id().string()) {
+      return false;
+    }
+    return lhs.bulb_group_id().string() < rhs.bulb_group_id().string();
   }
 };
 
