@@ -80,41 +80,39 @@ TEST_F(ManualDiscreteRuleStateProviderTest, SetStateTest) {
   EXPECT_EQ(result->next->duration_until.value(), kDurationUntil);
 }
 
-api::rules::Rule::RelatedRules CreateRightOfWayRelatedRule() {
+api::rules::Rule::RelatedRules CreateRightOfWayRelatedRules() {
   return std::map<std::string, std::vector<api::rules::Rule::Id>>{
       {VehicleStopInZoneBehaviorRuleTypeId().string(),
-       {api::rules::Rule::Id{VehicleStopInZoneBehaviorRuleTypeId().string() + "/" + "test_id"}}},
+       {api::rules::Rule::Id{VehicleStopInZoneBehaviorRuleTypeId().string() + "/" + "test_id_a"}}},
       {RightOfWayYieldGroup(),
-       {api::rules::Rule::Id{RightOfWayRuleTypeId().string() + "/" + "test_yield_id_1"},
-        api::rules::Rule::Id{RightOfWayRuleTypeId().string() + "/" + "test_yield_id_2"}}},
+       {api::rules::Rule::Id{RightOfWayRuleTypeId().string() + "/" + "test_id_b"},
+        api::rules::Rule::Id{RightOfWayRuleTypeId().string() + "/" + "test_id_c"}}},
   };
 }
 
 class GetCurrentYieldGroupTest : public ::testing::Test {
  protected:
-  const Rule::Id kRuleId{RightOfWayRuleTypeId().string() + "/right_of_way_rule_id"};
   const Rule::TypeId kTypeId{RightOfWayRuleTypeId()};
+  const Rule::Id kRuleId{kTypeId.string() + "/right_of_way_rule_id"};
   const LaneSRoute kLaneSRoute{LaneSRoute{{LaneSRange{LaneId{"lane_id"}, {0., 10.}}}}};
   const DiscreteValueRule::DiscreteValue kStateDiscreteValue{
-      MakeDiscreteValue(Rule::State::kStrict, CreateRightOfWayRelatedRule(), "test_value_state")};
-  const std::vector<Rule::Id> expected_yield_group{CreateRightOfWayRelatedRule().at(RightOfWayYieldGroup())};
+      MakeDiscreteValue(Rule::State::kStrict, CreateRightOfWayRelatedRules(), "StopAndGo")};
+  const std::vector<Rule::Id> expected_yield_group{CreateRightOfWayRelatedRules().at(RightOfWayYieldGroup())};
 
   void SetUp() override {
+    road_rulebook_ = std::make_unique<ManualRulebook>();
     road_rulebook_->AddRule(DiscreteValueRule{kRuleId, kTypeId, kLaneSRoute, {kStateDiscreteValue}});
+    discrete_value_rule_state_provider.reset(new maliput::ManualDiscreteValueRuleStateProvider(road_rulebook_.get()));
+    discrete_value_rule_state_provider->SetState(kRuleId, kStateDiscreteValue, drake::nullopt, drake::nullopt);
   }
-
-  std::unique_ptr<ManualRulebook> road_rulebook_ = std::make_unique<ManualRulebook>();
-  //--CHECK. What is the difference with:
-  // std::unique_ptr<ManualRulebook> road_rulebook_;
+  std::unique_ptr<ManualRulebook> road_rulebook_;
+  std::unique_ptr<maliput::ManualDiscreteValueRuleStateProvider> discrete_value_rule_state_provider;
 };
 
-// TODO docstring
+// Tests GetCurrentYieldGroup function.
 TEST_F(GetCurrentYieldGroupTest, GetCurrentYieldGroup) {
-  maliput::ManualDiscreteValueRuleStateProvider discrete_value_rule_state_provider{road_rulebook_.get()};
-  discrete_value_rule_state_provider.SetState(kRuleId, kStateDiscreteValue, drake::nullopt,
-                                              drake::nullopt);  // --CHECK. No nextstate?
   const DiscreteValueRule discrete_value_rule{road_rulebook_->GetDiscreteValueRule(kRuleId)};
-  std::vector<Rule::Id> dut{maliput::GetCurrentYieldGroup(discrete_value_rule, &discrete_value_rule_state_provider)};
+  std::vector<Rule::Id> dut{GetCurrentYieldGroup(discrete_value_rule, discrete_value_rule_state_provider.get())};
 
   EXPECT_EQ(dut.size(), expected_yield_group.size());
   for (const auto& expected_yield_id : expected_yield_group) {
