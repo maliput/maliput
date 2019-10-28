@@ -125,6 +125,80 @@ void CheckRelatedBulbGroups(const RoadNetwork& road_network) {
   }
 }
 
+// Walks through all rules::Phases in rules::PhaseRingBook and calls
+// `evaluate_phase`.
+//
+// `evaluate_phase` is a functor that throws if rules::Phase is invalid.
+//
+// @throws common::assertion_error When querying for a rules::PhaseRing to
+// `road_network.phase_ring_book()` returns nullopt.
+void WalkPhases(const RoadNetwork& road_network, std::function<void(const rules::Phase&)> evaluate_phase) {
+  const rules::PhaseRingBook* phase_ring_book = road_network.phase_ring_book();
+  MALIPUT_THROW_UNLESS(phase_ring_book != nullptr);
+  const std::vector<rules::PhaseRing::Id> phase_ring_ids = phase_ring_book->GetPhaseRings();
+  for (const rules::PhaseRing::Id& phase_ring_id : phase_ring_ids) {
+    const drake::optional<rules::PhaseRing> phase_ring = phase_ring_book->GetPhaseRing(phase_ring_id);
+    MALIPUT_THROW_UNLESS(phase_ring.has_value());
+    for (const auto& phase_id_phase : phase_ring->phases()) {
+      evaluate_phase(phase_id_phase.second);
+    }
+  }
+}
+
+// Evaluates that every rules::DiscreteValueRuleStates contained in
+// rules::Phases reference rules::Rules in `road_network.rulebook()` and their
+// values.
+void CheckPhaseDiscreteValueRuleStates(const RoadNetwork& road_network) {
+  auto evaluate_phase = [rulebook = road_network.rulebook()](const rules::Phase& phase) {
+    for (const auto& rule_id_value : phase.discrete_value_rule_states()) {
+      const rules::DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id_value.first);
+      if (std::find(rule.values().begin(), rule.values().end(), rule_id_value.second) == rule.values().end()) {
+        MALIPUT_THROW_MESSAGE("DiscreteValueRuleStates have an unknown DiscreteValue referenced by Rule(id: " +
+                              rule.id().string() + ") in Phase(id: " + phase_id_value.first.string() + ")");
+      }
+    }
+  };
+  WalkPhases(road_network, evaluate_phase);
+}
+
+// Evaluates that every rules::BulbStates contained in rules::Phases reference
+// rules::Bulbs in `road_network.traffic_light_book()`.
+void CheckPhasesBulbStates(const RoadNetwork& road_network) {
+  auto evaluate_phase = [traffic_light_book = road_network.traffic_light_book()](const rules::Phase& phase) {
+    if (!phase.bulb_states().has_value()) {
+      return;
+    }
+    for (const auto& unique_bulb_id_state : *phase.bulb_states()) {
+      const rules::TrafficLight* traffic_light =
+          traffic_light_book->GetTrafficLight(unique_bulb_id_state.first.traffic_light_id());
+      if (traffic_light == nullptr) {
+        MALIPUT_THROW_MESSAGE("TrafficLight(id: " + unique_bulb_id_state.first.traffic_light_id().string() +
+                              "), which is referenced by Phase(id: " + phase.id().string() +
+                              ") does not exist in TrafficLightBook.");
+      }
+      const rules::BulbGroup* bulb_group = traffic_light->GetBulbGroup(unique_bulb_id_state.first.bulb_group_id());
+      if (bulb_group == nullptr) {
+        MALIPUT_THROW_MESSAGE("BulbGroup(id: " + unique_bulb_id_state.first.bulb_group_id().string() +
+                              "), which is referenced by Phase(id: " + phase.id().string() +
+                              ") does not exist in TrafficLightBook.");
+      }
+      const rules::Bulb* bulb = bulb_group->GetBulb(unique_bulb_id_state.first.bulb_id());
+      if (bulb == nullptr) {
+        MALIPUT_THROW_MESSAGE("Bulb(id: " + unique_bulb_id_state.first.bulb_id().string() +
+                              "), which is referenced by Phase(id: " + phase.id().string() +
+                              ") does not exist in TrafficLightBook.");
+      }
+      if (std::find(bulb->states().begin(), bulb->states().end(), unique_bulb_id_state.second) ==
+          bulb->states().end()) {
+        MALIPUT_THROW_MESSAGE("BulbStates have an unknown BulbState referenced by UniqueBulbId(id: " +
+                              unique_bulb_id_state.first.string() + ") in Phase(id: " + phase_id_value.first.string() +
+                              ")");
+      }
+    }
+  };
+  WalkPhases(road_network, evaluate_phase);
+}
+
 }  // namespace
 
 void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValidatorOptions& options) {
@@ -142,6 +216,12 @@ void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValid
   }
   if (options.check_contiguity_rule_zones) {
     CheckContiguityBetweenLanes(road_network);
+  }
+  if (options.check_phase_discrete_value_rule_states) {
+    CheckPhaseDiscreteValueRuleStates(road_network);
+  }
+  if (options.check_phase_bulb_states) {
+    CheckPhasesBulbStates(road_network);
   }
 }
 
