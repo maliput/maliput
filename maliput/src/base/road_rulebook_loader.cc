@@ -291,7 +291,7 @@ Rule::Id GetRuleIdFrom(const Rule::TypeId& rule_type_id, const RightOfWayRule::I
 DiscreteValueRule BuildVehicleStopInZoneBehaviourDiscreteValueRule(const RightOfWayRule& right_of_way_rule) {
   return DiscreteValueRule(GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.id()),
                            VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.zone(),
-                           {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{},
+                           {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
                                               right_of_way_rule.zone_type() == RightOfWayRule::ZoneType::kStopExcluded
                                                   ? "DoNotStop"
                                                   : "UnconstrainedParking")});
@@ -317,6 +317,7 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
       related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{RightOfWayYieldGroup(), rule_ids});
     }
     discrete_values.push_back(api::rules::MakeDiscreteValue(Rule::State::kStrict, related_rules,
+                                                            Rule::RelatedUniqueIds{},
                                                             right_of_way_rule_state_types.at(state.second.type())));
   }
   return DiscreteValueRule(GetRuleIdFrom(RightOfWayRuleTypeId(), right_of_way_rule.id()), RightOfWayRuleTypeId(),

@@ -55,6 +55,7 @@ class DiscreteValueRule : public Rule {
 /// Constructs a DiscreteValueRule::DiscreteValue.
 // TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
 DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const Rule::RelatedRules& related_rules,
+                                                   const Rule::RelatedUniqueIds& related_unique_ids,
                                                    const std::string& value);
 
 }  // namespace rules

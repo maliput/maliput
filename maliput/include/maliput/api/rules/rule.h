@@ -8,6 +8,7 @@
 
 #include "maliput/api/regions.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/api/unique_id.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -45,6 +46,12 @@ class Rule {
   /// Rule::Id must contain unique Rule::Ids.
   using RelatedRules = std::map<std::string, std::vector<Id>>;
 
+  /// Alias of a map holding groups of related unique ids. The name of each group is
+  /// specified by the key, and the semantics vary based on the specific unique id
+  /// type. The group name must not be an empty string. Each vector of
+  /// UniqueId must not be empty and must contain unique UniqueIds.
+  using RelatedUniqueIds = std::map<std::string, std::vector<UniqueId>>;
+
   /// Defines a base state for a Rule.
   struct State {
     /// Defines common Rule severity levels. Specific rule types can choose to use
@@ -69,6 +76,7 @@ class Rule {
     /// levels.
     int severity{};
     RelatedRules related_rules;
+    RelatedUniqueIds related_unique_ids;
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);

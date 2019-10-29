@@ -32,13 +32,15 @@ class MockRangeValueRuleStateProvider : public RangeValueRuleStateProvider {
 const Rule::Id MockRangeValueRuleStateProvider::kRuleId{"RuleId"};
 
 RangeValueRule::Range MockRangeValueRuleStateProvider::MakeCurrentRange() {
-  return MakeRange(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "current_range_description",
-                   56. /* min */, 78. /* max*/);
+  return MakeRange(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(),
+                   maliput::api::test::CreateEmptyRelatedUniqueIds(), "current_range_description", 56. /* min */,
+                   78. /* max*/);
 }
 
 RangeValueRule::Range MockRangeValueRuleStateProvider::MakeNextRange() {
-  return MakeRange(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(), "next_range_description",
-                   12. /* min */, 4. /* max*/);
+  return MakeRange(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(),
+                   maliput::api::test::CreateEmptyRelatedUniqueIds(), "next_range_description", 12. /* min */,
+                   4. /* max*/);
 }
 
 GTEST_TEST(RangeValueRuleStateProviderTest, ExerciseInterface) {

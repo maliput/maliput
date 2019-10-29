@@ -19,6 +19,20 @@ bool Rule::State::operator==(const State& other) const {
       }
     }
   }
+  if (related_unique_ids.size() != other.related_unique_ids.size()) {
+    return false;
+  }
+  for (const auto& key_val : related_unique_ids) {
+    const auto it = other.related_unique_ids.find(key_val.first);
+    if (it == other.related_unique_ids.end()) {
+      false;
+    }
+    for (const UniqueId& unique_id : key_val.second) {
+      if (std::find(it->second.begin(), it->second.end(), unique_id) == it->second.end()) {
+        return false;
+      }
+    }
+  }
   return severity == other.severity;
 }
 

@@ -18,10 +18,12 @@ DiscreteValueRule::DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& typ
 }
 
 DiscreteValueRule::DiscreteValue MakeDiscreteValue(int severity, const Rule::RelatedRules& related_rules,
+                                                   const Rule::RelatedUniqueIds& related_unique_ids,
                                                    const std::string& value) {
   DiscreteValueRule::DiscreteValue discrete_value;
   discrete_value.severity = severity;
   discrete_value.related_rules = related_rules;
+  discrete_value.related_unique_ids = related_unique_ids;
   discrete_value.value = value;
   return discrete_value;
 }
