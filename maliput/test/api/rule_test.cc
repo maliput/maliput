@@ -31,6 +31,10 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
                 "range_description_1", 123. /* min */, 456. /* max */),
       MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(),
                 api::test::CreateEmptyRelatedUniqueIds(), "range_description_2", 789. /* min */, 1234. /* max */),
+      MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(),
+                api::test::CreateNonEmptyRelatedUniqueIds(), "range_description_3", 123. /* min */, 456. /* max */),
+      MakeRange(Rule::State::kBestEffort, api::test::CreateNonEmptyRelatedRules(),
+                api::test::CreateNonEmptyRelatedUniqueIds(), "range_description_4", 789. /* min */, 1234. /* max */),
   };
 
   EXPECT_NO_THROW(RangeValueRule(kId, kTypeId, kZone, kRanges));
@@ -44,10 +48,21 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
   // Duplicated Rule::Ids in RelatedRules in RangeValueRule::Range.
   const Rule::RelatedRules kDuplicatedRelatedRules{
       {"RuleGroup", {Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdB/RuleIdB")}}};
-  const RangeValueRule::Range kRangeWithDuplicatedRules =
+  const RangeValueRule::Range kRangeWithDuplicatedRelatedRulesIds =
       MakeRange(Rule::State::kStrict, kDuplicatedRelatedRules, api::test::CreateEmptyRelatedUniqueIds(),
                 "range_description_1", 123. /* min */, 456. /* max */);
-  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithDuplicatedRules}), maliput::common::assertion_error);
+  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithDuplicatedRelatedRulesIds}),
+               maliput::common::assertion_error);
+
+  // Duplicated UniqueIds in RelatedUniqueIds in RangeValueRule::Range.
+  const Rule::RelatedUniqueIds kDuplicatedRelatedUniqueIds{
+      {"RelatedUniqueIdsGroup",
+       {UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB"), UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+  const RangeValueRule::Range kRangeWithDuplicatedRelatedUniqueIds =
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kDuplicatedRelatedUniqueIds,
+                "range_description_1", 123. /* min */, 456. /* max */);
+  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithDuplicatedRelatedUniqueIds}),
+               maliput::common::assertion_error);
 
   // Empty std::string for semantic group key in RelatedRules in RangeValueRule::Range.
   const Rule::RelatedRules kEmptyKeyRelatedRules{{"", {Rule::Id("RuleTypeIdB/RuleIdB")}}};
@@ -55,6 +70,14 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
       MakeRange(Rule::State::kStrict, kEmptyKeyRelatedRules, api::test::CreateEmptyRelatedUniqueIds(),
                 "range_description_1", 123. /* min */, 456. /* max */);
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithEmptyKeyRelatedRules}), maliput::common::assertion_error);
+
+  // Empty std::string for semantic group key in RelatedUniqueIds in RangeValueRule::Range.
+  const Rule::RelatedUniqueIds kEmptyKeyRelatedUniqueIds{{"", {UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+  const RangeValueRule::Range kRangeWithEmptyKeyRelatedUniqueIds =
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kEmptyKeyRelatedUniqueIds,
+                "range_description_1", 123. /* min */, 456. /* max */);
+  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithEmptyKeyRelatedUniqueIds}),
+               maliput::common::assertion_error);
 
   // Negative severity.
   const int kSeverityInvalid{-1};
@@ -88,6 +111,10 @@ TEST_F(RuleTest, RangeValueRuleAccessors) {
                 "range_description_1", 123. /* min */, 456. /* max */),
       MakeRange(Rule::State::kBestEffort, api::test::CreateNonEmptyRelatedRules(),
                 api::test::CreateEmptyRelatedUniqueIds(), "range_description_2", 789. /* min */, 1234. /* max */),
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateNonEmptyRelatedUniqueIds(),
+                "range_description_3", 567. /* min */, 891. /* max */),
+      MakeRange(Rule::State::kBestEffort, api::test::CreateNonEmptyRelatedRules(),
+                api::test::CreateNonEmptyRelatedUniqueIds(), "range_description_4", 2345. /* min */, 6789. /* max */),
   };
 
   const RangeValueRule dut(kId, kTypeId, kZone, kRanges);
@@ -117,13 +144,13 @@ GTEST_TEST(RangeTest, EqualOperator) {
       MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(),
                 api::test::CreateEmptyRelatedUniqueIds(), "range_description_1", 123. /* min */, 456. /* max */);
   const RangeValueRule::Range range_6 =
-      MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
-                "range_description_6", 123. /* min */, 456. /* max */);
+      MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(),
+                api::test::CreateNonEmptyRelatedUniqueIds(), "range_description_6", 123. /* min */, 456. /* max */);
 
-  // `related_rules` are empty.
+  // `related_rules` and `related_unique_ids` are empty.
   EXPECT_TRUE(range_1 == range_1);
   EXPECT_FALSE(range_1 != range_1);
-  // `related_rules` are not empty.
+  // `related_rules` and `related_unique_ids` are not empty.
   EXPECT_TRUE(range_6 == range_6);
   EXPECT_FALSE(range_6 != range_6);
   // `min` is different.
@@ -158,8 +185,8 @@ GTEST_TEST(RangeTest, LessOperator) {
       MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
                 "range_description", 123. /* min */, 789. /* max */);
   const RangeValueRule::Range range_6 =
-      MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
-                "range_description", 123. /* min */, 456. /* max */);
+      MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(),
+                api::test::CreateNonEmptyRelatedUniqueIds(), "range_description", 123. /* min */, 456. /* max */);
 
   // Ranges are equal.
   EXPECT_FALSE(range_1 < range_1);
@@ -171,7 +198,7 @@ GTEST_TEST(RangeTest, LessOperator) {
   EXPECT_TRUE(range_1 < range_4);
   // Evaluates by `max`.
   EXPECT_TRUE(range_1 < range_5);
-  // Ranges are equal for this operator, because `related_rules` is not taken
+  // Ranges are equal for this operator, because `related_rules` and `related_unique_ids` are not taken
   // into account.
   EXPECT_FALSE(range_1 < range_6);
   EXPECT_FALSE(range_6 < range_1);
@@ -183,8 +210,11 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
       MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
                         api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_1"),
       MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateNonEmptyRelatedRules(),
-                        api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_2")};
-
+                        api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_2"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateNonEmptyRelatedUniqueIds(), "rule_state_value_3"),
+      MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateNonEmptyRelatedRules(),
+                        api::test::CreateNonEmptyRelatedUniqueIds(), "rule_state_value_4")};
   EXPECT_NO_THROW(DiscreteValueRule(kId, kTypeId, kZone, kDiscreteValues));
 
   // Missing Rule::Ids in RelatedRules in DiscreteValueRule::DiscreteValue.
@@ -199,6 +229,7 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
                                  {MakeDiscreteValue(kSeverityInvalid, api::test::CreateEmptyRelatedRules(),
                                                     api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value")}),
                maliput::common::assertion_error);
+
   // Duplicated Rule::Ids in RelatedRules in DiscreteValueRule::DiscreteValue.
   const Rule::RelatedRules kDuplicatedRelatedRules{
       {"RuleGroup", {Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdB/RuleIdB")}}};
@@ -206,13 +237,24 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
       Rule::State::kStrict, kDuplicatedRelatedRules, api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value");
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithDuplicatedRules}),
                maliput::common::assertion_error);
-  // Duplicated ranges.
+
+  // Duplicated UniqueIds in RelatedUniqueIds in DiscreteValueRule::DiscreteValue.
+  const Rule::RelatedUniqueIds kDuplicatedRelatedUniqueIds{
+      {"RelatedUniqueIdsGroup",
+       {UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB"), UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+  const DiscreteValueRule::DiscreteValue kDiscreteValueWithDuplicatedRelatedUniqueIds = MakeDiscreteValue(
+      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kDuplicatedRelatedUniqueIds, "rule_state_value");
+  EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithDuplicatedRelatedUniqueIds}),
+               maliput::common::assertion_error);
+
+  // Duplicated discrete values.
   const std::vector<DiscreteValueRule::DiscreteValue> kDuplicatedDiscreteValues{
       MakeDiscreteValue(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(),
                         api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_1"),
       MakeDiscreteValue(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(),
                         api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_1")};
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, kDuplicatedDiscreteValues), maliput::common::assertion_error);
+
   // Empty std::string for semantic group key in RelatedRules in DiscreteValueRule::DiscreteValue.
   const Rule::RelatedRules kEmptyKeyRelatedRules{{"", {Rule::Id("RuleTypeIdB/RuleIdB")}}};
   const DiscreteValueRule::DiscreteValue kDiscreteValueWithEmptyKeyRelatedRules = MakeDiscreteValue(
@@ -220,10 +262,15 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithEmptyKeyRelatedRules}),
                maliput::common::assertion_error);
 
+  // Empty std::string for semantic group key in RelatedUniqueIds in DiscreteValueRule::DiscreteValue.
+  const Rule::RelatedUniqueIds kEmptyKeyRelatedUniqueIds{{"", {UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+  const DiscreteValueRule::DiscreteValue kDiscreteValueWithEmptyKeyRelatedUniqueIds = MakeDiscreteValue(
+      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kEmptyKeyRelatedUniqueIds, "rule_state_value");
+  EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithEmptyKeyRelatedUniqueIds}),
+               maliput::common::assertion_error);
+
   // Empty discrete values.
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {} /* discrete_values */), maliput::common::assertion_error);
-  // Duplicated discrete values.
-  EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, kDuplicatedDiscreteValues), maliput::common::assertion_error);
 }
 
 // Evaluates DiscreteValueRule accessors.
@@ -232,7 +279,7 @@ TEST_F(RuleTest, DiscreteValueRuleAccessors) {
       MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
                         api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_1"),
       MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateNonEmptyRelatedRules(),
-                        api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_2")};
+                        api::test::CreateNonEmptyRelatedUniqueIds(), "rule_state_value_2")};
 
   const DiscreteValueRule dut(kId, kTypeId, kZone, kDiscreteValues);
 
@@ -254,9 +301,9 @@ GTEST_TEST(DiscreteValueTest, EqualOperator) {
                         api::test::CreateEmptyRelatedUniqueIds(), "value_1");
   const DiscreteValueRule::DiscreteValue discrete_value_4 =
       MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateNonEmptyRelatedRules(),
-                        api::test::CreateEmptyRelatedUniqueIds(), "value_4");
+                        api::test::CreateNonEmptyRelatedUniqueIds(), "value_4");
 
-  // `related_rules` are empty.
+  // `related_rules` and `related_unique_ids` are empty.
   EXPECT_TRUE(discrete_value_1 == discrete_value_1);
   EXPECT_FALSE(discrete_value_1 != discrete_value_1);
   // `value` is different.
@@ -265,7 +312,7 @@ GTEST_TEST(DiscreteValueTest, EqualOperator) {
   // `severity` is different.
   EXPECT_TRUE(discrete_value_1 != discrete_value_3);
   EXPECT_FALSE(discrete_value_1 == discrete_value_3);
-  // `related_rules` are not empty.
+  // `related_rules` and `related_unique_ids` are not empty.
   EXPECT_TRUE(discrete_value_4 == discrete_value_4);
   EXPECT_FALSE(discrete_value_4 != discrete_value_4);
 }

@@ -12,6 +12,7 @@ RangeValueRule::RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, 
   MALIPUT_THROW_UNLESS(!ranges_.empty());
   for (const Range& range : ranges_) {
     ValidateRelatedRules(range.related_rules);
+    ValidateRelatedUniqueIds(range.related_unique_ids);
     ValidateSeverity(range.severity);
     MALIPUT_THROW_UNLESS(range.min <= range.max);
     MALIPUT_THROW_UNLESS(std::count(ranges_.begin(), ranges_.end(), range) == 1);

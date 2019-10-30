@@ -12,6 +12,7 @@ DiscreteValueRule::DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& typ
   MALIPUT_THROW_UNLESS(!values_.empty());
   for (const DiscreteValue& value : values_) {
     ValidateRelatedRules(value.related_rules);
+    ValidateRelatedUniqueIds(value.related_unique_ids);
     ValidateSeverity(value.severity);
     MALIPUT_THROW_UNLESS(std::count(values_.begin(), values_.end(), value) == 1);
   }

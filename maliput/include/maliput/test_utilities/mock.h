@@ -140,11 +140,14 @@ rules::DirectionUsageRule CreateDirectionUsageRule();
 /// Returns an empty rules::Rule::RelatedRules.
 rules::Rule::RelatedRules CreateEmptyRelatedRules();
 
+/// Returns an arbitrary rules::Rule::RelatedRules.
+rules::Rule::RelatedRules CreateNonEmptyRelatedRules();
+
 /// Returns an empty rules::Rule::RelatedUniqueIds.
 rules::Rule::RelatedUniqueIds CreateEmptyRelatedUniqueIds();
 
-/// Returns an arbitrary rules::Rule::RelatedRules.
-rules::Rule::RelatedRules CreateNonEmptyRelatedRules();
+/// Returns an arbitrary rules::Rule::RelatedUniqueIds.
+rules::Rule::RelatedUniqueIds CreateNonEmptyRelatedUniqueIds();
 
 /// Returns a rules::DiscreteValueRule containing an arbitrary state.
 rules::DiscreteValueRule CreateDiscreteValueRule();

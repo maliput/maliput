@@ -49,7 +49,7 @@ class Rule {
   /// Alias of a map holding groups of related unique ids. The name of each group is
   /// specified by the key, and the semantics vary based on the specific unique id
   /// type. The group name must not be an empty string. Each vector of
-  /// UniqueId must not be empty and must contain unique UniqueIds.
+  /// UniqueId must contain unique UniqueIds.
   using RelatedUniqueIds = std::map<std::string, std::vector<UniqueId>>;
 
   /// Defines a base state for a Rule.
@@ -105,6 +105,12 @@ class Rule {
   // @throws maliput::assertion_error When any of the requirements in
   //         `RelatedRules` are not met.
   void ValidateRelatedRules(const RelatedRules& related_rules) const;
+
+  // Validates that `related_unique_ids` requirements are met.
+  // @see RelatedUniqueIds alias definition for full type requirements.
+  // @throws maliput::assertion_error When any of the requirements in
+  //         `RelatedUniqueIds` are not met.
+  void ValidateRelatedUniqueIds(const RelatedUniqueIds& related_unique_ids) const;
 
   // Validates that `severity` is a non-negative quantity.
   // @throws maliput::assertion_error When `severity` is negative.

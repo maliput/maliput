@@ -536,10 +536,16 @@ DirectionUsageRule CreateDirectionUsageRule() {
 
 rules::Rule::RelatedRules CreateEmptyRelatedRules() { return {}; }
 
-rules::Rule::RelatedUniqueIds CreateEmptyRelatedUniqueIds() { return {}; }
-
 rules::Rule::RelatedRules CreateNonEmptyRelatedRules() {
   return Rule::RelatedRules{{"RelatedRulesGroup", {Rule::Id("RuleTypeIdA/RuleIdA"), Rule::Id("RuleTypeIdB/RuleIdB")}}};
+}
+
+rules::Rule::RelatedUniqueIds CreateEmptyRelatedUniqueIds() { return {}; }
+
+rules::Rule::RelatedUniqueIds CreateNonEmptyRelatedUniqueIds() {
+  return Rule::RelatedUniqueIds{
+      {"RelatedUniqueIdsGroup",
+       {UniqueId("TrafficLightIdA-BulbGroupIdA-BulbA"), UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
 }
 
 DiscreteValueRule CreateDiscreteValueRule() {
