@@ -58,4 +58,6 @@ api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleTyp
 
 std::string RightOfWayYieldGroup() { return "YieldGroup"; }
 
+std::string RightOfWayBulbGroup() { return "BulbGroupIds"; }
+
 }  // namespace maliput
