@@ -42,7 +42,7 @@ class Rule {
   /// Alias of a map holding groups of related rules. The name of each group is
   /// specified by the key, and the semantics vary based on the specific rule
   /// type. The group name must not be an empty string. Each vector of
-  /// Rule::Id must not be empty and must contain unique Rule::Ids.
+  /// Rule::Id must contain unique Rule::Ids.
   using RelatedRules = std::map<std::string, std::vector<Id>>;
 
   /// Defines a base state for a Rule.

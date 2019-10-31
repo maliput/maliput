@@ -35,18 +35,18 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
 
   EXPECT_NO_THROW(RangeValueRule(kId, kTypeId, kZone, kRanges));
 
+  // Missing Rule::Ids in RelatedRules in RangeValueRule::Range.
+  const Rule::RelatedRules kMissingRelatedRules{{"RuleGroup", {}}};
+  const RangeValueRule::Range kRangeWithMissingRelatedRules =
+      MakeRange(Rule::State::kStrict, kMissingRelatedRules, "range_description_1", 123. /* min */, 456. /* max */);
+  EXPECT_NO_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithMissingRelatedRules}));
+
   // Duplicated Rule::Ids in RelatedRules in RangeValueRule::Range.
   const Rule::RelatedRules kDuplicatedRelatedRules{
       {"RuleGroup", {Rule::Id("RuleTypeIdB/RuleIdB"), Rule::Id("RuleTypeIdB/RuleIdB")}}};
   const RangeValueRule::Range kRangeWithDuplicatedRules =
       MakeRange(Rule::State::kStrict, kDuplicatedRelatedRules, "range_description_1", 123. /* min */, 456. /* max */);
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithDuplicatedRules}), maliput::common::assertion_error);
-
-  // Missing Rule::Ids in RelatedRules in RangeValueRule::Range.
-  const Rule::RelatedRules kMissingRelatedRules{{"RuleGroup", {}}};
-  const RangeValueRule::Range kRangeWithMissingRelatedRules =
-      MakeRange(Rule::State::kStrict, kMissingRelatedRules, "range_description_1", 123. /* min */, 456. /* max */);
-  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithMissingRelatedRules}), maliput::common::assertion_error);
 
   // Empty std::string for semantic group key in RelatedRules in RangeValueRule::Range.
   const Rule::RelatedRules kEmptyKeyRelatedRules{{"", {Rule::Id("RuleTypeIdB/RuleIdB")}}};
@@ -170,6 +170,12 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
 
   EXPECT_NO_THROW(DiscreteValueRule(kId, kTypeId, kZone, kDiscreteValues));
 
+  // Missing Rule::Ids in RelatedRules in DiscreteValueRule::DiscreteValue.
+  const Rule::RelatedRules kMissingRelatedRules{{"RuleGroup", {}}};
+  const DiscreteValueRule::DiscreteValue kDiscreteValueWithMissingRelatedRules =
+      MakeDiscreteValue(Rule::State::kStrict, kMissingRelatedRules, "rule_state_value");
+  EXPECT_NO_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithMissingRelatedRules}));
+
   // Negative severity.
   const int kSeverityInvalid{-1};
   EXPECT_THROW(DiscreteValueRule(
@@ -182,12 +188,6 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
   const DiscreteValueRule::DiscreteValue kDiscreteValueWithDuplicatedRules =
       MakeDiscreteValue(Rule::State::kStrict, kDuplicatedRelatedRules, "rule_state_value");
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithDuplicatedRules}),
-               maliput::common::assertion_error);
-  // Missing Rule::Ids in RelatedRules in DiscreteValueRule::DiscreteValue.
-  const Rule::RelatedRules kMissingRelatedRules{{"RuleGroup", {}}};
-  const DiscreteValueRule::DiscreteValue kDiscreteValueWithMissingRelatedRules =
-      MakeDiscreteValue(Rule::State::kStrict, kMissingRelatedRules, "rule_state_value");
-  EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithMissingRelatedRules}),
                maliput::common::assertion_error);
   // Duplicated ranges.
   const std::vector<DiscreteValueRule::DiscreteValue> kDuplicatedDiscreteValues{
