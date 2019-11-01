@@ -23,6 +23,12 @@ class IntersectionBook : public api::IntersectionBook {
   /// exists, or if @p intersection is nullptr.
   void AddIntersection(std::unique_ptr<api::Intersection> intersection);
 
+  /// Returns a vector of Intersection pointers whose regions intersect `region`.
+  ///
+  /// @param region A vector of `LaneSRanges`.
+  /// @param tolerance Tolerance to compare `LaneSRange` intersections.
+  std::vector<api::Intersection*> FindIntersections(const std::vector<api::LaneSRange>& region, double tolerance);
+
  private:
   std::vector<api::Intersection*> DoGetIntersections() override;
 

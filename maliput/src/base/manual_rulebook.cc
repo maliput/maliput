@@ -234,7 +234,7 @@ class ManualRulebook::Impl {
       auto it = map_.find(range.lane_id());
       if (it != map_.end()) {
         for (const auto& id_and_range : it->second) {
-          if (Intersects(id_and_range.second, range.s_range(), tolerance)) {
+          if (id_and_range.second.Intersects(range.s_range(), tolerance)) {
             result.emplace_back(id_and_range.first);
           }
         }
@@ -252,13 +252,6 @@ class ManualRulebook::Impl {
       if (map_[lane_id].empty()) {
         map_.erase(lane_id);
       }
-    }
-
-    // Determines if two SRanges intersect.  Positive tolerance makes the
-    // comparison more optimistic.
-    static bool Intersects(const SRange& lhs, const SRange& rhs, double tolerance) {
-      const SRange wider_rhs(std::min(rhs.s0(), rhs.s1()) - tolerance, std::max(rhs.s0(), rhs.s1()) + tolerance);
-      return !((std::max(lhs.s0(), lhs.s1()) < wider_rhs.s0()) || (std::min(lhs.s0(), lhs.s1()) > wider_rhs.s1()));
     }
 
     // TODO(maddog@tri.global)  Perhaps this class would benefit from something

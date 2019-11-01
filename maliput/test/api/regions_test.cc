@@ -14,6 +14,16 @@ namespace maliput {
 namespace api {
 namespace {
 
+// Tolerance small enough to test possibly actual use cases.
+const double linear_tolerance = 1e-3;
+// Negative tolerance used to test SRange::Intersects method.
+// Using negative values in this method makes ranges shrink.
+const double negative_linear_tolerance = -2;
+// An excessive negative tolerance used to test SRange::Intersects method.
+// Using negative values bigger than the size of one SRange is not allowed
+// and an exception will be thrown.
+const double excessive_negative_linear_tolerance = -50;
+
 GTEST_TEST(SRangeTest, DefaultConstructionAndAccessors) {
   const SRange dut;
   EXPECT_EQ(dut.s0(), 0.);
@@ -71,6 +81,60 @@ GTEST_TEST(SRangeTest, WithS) {
   EXPECT_FALSE(dut3.WithS());
 }
 
+GTEST_TEST(SRangeTest, Intersects) {
+  const SRange s_range(3., 10.);
+  EXPECT_TRUE(s_range.Intersects(SRange{2., 5.}, linear_tolerance));
+  EXPECT_TRUE(s_range.Intersects(SRange{8., 13.}, linear_tolerance));
+  EXPECT_TRUE(s_range.Intersects(SRange{11., 9.}, linear_tolerance));
+  EXPECT_FALSE(s_range.Intersects(SRange{15., 33.}, linear_tolerance));
+  EXPECT_TRUE(s_range.Intersects(SRange{2., 33.}, negative_linear_tolerance));
+  EXPECT_FALSE(s_range.Intersects(SRange{9., 33.}, negative_linear_tolerance));
+  EXPECT_THROW(s_range.Intersects(SRange{15., 33.}, excessive_negative_linear_tolerance), common::assertion_error);
+  EXPECT_THROW(s_range.Intersects(SRange{-5., 33.}, linear_tolerance), common::assertion_error);
+}
+
+// Holds build configuration for SRangeGetIntersectionTest.
+struct SRangeGetIntersectionBuildFlags {
+  SRange s_range{};
+  SRange intersect{};
+  SRange expected{};
+  double tolerance{};
+  bool expects_nullopt{false};
+};
+
+// Tests SRange::GetIntersection method.
+class SRangeGetIntersectionTest : public ::testing::TestWithParam<SRangeGetIntersectionBuildFlags> {
+ protected:
+  void SetUp() override { build_config_ = GetParam(); }
+
+  SRangeGetIntersectionBuildFlags build_config_;
+};
+
+std::vector<SRangeGetIntersectionBuildFlags> GetIntersectionTestParameters() {
+  return {
+      SRangeGetIntersectionBuildFlags{SRange{3., 10.}, SRange{2., 5.}, SRange{3., 5.}, linear_tolerance, false},
+      SRangeGetIntersectionBuildFlags{SRange{10., 3.}, SRange{11., 7.}, SRange{7., 10.}, linear_tolerance, false},
+      SRangeGetIntersectionBuildFlags{SRange{1., 100.}, SRange{49., 50.}, SRange{49., 50.}, linear_tolerance, false},
+      SRangeGetIntersectionBuildFlags{SRange{37., 27.}, SRange{1., 29.}, SRange{27., 29.}, linear_tolerance, false},
+      // There is no intersection.
+      SRangeGetIntersectionBuildFlags{SRange{3., 10.}, SRange{11., 75.}, SRange{3., 5.}, linear_tolerance, true},
+  };
+}
+
+TEST_P(SRangeGetIntersectionTest, GetIntersection) {
+  const drake::optional<SRange> dut =
+      build_config_.s_range.GetIntersection(build_config_.intersect, build_config_.tolerance);
+  if (build_config_.expects_nullopt) {
+    EXPECT_EQ(dut, drake::nullopt);
+  } else {
+    EXPECT_TRUE(std::fabs(dut.value().s0() - build_config_.expected.s0()) <= build_config_.tolerance &&
+                std::fabs(dut.value().s1() - build_config_.expected.s1()) <= build_config_.tolerance);
+  }
+}
+
+INSTANTIATE_TEST_CASE_P(SRangeGetIntersectionTestGroup, SRangeGetIntersectionTest,
+                        ::testing::ValuesIn(GetIntersectionTestParameters()));
+
 GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
   LaneSRange dut(LaneId("dut"), SRange(34., 0.));
   EXPECT_EQ(dut.lane_id(), LaneId("dut"));
@@ -91,6 +155,15 @@ GTEST_TEST(LaneSRangeTest, Assignment) {
   LaneSRange dut(LaneId("yyy"), SRange(40., 99.));  // e.g., "something else"
   dut = source;
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
+}
+
+GTEST_TEST(LaneSRangeTest, Intersects) {
+  const LaneSRange lane_s_range_a(LaneId("lane_a"), SRange(20., 30.));
+  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_a"), SRange(25., 35.)}, linear_tolerance));
+  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_a"), SRange(70., 10.)}, linear_tolerance));
+  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_a"), SRange(15., 25.)}, linear_tolerance));
+  EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_a"), SRange(55., 35.)}, linear_tolerance));
+  EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_x"), SRange(70., 10.)}, linear_tolerance));
 }
 
 class LaneSRouteTest : public ::testing::Test {
@@ -124,6 +197,17 @@ TEST_F(LaneSRouteTest, Assignment) {
   LaneSRoute dut;
   dut = dut_source;
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, dut_source));
+}
+
+TEST_F(LaneSRouteTest, Intersects) {
+  EXPECT_TRUE(LaneSRoute(source_).Intersects(
+      LaneSRoute{{{LaneId("id1"), SRange(5., 35.)}, {LaneId("id2"), SRange(32., 1.)}}}, linear_tolerance));
+  EXPECT_TRUE(LaneSRoute(source_).Intersects(
+      LaneSRoute{{{LaneId("idx"), SRange(100., 102.)}, {LaneId("id2"), SRange(25., 30.)}}}, linear_tolerance));
+  EXPECT_TRUE(LaneSRoute(source_).Intersects(
+      LaneSRoute{{{LaneId("id1"), SRange(180., 12.)}, {LaneId("id2"), SRange(1., 50.)}}}, linear_tolerance));
+  EXPECT_FALSE(LaneSRoute(source_).Intersects(
+      LaneSRoute{{{LaneId("id1"), SRange(180., 12.)}, {LaneId("id2"), SRange(1., 15.)}}}, linear_tolerance));
 }
 
 // Holds RoadGeometry build configuration.

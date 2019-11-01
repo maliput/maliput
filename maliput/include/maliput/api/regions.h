@@ -40,6 +40,18 @@ class SRange {
   /// Returns whether this SRange is in the direction of +s (i.e., s1() > s0()).
   double WithS() const { return s1() > s0(); }
 
+  /// Determines whether this SRange intersects with `s_range`.
+  /// `tolerance` will modify this range and `s_range` by increasing the maximum tolerance
+  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  bool Intersects(const SRange& s_range, double tolerance) const;
+
+  /// Returns a drake::optional<SRange> bearing the intersected SRange that results overlapping
+  /// this SRange with `s_range`. When there is no common area, drake::nullopt is returned.
+  ///
+  /// `tolerance` will modify this range and `s_range` by increasing the maximum tolerance
+  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  drake::optional<SRange> GetIntersection(const SRange& s_range, double tolerance) const;
+
  private:
   double s0_{0.};
   double s1_{0.};
@@ -60,6 +72,13 @@ class LaneSRange {
   SRange s_range() const { return s_range_; }
 
   double length() const { return s_range_.size(); }
+
+  /// Determines whether this LaneSRange intersects with `lane_s_range`.
+  /// LaneIds are evaluated prior calling SRange::Intersects() method.
+  ///
+  /// `tolerance` will modify this LaneSRanges's ranges and `lane_s_range`'s ranges by increasing the maximum tolerance
+  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  bool Intersects(const LaneSRange& lane_s_range, double tolerance) const;
 
  private:
   LaneId lane_id_;
@@ -90,6 +109,14 @@ class LaneSRoute {
     return std::accumulate(ranges_.cbegin(), ranges_.cend(), 0.,
                            [](const double acc, const LaneSRange& lane_range) { return acc + lane_range.length(); });
   }
+
+  /// Determines whether this LaneSRoute intersects with `lane_s_route`.
+  /// LaneSRoutes intersection is evaluated first by LaneSRange's LaneId coincidence, then LaneSRange::Intersects() is
+  /// used.
+  ///
+  /// `tolerance` will modify this LaneSRoute's ranges and `lane_s_route`'s ranges by increasing the maximum tolerance
+  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  bool Intersects(const LaneSRoute& lane_s_route, double tolerance) const;
 
   // TODO(maddog@tri.global)  Implement a "CheckInvariants()" method which
   //                          ensures contiguity (with respect to a specified
