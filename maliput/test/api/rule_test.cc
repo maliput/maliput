@@ -42,7 +42,8 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
   // Missing Rule::Ids in RelatedRules in RangeValueRule::Range.
   const Rule::RelatedRules kMissingRelatedRules{{"RuleGroup", {}}};
   const RangeValueRule::Range kRangeWithMissingRelatedRules =
-      MakeRange(Rule::State::kStrict, kMissingRelatedRules, "range_description_1", 123. /* min */, 456. /* max */);
+      MakeRange(Rule::State::kStrict, kMissingRelatedRules, api::test::CreateEmptyRelatedUniqueIds(),
+                "range_description_1", 123. /* min */, 456. /* max */);
   EXPECT_NO_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithMissingRelatedRules}));
 
   // Duplicated Rule::Ids in RelatedRules in RangeValueRule::Range.
@@ -219,8 +220,8 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
 
   // Missing Rule::Ids in RelatedRules in DiscreteValueRule::DiscreteValue.
   const Rule::RelatedRules kMissingRelatedRules{{"RuleGroup", {}}};
-  const DiscreteValueRule::DiscreteValue kDiscreteValueWithMissingRelatedRules =
-      MakeDiscreteValue(Rule::State::kStrict, kMissingRelatedRules, "rule_state_value");
+  const DiscreteValueRule::DiscreteValue kDiscreteValueWithMissingRelatedRules = MakeDiscreteValue(
+      Rule::State::kStrict, kMissingRelatedRules, api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value");
   EXPECT_NO_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithMissingRelatedRules}));
 
   // Negative severity.

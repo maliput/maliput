@@ -544,8 +544,8 @@ rules::Rule::RelatedUniqueIds CreateEmptyRelatedUniqueIds() { return {}; }
 
 rules::Rule::RelatedUniqueIds CreateNonEmptyRelatedUniqueIds() {
   return Rule::RelatedUniqueIds{
-      {"RelatedUniqueIdsGroup",
-       {UniqueId("TrafficLightIdA-BulbGroupIdA-BulbA"), UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+      {"UniqueBulbGroupId",
+       {UniqueId("TrafficLightIdA-UniqueBulbGroupIdA-BulbA"), UniqueId("TrafficLightIdB-UniqueBulbGroupIdB-BulbB")}}};
 }
 
 DiscreteValueRule CreateDiscreteValueRule() {
