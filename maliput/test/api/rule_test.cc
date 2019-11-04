@@ -57,8 +57,9 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
 
   // Duplicated UniqueIds in RelatedUniqueIds in RangeValueRule::Range.
   const Rule::RelatedUniqueIds kDuplicatedRelatedUniqueIds{
-      {"RelatedUniqueIdsGroup",
-       {UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB"), UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+      {"UniqueBulbGroupId",
+       {rules::UniqueBulbGroupId(TrafficLight::Id("TrafficLightIdA"), BulbGroup::Id("BulbGroupIdA")),
+        rules::UniqueBulbGroupId(TrafficLight::Id("TrafficLightIdA"), BulbGroup::Id("BulbGroupIdA"))}}};
   const RangeValueRule::Range kRangeWithDuplicatedRelatedUniqueIds =
       MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kDuplicatedRelatedUniqueIds,
                 "range_description_1", 123. /* min */, 456. /* max */);
@@ -73,7 +74,8 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithEmptyKeyRelatedRules}), maliput::common::assertion_error);
 
   // Empty std::string for semantic group key in RelatedUniqueIds in RangeValueRule::Range.
-  const Rule::RelatedUniqueIds kEmptyKeyRelatedUniqueIds{{"", {UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+  const Rule::RelatedUniqueIds kEmptyKeyRelatedUniqueIds{
+      {"", {rules::UniqueBulbGroupId(TrafficLight::Id("TrafficLightIdB"), BulbGroup::Id("BulbGroupIdB"))}}};
   const RangeValueRule::Range kRangeWithEmptyKeyRelatedUniqueIds =
       MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kEmptyKeyRelatedUniqueIds,
                 "range_description_1", 123. /* min */, 456. /* max */);
@@ -241,8 +243,9 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
 
   // Duplicated UniqueIds in RelatedUniqueIds in DiscreteValueRule::DiscreteValue.
   const Rule::RelatedUniqueIds kDuplicatedRelatedUniqueIds{
-      {"RelatedUniqueIdsGroup",
-       {UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB"), UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+      {"UniqueBulbGroupId",
+       {rules::UniqueBulbGroupId(TrafficLight::Id("TrafficLightIdA"), BulbGroup::Id("BulbGroupIdA")),
+        rules::UniqueBulbGroupId(TrafficLight::Id("TrafficLightIdA"), BulbGroup::Id("BulbGroupIdA"))}}};
   const DiscreteValueRule::DiscreteValue kDiscreteValueWithDuplicatedRelatedUniqueIds = MakeDiscreteValue(
       Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kDuplicatedRelatedUniqueIds, "rule_state_value");
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithDuplicatedRelatedUniqueIds}),
@@ -264,7 +267,8 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
                maliput::common::assertion_error);
 
   // Empty std::string for semantic group key in RelatedUniqueIds in DiscreteValueRule::DiscreteValue.
-  const Rule::RelatedUniqueIds kEmptyKeyRelatedUniqueIds{{"", {UniqueId("TrafficLightIdB-BulbGroupIdB-BulbB")}}};
+  const Rule::RelatedUniqueIds kEmptyKeyRelatedUniqueIds{
+      {"", {rules::UniqueBulbGroupId(TrafficLight::Id("TrafficLightIdB"), BulbGroup::Id("BulbGroupIdB"))}}};
   const DiscreteValueRule::DiscreteValue kDiscreteValueWithEmptyKeyRelatedUniqueIds = MakeDiscreteValue(
       Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kEmptyKeyRelatedUniqueIds, "rule_state_value");
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithEmptyKeyRelatedUniqueIds}),

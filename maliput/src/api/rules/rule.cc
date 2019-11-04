@@ -7,7 +7,7 @@ namespace rules {
 namespace {
 
 // Compare whether two map's contents match.
-// It does not use std::map::operator due to we do not care about elements in the vector.
+// It does not use std::map::operator==() because the order in the vector is meaningless.
 template <class T>
 bool CompareMapAttributes(const std::map<std::string, std::vector<T>>& map_a,
                           const std::map<std::string, std::vector<T>>& map_b) {
