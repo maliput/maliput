@@ -15,6 +15,7 @@ set(BASE_SOURCES
   phase_based_right_of_way_rule_state_provider.cc
   phase_ring_book_loader.cc
   road_rulebook_loader.cc
+  rule_filter.cc
   rule_registry.cc
   rule_tools.cc
   traffic_light_book.cc
