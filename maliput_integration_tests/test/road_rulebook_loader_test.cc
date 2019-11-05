@@ -41,6 +41,7 @@ using maliput::api::rules::DiscreteValueRule;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::Rule;
 using maliput::api::rules::TrafficLight;
+using maliput::api::rules::UniqueBulbGroupId;
 
 class TestLoading2x2IntersectionRules : public ::testing::Test {
  protected:
@@ -265,6 +266,26 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
                             discrete_value_it->related_rules.at(RightOfWayYieldGroup()).end(),
                             GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
         EXPECT_NE(it, discrete_value_it->related_rules.at(RightOfWayYieldGroup()).end());
+      }
+    }
+
+    // Check the related unique ids of the discrete value.
+    int related_bulb_group_size{0};
+    for (const auto& traffic_light_id_vector_bulb_group_id : right_of_way_rule.related_bulb_groups()) {
+      related_bulb_group_size += traffic_light_id_vector_bulb_group_id.second.size();
+    }
+    for (const auto& discrete_value : right_of_way_discrete_rule.values()) {
+      EXPECT_EQ(discrete_value.related_unique_ids.at(RightOfWayBulbGroup()).size(), related_bulb_group_size);
+      for (const auto& unique_id : discrete_value.related_unique_ids.at(RightOfWayBulbGroup())) {
+        const auto related_bulb_group_it = find_if(
+            right_of_way_rule.related_bulb_groups().begin(), right_of_way_rule.related_bulb_groups().end(),
+            [unique_id](std::pair<TrafficLight::Id, std::vector<BulbGroup::Id>> traffic_light_id_vector_bulb_group_id) {
+              for (const auto& bulb_group_id : traffic_light_id_vector_bulb_group_id.second) {
+                return unique_id == UniqueBulbGroupId{traffic_light_id_vector_bulb_group_id.first, bulb_group_id};
+              }
+              return false;
+            });
+        EXPECT_NE(related_bulb_group_it, right_of_way_rule.related_bulb_groups().end());
       }
     }
   }

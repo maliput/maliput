@@ -87,4 +87,7 @@ api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleTyp
 /// by Right-Of-Way rules to yield to other rules.
 std::string RightOfWayYieldGroup();
 
+/// Returns "BulbGroupIds", which is the key to the `Rules::RelatedUniqueIds` of Right-Of-Way rules.
+std::string RightOfWayBulbGroup();
+
 }  // namespace maliput

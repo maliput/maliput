@@ -19,7 +19,7 @@ bool CompareMapAttributes(const std::map<std::string, std::vector<T>>& map_a,
     if (it == map_b.end()) {
       false;
     }
-    for (const auto value_id : key_val.second) {
+    for (const auto& value_id : key_val.second) {
       if (std::find(it->second.begin(), it->second.end(), value_id) == it->second.end()) {
         return false;
       }

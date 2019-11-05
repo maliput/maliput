@@ -27,6 +27,7 @@ using maliput::api::rules::DiscreteValueRule;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::Rule;
 using maliput::api::rules::TrafficLight;
+using maliput::api::rules::UniqueBulbGroupId;
 
 namespace YAML {
 
@@ -304,6 +305,14 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
       {RightOfWayRule::State::Type::kStop, "Stop"},
       {RightOfWayRule::State::Type::kStopThenGo, "StopThenGo"},
   };
+
+  Rule::RelatedUniqueIds related_unique_ids{{RightOfWayBulbGroup(), {}}};
+  for (const auto& pair_traffic_light_id_vector_bulb_group_id : right_of_way_rule.related_bulb_groups()) {
+    for (const auto& bulb_group_id : pair_traffic_light_id_vector_bulb_group_id.second) {
+      related_unique_ids.at(RightOfWayBulbGroup())
+          .push_back(UniqueBulbGroupId{pair_traffic_light_id_vector_bulb_group_id.first, bulb_group_id});
+    }
+  }
   std::vector<DiscreteValueRule::DiscreteValue> discrete_values;
   for (const auto& state : right_of_way_rule.states()) {
     Rule::RelatedRules related_rules;
@@ -316,10 +325,10 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
     if (rule_ids.size()) {
       related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{RightOfWayYieldGroup(), rule_ids});
     }
-    discrete_values.push_back(api::rules::MakeDiscreteValue(Rule::State::kStrict, related_rules,
-                                                            Rule::RelatedUniqueIds{},
+    discrete_values.push_back(api::rules::MakeDiscreteValue(Rule::State::kStrict, related_rules, related_unique_ids,
                                                             right_of_way_rule_state_types.at(state.second.type())));
   }
+
   return DiscreteValueRule(GetRuleIdFrom(RightOfWayRuleTypeId(), right_of_way_rule.id()), RightOfWayRuleTypeId(),
                            right_of_way_rule.zone(), discrete_values);
 }
