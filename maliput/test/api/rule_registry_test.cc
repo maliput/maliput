@@ -31,9 +31,11 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeB("RangeValueRuleTypeB");
   const Rule::TypeId kTypeC("RangeValueRuleTypeC");
   const RangeValueRule::Range kRangeA =
-      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "range_description_a", 123., 456.);
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
+                "range_description_a", 123., 456.);
   const RangeValueRule::Range kRangeB =
-      MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "range_description_b", 456., 789.);
+      MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(),
+                api::test::CreateEmptyRelatedUniqueIds(), "range_description_b", 456., 789.);
 
   RuleRegistry dut;
   // Registers RangeValueRule types.
@@ -41,10 +43,10 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   EXPECT_NO_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}));
   // Throws because of duplicated type ID.
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}), maliput::common::assertion_error);
-  EXPECT_THROW(
-      dut.RegisterDiscreteValueRule(
-          kTypeB, {MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "SomeValue")}),
-      maliput::common::assertion_error);
+  EXPECT_THROW(dut.RegisterDiscreteValueRule(
+                   kTypeB, {MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                                              api::test::CreateEmptyRelatedUniqueIds(), "SomeValue")}),
+               maliput::common::assertion_error);
   // Throws because of empty range vector.
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeC, {} /* ranges */), maliput::common::assertion_error);
   // Throws because of duplicated ranges.
@@ -92,25 +94,31 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
 GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   const Rule::TypeId kTypeA("DiscreteValueTypeA");
   const std::vector<DiscreteValueRule::DiscreteValue> kValuesA{
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "ValueA1"),
-      MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "ValueA2")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "ValueA1"),
+      MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "ValueA2")};
   const Rule::TypeId kTypeB("DiscreteValueRuleTypeB");
   const std::vector<DiscreteValueRule::DiscreteValue> kValuesB{
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "ValueB1"),
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "ValueB2"),
-      MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "ValueB3")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "ValueB1"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "ValueB2"),
+      MakeDiscreteValue(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "ValueB3")};
   const RangeValueRule::Range kRange =
-      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "range_description_a", 123., 456.);
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
+                "range_description_a", 123., 456.);
 
   RuleRegistry dut;
   // Registers DiscreteValueRule types.
   EXPECT_NO_THROW(dut.RegisterDiscreteValueRule(kTypeA, kValuesA));
   EXPECT_NO_THROW(dut.RegisterDiscreteValueRule(kTypeB, kValuesB));
   // Throws because of duplicated type ID.
-  EXPECT_THROW(
-      dut.RegisterDiscreteValueRule(
-          kTypeB, {MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "SomeValue")}),
-      maliput::common::assertion_error);
+  EXPECT_THROW(dut.RegisterDiscreteValueRule(
+                   kTypeB, {MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                                              api::test::CreateEmptyRelatedUniqueIds(), "SomeValue")}),
+               maliput::common::assertion_error);
   EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRange}), maliput::common::assertion_error);
   // Throws because of empty vector.
   EXPECT_THROW(dut.RegisterDiscreteValueRule(Rule::TypeId("SomeRuleType"), {}), maliput::common::assertion_error);
@@ -162,21 +170,27 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   const Rule::Id kRangeRuleId("RangeValueRuleType/RangeRuleId");
   const LaneSRoute kZone({LaneSRange(LaneId("LaneId"), SRange(10., 20.))});
   const RangeValueRule::Range kRangeA =
-      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "range_description", 123., 456.);
+      MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
+                "range_description", 123., 456.);
   const RangeValueRule::Range kRangeB =
-      MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(), "range_description", 123., 456.);
+      MakeRange(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
+                "range_description", 123., 456.);
   const RangeValueRule::Range kUnregisteredRange =
-      MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(), "range_description", 456., 789.);
+      MakeRange(Rule::State::kBestEffort, api::test::CreateEmptyRelatedRules(),
+                api::test::CreateEmptyRelatedUniqueIds(), "range_description", 456., 789.);
   const Rule::TypeId kDiscreteValueRuleType("DiscreteValueType");
   const Rule::Id kDiscreteValueRuleId("DiscreteValueType/DiscreteValueRuleId");
   const std::vector<DiscreteValueRule::DiscreteValue> kDiscreteValues{
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value1"),
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value2"),
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value3")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "Value1"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "Value2"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "Value3")};
 
   const Rule::TypeId kUnregisteredRuleType("UnregisteredRuleType");
-  const DiscreteValueRule::DiscreteValue kUnregisteredDiscreteValue =
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value4");
+  const DiscreteValueRule::DiscreteValue kUnregisteredDiscreteValue = MakeDiscreteValue(
+      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(), "Value4");
 
   RuleRegistry dut;
 
@@ -206,8 +220,10 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
 
   // Builds and evaluates a discrete value based rule.
   const std::vector<DiscreteValueRule::DiscreteValue> kExpectedDiscreteValues{
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), "Value1"),
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(), "Value3")};
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "Value1"),
+      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(),
+                        api::test::CreateEmptyRelatedUniqueIds(), "Value3")};
   DiscreteValueRule discrete_value_rule =
       dut.BuildDiscreteValueRule(kDiscreteValueRuleId, kDiscreteValueRuleType, kZone, kExpectedDiscreteValues);
   EXPECT_EQ(discrete_value_rule.id(), kDiscreteValueRuleId);

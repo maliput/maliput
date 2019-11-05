@@ -8,6 +8,7 @@
 
 #include "maliput/api/regions.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/api/unique_id.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -45,6 +46,12 @@ class Rule {
   /// Rule::Id must contain unique Rule::Ids.
   using RelatedRules = std::map<std::string, std::vector<Id>>;
 
+  /// Alias of a map holding groups of related unique ids. The name of each group is
+  /// specified by the key, and the semantics vary based on the specific unique id
+  /// type. The group name must not be an empty string. Each vector of
+  /// UniqueId must contain unique UniqueIds.
+  using RelatedUniqueIds = std::map<std::string, std::vector<UniqueId>>;
+
   /// Defines a base state for a Rule.
   struct State {
     /// Defines common Rule severity levels. Specific rule types can choose to use
@@ -69,6 +76,7 @@ class Rule {
     /// levels.
     int severity{};
     RelatedRules related_rules;
+    RelatedUniqueIds related_unique_ids;
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
@@ -97,6 +105,12 @@ class Rule {
   // @throws maliput::assertion_error When any of the requirements in
   //         `RelatedRules` are not met.
   void ValidateRelatedRules(const RelatedRules& related_rules) const;
+
+  // Validates that `related_unique_ids` requirements are met.
+  // @see RelatedUniqueIds alias definition for full type requirements.
+  // @throws maliput::assertion_error When any of the requirements in
+  //         `RelatedUniqueIds` are not met.
+  void ValidateRelatedUniqueIds(const RelatedUniqueIds& related_unique_ids) const;
 
   // Validates that `severity` is a non-negative quantity.
   // @throws maliput::assertion_error When `severity` is negative.

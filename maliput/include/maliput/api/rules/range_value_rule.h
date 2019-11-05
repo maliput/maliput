@@ -67,7 +67,8 @@ class RangeValueRule : public Rule {
 
 /// Constructs a RangeValueRule::RangeValue.
 // TODO(maliput #121) Remove this once we switch to C++17 and can use aggregate initialization.
-RangeValueRule::Range MakeRange(int severity, const Rule::RelatedRules& related_rules, const std::string& description,
+RangeValueRule::Range MakeRange(int severity, const Rule::RelatedRules& related_rules,
+                                const Rule::RelatedUniqueIds& related_unique_ids, const std::string& description,
                                 double min, double max);
 
 }  // namespace rules

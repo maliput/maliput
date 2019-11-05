@@ -12,10 +12,12 @@ namespace {
 std::vector<api::rules::DiscreteValueRule::DiscreteValue> GenerateEveryCombination(
     const std::vector<int>& severities, const std::vector<std::string>& state_values) {
   const api::rules::Rule::RelatedRules empty_related_rules;
+  const api::rules::Rule::RelatedUniqueIds empty_related_unique_ids;
   std::vector<api::rules::DiscreteValueRule::DiscreteValue> values;
   for (const int severity : severities) {
     for (const std::string& state_value : state_values) {
-      values.push_back(api::rules::MakeDiscreteValue(severity, empty_related_rules, state_value));
+      values.push_back(
+          api::rules::MakeDiscreteValue(severity, empty_related_rules, empty_related_unique_ids, state_value));
     }
   }
   return values;

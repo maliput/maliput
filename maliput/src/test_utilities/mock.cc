@@ -540,23 +540,34 @@ rules::Rule::RelatedRules CreateNonEmptyRelatedRules() {
   return Rule::RelatedRules{{"RelatedRulesGroup", {Rule::Id("RuleTypeIdA/RuleIdA"), Rule::Id("RuleTypeIdB/RuleIdB")}}};
 }
 
+rules::Rule::RelatedUniqueIds CreateEmptyRelatedUniqueIds() { return {}; }
+
+rules::Rule::RelatedUniqueIds CreateNonEmptyRelatedUniqueIds() {
+  return Rule::RelatedUniqueIds{
+      {"UniqueBulbGroupId",
+       {rules::UniqueBulbGroupId(TrafficLight::Id("TrafficLightIdA"), BulbGroup::Id("BulbGroupIdA"))}}};
+}
+
 DiscreteValueRule CreateDiscreteValueRule() {
-  return DiscreteValueRule(
-      Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(),
-      {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value1"),
-       rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value2")});
+  return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(),
+                           {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                                     CreateEmptyRelatedUniqueIds(), "value1"),
+                            rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                                     CreateEmptyRelatedUniqueIds(), "value2")});
 }
 DiscreteValueRule CreateDiscreteValueRuleForContiguityTest() {
   return DiscreteValueRule(
       Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"),
       LaneSRoute({LaneSRange(LaneId("mock_a"), {0., 10.}), LaneSRange(LaneId("mock_b"), {0., 10.})}),
-      {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value1"),
-       rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "value2")});
+      {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), CreateEmptyRelatedUniqueIds(),
+                                "value1"),
+       rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), CreateEmptyRelatedUniqueIds(),
+                                "value2")});
 }
 
 RangeValueRule::Range CreateRange() {
-  return rules::MakeRange(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), "description", 123. /* min */,
-                          456. /* max */);
+  return rules::MakeRange(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), CreateEmptyRelatedUniqueIds(),
+                          "description", 123. /* min */, 456. /* max */);
 }
 
 RangeValueRule CreateRangeValueRule() {

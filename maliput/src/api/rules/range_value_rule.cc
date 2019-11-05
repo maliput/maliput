@@ -12,6 +12,7 @@ RangeValueRule::RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, 
   MALIPUT_THROW_UNLESS(!ranges_.empty());
   for (const Range& range : ranges_) {
     ValidateRelatedRules(range.related_rules);
+    ValidateRelatedUniqueIds(range.related_unique_ids);
     ValidateSeverity(range.severity);
     MALIPUT_THROW_UNLESS(range.min <= range.max);
     MALIPUT_THROW_UNLESS(std::count(ranges_.begin(), ranges_.end(), range) == 1);
@@ -37,11 +38,13 @@ bool RangeValueRule::Range::operator<(const RangeValueRule::Range& other) const 
   return false;
 }
 
-RangeValueRule::Range MakeRange(int severity, const Rule::RelatedRules& related_rules, const std::string& description,
+RangeValueRule::Range MakeRange(int severity, const Rule::RelatedRules& related_rules,
+                                const Rule::RelatedUniqueIds& related_unique_ids, const std::string& description,
                                 double min, double max) {
   RangeValueRule::Range range;
   range.severity = severity;
   range.related_rules = related_rules;
+  range.related_unique_ids = related_unique_ids;
   range.description = description;
   range.min = min;
   range.max = max;
