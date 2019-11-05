@@ -24,9 +24,10 @@ GTEST_TEST(PhaseBasedRightOfWayRuleStateProviderTest, BasicTest) {
 
   const Rule::Id rule_id_a("Right-Of-Way/rule a");
   const Rule::Id rule_id_b("Right-Of-Way/rule b");
-  const DiscreteValueRule::DiscreteValue state_go = MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, "Go");
+  const DiscreteValueRule::DiscreteValue state_go =
+      MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Go");
   const DiscreteValueRule::DiscreteValue state_stop =
-      MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, "Stop");
+      MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Stop");
 
   const Phase::Id phase_id_1("phase1");
   const Phase phase1(phase_id_1, {{row_rule_id_a, row_state_id_go}, {row_rule_id_b, row_state_id_stop}},

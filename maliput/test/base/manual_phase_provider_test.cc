@@ -94,10 +94,10 @@ GTEST_TEST(PhaseRingTest, InvalidPhases) {
   const RuleStates rule_states_2{{RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")}};
 
   const DiscreteValueRuleStates discrete_value_rule_states_1{
-      {Rule::Id("a"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, "1")}},
-      {Rule::Id("b"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, "2")}}};
+      {Rule::Id("a"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "1")}},
+      {Rule::Id("b"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "2")}}};
   const DiscreteValueRuleStates discrete_value_rule_states_2{
-      {Rule::Id("a"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, "1")}}};
+      {Rule::Id("a"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "1")}}};
 
   Phase phase_1(Phase::Id("bar"), rule_states_1, discrete_value_rule_states_1);
   Phase phase_2(Phase::Id("baz"), rule_states_2, discrete_value_rule_states_2);

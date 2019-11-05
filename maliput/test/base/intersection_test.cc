@@ -25,10 +25,12 @@ class IntersectionTest : public ::testing::Test {
 
   const api::rules::DiscreteValueRuleStates discrete_value_rule_states_1_{
       {api::rules::Rule::Id("dummy_rule"),
-       api::rules::MakeDiscreteValue(api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, "Go")}};
+       api::rules::MakeDiscreteValue(api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{},
+                                     api::rules::Rule::RelatedUniqueIds{}, "Go")}};
   const api::rules::DiscreteValueRuleStates discrete_value_rule_states_2_{
       {api::rules::Rule::Id("dummy_rule"),
-       api::rules::MakeDiscreteValue(api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, "Stop")}};
+       api::rules::MakeDiscreteValue(api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{},
+                                     api::rules::Rule::RelatedUniqueIds{}, "Stop")}};
 
   const api::rules::Phase dummy_phase_1_;
   const api::rules::Phase dummy_phase_2_;

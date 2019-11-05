@@ -323,7 +323,7 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
       rule_ids.push_back(GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
     }
     related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{RightOfWayYieldGroup(), rule_ids});
-    discrete_values.push_back(api::rules::MakeDiscreteValue(Rule::State::kStrict, related_rules, related_unique_ids
+    discrete_values.push_back(api::rules::MakeDiscreteValue(Rule::State::kStrict, related_rules, related_unique_ids,
                                                             right_of_way_rule_state_types.at(state.second.type())));
   }
 
