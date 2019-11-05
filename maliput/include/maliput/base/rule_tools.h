@@ -2,6 +2,7 @@
 
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/discrete_value_rule_state_provider.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/rule_registry.h"
 
 namespace maliput {
@@ -20,5 +21,14 @@ std::vector<maliput::api::rules::Rule::Id> GetYieldGroup(
 std::vector<maliput::api::rules::Rule::Id> GetCurrentYieldGroup(
     const maliput::api::rules::DiscreteValueRule& discrete_value_rule,
     const maliput::api::rules::DiscreteValueRuleStateProvider* state_provider);
+
+/// Functor to filter by api::rules::Rule::TypeId.
+struct RuleTypeFilter {
+  RuleTypeFilter(const api::rules::Rule::TypeId& rule_type_in) : rule_type(rule_type_in) {}
+
+  bool operator()(const api::rules::Rule& rule) { return rule.type_id() == rule_type; }
+
+  api::rules::Rule::TypeId rule_type;
+};
 
 }  // namespace maliput
