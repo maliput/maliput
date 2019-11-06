@@ -169,9 +169,9 @@ Rule::Id GetRuleIdFrom(const Rule::TypeId& rule_type_id, const RightOfWayRule::I
   return Rule::Id(rule_type_id.string() + "/" + right_of_way_rule_id.string());
 }
 
-DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(
-    const RightOfWayRule::Id& row_id, const RightOfWayRule::State& row_state,
-    const RightOfWayRule::RelatedBulbGroups& related_bulb_groups, const DiscreteValueRule& rule) {
+DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(const RightOfWayRule::Id& row_id,
+                                                                          const RightOfWayRule::State& row_state,
+                                                                          const DiscreteValueRule& rule) {
   const std::unordered_map<RightOfWayRule::State::Type, std::string> kRightOfWayStateToString{
       {RightOfWayRule::State::Type::kGo, "Go"},
       {RightOfWayRule::State::Type::kStop, "Stop"},
@@ -187,17 +187,8 @@ DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(
   }
   related_rules.emplace(RightOfWayYieldGroup(), yield_group);
 
-  Rule::RelatedUniqueIds related_unique_ids{{RightOfWayBulbGroup(), {}}};
-  for (const auto& pair_traffic_light_id_vector_bulb_group_id : related_bulb_groups) {
-    for (const auto& bulb_group_id : pair_traffic_light_id_vector_bulb_group_id.second) {
-      related_unique_ids.at(RightOfWayBulbGroup())
-          .push_back(UniqueBulbGroupId{pair_traffic_light_id_vector_bulb_group_id.first, bulb_group_id});
-    }
-  }
-
-  const auto discrete_value = MakeDiscreteValue(Rule::State::kStrict, related_rules, related_unique_ids,
+  const auto discrete_value = MakeDiscreteValue(Rule::State::kStrict, related_rules, Rule::RelatedUniqueIds{},
                                                 kRightOfWayStateToString.at(row_state.type()));
-  MALIPUT_THROW_UNLESS(std::find(rule.values().begin(), rule.values().end(), discrete_value) != rule.values().end());
   return discrete_value;
 }
 
@@ -211,8 +202,7 @@ DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_state
     const RightOfWayRule right_of_way_rule = rulebook->GetRule(row_it.first);
     MALIPUT_THROW_UNLESS(discrete_value_rule_states
                              .emplace(rule_id, FindDiscreteValueFromRightOfWayRuleState(
-                                                   row_it.first, right_of_way_rule.states().at(row_it.second),
-                                                   right_of_way_rule.related_bulb_groups(), rule))
+                                                   row_it.first, right_of_way_rule.states().at(row_it.second), rule))
                              .second);
   }
   return discrete_value_rule_states;
