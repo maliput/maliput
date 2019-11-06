@@ -8,6 +8,7 @@
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 
 namespace maliput {
 
@@ -42,6 +43,8 @@ class ManualPhaseRingBook : public api::rules::PhaseRingBook {
   drake::optional<api::rules::PhaseRing> DoGetPhaseRing(const api::rules::PhaseRing::Id& ring_id) const override;
 
   drake::optional<api::rules::PhaseRing> DoFindPhaseRing(const api::rules::RightOfWayRule::Id& rule_id) const override;
+
+  drake::optional<api::rules::PhaseRing> DoFindPhaseRing(const api::rules::Rule::Id& rule_id) const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

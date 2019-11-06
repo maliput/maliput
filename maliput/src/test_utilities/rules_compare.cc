@@ -27,7 +27,7 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   const int smallest = std::min(a.size(), b.size());
   for (int i = 0; i < smallest; ++i) {
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.at(i), b.at(i)));
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(std::find(b.begin(), b.end(), a.at(i)) != b.end(), true));
   }
   return c.result();
 }
@@ -75,18 +75,6 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type_id(), b.type_id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.zone(), b.zone()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.ranges(), b.ranges()));
-  return c.result();
-}
-
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& a,
-                                   const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& b) {
-  drake::unused(a_expression, b_expression);
-  AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
-  for (const auto& discrete_value_rule_state : a) {
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(b.at(discrete_value_rule_state.first), discrete_value_rule_state.second));
-  }
   return c.result();
 }
 

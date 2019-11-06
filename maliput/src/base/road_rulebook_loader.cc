@@ -318,13 +318,11 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
     Rule::RelatedRules related_rules;
     related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{VehicleStopInZoneBehaviorRuleTypeId().string(),
                                                                         {vehicle_stop_in_zone_rule_id}});
-    std::vector<Rule::Id> rule_ids{};
+    std::vector<Rule::Id> rule_ids;
     for (const auto& yield_id : state.second.yield_to()) {
       rule_ids.push_back(GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
     }
-    if (rule_ids.size()) {
-      related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{RightOfWayYieldGroup(), rule_ids});
-    }
+    related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{RightOfWayYieldGroup(), rule_ids});
     discrete_values.push_back(api::rules::MakeDiscreteValue(Rule::State::kStrict, related_rules, related_unique_ids,
                                                             right_of_way_rule_state_types.at(state.second.type())));
   }

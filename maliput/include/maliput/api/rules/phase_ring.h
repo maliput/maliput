@@ -43,11 +43,11 @@ class PhaseRing final {
   /// can be drake::nullopt, in which case, no next phases will be specified.
   ///
   /// @throws std::exception if `phases` is empty, `phases` contains duplicate
-  /// Phase::Id's, the phases define different sets of
-  /// RightOfWayRule::Ids, or the phases define different sets of bulb states.
-  /// Also if `next_phases` is not drake::nullopt but does not define the possible next
-  /// phases of every phase in `phases` or defines the next phases of a phase
-  /// that is not in `phases`.
+  /// Phase::Id's, the phases define different sets of RightOfWayRule::Ids and
+  /// Rule::Ids, or the phases define different sets of bulb states. If
+  /// `next_phases` is provided, this method will also throw if `next_phases`
+  /// does not define the possible next phases of every phase in `phases`, or
+  /// defines a next phase that is not in `phases`.
   PhaseRing(
       const Id& id, const std::vector<Phase>& phases,
       const drake::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases = drake::nullopt);

@@ -8,8 +8,10 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/test_utilities/phases_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
@@ -23,6 +25,10 @@ Phase CreateFullPhase(const Phase::Id& id) {
   return Phase{id,
                {{RightOfWayRule::Id("rule_a"), RightOfWayRule::State::Id("GO")},
                 {RightOfWayRule::Id("rule_b"), RightOfWayRule::State::Id("STOP")}},
+               {{Rule::Id("RightOfWayRuleType/rule_a"),
+                 MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Go")},
+                {Rule::Id("RightOfWayRuleType/rule_b"),
+                 MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Stop")}},
                {{{{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_a_green")},
                   BulbState::kOn},
                  {{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_a_red")},
@@ -37,14 +43,16 @@ Phase CreatePhaseWithMissingRuleStates(const Phase::Id& id) {
   const Phase mock_phase = CreateFullPhase(id);
   RuleStates rule_states = mock_phase.rule_states();
   rule_states.erase(rule_states.begin());
-  return Phase(id, rule_states, mock_phase.bulb_states());
+  DiscreteValueRuleStates discrete_value_rule_states = mock_phase.discrete_value_rule_states();
+  discrete_value_rule_states.erase(discrete_value_rule_states.begin());
+  return Phase(id, rule_states, discrete_value_rule_states, mock_phase.bulb_states());
 }
 
 Phase CreatePhaseWithMissingBulbStates(const Phase::Id& id) {
   const Phase mock_phase = CreateFullPhase(id);
   BulbStates bulb_states = *mock_phase.bulb_states();
   bulb_states.erase(bulb_states.begin());
-  return Phase(id, mock_phase.rule_states(), bulb_states);
+  return Phase(id, mock_phase.rule_states(), mock_phase.discrete_value_rule_states(), bulb_states);
 }
 
 class PhaseRingTest : public ::testing::Test {

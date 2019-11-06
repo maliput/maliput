@@ -8,22 +8,33 @@
 namespace maliput {
 namespace {
 
+using maliput::api::rules::DiscreteValueRule;
+using maliput::api::rules::MakeDiscreteValue;
 using maliput::api::rules::Phase;
 using maliput::api::rules::PhaseRing;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::RightOfWayRuleStateProvider;
+using maliput::api::rules::Rule;
 
 GTEST_TEST(PhaseBasedRightOfWayRuleStateProviderTest, BasicTest) {
-  const RightOfWayRule::Id rule_id_a("rule a");
-  const RightOfWayRule::Id rule_id_b("rule b");
+  const RightOfWayRule::Id row_rule_id_a("rule a");
+  const RightOfWayRule::Id row_rule_id_b("rule b");
+  const RightOfWayRule::State::Id row_state_id_go("GO");
+  const RightOfWayRule::State::Id row_state_id_stop("STOP");
 
-  const RightOfWayRule::State::Id state_id_go("GO");
-  const RightOfWayRule::State::Id state_id_stop("STOP");
+  const Rule::Id rule_id_a("Right-Of-Way/rule a");
+  const Rule::Id rule_id_b("Right-Of-Way/rule b");
+  const DiscreteValueRule::DiscreteValue state_go =
+      MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Go");
+  const DiscreteValueRule::DiscreteValue state_stop =
+      MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Stop");
 
   const Phase::Id phase_id_1("phase1");
-  const Phase phase1(phase_id_1, {{rule_id_a, state_id_go}, {rule_id_b, state_id_stop}});
+  const Phase phase1(phase_id_1, {{row_rule_id_a, row_state_id_go}, {row_rule_id_b, row_state_id_stop}},
+                     {{rule_id_a, state_go}, {rule_id_b, state_stop}});
   const Phase::Id phase_id_2("phase2");
-  const Phase phase2(phase_id_2, {{rule_id_a, state_id_stop}, {rule_id_b, state_id_go}});
+  const Phase phase2(phase_id_2, {{row_rule_id_a, row_state_id_stop}, {row_rule_id_b, row_state_id_go}},
+                     {{rule_id_a, state_stop}, {rule_id_b, state_go}});
 
   const PhaseRing::Id ring_id("ring");
   const PhaseRing ring(ring_id, {phase1, phase2});
@@ -64,11 +75,12 @@ GTEST_TEST(PhaseBasedRightOfWayRuleStateProviderTest, BasicTest) {
 
   // TODO(liang.fok) Add tests for "next state" in returned results once #9993
   // is resolved.
-  const std::vector<ExpectedState> phase_1_test_cases{{rule_id_a, {state_id_go, drake::nullopt}},
-                                                      {rule_id_b, {state_id_stop, drake::nullopt}}};
+  const std::vector<ExpectedState> phase_1_test_cases{{row_rule_id_a, {row_state_id_go, drake::nullopt}},
+                                                      {row_rule_id_b, {row_state_id_stop, drake::nullopt}}};
   compare_expected(phase_1_test_cases);
   phase_provider.SetPhase(ring_id, phase_id_2);
-  const std::vector<ExpectedState> phase_2_test_cases{{rule_id_a, {state_id_stop}}, {rule_id_b, {state_id_go}}};
+  const std::vector<ExpectedState> phase_2_test_cases{{row_rule_id_a, {row_state_id_stop}},
+                                                      {row_rule_id_b, {row_state_id_go}}};
   compare_expected(phase_2_test_cases);
   EXPECT_FALSE(dut.GetState(RightOfWayRule::Id("unknown rule")).has_value());
 }

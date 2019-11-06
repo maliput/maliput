@@ -4,7 +4,10 @@
 
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+
+#include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/type_specific_identifier.h"
 
@@ -19,6 +22,10 @@ using RuleStates = std::unordered_map<RightOfWayRule::Id, RightOfWayRule::State:
 /// A mapping from a UniqueBulbId to a BulbState. Just an alias for user
 /// convenience.
 using BulbStates = std::unordered_map<UniqueBulbId, BulbState>;
+
+/// A mapping from a Rule::Id to a DiscreteValueRule::DiscreteValue.
+/// Just an alias for user convenience.
+using DiscreteValueRuleStates = std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>;
 
 /// A group of RightOfWayRule instances and their states. It models coupling
 /// between these rules due to, for example, spatial co-location at
@@ -37,9 +44,18 @@ class Phase final {
   /// @param rule_states the RightOfWayRules and their states when the phase is
   /// applied, e.g., to an intersection.
   ///
+  /// @param discrete_value_rule_states the DiscreteValueRules and their states
+  /// when the phase is applied, e.g., to an intersection. Referenced rule type
+  /// must be RightOfWayRuleType().
+  ///
   /// @param bulb_states the states of the bulbs when this phase is applied,
   /// e.g., to an intersection.
-  Phase(const Id& id, const RuleStates& rule_states, drake::optional<BulbStates> bulb_states = drake::nullopt);
+  ///
+  /// @note @p rules_states and @p discrete_value_rule_states should reflect the
+  /// same information. Rules should be duplicated while the transition from one
+  /// type to the other happens.
+  Phase(const Id& id, const RuleStates& rule_states, const DiscreteValueRuleStates& discrete_value_rule_states,
+        drake::optional<BulbStates> bulb_states = drake::nullopt);
 
   /// Returns the phase's identifier.
   const Id& id() const { return id_; }
@@ -47,12 +63,16 @@ class Phase final {
   /// Returns the phase's RightOfWayRule instances and their states.
   const RuleStates& rule_states() const { return rule_states_; }
 
+  /// Returns the phase's DiscreteValueRule instances and their states.
+  const DiscreteValueRuleStates& discrete_value_rule_states() const { return discrete_value_rule_states_; }
+
   /// Returns the phase's bulb states.
   const drake::optional<BulbStates>& bulb_states() const { return bulb_states_; }
 
  private:
   Id id_;
   RuleStates rule_states_;
+  DiscreteValueRuleStates discrete_value_rule_states_;
   drake::optional<BulbStates> bulb_states_;
 };
 

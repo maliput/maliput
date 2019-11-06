@@ -18,6 +18,10 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const RuleStates& a,
                                    const RuleStates& b);
 
+/// Predicate-formatter which tests equality of DiscreteValueRuleStates.
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const DiscreteValueRuleStates& a,
+                                   const DiscreteValueRuleStates& b);
+
 /// Predicate-formatter which tests equality of drake::optional<BulbStates>.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const drake::optional<BulbStates>& a, const drake::optional<BulbStates>& b);

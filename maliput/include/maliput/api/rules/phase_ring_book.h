@@ -4,8 +4,10 @@
 
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
+
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 
 namespace maliput {
 namespace api {
@@ -30,6 +32,10 @@ class PhaseRingBook {
   /// RightOfWayRule. Returns drake::nullopt if @p rule_id is unrecognized.
   drake::optional<PhaseRing> FindPhaseRing(const RightOfWayRule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
 
+  /// Finds and returns the PhaseRing containing the specified
+  /// Rule. Returns drake::nullopt if @p rule_id is unrecognized.
+  drake::optional<PhaseRing> FindPhaseRing(const Rule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
+
  protected:
   PhaseRingBook() = default;
 
@@ -39,6 +45,8 @@ class PhaseRingBook {
   virtual drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const = 0;
 
   virtual drake::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const = 0;
+
+  virtual drake::optional<PhaseRing> DoFindPhaseRing(const Rule::Id& rule_id) const = 0;
 };
 
 }  // namespace rules

@@ -5,18 +5,24 @@
 #include <gtest/gtest.h>
 
 #include "drake/common/drake_optional.h"
+
+#include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 
 namespace maliput {
 namespace {
 
+using api::rules::DiscreteValueRuleStates;
+using api::rules::MakeDiscreteValue;
 using api::rules::Phase;
 using api::rules::PhaseProvider;
 using api::rules::PhaseRing;
 using api::rules::RightOfWayRule;
+using api::rules::Rule;
 using api::rules::RuleStates;
 
 constexpr double kDurationUntil{10.};  // Arbitrarily chosen.
@@ -86,8 +92,15 @@ GTEST_TEST(PhaseRingTest, InvalidPhases) {
   const RuleStates rule_states_1{{RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")},
                                  {RightOfWayRule::Id("b"), RightOfWayRule::State::Id("2")}};
   const RuleStates rule_states_2{{RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")}};
-  Phase phase_1(Phase::Id("bar"), rule_states_1);
-  Phase phase_2(Phase::Id("baz"), rule_states_2);
+
+  const DiscreteValueRuleStates discrete_value_rule_states_1{
+      {Rule::Id("a"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "1")}},
+      {Rule::Id("b"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "2")}}};
+  const DiscreteValueRuleStates discrete_value_rule_states_2{
+      {Rule::Id("a"), {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "1")}}};
+
+  Phase phase_1(Phase::Id("bar"), rule_states_1, discrete_value_rule_states_1);
+  Phase phase_2(Phase::Id("baz"), rule_states_2, discrete_value_rule_states_2);
   const std::vector<Phase> phases{phase_1, phase_2};
   EXPECT_THROW(PhaseRing(PhaseRing::Id("foo"), phases), std::exception);
 }

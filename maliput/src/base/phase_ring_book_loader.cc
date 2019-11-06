@@ -7,11 +7,14 @@
 #include "yaml-cpp/yaml.h"
 
 #include "maliput/api/regions.h"
+#include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/manual_phase_ring_book.h"
+#include "maliput/base/rule_registry.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
 
@@ -52,14 +55,19 @@ using api::rules::Bulb;
 using api::rules::BulbGroup;
 using api::rules::BulbState;
 using api::rules::BulbStates;
+using api::rules::DiscreteValueRule;
+using api::rules::DiscreteValueRuleStates;
+using api::rules::MakeDiscreteValue;
 using api::rules::Phase;
 using api::rules::PhaseRing;
 using api::rules::PhaseRingBook;
 using api::rules::RightOfWayRule;
 using api::rules::RoadRulebook;
+using api::rules::Rule;
 using api::rules::RuleStates;
 using api::rules::TrafficLight;
 using api::rules::TrafficLightBook;
+using api::rules::UniqueBulbGroupId;
 using api::rules::UniqueBulbId;
 
 // Given @p rulebook that contains all of the rules, and @p rules_node that
@@ -157,6 +165,49 @@ drake::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light
   return result;
 }
 
+Rule::Id GetRuleIdFrom(const Rule::TypeId& rule_type_id, const RightOfWayRule::Id& right_of_way_rule_id) {
+  return Rule::Id(rule_type_id.string() + "/" + right_of_way_rule_id.string());
+}
+
+DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(const RightOfWayRule::Id& row_id,
+                                                                          const RightOfWayRule::State& row_state,
+                                                                          const DiscreteValueRule& rule) {
+  const std::unordered_map<RightOfWayRule::State::Type, std::string> kRightOfWayStateToString{
+      {RightOfWayRule::State::Type::kGo, "Go"},
+      {RightOfWayRule::State::Type::kStop, "Stop"},
+      {RightOfWayRule::State::Type::kStopThenGo, "StopThenGo"},
+  };
+  // Constructs a DiscreteValueRule::DiscreteValue from `row_state`.
+  api::rules::Rule::RelatedRules related_rules;
+  related_rules.emplace(VehicleStopInZoneBehaviorRuleTypeId().string(),
+                        std::vector<Rule::Id>{GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), row_id)});
+  std::vector<Rule::Id> yield_group;
+  for (const auto& yield_id : row_state.yield_to()) {
+    yield_group.push_back(GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
+  }
+  related_rules.emplace(RightOfWayYieldGroup(), yield_group);
+
+  const auto discrete_value = MakeDiscreteValue(Rule::State::kStrict, related_rules, Rule::RelatedUniqueIds{},
+                                                kRightOfWayStateToString.at(row_state.type()));
+  return discrete_value;
+}
+
+DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_states, const RoadRulebook* rulebook) {
+  MALIPUT_THROW_UNLESS(rulebook != nullptr);
+
+  DiscreteValueRuleStates discrete_value_rule_states;
+  for (const auto& row_it : rule_states) {
+    const Rule::Id rule_id = GetRuleIdFrom(RightOfWayRuleTypeId(), row_it.first);
+    const DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id);
+    const RightOfWayRule right_of_way_rule = rulebook->GetRule(row_it.first);
+    MALIPUT_THROW_UNLESS(discrete_value_rule_states
+                             .emplace(rule_id, FindDiscreteValueFromRightOfWayRuleState(
+                                                   row_it.first, right_of_way_rule.states().at(row_it.second), rule))
+                             .second);
+  }
+  return discrete_value_rule_states;
+}
+
 void VerifyPhaseExists(const std::vector<Phase>& phases, const Phase::Id& phase_id) {
   const auto it =
       std::find_if(phases.begin(), phases.end(), [&](const Phase& p) -> bool { return p.id() == phase_id; });
@@ -222,8 +273,8 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
       MALIPUT_THROW_UNLESS(rule_states.find(rule_id) != rule_states.end());
       rule_states.at(rule_id) = state_id;
     }
-    drake::optional<BulbStates> bulb_states = LoadBulbStates(traffic_light_book, phase_node);
-    phases.push_back(Phase(phase_id, rule_states, bulb_states));
+    phases.push_back(Phase(phase_id, rule_states, LoadDiscreteValueRuleStates(rule_states, rulebook),
+                           LoadBulbStates(traffic_light_book, phase_node)));
   }
 
   const auto next_phases = BuildNextPhases(phases, phase_ring_node);
