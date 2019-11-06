@@ -27,8 +27,7 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   const int smallest = std::min(a.size(), b.size());
   for (int i = 0; i < smallest; ++i) {
-    // MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(std::find(b.begin(), b.end(), a.at(i)) != b.end(), true));
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.at(i), b.at(i)));
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(std::find(b.begin(), b.end(), a.at(i)) != b.end(), true));
   }
   return c.result();
 }

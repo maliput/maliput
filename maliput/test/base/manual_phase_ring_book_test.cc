@@ -15,13 +15,11 @@
 namespace maliput {
 namespace {
 
-using api::rules::DiscreteValueRuleStates;
 using api::rules::MakeDiscreteValue;
 using api::rules::Phase;
 using api::rules::PhaseRing;
 using api::rules::RightOfWayRule;
 using api::rules::Rule;
-using api::rules::RuleStates;
 
 struct ManualPhaseRingBookTest : public ::testing::Test {
   ManualPhaseRingBookTest()

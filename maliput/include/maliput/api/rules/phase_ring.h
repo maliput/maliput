@@ -46,9 +46,9 @@ class PhaseRing final {
   /// Phase::Id's, the phases define different sets of
   /// RightOfWayRule::Ids and Rule::Ids, or the phases define different sets of
   /// bulb states.
-  /// Also if `next_phases` is not drake::nullopt but does not define the
-  /// possible next phases of every phase in `phases` or defines the next phases
-  /// of a phase that is not in `phases`.
+  /// Also if `next_phases` is provided but does not define the possible next
+  /// phases of every phase in `phases` or defines the next phases of a phase
+  /// that is not in `phases`.
   PhaseRing(
       const Id& id, const std::vector<Phase>& phases,
       const drake::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases = drake::nullopt);
