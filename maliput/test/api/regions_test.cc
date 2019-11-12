@@ -23,6 +23,10 @@ const double negative_linear_tolerance = -2;
 // Using negative values bigger than the size of one SRange is not allowed
 // and an exception will be thrown.
 const double excessive_negative_linear_tolerance = -50;
+// Arbitrary api::LaneId created for testing purposes.
+const LaneId lane_id_1{"id1"};
+const LaneId lane_id_2{"id2"};
+const LaneId lane_id_x{"idx"};
 
 GTEST_TEST(SRangeTest, DefaultConstructionAndAccessors) {
   const SRange dut;
@@ -125,10 +129,10 @@ TEST_P(SRangeGetIntersectionTest, GetIntersection) {
   const drake::optional<SRange> dut =
       build_config_.s_range.GetIntersection(build_config_.intersect, build_config_.tolerance);
   if (build_config_.expects_nullopt) {
-    EXPECT_EQ(dut, drake::nullopt);
+    EXPECT_FALSE(dut.has_value());
   } else {
-    EXPECT_TRUE(std::fabs(dut.value().s0() - build_config_.expected.s0()) <= build_config_.tolerance &&
-                std::fabs(dut.value().s1() - build_config_.expected.s1()) <= build_config_.tolerance);
+    EXPECT_LE(std::fabs(dut.value().s0() - build_config_.expected.s0()), build_config_.tolerance);
+    EXPECT_LE(std::fabs(dut.value().s1() - build_config_.expected.s1()), build_config_.tolerance);
   }
 }
 
@@ -136,41 +140,41 @@ INSTANTIATE_TEST_CASE_P(SRangeGetIntersectionTestGroup, SRangeGetIntersectionTes
                         ::testing::ValuesIn(GetIntersectionTestParameters()));
 
 GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
-  LaneSRange dut(LaneId("dut"), SRange(34., 0.));
-  EXPECT_EQ(dut.lane_id(), LaneId("dut"));
+  LaneSRange dut(lane_id_1, SRange(34., 0.));
+  EXPECT_EQ(dut.lane_id(), lane_id_1);
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.s_range(), SRange(34., 0.)));
 
   // Exercise convenient construction via initializer list for s_range.
-  EXPECT_NO_THROW(LaneSRange(LaneId("dut"), {0., 50.}));
+  EXPECT_NO_THROW(LaneSRange(lane_id_1, {0., 50.}));
 }
 
 GTEST_TEST(LaneSRangeTest, Copying) {
-  const LaneSRange source(LaneId("xxx"), SRange(20., 30.));
+  const LaneSRange source(lane_id_1, SRange(20., 30.));
   const LaneSRange dut(source);
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
 }
 
 GTEST_TEST(LaneSRangeTest, Assignment) {
-  const LaneSRange source(LaneId("xxx"), SRange(20., 30.));
-  LaneSRange dut(LaneId("yyy"), SRange(40., 99.));  // e.g., "something else"
+  const LaneSRange source(lane_id_1, SRange(20., 30.));
+  LaneSRange dut(lane_id_2, SRange(40., 99.));  // e.g., "something else"
   dut = source;
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
 }
 
 GTEST_TEST(LaneSRangeTest, Intersects) {
-  const LaneSRange lane_s_range_a(LaneId("lane_a"), SRange(20., 30.));
-  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_a"), SRange(25., 35.)}, linear_tolerance));
-  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_a"), SRange(70., 10.)}, linear_tolerance));
-  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_a"), SRange(15., 25.)}, linear_tolerance));
-  EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_a"), SRange(55., 35.)}, linear_tolerance));
-  EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{LaneId("lane_x"), SRange(70., 10.)}, linear_tolerance));
+  const LaneSRange lane_s_range_a(lane_id_1, SRange(20., 30.));
+  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{lane_id_1, SRange(25., 35.)}, linear_tolerance));
+  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{lane_id_1, SRange(70., 10.)}, linear_tolerance));
+  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{lane_id_1, SRange(15., 25.)}, linear_tolerance));
+  EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{lane_id_1, SRange(55., 35.)}, linear_tolerance));
+  EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{lane_id_x, SRange(70., 10.)}, linear_tolerance));
 }
 
 class LaneSRouteTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    source_.emplace_back(LaneId("id1"), SRange(0., 10.));
-    source_.emplace_back(LaneId("id2"), SRange(90., 17.));
+    source_.emplace_back(lane_id_1, SRange(0., 10.));
+    source_.emplace_back(lane_id_2, SRange(90., 17.));
   }
 
   std::vector<LaneSRange> source_;
@@ -200,14 +204,14 @@ TEST_F(LaneSRouteTest, Assignment) {
 }
 
 TEST_F(LaneSRouteTest, Intersects) {
+  EXPECT_TRUE(LaneSRoute(source_).Intersects(LaneSRoute{{{lane_id_1, SRange(5., 35.)}, {lane_id_2, SRange(32., 1.)}}},
+                                             linear_tolerance));
   EXPECT_TRUE(LaneSRoute(source_).Intersects(
-      LaneSRoute{{{LaneId("id1"), SRange(5., 35.)}, {LaneId("id2"), SRange(32., 1.)}}}, linear_tolerance));
-  EXPECT_TRUE(LaneSRoute(source_).Intersects(
-      LaneSRoute{{{LaneId("idx"), SRange(100., 102.)}, {LaneId("id2"), SRange(25., 30.)}}}, linear_tolerance));
-  EXPECT_TRUE(LaneSRoute(source_).Intersects(
-      LaneSRoute{{{LaneId("id1"), SRange(180., 12.)}, {LaneId("id2"), SRange(1., 50.)}}}, linear_tolerance));
+      LaneSRoute{{{lane_id_x, SRange(100., 102.)}, {lane_id_2, SRange(25., 30.)}}}, linear_tolerance));
+  EXPECT_TRUE(LaneSRoute(source_).Intersects(LaneSRoute{{{lane_id_1, SRange(180., 12.)}, {lane_id_2, SRange(1., 50.)}}},
+                                             linear_tolerance));
   EXPECT_FALSE(LaneSRoute(source_).Intersects(
-      LaneSRoute{{{LaneId("id1"), SRange(180., 12.)}, {LaneId("id2"), SRange(1., 15.)}}}, linear_tolerance));
+      LaneSRoute{{{lane_id_1, SRange(180., 12.)}, {lane_id_2, SRange(1., 15.)}}}, linear_tolerance));
 }
 
 // Holds RoadGeometry build configuration.

@@ -25,8 +25,8 @@ class IntersectionBook : public api::IntersectionBook {
 
   /// Returns a vector of Intersection pointers whose regions intersect `region`.
   ///
-  /// @param region A vector of `LaneSRanges`.
-  /// @param tolerance Tolerance to compare `LaneSRange` intersections.
+  /// @param region A vector of api::LaneSRanges.
+  /// @param tolerance Tolerance to compare api::LaneSRange intersections.
   std::vector<api::Intersection*> FindIntersections(const std::vector<api::LaneSRange>& region, double tolerance);
 
  private:
