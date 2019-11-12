@@ -28,4 +28,18 @@ if (BUILD_TESTING)
   ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
 endif()
 
+##############################################################################
+# Docs
+##############################################################################
+
+if(NOT DEFINED BUILD_DOCS)
+  set(BUILD_DOCS 1)
+endif()
+
+if(BUILD_DOCS)
+  find_package(ament_cmake_doxygen REQUIRED)
+  ament_doxygen_generate(doxygen_maliput_integration_tests
+    DEPENDENCIES dragway maliput multilane)
+endif()
+
 ament_package()

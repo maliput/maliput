@@ -43,6 +43,10 @@ endif()
 # Docs
 ##############################################################################
 
+if(NOT DEFINED BUILD_DOCS)
+  set(BUILD_DOCS 1)
+endif()
+
 if(BUILD_DOCS)
   find_package(ament_cmake_doxygen REQUIRED)
   ament_doxygen_generate(doxygen_multilane
