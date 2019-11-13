@@ -33,6 +33,13 @@ struct RoadNetworkValidatorOptions {
   bool check_related_bulb_groups{true};
   /// Whether to check if rule zones are G1 contiguous.
   bool check_contiguity_rule_zones{true};
+  /// Whether to check rules::DiscreteValueRuleStates in rules::Phases
+  /// consistency with respect to the available rules::DiscreteValueRules in the
+  /// rules::RoadRulebook.
+  bool check_phase_discrete_value_rule_states{true};
+  /// Whether to check rules::BulbStates in rules::Phases consistency with
+  /// respect to rules::Bulbs living in rules::TrafficLightBook.
+  bool check_phase_bulb_states{true};
 };
 
 /// Validates a RoadNetwork.

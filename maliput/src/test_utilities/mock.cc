@@ -400,11 +400,20 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockPhaseRingBook)
   MockPhaseRingBook() {}
 
- private:
-  std::vector<rules::PhaseRing::Id> DoGetPhaseRings() const override { return std::vector<rules::PhaseRing::Id>(); }
+  void SetPhaseRing(const rules::PhaseRing& phase_ring) { phase_rings_.emplace(phase_ring.id(), phase_ring); }
 
-  drake::optional<rules::PhaseRing> DoGetPhaseRing(const rules::PhaseRing::Id&) const override {
-    return drake::nullopt;
+ private:
+  std::vector<PhaseRing::Id> DoGetPhaseRings() const override {
+    std::vector<PhaseRing::Id> phase_ring_ids;
+    for (const auto& k_v : phase_rings_) {
+      phase_ring_ids.push_back(k_v.first);
+    }
+    return phase_ring_ids;
+  }
+
+  drake::optional<rules::PhaseRing> DoGetPhaseRing(const rules::PhaseRing::Id& id) const override {
+    return phase_rings_.find(id) != phase_rings_.end() ? drake::optional<rules::PhaseRing>{phase_rings_.at(id)}
+                                                       : drake::optional<rules::PhaseRing>{};
   }
 
   drake::optional<rules::PhaseRing> DoFindPhaseRing(const rules::RightOfWayRule::Id&) const override {
@@ -412,6 +421,8 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
   }
 
   drake::optional<rules::PhaseRing> DoFindPhaseRing(const rules::Rule::Id&) const override { return drake::nullopt; }
+
+  std::unordered_map<rules::PhaseRing::Id, rules::PhaseRing> phase_rings_;
 };
 
 class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateProvider {
@@ -443,8 +454,6 @@ class MockIntersection final : public Intersection {
   void SetPhase(const api::rules::Phase::Id&, const drake::optional<api::rules::Phase::Id>& next_phase = drake::nullopt,
                 const drake::optional<double>& duration_until = drake::nullopt) override {}
 };
-
-PhaseRing CreatePhaseRing() { return PhaseRing(PhaseRing::Id("mock"), {Phase(Phase::Id("mock"), {}, {})}); }
 
 class MockIntersectionBook final : public IntersectionBook {
  public:
@@ -580,6 +589,33 @@ RangeValueRule CreateRangeValueRuleForContiguityTest() {
   return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"),
                         LaneSRoute({LaneSRange(LaneId("mock_a"), {0., 10.}), LaneSRange(LaneId("mock_b"), {0., 10.})}),
                         {CreateRange()});
+}
+
+Phase CreatePhase() { return Phase(Phase::Id("mock"), {}, {}); }
+
+Phase CreatePhase(const PhaseBuildFlags& build_flags) {
+  const Rule::Id rule_id(build_flags.add_missing_rule ? "dvrt/unknown_id" : "dvrt/dvr_id");
+  const auto discrete_value = build_flags.add_missing_value
+                                  ? rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                                             CreateEmptyRelatedUniqueIds(), "unkonwn")
+                                  : rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                                             CreateEmptyRelatedUniqueIds(), "value1");
+  const rules::UniqueBulbId bulb_id(
+      rules::TrafficLight::Id("TrafficLightId"), rules::BulbGroup::Id("BulbGroupId"),
+      build_flags.add_missing_bulb ? rules::Bulb::Id("UnknownBulbId") : rules::Bulb::Id("BulbId"));
+  const rules::UniqueBulbId unique_bulb_id(
+      rules::TrafficLight::Id("TrafficLightId"), rules::BulbGroup::Id("BulbGroupId"),
+      build_flags.add_missing_bulb ? rules::Bulb::Id("UnknownBulbId") : rules::Bulb::Id("BulbId"));
+  const rules::BulbState bulb_state =
+      build_flags.add_missing_bulb_state ? rules::BulbState::kOff : rules::BulbState::kOn;
+  return Phase(Phase::Id("phase_id"), rules::RuleStates{}, rules::DiscreteValueRuleStates{{rule_id, {discrete_value}}},
+               rules::BulbStates{{unique_bulb_id, bulb_state}});
+}
+
+PhaseRing CreatePhaseRing() { return PhaseRing(PhaseRing::Id("mock"), {CreatePhase()}); }
+
+PhaseRing CreatePhaseRing(const PhaseBuildFlags& build_flags) {
+  return PhaseRing(PhaseRing::Id("mock"), {CreatePhase(build_flags)});
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
@@ -732,7 +768,8 @@ std::unique_ptr<BulbGroup> CreateBulbGroup(bool add_missing_bulb_group) {
   const BulbGroup::Id bulb_group_id{add_missing_bulb_group ? "MissingBulbGroupId" : "BulbGroupId"};
   std::vector<std::unique_ptr<Bulb>> bulbs;
   bulbs.push_back(std::make_unique<Bulb>(Bulb::Id{"BulbId"}, GeoPosition(), Rotation(), rules::BulbColor::kRed,
-                                         rules::BulbType::kRound));
+                                         rules::BulbType::kRound, drake::nullopt /* arrow_orientation_rad */,
+                                         std::vector<rules::BulbState>{rules::BulbState::kOn}));
   return std::make_unique<BulbGroup>(bulb_group_id, GeoPosition(), Rotation(), std::move(bulbs));
 }
 
@@ -756,6 +793,12 @@ std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook(const TrafficLig
 }
 
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook() { return std::make_unique<MockPhaseRingBook>(); }
+
+std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook(const PhaseBuildFlags& build_flags) {
+  auto phase_ring_book = std::make_unique<MockPhaseRingBook>();
+  phase_ring_book->SetPhaseRing(CreatePhaseRing(build_flags));
+  return phase_ring_book;
+}
 
 std::unique_ptr<rules::RightOfWayRuleStateProvider> CreateRightOfWayRuleStateProvider() {
   return std::make_unique<MockRightOfWayRuleStateProvider>();

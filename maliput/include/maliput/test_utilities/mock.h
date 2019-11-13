@@ -97,6 +97,16 @@ struct TrafficLightBookBuildFlags {
   TrafficLightBuildFlags traffic_light_book_flags{};
 };
 
+/// Holds Phase build configurations.
+/// @see CreatePhase() docstring for full details on how this structure pairs
+///      with the function.
+struct PhaseBuildFlags {
+  bool add_missing_rule{false};
+  bool add_missing_value{false};
+  bool add_missing_bulb{false};
+  bool add_missing_bulb_state{false};
+};
+
 /// Returns a LaneSRoute containing an arbitrary route.
 LaneSRoute CreateLaneSRoute();
 
@@ -160,6 +170,30 @@ rules::RangeValueRule::Range CreateRange();
 
 /// Returns a rules::RangeValueRule containing an arbitrary state.
 rules::RangeValueRule CreateRangeValueRule();
+
+/// Returns an arbitrary rules::Phase.
+rules::Phase CreatePhase();
+
+/// Returns a rules::Phase based on `build_flags` configuration.
+///
+/// When `build_flags.add_missing_rule` is true, an unknown rule id is added;
+/// and if `build_flags.add_missing_value` is true, an unknown
+/// rules::DiscreteValueRule::DiscreteValue is added. Otherwise, it adds a
+/// reference to both rules::Rule::Id and
+/// rules::DiscreteValueRule::DiscreteValue offered by
+/// CreateDiscreteValueRule(). When `build_flags.add_missing_bulb` is true, an
+/// unknown rules::UniqueBulbId is added; and if
+/// `build_flags.add_missing_bulb_state` is true, the rules::Bulb's
+/// rules::BulbState will be other than the one set by CreateBulbGroup().
+rules::Phase CreatePhase(const PhaseBuildFlags& build_flags);
+
+/// Returns an arbitrary rules::PhaseRing whose rules::Phase is the result of
+/// CreatePhase().
+rules::PhaseRing CreatePhaseRing();
+
+/// Returns a rules::PhaseRing whose rules::Phase is the result of
+/// `CreatePhase(build_flags)`.
+rules::PhaseRing CreatePhaseRing(const PhaseBuildFlags& build_flags);
 
 /// Returns a rules::RangeValueRule containing an arbitrary state.
 rules::RangeValueRule CreateRangeValueRuleForContiguityTest();
@@ -250,6 +284,8 @@ std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook(const TrafficLig
 
 /// Returns an arbitrary rules::PhaseRingBook.
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook();
+
+std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook(const PhaseBuildFlags& build_flags);
 
 /// Returns an arbitrary rules::RightOfWayRuleStateProvider.
 std::unique_ptr<rules::RightOfWayRuleStateProvider> CreateRightOfWayRuleStateProvider();
