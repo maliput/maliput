@@ -60,4 +60,24 @@ std::vector<Intersection*> IntersectionBook::DoGetIntersections() { return impl_
 
 Intersection* IntersectionBook::DoGetIntersection(const Intersection::Id& id) { return impl_->DoGetIntersection(id); }
 
+std::vector<Intersection*> IntersectionBook::FindIntersections(const std::vector<maliput::api::LaneSRange>& region,
+                                                               double tolerance) {
+  std::vector<Intersection*> intersections{};
+  std::vector<Intersection*> intersections_from_book{GetIntersections()};
+
+  for (const auto& intersection_from_book : intersections_from_book) {
+    for (const auto& lane_s_range_intersection : intersection_from_book->region()) {
+      const auto lanes_s_range_it = std::find_if(
+          region.begin(), region.end(), [lane_s_range_intersection, tolerance](maliput::api::LaneSRange lane_s_range) {
+            return lane_s_range_intersection.Intersects(lane_s_range, tolerance);
+          });
+      if (lanes_s_range_it != region.end()) {
+        intersections.push_back(intersection_from_book);
+        break;
+      }
+    }
+  }
+  return intersections;
+}
+
 }  // namespace maliput
