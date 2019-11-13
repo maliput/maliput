@@ -90,4 +90,8 @@ std::string RightOfWayYieldGroup();
 /// Returns "BulbGroupIds", which is the key to the `Rules::RelatedUniqueIds` of Right-Of-Way rules.
 std::string RightOfWayBulbGroup();
 
+/// Returns a maliput::api::rules::Rule::TypeId initialized with
+/// "Speed Limit Rule Type".
+api::rules::Rule::TypeId SpeedLimitRuleTypeId();
+
 }  // namespace maliput
