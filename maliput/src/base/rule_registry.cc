@@ -60,4 +60,6 @@ std::string RightOfWayYieldGroup() { return "YieldGroup"; }
 
 std::string RightOfWayBulbGroup() { return "BulbGroupIds"; }
 
+api::rules::Rule::TypeId SpeedLimitRuleTypeId() { return api::rules::Rule::TypeId{"Speed Limit Rule Type"}; }
+
 }  // namespace maliput
