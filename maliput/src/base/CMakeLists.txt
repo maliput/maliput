@@ -18,6 +18,7 @@ set(BASE_SOURCES
   road_rulebook_loader.cc
   rule_filter.cc
   rule_registry.cc
+  rule_registry_loader.cc
   rule_tools.cc
   traffic_light_book.cc
   traffic_light_book_loader.cc
