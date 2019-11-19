@@ -451,6 +451,75 @@ double PickGridUnit(const api::Lane* lane, double max_size, double min_resolutio
   return result;
 }
 
+// Generates a mesh to be used for a BranchPoint
+//
+// @param elevation   the elevation over the BranchPoint which the mesh /
+//                    will be generated
+// @param height      the height of the mesh to be generated
+// @param lane_end    one of the lane ends within the BranchPoint to be used /
+//                    as a reference for its geometry
+// @param as_diamond  whether a diamond shape is desired or not
+// @param mesh        the mesh to store the created shapes in
+void DrawBranch(double elevation, double height, const api::LaneEnd& lane_end, bool as_diamond, GeoMesh* mesh) {
+  MALIPUT_THROW_UNLESS(mesh != nullptr && elevation >= 0 && height >= 0);
+
+  static const double kWidthFactor = 0.1;
+  static const double kTipFactor = 0.1;
+  static const double kLengthFactor = 1.0;
+  static const double kMaxLengthFraction = 0.4;
+
+  const bool is_end_of_lane = lane_end.end == api::LaneEnd::kStart;
+  const double end_s = is_end_of_lane ? 0. : lane_end.lane->length();
+  const api::RBounds r_bounds = lane_end.lane->lane_bounds(end_s);
+
+  // TODO(anyone): Remove the assumption that lane centerline is centered with respect to lane_bound().
+  const double half_width = (r_bounds.max() - r_bounds.min()) * kWidthFactor * 0.5;
+  const double length =
+      std::min(kMaxLengthFraction * lane_end.lane->length(), kLengthFactor * (r_bounds.max() - r_bounds.min())) *
+      (is_end_of_lane ? 1. : -1);
+
+  const double left_r = half_width * (is_end_of_lane ? 1. : -1);
+  const double right_r = -left_r;
+
+  if (as_diamond) {
+    SrhFace srh_face({{end_s, 0., elevation - (0.5 * height)},
+                      {end_s, right_r, elevation},
+                      {end_s, 0., elevation + (0.5 * height)},
+                      {end_s, left_r, elevation}},
+                     api::LanePosition{(end_s == 0. ? 1. : -1), 0., 0.});
+    mesh->PushFace(srh_face.ToGeoFace(lane_end.lane));
+  } else {
+    SrhFace srh_face1({{end_s, left_r, elevation},
+                       {end_s, right_r, elevation},
+                       {end_s + length, right_r * kTipFactor, elevation},
+                       {end_s + length, left_r * kTipFactor, elevation}},
+                      api::LanePosition{0., 0., 1.});
+    SrhFace srh_face2({{end_s, 0., elevation - (0.5 * height)},
+                       {end_s, 0., elevation + (0.5 * height)},
+                       {end_s + length, 0., elevation + (0.5 * kTipFactor * height)},
+                       {end_s + length, 0., elevation - (0.5 * kTipFactor * height)}},
+                      api::LanePosition{0., (length > 0. ? 1. : -1.), 0.});
+    mesh->PushFace(srh_face1.ToGeoFace(lane_end.lane));
+    mesh->PushFace(srh_face2.ToGeoFace(lane_end.lane));
+  }
+}
+
+// Generates a meshes for all BranchPoints in a LaneEndSet
+//
+// @param elevation   the elevation over the BranchPoint which the mesh /
+//                    will be generated
+// @param height      the height of the mesh to be generated
+// @param set         the set containing the BranchPoints to draw indicators /
+//                    for
+// @param mesh        the mesh to store the created shapes in
+void DrawArrows(double elevation, double height, const api::LaneEndSet* set, GeoMesh* mesh) {
+  MALIPUT_THROW_UNLESS(set != nullptr && mesh != nullptr);
+
+  for (int i = 0; i < set->size(); ++i) {
+    DrawBranch(elevation, height, set->get(i), false /* as_diamond */, mesh);
+  }
+}
+
 // Renders a BranchPoint @p branch_point as a collection of pointy
 // arrows for each branch.  @p base_elevation is the desired elevation
 // of the center of the rendering (above the road surface), and
@@ -514,57 +583,10 @@ void RenderBranchPoint(const api::BranchPoint* const branch_point, const double 
   // - for each branch (LaneEnd), an arrow formed from a pair of very
   //   pointy trapezoids (one in the sr-plane, one in the sh-plane) pointing
   //   into the lane.
-  static const double kWidthFactor = 0.1;
-  static const double kTipFactor = 0.1;
-  static const double kLengthFactor = 1.0;
-  static const double kMaxLengthFraction = 0.4;
 
-  // Helper to draw a LaneEnd as either diamond or arrow.
-  const auto draw_branch = [elevation, height, &mesh](const api::LaneEnd& lane_end, bool as_diamond) {
-    const double end_s = (lane_end.end == api::LaneEnd::kStart) ? 0. : lane_end.lane->length();
-    const api::RBounds r_bounds = lane_end.lane->lane_bounds(end_s);
-
-    const double half_width = (r_bounds.max() - r_bounds.min()) * kWidthFactor * 0.5;
-    const double length =
-        std::min(kMaxLengthFraction * lane_end.lane->length(), kLengthFactor * (r_bounds.max() - r_bounds.min())) *
-        ((lane_end.end == api::LaneEnd::kStart) ? 1. : -1);
-
-    const double left_r = half_width * ((lane_end.end == api::LaneEnd::kStart) ? 1. : -1);
-    const double right_r = -left_r;
-
-    if (as_diamond) {
-      SrhFace srh_face({{end_s, 0., elevation - (0.5 * height)},
-                        {end_s, right_r, elevation},
-                        {end_s, 0., elevation + (0.5 * height)},
-                        {end_s, left_r, elevation}},
-                       api::LanePosition{(end_s == 0. ? 1. : -1), 0., 0.});
-      mesh->PushFace(srh_face.ToGeoFace(lane_end.lane));
-    } else {
-      SrhFace srh_face1({{end_s, left_r, elevation},
-                         {end_s, right_r, elevation},
-                         {end_s + length, right_r * kTipFactor, elevation},
-                         {end_s + length, left_r * kTipFactor, elevation}},
-                        api::LanePosition{0., 0., 1.});
-      SrhFace srh_face2({{end_s, 0., elevation - (0.5 * height)},
-                         {end_s, 0., elevation + (0.5 * height)},
-                         {end_s + length, 0., elevation + (0.5 * kTipFactor * height)},
-                         {end_s + length, 0., elevation - (0.5 * kTipFactor * height)}},
-                        api::LanePosition{0., (length > 0. ? 1. : -1.), 0.});
-      mesh->PushFace(srh_face1.ToGeoFace(lane_end.lane));
-      mesh->PushFace(srh_face2.ToGeoFace(lane_end.lane));
-    }
-  };
-
-  // Helper to draw all LaneEnds in a LaneEndSet as arrows.
-  const auto draw_arrows = [&draw_branch](const api::LaneEndSet* set) {
-    for (int i = 0; i < set->size(); ++i) {
-      draw_branch(set->get(i), false);
-    }
-  };
-
-  draw_branch(reference_end, true /* as_diamond */);
-  draw_arrows(branch_point->GetASide());
-  draw_arrows(branch_point->GetBSide());
+  DrawBranch(elevation, height, reference_end, true /* as_diamond */, mesh);
+  DrawArrows(elevation, height, branch_point->GetASide(), mesh);
+  DrawArrows(elevation, height, branch_point->GetBSide(), mesh);
 }
 
 GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
@@ -635,7 +657,220 @@ bool IsSegmentRenderedNormally(const api::SegmentId& id, const std::vector<api::
   return false;
 }
 
+// Generates an id for the lane mesh
+//
+// @param id   the id of the lane
+std::string LaneKey(const api::LaneId& id) { return "lane_" + id.string(); }
+
+// Generates an id for the marker mesh
+//
+// @param id   the id of the lane
+std::string MarkerKey(const api::LaneId& id) { return "marker_" + id.string(); }
+
+// Generates an id for the grayed lane mesh
+//
+// @param id   the id of the lane
+std::string GrayedLaneKey(const api::LaneId& id) { return "grayed_lane_" + id.string(); }
+
+// Generates an id for the grayed marker mesh
+//
+// @param id   the id of the lane
+std::string GrayedMarkerKey(const api::LaneId& id) { return "grayed_marker_" + id.string(); }
+
+// Generates an id for the branch point mesh
+//
+// @param id   the id of the branch point
+std::string BranchPointKey(const api::BranchPointId& id) { return "branch_point_" + id.string(); }
+
 }  // namespace
+
+Material GetMaterialFromMesh(const MaterialType mesh_material) {
+  switch (mesh_material) {
+    case Asphalt:
+      return GetMaterialByName(kBlandAsphalt);
+    case Lane:
+      return GetMaterialByName(kLaneHaze);
+    case Marker:
+      return GetMaterialByName(kMarkerPaint);
+    case HBounds:
+      return GetMaterialByName(kHBoundsHaze);
+    case BranchPointGlow:
+      return GetMaterialByName(kBranchPointGlow);
+    case GrayedAsphalt:
+      return GetMaterialByName(kGrayedBlandAsphalt);
+    case GrayedLane:
+      return GetMaterialByName(kGrayedLaneHaze);
+    case GrayedMarker:
+      return GetMaterialByName(kGrayedMarkerPaint);
+  }
+}
+
+std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
+                                             const api::LaneId& lane_id, const MaterialType& mesh_material) {
+  MALIPUT_DEMAND(rg != nullptr);
+  MALIPUT_THROW_UNLESS(mesh_material != BranchPointGlow);
+
+  GeoMesh mesh;
+  const api::RoadGeometry::IdIndex& road_index = rg->ById();
+  const api::Lane* lane = road_index.GetLane(lane_id);
+  const api::Segment* segment = lane->segment();
+  const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
+  const double base_grid_unit =
+      features.off_grid_mesh_generation
+          ? linear_tolerance
+          : PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
+
+  switch (mesh_material) {
+    case Asphalt:
+    case GrayedAsphalt: {
+      GeoMesh segment_mesh;
+      CoverLaneWithQuads(&segment_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
+                         [](double, double) { return 0.; }, features.off_grid_mesh_generation);
+      mesh.AddFacesFrom(SimplifyMesh(segment_mesh, features));
+      break;
+    }
+    case Lane:
+    case GrayedLane: {
+      if (features.draw_lane_haze) {
+        GeoMesh haze_mesh;
+        CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
+                           [&features](double, double) { return features.lane_haze_elevation; },
+                           features.off_grid_mesh_generation);
+        mesh.AddFacesFrom(SimplifyMesh(haze_mesh, features));
+      }
+      break;
+    }
+    case Marker:
+    case GrayedMarker: {
+      const double grid_unit =
+          PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
+      if (features.draw_stripes) {
+        GeoMesh stripes_mesh;
+        StripeLaneBounds(&stripes_mesh, lane, grid_unit, features.stripe_elevation, features.stripe_width);
+        mesh.AddFacesFrom(SimplifyMesh(stripes_mesh, features));
+      }
+      if (features.draw_arrows) {
+        GeoMesh arrows_mesh;
+        MarkLaneEnds(&arrows_mesh, lane, grid_unit, features.arrow_elevation);
+        mesh.AddFacesFrom(SimplifyMesh(arrows_mesh, features));
+      }
+      break;
+    }
+    case HBounds: {
+      if (features.draw_elevation_bounds) {
+        GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
+        CoverLaneWithQuads(&upper_h_bounds_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
+                           [&lane](double s, double r) { return lane->elevation_bounds(s, r).max(); },
+                           features.off_grid_mesh_generation);
+        CoverLaneWithQuads(&lower_h_bounds_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
+                           [&lane](double s, double r) { return lane->elevation_bounds(s, r).min(); },
+                           features.off_grid_mesh_generation);
+        mesh.AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
+        mesh.AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
+      }
+      break;
+    }
+  }
+
+  return std::make_pair(std::move(mesh), GetMaterialFromMesh(mesh_material));
+}
+
+std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
+                                             const api::BranchPointId& branch_point_id,
+                                             const MaterialType& mesh_material) {
+  MALIPUT_DEMAND(rg != nullptr);
+  MALIPUT_THROW_UNLESS(mesh_material == BranchPointGlow);
+
+  GeoMesh mesh;
+  const api::RoadGeometry::IdIndex& road_index = rg->ById();
+  const api::BranchPoint* branch_point = road_index.GetBranchPoint(branch_point_id);
+  const api::LaneEnd reference_end =
+      (branch_point->GetASide()->size() > 0) ? branch_point->GetASide()->get(0) : branch_point->GetBSide()->get(0);
+  double elevation = features.branch_point_elevation;
+  double height = features.branch_point_height;
+
+  DrawBranch(elevation, height, reference_end, true /* as_diamond */, &mesh);
+  DrawArrows(elevation, height, branch_point->GetASide(), &mesh);
+  DrawArrows(elevation, height, branch_point->GetBSide(), &mesh);
+
+  return std::make_pair(std::move(mesh), GetMaterialFromMesh(mesh_material));
+}
+
+std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
+                                             const api::SegmentId& segment_id, const MaterialType& mesh_material) {
+  MALIPUT_DEMAND(rg != nullptr);
+  MALIPUT_THROW_UNLESS(mesh_material == Asphalt || mesh_material == GrayedAsphalt);
+
+  GeoMesh mesh;
+  const api::RoadGeometry::IdIndex& road_index = rg->ById();
+  const api::Segment* segment = road_index.GetSegment(segment_id);
+  const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
+  const double base_grid_unit =
+      features.off_grid_mesh_generation
+          ? linear_tolerance
+          : PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
+
+  GeoMesh segment_mesh;
+  CoverLaneWithQuads(&segment_mesh, segment->lane(0), base_grid_unit, true /* use_segment_bounds */,
+                     [](double, double) { return 0.; }, features.off_grid_mesh_generation);
+  mesh.AddFacesFrom(SimplifyMesh(segment_mesh, features));
+
+  Material material = GetMaterialFromMesh(mesh_material);
+
+  return std::make_pair(std::move(mesh), material);
+}
+
+RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFeatures& features) {
+  RoadGeometryMesh meshes;
+
+  GeoMesh asphalt_mesh;
+  GeoMesh lane_mesh;
+  GeoMesh marker_mesh;
+  GeoMesh h_bounds_mesh;
+  GeoMesh branch_point_mesh;
+
+  GeoMesh grayed_asphalt_mesh;
+  GeoMesh grayed_lane_mesh;
+  GeoMesh grayed_marker_mesh;
+
+  for (int ji = 0; ji < rg->num_junctions(); ++ji) {
+    const api::Junction* junction = rg->junction(ji);
+    for (int si = 0; si < junction->num_segments(); ++si) {
+      const api::Segment* segment = junction->segment(si);
+      if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
+        RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh);
+        for (int li = 0; li < segment->num_lanes(); ++li) {
+          const api::Lane* lane = segment->lane(li);
+          meshes.lane_lane_mesh[LaneKey(lane->id())] = BuildMesh(rg, features, lane->id(), Lane);
+          meshes.lane_marker_mesh[MarkerKey(lane->id())] = BuildMesh(rg, features, lane->id(), Marker);
+        }
+      } else {
+        RenderSegment(segment, features, &grayed_asphalt_mesh, &grayed_lane_mesh, &grayed_marker_mesh, &h_bounds_mesh);
+        for (int li = 0; li < segment->num_lanes(); ++li) {
+          const api::Lane* lane = segment->lane(li);
+          meshes.lane_grayed_lane_mesh[GrayedLaneKey(lane->id())] = BuildMesh(rg, features, lane->id(), GrayedLane);
+          meshes.lane_grayed_marker_mesh[GrayedMarkerKey(lane->id())] =
+              BuildMesh(rg, features, lane->id(), GrayedMarker);
+        }
+      }
+    }
+  }
+
+  if (features.draw_branch_points) {
+    for (int bpi = 0; bpi < rg->num_branch_points(); ++bpi) {
+      const api::BranchPoint* branch_point = rg->branch_point(bpi);
+      meshes.branch_point_mesh[BranchPointKey(branch_point->id())] =
+          BuildMesh(rg, features, branch_point->id(), BranchPointGlow);
+    }
+  }
+
+  meshes.asphalt_mesh["asphalt"] = std::make_pair(std::move(asphalt_mesh), GetMaterialByName(kBlandAsphalt));
+  meshes.grayed_asphalt_mesh["grayed_asphalt"] =
+      std::make_pair(std::move(grayed_asphalt_mesh), GetMaterialByName(kGrayedBlandAsphalt));
+  meshes.hbounds_mesh["h_bounds"] = std::make_pair(std::move(h_bounds_mesh), GetMaterialByName(kHBoundsHaze));
+
+  return meshes;
+}
 
 std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* rg,
                                                                       const ObjFeatures& features) {
