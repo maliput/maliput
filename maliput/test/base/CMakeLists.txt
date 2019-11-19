@@ -1,3 +1,4 @@
+ament_add_gtest(base_rule_registry_test rule_registry_test.cc)
 ament_add_gtest(intersection_test intersection_test.cc)
 ament_add_gtest(intersection_book_test intersection_book_test.cc)
 ament_add_gtest(manual_phase_provider_test manual_phase_provider_test.cc)
@@ -9,7 +10,6 @@ ament_add_gtest(manual_rulebook_test manual_rulebook_test.cc)
 ament_add_gtest(phase_based_right_of_way_rule_state_provider_test phase_based_right_of_way_rule_state_provider_test.cc)
 ament_add_gtest(rule_filter_test rule_filter_test.cc)
 ament_add_gtest(rule_tools_test rule_tools_test.cc)
-ament_add_gtest(base_rule_registry_test rule_registry_test.cc)
 ament_add_gtest(rule_registry_loader_test rule_registry_loader_test.cc)
 ament_add_gtest(traffic_light_book_test traffic_light_book_test.cc)
 

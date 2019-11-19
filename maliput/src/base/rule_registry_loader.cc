@@ -45,12 +45,12 @@ namespace maliput {
 namespace {
 
 // Constants to identify attributes of DiscreteValueRule Types and DiscreteValueRule Types.
-constexpr char kValue[] = "value";
-constexpr char kRange[] = "range";
-constexpr char kDescription[] = "description";
-constexpr char kSeverity[] = "severity";
-constexpr char kRelatedRules[] = "related_rules";
-constexpr char kRelatedUniqueIds[] = "related_unique_ids";
+constexpr const char* const kValue = "value";
+constexpr const char* const kRange = "range";
+constexpr const char* const kDescription = "description";
+constexpr const char* const kSeverity = "severity";
+constexpr const char* const kRelatedRules = "related_rules";
+constexpr const char* const kRelatedUniqueIds = "related_unique_ids";
 // Label to identify rule type.
 enum class RuleType {
   // Label for a DiscreteValueRule Type.

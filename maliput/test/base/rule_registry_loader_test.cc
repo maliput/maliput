@@ -67,7 +67,7 @@ class TestLoadingRuleTypesFromYaml : public ::testing::Test {
     - range: [16.6, 27.8]
       description: "Interstate highway - day time"
       severity: 0
-    - range: [16.6, 27.8]
+    - range: [16.6, 22.2]
       description: "Arterial road in Ciudad Autonoma de Buenos Aires"
       severity: 1
 )R",
@@ -162,7 +162,7 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
         EXPECT_EQ(range_value.related_unique_ids.size(), 0);
       } else if (range_value.description == "Arterial road in Ciudad Autonoma de Buenos Aires") {
         EXPECT_DOUBLE_EQ(range_value.min, 16.6);
-        EXPECT_DOUBLE_EQ(range_value.max, 27.8);
+        EXPECT_DOUBLE_EQ(range_value.max, 22.2);
         EXPECT_EQ(range_value.severity, kBestEffort);
         EXPECT_EQ(range_value.related_rules.size(), 0);
         EXPECT_EQ(range_value.related_unique_ids.size(), 0);

@@ -24,7 +24,7 @@ std::unique_ptr<api::rules::RuleRegistry> LoadRuleRegistry(const std::string& in
 /// @return An api::rules::RuleRegistry containing the rule types for DiscreteValueRule
 /// and RangeValueRule Types specified in the file.
 ///
-/// @throws std::exception if the YAML document in @p filename is invalid.
+/// @throws std::exception if the YAML document referred by @p filename is invalid.
 std::unique_ptr<api::rules::RuleRegistry> LoadRuleRegistryFromFile(const std::string& filename);
 
 }  // namespace maliput
