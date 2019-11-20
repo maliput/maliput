@@ -124,6 +124,47 @@ TEST_F(GetCurrentYieldGroupTest, GetCurrentYieldGroup) {
   }
 }
 
+api::rules::Rule::RelatedUniqueIds CreateRelatedUniqueIds() {
+  return std::map<std::string, std::vector<api::UniqueId>>{
+      {RightOfWayBulbGroup(),
+       {api::rules::UniqueBulbGroupId{maliput::api::rules::TrafficLight::Id{"traffic_light_a"},
+                                      maliput::api::rules::BulbGroup::Id{"bulb_group_a"}},
+        api::rules::UniqueBulbGroupId{maliput::api::rules::TrafficLight::Id{"traffic_light_b"},
+                                      maliput::api::rules::BulbGroup::Id{"bulb_group_b"}}}},
+  };
+}
+
+class GetCurrentBulbGroupTest : public ::testing::Test {
+ protected:
+  const Rule::TypeId kTypeId{RightOfWayRuleTypeId()};
+  const Rule::Id kRuleId{kTypeId.string() + "/right_of_way_rule_id"};
+  const LaneSRoute kLaneSRoute{LaneSRoute{{LaneSRange{LaneId{"lane_id"}, {0., 10.}}}}};
+  const DiscreteValueRule::DiscreteValue kStateDiscreteValue{MakeDiscreteValue(
+      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), CreateRelatedUniqueIds(), "StopAndGo")};
+  const std::vector<api::UniqueId> expected_bulb_group{CreateRelatedUniqueIds().at(RightOfWayBulbGroup())};
+
+  void SetUp() override {
+    road_rulebook_ = std::make_unique<ManualRulebook>();
+    road_rulebook_->AddRule(DiscreteValueRule{kRuleId, kTypeId, kLaneSRoute, {kStateDiscreteValue}});
+    discrete_value_rule_state_provider_ = std::make_unique<ManualDiscreteValueRuleStateProvider>(road_rulebook_.get());
+    discrete_value_rule_state_provider_->SetState(kRuleId, kStateDiscreteValue, drake::nullopt, drake::nullopt);
+  }
+
+  std::unique_ptr<ManualRulebook> road_rulebook_;
+  std::unique_ptr<maliput::ManualDiscreteValueRuleStateProvider> discrete_value_rule_state_provider_;
+};
+
+// Tests GetCurrentBulbGroup function.
+TEST_F(GetCurrentBulbGroupTest, GetCurrentBulbGroup) {
+  const std::vector<api::UniqueId> dut{
+      GetCurrentBulbGroup(road_rulebook_->GetDiscreteValueRule(kRuleId), discrete_value_rule_state_provider_.get())};
+
+  EXPECT_EQ(dut.size(), expected_bulb_group.size());
+  for (const auto& expected_bulb_id : expected_bulb_group) {
+    EXPECT_NE(std::find(dut.begin(), dut.end(), expected_bulb_id), dut.end());
+  }
+}
+
 }  // namespace
 }  // namespace test
 }  // namespace maliput
