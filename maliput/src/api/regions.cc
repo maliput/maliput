@@ -1,4 +1,6 @@
 #include "maliput/api/regions.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
 
 namespace maliput {
@@ -58,6 +60,28 @@ bool LaneSRoute::Intersects(const LaneSRoute& lane_s_route, double tolerance) co
       if (s_range.Intersects(*lane_s_range_it, tolerance)) {
         return true;
       }
+    }
+  }
+  return false;
+}
+
+bool IsIncluded(const GeoPosition& geo_position, const std::vector<LaneSRange>& region,
+                const RoadGeometry* road_geometry) {
+  MALIPUT_THROW_UNLESS(road_geometry != nullptr);
+  double linear_tolerance = road_geometry->linear_tolerance();
+  const std::unordered_map<LaneId, const Lane*> lane_id_lane_map = road_geometry->ById().GetLanes();
+  for (const auto& lane_s_range : region) {
+    const auto lane_ptr = std::find_if(lane_id_lane_map.begin(), lane_id_lane_map.end(),
+                                       [lane_s_range](std::pair<LaneId, const Lane*> lane_id_lane) {
+                                         return lane_id_lane.first == lane_s_range.lane_id();
+                                       });
+    MALIPUT_THROW_UNLESS(lane_ptr != lane_id_lane_map.end());
+    LanePositionResult result = lane_ptr->second->ToLanePosition(geo_position);
+    if (result.distance <= linear_tolerance) {
+      // Lane contains the GeoPosition.
+      // It is needed to verify whether the `region` containts it.
+      double s_position = result.lane_position.s();
+      return lane_s_range.s_range().Intersects(SRange(s_position, s_position), linear_tolerance);
     }
   }
   return false;

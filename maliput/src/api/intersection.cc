@@ -20,5 +20,10 @@ const drake::optional<BulbStates> Intersection::bulb_states() const {
   return drake::nullopt;
 }
 
+bool Intersection::Includes(const GeoPosition& geo_position, const RoadGeometry* road_geometry) const {
+  MALIPUT_THROW_UNLESS(road_geometry != nullptr);
+  return IsIncluded(geo_position, region_, road_geometry);
+}
+
 }  // namespace api
 }  // namespace maliput
