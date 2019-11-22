@@ -83,6 +83,8 @@ class MockLane final : public Lane {
   MockLane(const LaneId& id, const GeoPosition& start_gp, const Rotation& start_rot, const GeoPosition& end_gp,
            const Rotation& end_rot)
       : Lane(), id_(id), start_gp_(start_gp), start_rot_(start_rot), end_gp_(end_gp), end_rot_(end_rot) {}
+  MockLane(const LaneId& id, const LanePositionResult& lane_position_result)
+      : Lane(), id_(id), lane_position_result_(lane_position_result) {}
   void set_segment(Segment* segment) { segment_ = segment; }
   void set_start_bp(BranchPoint* start_bp) { start_bp_ = start_bp; }
   void set_end_bp(BranchPoint* end_bp) { end_bp_ = end_bp; }
@@ -100,7 +102,7 @@ class MockLane final : public Lane {
   GeoPosition DoToGeoPosition(const LanePosition& lane_pos) const override {
     return lane_pos.s() ? end_gp_ : start_gp_;
   }
-  LanePositionResult DoToLanePosition(const GeoPosition& geo_pos) const override { return LanePositionResult(); }
+  LanePositionResult DoToLanePosition(const GeoPosition& geo_pos) const override { return lane_position_result_; }
   Rotation DoGetOrientation(const LanePosition& lane_pos) const override {
     return lane_pos.s() ? end_rot_ : start_rot_;
   }
@@ -122,6 +124,7 @@ class MockLane final : public Lane {
   GeoPosition end_gp_{};
   Rotation start_rot_{};
   Rotation end_rot_{};
+  LanePositionResult lane_position_result_{};
 };
 
 class MockSegment final : public Segment {
@@ -661,6 +664,37 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& b
   }
   return std::move(rg);
 }
+
+// Creates a RoadGeometry with two Junctions. Each Junction will have a Segment and a Lane.
+// Return values when ToLanePosition method is called are hardcoded.
+std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry() {
+  constexpr double kArbitrary{1.};
+  const LanePositionResult lane_position_result_a{{10., 20., 30.}, {12., 89., 1.}, 0.5};
+  const LanePositionResult lane_position_result_b{{40., 50., 60.}, {50., 1., 45.}, 30.};
+  auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("road_geometry"), kArbitrary, kArbitrary);
+  auto junction_a = std::make_unique<MockJunction>(JunctionId("junction_a"));
+  auto junction_b = std::make_unique<MockJunction>(JunctionId("junction_b"));
+  auto segment_a = std::make_unique<MockSegment>(SegmentId("segment_a"));
+  auto segment_b = std::make_unique<MockSegment>(SegmentId("segment_b"));
+  auto lane_a = std::make_unique<MockLane>(LaneId("lane_a"), lane_position_result_a);
+  auto lane_b = std::make_unique<MockLane>(LaneId("lane_b"), lane_position_result_b);
+  junction_a->set_road_geometry(rg.get());
+  junction_b->set_road_geometry(rg.get());
+  segment_a->set_junction(junction_a.get());
+  segment_a->set_junction(junction_b.get());
+  lane_a->set_segment(segment_a.get());
+  lane_b->set_segment(segment_b.get());
+  rg->GetIdIndex()->add_lane_to_map(lane_a->id(), lane_a.get());
+  rg->GetIdIndex()->add_lane_to_map(lane_b->id(), lane_b.get());
+  segment_a->set_lane(std::move(lane_a));
+  segment_b->set_lane(std::move(lane_b));
+  junction_a->set_segment(std::move(segment_a));
+  junction_b->set_segment(std::move(segment_b));
+  rg->add_junction(std::move(junction_a));
+  rg->add_junction(std::move(junction_b));
+  return std::move(rg);
+}
+
 // Creates a RoadGeometry with two Junctions. Each Junction will have a Segment and a Lane.
 // Lanes' geometry will be created in accordance to `build_flags`.
 std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometryContiguityBuildFlags& build_flags) {

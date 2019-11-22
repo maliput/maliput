@@ -309,6 +309,22 @@ TEST_P(IsContiguousInvalidArgumentsTest, ChecksIsContiguousFunctionWithInvalidVa
 INSTANTIATE_TEST_CASE_P(IsContiguousFunctionTestGroup, IsContiguousInvalidArgumentsTest,
                         ::testing::ValuesIn(ContiguityInvalidValuesTestParameters()));
 
+GTEST_TEST(IsIncluded, BasicUsage) {
+  const auto rg = test::CreateTwoLanesRoadGeometry();
+  const GeoPosition geo_pos{11.9, 89., 1.};
+  {  // `lane_s_range_a` includes `geo_pos`.
+    const LaneSRange lane_s_range_a{LaneId{"lane_a"}, SRange{0., 50.}};
+    const LaneSRange lane_s_range_b{LaneId{"lane_b"}, SRange{0., 50.}};
+    const std::vector<LaneSRange> region{lane_s_range_a, lane_s_range_b};
+    EXPECT_TRUE(IsIncluded(geo_pos, region, rg.get()));
+  }
+  {  // `lane_a` includes `geo_pos` but `lane_s_range_a` does not.
+    const LaneSRange lane_s_range_a{LaneId{"lane_a"}, SRange{0., 5.}};
+    const std::vector<LaneSRange> region{lane_s_range_a};
+    EXPECT_FALSE(IsIncluded(geo_pos, region, rg.get()));
+  }
+}
+
 }  // namespace
 }  // namespace api
 }  // namespace maliput
