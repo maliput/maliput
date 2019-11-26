@@ -45,5 +45,9 @@ bool RoadNetwork::Contains(const RoadPosition& road_position) const {
   return road_position.lane->Contains(road_position.pos);
 }
 
+bool RoadNetwork::Contains(const LaneId& lane_id) const {
+  return (this->road_geometry()->ById().GetLane(lane_id) != nullptr);
+}
+
 }  // namespace api
 }  // namespace maliput

@@ -1,7 +1,7 @@
 #include "maliput/api/lane.h"
-#include "maliput/api/segment.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/api/segment.h"
 
 namespace maliput {
 namespace api {
@@ -83,8 +83,7 @@ bool Lane::Contains(const LanePosition& lane_position) const {
   const double linear_tolerance = this->segment()->junction()->road_geometry()->linear_tolerance();
 
   if (!(h <= elevation_bounds.max() && h >= elevation_bounds.min()) ||
-      !(r <= lane_bounds.max() && r >= lane_bounds.min()) ||
-      !(abs(lane_length - s) <= linear_tolerance)) {
+      !(r <= lane_bounds.max() && r >= lane_bounds.min()) || !(abs(lane_length - s) <= linear_tolerance)) {
     return false;
   }
 

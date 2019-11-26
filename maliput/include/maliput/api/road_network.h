@@ -41,8 +41,10 @@ class RoadNetwork {
               std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider);
 
   virtual ~RoadNetwork() = default;
-  
+
   bool Contains(const RoadPosition& road_position) const;
+
+  bool Contains(const LaneId& lane_id) const;
 
   const RoadGeometry* road_geometry() const { return road_geometry_.get(); }
 
@@ -69,7 +71,6 @@ class RoadNetwork {
   const rules::RangeValueRuleStateProvider* range_value_rule_state_provider() const {
     return range_value_rule_state_provider_.get();
   }
-
 
  private:
   std::unique_ptr<const RoadGeometry> road_geometry_;
