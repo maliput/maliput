@@ -72,9 +72,9 @@ LanePositionResultT<drake::symbolic::Expression> Lane::ToLanePositionT<drake::sy
 bool Lane::Contains(const LanePosition& lane_position) {
   using std::abs;
 
-  const double s = lane_position.s(); // to compare with lane length
-  const double r = lane_position.r(); // to compare with driveable bounds
-  const double h = lane_position.h(); // to compare with elevation bounds
+  const double s = lane_position.s();
+  const double r = lane_position.r();
+  const double h = lane_position.h();
 
   RBounds lane_bounds = this->lane_bounds(s);
   HBounds elevation_bounds = this->elevation_bounds(s, r);
