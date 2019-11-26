@@ -76,9 +76,9 @@ bool Lane::Contains(const LanePosition& lane_position) {
   const double r = lane_position.r();
   const double h = lane_position.h();
 
-  RBounds lane_bounds = this->lane_bounds(s);
-  HBounds elevation_bounds = this->elevation_bounds(s, r);
-  double lane_length = this->length();
+  const RBounds lane_bounds = this->lane_bounds(s);
+  const HBounds elevation_bounds = this->elevation_bounds(s, r);
+  const double lane_length = this->length();
 
   if (!(h <= elevation_bounds.max() && h >= elevation_bounds.min()) ||
       !(r <= lane_bounds.max() && r >= lane_bounds.min()) ||
