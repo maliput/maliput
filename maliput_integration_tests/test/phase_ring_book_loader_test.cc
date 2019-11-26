@@ -1,6 +1,8 @@
 #include "maliput/base/phase_ring_book_loader.h"
 
+#include <algorithm>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -42,22 +44,50 @@ using api::rules::RoadRulebook;
 using api::rules::Rule;
 using api::rules::TrafficLight;
 using api::rules::TrafficLightBook;
+using api::rules::UniqueBulbGroupId;
 using api::rules::UniqueBulbId;
 
 constexpr char MULTILANE_RESOURCE_VAR[] = "MULTILANE_RESOURCE_ROOT";
 
-std::pair<std::string, std::vector<Rule::Id>> RelatedVehicleInZoneStopBehavior(const std::string& row_rule_name) {
-  return std::make_pair(
-      VehicleStopInZoneBehaviorRuleTypeId().string(),
-      std::vector<Rule::Id>{Rule::Id(VehicleStopInZoneBehaviorRuleTypeId().string() + row_rule_name)});
+// Returns the RelatedVehicleInZoneStopBehavior api::rules::Rule::RelatedRules.
+//
+// `rule_id_str` is the RelatedVehicleInZoneStopBehavior api::Rule::Id that the
+// rule refers to.
+std::pair<std::string, std::vector<Rule::Id>> RelatedVehicleInZoneStopBehavior(const std::string& rule_id_str) {
+  return std::make_pair(VehicleStopInZoneBehaviorRuleTypeId().string(),
+                        std::vector<Rule::Id>{Rule::Id(VehicleStopInZoneBehaviorRuleTypeId().string() + rule_id_str)});
 }
 
-std::pair<std::string, std::vector<Rule::Id>> RelatedYieldGroup(const std::vector<std::string>& row_rule_names) {
+// Returns the yield group of a Right-Of-Way Rule Type.
+//
+// `rule_id_strs` is a vector of strings containing Right-Of-Way api::Rule::Ids a
+// rule yields to.
+std::pair<std::string, std::vector<Rule::Id>> RelatedYieldGroup(const std::vector<std::string>& rule_id_strs) {
   std::vector<Rule::Id> rule_ids;
-  for (const std::string& row_rule_name : row_rule_names) {
-    rule_ids.push_back(Rule::Id(RightOfWayRuleTypeId().string() + row_rule_name));
+  for (const std::string& rule_id_str : rule_id_strs) {
+    rule_ids.push_back(Rule::Id(RightOfWayRuleTypeId().string() + rule_id_str));
   }
   return std::make_pair(RightOfWayYieldGroup(), rule_ids);
+}
+
+// Returns a api::UniqueBulbGroupId from `unique_bulb_group_id_str`.
+//
+// `unique_bulb_group_id_str` should have the form 'TrafficLightId-BulbGroupId'.
+UniqueBulbGroupId FromString(const std::string& unique_bulb_group_id_str) {
+  std::vector<std::string> ids;
+  std::string id;
+  std::istringstream ss(unique_bulb_group_id_str);
+  while (std::getline(ss, id, *(UniqueBulbGroupId::delimiter().c_str()))) {
+    ids.push_back(id);
+  }
+  MALIPUT_THROW_UNLESS(ids.size() == 2);
+  return UniqueBulbGroupId(TrafficLight::Id(ids[0]), BulbGroup::Id(ids[1]));
+}
+
+// Returns Rule::RelatedUniqueIds initialized with `unique_bulb_group_id_str` as
+// sole api::UniqueBulbGroupId.
+Rule::RelatedUniqueIds CreateRelatedBulbGroups(const std::string& unique_bulb_group_id_str) {
+  return Rule::RelatedUniqueIds{{RightOfWayBulbGroup(), {FromString(unique_bulb_group_id_str)}}};
 }
 
 class TestLoading2x2IntersectionPhasebook : public ::testing::Test {
@@ -86,62 +116,64 @@ class TestLoading2x2IntersectionPhasebook : public ::testing::Test {
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/NorthStraight"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Go")},
+                       CreateRelatedBulbGroups("SouthFacing-SouthFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/SouthStraight"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/SouthStraight"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Go")},
+                       CreateRelatedBulbGroups("NorthFacing-NorthFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/EastStraight"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/EastStraight"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Stop")},
+                       CreateRelatedBulbGroups("WestFacing-WestFacingBulbs"), "Stop")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/WestStraight"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/WestStraight"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Stop")},
+                       CreateRelatedBulbGroups("EastFacing-EastFacingBulbs"), "Stop")},
+
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/NorthRightTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/NorthRightTurn"),
                                                         RelatedYieldGroup({"/SouthLeftTurn"})},
-                                     Rule::RelatedUniqueIds{}, "Go")},
+                                     CreateRelatedBulbGroups("SouthFacing-SouthFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/SouthRightTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/SouthRightTurn"),
                                                         RelatedYieldGroup({"/NorthLeftTurn"})},
-                                     Rule::RelatedUniqueIds{}, "Go")},
+                                     CreateRelatedBulbGroups("NorthFacing-NorthFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/EastRightTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/EastRightTurn"),
                                                         RelatedYieldGroup({"/SouthStraight", "/WestLeftTurn"})},
-                                     Rule::RelatedUniqueIds{}, "StopThenGo")},
+                                     CreateRelatedBulbGroups("WestFacing-WestFacingBulbs"), "StopThenGo")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/WestRightTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/WestRightTurn"),
                                                         RelatedYieldGroup({"/NorthStraight", "/EastLeftTurn"})},
-                                     Rule::RelatedUniqueIds{}, "StopThenGo")},
+                                     CreateRelatedBulbGroups("EastFacing-EastFacingBulbs"), "StopThenGo")},
+
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/NorthLeftTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/NorthLeftTurn"),
                                                         RelatedYieldGroup({"/SouthStraight"})},
-                                     Rule::RelatedUniqueIds{}, "Go")},
+                                     CreateRelatedBulbGroups("SouthFacing-SouthFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/SouthLeftTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/SouthLeftTurn"),
                                                         RelatedYieldGroup({"/NorthStraight"})},
-                                     Rule::RelatedUniqueIds{}, "Go")},
+                                     CreateRelatedBulbGroups("NorthFacing-NorthFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/EastLeftTurn"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/EastLeftTurn"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Stop")},
+                       CreateRelatedBulbGroups("WestFacing-WestFacingBulbs"), "Stop")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/WestLeftTurn"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/WestLeftTurn"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Stop")}},
+                       CreateRelatedBulbGroups("EastFacing-EastFacingBulbs"), "Stop")}},
                  {{{UniqueBulbId{TrafficLight::Id("EastFacing"), BulbGroup::Id("EastFacingBulbs"), Bulb::Id("RedBulb")},
                     BulbState::kOn},
                    {UniqueBulbId{TrafficLight::Id("EastFacing"), BulbGroup::Id("EastFacingBulbs"),
@@ -206,62 +238,64 @@ class TestLoading2x2IntersectionPhasebook : public ::testing::Test {
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/NorthStraight"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Stop")},
+                       CreateRelatedBulbGroups("SouthFacing-SouthFacingBulbs"), "Stop")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/SouthStraight"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/SouthStraight"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Stop")},
+                       CreateRelatedBulbGroups("NorthFacing-NorthFacingBulbs"), "Stop")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/EastStraight"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/EastStraight"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Go")},
+                       CreateRelatedBulbGroups("WestFacing-WestFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/WestStraight"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/WestStraight"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Go")},
+                       CreateRelatedBulbGroups("EastFacing-EastFacingBulbs"), "Go")},
+
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/NorthRightTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/NorthRightTurn"),
                                                         RelatedYieldGroup({"/EastStraight", "/SouthLeftTurn"})},
-                                     Rule::RelatedUniqueIds{}, "StopThenGo")},
+                                     CreateRelatedBulbGroups("SouthFacing-SouthFacingBulbs"), "StopThenGo")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/SouthRightTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/SouthRightTurn"),
                                                         RelatedYieldGroup({"/WestStraight", "/NorthLeftTurn"})},
-                                     Rule::RelatedUniqueIds{}, "StopThenGo")},
+                                     CreateRelatedBulbGroups("NorthFacing-NorthFacingBulbs"), "StopThenGo")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/EastRightTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/EastRightTurn"),
                                                         RelatedYieldGroup({"/WestLeftTurn"})},
-                                     Rule::RelatedUniqueIds{}, "Go")},
+                                     CreateRelatedBulbGroups("WestFacing-WestFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/WestRightTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/WestRightTurn"),
                                                         RelatedYieldGroup({"/EastLeftTurn"})},
-                                     Rule::RelatedUniqueIds{}, "Go")},
+                                     CreateRelatedBulbGroups("EastFacing-EastFacingBulbs"), "Go")},
+
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/NorthLeftTurn"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/NorthLeftTurn"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Stop")},
+                       CreateRelatedBulbGroups("SouthFacing-SouthFacingBulbs"), "Stop")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/SouthLeftTurn"),
                    MakeDiscreteValue(
                        Rule::State::kStrict,
                        Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/SouthLeftTurn"), RelatedYieldGroup({})},
-                       Rule::RelatedUniqueIds{}, "Stop")},
+                       CreateRelatedBulbGroups("NorthFacing-NorthFacingBulbs"), "Stop")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/EastLeftTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/EastLeftTurn"),
                                                         RelatedYieldGroup({"/WestStraight"})},
-                                     Rule::RelatedUniqueIds{}, "Go")},
+                                     CreateRelatedBulbGroups("WestFacing-WestFacingBulbs"), "Go")},
                   {Rule::Id(RightOfWayRuleTypeId().string() + "/WestLeftTurn"),
                    MakeDiscreteValue(Rule::State::kStrict,
                                      Rule::RelatedRules{RelatedVehicleInZoneStopBehavior("/WestLeftTurn"),
                                                         RelatedYieldGroup({"/EastStraight"})},
-                                     Rule::RelatedUniqueIds{}, "Go")}},
+                                     CreateRelatedBulbGroups("EastFacing-EastFacingBulbs"), "Go")}},
                  {{{UniqueBulbId{TrafficLight::Id("WestFacing"), BulbGroup::Id("WestFacingBulbs"), Bulb::Id("RedBulb")},
                     BulbState::kOff},
                    {UniqueBulbId{TrafficLight::Id("WestFacing"), BulbGroup::Id("WestFacingBulbs"),
