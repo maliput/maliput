@@ -1,9 +1,10 @@
 #include "maliput/api/lane.h"
+#include "maliput/api/segment.h"
+#include "maliput/api/junction.h"
+#include "maliput/api/road_geometry.h"
 
 namespace maliput {
 namespace api {
-
-const double kLinearTolerance = 1e-3;
 
 // These instantiations must match the API documentation in lane.h.
 template <>
@@ -79,10 +80,11 @@ bool Lane::Contains(const LanePosition& lane_position) {
   const RBounds lane_bounds = this->lane_bounds(s);
   const HBounds elevation_bounds = this->elevation_bounds(s, r);
   const double lane_length = this->length();
+  const double linear_tolerance = this->segment()->junction()->road_geometry()->linear_tolerance();
 
   if (!(h <= elevation_bounds.max() && h >= elevation_bounds.min()) ||
       !(r <= lane_bounds.max() && r >= lane_bounds.min()) ||
-      !(abs(lane_length - s) <= kLinearTolerance)) {
+      !(abs(lane_length - s) <= linear_tolerance)) {
     return false;
   }
 
