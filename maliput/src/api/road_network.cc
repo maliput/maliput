@@ -41,5 +41,9 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
   MALIPUT_THROW_UNLESS(range_value_rule_state_provider_.get() != nullptr);
 }
 
+bool RoadNetwork::Contains(const RoadPosition& road_position) const {
+  return road_position.lane->Contains(road_position.pos);
+}
+
 }  // namespace api
 }  // namespace maliput

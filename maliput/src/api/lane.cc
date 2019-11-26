@@ -70,7 +70,7 @@ LanePositionResultT<drake::symbolic::Expression> Lane::ToLanePositionT<drake::sy
   return DoToLanePositionSymbolic(geo_pos);
 }
 
-bool Lane::Contains(const LanePosition& lane_position) {
+bool Lane::Contains(const LanePosition& lane_position) const {
   using std::abs;
 
   const double s = lane_position.s();
