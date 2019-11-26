@@ -3,6 +3,8 @@
 namespace maliput {
 namespace api {
 
+const double kLinearTolerance = 1e-3;
+
 // These instantiations must match the API documentation in lane.h.
 template <>
 GeoPositionT<double> Lane::ToGeoPositionT<double>(const LanePositionT<double>& lane_pos) const {
@@ -65,6 +67,26 @@ template <>
 LanePositionResultT<drake::symbolic::Expression> Lane::ToLanePositionT<drake::symbolic::Expression>(
     const GeoPositionT<drake::symbolic::Expression>& geo_pos) const {
   return DoToLanePositionSymbolic(geo_pos);
+}
+
+bool Lane::Contains(const LanePosition& lane_position) {
+  using std::abs;
+
+  const double s = lane_position.s(); // to compare with lane length
+  const double r = lane_position.r(); // to compare with driveable bounds
+  const double h = lane_position.h(); // to compare with elevation bounds
+
+  RBounds lane_bounds = this->lane_bounds(s);
+  HBounds elevation_bounds = this->elevation_bounds(s, r);
+  double lane_length = this->length();
+
+  if (!(h <= elevation_bounds.max() && h >= elevation_bounds.min()) ||
+      !(r <= lane_bounds.max() && r >= lane_bounds.min()) ||
+      !(abs(lane_length - s) <= kLinearTolerance)) {
+    return false;
+  }
+
+  return true;
 }
 
 }  // namespace api
