@@ -60,15 +60,16 @@ class Intersection {
   /// Returns the current bulb states within the intersection.
   const drake::optional<rules::BulbStates> bulb_states() const;
 
-  /// Determines whether `geo_position` is included in this Intersection::Region().
+  /// Determines whether `geo_position` is within this Intersection::Region().
   ///
-  /// @param geo_position A GeoPosition of the World Frame.
-  /// @param road_geometry The RoadGeometry where `region` is contained. It must not be nullptr.
-  /// @returns True when `geo_position` is contained within the `region`. `geo_position` is contained if the distance to
-  /// the closer LanePosition of `region` is minor or equal than the linear tolerance of the `road_geometry`.
+  /// @param geo_position A GeoPosition in the World Frame.
+  /// @param road_geometry The RoadGeometry where Intersection::Region() is contained. It must not be nullptr.
+  /// @returns True when `geo_position` is within Intersection::Region(). `geo_position` is contained if
+  /// the distance to the closest LanePosition in Intersection::Region() is less or equal than the linear tolerance of
+  /// the `road_geometry`.
   ///
   /// @throws common::assertion_error When `road_geometry` is nullptr.
-  /// @throws common::assertion_error When Lanes of this Intersection::Region() are not found in `road_geometry`.
+  /// @throws common::assertion_error When Lanes in Intersection::Region() are not found in `road_geometry`.
   bool Includes(const GeoPosition& geo_position, const RoadGeometry* road_geometry) const;
 
   // TODO(liang.fok) Add method for obtaining the intersection's bounding box.

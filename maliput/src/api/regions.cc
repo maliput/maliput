@@ -6,6 +6,15 @@
 namespace maliput {
 namespace api {
 
+namespace {
+
+// Evaluates whether `lane_s_range` belongs to `road_geometry`.
+bool IsValid(const LaneSRange& lane_s_range, const RoadGeometry* road_geometry) {
+  return road_geometry->ById().GetLane(lane_s_range.lane_id()) != nullptr;
+}
+
+}  // namespace
+
 bool IsContiguous(const LaneSRange& lane_range_a, const LaneSRange& lane_range_b, const RoadGeometry* road_geometry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
   const Lane* lane_a = road_geometry->ById().GetLane(lane_range_a.lane_id());
@@ -65,21 +74,18 @@ bool LaneSRoute::Intersects(const LaneSRoute& lane_s_route, double tolerance) co
   return false;
 }
 
-bool IsIncluded(const GeoPosition& geo_position, const std::vector<LaneSRange>& region,
+bool IsIncluded(const GeoPosition& geo_position, const std::vector<LaneSRange>& lane_s_ranges,
                 const RoadGeometry* road_geometry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
+  MALIPUT_THROW_UNLESS(!lane_s_ranges.empty());
+  for (const auto& lane_s_range : lane_s_ranges) {
+    MALIPUT_THROW_UNLESS(IsValid(lane_s_range, road_geometry));
+  }
   const double linear_tolerance = road_geometry->linear_tolerance();
-  const std::unordered_map<LaneId, const Lane*> lane_id_lane_map = road_geometry->ById().GetLanes();
-  for (const auto& lane_s_range : region) {
-    const auto lane_ptr = std::find_if(lane_id_lane_map.begin(), lane_id_lane_map.end(),
-                                       [lane_s_range](const std::pair<LaneId, const Lane*>& lane_id_lane) {
-                                         return lane_id_lane.first == lane_s_range.lane_id();
-                                       });
-    MALIPUT_THROW_UNLESS(lane_ptr != lane_id_lane_map.end());
-    const LanePositionResult result = lane_ptr->second->ToLanePosition(geo_position);
+  for (const auto& lane_s_range : lane_s_ranges) {
+    const LanePositionResult result =
+        road_geometry->ById().GetLane(lane_s_range.lane_id())->ToLanePosition(geo_position);
     if (result.distance <= linear_tolerance) {
-      // Lane contains the GeoPosition.
-      // It is needed to verify whether the `region` containts it.
       const double s_position = result.lane_position.s();
       return lane_s_range.s_range().Intersects(SRange(s_position, s_position), linear_tolerance);
     }
