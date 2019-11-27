@@ -125,7 +125,7 @@ TEST_F(GetCurrentYieldGroupTest, GetCurrentYieldGroup) {
 }
 
 api::rules::Rule::RelatedUniqueIds CreateRelatedUniqueIds() {
-  return std::map<std::string, std::vector<api::UniqueId>>{
+  return {
       {RightOfWayBulbGroup(),
        {api::rules::UniqueBulbGroupId{maliput::api::rules::TrafficLight::Id{"traffic_light_a"},
                                       maliput::api::rules::BulbGroup::Id{"bulb_group_a"}},
@@ -138,14 +138,13 @@ class GetCurrentBulbGroupTest : public ::testing::Test {
  protected:
   const Rule::TypeId kTypeId{RightOfWayRuleTypeId()};
   const Rule::Id kRuleId{kTypeId.string() + "/right_of_way_rule_id"};
-  const LaneSRoute kLaneSRoute{LaneSRoute{{LaneSRange{LaneId{"lane_id"}, {0., 10.}}}}};
   const DiscreteValueRule::DiscreteValue kStateDiscreteValue{MakeDiscreteValue(
       Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), CreateRelatedUniqueIds(), "StopAndGo")};
   const std::vector<api::UniqueId> expected_bulb_group{CreateRelatedUniqueIds().at(RightOfWayBulbGroup())};
 
   void SetUp() override {
     road_rulebook_ = std::make_unique<ManualRulebook>();
-    road_rulebook_->AddRule(DiscreteValueRule{kRuleId, kTypeId, kLaneSRoute, {kStateDiscreteValue}});
+    road_rulebook_->AddRule(DiscreteValueRule{kRuleId, kTypeId, api::test::CreateLaneSRoute(), {kStateDiscreteValue}});
     discrete_value_rule_state_provider_ = std::make_unique<ManualDiscreteValueRuleStateProvider>(road_rulebook_.get());
     discrete_value_rule_state_provider_->SetState(kRuleId, kStateDiscreteValue, drake::nullopt, drake::nullopt);
   }
