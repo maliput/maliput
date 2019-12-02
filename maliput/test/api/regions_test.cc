@@ -311,6 +311,12 @@ INSTANTIATE_TEST_CASE_P(IsContiguousFunctionTestGroup, IsContiguousInvalidArgume
 
 GTEST_TEST(IsIncluded, BasicUsage) {
   const auto rg = test::CreateTwoLanesRoadGeometry();
+  {  // `geo_pos` does not map any Lane.
+    const GeoPosition geo_pos{80., 100., 45.};
+    const LaneSRange lane_s_range_b{LaneId{"lane_b"}, SRange{0., 50.}};
+    const std::vector<LaneSRange> region{lane_s_range_b};
+    EXPECT_FALSE(IsIncluded(geo_pos, region, rg.get()));
+  }
   const GeoPosition geo_pos{11.9, 89., 1.};
   {  // `lane_s_range_a` includes `geo_pos`.
     const LaneSRange lane_s_range_a{LaneId{"lane_a"}, SRange{0., 50.}};

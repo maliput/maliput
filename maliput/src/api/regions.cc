@@ -10,6 +10,7 @@ namespace {
 
 // Evaluates whether `lane_s_range` belongs to `road_geometry`.
 bool IsValid(const LaneSRange& lane_s_range, const RoadGeometry* road_geometry) {
+  // TODO(francocipollone) This function could be removed once maliput#203 is addressed.
   return road_geometry->ById().GetLane(lane_s_range.lane_id()) != nullptr;
 }
 

@@ -102,7 +102,7 @@ class MockLane final : public Lane {
   GeoPosition DoToGeoPosition(const LanePosition& lane_pos) const override {
     return lane_pos.s() ? end_gp_ : start_gp_;
   }
-  LanePositionResult DoToLanePosition(const GeoPosition& geo_pos) const override { return lane_position_result_; }
+  LanePositionResult DoToLanePosition(const GeoPosition&) const override { return lane_position_result_; }
   Rotation DoGetOrientation(const LanePosition& lane_pos) const override {
     return lane_pos.s() ? end_rot_ : start_rot_;
   }
