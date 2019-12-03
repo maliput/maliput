@@ -7,6 +7,7 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/test_utilities/mock.h"
 
 namespace maliput {
 namespace {
@@ -37,14 +38,17 @@ class IntersectionTest : public ::testing::Test {
 
   const api::rules::PhaseRing dummy_ring_;
 
-  const std::vector<api::LaneSRange> ranges_{api::LaneSRange(api::LaneId("road A"), api::SRange(0, 100))};
+  std::unique_ptr<api::RoadGeometry> road_geometry = api::test::CreateTwoLanesRoadGeometry();
+  const std::vector<api::LaneSRange> ranges_a{api::LaneSRange(api::LaneId("lane_a"), api::SRange(0, 100))};
+  const std::vector<api::LaneSRange> ranges_b{api::LaneSRange(api::LaneId("lane_b"), api::SRange(0, 100))};
+  const std::vector<api::LaneSRange> ranges_c{api::LaneSRange(api::LaneId("lane_c"), api::SRange(0, 100))};
 };
 
 TEST_F(IntersectionTest, BasicTest) {
   const double kDurationUntil{1};  // Arbitrary.
   const Intersection::Id intersection_id("foo");
   ManualPhaseProvider phase_provider;
-  Intersection dut(intersection_id, ranges_, dummy_ring_, &phase_provider);
+  Intersection dut(intersection_id, ranges_a, dummy_ring_, &phase_provider);
   EXPECT_EQ(dut.id(), intersection_id);
   EXPECT_EQ(dut.Phase(), drake::nullopt);
   phase_provider.AddPhaseRing(dummy_ring_.id(), dummy_phase_1_.id());
@@ -55,11 +59,33 @@ TEST_F(IntersectionTest, BasicTest) {
   EXPECT_EQ(dut.Phase()->next->state, dummy_phase_1_.id());
   EXPECT_TRUE(dut.Phase()->next->duration_until.has_value());
   EXPECT_EQ(dut.Phase()->next->duration_until.value(), kDurationUntil);
-  EXPECT_EQ(dut.region().size(), ranges_.size());
-  EXPECT_EQ(dut.region().at(0).lane_id(), ranges_.at(0).lane_id());
+  EXPECT_EQ(dut.region().size(), ranges_a.size());
+  EXPECT_EQ(dut.region().at(0).lane_id(), ranges_a.at(0).lane_id());
   EXPECT_EQ(dut.ring_id(), dummy_ring_.id());
   EXPECT_EQ(dut.bulb_states(), drake::nullopt);
   EXPECT_THROW(dut.SetPhase(dummy_phase_1_.id(), drake::nullopt, kDurationUntil), std::exception);
+}
+
+TEST_F(IntersectionTest, Includes) {
+  const double kDurationUntil{1};  // Arbitrary.
+  const Intersection::Id intersection_id("foo");
+  ManualPhaseProvider phase_provider;
+  {
+    Intersection dut(intersection_id, ranges_a, dummy_ring_, &phase_provider);
+    EXPECT_TRUE(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()));
+  }
+  {
+    Intersection dut(intersection_id, ranges_b, dummy_ring_, &phase_provider);
+    EXPECT_FALSE(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()));
+  }
+  {
+    Intersection dut(intersection_id, ranges_c, dummy_ring_, &phase_provider);
+    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()), std::exception);
+  }
+  {
+    Intersection dut(intersection_id, ranges_c, dummy_ring_, &phase_provider);
+    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, nullptr), std::exception);
+  }
 }
 
 }  // namespace

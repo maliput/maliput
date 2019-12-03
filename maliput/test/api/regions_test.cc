@@ -329,9 +329,9 @@ GTEST_TEST(IsIncluded, BasicUsage) {
     const std::vector<LaneSRange> region{lane_s_range_a};
     EXPECT_FALSE(IsIncluded(geo_pos, region, rg.get()));
   }
-  {  // `lane_a` includes `geo_pos` but `lane_s_range_a`'s lane does not.
-    const LaneSRange lane_s_range_a{LaneId{"lane_b"}, SRange{0., 50.}};
-    const std::vector<LaneSRange> region{lane_s_range_a};
+  {  // `lane_a` includes `geo_pos` but `lane_s_range_b`'s lane does not.
+    const LaneSRange lane_s_range_b{LaneId{"lane_b"}, SRange{0., 50.}};
+    const std::vector<LaneSRange> region{lane_s_range_b};
     EXPECT_FALSE(IsIncluded(geo_pos, region, rg.get()));
   }
 }
