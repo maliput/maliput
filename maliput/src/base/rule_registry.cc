@@ -56,10 +56,10 @@ api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleTyp
       GenerateEveryCombination({api::rules::Rule::State::kStrict}, state_values));
 }
 
-std::string RightOfWayYieldGroup() { return "YieldGroup"; }
-
-std::string RightOfWayBulbGroup() { return "BulbGroupIds"; }
-
 api::rules::Rule::TypeId SpeedLimitRuleTypeId() { return api::rules::Rule::TypeId{"Speed Limit Rule Type"}; }
+
+const char* RelatedRulesKeys::kYieldGroup{"Yield Group"};
+
+const char* RelatedUniqueIdsKeys::kBulbGroup{"Bulb Group"};
 
 }  // namespace maliput

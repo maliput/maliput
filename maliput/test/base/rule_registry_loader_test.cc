@@ -40,8 +40,6 @@ class TestLoadingRuleTypesFromYaml : public ::testing::Test {
     const std::string kDirectionUsageRuleType = DirectionUsageRuleTypeId().string();
     const std::string kSpeedLimitRuleType = SpeedLimitRuleTypeId().string();
     const std::string kVehicleInStopBehaviour = VehicleStopInZoneBehaviorRuleTypeId().string();
-    const std::string kYieldGroup = RightOfWayYieldGroup();
-    const std::string kBulbGroup = RightOfWayBulbGroup();
 
     return fmt::format(
         R"R(RuleRegistry:
@@ -71,8 +69,8 @@ class TestLoadingRuleTypesFromYaml : public ::testing::Test {
       description: "Arterial road in Ciudad Autonoma de Buenos Aires"
       severity: 1
 )R",
-        kRightOfWayRuleType, kVehicleInStopBehaviour, kYieldGroup, kBulbGroup, kVehicleInStopBehaviour,
-        kDirectionUsageRuleType, kSpeedLimitRuleType);
+        kRightOfWayRuleType, kVehicleInStopBehaviour, RelatedRulesKeys::kYieldGroup, RelatedUniqueIdsKeys::kBulbGroup,
+        kVehicleInStopBehaviour, kDirectionUsageRuleType, kSpeedLimitRuleType);
   }
 
   void GenerateYamlFileFromString(const std::string& string_to_yaml, const std::string& filepath) {
@@ -100,8 +98,8 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
         EXPECT_EQ(discrete_value.severity, kStrict);
         EXPECT_NE(discrete_value.related_rules.find(VehicleStopInZoneBehaviorRuleTypeId().string()),
                   discrete_value.related_rules.end());
-        EXPECT_NE(discrete_value.related_rules.find(RightOfWayYieldGroup()), discrete_value.related_rules.end());
-        EXPECT_NE(discrete_value.related_unique_ids.find(RightOfWayBulbGroup()),
+        EXPECT_NE(discrete_value.related_rules.find(RelatedRulesKeys::kYieldGroup), discrete_value.related_rules.end());
+        EXPECT_NE(discrete_value.related_unique_ids.find(RelatedUniqueIdsKeys::kBulbGroup),
                   discrete_value.related_unique_ids.end());
       } else if (discrete_value.value == "Stop") {
         EXPECT_EQ(discrete_value.severity, kBestEffort);

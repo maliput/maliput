@@ -262,10 +262,10 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
       EXPECT_EQ(discrete_value_it->related_rules.at(VehicleStopInZoneBehaviorRuleTypeId().string())[0],
                 GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.id()));
       for (const auto yield_id : state.second.yield_to()) {
-        auto it = std::find(discrete_value_it->related_rules.at(RightOfWayYieldGroup()).begin(),
-                            discrete_value_it->related_rules.at(RightOfWayYieldGroup()).end(),
+        auto it = std::find(discrete_value_it->related_rules.at(RelatedRulesKeys::kYieldGroup).begin(),
+                            discrete_value_it->related_rules.at(RelatedRulesKeys::kYieldGroup).end(),
                             GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
-        EXPECT_NE(it, discrete_value_it->related_rules.at(RightOfWayYieldGroup()).end());
+        EXPECT_NE(it, discrete_value_it->related_rules.at(RelatedRulesKeys::kYieldGroup).end());
       }
     }
 
@@ -275,8 +275,8 @@ class TestLoading2x2IntersectionRules : public ::testing::Test {
       related_bulb_group_size += traffic_light_id_vector_bulb_group_id.second.size();
     }
     for (const auto& discrete_value : right_of_way_discrete_rule.values()) {
-      EXPECT_EQ(discrete_value.related_unique_ids.at(RightOfWayBulbGroup()).size(), related_bulb_group_size);
-      for (const auto& unique_id : discrete_value.related_unique_ids.at(RightOfWayBulbGroup())) {
+      EXPECT_EQ(discrete_value.related_unique_ids.at(RelatedUniqueIdsKeys::kBulbGroup).size(), related_bulb_group_size);
+      for (const auto& unique_id : discrete_value.related_unique_ids.at(RelatedUniqueIdsKeys::kBulbGroup)) {
         const auto related_bulb_group_it = find_if(
             right_of_way_rule.related_bulb_groups().begin(), right_of_way_rule.related_bulb_groups().end(),
             [unique_id](std::pair<TrafficLight::Id, std::vector<BulbGroup::Id>> traffic_light_id_vector_bulb_group_id) {

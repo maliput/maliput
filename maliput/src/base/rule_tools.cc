@@ -24,8 +24,9 @@ maliput::api::rules::DiscreteValueRule::DiscreteValue GetCurrentStateValue(
 
 std::vector<maliput::api::rules::Rule::Id> GetYieldGroup(
     const maliput::api::rules::DiscreteValueRule::DiscreteValue& discrete_value) {
-  MALIPUT_THROW_UNLESS(discrete_value.related_rules.find(RightOfWayYieldGroup()) != discrete_value.related_rules.end());
-  return discrete_value.related_rules.at(RightOfWayYieldGroup());
+  MALIPUT_THROW_UNLESS(discrete_value.related_rules.find(RelatedRulesKeys::kYieldGroup) !=
+                       discrete_value.related_rules.end());
+  return discrete_value.related_rules.at(RelatedRulesKeys::kYieldGroup);
 }
 
 std::vector<maliput::api::rules::Rule::Id> GetCurrentYieldGroup(
@@ -36,9 +37,9 @@ std::vector<maliput::api::rules::Rule::Id> GetCurrentYieldGroup(
 
 std::vector<maliput::api::UniqueId> GetBulbGroup(
     const maliput::api::rules::DiscreteValueRule::DiscreteValue& discrete_value) {
-  MALIPUT_THROW_UNLESS(discrete_value.related_unique_ids.find(RightOfWayBulbGroup()) !=
+  MALIPUT_THROW_UNLESS(discrete_value.related_unique_ids.find(RelatedUniqueIdsKeys::kBulbGroup) !=
                        discrete_value.related_unique_ids.end());
-  return discrete_value.related_unique_ids.at(RightOfWayBulbGroup());
+  return discrete_value.related_unique_ids.at(RelatedUniqueIdsKeys::kBulbGroup);
 }
 
 std::vector<maliput::api::UniqueId> GetCurrentBulbGroup(

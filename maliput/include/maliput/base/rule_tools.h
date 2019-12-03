@@ -8,7 +8,8 @@
 namespace maliput {
 
 /// Returns a vector of Rule::Ids that represents the yield group of a Right-Of-Way rule state.
-/// @throws common::assertion_error When `discrete_value.related_rules` does not have `RightOfWayYieldGroup()` key.
+/// @throws common::assertion_error When `discrete_value.related_rules` does not have `RelatedRulesKeys::kYieldGroup`
+/// key.
 std::vector<maliput::api::rules::Rule::Id> GetYieldGroup(
     const maliput::api::rules::DiscreteValueRule::DiscreteValue& discrete_value);
 
@@ -23,7 +24,8 @@ std::vector<maliput::api::rules::Rule::Id> GetCurrentYieldGroup(
     const maliput::api::rules::DiscreteValueRuleStateProvider* state_provider);
 
 /// Returns a vector of maliput::api::UniqueIds that represents the bulb group of a Right-Of-Way rule state.
-/// @throws common::assertion_error When `discrete_value.related_unique_ids` does not have `RightOfWayBulbGroup()` key.
+/// @throws common::assertion_error When `discrete_value.related_unique_ids` does not have
+/// `RelatedUniqueIdsKeys::kBulbGroup` key.
 std::vector<maliput::api::UniqueId> GetBulbGroup(
     const maliput::api::rules::DiscreteValueRule::DiscreteValue& discrete_value);
 
