@@ -42,8 +42,10 @@ class RoadNetwork {
 
   virtual ~RoadNetwork() = default;
 
+  /// Determines if the road network contains @p road_position
   bool Contains(const RoadPosition& road_position) const;
 
+  /// Determines if the road networks contains @p lane_id
   bool Contains(const LaneId& lane_id) const;
 
   const RoadGeometry* road_geometry() const { return road_geometry_.get(); }

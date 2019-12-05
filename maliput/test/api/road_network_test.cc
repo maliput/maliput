@@ -6,7 +6,9 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/intersection.h"
+#include "maliput/geometry_base/road_geometry.h"
 #include "maliput/test_utilities/mock.h"
+#include "maliput/test_utilities/mock_geometry.h"
 
 namespace maliput {
 namespace api {
@@ -27,6 +29,10 @@ using rules::TrafficLightBook;
 
 class RoadNetworkTest : public ::testing::Test {
  protected:
+  const double linear_tolerance{1.};
+  const double angular_tolerance{1.};
+  const double scale_length{1.};
+
   virtual void SetUp() {
     road_geometry_ = test::CreateRoadGeometry();
     road_rulebook_ = test::CreateRoadRulebook();
@@ -165,6 +171,28 @@ TEST_F(RoadNetworkTest, TestMemberMethodAccess) {
   dut.rule_registry()->GetPossibleStatesOfRuleType(rules::Rule::TypeId("Mock"));
   dut.discrete_value_rule_state_provider()->GetState(rules::Rule::Id("Mock"));
   dut.range_value_rule_state_provider()->GetState(rules::Rule::Id("Mock"));
+}
+
+TEST_F(RoadNetworkTest, Contains) {
+  auto mock_road_geometry = std::make_unique<geometry_base::test::MockRoadGeometry>(
+      api::RoadGeometryId{"mock_road_geometry"}, linear_tolerance, angular_tolerance, scale_length);
+  auto mock_lane = std::make_unique<geometry_base::test::MockLane>(api::LaneId{"mock_lane"});
+  auto mock_segment = std::make_unique<geometry_base::test::MockSegment>(api::SegmentId{"mock_segment"});
+  auto mock_junction = std::make_unique<geometry_base::test::MockJunction>(api::JunctionId{"mock_junction"});
+
+  mock_lane->lane_bounds(1.);
+
+  mock_segment->AddLane(std::move(mock_lane));
+  mock_junction->AddSegment(std::move(mock_segment));
+  mock_road_geometry->AddJunction(std::move(mock_junction));
+
+  RoadNetwork dut(std::move(mock_road_geometry), std::move(road_rulebook_), std::move(traffic_light_book_),
+                  std::move(intersection_book_), std::move(phase_ring_book_),
+                  std::move(right_of_way_rule_state_provider_), std::move(phase_provider_), std::move(rule_registry_),
+                  std::move(discrete_value_rule_state_provider_), std::move(range_value_rule_state_provider_));
+
+  ASSERT_TRUE(dut.Contains(api::LaneId("mock_lane")));
+  ASSERT_FALSE(dut.Contains(api::LaneId("false_lane")));
 }
 
 }  // namespace
