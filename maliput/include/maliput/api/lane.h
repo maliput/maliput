@@ -261,8 +261,6 @@ class Lane {
 
   virtual drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
 
-  bool IsWithinRange(double x, double min, double max, double tolerance) const;
-
   // drake::AutoDiffXd overload of DoToGeoPosition().
   virtual GeoPositionT<drake::AutoDiffXd> DoToGeoPositionAutoDiff(const LanePositionT<drake::AutoDiffXd>&) const {
     MALIPUT_THROW_MESSAGE(

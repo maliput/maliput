@@ -180,8 +180,6 @@ TEST_F(RoadNetworkTest, Contains) {
   auto mock_segment = std::make_unique<geometry_base::test::MockSegment>(api::SegmentId{"mock_segment"});
   auto mock_junction = std::make_unique<geometry_base::test::MockJunction>(api::JunctionId{"mock_junction"});
 
-  mock_lane->lane_bounds(1.);
-
   mock_segment->AddLane(std::move(mock_lane));
   mock_junction->AddSegment(std::move(mock_segment));
   mock_road_geometry->AddJunction(std::move(mock_junction));

@@ -19,11 +19,17 @@ namespace api {
 namespace test {
 namespace {
 
+const double lane_length{10.};
+const double kOneTolerance{1.};
+
 class LaneTest : public ::testing::Test {
  protected:
-  const double linear_tolerance{1.};
+  const double linear_tolerance{kOneTolerance};
   const double angular_tolerance{1.};
   const double scale_length{1.};
+  const double s{1};
+  const double r{2};
+  const double h{3};
 };
 
 class LaneMock final : public geometry_base::test::MockLane {
@@ -43,7 +49,7 @@ class LaneMock final : public geometry_base::test::MockLane {
 
   HBounds InternalElevationBounds(double s, double r) const { return HBounds(-5, 5); }
 
-  double InternalLength() const { return 10.; }
+  double InternalLength() const { return lane_length; }
 };
 
 class RoadGeometryMock final : public geometry_base::test::MockRoadGeometry {
@@ -89,10 +95,8 @@ std::unique_ptr<RoadGeometryMock> MakeFullRoadGeometry(const api::RoadGeometryId
 }
 
 TEST_F(LaneTest, Contains) {
-  double s = 1.0;
-  double r = 2.0;
-  double h = 3.0;
-  const LanePosition lane_position = LanePosition(s, r, h);
+  const LanePosition true_lane_position = LanePosition(s, r, h);
+  const LanePosition false_lane_position = LanePosition(s + lane_length + linear_tolerance, r, h);
 
   auto rg = MakeFullRoadGeometry(api::RoadGeometryId("mock_road_geometry"), linear_tolerance, angular_tolerance,
                                  scale_length);
@@ -100,10 +104,14 @@ TEST_F(LaneTest, Contains) {
   const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
 
   for (auto lane : lanes) {
-    EXPECT_CALL(*lane, do_segment_bounds(lane_position.s()));
-    EXPECT_CALL(*lane, do_elevation_bounds(lane_position.s(), lane_position.r()));
+    EXPECT_CALL(*lane, do_segment_bounds(true_lane_position.s()));
+    EXPECT_CALL(*lane, do_elevation_bounds(true_lane_position.s(), true_lane_position.r()));
     EXPECT_CALL(*lane, do_length());
-    EXPECT_TRUE(lane->Contains(lane_position));
+    EXPECT_TRUE(lane->Contains(true_lane_position));
+    EXPECT_CALL(*lane, do_segment_bounds(false_lane_position.s()));
+    EXPECT_CALL(*lane, do_elevation_bounds(false_lane_position.s(), false_lane_position.r()));
+    EXPECT_CALL(*lane, do_length());
+    EXPECT_FALSE(lane->Contains(false_lane_position));
   }
 }
 

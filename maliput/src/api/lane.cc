@@ -70,7 +70,7 @@ LanePositionResultT<drake::symbolic::Expression> Lane::ToLanePositionT<drake::sy
   return DoToLanePositionSymbolic(geo_pos);
 }
 
-bool Lane::IsWithinRange(double x, double min, double max, double tolerance) const {
+bool IsWithinRange(double x, double min, double max, double tolerance) {
   return ((min - tolerance) <= x) && (x <= (max + tolerance));
 }
 
@@ -84,9 +84,9 @@ bool Lane::Contains(const LanePosition& lane_position) const {
   const double lane_length = this->length();
   const double linear_tolerance = this->segment()->junction()->road_geometry()->linear_tolerance();
 
-  return this->IsWithinRange(s, 0., lane_length, linear_tolerance) &&
-         this->IsWithinRange(r, segment_bounds.min(), segment_bounds.max(), linear_tolerance) &&
-         this->IsWithinRange(h, elevation_bounds.min(), elevation_bounds.max(), linear_tolerance);
+  return IsWithinRange(s, 0., lane_length, linear_tolerance) &&
+         IsWithinRange(r, segment_bounds.min(), segment_bounds.max(), linear_tolerance) &&
+         IsWithinRange(h, elevation_bounds.min(), elevation_bounds.max(), linear_tolerance);
 }
 
 }  // namespace api
