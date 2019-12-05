@@ -19,7 +19,7 @@ namespace api {
 namespace test {
 namespace {
 
-const double lane_length{10.};
+const double kLaneLength{10.};
 const double kOneTolerance{1.};
 
 class LaneTest : public ::testing::Test {
