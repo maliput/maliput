@@ -7,6 +7,7 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
 
 namespace maliput {
@@ -67,24 +68,24 @@ TEST_F(IntersectionTest, BasicTest) {
 }
 
 TEST_F(IntersectionTest, Includes) {
-  const double kDurationUntil{1};  // Arbitrary.
-  const Intersection::Id intersection_id("foo");
+  const Intersection::Id kIntersectionId("intersection");
+  const api::GeoPosition kGeoPos{11.8, 89., 1.};
   ManualPhaseProvider phase_provider;
   {
-    Intersection dut(intersection_id, ranges_a, dummy_ring_, &phase_provider);
+    const Intersection dut(kIntersectionId, ranges_a, dummy_ring_, &phase_provider);
     EXPECT_TRUE(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()));
   }
   {
-    Intersection dut(intersection_id, ranges_b, dummy_ring_, &phase_provider);
+    const Intersection dut(kIntersectionId, ranges_b, dummy_ring_, &phase_provider);
     EXPECT_FALSE(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()));
   }
   {
-    Intersection dut(intersection_id, ranges_c, dummy_ring_, &phase_provider);
-    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()), std::exception);
+    const Intersection dut(kIntersectionId, ranges_c, dummy_ring_, &phase_provider);
+    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()), maliput::common::assertion_error);
   }
   {
-    Intersection dut(intersection_id, ranges_c, dummy_ring_, &phase_provider);
-    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, nullptr), std::exception);
+    const Intersection dut(kIntersectionId, ranges_c, dummy_ring_, &phase_provider);
+    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, nullptr), maliput::common::assertion_error);
   }
 }
 
