@@ -49,7 +49,7 @@ class LaneMock final : public geometry_base::test::MockLane {
 
   HBounds InternalElevationBounds(double s, double r) const { return HBounds(-5, 5); }
 
-  double InternalLength() const { return lane_length; }
+  double InternalLength() const { return kLaneLength; }
 };
 
 class RoadGeometryMock final : public geometry_base::test::MockRoadGeometry {
@@ -96,7 +96,7 @@ std::unique_ptr<RoadGeometryMock> MakeFullRoadGeometry(const api::RoadGeometryId
 
 TEST_F(LaneTest, Contains) {
   const LanePosition true_lane_position = LanePosition(s, r, h);
-  const LanePosition false_lane_position = LanePosition(s + lane_length + linear_tolerance, r, h);
+  const LanePosition false_lane_position = LanePosition(s + kLaneLength + linear_tolerance, r, h);
 
   auto rg = MakeFullRoadGeometry(api::RoadGeometryId("mock_road_geometry"), linear_tolerance, angular_tolerance,
                                  scale_length);
