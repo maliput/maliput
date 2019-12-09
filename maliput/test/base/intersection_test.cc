@@ -11,6 +11,7 @@
 #include "maliput/test_utilities/mock.h"
 
 namespace maliput {
+namespace test {
 namespace {
 
 class IntersectionTest : public ::testing::Test {
@@ -81,13 +82,14 @@ TEST_F(IntersectionTest, Includes) {
   }
   {
     const Intersection dut(kIntersectionId, ranges_c, dummy_ring_, &phase_provider);
-    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()), maliput::common::assertion_error);
+    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()), common::assertion_error);
   }
   {
     const Intersection dut(kIntersectionId, ranges_c, dummy_ring_, &phase_provider);
-    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, nullptr), maliput::common::assertion_error);
+    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, nullptr), common::assertion_error);
   }
 }
 
 }  // namespace
+}  // namespace test
 }  // namespace maliput
