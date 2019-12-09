@@ -302,6 +302,9 @@ std::unique_ptr<IntersectionBook> CreateIntersectionBook();
 /// Returns an arbitrary rules::RuleRegistry.
 std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry();
 
+/// Returns an arbitrary rules::RuleRegistry populated with discrete and range value rule types.
+std::unique_ptr<rules::RuleRegistry> CreateBasicRuleRegistry();
+
 /// Returns an arbitrary rules::DiscreteValueRuleStateProvider.
 std::unique_ptr<rules::DiscreteValueRuleStateProvider> CreateDiscreteValueRuleStateProvider();
 
