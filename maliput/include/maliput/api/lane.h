@@ -216,6 +216,9 @@ class Lane {
     return DoGetDefaultBranch(which_end);
   }
 
+  /// Returns if this lane contains @p lane_position.
+  bool Contains(const LanePosition& lane_position) const;
+
  protected:
   Lane() = default;
 
