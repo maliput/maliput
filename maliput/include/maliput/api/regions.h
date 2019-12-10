@@ -142,5 +142,18 @@ class LaneSRoute {
 /// @throws common::assertion_error When `road_geometry` is nullptr.
 bool IsContiguous(const LaneSRange& lane_range_a, const LaneSRange& lane_range_b, const RoadGeometry* road_geometry);
 
+/// Evaluates whether `geo_position` is within `lane_s_ranges`.
+///
+/// @param geo_position A GeoPosition in the World Frame.
+/// @param lane_s_ranges A vector of LaneSRanges that define a region.
+/// @param road_geometry The RoadGeometry where `lane_s_ranges` is contained. It must not be nullptr.
+/// @returns True when `geo_position` is within `lane_s_ranges`. `geo_position` is contained if the distance to
+/// the closest LanePosition of `lane_s_ranges` is less or equal than the linear tolerance of the `road_geometry`.
+///
+/// @throws common::assertion_error When `road_geometry` is nullptr.
+/// @throws common::assertion_error When Lanes in `lane_s_ranges` are not found in `road_geometry`.
+bool IsIncluded(const GeoPosition& geo_position, const std::vector<LaneSRange>& lane_s_ranges,
+                const RoadGeometry* road_geometry);
+
 }  // namespace api
 }  // namespace maliput

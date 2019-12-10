@@ -229,6 +229,9 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
 /// Returns an arbitrary one-lane RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry();
 
+/// Returns an arbitrary two-lane RoadGeometry.
+std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry();
+
 /// Returns an arbitrary rules::RoadRulebook.
 ///
 /// Forwards the call to CreateRoadRulebook() passing a default-constructed

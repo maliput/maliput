@@ -1,8 +1,20 @@
 #include "maliput/api/regions.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
 
 namespace maliput {
 namespace api {
+
+namespace {
+
+// Evaluates whether `lane_s_range` belongs to `road_geometry`.
+bool IsValid(const LaneSRange& lane_s_range, const RoadGeometry* road_geometry) {
+  // TODO(francocipollone) This function could be removed once maliput#203 is addressed.
+  return road_geometry->ById().GetLane(lane_s_range.lane_id()) != nullptr;
+}
+
+}  // namespace
 
 bool IsContiguous(const LaneSRange& lane_range_a, const LaneSRange& lane_range_b, const RoadGeometry* road_geometry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
@@ -58,6 +70,25 @@ bool LaneSRoute::Intersects(const LaneSRoute& lane_s_route, double tolerance) co
       if (s_range.Intersects(*lane_s_range_it, tolerance)) {
         return true;
       }
+    }
+  }
+  return false;
+}
+
+bool IsIncluded(const GeoPosition& geo_position, const std::vector<LaneSRange>& lane_s_ranges,
+                const RoadGeometry* road_geometry) {
+  MALIPUT_THROW_UNLESS(road_geometry != nullptr);
+  MALIPUT_THROW_UNLESS(!lane_s_ranges.empty());
+  for (const auto& lane_s_range : lane_s_ranges) {
+    MALIPUT_THROW_UNLESS(IsValid(lane_s_range, road_geometry));
+  }
+  const double linear_tolerance = road_geometry->linear_tolerance();
+  for (const auto& lane_s_range : lane_s_ranges) {
+    const LanePositionResult result =
+        road_geometry->ById().GetLane(lane_s_range.lane_id())->ToLanePosition(geo_position);
+    if (result.distance <= linear_tolerance) {
+      const double s_position = result.lane_position.s();
+      return lane_s_range.s_range().Intersects(SRange(s_position, s_position), linear_tolerance);
     }
   }
   return false;
