@@ -44,7 +44,7 @@ enum class BulbState { kOff = 0, kOn, kBlinking };
 std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper();
 
 /// Forward declaration of `UniqueBulbId` to be used by `Bulb`.
-struct UniqueBulbId;
+class UniqueBulbId;
 
 /// Forward declaration of `BulbGroup` to be used by `Bulb`.
 class BulbGroup;
