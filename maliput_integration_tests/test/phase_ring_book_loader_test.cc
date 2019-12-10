@@ -67,7 +67,7 @@ std::pair<std::string, std::vector<Rule::Id>> RelatedYieldGroup(const std::vecto
   for (const std::string& rule_id_str : rule_id_strs) {
     rule_ids.push_back(Rule::Id(RightOfWayRuleTypeId().string() + rule_id_str));
   }
-  return std::make_pair(RightOfWayYieldGroup(), rule_ids);
+  return std::make_pair(RelatedRulesKeys::kYieldGroup, rule_ids);
 }
 
 // Returns a api::UniqueBulbGroupId from `unique_bulb_group_id_str`.
@@ -87,7 +87,7 @@ UniqueBulbGroupId FromString(const std::string& unique_bulb_group_id_str) {
 // Returns Rule::RelatedUniqueIds initialized with `unique_bulb_group_id_str` as
 // sole api::UniqueBulbGroupId.
 Rule::RelatedUniqueIds CreateRelatedBulbGroups(const std::string& unique_bulb_group_id_str) {
-  return Rule::RelatedUniqueIds{{RightOfWayBulbGroup(), {FromString(unique_bulb_group_id_str)}}};
+  return Rule::RelatedUniqueIds{{RelatedUniqueIdsKeys::kBulbGroup, {FromString(unique_bulb_group_id_str)}}};
 }
 
 class TestLoading2x2IntersectionPhasebook : public ::testing::Test {

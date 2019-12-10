@@ -87,7 +87,7 @@ api::rules::Rule::RelatedRules CreateRightOfWayRelatedRules() {
   return std::map<std::string, std::vector<api::rules::Rule::Id>>{
       {VehicleStopInZoneBehaviorRuleTypeId().string(),
        {api::rules::Rule::Id{VehicleStopInZoneBehaviorRuleTypeId().string() + "/" + "test_id_a"}}},
-      {RightOfWayYieldGroup(),
+      {RelatedRulesKeys::kYieldGroup,
        {api::rules::Rule::Id{RightOfWayRuleTypeId().string() + "/" + "test_id_b"},
         api::rules::Rule::Id{RightOfWayRuleTypeId().string() + "/" + "test_id_c"}}},
   };
@@ -100,7 +100,7 @@ class GetCurrentYieldGroupTest : public ::testing::Test {
   const LaneSRoute kLaneSRoute{LaneSRoute{{LaneSRange{LaneId{"lane_id"}, {0., 10.}}}}};
   const DiscreteValueRule::DiscreteValue kStateDiscreteValue{MakeDiscreteValue(
       Rule::State::kStrict, CreateRightOfWayRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(), "StopAndGo")};
-  const std::vector<Rule::Id> expected_yield_group{CreateRightOfWayRelatedRules().at(RightOfWayYieldGroup())};
+  const std::vector<Rule::Id> expected_yield_group{CreateRightOfWayRelatedRules().at(RelatedRulesKeys::kYieldGroup)};
 
   void SetUp() override {
     road_rulebook_ = std::make_unique<ManualRulebook>();
@@ -126,7 +126,7 @@ TEST_F(GetCurrentYieldGroupTest, GetCurrentYieldGroup) {
 
 api::rules::Rule::RelatedUniqueIds CreateRelatedUniqueIds() {
   return {
-      {RightOfWayBulbGroup(),
+      {RelatedUniqueIdsKeys::kBulbGroup,
        {api::rules::UniqueBulbGroupId{maliput::api::rules::TrafficLight::Id{"traffic_light_a"},
                                       maliput::api::rules::BulbGroup::Id{"bulb_group_a"}},
         api::rules::UniqueBulbGroupId{maliput::api::rules::TrafficLight::Id{"traffic_light_b"},
@@ -140,7 +140,7 @@ class GetCurrentBulbGroupTest : public ::testing::Test {
   const Rule::Id kRuleId{kTypeId.string() + "/right_of_way_rule_id"};
   const DiscreteValueRule::DiscreteValue kStateDiscreteValue{MakeDiscreteValue(
       Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), CreateRelatedUniqueIds(), "StopAndGo")};
-  const std::vector<api::UniqueId> expected_bulb_group{CreateRelatedUniqueIds().at(RightOfWayBulbGroup())};
+  const std::vector<api::UniqueId> expected_bulb_group{CreateRelatedUniqueIds().at(RelatedUniqueIdsKeys::kBulbGroup)};
 
   void SetUp() override {
     road_rulebook_ = std::make_unique<ManualRulebook>();

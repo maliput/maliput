@@ -185,12 +185,12 @@ DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(
   for (const auto& yield_id : row_state.yield_to()) {
     yield_group.push_back(GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
   }
-  related_rules.emplace(RightOfWayYieldGroup(), yield_group);
+  related_rules.emplace(RelatedRulesKeys::kYieldGroup, yield_group);
 
-  Rule::RelatedUniqueIds related_unique_ids{{RightOfWayBulbGroup(), {}}};
+  Rule::RelatedUniqueIds related_unique_ids{{RelatedUniqueIdsKeys::kBulbGroup, {}}};
   for (const auto& pair_traffic_light_id_vector_bulb_group_id : related_bulb_groups) {
     for (const auto& bulb_group_id : pair_traffic_light_id_vector_bulb_group_id.second) {
-      related_unique_ids.at(RightOfWayBulbGroup())
+      related_unique_ids.at(RelatedUniqueIdsKeys::kBulbGroup)
           .push_back(UniqueBulbGroupId{pair_traffic_light_id_vector_bulb_group_id.first, bulb_group_id});
     }
   }

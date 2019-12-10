@@ -83,15 +83,20 @@ api::rules::Rule::TypeId VehicleStopInZoneBehaviorRuleTypeId();
 /// empty.
 api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleType();
 
-/// Returns "YieldGroup", which is the key used in DiscreteValue::RelatedRules
-/// by Right-Of-Way rules to yield to other rules.
-std::string RightOfWayYieldGroup();
-
-/// Returns "BulbGroupIds", which is the key to the `Rules::RelatedUniqueIds` of Right-Of-Way rules.
-std::string RightOfWayBulbGroup();
-
 /// Returns a maliput::api::rules::Rule::TypeId initialized with
 /// "Speed Limit Rule Type".
 api::rules::Rule::TypeId SpeedLimitRuleTypeId();
+
+/// Defines keys used in api::rules::Rule::RelatedRules.
+struct RelatedRulesKeys {
+  /// Key used by Right-Of-Way rules to yield to other rules.
+  static const char* kYieldGroup;
+};
+
+/// Defines keys used in api::rules::Rule::RelatedUniqueIds.
+struct RelatedUniqueIdsKeys {
+  /// Key used by Right-Of-Way rules.
+  static const char* kBulbGroup;
+};
 
 }  // namespace maliput

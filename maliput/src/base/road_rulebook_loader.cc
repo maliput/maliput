@@ -306,10 +306,10 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
       {RightOfWayRule::State::Type::kStopThenGo, "StopThenGo"},
   };
 
-  Rule::RelatedUniqueIds related_unique_ids{{RightOfWayBulbGroup(), {}}};
+  Rule::RelatedUniqueIds related_unique_ids{{RelatedUniqueIdsKeys::kBulbGroup, {}}};
   for (const auto& pair_traffic_light_id_vector_bulb_group_id : right_of_way_rule.related_bulb_groups()) {
     for (const auto& bulb_group_id : pair_traffic_light_id_vector_bulb_group_id.second) {
-      related_unique_ids.at(RightOfWayBulbGroup())
+      related_unique_ids.at(RelatedUniqueIdsKeys::kBulbGroup)
           .push_back(UniqueBulbGroupId{pair_traffic_light_id_vector_bulb_group_id.first, bulb_group_id});
     }
   }
@@ -322,7 +322,7 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
     for (const auto& yield_id : state.second.yield_to()) {
       rule_ids.push_back(GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
     }
-    related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{RightOfWayYieldGroup(), rule_ids});
+    related_rules.emplace(std::pair<std::string, std::vector<Rule::Id>>{RelatedRulesKeys::kYieldGroup, rule_ids});
     discrete_values.push_back(api::rules::MakeDiscreteValue(Rule::State::kStrict, related_rules, related_unique_ids,
                                                             right_of_way_rule_state_types.at(state.second.type())));
   }
