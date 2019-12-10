@@ -278,7 +278,7 @@ std::unique_ptr<BulbGroup> BuildBulbGroup(const YAML::Node& bulb_group_node) {
   MALIPUT_THROW_UNLESS(bulbs_node.IsSequence());
   std::vector<std::unique_ptr<Bulb>> bulbs;
   for (const YAML::Node& bulb_node : bulbs_node) {
-    bulbs.push_back(std::move(BuildBulb(bulb_node)));
+    bulbs.push_back(BuildBulb(bulb_node));
   }
   return std::make_unique<BulbGroup>(id, position_traffic_light, orientation_traffic_light, std::move(bulbs));
 }
@@ -299,7 +299,7 @@ std::unique_ptr<TrafficLight> BuildTrafficLight(const YAML::Node& traffic_light_
   MALIPUT_THROW_UNLESS(bulb_groups_node.IsSequence());
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
   for (const YAML::Node& bulb_group_node : bulb_groups_node) {
-    bulb_groups.push_back(std::move(BuildBulbGroup(bulb_group_node)));
+    bulb_groups.push_back(BuildBulbGroup(bulb_group_node));
   }
   return std::make_unique<TrafficLight>(id, position_road_network, orientation_road_network, std::move(bulb_groups));
 }
@@ -311,7 +311,7 @@ std::unique_ptr<api::rules::TrafficLightBook> BuildFrom(const YAML::Node& root_n
   MALIPUT_THROW_UNLESS(traffic_lights_node.IsSequence());
   auto result = std::make_unique<TrafficLightBook>();
   for (const YAML::Node& traffic_light_node : traffic_lights_node) {
-    result->AddTrafficLight(std::move(BuildTrafficLight(traffic_light_node)));
+    result->AddTrafficLight(BuildTrafficLight(traffic_light_node));
   }
   return result;
 }
