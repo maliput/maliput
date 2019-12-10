@@ -200,7 +200,7 @@ class Bulb final {
 };
 
 /// Forward declaration of `UniqueBulbGroupId` to be used by `BulbGroup`.
-struct UniqueBulbGroupId;
+class UniqueBulbGroupId;
 
 /// Forward declaration of `TrafficLight` to be used by `BulbGroup`.
 class TrafficLight;
