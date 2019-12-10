@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/branch_point.h"
+#include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
@@ -19,6 +20,7 @@ namespace multilane {
 namespace {
 
 using api::GeoPosition;
+using api::JunctionId;
 using api::Lane;
 using api::LaneEnd;
 using api::LaneId;
@@ -51,12 +53,13 @@ class Test2x2Intersection : public ::testing::Test {
 TEST_F(Test2x2Intersection, CheckRoadGeometryProperties) {
   EXPECT_NE(dut_, nullptr);
   EXPECT_EQ(dut_->id().string(), "basic_two_lane_x_intersection");
-  EXPECT_EQ(dut_->num_junctions(), 14);
+  EXPECT_EQ(dut_->num_junctions(), 5);
   EXPECT_EQ(dut_->num_branch_points(), 16);
   EXPECT_NEAR(dut_->linear_tolerance(), 0.01, 1e-6);
   EXPECT_NEAR(dut_->angular_tolerance(), 0.5 * M_PI / 180., 1e-6);
   EXPECT_NEAR(dut_->scale_length(), 1, 1e-6);
   EXPECT_EQ(dut_->CheckInvariants().size(), 0);
+  EXPECT_EQ(dut_->ById().GetJunction(JunctionId("j:intersection"))->num_segments(), 10);
 }
 
 TEST_F(Test2x2Intersection, CheckLaneNamesAndPositions) {

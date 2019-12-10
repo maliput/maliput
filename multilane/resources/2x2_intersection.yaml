@@ -112,6 +112,10 @@ maliput_multilane_builder:
        start: ["lane.0", "connections.ns_intersection_segment.end.1.reverse"]
        arc: [11.25, 90]
        explicit_end: ["lane.0", "connections.ew_intersection_segment.start.0.forward"]
+  groups:
+      intersection: [ew_intersection_segment, ns_intersection_segment, east_right_turn_segment, west_right_turn_segment,
+                     north_right_turn_segment, south_right_turn_segment, east_left_turn_segment, west_left_turn_segment,
+                     north_left_turn_segment, south_left_turn_segment]
 
 RoadRulebook:
   RightOfWayRules:
