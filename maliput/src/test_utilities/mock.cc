@@ -845,7 +845,7 @@ std::unique_ptr<IntersectionBook> CreateIntersectionBook() { return std::make_un
 std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry() { return std::make_unique<rules::RuleRegistry>(); }
 
 std::unique_ptr<rules::RuleRegistry> CreateBasicRuleRegistry() {
-  std::unique_ptr<rules::RuleRegistry> rule_registry;
+  std::unique_ptr<rules::RuleRegistry> rule_registry = std::make_unique<rules::RuleRegistry>();
   std::vector<DiscreteValueRule::DiscreteValue> discrete_values{};
   std::vector<RangeValueRule::Range> range_values{};
   {
@@ -870,7 +870,7 @@ std::unique_ptr<rules::RuleRegistry> CreateBasicRuleRegistry() {
                   Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Interstate highway - day time", 16.6, 27.8));  //--CHECK
     rule_registry->RegisterRangeValueRule(Rule::TypeId("Speed-Limit Rule Type"), range_values);
   }
-  return std::move(rule_registry);
+  return rule_registry;
 }
 
 std::unique_ptr<rules::DiscreteValueRuleStateProvider> CreateDiscreteValueRuleStateProvider() {

@@ -351,7 +351,6 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
     filepath_ = directory_.get_path() + "/rules_loader_test.yaml";
 
     GenerateYamlFileFromString(rules_string_, filepath_);
-
     road_geometry_ = api::test::CreateTwoLanesRoadGeometry();
     rule_registry_ = api::test::CreateBasicRuleRegistry();
   }
@@ -364,10 +363,10 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
   // Creates three rule types.
   std::string GenerateRulebookString() {
     return fmt::format(
-        R"R(RuleRegistry:
+        R"R(RoadRulebook:
   - id: "rule1"
     type: "Right-Of-Way Rule Type"
-    region:
+    zone:
       - lane_id: "lane_a"
         s_range: [0, 100]
       - lane_id: "lane_b"
@@ -376,19 +375,19 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
       - value: "Go"
         severity: 0
         related_rules:
-        - Yield Group: ["RightOfWayRuleType/lane2",]
-        - Vehicle Stop In Zone Behavior: ["VehicleStopInZoneBehaviorRuleType/lane34"]
+        - Yield Group: ["RightOfWayRuleType/lane2"]
+          Vehicle Stop In Zone Behavior: ["VehicleStopInZoneBehaviorRuleType/lane34"]
         related_unique_ids:
-        - Bulb Group: ["TrafficLightId-BulbGroupId",]
+        - Bulb Group: ["TrafficLightId-BulbGroupId"]
       - value: "Stop"
         severity: 0
         related_rules:
-        - Yield Group: ["RightOfWayRuleType/lane2",]
+        - Yield Group: ["RightOfWayRuleType/lane2"]
         related_unique_ids:
-        - Bulb Group: ["TrafficLightId-BulbGroupId",]
+        - Bulb Group: ["TrafficLightId-BulbGroupId"]
   - id: "rule2"
     type: "Speed-Limit Rule Type"
-    region:
+    zone:
       - lane_id: "lane_a"
         s_range: [0, 100]
       - lane_id: "lane_b"
@@ -397,8 +396,8 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
       - range: [16.6, 27.8]
         description : "Interstate highway - day time"
         severity: 0
-        related_rules:
-        related_unique_ids:
+        related_rules: []
+        related_unique_ids: []
 )R");
   }
 
@@ -406,12 +405,12 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
     std::vector<DiscreteValueRule::DiscreteValue> discrete_values;
     discrete_values.push_back(api::rules::MakeDiscreteValue(
         Rule::State::kStrict,
-        Rule::RelatedRules{{"YieldGroup", {Rule::Id{"RightOfWayRuleType/lane2"}}},
-                           {"VehicleStopInZoneBehavior", {Rule::Id{"VehicleStopInZoneBehaviorRuleType/lane34"}}}},
-        Rule::RelatedUniqueIds{{"BulbGroup", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Go"));
+        Rule::RelatedRules{{"Yield Group", {Rule::Id{"RightOfWayRuleType/lane2"}}},
+                           {"Vehicle Stop In Zone Behavior", {Rule::Id{"VehicleStopInZoneBehaviorRuleType/lane34"}}}},
+        Rule::RelatedUniqueIds{{"Bulb Group", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Go"));
     discrete_values.push_back(api::rules::MakeDiscreteValue(
-        Rule::State::kStrict, Rule::RelatedRules{{"YieldGroup", {Rule::Id{"RightOfWayRuleType/lane2"}}}},
-        Rule::RelatedUniqueIds{{"BulbGroup", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Stop"));
+        Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {Rule::Id{"RightOfWayRuleType/lane2"}}}},
+        Rule::RelatedUniqueIds{{"Bulb Group", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Stop"));
     DiscreteValueRule discrete_value_rule{
         Rule::Id{"rule1"}, Rule::TypeId{"Right-Of-Way Rule Type"},
         LaneSRoute{{{LaneId{"lane_a"}, SRange{0., 100.}}, {LaneId{"lane_b"}, SRange{0., 50.}}}}, discrete_values};
@@ -423,7 +422,7 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
     range_values.push_back(api::rules::MakeRange(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
                                                  "Interstate highway - day time", 16.6, 27.8));
     RangeValueRule range_value_rule{
-        Rule::Id{"rule1"}, Rule::TypeId{"Right-Of-Way Rule Type"},
+        Rule::Id{"rule2"}, Rule::TypeId{"Speed-Limit Rule Type"},
         LaneSRoute{{{LaneId{"lane_a"}, SRange{0., 100.}}, {LaneId{"lane_b"}, SRange{0., 50.}}}}, range_values};
     return {{range_value_rule}};
   }
