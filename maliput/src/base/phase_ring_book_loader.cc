@@ -209,6 +209,7 @@ DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_state
     const Rule::Id rule_id = GetRuleIdFrom(RightOfWayRuleTypeId(), row_it.first);
     const DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id);
     const RightOfWayRule right_of_way_rule = rulebook->GetRule(row_it.first);
+    MALIPUT_THROW_UNLESS(right_of_way_rule.states().find(row_it.second) != right_of_way_rule.states().end());
     MALIPUT_THROW_UNLESS(discrete_value_rule_states
                              .emplace(rule_id, FindDiscreteValueFromRightOfWayRuleState(
                                                    row_it.first, right_of_way_rule.states().at(row_it.second),
