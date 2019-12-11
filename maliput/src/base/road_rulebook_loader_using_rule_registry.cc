@@ -244,7 +244,7 @@ LaneSRoute GetZoneFromYamlNode(const YAML::Node& rule_node, const api::RoadGeome
 // Returns the severity field value from the `node`.
 int GetSeverityFromYamlNode(const YAML::Node& node) {
   if (node[kSeverity].IsDefined()) {
-    const int severity = node["severity"].as<int>();
+    const int severity = node[kSeverity].as<int>();
     MALIPUT_THROW_UNLESS(severity >= 0);
     return severity;
   }
@@ -253,15 +253,13 @@ int GetSeverityFromYamlNode(const YAML::Node& node) {
 
 // Returns a Rule::RelatedRules containing the related_rules field value from the `node`.
 Rule::RelatedRules GetRelatedRuleFromYamlNode(const YAML::Node& node) {
-  return node[kRelatedRules].IsDefined() ? node[kRelatedRules].as<Rule::RelatedRules>()
-                                         : Rule::RelatedRules{};  //--Hacer YAML decode encode
+  return node[kRelatedRules].IsDefined() ? node[kRelatedRules].as<Rule::RelatedRules>() : Rule::RelatedRules{};
 }
 
 // Returns a Rule::RelatedUniqueIds containing the related_unique_ids field value from the `node`.
 Rule::RelatedUniqueIds GetRelatedUniqueIdsFromYamlNode(const YAML::Node& node) {
-  return node[kRelatedUniqueIds].IsDefined()
-             ? node[kRelatedUniqueIds].as<Rule::RelatedUniqueIds>()  //--Hacer YAML decode encode
-             : Rule::RelatedUniqueIds{};
+  return node[kRelatedUniqueIds].IsDefined() ? node[kRelatedUniqueIds].as<Rule::RelatedUniqueIds>()
+                                             : Rule::RelatedUniqueIds{};
 }
 
 // Returns a std::string containing the value field value from the `node`.

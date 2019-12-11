@@ -12,11 +12,11 @@ set(BASE_SOURCES
   manual_right_of_way_rule_state_provider.cc
   manual_phase_ring_book.cc
   manual_rulebook.cc
-  road_rulebook_loader_using_rule_registry.cc
   phase_based_right_of_way_discrete_value_rule_state_provider.cc
   phase_based_right_of_way_rule_state_provider.cc
   phase_ring_book_loader.cc
   road_rulebook_loader.cc
+  road_rulebook_loader_using_rule_registry.cc
   rule_filter.cc
   rule_registry.cc
   rule_registry_loader.cc

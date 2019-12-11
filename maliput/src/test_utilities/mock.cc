@@ -844,6 +844,35 @@ std::unique_ptr<IntersectionBook> CreateIntersectionBook() { return std::make_un
 
 std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry() { return std::make_unique<rules::RuleRegistry>(); }
 
+std::unique_ptr<rules::RuleRegistry> CreateBasicRuleRegistry() {
+  std::unique_ptr<rules::RuleRegistry> rule_registry;
+  std::vector<DiscreteValueRule::DiscreteValue> discrete_values{};
+  std::vector<RangeValueRule::Range> range_values{};
+  {
+    discrete_values.push_back(MakeDiscreteValue(
+        Rule::State::kStrict,
+        Rule::RelatedRules{{"Yield Group", {}},
+                           {"Vehicle Stop In Zone Behavior",
+                            {}}},  //--CHECK when I use base/rule_registry.h struct -> error in buildtime
+        Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Go"));  //--CHECK
+    discrete_values.push_back(MakeDiscreteValue(
+        Rule::State::kStrict,
+        Rule::RelatedRules{{"Yield Group", {}}},  //--CHECK when I use base/rule_registry.h struct -> error in buildtime
+        Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Stop"));  //--CHECK
+    rule_registry->RegisterDiscreteValueRule(Rule::TypeId("Right-Of-Way Rule Type"), discrete_values);
+  }
+  {
+    range_values.push_back(
+        MakeRange(Rule::State::kStrict,
+                  Rule::RelatedRules{{"Yield Group", {}},
+                                     {"Vehicle Stop In Zone Behavior",
+                                      {}}},  //--CHECK when I use base/rule_registry.h struct -> error in buildtime
+                  Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Interstate highway - day time", 16.6, 27.8));  //--CHECK
+    rule_registry->RegisterRangeValueRule(Rule::TypeId("Speed-Limit Rule Type"), range_values);
+  }
+  return std::move(rule_registry);
+}
+
 std::unique_ptr<rules::DiscreteValueRuleStateProvider> CreateDiscreteValueRuleStateProvider() {
   return std::make_unique<MockDiscreteValueRuleStateProvider>();
 }
