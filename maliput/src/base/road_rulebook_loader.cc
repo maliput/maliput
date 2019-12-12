@@ -13,6 +13,7 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/base/manual_rulebook.h"
 #include "maliput/base/rule_registry.h"
+#include "maliput/base/yaml_conversion.h"
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_throw.h"
 
@@ -30,29 +31,6 @@ using maliput::api::rules::TrafficLight;
 using maliput::api::rules::UniqueBulbGroupId;
 
 namespace YAML {
-
-template <>
-struct convert<SRange> {
-  static Node encode(const SRange& rhs) {
-    Node node;
-    node.push_back(rhs.s0());
-    node.push_back(rhs.s1());
-    return node;
-  }
-
-  // The following API is required by yaml-cpp. See this web page for more
-  // information:
-  // https://github.com/jbeder/yaml-cpp/wiki/Tutorial#converting-tofrom-native-data-types
-  // NOLINTNEXTLINE(runtime/references).
-  static bool decode(const Node& node, SRange& rhs) {
-    if (!node.IsSequence() || node.size() != 2) {
-      return false;
-    }
-    rhs.set_s0(node[0].as<double>());
-    rhs.set_s1(node[1].as<double>());
-    return true;
-  }
-};
 
 template <>
 struct convert<RightOfWayRule::State::YieldGroup> {

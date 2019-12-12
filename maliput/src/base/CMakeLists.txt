@@ -22,6 +22,7 @@ set(BASE_SOURCES
   rule_tools.cc
   traffic_light_book.cc
   traffic_light_book_loader.cc
+  yaml_conversion.cc
   )
 
 add_library(base ${BASE_SOURCES})
