@@ -4,6 +4,7 @@
 
 #include "drake/common/drake_copyable.h"
 #include "maliput/api/intersection.h"
+#include "maliput/api/rules/traffic_lights.h"
 
 namespace maliput {
 namespace api {
@@ -24,6 +25,18 @@ class IntersectionBook {
   /// the lifetime of this IntersectionBook's instance.
   Intersection* GetIntersection(const Intersection::Id& id) { return DoGetIntersection(id); }
 
+  /// Find the intersection which contains api::rules::TrafficLight::Id.
+  ///
+  /// @param id A api::rules::TrafficLight::Id.
+  /// @returns The api::Intersection that contains `id`. Nullptr will be returned if none contains `id`.
+  Intersection* FindIntersection(const rules::TrafficLight::Id& id) { return DoGetFindIntersection(id); }
+
+  /// Find the intersection which contains api::rules::DiscreteValueRule::Id.
+  ///
+  /// @param id A api::rules::DiscreteValueRule::Id.
+  /// @returns The api::Intersection that contains `id`. Nullptr will be returned if none contains `id`.
+  Intersection* FindIntersection(const rules::DiscreteValueRule::Id& id) { return DoGetFindIntersection(id); }
+
  protected:
   IntersectionBook() = default;
 
@@ -31,6 +44,10 @@ class IntersectionBook {
   virtual std::vector<Intersection*> DoGetIntersections() = 0;
 
   virtual Intersection* DoGetIntersection(const Intersection::Id& id) = 0;
+
+  virtual Intersection* DoGetFindIntersection(const rules::TrafficLight::Id& id) = 0;
+
+  virtual Intersection* DoGetFindIntersection(const rules::DiscreteValueRule::Id& id) = 0;
 };
 
 }  // namespace api

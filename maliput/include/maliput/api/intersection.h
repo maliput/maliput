@@ -60,6 +60,21 @@ class Intersection {
   /// Returns the current bulb states within the intersection.
   const std::optional<rules::BulbStates> bulb_states() const;
 
+  /// Returns the current discrete value rule states within the intersection.
+  const drake::optional<rules::DiscreteValueRuleStates> DiscreteValueRuleStates() const;
+
+  /// Determines whether the api::rules::TrafficLight::Id is within this Intersection.
+  ///
+  /// @param id A api::rules::TrafficLight::Id.
+  /// @returns True when `id` is within this Intersection.
+  bool Includes(const api::rules::TrafficLight::Id& id) const;
+
+  /// Determines whether the api::rules::DiscreteValueRule::Id is within this Intersection.
+  ///
+  /// @param id A api::rules::DiscreteValueRule::Id.
+  /// @returns True when `id` is within this Intersection.
+  bool Includes(const api::rules::DiscreteValueRule::Id& id) const;
+
   /// Determines whether `geo_position` is within this Intersection::Region().
   ///
   /// @param geo_position A GeoPosition in the World Frame.
