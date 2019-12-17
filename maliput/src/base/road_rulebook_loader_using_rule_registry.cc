@@ -29,30 +29,6 @@ using maliput::api::rules::RuleRegistry;
 namespace maliput {
 namespace {
 
-// Constants to identify attributes of DiscreteValueRule Types and DiscreteValueRule Types.
-constexpr const char* const kDescription = "description";
-constexpr const char* const kId = "id";
-constexpr const char* const kLaneId = "lane_id";
-constexpr const char* const kRange = "range";
-constexpr const char* const kRanges = "ranges";
-constexpr const char* const kRelatedRules = "related_rules";
-constexpr const char* const kRelatedUniqueIds = "related_unique_ids";
-constexpr const char* const kSeverity = "severity";
-constexpr const char* const kSRange = "s_range";
-constexpr const char* const kType = "type";
-constexpr const char* const kValue = "value";
-constexpr const char* const kValues = "values";
-constexpr const char* const kZone = "zone";
-// Label to identify rule type.
-enum class RuleType {
-  // Label for a DiscreteValueRule Type.
-  kDiscreteValueRuleType,
-  // Label for a RangeValueRule Type.
-  kRangeValueRuleType,
-  // Label for an unidentified rule type.
-  kUnknownRuleType,
-};
-
 // Determines whether the `rule_node` corresponds to a api::rules::DiscreteValueRule description.
 bool IsDiscreteValueRule(const YAML::Node& rule_node) {
   if (!rule_node[kId].IsDefined() || !rule_node[kType].IsDefined() || !rule_node[kZone].IsDefined() ||
@@ -61,22 +37,8 @@ bool IsDiscreteValueRule(const YAML::Node& rule_node) {
   }
   bool result = true;
   for (const auto& discrete_value_node : rule_node[kValues]) {
-    if (!discrete_value_node[kValue].IsDefined()) {
-      result = false;
-      break;
-    }
-    int attribute_count{1};
-    if (discrete_value_node[kSeverity].IsDefined()) {
-      attribute_count++;
-    }
-    if (discrete_value_node[kRelatedRules].IsDefined()) {
-      attribute_count++;
-    }
-    if (discrete_value_node[kRelatedUniqueIds].IsDefined()) {
-      attribute_count++;
-    }
-    if (discrete_value_node.size() != attribute_count) {
-      result = false;
+    result = IsDiscreteValue(discrete_value_node);
+    if (!result) {
       break;
     }
   }
@@ -91,22 +53,8 @@ bool IsRangeValueRule(const YAML::Node& rule_node) {
   }
   bool result = true;
   for (const auto& range_value_node : rule_node[kRanges]) {
-    if (!range_value_node[kRange].IsDefined() || !range_value_node[kDescription].IsDefined()) {
-      result = false;
-      break;
-    }
-    int attribute_count{2};
-    if (range_value_node[kSeverity].IsDefined()) {
-      attribute_count++;
-    }
-    if (range_value_node[kRelatedRules].IsDefined()) {
-      attribute_count++;
-    }
-    if (range_value_node[kRelatedUniqueIds].IsDefined()) {
-      attribute_count++;
-    }
-    if (range_value_node.size() != attribute_count) {
-      result = false;
+    result = IsRangeValue(range_value_node);
+    if (!result) {
       break;
     }
   }
@@ -186,18 +134,6 @@ LaneSRoute GetZoneFromYamlNode(const YAML::Node& rule_node, const api::RoadGeome
   return LaneSRoute{zone};
 }
 
-// Returns the severity field value from the `node`.
-// If severity is undefined, It will return the strictest value.
-// @throws maliput::common::assertion_error if the severity is negative.
-int GetSeverityFromYamlNode(const YAML::Node& node) {
-  if (node[kSeverity].IsDefined()) {
-    const int severity = node[kSeverity].as<int>();
-    MALIPUT_THROW_UNLESS(severity >= 0);
-    return severity;
-  }
-  return Rule::State::kStrict;
-}
-
 // Returns a Rule::RelatedRules contained in the related_rules from the `node`.
 // @throws maliput::common::assertion_error if the related rules are ill-defined.
 Rule::RelatedRules GetRelatedRuleFromYamlNode(const YAML::Node& node) {
@@ -226,31 +162,6 @@ Rule::RelatedUniqueIds GetRelatedUniqueIdsFromYamlNode(const YAML::Node& node) {
     }
   }
   return related_unique_ids;
-}
-
-// Returns a std::string contained in the value from the `node`.
-// @throws maliput::common::assertion_error if the value is ill-defined.
-std::string GetValueFromYamlNode(const YAML::Node& node) {
-  MALIPUT_THROW_UNLESS(node[kValue].IsDefined());
-  return node[kValue].as<std::string>();
-}
-
-// Returns a the min and max values contained in the range from the node.
-// @throws maliput::common::assertion_error if the range is ill-defined.
-std::pair<double, double> GetRangeMinMaxValuesFromYamlNode(const YAML::Node& node) {
-  MALIPUT_THROW_UNLESS(node[kRange].IsSequence());
-  MALIPUT_THROW_UNLESS(node[kRange].size() == 2);
-  const double min = node[kRange][0].as<double>();
-  const double max = node[kRange][1].as<double>();
-  MALIPUT_THROW_UNLESS(min <= max);
-  return std::make_pair(min, max);
-}
-
-// Returns a std::string contained in the description field value from the `node`.
-// @throws maliput::common::assertion_error if the description is ill-defined.
-std::string GetDescriptionFromYamlNode(const YAML::Node& node) {
-  MALIPUT_THROW_UNLESS(node[kDescription].IsDefined());
-  return node[kDescription].as<std::string>();
 }
 
 // Add a DiscreteValueRule to the `rulebook`.
