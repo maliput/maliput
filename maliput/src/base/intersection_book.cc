@@ -83,14 +83,18 @@ std::vector<Intersection*> IntersectionBook::FindIntersections(const std::vector
 
 api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::TrafficLight::Id& id) {
   for (const auto& intersection : GetIntersections()) {
-    return intersection->Includes(id) ? intersection : nullptr;
+    if (intersection->Includes(id)) {
+      return intersection;
+    }
   }
   return nullptr;
 }
 
 api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) {
   for (const auto& intersection : GetIntersections()) {
-    return intersection->Includes(id) ? intersection : nullptr;
+    if (intersection->Includes(id)) {
+      return intersection;
+    }
   }
   return nullptr;
 }

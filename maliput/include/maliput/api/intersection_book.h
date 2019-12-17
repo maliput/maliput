@@ -27,14 +27,16 @@ class IntersectionBook {
 
   /// Find the intersection which contains api::rules::TrafficLight::Id.
   ///
-  /// @param id A api::rules::TrafficLight::Id.
-  /// @returns The api::Intersection that contains `id`. Nullptr will be returned if none contains `id`.
+  /// @param id A rules::TrafficLight::Id.
+  /// @returns The Intersection that contains `id`. When none of the Intersections have a rules::TrafficLight with `id`,
+  /// nullptr is returned.
   Intersection* FindIntersection(const rules::TrafficLight::Id& id) { return DoGetFindIntersection(id); }
 
   /// Find the intersection which contains api::rules::DiscreteValueRule::Id.
   ///
-  /// @param id A api::rules::DiscreteValueRule::Id.
-  /// @returns The api::Intersection that contains `id`. Nullptr will be returned if none contains `id`.
+  /// @param id A rules::DiscreteValueRule::Id.
+  /// @returns The Intersection that contains `id`. When none of the Intersections have a rules::DiscreteValueRule with
+  /// `id`, nullptr is returned.
   Intersection* FindIntersection(const rules::DiscreteValueRule::Id& id) { return DoGetFindIntersection(id); }
 
  protected:

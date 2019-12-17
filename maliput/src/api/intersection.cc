@@ -11,7 +11,7 @@ Intersection::Intersection(const Id& id, const std::vector<LaneSRange>& region, 
     : id_(id), region_(region), ring_(ring) {}
 
 const std::optional<BulbStates> Intersection::bulb_states() const {
-  std::optional<PhaseProvider::Result> phase_result = Phase();
+  const std::optional<PhaseProvider::Result> phase_result = Phase();
   if (phase_result.has_value()) {
     const rules::Phase::Id phase_id = phase_result->state;
     const rules::Phase& phase = ring_.phases().at(phase_id);
@@ -21,7 +21,7 @@ const std::optional<BulbStates> Intersection::bulb_states() const {
 }
 
 const drake::optional<rules::DiscreteValueRuleStates> Intersection::DiscreteValueRuleStates() const {
-  drake::optional<PhaseProvider::Result> phase_result = Phase();
+  const drake::optional<PhaseProvider::Result> phase_result = Phase();
   if (phase_result.has_value()) {
     const rules::Phase::Id phase_id = phase_result->state;
     const rules::Phase& phase = ring_.phases().at(phase_id);
@@ -43,8 +43,7 @@ bool Intersection::Includes(const api::rules::TrafficLight::Id& id) const {
 }
 
 bool Intersection::Includes(const api::rules::DiscreteValueRule::Id& id) const {
-  const drake::optional<api::rules::DiscreteValueRuleStates> discrete_value_rule_states =
-      this->DiscreteValueRuleStates();
+  const drake::optional<api::rules::DiscreteValueRuleStates> discrete_value_rule_states = DiscreteValueRuleStates();
   if (discrete_value_rule_states.has_value()) {
     for (const auto& discrete_value_rule_state : discrete_value_rule_states.value()) {
       if (discrete_value_rule_state.first == id) {
