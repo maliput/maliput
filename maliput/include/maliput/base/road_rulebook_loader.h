@@ -47,7 +47,7 @@ std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebookFromFile(const api::Ro
 /// road_geometry, @p input and @p rule_registry.
 ///
 /// @param road_geometry The road geometry to which the api::rules::RoadRulebook
-/// to be loaded applies.
+/// to be loaded applies. It must not be nullptr.
 ///
 /// @param input The YAML RoadRulebook document.
 ///
@@ -65,7 +65,7 @@ std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebook(const api::RoadGeomet
 /// road_geometry, @p filename and @p rule_registry.
 ///
 /// @param road_geometry The road geometry to which the api::rules::RoadRulebook
-/// to be loaded applies.
+/// to be loaded applies. It must not be nullptr.
 ///
 /// @param filename The path to the YAML RoadRulebook document.
 ///

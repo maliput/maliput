@@ -113,8 +113,9 @@ bool IsRangeValueRule(const YAML::Node& rule_node) {
   return result;
 }
 
-// Returns whether the `rule_node` refer to a RuleType::kDiscreteValueRuleType or
-// RuleType::kRangeValueRuleType. RuleType::kUnknownRuleType is returned if the rule type is not well-defined.
+// Returns whether the `rule_node` refers to a RuleType::kDiscreteValueRuleType or
+// RuleType::kRangeValueRuleType. When the rule type is ill-defined, RuleType::KUnknownRuleType is returned.
+// @throws maliput::common::assertion_error if `rule_node` is ill-defined or empty.
 RuleType EvaluateRuleType(const YAML::Node& rule_node) {
   MALIPUT_THROW_UNLESS(rule_node.IsMap());
   MALIPUT_THROW_UNLESS(rule_node.size());
@@ -127,19 +128,24 @@ RuleType EvaluateRuleType(const YAML::Node& rule_node) {
   return rule_type;
 }
 
-// Returns a Rule::Id containing the id field value from the `node`.
+// Returns a Rule::Id contained in the ID from `rule_node`.
+// @throws maliput::common::assertion_error if ID is undefined within `rule_node`.
 Rule::Id GetRuleIdFromYamlNode(const YAML::Node& rule_node) {
   MALIPUT_THROW_UNLESS(rule_node[kId].IsDefined());
   return Rule::Id{rule_node[kId].as<std::string>()};
 }
 
-// Returns a Rule::TypeId containing the type field value from the `node`.
+// Returns a Rule::TypeId contained in the type from the `rule_node`.
+// @throws maliput::common::assertion_error if the type is undefined within `rule_node`.
 Rule::TypeId GetRuleTypeIdFromYamlNode(const YAML::Node& rule_node) {
   MALIPUT_THROW_UNLESS(rule_node[kType].IsDefined());
   return Rule::TypeId{rule_node[kType].as<std::string>()};
 }
 
-// Returns a api::SRange obtained from the `node`.
+// Returns a api::SRange obtained from the `lane_node`.
+// If the range is not defined within `lane_node`, the whole lane will be returned as api::SRange.
+// @throws maliput::common::assertion_error if 'lane' is nullptr.
+// @throws maliput::common::assertion_error if the lane range is not valid.
 SRange GetSRange(const Lane* lane, const YAML::Node& lane_node) {
   MALIPUT_THROW_UNLESS(lane != nullptr);
   if (lane_node[kSRange]) {
@@ -152,7 +158,9 @@ SRange GetSRange(const Lane* lane, const YAML::Node& lane_node) {
   }
 }
 
-// Returns a api::LaneSRange obtained from the `node`.
+// Returns a api::LaneSRange obtained from the `lane_s_range_node`.
+// @throws maliput::common::assertion_error if 'road_geometry' is nullptr.
+// @throws maliput::common::assertion_error if lane id is undefined within `lane_s_range_node`.
 LaneSRange GetLaneSRangeFromYamlNode(const YAML::Node& lane_s_range_node, const api::RoadGeometry* road_geometry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
   MALIPUT_THROW_UNLESS(lane_s_range_node.IsMap());
@@ -164,7 +172,9 @@ LaneSRange GetLaneSRangeFromYamlNode(const YAML::Node& lane_s_range_node, const 
   return LaneSRange(lane_id, s_range);
 }
 
-// Returns a api::LaneSRoute containing the zone field value from the `node`.
+// Returns a api::LaneSRoute contained in the zone from the `node`.
+// @throws maliput::common::assertion_error if 'road_geometry' is nullptr.
+// @throws maliput::common::assertion_error if the zone is ill-defined within `rule_node`.
 LaneSRoute GetZoneFromYamlNode(const YAML::Node& rule_node, const api::RoadGeometry* road_geometry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
   MALIPUT_THROW_UNLESS(rule_node[kZone].IsDefined());
@@ -177,6 +187,8 @@ LaneSRoute GetZoneFromYamlNode(const YAML::Node& rule_node, const api::RoadGeome
 }
 
 // Returns the severity field value from the `node`.
+// If severity is undefined, It will return the strictest value.
+// @throws maliput::common::assertion_error if the severity is negative.
 int GetSeverityFromYamlNode(const YAML::Node& node) {
   if (node[kSeverity].IsDefined()) {
     const int severity = node[kSeverity].as<int>();
@@ -186,7 +198,8 @@ int GetSeverityFromYamlNode(const YAML::Node& node) {
   return Rule::State::kStrict;
 }
 
-// Returns a Rule::RelatedRules containing the related_rules field value from the `node`.
+// Returns a Rule::RelatedRules contained in the related_rules from the `node`.
+// @throws maliput::common::assertion_error if the related rules are ill-defined.
 Rule::RelatedRules GetRelatedRuleFromYamlNode(const YAML::Node& node) {
   MALIPUT_THROW_UNLESS(node[kRelatedRules].IsSequence());
   Rule::RelatedRules related_rules{};
@@ -200,7 +213,8 @@ Rule::RelatedRules GetRelatedRuleFromYamlNode(const YAML::Node& node) {
   return related_rules;
 }
 
-// Returns a Rule::RelatedUniqueIds containing the related_unique_ids field value from the `node`.
+// Returns a Rule::RelatedUniqueIds contained in the related_unique_ids from the `node`.
+// @throws maliput::common::assertion_error if the related unique ids are ill-defined.
 Rule::RelatedUniqueIds GetRelatedUniqueIdsFromYamlNode(const YAML::Node& node) {
   MALIPUT_THROW_UNLESS(node[kRelatedUniqueIds].IsSequence());
   Rule::RelatedUniqueIds related_unique_ids{};
@@ -214,29 +228,36 @@ Rule::RelatedUniqueIds GetRelatedUniqueIdsFromYamlNode(const YAML::Node& node) {
   return related_unique_ids;
 }
 
-// Returns a std::string containing the value field value from the `node`.
+// Returns a std::string contained in the value from the `node`.
+// @throws maliput::common::assertion_error if the value is ill-defined.
 std::string GetValueFromYamlNode(const YAML::Node& node) {
   MALIPUT_THROW_UNLESS(node[kValue].IsDefined());
   return node[kValue].as<std::string>();
 }
 
-// Returns a std::pair containing the min and max of the range field values from the node.
+// Returns a the min and max values contained in the range from the node.
+// @throws maliput::common::assertion_error if the range is ill-defined.
 std::pair<double, double> GetRangeMinMaxValuesFromYamlNode(const YAML::Node& node) {
   MALIPUT_THROW_UNLESS(node[kRange].IsSequence());
   MALIPUT_THROW_UNLESS(node[kRange].size() == 2);
-  double min = node[kRange][0].as<double>();
-  double max = node[kRange][1].as<double>();
+  const double min = node[kRange][0].as<double>();
+  const double max = node[kRange][1].as<double>();
   MALIPUT_THROW_UNLESS(min <= max);
   return std::make_pair(min, max);
 }
 
-// Returns a std::string containing the description field value from the `node`.
+// Returns a std::string contained in the description field value from the `node`.
+// @throws maliput::common::assertion_error if the description is ill-defined.
 std::string GetDescriptionFromYamlNode(const YAML::Node& node) {
   MALIPUT_THROW_UNLESS(node[kDescription].IsDefined());
   return node[kDescription].as<std::string>();
 }
 
-// Add a DiscreteValueRule within the `rulebook`.
+// Add a DiscreteValueRule to the `rulebook`.
+// @throws maliput::common::assertion_error if 'rulebook' is nullptr.
+// @throws maliput::common::assertion_error if 'road_geometry' is nullptr.
+// @throws maliput::common::assertion_error if the `rule_node` is ill-defined.
+// @throws maliput::common::assertion_error if the discrete value rules are ill-defined.
 void AddDiscreteValueRule(ManualRulebook* rulebook, const YAML::Node& rule_node, const api::RoadGeometry* road_geometry,
                           const RuleRegistry& rule_registry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
@@ -255,7 +276,11 @@ void AddDiscreteValueRule(ManualRulebook* rulebook, const YAML::Node& rule_node,
                                            GetZoneFromYamlNode(rule_node, road_geometry), discrete_values));
 }
 
-// Add a RangeValueRule within the `rulebook`.
+// Add a RangeValueRule to the `rulebook`.
+// @throws maliput::common::assertion_error if 'rulebook' is nullptr.
+// @throws maliput::common::assertion_error if 'road_geometry' is nullptr.
+// @throws maliput::common::assertion_error if the `rule_node` is ill-defined.
+// @throws maliput::common::assertion_error if the range value rules are ill-defined.
 void AddRangeValueRule(ManualRulebook* rulebook, const YAML::Node& rule_node, const api::RoadGeometry* road_geometry,
                        const RuleRegistry& rule_registry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
@@ -277,6 +302,8 @@ void AddRangeValueRule(ManualRulebook* rulebook, const YAML::Node& rule_node, co
 }
 
 // Returns a api::rules::RoadRulebook created from `root_node`.
+// @throws maliput::common::assertion_error if 'road_geometry' is nullptr.
+// @throws maliput::common::assertion_error if the `root_node` is ill-defined.
 std::unique_ptr<api::rules::RoadRulebook> BuildFrom(const api::RoadGeometry* road_geometry, const YAML::Node& root_node,
                                                     const RuleRegistry& rule_registry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
@@ -286,8 +313,7 @@ std::unique_ptr<api::rules::RoadRulebook> BuildFrom(const api::RoadGeometry* roa
   MALIPUT_THROW_UNLESS(rulebook_node.IsSequence());
   std::unique_ptr<ManualRulebook> rulebook = std::make_unique<ManualRulebook>();
   for (const YAML::Node& rule_node : rulebook_node) {  //
-    const RuleType rule_type = EvaluateRuleType(rule_node);
-    switch (rule_type) {
+    switch (EvaluateRuleType(rule_node)) {
       case RuleType::kDiscreteValueRuleType:
         AddDiscreteValueRule(rulebook.get(), rule_node, road_geometry, rule_registry);
         break;

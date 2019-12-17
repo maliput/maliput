@@ -851,22 +851,17 @@ std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry() { return std::make_uni
 
 std::unique_ptr<rules::RuleRegistry> CreateBasicRuleRegistry() {
   std::unique_ptr<rules::RuleRegistry> rule_registry = std::make_unique<rules::RuleRegistry>();
-  std::vector<DiscreteValueRule::DiscreteValue> discrete_values{};
-  std::vector<RangeValueRule::Range> range_values{};
-  {
-    discrete_values.push_back(MakeDiscreteValue(
-        Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {}}, {"Vehicle Stop In Zone Behavior", {}}},
-        Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Go"));
-    discrete_values.push_back(MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {}}},
-                                                Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Stop"));
-    rule_registry->RegisterDiscreteValueRule(Rule::TypeId("Right-Of-Way Rule Type"), discrete_values);
-  }
-  {
-    range_values.push_back(
-        MakeRange(Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {}}, {"Vehicle Stop In Zone Behavior", {}}},
-                  Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Interstate highway - day time", 16.6, 27.8));
-    rule_registry->RegisterRangeValueRule(Rule::TypeId("Speed-Limit Rule Type"), range_values);
-  }
+  const std::vector<DiscreteValueRule::DiscreteValue> discrete_values{
+      MakeDiscreteValue(Rule::State::kStrict,
+                        Rule::RelatedRules{{"Yield Group", {}}, {"Vehicle Stop In Zone Behavior", {}}},
+                        Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Go"),
+      MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {}}},
+                        Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Stop")};
+  rule_registry->RegisterDiscreteValueRule(Rule::TypeId("Right-Of-Way Rule Type"), discrete_values);
+  const std::vector<RangeValueRule::Range> range_values{
+      MakeRange(Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {}}, {"Vehicle Stop In Zone Behavior", {}}},
+                Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Interstate highway - day time", 16.6, 27.8)};
+  rule_registry->RegisterRangeValueRule(Rule::TypeId("Speed-Limit Rule Type"), range_values);
   return rule_registry;
 }
 
