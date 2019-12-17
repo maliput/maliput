@@ -770,6 +770,11 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
       }
       break;
     }
+    case BranchPointGlow: {
+      // Shouldn't occur due to above assertion, but handle anyway to quash warnings
+      MALIPUT_THROW_MESSAGE("BranchPointGlow is not a valid Mesh Material type within this function call.");
+      break;
+    }
   }
 
   return std::make_pair(std::move(mesh), GetMaterialFromMesh(mesh_material));
