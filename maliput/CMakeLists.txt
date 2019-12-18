@@ -26,14 +26,19 @@ message(STATUS "\n\n========= Project Configuration ========\n")
 
 set(BUILD_SHARED_LIBS true)
 
-ament_python_install_package(${PROJECT_NAME})
+include(${PROJECT_SOURCE_DIR}/../cmake/DefaultCFlags.cmake)
 
-add_subdirectory(include)
-add_subdirectory(src)
+ament_python_install_package(${PROJECT_NAME})
 
 ament_environment_hooks(
   "${ament_cmake_package_templates_ENVIRONMENT_HOOK_LIBRARY_PATH}"
 )
+
+##############################################################################
+# Sources
+##############################################################################
+add_subdirectory(include)
+add_subdirectory(src)
 
 ##############################################################################
 # Tests

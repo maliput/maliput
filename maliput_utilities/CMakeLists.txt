@@ -26,6 +26,8 @@ message(STATUS "\n\n========= Project Configuration ========\n")
 
 set(BUILD_SHARED_LIBS true)
 
+include(${PROJECT_SOURCE_DIR}/../cmake/DefaultCFlags.cmake)
+
 ##############################################################################
 # Sources
 ##############################################################################

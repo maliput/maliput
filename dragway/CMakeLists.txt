@@ -28,6 +28,8 @@ set(BUILD_SHARED_LIBS true)
 
 ament_python_install_package(${PROJECT_NAME})
 
+include(${PROJECT_SOURCE_DIR}/../cmake/DefaultCFlags.cmake)
+
 ##############################################################################
 # Sources
 ##############################################################################
