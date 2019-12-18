@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -22,9 +23,9 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const DiscreteValueRuleStates& a,
                                    const DiscreteValueRuleStates& b);
 
-/// Predicate-formatter which tests equality of drake::optional<BulbStates>.
+/// Predicate-formatter which tests equality of std::optional<BulbStates>.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const drake::optional<BulbStates>& a, const drake::optional<BulbStates>& b);
+                                   const std::optional<BulbStates>& a, const std::optional<BulbStates>& b);
 
 /// Predicate-formatter which tests equality of Phase.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Phase& a, const Phase& b);

@@ -26,8 +26,8 @@ namespace test {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const drake::optional<double>& a,
-                                   const drake::optional<double>& b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const std::optional<double>& a,
+                                   const std::optional<double>& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 

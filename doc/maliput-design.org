@@ -1030,9 +1030,9 @@ method that accepts a =RightOfWayRule::Id= and returns a result containing:
 |-----------------------+----------------------|
 | =current_id=          | =State::Id=          |
 |-----------------------+----------------------|
-| =next.id=             | drake::optional =State::Id= |
+| =next.id=             | std::optional =State::Id= |
 |-----------------------+----------------------|
-| =next.duration_until= | drake::optional =double=    |
+| =next.duration_until= | std::optional =double=    |
 |-----------------------+----------------------|
 =current_id= is the current =State= of the rule.  =next.id= is the
 /next/ =State= of the rule, if a transition is anticipated and the next

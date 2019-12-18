@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include <vector>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
 #include "maliput/api/lane.h"
@@ -45,12 +46,12 @@ class SRange {
   /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
   bool Intersects(const SRange& s_range, double tolerance) const;
 
-  /// Returns a drake::optional<SRange> bearing the intersected SRange that results overlapping
-  /// this SRange with `s_range`. When there is no common area, drake::nullopt is returned.
+  /// Returns a std::optional<SRange> bearing the intersected SRange that results overlapping
+  /// this SRange with `s_range`. When there is no common area, std::nullopt is returned.
   ///
   /// `tolerance` will modify this range and `s_range` by increasing the maximum tolerance
   /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
-  drake::optional<SRange> GetIntersection(const SRange& s_range, double tolerance) const;
+  std::optional<SRange> GetIntersection(const SRange& s_range, double tolerance) const;
 
  private:
   double s0_{0.};

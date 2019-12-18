@@ -8,7 +8,7 @@ namespace geometry_base {
 namespace test {
 
 api::RoadPositionResult MockRoadGeometry::DoToRoadPosition(const api::GeoPosition&,
-                                                           const drake::optional<api::RoadPosition>&) const {
+                                                           const std::optional<api::RoadPosition>&) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }

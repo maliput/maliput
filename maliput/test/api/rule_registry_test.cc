@@ -20,7 +20,7 @@ GTEST_TEST(EmptyRuleRegistry, AccessorsTest) {
   EXPECT_TRUE(dut.RangeValueRuleTypes().empty());
   EXPECT_TRUE(dut.DiscreteValueRuleTypes().empty());
 
-  const drake::optional<RuleRegistry::QueryResult> result =
+  const std::optional<RuleRegistry::QueryResult> result =
       dut.GetPossibleStatesOfRuleType(Rule::TypeId("any_rule_type"));
   EXPECT_FALSE(result.has_value());
 }
@@ -75,7 +75,7 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   }
 
   // Finds each type.
-  drake::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
+  std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
   EXPECT_TRUE(result.has_value());
   EXPECT_EQ(result->type_id, kTypeA);
   EXPECT_TRUE(result->range_values.has_value());
@@ -149,7 +149,7 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   }
 
   // Finds each type.
-  drake::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
+  std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
   EXPECT_TRUE(result.has_value());
   EXPECT_FALSE(result->range_values.has_value());
   EXPECT_EQ(result->type_id, kTypeA);

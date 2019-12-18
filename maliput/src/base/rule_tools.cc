@@ -1,8 +1,9 @@
 #include "maliput/base/rule_tools.h"
+
+#include <optional>
+
 #include "maliput/api/rules/state_provider_result.h"
 #include "maliput/base/rule_registry.h"
-
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 
@@ -14,9 +15,9 @@ maliput::api::rules::DiscreteValueRule::DiscreteValue GetCurrentStateValue(
     const maliput::api::rules::DiscreteValueRuleStateProvider* state_provider) {
   MALIPUT_THROW_UNLESS(state_provider != nullptr);
   MALIPUT_THROW_UNLESS(discrete_value_rule.type_id() == RightOfWayRuleTypeId());
-  const drake::optional<maliput::api::rules::DiscreteValueRuleStateProvider::StateResult> state_result{
+  const std::optional<maliput::api::rules::DiscreteValueRuleStateProvider::StateResult> state_result{
       state_provider->GetState(discrete_value_rule.id())};
-  MALIPUT_THROW_UNLESS(state_result != drake::nullopt);
+  MALIPUT_THROW_UNLESS(state_result != std::nullopt);
   return state_result->state;
 }
 

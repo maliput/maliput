@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -23,7 +24,6 @@
 #include "multilane/builder.h"
 #include "multilane/loader.h"
 
-#include "drake/common/drake_optional.h"
 #include "drake/common/find_resource.h"
 
 namespace maliput {

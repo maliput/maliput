@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
@@ -40,15 +40,15 @@ class Intersection {
   const Id& id() const { return id_; }
 
   /// Returns the current phase.
-  virtual drake::optional<rules::PhaseProvider::Result> Phase() const = 0;
+  virtual std::optional<rules::PhaseProvider::Result> Phase() const = 0;
 
   /// Sets the current Phase and optionally the next Phase.
   ///
   /// @throws std::exception if @p duration_until is defined when @p next_phase
   /// is undefined.
   virtual void SetPhase(const api::rules::Phase::Id& phase_id,
-                        const drake::optional<api::rules::Phase::Id>& next_phase = drake::nullopt,
-                        const drake::optional<double>& duration_until = drake::nullopt) = 0;
+                        const std::optional<api::rules::Phase::Id>& next_phase = std::nullopt,
+                        const std::optional<double>& duration_until = std::nullopt) = 0;
 
   /// Returns the region. See constructor parameter @p region for more details.
   const std::vector<LaneSRange>& region() const { return region_; }
@@ -58,7 +58,7 @@ class Intersection {
   const rules::PhaseRing::Id& ring_id() const { return ring_.id(); }
 
   /// Returns the current bulb states within the intersection.
-  const drake::optional<rules::BulbStates> bulb_states() const;
+  const std::optional<rules::BulbStates> bulb_states() const;
 
   /// Determines whether `geo_position` is within this Intersection::Region().
   ///

@@ -26,12 +26,12 @@ class RightOfWayRuleStateProviderTest : public ::testing::Test {
     explicit MockStateProvider(const RightOfWayRuleStateProviderTest* fixture) : fixture_(fixture) {}
 
    private:
-    drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id& id) const final {
+    std::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id& id) const final {
       if (id == fixture_->kExistingId) {
         return RightOfWayResult{fixture_->kCurrentStateId,
                                 RightOfWayResult::Next{fixture_->kNextStateId, fixture_->kDurationUntil}};
       }
-      return drake::nullopt;
+      return std::nullopt;
     }
 
     const RightOfWayRuleStateProviderTest* const fixture_;

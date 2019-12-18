@@ -1,10 +1,9 @@
 #include "maliput/base/intersection_book_loader.h"
 
 #include <vector>
+#include <optional>
 
 #include "yaml-cpp/yaml.h"
-
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
@@ -49,12 +48,12 @@ std::unique_ptr<api::Intersection> BuildIntersection(const YAML::Node& intersect
   const Intersection::Id id(intersection_node["ID"].as<std::string>());
   const PhaseRing::Id ring_id(intersection_node["PhaseRing"].as<std::string>());
   const Phase::Id phase_id(intersection_node["InitialPhase"].as<std::string>());
-  drake::optional<PhaseRing> ring = phase_ring_book.GetPhaseRing(ring_id);
+  std::optional<PhaseRing> ring = phase_ring_book.GetPhaseRing(ring_id);
   MALIPUT_THROW_UNLESS(ring.has_value());
   MALIPUT_THROW_UNLESS(ring->phases().size() > 0);
   MALIPUT_THROW_UNLESS(ring->phases().find(phase_id) != ring->phases().end());
-  drake::optional<api::rules::Phase::Id> next_phase_id = drake::nullopt;
-  drake::optional<double> duration_until = drake::nullopt;
+  std::optional<api::rules::Phase::Id> next_phase_id = std::nullopt;
+  std::optional<double> duration_until = std::nullopt;
   std::vector<PhaseRing::NextPhase> next_phases = ring->next_phases().at(phase_id);
   if (next_phases.size() > 0) {
     // This arbitrarily selects the first (index 0) next phase. In the future,

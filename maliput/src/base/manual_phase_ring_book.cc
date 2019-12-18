@@ -43,8 +43,8 @@ class ManualPhaseRingBook::Impl {
   }
 
   void RemovePhaseRing(const PhaseRing::Id& ring_id) {
-    const drake::optional<PhaseRing> ring = DoGetPhaseRing(ring_id);
-    if (ring == drake::nullopt) {
+    const std::optional<PhaseRing> ring = DoGetPhaseRing(ring_id);
+    if (ring == std::nullopt) {
       throw std::logic_error("Attempted to remove unknown PhaseRing with ID " + ring_id.string());
     }
     MALIPUT_THROW_UNLESS(ring_book_.erase(ring_id) == 1);
@@ -66,26 +66,26 @@ class ManualPhaseRingBook::Impl {
     return result;
   }
 
-  drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
+  std::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
     auto it = ring_book_.find(ring_id);
     if (it == ring_book_.end()) {
-      return drake::nullopt;
+      return std::nullopt;
     }
     return it->second;
   }
 
-  drake::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
+  std::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
     auto it = right_of_way_rule_book_.find(rule_id);
     if (it == right_of_way_rule_book_.end()) {
-      return drake::nullopt;
+      return std::nullopt;
     }
     return ring_book_.at(it->second);
   }
 
-  drake::optional<PhaseRing> DoFindPhaseRing(const Rule::Id& rule_id) const {
+  std::optional<PhaseRing> DoFindPhaseRing(const Rule::Id& rule_id) const {
     auto it = rule_book_.find(rule_id);
     if (it == rule_book_.end()) {
-      return drake::nullopt;
+      return std::nullopt;
     }
     return ring_book_.at(it->second);
   }
@@ -106,15 +106,15 @@ void ManualPhaseRingBook::RemovePhaseRing(const PhaseRing::Id& ring_id) { impl_-
 
 std::vector<PhaseRing::Id> ManualPhaseRingBook::DoGetPhaseRings() const { return impl_->DoGetPhaseRings(); }
 
-drake::optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
+std::optional<PhaseRing> ManualPhaseRingBook::DoGetPhaseRing(const PhaseRing::Id& ring_id) const {
   return impl_->DoGetPhaseRing(ring_id);
 }
 
-drake::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
+std::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const {
   return impl_->DoFindPhaseRing(rule_id);
 }
 
-drake::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(const Rule::Id& rule_id) const {
+std::optional<PhaseRing> ManualPhaseRingBook::DoFindPhaseRing(const Rule::Id& rule_id) const {
   return impl_->DoFindPhaseRing(rule_id);
 }
 

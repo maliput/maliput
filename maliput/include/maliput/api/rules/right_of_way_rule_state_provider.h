@@ -1,7 +1,8 @@
 #pragma once
 
+#include <optional>
+
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/state_provider_result.h"
@@ -29,15 +30,15 @@ class RightOfWayRuleStateProvider {
   /// RightOfWayResult::next.duration_until will be populated with that
   /// duration.
   ///
-  /// Returns drake::nullopt if `id` is unrecognized, which would be the case
+  /// Returns std::nullopt if `id` is unrecognized, which would be the case
   /// if no such rule exists or if the rule has only static semantics.
-  drake::optional<RightOfWayResult> GetState(const RightOfWayRule::Id& id) const { return DoGetState(id); }
+  std::optional<RightOfWayResult> GetState(const RightOfWayRule::Id& id) const { return DoGetState(id); }
 
  protected:
   RightOfWayRuleStateProvider() = default;
 
  private:
-  virtual drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id& id) const = 0;
+  virtual std::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id& id) const = 0;
 };
 
 }  // namespace rules

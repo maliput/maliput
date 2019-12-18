@@ -115,7 +115,7 @@ class StartLane {
 
   /// Builds a Spec at `endpoint` with `direction` direction. When
   /// `direction` == `Direction::kReverse`, `endpoint` is reversed.
-  /// Additionally, `endpoint`'s theta_dot must be drake::nullopt. Otherwise
+  /// Additionally, `endpoint`'s theta_dot must be std::nullopt. Otherwise
   /// the Builder is unable to match road continuity constraints.
   Spec at(const Endpoint& endpoint, Direction direction) const {
     MALIPUT_DEMAND(!endpoint.z().theta_dot().has_value());
@@ -253,7 +253,7 @@ class EndLane {
 
   /// Builds an Spec at `endpoint_z` with `direction` direction.
   /// When `direction` == `Direction::kReverse`, `endpoint_z` is reversed.
-  /// Additionally, `endpoint`'s theta_dot must be drake::nullopt. Otherwise
+  /// Additionally, `endpoint`'s theta_dot must be std::nullopt. Otherwise
   /// the Builder is unable to match road continuity constraints.
   Spec z_at(const EndpointZ& endpoint_z, Direction direction) const {
     MALIPUT_DEMAND(!endpoint_z.theta_dot().has_value());

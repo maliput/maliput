@@ -42,13 +42,13 @@ class PhaseTest : public ::testing::Test {
   const Phase::Id id_;
   const RuleStates rule_states_;
   const DiscreteValueRuleStates discrete_value_rule_states_;
-  const drake::optional<BulbStates> bulb_states_;
+  const std::optional<BulbStates> bulb_states_;
   const Phase phase_;
 };
 
 TEST_F(PhaseTest, Accessors) {
-  for (const drake::optional<BulbStates>& bulb_states :
-       std::vector<drake::optional<BulbStates>>{drake::nullopt, bulb_states_}) {
+  for (const std::optional<BulbStates>& bulb_states :
+       std::vector<std::optional<BulbStates>>{std::nullopt, bulb_states_}) {
     Phase dut(id_, rule_states_, discrete_value_rule_states_, bulb_states);
     EXPECT_EQ(dut.id(), id_);
     EXPECT_EQ(dut.rule_states(), rule_states_);

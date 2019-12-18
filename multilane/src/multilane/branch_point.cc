@@ -18,10 +18,10 @@ const api::LaneEndSet* BranchPoint::DoGetOngoingBranches(const api::LaneEnd& end
   return ongoing_branches_.at(end);
 }
 
-drake::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(const api::LaneEnd& end) const {
+std::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(const api::LaneEnd& end) const {
   auto default_it = defaults_.find(end);
   if (default_it == defaults_.end()) {
-    return drake::nullopt;
+    return std::nullopt;
   }
   return default_it->second;
 }

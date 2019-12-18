@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <optional>
 
 #include "maliput/api/intersection_book.h"
 #include "maliput/api/road_geometry.h"
@@ -18,7 +19,6 @@
 #include "maliput/api/rules/traffic_light_book.h"
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace api {

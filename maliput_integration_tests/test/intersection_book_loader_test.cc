@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -52,7 +53,7 @@ class TestLoading2x2IntersectionIntersectionBook : public ::testing::Test {
 
 TEST_F(TestLoading2x2IntersectionIntersectionBook, LoadFromFile) {
   const PhaseRing::Id ring_id("2x2Intersection");
-  const drake::optional<PhaseRing> ring = ring_book_->GetPhaseRing(PhaseRing::Id(ring_id));
+  const std::optional<PhaseRing> ring = ring_book_->GetPhaseRing(PhaseRing::Id(ring_id));
   EXPECT_TRUE(ring.has_value());
 
   ManualPhaseProvider phase_provider;

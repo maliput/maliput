@@ -1,10 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
-
 #include "maliput/api/rules/traffic_lights.h"
 
 namespace maliput {

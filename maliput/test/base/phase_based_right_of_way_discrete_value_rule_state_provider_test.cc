@@ -56,7 +56,7 @@ GTEST_TEST(PhaseBasedRightOfWayDiscreteValueRuleStateProviderTest, BasicTest) {
 
   auto compare_expected = [&](const std::vector<ExpectedState>& test_cases) {
     for (const auto& test : test_cases) {
-      drake::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(test.rule);
+      std::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(test.rule);
       EXPECT_TRUE(result.has_value());
       EXPECT_EQ(result->state, test.result.state);
       if (test.result.next) {
@@ -64,18 +64,18 @@ GTEST_TEST(PhaseBasedRightOfWayDiscreteValueRuleStateProviderTest, BasicTest) {
         if (test.result.next->duration_until) {
           EXPECT_EQ(*result->next->duration_until, *test.result.next->duration_until);
         } else {
-          EXPECT_EQ(result->next->duration_until, drake::nullopt);
+          EXPECT_EQ(result->next->duration_until, std::nullopt);
         }
       } else {
-        EXPECT_EQ(result->next, drake::nullopt);
+        EXPECT_EQ(result->next, std::nullopt);
       }
     }
   };
 
   // TODO(liang.fok) Add tests for "next state" in returned results once #9993
   // is resolved.
-  const std::vector<ExpectedState> phase_1_test_cases{{rule_id_a, {state_go, drake::nullopt}},
-                                                      {rule_id_b, {state_stop, drake::nullopt}}};
+  const std::vector<ExpectedState> phase_1_test_cases{{rule_id_a, {state_go, std::nullopt}},
+                                                      {rule_id_b, {state_stop, std::nullopt}}};
   compare_expected(phase_1_test_cases);
   phase_provider.SetPhase(ring_id, phase_id_2);
   const std::vector<ExpectedState> phase_2_test_cases{{rule_id_a, {state_stop}}, {rule_id_b, {state_go}}};

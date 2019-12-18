@@ -24,7 +24,7 @@ GTEST_TEST(ManualRightOfWayRuleStateProviderTest, BasicTest) {
 
   dut.AddState(kRuleId, kStateId);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetState(kRuleId).value(),
-                               (RightOfWayRuleStateProvider::RightOfWayResult{kStateId, drake::nullopt})));
+                               (RightOfWayRuleStateProvider::RightOfWayResult{kStateId, std::nullopt})));
 
   // Attempting to add duplicate state.
   EXPECT_THROW(dut.AddState(kRuleId, kStateId), std::logic_error);
@@ -32,7 +32,7 @@ GTEST_TEST(ManualRightOfWayRuleStateProviderTest, BasicTest) {
   const RightOfWayRule::State::Id kOtherStateId("baz");
   dut.SetState(kRuleId, kOtherStateId);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetState(kRuleId).value(),
-                               (RightOfWayRuleStateProvider::RightOfWayResult{kOtherStateId, drake::nullopt})));
+                               (RightOfWayRuleStateProvider::RightOfWayResult{kOtherStateId, std::nullopt})));
 }
 
 }  // namespace

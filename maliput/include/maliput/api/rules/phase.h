@@ -1,9 +1,9 @@
 #pragma once
 
 #include <unordered_map>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
@@ -55,7 +55,7 @@ class Phase final {
   /// same information. Rules should be duplicated while the transition from one
   /// type to the other happens.
   Phase(const Id& id, const RuleStates& rule_states, const DiscreteValueRuleStates& discrete_value_rule_states,
-        drake::optional<BulbStates> bulb_states = drake::nullopt);
+        std::optional<BulbStates> bulb_states = std::nullopt);
 
   /// Returns the phase's identifier.
   const Id& id() const { return id_; }
@@ -67,13 +67,13 @@ class Phase final {
   const DiscreteValueRuleStates& discrete_value_rule_states() const { return discrete_value_rule_states_; }
 
   /// Returns the phase's bulb states.
-  const drake::optional<BulbStates>& bulb_states() const { return bulb_states_; }
+  const std::optional<BulbStates>& bulb_states() const { return bulb_states_; }
 
  private:
   Id id_;
   RuleStates rule_states_;
   DiscreteValueRuleStates discrete_value_rule_states_;
-  drake::optional<BulbStates> bulb_states_;
+  std::optional<BulbStates> bulb_states_;
 };
 
 }  // namespace rules

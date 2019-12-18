@@ -34,8 +34,8 @@ std::unordered_map<BulbState, const char*, maliput::common::DefaultHash> BulbSta
 }
 
 Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
-           const BulbColor& color, const BulbType& type, const drake::optional<double>& arrow_orientation_rad,
-           const drake::optional<std::vector<BulbState>>& states, BoundingBox bounding_box)
+           const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad,
+           const std::optional<std::vector<BulbState>>& states, BoundingBox bounding_box)
     : id_(id),
       position_bulb_group_(position_bulb_group),
       orientation_bulb_group_(orientation_bulb_group),
@@ -43,11 +43,11 @@ Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group, const Rot
       type_(type),
       arrow_orientation_rad_(arrow_orientation_rad),
       bounding_box_(std::move(bounding_box)) {
-  MALIPUT_THROW_UNLESS(type_ != BulbType::kArrow || arrow_orientation_rad_ != drake::nullopt);
+  MALIPUT_THROW_UNLESS(type_ != BulbType::kArrow || arrow_orientation_rad_ != std::nullopt);
   if (type_ != BulbType::kArrow) {
-    MALIPUT_THROW_UNLESS(arrow_orientation_rad_ == drake::nullopt);
+    MALIPUT_THROW_UNLESS(arrow_orientation_rad_ == std::nullopt);
   }
-  if (states == drake::nullopt || states->size() == 0) {
+  if (states == std::nullopt || states->size() == 0) {
     states_ = {BulbState::kOff, BulbState::kOn};
   } else {
     states_ = *states;

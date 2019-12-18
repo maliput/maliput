@@ -23,7 +23,7 @@ namespace api {
 /// Construction from empty strings is not allowed; there is no notion of
 /// an "unassigned" value for a %TypeSpecificIdentifier.  To represent a
 /// possibly-unassigned %TypeSpecificIdentifier, use
-/// drake::optional<TypeSpecificIdentifier<T>>.
+/// std::optional<TypeSpecificIdentifier<T>>.
 ///
 /// %TypeSpecificIdentifier is EqualityComparable (and provides == and !=
 /// operators), but it is not LessThanComparable; there is no particular

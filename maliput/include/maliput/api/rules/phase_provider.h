@@ -1,7 +1,8 @@
 #pragma once
 
+#include <optional>
+
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
@@ -22,15 +23,15 @@ class PhaseProvider {
   /// Result returned by GetPhase().
   using Result = StateProviderResult<Phase::Id>;
 
-  /// Gets the phase within a specified PhaseRing. Returns drake::nullopt if
+  /// Gets the phase within a specified PhaseRing. Returns std::nullopt if
   /// @p id is unrecognized.
-  drake::optional<Result> GetPhase(const PhaseRing::Id& id) const { return DoGetPhase(id); }
+  std::optional<Result> GetPhase(const PhaseRing::Id& id) const { return DoGetPhase(id); }
 
  protected:
   PhaseProvider() = default;
 
  private:
-  virtual drake::optional<Result> DoGetPhase(const PhaseRing::Id& id) const = 0;
+  virtual std::optional<Result> DoGetPhase(const PhaseRing::Id& id) const = 0;
 };
 
 }  // namespace rules

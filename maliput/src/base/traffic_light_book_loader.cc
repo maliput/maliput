@@ -244,7 +244,7 @@ std::unique_ptr<Bulb> BuildBulb(const YAML::Node& bulb_node) {
   MALIPUT_THROW_UNLESS(type_node.IsDefined());
   const BulbType type = type_node.as<BulbType>();
 
-  drake::optional<double> arrow_orientation_rad = drake::nullopt;
+  std::optional<double> arrow_orientation_rad = std::nullopt;
   if (type == BulbType::kArrow) {
     const YAML::Node& arrow_orientation_node = bulb_node["ArrowOrientation"];
     MALIPUT_THROW_UNLESS(arrow_orientation_node.IsDefined());

@@ -2,9 +2,9 @@
 
 #include <memory>
 #include <string>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
 
@@ -92,10 +92,10 @@ class BranchPoint {
   /// a turn).
   ///
   /// If @p end has no default-branch at this BranchPoint, the return
-  /// value will be drake::nullopt.
+  /// value will be std::nullopt.
   ///
   /// @pre @p end must be connected to the BranchPoint.
-  drake::optional<LaneEnd> GetDefaultBranch(const LaneEnd& end) const { return DoGetDefaultBranch(end); }
+  std::optional<LaneEnd> GetDefaultBranch(const LaneEnd& end) const { return DoGetDefaultBranch(end); }
 
   /// Returns the set of LaneEnds grouped together on the "A-side".
   const LaneEndSet* GetASide() const { return DoGetASide(); }
@@ -119,7 +119,7 @@ class BranchPoint {
 
   virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd& end) const = 0;
 
-  virtual drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd& end) const = 0;
+  virtual std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd& end) const = 0;
 
   virtual const LaneEndSet* DoGetASide() const = 0;
 

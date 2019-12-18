@@ -1,7 +1,8 @@
 #pragma once
 
+#include <optional>
+
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/segment.h"
@@ -86,7 +87,7 @@ class Lane : public api::Lane {
 
   const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd::Which which_end) const override;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
+  std::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
 
   const api::LaneId id_;
   const api::Segment* segment_{};

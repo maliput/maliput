@@ -21,13 +21,13 @@ void ManualRightOfWayRuleStateProvider::SetState(const RightOfWayRule::Id& id, c
   states_.at(id) = state;
 }
 
-drake::optional<api::rules::RightOfWayRuleStateProvider::RightOfWayResult>
-ManualRightOfWayRuleStateProvider::DoGetState(const RightOfWayRule::Id& id) const {
+std::optional<api::rules::RightOfWayRuleStateProvider::RightOfWayResult> ManualRightOfWayRuleStateProvider::DoGetState(
+    const RightOfWayRule::Id& id) const {
   auto it = states_.find(id);
   if (it == states_.end()) {
-    return drake::nullopt;
+    return std::nullopt;
   }
-  return api::rules::RightOfWayRuleStateProvider::RightOfWayResult{it->second, drake::nullopt};
+  return api::rules::RightOfWayRuleStateProvider::RightOfWayResult{it->second, std::nullopt};
 }
 
 }  // namespace maliput

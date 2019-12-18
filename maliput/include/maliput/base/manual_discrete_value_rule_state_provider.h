@@ -1,9 +1,9 @@
 #pragma once
 
 #include <unordered_map>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/discrete_value_rule_state_provider.h"
@@ -61,11 +61,11 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   /// @throws common::assertion_error When @p duration_until is not positive or
   ///         it is provided when @p next_state is nullopt.
   void SetState(const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& state,
-                const drake::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
-                const drake::optional<double>& duration_until);
+                const std::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
+                const std::optional<double>& duration_until);
 
  private:
-  drake::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
+  std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 
   // @throws common::assertion_error When @p state is unrecognized in

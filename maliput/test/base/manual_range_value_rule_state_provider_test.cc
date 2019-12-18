@@ -61,7 +61,7 @@ TEST_F(ManualRangeValueRuleStateProviderTest, SetStateTest) {
 
   // Sets a valid state, next state and duration until.
   EXPECT_NO_THROW(dut.SetState(kRuleId, kRangeA, {kRangeA}, {kDurationUntil}));
-  const drake::optional<RangeValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
+  const std::optional<RangeValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
   EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kRangeA));
   EXPECT_TRUE(result->next.has_value());

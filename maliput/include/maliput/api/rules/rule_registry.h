@@ -3,9 +3,9 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/discrete_value_rule.h"
@@ -38,10 +38,10 @@ class RuleRegistry {
     Rule::TypeId type_id;
 
     /// Defines the possible ranges of a range value rule type.
-    drake::optional<std::vector<RangeValueRule::Range>> range_values;
+    std::optional<std::vector<RangeValueRule::Range>> range_values;
 
     /// Defines the possible discrete values of a discrete value rule type.
-    drake::optional<std::vector<DiscreteValueRule::DiscreteValue>> discrete_values;
+    std::optional<std::vector<DiscreteValueRule::DiscreteValue>> discrete_values;
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RuleRegistry);
@@ -93,7 +93,7 @@ class RuleRegistry {
   /// @param type_id Rule type ID.
   /// @returns The possible states of a specified rule type, or nullopt if
   ///          no such rule type exists.
-  drake::optional<QueryResult> GetPossibleStatesOfRuleType(const Rule::TypeId& type_id) const;
+  std::optional<QueryResult> GetPossibleStatesOfRuleType(const Rule::TypeId& type_id) const;
 
   /// Builds a RangeValueRule.
   ///
