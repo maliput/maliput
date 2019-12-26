@@ -1,7 +1,7 @@
 #include "maliput/base/manual_phase_provider.h"
 
-#include <stdexcept>
 #include <optional>
+#include <stdexcept>
 
 #include <gtest/gtest.h>
 

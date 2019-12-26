@@ -1,7 +1,7 @@
 #include "maliput/base/intersection_book_loader.h"
 
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "yaml-cpp/yaml.h"
 

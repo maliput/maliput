@@ -1,9 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <unordered_map>
 #include <vector>
-#include <optional>
 
 #include "maliput/api/intersection_book.h"
 #include "maliput/api/road_geometry.h"

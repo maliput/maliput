@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <optional>
+#include <string>
 
 #include "drake/common/autodiff.h"
 #include "drake/common/drake_copyable.h"

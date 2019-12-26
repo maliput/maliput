@@ -1,8 +1,8 @@
 #pragma once
 
+#include <optional>
 #include <unordered_map>
 #include <vector>
-#include <optional>
 
 #include "drake/common/drake_copyable.h"
 #include "maliput/api/rules/phase.h"

@@ -1,8 +1,8 @@
 #include "maliput/base/intersection_book_loader.h"
 
 #include <memory>
-#include <string>
 #include <optional>
+#include <string>
 
 #include <gtest/gtest.h>
 

@@ -4,8 +4,8 @@
 #include <cmath>
 #include <limits>
 #include <memory>
-#include <string>
 #include <optional>
+#include <string>
 
 #include "drake/math/saturate.h"
 

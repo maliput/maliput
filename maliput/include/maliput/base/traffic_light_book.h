@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "drake/common/drake_copyable.h"
 #include "maliput/api/rules/traffic_light_book.h"

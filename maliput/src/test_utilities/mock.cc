@@ -1,10 +1,10 @@
 #include "maliput/test_utilities/mock.h"
 
+#include <optional>
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <optional>
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/intersection.h"

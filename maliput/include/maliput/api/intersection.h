@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "drake/common/drake_copyable.h"
 #include "maliput/api/regions.h"

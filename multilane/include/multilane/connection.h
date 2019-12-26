@@ -2,11 +2,11 @@
 
 #include <cmath>
 #include <memory>
+#include <optional>
 #include <ostream>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <optional>
 
 #include "drake/common/drake_copyable.h"
 

@@ -2,11 +2,11 @@
 
 #include <algorithm>
 #include <iterator>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <optional>
 
 #include "maliput/api/rules/rule.h"
 #include "maliput/common/maliput_hash.h"

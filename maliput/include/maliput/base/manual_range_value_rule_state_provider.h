@@ -1,7 +1,7 @@
 #pragma once
 
-#include <unordered_map>
 #include <optional>
+#include <unordered_map>
 
 #include "drake/common/drake_copyable.h"
 

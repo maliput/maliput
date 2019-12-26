@@ -2,8 +2,8 @@
 
 #include <limits>
 #include <memory>
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "dragway/branch_point.h"
 #include "dragway/junction.h"

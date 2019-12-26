@@ -75,25 +75,30 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   }
 
   // Finds each type.
-  std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
-  EXPECT_TRUE(result.has_value());
-  EXPECT_EQ(result->type_id, kTypeA);
-  EXPECT_TRUE(result->range_values.has_value());
-  EXPECT_EQ(result->range_values->size(), 2);
-  EXPECT_EQ(result->range_values->at(0), kRangeA);
-  EXPECT_EQ(result->range_values->at(1), kRangeB);
-  EXPECT_FALSE(result->discrete_values.has_value());
-
-  result = dut.GetPossibleStatesOfRuleType(kTypeB);
-  EXPECT_TRUE(result.has_value());
-  EXPECT_EQ(result->type_id, kTypeB);
-  EXPECT_TRUE(result->range_values.has_value());
-  EXPECT_EQ(result->range_values->size(), 1);
-  EXPECT_EQ(result->range_values->at(0), kRangeA);
-  EXPECT_FALSE(result->discrete_values.has_value());
-
-  result = dut.GetPossibleStatesOfRuleType(Rule::TypeId("any_rule_type"));
-  EXPECT_FALSE(result.has_value());
+  {
+    const std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->type_id, kTypeA);
+    EXPECT_TRUE(result->range_values.has_value());
+    EXPECT_EQ(result->range_values->size(), 2);
+    EXPECT_EQ(result->range_values->at(0), kRangeA);
+    EXPECT_EQ(result->range_values->at(1), kRangeB);
+    EXPECT_FALSE(result->discrete_values.has_value());
+  }
+  {
+    const std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeB);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->type_id, kTypeB);
+    EXPECT_TRUE(result->range_values.has_value());
+    EXPECT_EQ(result->range_values->size(), 1);
+    EXPECT_EQ(result->range_values->at(0), kRangeA);
+    EXPECT_FALSE(result->discrete_values.has_value());
+  }
+  {
+    const std::optional<RuleRegistry::QueryResult> result =
+        dut.GetPossibleStatesOfRuleType(Rule::TypeId("any_rule_type"));
+    EXPECT_FALSE(result.has_value());
+  }
 }
 
 // Evaluates queries after registering DiscreteValueRule types.

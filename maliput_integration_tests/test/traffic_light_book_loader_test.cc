@@ -1,10 +1,10 @@
 #include "maliput/base/traffic_light_book_loader.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
-#include <optional>
 
 #include <gtest/gtest.h>
 

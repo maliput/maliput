@@ -56,7 +56,7 @@ GTEST_TEST(PhaseBasedRightOfWayDiscreteValueRuleStateProviderTest, BasicTest) {
 
   auto compare_expected = [&](const std::vector<ExpectedState>& test_cases) {
     for (const auto& test : test_cases) {
-      std::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(test.rule);
+      const std::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(test.rule);
       EXPECT_TRUE(result.has_value());
       EXPECT_EQ(result->state, test.result.state);
       if (test.result.next) {

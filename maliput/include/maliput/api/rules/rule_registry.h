@@ -1,9 +1,9 @@
 #pragma once
 
 #include <map>
+#include <optional>
 #include <utility>
 #include <vector>
-#include <optional>
 
 #include "drake/common/drake_copyable.h"
 

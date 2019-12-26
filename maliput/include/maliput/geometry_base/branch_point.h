@@ -2,8 +2,8 @@
 
 #include <map>
 #include <memory>
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "drake/common/drake_copyable.h"
 #include "maliput/api/branch_point.h"

@@ -3,11 +3,11 @@
 #include <cmath>
 #include <cstring>
 #include <map>
+#include <optional>
 #include <regex>
 #include <string>
 #include <tuple>
 #include <utility>
-#include <optional>
 
 #include "yaml-cpp/yaml.h"
 
@@ -311,7 +311,7 @@ std::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
 
   StartSpec spec{};
   if (parsed_reference.type == ReferenceType::kPoint) {
-    std::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
+    const std::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
     MALIPUT_DEMAND(endpoint.has_value());
     if (parsed_anchor_point.type == AnchorPointType::kReference) {
       spec.ref_spec = StartReference().at(endpoint.value(), parsed_reference.direction);
@@ -319,7 +319,8 @@ std::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
       spec.lane_spec = StartLane(parsed_anchor_point.lane_id.value()).at(endpoint.value(), parsed_reference.direction);
     }
   } else if (parsed_reference.type == ReferenceType::kConnection) {
-    std::optional<const Connection*> connection = FindConnectionInCatalog(parsed_reference.id, connection_catalog);
+    const std::optional<const Connection*> connection =
+        FindConnectionInCatalog(parsed_reference.id, connection_catalog);
     if (!connection) {
       return std::nullopt;
     }
@@ -370,7 +371,7 @@ std::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
     const ParsedReference parsed_reference = ResolveEndpointReference(endpoint_key);
 
     if (parsed_reference.type == ReferenceType::kPoint) {
-      std::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
+      const std::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
       MALIPUT_DEMAND(endpoint.has_value());
       if (parsed_anchor_point.type == AnchorPointType::kReference) {
         spec.ref_spec = EndReference().z_at(endpoint.value().z(), parsed_reference.direction);
@@ -379,7 +380,8 @@ std::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
             EndLane(parsed_anchor_point.lane_id.value()).z_at(endpoint.value().z(), parsed_reference.direction);
       }
     } else if (parsed_reference.type == ReferenceType::kConnection) {
-      std::optional<const Connection*> connection = FindConnectionInCatalog(parsed_reference.id, connection_catalog);
+      const std::optional<const Connection*> connection =
+          FindConnectionInCatalog(parsed_reference.id, connection_catalog);
       if (!connection) {
         return std::nullopt;
       }
@@ -442,7 +444,7 @@ const Connection* MaybeMakeConnection(std::string id, const YAML::Node& node,
   const Connection::Type geometry_type = node["length"] ? Connection::kLine : Connection::kArc;
 
   // Resolve start endpoint.
-  std::optional<std::pair<ParsedAnchorPoint, StartSpec>> start_spec =
+  const std::optional<std::pair<ParsedAnchorPoint, StartSpec>> start_spec =
       ResolveEndpoint(node["start"], point_catalog, connection_catalog);
   if (!start_spec.has_value()) {
     return nullptr;
@@ -453,7 +455,7 @@ const Connection* MaybeMakeConnection(std::string id, const YAML::Node& node,
   //                     "explicit_end" is used, the Endpoint it refers to
   //                     actually matches within linear and angular tolerance
   //                     the new Connection's end Endpoint.
-  std::optional<std::pair<ParsedAnchorPoint, EndSpec>> end_spec =
+  const std::optional<std::pair<ParsedAnchorPoint, EndSpec>> end_spec =
       ResolveEndpointZ(node["explicit_end"] ? node["explicit_end"] : node["z_end"], point_catalog, connection_catalog);
   if (!end_spec.has_value()) {
     return nullptr;
