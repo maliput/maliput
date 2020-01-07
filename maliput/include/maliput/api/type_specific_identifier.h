@@ -5,8 +5,8 @@
 #include <utility>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/hash.h"
 
+#include "maliput/common/maliput_hash.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -63,7 +63,7 @@ class TypeSpecificIdentifier {
   /// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const TypeSpecificIdentifier& item) noexcept {
-    using drake::hash_append;
+    using maliput::common::hash_append;
     hash_append(hasher, item.string_);
   }
 
@@ -78,7 +78,7 @@ namespace std {
 
 /// Specialization of std::hash for maliput::api::TypeSpecificIdentifier<T>.
 template <typename T>
-struct hash<maliput::api::TypeSpecificIdentifier<T>> : public drake::DefaultHash {};
+struct hash<maliput::api::TypeSpecificIdentifier<T>> : public maliput::common::DefaultHash {};
 
 /// Specialization of std::less for maliput::api::TypeSpecificIdentifier<T>
 /// providing a strict ordering over maliput::api::TypeSpecificIdentifier<T>

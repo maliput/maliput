@@ -11,8 +11,8 @@
 
 #include <Eigen/Geometry>
 
-#include "drake/common/hash.h"
 #include "maliput-utilities/mesh.h"
+#include "maliput/common/maliput_hash.h"
 
 namespace maliput {
 namespace utility {
@@ -38,7 +38,7 @@ inline bool operator!=(const DirectedEdgeIndex& lhs, const DirectedEdgeIndex& rh
 /// Implements the @ref hash_append concept.
 template <class HashAlgorithm>
 void hash_append(HashAlgorithm& hasher, const DirectedEdgeIndex& item) noexcept {
-  using drake::hash_append;
+  using maliput::common::hash_append;
   hash_append(hasher, item.start_vertex_index);
   hash_append(hasher, item.end_vertex_index);
 }
@@ -63,7 +63,7 @@ inline bool operator!=(const FaceEdgeIndex& lhs, const FaceEdgeIndex& rhs) { ret
 /// The inverse of the mapping from face edges indices to their
 /// associated directed edge indices.
 /// @see ComputeInverseFaceEdgeMap
-using InverseFaceEdgeMap = std::unordered_map<DirectedEdgeIndex, FaceEdgeIndex, drake::DefaultHash>;
+using InverseFaceEdgeMap = std::unordered_map<DirectedEdgeIndex, FaceEdgeIndex, maliput::common::DefaultHash>;
 
 /// Computes the inverse of the mapping from face edges indices to their
 /// associated directed edge indices for the given @p faces collection.

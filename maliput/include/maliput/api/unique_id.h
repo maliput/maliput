@@ -3,8 +3,8 @@
 #include <string>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/hash.h"
 
+#include "maliput/common/maliput_hash.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -36,7 +36,7 @@ class UniqueId {
   /// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const UniqueId& item) noexcept {
-    using drake::hash_append;
+    using maliput::common::hash_append;
     hash_append(hasher, item.string_);
   }
 
@@ -51,7 +51,7 @@ namespace std {
 
 /// Specialization of std::hash for maliput::api::UniqueId.
 template <>
-struct hash<maliput::api::UniqueId> : public drake::DefaultHash {};
+struct hash<maliput::api::UniqueId> : public maliput::common::DefaultHash {};
 
 /// Specialization of std::less for maliput::api::UniqueId providing a
 /// strict ordering over UniqueId suitable for use with ordered

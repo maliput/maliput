@@ -8,9 +8,9 @@
 #include <unordered_map>
 
 #include "drake/common/drake_optional.h"
-#include "drake/common/hash.h"
 
 #include "maliput/api/rules/rule.h"
+#include "maliput/common/maliput_hash.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -33,10 +33,10 @@ namespace {
 // using IdVariant = std::variant<RightOfWayRule::Id,
 //                                SpeedLimitRule::Id>;
 struct IdVariant {
-  drake::optional<RightOfWayRule::Id> r;
-  drake::optional<SpeedLimitRule::Id> s;
-  drake::optional<DirectionUsageRule::Id> d;
-  drake::optional<Rule::Id> rule;
+  std::optional<RightOfWayRule::Id> r;
+  std::optional<SpeedLimitRule::Id> s;
+  std::optional<DirectionUsageRule::Id> d;
+  std::optional<Rule::Id> rule;
 
   IdVariant() = default;
 
@@ -54,7 +54,7 @@ struct IdVariant {
 
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const IdVariant& item) noexcept {
-    using drake::hash_append;
+    using maliput::common::hash_append;
     hash_append(hasher, item.r);
     hash_append(hasher, item.s);
     hash_append(hasher, item.d);
@@ -258,7 +258,7 @@ class ManualRulebook::Impl {
     //                          like boost::interval_map, though if there are
     //                          not many rules attached to each individual
     //                          lane_id, this is probably good enough.
-    std::unordered_map<LaneId, std::unordered_multimap<IdVariant, SRange, drake::DefaultHash>> map_;
+    std::unordered_map<LaneId, std::unordered_multimap<IdVariant, SRange, maliput::common::DefaultHash>> map_;
   };
 
   // ID->Rule indices for each rule type.
