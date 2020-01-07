@@ -159,9 +159,9 @@ void RegisterDiscreteValueRuleType(RuleRegistry* rule_registry, const std::strin
 
   std::vector<DiscreteValueRule::DiscreteValue> discrete_values{};
   for (const YAML::Node& rule_node : rule_nodes) {
-    discrete_values.push_back(
-        MakeDiscreteValue(GetSeverityFromYamlNode(rule_node), GetRelatedRuleFromYamlNode(rule_node),
-                          GetRelatedUniqueIdsFromYamlNode(rule_node), rule_node[kValue].as<std::string>()));
+    discrete_values.push_back(DiscreteValueRule::DiscreteValue{
+        GetSeverityFromYamlNode(rule_node), GetRelatedRuleFromYamlNode(rule_node),
+        GetRelatedUniqueIdsFromYamlNode(rule_node), rule_node[kValue].as<std::string>()});
   }
   rule_registry->RegisterDiscreteValueRule(Rule::TypeId(rule_type_id), discrete_values);
 }
@@ -174,9 +174,9 @@ void RegisterRangeValueRuleType(RuleRegistry* rule_registry, const std::string& 
   std::vector<RangeValueRule::Range> ranges{};
   for (const YAML::Node& rule_node : rule_nodes) {
     const std::pair<double, double> min_max{GetRangeMinMaxValuesFromYamlNode(rule_node)};
-    ranges.push_back(MakeRange(GetSeverityFromYamlNode(rule_node), GetRelatedRuleFromYamlNode(rule_node),
-                               GetRelatedUniqueIdsFromYamlNode(rule_node), rule_node[kDescription].as<std::string>(),
-                               min_max.first, min_max.second));
+    ranges.push_back(RangeValueRule::Range{GetSeverityFromYamlNode(rule_node), GetRelatedRuleFromYamlNode(rule_node),
+                                           GetRelatedUniqueIdsFromYamlNode(rule_node),
+                                           rule_node[kDescription].as<std::string>(), min_max.first, min_max.second});
   }
   rule_registry->RegisterRangeValueRule(Rule::TypeId(rule_type_id), ranges);
 }

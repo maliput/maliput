@@ -22,21 +22,23 @@ namespace rules {
 namespace {
 
 Phase CreateFullPhase(const Phase::Id& id) {
-  return Phase{id,
-               {{RightOfWayRule::Id("rule_a"), RightOfWayRule::State::Id("GO")},
-                {RightOfWayRule::Id("rule_b"), RightOfWayRule::State::Id("STOP")}},
-               {{Rule::Id("RightOfWayRuleType/rule_a"),
-                 MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Go")},
-                {Rule::Id("RightOfWayRuleType/rule_b"),
-                 MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Stop")}},
-               {{{{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_a_green")},
-                  BulbState::kOn},
-                 {{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_a_red")},
-                  BulbState::kOff},
-                 {{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_b_green")},
-                  BulbState::kOff},
-                 {{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_b_red")},
-                  BulbState::kOn}}}};
+  return Phase{
+      id,
+      {{RightOfWayRule::Id("rule_a"), RightOfWayRule::State::Id("GO")},
+       {RightOfWayRule::Id("rule_b"), RightOfWayRule::State::Id("STOP")}},
+      {{Rule::Id("RightOfWayRuleType/rule_a"),
+        DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Go"}},
+       {Rule::Id("RightOfWayRuleType/rule_b"),
+        DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
+                                         "Stop"}}},
+      {{{{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_a_green")},
+         BulbState::kOn},
+        {{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_a_red")},
+         BulbState::kOff},
+        {{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_b_green")},
+         BulbState::kOff},
+        {{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_b_red")},
+         BulbState::kOn}}}};
 }
 
 Phase CreatePhaseWithMissingRuleStates(const Phase::Id& id) {

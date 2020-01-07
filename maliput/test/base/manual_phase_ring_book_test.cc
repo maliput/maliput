@@ -15,7 +15,7 @@
 namespace maliput {
 namespace {
 
-using api::rules::MakeDiscreteValue;
+using api::rules::DiscreteValueRule;
 using api::rules::Phase;
 using api::rules::PhaseRing;
 using api::rules::RightOfWayRule;
@@ -27,12 +27,12 @@ struct ManualPhaseRingBookTest : public ::testing::Test {
         row_rule_id_b("rule b"),
         rule_id_a("rule a"),
         rule_id_b("rule b"),
-        phase(
-            Phase::Id("phase"),
-            {{row_rule_id_a, RightOfWayRule::State::Id("a")}, {row_rule_id_b, RightOfWayRule::State::Id("b")}},
-            {{rule_id_a, MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "a")},
-             {rule_id_b,
-              MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "b")}}),
+        phase(Phase::Id("phase"),
+              {{row_rule_id_a, RightOfWayRule::State::Id("a")}, {row_rule_id_b, RightOfWayRule::State::Id("b")}},
+              {{rule_id_a, DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{},
+                                                            Rule::RelatedUniqueIds{}, "a"}},
+               {rule_id_b, DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{},
+                                                            Rule::RelatedUniqueIds{}, "b"}}}),
         ring_id("ring"),
         ring(ring_id, {phase}) {}
 
@@ -79,7 +79,8 @@ TEST_F(ManualPhaseRingBookTest, RingWithSameId) {
   const Rule::Id rule_id_c("rule c");
   const Phase different_phase(
       Phase::Id("different phase with different rules"), {{row_rule_id_c, RightOfWayRule::State::Id("c")}},
-      {{rule_id_c, MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "c")}});
+      {{rule_id_c,
+        DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "c"}}});
   const PhaseRing ring_with_same_id(ring_id, {different_phase});
   EXPECT_THROW(dut.AddPhaseRing(ring_with_same_id), std::logic_error);
 }
@@ -92,7 +93,8 @@ TEST_F(ManualPhaseRingBookTest, RingWithOverlappingRule) {
   dut.AddPhaseRing(ring);
   const Phase phase_with_overlapping_rule(
       Phase::Id("different phase with overlapping rules"), {{row_rule_id_a, RightOfWayRule::State::Id("a")}},
-      {{rule_id_a, MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "a")}});
+      {{rule_id_a,
+        DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "a"}}});
   const PhaseRing ring_with_overlapping_rule(PhaseRing::Id("unique phase ID"), {phase_with_overlapping_rule});
   EXPECT_THROW(dut.AddPhaseRing(ring_with_overlapping_rule), std::logic_error);
 }

@@ -26,7 +26,6 @@ using api::LaneSRange;
 using api::LaneSRoute;
 using api::rules::DiscreteValueRule;
 using api::rules::DiscreteValueRuleStateProvider;
-using api::rules::MakeDiscreteValue;
 using api::rules::RoadRulebook;
 using api::rules::Rule;
 
@@ -34,13 +33,13 @@ class ManualDiscreteRuleStateProviderTest : public ::testing::Test {
  protected:
   const Rule::Id kRuleId{"dvrt/dvr_id"};
   const Rule::Id kUnknownRuleId{"dvrt/unknown_id"};
-  const DiscreteValueRule::DiscreteValue kStateA{MakeDiscreteValue(
-      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(), "value1")};
-  const DiscreteValueRule::DiscreteValue kStateB{MakeDiscreteValue(
-      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(), "value2")};
+  const DiscreteValueRule::DiscreteValue kStateA{DiscreteValueRule::DiscreteValue{
+      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(), "value1"}};
+  const DiscreteValueRule::DiscreteValue kStateB{DiscreteValueRule::DiscreteValue{
+      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(), "value2"}};
   const DiscreteValueRule::DiscreteValue kInvalidState{
-      MakeDiscreteValue(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
-                        api::test::CreateEmptyRelatedUniqueIds(), "invalid_state")};
+      DiscreteValueRule::DiscreteValue{Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                                       api::test::CreateEmptyRelatedUniqueIds(), "invalid_state"}};
   const double kDurationUntil{10.};
 
   void SetUp() override {
@@ -98,8 +97,8 @@ class GetCurrentYieldGroupTest : public ::testing::Test {
   const Rule::TypeId kTypeId{RightOfWayRuleTypeId()};
   const Rule::Id kRuleId{kTypeId.string() + "/right_of_way_rule_id"};
   const LaneSRoute kLaneSRoute{LaneSRoute{{LaneSRange{LaneId{"lane_id"}, {0., 10.}}}}};
-  const DiscreteValueRule::DiscreteValue kStateDiscreteValue{MakeDiscreteValue(
-      Rule::State::kStrict, CreateRightOfWayRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(), "StopAndGo")};
+  const DiscreteValueRule::DiscreteValue kStateDiscreteValue{DiscreteValueRule::DiscreteValue{
+      Rule::State::kStrict, CreateRightOfWayRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(), "StopAndGo"}};
   const std::vector<Rule::Id> expected_yield_group{CreateRightOfWayRelatedRules().at(RelatedRulesKeys::kYieldGroup)};
 
   void SetUp() override {
@@ -138,8 +137,8 @@ class GetCurrentBulbGroupTest : public ::testing::Test {
  protected:
   const Rule::TypeId kTypeId{RightOfWayRuleTypeId()};
   const Rule::Id kRuleId{kTypeId.string() + "/right_of_way_rule_id"};
-  const DiscreteValueRule::DiscreteValue kStateDiscreteValue{MakeDiscreteValue(
-      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), CreateRelatedUniqueIds(), "StopAndGo")};
+  const DiscreteValueRule::DiscreteValue kStateDiscreteValue{DiscreteValueRule::DiscreteValue{
+      Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), CreateRelatedUniqueIds(), "StopAndGo"}};
   const std::vector<api::UniqueId> expected_bulb_group{CreateRelatedUniqueIds().at(RelatedUniqueIdsKeys::kBulbGroup)};
 
   void SetUp() override {
