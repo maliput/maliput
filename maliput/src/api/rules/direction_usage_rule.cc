@@ -4,7 +4,7 @@ namespace maliput {
 namespace api {
 namespace rules {
 
-std::unordered_map<DirectionUsageRule::State::Type, const char*, drake::DefaultHash>
+std::unordered_map<DirectionUsageRule::State::Type, const char*, maliput::common::DefaultHash>
 DirectionUsageRule::StateTypeMapper() {
   return {{DirectionUsageRule::State::Type::kWithS, "WithS"},
           {DirectionUsageRule::State::Type::kAgainstS, "AgainstS"},

@@ -8,10 +8,10 @@
 
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_optional.h"
-#include "drake/common/hash.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/unique_id.h"
+#include "maliput/common/maliput_hash.h"
 #include "maliput/common/passkey.h"
 
 namespace maliput {
@@ -26,7 +26,7 @@ enum class BulbColor {
 };
 
 /// Maps BulbColor enums to string representations.
-std::unordered_map<BulbColor, const char*, drake::DefaultHash> BulbColorMapper();
+std::unordered_map<BulbColor, const char*, maliput::common::DefaultHash> BulbColorMapper();
 
 /// Defines the possible bulb types.
 enum class BulbType {
@@ -35,13 +35,13 @@ enum class BulbType {
 };
 
 /// Maps BulbType enums to string representations.
-std::unordered_map<BulbType, const char*, drake::DefaultHash> BulbTypeMapper();
+std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> BulbTypeMapper();
 
 /// Defines the possible bulb states.
 enum class BulbState { kOff = 0, kOn, kBlinking };
 
 /// Maps BulbState enums to string representations.
-std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper();
+std::unordered_map<BulbState, const char*, maliput::common::DefaultHash> BulbStateMapper();
 
 /// Forward declaration of `UniqueBulbId` to be used by `Bulb`.
 class UniqueBulbId;
@@ -399,7 +399,7 @@ class UniqueBulbId : public UniqueId {
   /// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const UniqueBulbId& id) noexcept {
-    using drake::hash_append;
+    using maliput::common::hash_append;
     hash_append(hasher, id.traffic_light_id_);
     hash_append(hasher, id.bulb_group_id_);
     hash_append(hasher, id.bulb_id_);
@@ -460,7 +460,7 @@ class UniqueBulbGroupId : public UniqueId {
   /// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const UniqueBulbGroupId& id) noexcept {
-    using drake::hash_append;
+    using maliput::common::hash_append;
     hash_append(hasher, id.traffic_light_id_);
     hash_append(hasher, id.bulb_group_id_);
   }
@@ -481,7 +481,7 @@ namespace std {
 
 /// Specialization of std::hash for maliput::api::rules::UniqueBulbId.
 template <>
-struct hash<maliput::api::rules::UniqueBulbId> : public drake::DefaultHash {};
+struct hash<maliput::api::rules::UniqueBulbId> : public maliput::common::DefaultHash {};
 
 /// Specialization of std::less for maliput::api::rules::UniqueBulbId
 /// providing a strict ordering over maliput::api::rules::UniqueBulbId
@@ -503,7 +503,7 @@ struct less<maliput::api::rules::UniqueBulbId> {
 
 /// Specialization of std::hash for maliput::api::rules::UniqueBulbGroupId.
 template <>
-struct hash<maliput::api::rules::UniqueBulbGroupId> : public drake::DefaultHash {};
+struct hash<maliput::api::rules::UniqueBulbGroupId> : public maliput::common::DefaultHash {};
 
 /// Specialization of std::less for maliput::api::rules::UniqueBulbGroupId
 /// providing a strict ordering over maliput::api::rules::UniqueBulbGroupId

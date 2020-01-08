@@ -10,23 +10,23 @@ namespace maliput {
 namespace api {
 namespace rules {
 
-std::unordered_map<BulbColor, const char*, drake::DefaultHash> BulbColorMapper() {
-  std::unordered_map<BulbColor, const char*, drake::DefaultHash> result;
+std::unordered_map<BulbColor, const char*, maliput::common::DefaultHash> BulbColorMapper() {
+  std::unordered_map<BulbColor, const char*, maliput::common::DefaultHash> result;
   result.emplace(BulbColor::kRed, "Red");
   result.emplace(BulbColor::kYellow, "Yellow");
   result.emplace(BulbColor::kGreen, "Green");
   return result;
 }
 
-std::unordered_map<BulbType, const char*, drake::DefaultHash> BulbTypeMapper() {
-  std::unordered_map<BulbType, const char*, drake::DefaultHash> result;
+std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> BulbTypeMapper() {
+  std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> result;
   result.emplace(BulbType::kRound, "Round");
   result.emplace(BulbType::kArrow, "Arrow");
   return result;
 }
 
-std::unordered_map<BulbState, const char*, drake::DefaultHash> BulbStateMapper() {
-  std::unordered_map<BulbState, const char*, drake::DefaultHash> result;
+std::unordered_map<BulbState, const char*, maliput::common::DefaultHash> BulbStateMapper() {
+  std::unordered_map<BulbState, const char*, maliput::common::DefaultHash> result;
   result.emplace(BulbState::kOff, "Off");
   result.emplace(BulbState::kOn, "On");
   result.emplace(BulbState::kBlinking, "Blinking");

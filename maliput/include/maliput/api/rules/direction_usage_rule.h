@@ -137,7 +137,7 @@ class DirectionUsageRule final {
   }
 
   /// Maps DirectionUsageRule::State::Type enums to string representations.
-  static std::unordered_map<State::Type, const char*, drake::DefaultHash> StateTypeMapper();
+  static std::unordered_map<State::Type, const char*, maliput::common::DefaultHash> StateTypeMapper();
 
  private:
   Id id_;

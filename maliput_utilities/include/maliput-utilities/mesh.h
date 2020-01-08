@@ -8,12 +8,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/common/hash.h"
-
 #include "fmt/ostream.h"
 
 #include "maliput/api/lane.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_hash.h"
 
 namespace maliput {
 namespace utility {
@@ -61,7 +60,7 @@ class UniqueIndexer {
 class GeoVertex {
  public:
   /// A hasher operation suitable for std::unordered_map.
-  using Hash = drake::DefaultHash;
+  using Hash = maliput::common::DefaultHash;
 
   /// An equivalence operation suitable for std::unordered_map.
   struct Equiv {
@@ -77,7 +76,7 @@ class GeoVertex {
   //// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const GeoVertex& item) noexcept {
-    using drake::hash_append;
+    using maliput::common::hash_append;
     hash_append(hasher, item.v_.x());
     hash_append(hasher, item.v_.y());
     hash_append(hasher, item.v_.z());
@@ -91,7 +90,7 @@ class GeoVertex {
 class GeoNormal {
  public:
   /// A hasher operation suitable for std::unordered_map.
-  using Hash = drake::DefaultHash;
+  using Hash = maliput::common::DefaultHash;
 
   /// An equivalence operation suitable for std::unordered_map.
   struct Equiv {
@@ -107,7 +106,7 @@ class GeoNormal {
   //// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
   friend void hash_append(HashAlgorithm& hasher, const GeoNormal& item) noexcept {
-    using drake::hash_append;
+    using maliput::common::hash_append;
     hash_append(hasher, item.n_.x());
     hash_append(hasher, item.n_.y());
     hash_append(hasher, item.n_.z());
