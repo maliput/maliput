@@ -46,8 +46,8 @@ class BuildDiscreteValueRuleTypeTest : public ::testing::TestWithParam<BuildDisc
 
   bool HaveDiscreteValueWith(const std::vector<api::rules::DiscreteValueRule::DiscreteValue>& values, int severity,
                              const std::string& value) {
-    const auto discrete_value =
-        api::rules::MakeDiscreteValue(severity, {} /* related_rules */, {} /* related_unique_ids */, value);
+    const auto discrete_value = api::rules::DiscreteValueRule::DiscreteValue{
+        severity, {} /* related_rules */, {} /* related_unique_ids */, value};
     return std::find(values.begin(), values.end(), discrete_value) != values.end();
   }
 

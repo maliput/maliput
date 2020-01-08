@@ -564,24 +564,28 @@ rules::Rule::RelatedUniqueIds CreateNonEmptyRelatedUniqueIds() {
 
 DiscreteValueRule CreateDiscreteValueRule() {
   return DiscreteValueRule(Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(),
-                           {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
-                                                     CreateEmptyRelatedUniqueIds(), "value1"),
-                            rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
-                                                     CreateEmptyRelatedUniqueIds(), "value2")});
+                           {DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                                             CreateEmptyRelatedUniqueIds(), "value1"},
+                            DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                                             CreateEmptyRelatedUniqueIds(), "value2"}});
 }
 DiscreteValueRule CreateDiscreteValueRuleForContiguityTest() {
   return DiscreteValueRule(
       Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"),
       LaneSRoute({LaneSRange(LaneId("mock_a"), {0., 10.}), LaneSRange(LaneId("mock_b"), {0., 10.})}),
-      {rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), CreateEmptyRelatedUniqueIds(),
-                                "value1"),
-       rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), CreateEmptyRelatedUniqueIds(),
-                                "value2")});
+      {DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                        CreateEmptyRelatedUniqueIds(), "value1"},
+       DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                        CreateEmptyRelatedUniqueIds(), "value2"}});
 }
 
 RangeValueRule::Range CreateRange() {
-  return rules::MakeRange(rules::Rule::State::kStrict, CreateEmptyRelatedRules(), CreateEmptyRelatedUniqueIds(),
-                          "description", 123. /* min */, 456. /* max */);
+  return RangeValueRule::Range{rules::Rule::State::kStrict,
+                               CreateEmptyRelatedRules(),
+                               CreateEmptyRelatedUniqueIds(),
+                               "description",
+                               123. /* min */,
+                               456. /* max */};
 }
 
 RangeValueRule CreateRangeValueRule() {
@@ -598,11 +602,12 @@ Phase CreatePhase() { return Phase(Phase::Id("mock"), {}, {}); }
 
 Phase CreatePhase(const PhaseBuildFlags& build_flags) {
   const Rule::Id rule_id(build_flags.add_missing_rule ? "dvrt/unknown_id" : "dvrt/dvr_id");
-  const auto discrete_value = build_flags.add_missing_value
-                                  ? rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
-                                                             CreateEmptyRelatedUniqueIds(), "unkonwn")
-                                  : rules::MakeDiscreteValue(rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
-                                                             CreateEmptyRelatedUniqueIds(), "value1");
+  const auto discrete_value =
+      build_flags.add_missing_value
+          ? DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                             CreateEmptyRelatedUniqueIds(), "unkonwn"}
+          : DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                             CreateEmptyRelatedUniqueIds(), "value1"};
   const rules::UniqueBulbId bulb_id(
       rules::TrafficLight::Id("TrafficLightId"), rules::BulbGroup::Id("BulbGroupId"),
       build_flags.add_missing_bulb ? rules::Bulb::Id("UnknownBulbId") : rules::Bulb::Id("BulbId"));

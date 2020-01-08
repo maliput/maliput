@@ -10,7 +10,6 @@ namespace {
 
 using maliput::api::rules::DiscreteValueRule;
 using maliput::api::rules::DiscreteValueRuleStateProvider;
-using maliput::api::rules::MakeDiscreteValue;
 using maliput::api::rules::Phase;
 using maliput::api::rules::PhaseRing;
 using maliput::api::rules::RightOfWayRule;
@@ -25,9 +24,9 @@ GTEST_TEST(PhaseBasedRightOfWayDiscreteValueRuleStateProviderTest, BasicTest) {
   const Rule::Id rule_id_a("Right-Of-Way/rule a");
   const Rule::Id rule_id_b("Right-Of-Way/rule b");
   const DiscreteValueRule::DiscreteValue state_go =
-      MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Go");
+      DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Go"};
   const DiscreteValueRule::DiscreteValue state_stop =
-      MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Stop");
+      DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Stop"};
 
   const Phase::Id phase_id_1("phase1");
   const Phase phase1(phase_id_1, {{row_rule_id_a, row_state_id_go}, {row_rule_id_b, row_state_id_stop}},

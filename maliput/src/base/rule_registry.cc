@@ -16,8 +16,8 @@ std::vector<api::rules::DiscreteValueRule::DiscreteValue> GenerateEveryCombinati
   std::vector<api::rules::DiscreteValueRule::DiscreteValue> values;
   for (const int severity : severities) {
     for (const std::string& state_value : state_values) {
-      values.push_back(
-          api::rules::MakeDiscreteValue(severity, empty_related_rules, empty_related_unique_ids, state_value));
+      values.push_back(api::rules::DiscreteValueRule::DiscreteValue{severity, empty_related_rules,
+                                                                    empty_related_unique_ids, state_value});
     }
   }
   return values;

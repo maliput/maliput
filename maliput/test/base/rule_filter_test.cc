@@ -10,8 +10,6 @@ using maliput::api::LaneId;
 using maliput::api::LaneSRange;
 using maliput::api::LaneSRoute;
 using maliput::api::rules::DiscreteValueRule;
-using maliput::api::rules::MakeDiscreteValue;
-using maliput::api::rules::MakeRange;
 using maliput::api::rules::RangeValueRule;
 using maliput::api::rules::Rule;
 
@@ -36,25 +34,27 @@ GTEST_TEST(FilterRuleTest, BasicTest) {
       {} /* direction_usage */,
       std::map<DiscreteValueRule::Id, DiscreteValueRule>{
           {Rule::Id("dvrt a/1"),
-           DiscreteValueRule(
-               Rule::Id("dvrt a/1"), Rule::TypeId("dvrt a"), LaneSRoute({LaneSRange{LaneId("a"), {10., 20.}}}),
-               {MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "ValueA")})},
-          {Rule::Id("dvrt a/1"), DiscreteValueRule(Rule::Id("dvrt b/2"), Rule::TypeId("dvrt b"),
-                                                   LaneSRoute({LaneSRange{LaneId("a"), {10., 20.}}}),
-                                                   {MakeDiscreteValue(Rule::State::kBestEffort, Rule::RelatedRules{},
-                                                                      Rule::RelatedUniqueIds{}, "ValueB")})},
+           DiscreteValueRule(Rule::Id("dvrt a/1"), Rule::TypeId("dvrt a"),
+                             LaneSRoute({LaneSRange{LaneId("a"), {10., 20.}}}),
+                             {DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{},
+                                                               Rule::RelatedUniqueIds{}, "ValueA"}})},
+          {Rule::Id("dvrt a/1"),
+           DiscreteValueRule(Rule::Id("dvrt b/2"), Rule::TypeId("dvrt b"),
+                             LaneSRoute({LaneSRange{LaneId("a"), {10., 20.}}}),
+                             {DiscreteValueRule::DiscreteValue{Rule::State::kBestEffort, Rule::RelatedRules{},
+                                                               Rule::RelatedUniqueIds{}, "ValueB"}})},
       },
       std::map<RangeValueRule::Id, RangeValueRule>{
           {Rule::Id("rvrt a/1"),
            RangeValueRule(Rule::Id("rvrt a/1"), Rule::TypeId("rvrt a"),
                           LaneSRoute({LaneSRange{LaneId("a"), {10., 20.}}}),
-                          {MakeRange(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
-                                     "Range description A", 123., 456.)})},
+                          {RangeValueRule::Range{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
+                                                 "Range description A", 123., 456.}})},
           {Rule::Id("rvrt b/2"),
            RangeValueRule(Rule::Id("rvrt b/2"), Rule::TypeId("rvrt b"),
                           LaneSRoute({LaneSRange{LaneId("a"), {10., 20.}}}),
-                          {MakeRange(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
-                                     "Range description B", 789., 1234.)})},
+                          {RangeValueRule::Range{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
+                                                 "Range description B", 789., 1234.}})},
       }};
 
   const api::rules::RoadRulebook::QueryResults empty_result =

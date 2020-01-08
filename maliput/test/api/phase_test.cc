@@ -22,11 +22,12 @@ class PhaseTest : public ::testing::Test {
       : id_("test_id"),
         rule_states_{{RightOfWayRule::Id("northbound-forward"), RightOfWayRule::State::Id("GO")},
                      {RightOfWayRule::Id("southbound-left-turn"), RightOfWayRule::State::Id("STOP")}},
-        discrete_value_rule_states_{
-            {Rule::Id("RightOfWayRuleType/northbound-forward"),
-             MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Go")},
-            {Rule::Id("RightOfWayRuleType/southbound-left-turn"),
-             MakeDiscreteValue(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{}, "Stop")}},
+        discrete_value_rule_states_{{Rule::Id("RightOfWayRuleType/northbound-forward"),
+                                     DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{},
+                                                                      Rule::RelatedUniqueIds{}, "Go"}},
+                                    {Rule::Id("RightOfWayRuleType/southbound-left-turn"),
+                                     DiscreteValueRule::DiscreteValue{Rule::State::kStrict, Rule::RelatedRules{},
+                                                                      Rule::RelatedUniqueIds{}, "Stop"}}},
         bulb_states_{
             {{{TrafficLight::Id("major-intersection"), BulbGroup::Id("northbound"), Bulb::Id("forward-green")},
               BulbState::kOn},

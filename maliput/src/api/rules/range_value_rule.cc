@@ -38,19 +38,6 @@ bool RangeValueRule::Range::operator<(const RangeValueRule::Range& other) const 
   return false;
 }
 
-RangeValueRule::Range MakeRange(int severity, const Rule::RelatedRules& related_rules,
-                                const Rule::RelatedUniqueIds& related_unique_ids, const std::string& description,
-                                double min, double max) {
-  RangeValueRule::Range range;
-  range.severity = severity;
-  range.related_rules = related_rules;
-  range.related_unique_ids = related_unique_ids;
-  range.description = description;
-  range.min = min;
-  range.max = max;
-  return range;
-}
-
 }  // namespace rules
 }  // namespace api
 }  // namespace maliput

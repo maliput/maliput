@@ -33,13 +33,13 @@ class MockDiscreteValueRuleStateProvider : public DiscreteValueRuleStateProvider
 const Rule::Id MockDiscreteValueRuleStateProvider::kRuleId{"RuleId"};
 
 DiscreteValueRule::DiscreteValue MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue() {
-  return MakeDiscreteValue(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(),
-                           maliput::api::test::CreateEmptyRelatedUniqueIds(), "current_state");
+  return DiscreteValueRule::DiscreteValue{Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(),
+                                          maliput::api::test::CreateEmptyRelatedUniqueIds(), "current_state"};
 }
 
 DiscreteValueRule::DiscreteValue MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue() {
-  return MakeDiscreteValue(Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(),
-                           maliput::api::test::CreateEmptyRelatedUniqueIds(), "next_state");
+  return DiscreteValueRule::DiscreteValue{Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(),
+                                          maliput::api::test::CreateEmptyRelatedUniqueIds(), "next_state"};
 }
 
 GTEST_TEST(DiscreteValueRuleStateProviderTest, ExerciseInterface) {

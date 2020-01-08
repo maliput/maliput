@@ -15,7 +15,6 @@ namespace maliput {
 namespace test {
 namespace {
 
-using api::rules::MakeRange;
 using api::rules::RangeValueRule;
 using api::rules::RangeValueRuleStateProvider;
 using api::rules::RoadRulebook;
@@ -26,9 +25,9 @@ class ManualRangeValueRuleStateProviderTest : public ::testing::Test {
   const Rule::Id kRuleId{"rvrt/rvr_id"};
   const Rule::Id kUnknownRuleId{"rvrt/unknown_id"};
   const RangeValueRule::Range kRangeA{api::test::CreateRange()};
-  const RangeValueRule::Range kInvalidRange{MakeRange(Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
-                                                      api::test::CreateEmptyRelatedUniqueIds(), "invalid",
-                                                      456. /* min */, 789. /* max */)};
+  const RangeValueRule::Range kInvalidRange{
+      RangeValueRule::Range{Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
+                            api::test::CreateEmptyRelatedUniqueIds(), "invalid", 456. /* min */, 789. /* max */}};
   const double kDurationUntil{10.};
 
   void SetUp() override {

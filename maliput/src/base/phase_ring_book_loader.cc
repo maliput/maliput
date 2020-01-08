@@ -57,7 +57,6 @@ using api::rules::BulbState;
 using api::rules::BulbStates;
 using api::rules::DiscreteValueRule;
 using api::rules::DiscreteValueRuleStates;
-using api::rules::MakeDiscreteValue;
 using api::rules::Phase;
 using api::rules::PhaseRing;
 using api::rules::PhaseRingBook;
@@ -195,8 +194,8 @@ DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(
     }
   }
 
-  const auto discrete_value = MakeDiscreteValue(Rule::State::kStrict, related_rules, related_unique_ids,
-                                                kRightOfWayStateToString.at(row_state.type()));
+  const DiscreteValueRule::DiscreteValue discrete_value{Rule::State::kStrict, related_rules, related_unique_ids,
+                                                        kRightOfWayStateToString.at(row_state.type())};
   MALIPUT_THROW_UNLESS(std::find(rule.values().begin(), rule.values().end(), discrete_value) != rule.values().end());
   return discrete_value;
 }
