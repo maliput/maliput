@@ -405,14 +405,14 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
   // Creates a vector of api::rules::DiscreteValueRule.
   std::vector<api::rules::DiscreteValueRule> CreateDiscreteValueRules() {
     std::vector<DiscreteValueRule::DiscreteValue> discrete_values;
-    discrete_values.push_back(api::rules::MakeDiscreteValue(
-        Rule::State::kStrict,
-        Rule::RelatedRules{{"Yield Group", {Rule::Id{"RightOfWayRuleType/lane2"}}},
-                           {"Vehicle Stop In Zone Behavior", {Rule::Id{"VehicleStopInZoneBehaviorRuleType/lane34"}}}},
-        Rule::RelatedUniqueIds{{"Bulb Group", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Go"));
-    discrete_values.push_back(api::rules::MakeDiscreteValue(
-        Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {Rule::Id{"RightOfWayRuleType/lane2"}}}},
-        Rule::RelatedUniqueIds{{"Bulb Group", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Stop"));
+    discrete_values.push_back(
+        {Rule::State::kStrict,
+         Rule::RelatedRules{{"Yield Group", {Rule::Id{"RightOfWayRuleType/lane2"}}},
+                            {"Vehicle Stop In Zone Behavior", {Rule::Id{"VehicleStopInZoneBehaviorRuleType/lane34"}}}},
+         Rule::RelatedUniqueIds{{"Bulb Group", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Go"});
+    discrete_values.push_back(
+        {Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {Rule::Id{"RightOfWayRuleType/lane2"}}}},
+         Rule::RelatedUniqueIds{{"Bulb Group", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Stop"});
     DiscreteValueRule discrete_value_rule{
         Rule::Id{"rule1"}, Rule::TypeId{"Right-Of-Way Rule Type"},
         LaneSRoute{{{LaneId{"lane_a"}, SRange{0., 100.}}, {LaneId{"lane_b"}, SRange{0., 50.}}}}, discrete_values};
@@ -422,8 +422,8 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
   // Creates a vector of api::rules::RangeValueRules.
   std::vector<api::rules::RangeValueRule> CreateRangeValueRules() {
     std::vector<RangeValueRule::Range> range_values;
-    range_values.push_back(api::rules::MakeRange(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
-                                                 "Interstate highway - day time", 16.6, 27.8));
+    range_values.push_back({Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
+                            "Interstate highway - day time", 16.6, 27.8});
     RangeValueRule range_value_rule{
         Rule::Id{"rule2"}, Rule::TypeId{"Speed-Limit Rule Type"},
         LaneSRoute{{{LaneId{"lane_a"}, SRange{0., 100.}}, {LaneId{"lane_b"}, SRange{0., 50.}}}}, range_values};

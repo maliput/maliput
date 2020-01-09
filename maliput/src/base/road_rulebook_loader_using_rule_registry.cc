@@ -167,9 +167,9 @@ void AddDiscreteValueRule(ManualRulebook* rulebook, const YAML::Node& rule_node,
   std::vector<DiscreteValueRule::DiscreteValue> discrete_values;
   for (const auto& discrete_value_node : rule_node[DiscreteValueRuleConstants::kValues]) {
     MALIPUT_THROW_UNLESS(discrete_value_node.IsMap());
-    discrete_values.push_back(MakeDiscreteValue(
-        GetSeverityFromYamlNode(discrete_value_node), GetRelatedRuleFromYamlNode(discrete_value_node),
-        GetRelatedUniqueIdsFromYamlNode(discrete_value_node), GetValueFromYamlNode(discrete_value_node)));
+    discrete_values.push_back(
+        {GetSeverityFromYamlNode(discrete_value_node), GetRelatedRuleFromYamlNode(discrete_value_node),
+         GetRelatedUniqueIdsFromYamlNode(discrete_value_node), GetValueFromYamlNode(discrete_value_node)});
   }
   rulebook->AddRule(
       rule_registry.BuildDiscreteValueRule(GetRuleIdFromYamlNode(rule_node), GetRuleTypeIdFromYamlNode(rule_node),
@@ -191,10 +191,9 @@ void AddRangeValueRule(ManualRulebook* rulebook, const YAML::Node& rule_node, co
   for (const auto& range_value_node : rule_node[RangeValueRuleConstants::kRanges]) {
     MALIPUT_THROW_UNLESS(range_value_node.IsMap());
     const auto min_max = GetRangeMinMaxValuesFromYamlNode(range_value_node);
-    range_values.push_back(MakeRange(GetSeverityFromYamlNode(range_value_node),
-                                     GetRelatedRuleFromYamlNode(range_value_node),
-                                     GetRelatedUniqueIdsFromYamlNode(range_value_node),
-                                     GetDescriptionFromYamlNode(range_value_node), min_max.first, min_max.second));
+    range_values.push_back({GetSeverityFromYamlNode(range_value_node), GetRelatedRuleFromYamlNode(range_value_node),
+                            GetRelatedUniqueIdsFromYamlNode(range_value_node),
+                            GetDescriptionFromYamlNode(range_value_node), min_max.first, min_max.second});
   }
   rulebook->AddRule(rule_registry.BuildRangeValueRule(GetRuleIdFromYamlNode(rule_node),
                                                       GetRuleTypeIdFromYamlNode(rule_node),
