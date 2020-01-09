@@ -2,8 +2,6 @@
 
 #include <exception>
 
-#include <optional>
-
 #include <gtest/gtest.h>
 
 #include "maliput/api/lane.h"
@@ -30,23 +28,24 @@ class IntersectionTest : public ::testing::Test {
   const api::rules::RuleStates rule_states_2_{
       {api::rules::RightOfWayRule::Id(rule_id_a), api::rules::RightOfWayRule::State::Id("STOP")}};
 
-  const api::rules::DiscreteValueRule::DiscreteValue discrete_value_1 = api::rules::MakeDiscreteValue(
-      api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, api::rules::Rule::RelatedUniqueIds{}, "Go");
-  const api::rules::DiscreteValueRule::DiscreteValue discrete_value_2 = api::rules::MakeDiscreteValue(
-      api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, api::rules::Rule::RelatedUniqueIds{}, "Stop");
+  const api::rules::DiscreteValueRule::DiscreteValue discrete_value_1{
+      api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, api::rules::Rule::RelatedUniqueIds{}, "Go"};
+  const api::rules::DiscreteValueRule::DiscreteValue discrete_value_2{
+      api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, api::rules::Rule::RelatedUniqueIds{}, "Stop"};
   const api::rules::Rule::Id rule_id_b{"rule_id"};
   const api::rules::DiscreteValueRuleStates discrete_value_rule_states_1_{
       {api::rules::Rule::Id(rule_id_b), discrete_value_1}};
   const api::rules::DiscreteValueRuleStates discrete_value_rule_states_2_{
       {api::rules::Rule::Id(rule_id_b), discrete_value_2}};
 
-  const api::rules::UniqueBulbId unique_bulb_id{api::rules::TrafficLight::Id("traffic_light"),
-                                                api::rules::BulbGroup::Id("bulb_group"), api::rules::Bulb::Id("bulb")};
-  const std::optional<api::rules::BulbStates> bulb_states_1_ =
-      std::optional<api::rules::BulbStates>({{unique_bulb_id, api::rules::BulbState::kOff}});
+  const api::rules::TrafficLight::Id traffic_light{"traffic_light"};
+  const api::rules::UniqueBulbId unique_bulb_id{traffic_light, api::rules::BulbGroup::Id("bulb_group"),
+                                                api::rules::Bulb::Id("bulb")};
+  const drake::optional<api::rules::BulbStates> bulb_states_1_ =
+      drake::optional<api::rules::BulbStates>({{unique_bulb_id, api::rules::BulbState::kOff}});
 
-  const std::optional<api::rules::BulbStates> bulb_states_2_ =
-      std::optional<api::rules::BulbStates>({{unique_bulb_id, api::rules::BulbState::kOn}});
+  const drake::optional<api::rules::BulbStates> bulb_states_2_ =
+      drake::optional<api::rules::BulbStates>({{unique_bulb_id, api::rules::BulbState::kOn}});
 
   const api::rules::Phase dummy_phase_1_;
   const api::rules::Phase dummy_phase_2_;
