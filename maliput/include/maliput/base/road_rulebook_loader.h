@@ -56,7 +56,7 @@ std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebookFromFile(const api::Ro
 /// @return An api::rules::RoadRulebook containing the rules specified in
 /// @p input.
 ///
-/// @throws std::exception if the YAML document within @p input is invalid.
+/// @throws std::exception if the YAML document in @p input is invalid.
 std::unique_ptr<api::rules::RoadRulebook> LoadRoadRulebook(const api::RoadGeometry* road_geometry,
                                                            const std::string& input,
                                                            const api::rules::RuleRegistry& rule_registry);

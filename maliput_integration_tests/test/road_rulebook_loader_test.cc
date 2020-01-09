@@ -24,6 +24,7 @@
 #include "maliput/base/traffic_light_book_loader.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/mock.h"
+#include "maliput/test_utilities/rules_compare.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
@@ -360,7 +361,7 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
     }
     ASSERT_TRUE(common::Filesystem::remove_directory(directory_));
   }
-  // Creates three rule types.
+  // Returns a YAML string representation of an api::rules::Rulebook with three rules with different rule types.
   std::string GenerateRulebookString() {
     return fmt::format(
         R"R(RoadRulebook:
@@ -401,6 +402,7 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
 )R");
   }
 
+  // Creates a vector of api::rules::DiscreteValueRule.
   std::vector<api::rules::DiscreteValueRule> CreateDiscreteValueRules() {
     std::vector<DiscreteValueRule::DiscreteValue> discrete_values;
     discrete_values.push_back(api::rules::MakeDiscreteValue(
@@ -417,6 +419,7 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
     return {{discrete_value_rule}};
   }
 
+  // Creates a vector of api::rules::RangeValueRules.
   std::vector<api::rules::RangeValueRule> CreateRangeValueRules() {
     std::vector<RangeValueRule::Range> range_values;
     range_values.push_back(api::rules::MakeRange(Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
@@ -427,6 +430,7 @@ class TestLoadingRulesFromYaml : public ::testing::Test {
     return {{range_value_rule}};
   }
 
+  // Generates a YAML file located in 'filepath' from 'string_to_yaml''s content.
   void GenerateYamlFileFromString(const std::string& string_to_yaml, const std::string& filepath) {
     std::ofstream os(filepath);
     fmt::print(os, string_to_yaml);
@@ -451,20 +455,12 @@ TEST_F(TestLoadingRulesFromYaml, LoadFromFile) {
       const auto it =
           std::find_if(expected_discrete_rules.begin(), expected_discrete_rules.end(),
                        [id_discrete_value_rule](api::rules::DiscreteValueRule expected_discrete_rule) {
-                         if (id_discrete_value_rule.second.id() != expected_discrete_rule.id() ||
-                             id_discrete_value_rule.second.type_id() != expected_discrete_rule.type_id() ||
-                             id_discrete_value_rule.second.zone().length() != expected_discrete_rule.zone().length()) {
-                           return false;
-                         }
-                         const std::vector<DiscreteValueRule::DiscreteValue> expected_discrete_values =
-                             expected_discrete_rule.values();
-                         for (const auto discrete_value : id_discrete_value_rule.second.values()) {
-                           if (std::find(expected_discrete_values.begin(), expected_discrete_values.end(),
-                                         discrete_value) == expected_discrete_values.end()) {
-                             return false;
-                           }
-                         }
-                         return true;
+                         return api::rules::test::IsEqual("DiscreteValueRule", "Expected DiscreteValueRule",
+                                                          id_discrete_value_rule.second,
+                                                          expected_discrete_rule) == testing::AssertionSuccess();
+                         return api::rules::test::IsEqual(
+                                    "DiscreteValues", "Expected DiscreteValues", id_discrete_value_rule.second.values(),
+                                    expected_discrete_rule.values()) == testing::AssertionSuccess();
                        });
       EXPECT_NE(it, expected_discrete_rules.end());
     }
@@ -474,23 +470,14 @@ TEST_F(TestLoadingRulesFromYaml, LoadFromFile) {
     const std::map<RangeValueRule::Id, RangeValueRule> ids_range_value_rules = rules.range_value_rules;
     EXPECT_EQ(rules.range_value_rules.size(), expected_range_rules.size());
     for (const auto& id_range_value_rule : ids_range_value_rules) {
-      const auto it =
-          std::find_if(expected_range_rules.begin(), expected_range_rules.end(),
-                       [id_range_value_rule](api::rules::RangeValueRule expected_range_rule) {
-                         if (id_range_value_rule.second.id() != expected_range_rule.id() ||
-                             id_range_value_rule.second.type_id() != expected_range_rule.type_id() ||
-                             id_range_value_rule.second.zone().length() != expected_range_rule.zone().length()) {
-                           return false;
-                         }
-                         const std::vector<RangeValueRule::Range> expected_range_values = expected_range_rule.ranges();
-                         for (const auto range_value : id_range_value_rule.second.ranges()) {
-                           if (std::find(expected_range_values.begin(), expected_range_values.end(), range_value) ==
-                               expected_range_values.end()) {
-                             return false;
-                           }
-                         }
-                         return true;
-                       });
+      const auto it = std::find_if(
+          expected_range_rules.begin(), expected_range_rules.end(),
+          [id_range_value_rule](api::rules::RangeValueRule expected_range_rule) {
+            return api::rules::test::IsEqual("RangeValueRule", "Expected RangeValueRule", id_range_value_rule.second,
+                                             expected_range_rule) == testing::AssertionSuccess();
+            return api::rules::test::IsEqual("RangeValues", "Expected RangeValues", id_range_value_rule.second.ranges(),
+                                             expected_range_rule.ranges()) == testing::AssertionSuccess();
+          });
       EXPECT_NE(it, expected_range_rules.end());
     }
   }

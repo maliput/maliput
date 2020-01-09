@@ -72,13 +72,15 @@ RuleType EvaluateRuleType(const YAML::Node& rule_nodes) {
 
 // Returns a Rule::RelatedRules containing the related_rules field value from the `node`.
 Rule::RelatedRules GetRelatedRuleFromYamlNode(const YAML::Node& node) {
-  return node[kRelatedRules].IsDefined() ? node[kRelatedRules].as<Rule::RelatedRules>() : Rule::RelatedRules{};
+  return node[RuleConstants::kRelatedRules].IsDefined() ? node[RuleConstants::kRelatedRules].as<Rule::RelatedRules>()
+                                                        : Rule::RelatedRules{};
 }
 
 // Returns a Rule::RelatedUniqueIds containing the related_unique_ids field value from the `node`.
 Rule::RelatedUniqueIds GetRelatedUniqueIdsFromYamlNode(const YAML::Node& node) {
-  return node[kRelatedUniqueIds].IsDefined() ? node[kRelatedUniqueIds].as<Rule::RelatedUniqueIds>()
-                                             : Rule::RelatedUniqueIds{};
+  return node[RuleConstants::kRelatedUniqueIds].IsDefined()
+             ? node[RuleConstants::kRelatedUniqueIds].as<Rule::RelatedUniqueIds>()
+             : Rule::RelatedUniqueIds{};
 }
 
 // Register a DiscreteValueRule type within the `rule_registry`.
@@ -90,7 +92,7 @@ void RegisterDiscreteValueRuleType(RuleRegistry* rule_registry, const std::strin
   for (const YAML::Node& rule_node : rule_nodes) {
     discrete_values.push_back(DiscreteValueRule::DiscreteValue{
         GetSeverityFromYamlNode(rule_node), GetRelatedRuleFromYamlNode(rule_node),
-        GetRelatedUniqueIdsFromYamlNode(rule_node), rule_node[kValue].as<std::string>()});
+        GetRelatedUniqueIdsFromYamlNode(rule_node), rule_node[DiscreteValueRuleConstants::kValue].as<std::string>()});
   }
   rule_registry->RegisterDiscreteValueRule(Rule::TypeId(rule_type_id), discrete_values);
 }
