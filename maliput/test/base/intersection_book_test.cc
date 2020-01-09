@@ -21,6 +21,8 @@ namespace {
 using api::LaneSRange;
 
 // Returns an arbitrary Phase.
+// 'id' value is included in the api::rules::Rule::Id and the api::rules::Rule::TrafficLight::Id of the
+// api::rules::Phase only to allow generating different phases. The name does not represent a real usecase.
 api::rules::Phase CreatePhase(const api::rules::Phase::Id& id) {
   const std::string phase_id = id.string();
   return api::rules::Phase{
@@ -65,20 +67,9 @@ bool HasIntersectionId(const std::vector<maliput::api::Intersection*>& intersect
                       }) != intersections.end();
 }
 
-// Provides builded Intersections to populate an IntersectionBook.
+// Provides an IntersectionBook populated with three Intersections.
 class IntersectionBookTest : public ::testing::Test {
  public:
-  IntersectionBookTest() {
-    phase_provider_1.AddPhaseRing(kPhaseRing1.id(), kPhase1.id());
-    phase_provider_2.AddPhaseRing(kPhaseRing2.id(), kPhase2.id());
-    phase_provider_3.AddPhaseRing(kPhaseRing3.id(), kPhase3.id());
-    auto intersection_a = std::make_unique<Intersection>(kIntersectionIdA, region_a, kPhaseRing1, &phase_provider_1);
-    auto intersection_b = std::make_unique<Intersection>(kIntersectionIdB, region_b, kPhaseRing2, &phase_provider_2);
-    auto intersection_c = std::make_unique<Intersection>(kIntersectionIdC, region_c, kPhaseRing3, &phase_provider_3);
-    intersection_book.AddIntersection(std::move(intersection_a));
-    intersection_book.AddIntersection(std::move(intersection_b));
-    intersection_book.AddIntersection(std::move(intersection_c));
-  }
   const api::rules::Phase kPhase1 = CreatePhase(api::rules::Phase::Id("phase_id_1"));
   const api::rules::Phase kPhase2 = CreatePhase(api::rules::Phase::Id("phase_id_2"));
   const api::rules::Phase kPhase3 = CreatePhase(api::rules::Phase::Id("phase_id_3"));
@@ -106,15 +97,28 @@ class IntersectionBookTest : public ::testing::Test {
       LaneSRange{api::LaneId{"lane_c_1"}, api::SRange{0., 100.}},
       LaneSRange{api::LaneId{"lane_c_2"}, api::SRange{0., 100.}},
   }};
-
+  // TrafficLight::Id constants includes phase_id in its name to match with CreatePhase() function.
+  // The name does not represent a real usecase.
   const api::rules::TrafficLight::Id kTrafficLightIdAPhase1{"traffic_light_a/phase_id_1"};
   const api::rules::TrafficLight::Id kTrafficLightIdBPhase2{"traffic_light_b/phase_id_2"};
   const api::rules::TrafficLight::Id kTrafficLightIdAPhase3{"traffic_light_a/phase_id_3"};
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdAPhase1{"RightOfWayRuleType/rule_a/phase_id_1"};
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdBPhase2{"RightOfWayRuleType/rule_b/phase_id_2"};
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdAPhase3{"RightOfWayRuleType/rule_a/phase_id_3"};
-
   const double kTolerance = 1e-3;
+
+  IntersectionBookTest() {
+    phase_provider_1.AddPhaseRing(kPhaseRing1.id(), kPhase1.id());
+    phase_provider_2.AddPhaseRing(kPhaseRing2.id(), kPhase2.id());
+    phase_provider_3.AddPhaseRing(kPhaseRing3.id(), kPhase3.id());
+    auto intersection_a = std::make_unique<Intersection>(kIntersectionIdA, region_a, kPhaseRing1, &phase_provider_1);
+    auto intersection_b = std::make_unique<Intersection>(kIntersectionIdB, region_b, kPhaseRing2, &phase_provider_2);
+    auto intersection_c = std::make_unique<Intersection>(kIntersectionIdC, region_c, kPhaseRing3, &phase_provider_3);
+    intersection_book.AddIntersection(std::move(intersection_a));
+    intersection_book.AddIntersection(std::move(intersection_b));
+    intersection_book.AddIntersection(std::move(intersection_c));
+  }
+
   ManualPhaseProvider phase_provider_1;
   ManualPhaseProvider phase_provider_2;
   ManualPhaseProvider phase_provider_3;
