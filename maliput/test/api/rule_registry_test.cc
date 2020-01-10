@@ -79,20 +79,22 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
     const std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->type_id, kTypeA);
-    EXPECT_TRUE(result->range_values.has_value());
-    EXPECT_EQ(result->range_values->size(), 2);
-    EXPECT_EQ(result->range_values->at(0), kRangeA);
-    EXPECT_EQ(result->range_values->at(1), kRangeB);
-    EXPECT_FALSE(result->discrete_values.has_value());
+    const auto ranges_ptr = std::get_if<std::vector<RangeValueRule::Range>>(&result->rule_values);
+    EXPECT_NE(ranges_ptr, nullptr);
+    EXPECT_EQ(ranges_ptr->size(), 2);
+    EXPECT_EQ(ranges_ptr->at(0), kRangeA);
+    EXPECT_EQ(ranges_ptr->at(1), kRangeB);
+    EXPECT_EQ(std::get_if<std::vector<api::rules::DiscreteValueRule::DiscreteValue>>(&result->rule_values), nullptr);
   }
   {
     const std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeB);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->type_id, kTypeB);
-    EXPECT_TRUE(result->range_values.has_value());
-    EXPECT_EQ(result->range_values->size(), 1);
-    EXPECT_EQ(result->range_values->at(0), kRangeA);
-    EXPECT_FALSE(result->discrete_values.has_value());
+    const auto ranges_ptr = std::get_if<std::vector<RangeValueRule::Range>>(&result->rule_values);
+    EXPECT_NE(ranges_ptr, nullptr);
+    EXPECT_EQ(ranges_ptr->size(), 1);
+    EXPECT_EQ(ranges_ptr->at(0), kRangeA);
+    EXPECT_EQ(std::get_if<std::vector<api::rules::DiscreteValueRule::DiscreteValue>>(&result->rule_values), nullptr);
   }
   {
     const std::optional<RuleRegistry::QueryResult> result =
@@ -154,28 +156,37 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   }
 
   // Finds each type.
-  std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
-  EXPECT_TRUE(result.has_value());
-  EXPECT_FALSE(result->range_values.has_value());
-  EXPECT_EQ(result->type_id, kTypeA);
-  EXPECT_TRUE(result->discrete_values.has_value());
-  EXPECT_EQ(result->discrete_values->size(), kValuesA.size());
-  for (const DiscreteValueRule::DiscreteValue& value : *result->discrete_values) {
-    EXPECT_NE(std::find(kValuesA.begin(), kValuesA.end(), value), kValuesA.end());
+  {
+    const std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeA);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(std::get_if<std::vector<api::rules::RangeValueRule::Range>>(&result->rule_values), nullptr);
+    EXPECT_EQ(result->type_id, kTypeA);
+    const auto discrete_values_ptr =
+        std::get_if<std::vector<api::rules::DiscreteValueRule::DiscreteValue>>(&result->rule_values);
+    EXPECT_NE(discrete_values_ptr, nullptr);
+    EXPECT_EQ(discrete_values_ptr->size(), kValuesA.size());
+    for (const DiscreteValueRule::DiscreteValue& value : *discrete_values_ptr) {
+      EXPECT_NE(std::find(kValuesA.begin(), kValuesA.end(), value), kValuesA.end());
+    }
   }
-
-  result = dut.GetPossibleStatesOfRuleType(kTypeB);
-  EXPECT_TRUE(result.has_value());
-  EXPECT_FALSE(result->range_values.has_value());
-  EXPECT_EQ(result->type_id, kTypeB);
-  EXPECT_TRUE(result->discrete_values.has_value());
-  EXPECT_EQ(result->discrete_values->size(), kValuesB.size());
-  for (const DiscreteValueRule::DiscreteValue& value : *result->discrete_values) {
-    EXPECT_NE(std::find(kValuesB.begin(), kValuesB.end(), value), kValuesB.end());
+  {
+    const std::optional<RuleRegistry::QueryResult> result = dut.GetPossibleStatesOfRuleType(kTypeB);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(std::get_if<std::vector<api::rules::RangeValueRule::Range>>(&result->rule_values), nullptr);
+    EXPECT_EQ(result->type_id, kTypeB);
+    const auto discrete_values_ptr =
+        std::get_if<std::vector<api::rules::DiscreteValueRule::DiscreteValue>>(&result->rule_values);
+    EXPECT_NE(discrete_values_ptr, nullptr);
+    EXPECT_EQ(discrete_values_ptr->size(), kValuesB.size());
+    for (const DiscreteValueRule::DiscreteValue& value : *discrete_values_ptr) {
+      EXPECT_NE(std::find(kValuesB.begin(), kValuesB.end(), value), kValuesB.end());
+    }
   }
-
-  result = dut.GetPossibleStatesOfRuleType(Rule::TypeId("any_rule_type"));
-  EXPECT_FALSE(result.has_value());
+  {
+    const std::optional<RuleRegistry::QueryResult> result =
+        dut.GetPossibleStatesOfRuleType(Rule::TypeId("any_rule_type"));
+    EXPECT_FALSE(result.has_value());
+  }
 }
 
 // Registers RangeValueRules and DiscreteValueRules, then builds rules.

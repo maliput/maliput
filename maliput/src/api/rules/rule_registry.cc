@@ -1,6 +1,7 @@
 #include "maliput/api/rules/rule_registry.h"
 
 #include <algorithm>
+#include <optional>
 
 #include "maliput/common/maliput_throw.h"
 
@@ -66,14 +67,13 @@ std::optional<RuleRegistry::QueryResult> RuleRegistry::GetPossibleStatesOfRuleTy
   const auto range_value_rule_type_it = range_rule_types_.find(type_id);
   if (range_value_rule_type_it != range_rule_types_.end()) {
     return {RuleRegistry::QueryResult{range_value_rule_type_it->first /* type_id */,
-                                      range_value_rule_type_it->second /* range_values */,
-                                      std::nullopt /* discrete_values*/}};
+                                      range_value_rule_type_it->second /* rule_values */}};
   }
 
   const auto discrete_value_rule_type_it = discrete_rule_types_.find(type_id);
   if (discrete_value_rule_type_it != discrete_rule_types_.end()) {
-    return {RuleRegistry::QueryResult{discrete_value_rule_type_it->first /* type_id */, std::nullopt /* range_values */,
-                                      discrete_value_rule_type_it->second /* discrete_values*/}};
+    return {RuleRegistry::QueryResult{discrete_value_rule_type_it->first /* type_id */,
+                                      discrete_value_rule_type_it->second /* rule_values*/}};
   }
 
   return std::nullopt;
