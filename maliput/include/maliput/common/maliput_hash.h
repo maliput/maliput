@@ -43,12 +43,12 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <optional>
 
 #include "maliput/common/maliput_throw.h"
 
@@ -90,7 +90,7 @@
 /// std::unordered_set<MyValue, maliput::common::DefaultHash> foo;
 /// @endcode
 ///
-/// Some Drake types may also choose to specialize `std::hash<MyValue>` to use
+/// Some Maliput types may also choose to specialize `std::hash<MyValue>` to use
 /// `DefaultHash`, so that the second template argument to `std::unordered_set`
 /// can be omitted.
 
