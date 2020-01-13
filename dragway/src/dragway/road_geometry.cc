@@ -121,7 +121,7 @@ int RoadGeometry::GetLaneIndex(const api::GeoPosition& geo_pos) const {
 }
 
 api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos,
-                                                       const drake::optional<api::RoadPosition>& hint) const {
+                                                       const std::optional<api::RoadPosition>& hint) const {
   drake::unused(hint);
 
   // Computes the dragway's (x,y) segment surface coordinates.

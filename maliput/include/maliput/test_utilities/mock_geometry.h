@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "maliput/api/lane_data.h"
 #include "maliput/geometry_base/branch_point.h"
 #include "maliput/geometry_base/junction.h"
@@ -49,7 +51,7 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
 
  private:
   api::RoadPositionResult DoToRoadPosition(const api::GeoPosition& geo_position,
-                                           const drake::optional<api::RoadPosition>& hint) const override;
+                                           const std::optional<api::RoadPosition>& hint) const override;
 
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::GeoPosition& geo_position,
                                                            double radius) const override;

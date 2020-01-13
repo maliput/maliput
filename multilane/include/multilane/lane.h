@@ -1,9 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "drake/common/eigen_types.h"
 #include "drake/common/unused.h"
 
@@ -114,7 +114,7 @@ class Lane : public api::Lane {
 
   const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd::Which which_end) const override;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
+  std::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
 
   double do_length() const override { return lane_length_; }
 

@@ -1,9 +1,9 @@
 #pragma once
 
+#include <optional>
 #include <unordered_map>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/range_value_rule_state_provider.h"
@@ -61,11 +61,11 @@ class ManualRangeValueRuleStateProvider : public api::rules::RangeValueRuleState
   /// @throws common::assertion_error When @p duration_until is not positive or
   ///         it is provided when @p next_state is nullopt.
   void SetState(const api::rules::Rule::Id& id, const api::rules::RangeValueRule::Range& state,
-                const drake::optional<api::rules::RangeValueRule::Range>& next_state,
-                const drake::optional<double>& duration_until);
+                const std::optional<api::rules::RangeValueRule::Range>& next_state,
+                const std::optional<double>& duration_until);
 
  private:
-  drake::optional<api::rules::RangeValueRuleStateProvider::StateResult> DoGetState(
+  std::optional<api::rules::RangeValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 
   // @throws common::assertion_error When @p state is unrecognized in

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -27,9 +28,9 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbState& a,
                                    const BulbState& b);
 
-/// Predicate-formatter which tests equality of drake::optional<double>.
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const drake::optional<double>& a,
-                                   const drake::optional<double>& b);
+/// Predicate-formatter which tests equality of std::optional<double>.
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const std::optional<double>& a,
+                                   const std::optional<double>& b);
 
 /// Predicate-formatter which tests equality of Bulb::BoundingBox.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Bulb::BoundingBox& a,

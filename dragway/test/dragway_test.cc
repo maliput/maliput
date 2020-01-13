@@ -1,6 +1,7 @@
 #include <cmath>
 #include <limits>
 #include <map>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -220,12 +221,12 @@ class MaliputDragwayLaneTest : public ::testing::Test {
 
     // Verifies correctness of the default branches.
     {
-      drake::optional<api::LaneEnd> default_start_lane_end = lane->GetDefaultBranch(api::LaneEnd::kStart);
+      const std::optional<api::LaneEnd> default_start_lane_end = lane->GetDefaultBranch(api::LaneEnd::kStart);
       EXPECT_TRUE(default_start_lane_end);
       EXPECT_EQ(default_start_lane_end->end, api::LaneEnd::kFinish);
       EXPECT_EQ(default_start_lane_end->lane, lane);
 
-      drake::optional<api::LaneEnd> default_finish_lane_end = lane->GetDefaultBranch(api::LaneEnd::kFinish);
+      const std::optional<api::LaneEnd> default_finish_lane_end = lane->GetDefaultBranch(api::LaneEnd::kFinish);
       EXPECT_TRUE(default_finish_lane_end);
       EXPECT_EQ(default_finish_lane_end->end, api::LaneEnd::kStart);
       EXPECT_EQ(default_finish_lane_end->lane, lane);

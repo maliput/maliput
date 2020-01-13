@@ -1,11 +1,11 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
@@ -109,7 +109,7 @@ class RoadGeometry {
   //                          might expect an updated RoadPosition which is
   //                          nearby (e.g., on the same Lane).
   RoadPositionResult ToRoadPosition(const GeoPosition& geo_position,
-                                    const drake::optional<RoadPosition>& hint = drake::nullopt) const {
+                                    const std::optional<RoadPosition>& hint = std::nullopt) const {
     return DoToRoadPosition(geo_position, hint);
   }
 
@@ -198,7 +198,7 @@ class RoadGeometry {
   virtual const IdIndex& DoById() const = 0;
 
   virtual RoadPositionResult DoToRoadPosition(const GeoPosition& geo_position,
-                                              const drake::optional<RoadPosition>& hint) const = 0;
+                                              const std::optional<RoadPosition>& hint) const = 0;
 
   virtual std::vector<RoadPositionResult> DoFindRoadPositions(const GeoPosition& geo_position, double radius) const = 0;
 

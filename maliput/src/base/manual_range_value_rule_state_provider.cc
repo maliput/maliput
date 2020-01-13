@@ -16,8 +16,8 @@ void ManualRangeValueRuleStateProvider::ValidateRuleState(const api::rules::Rang
 
 void ManualRangeValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
                                                  const api::rules::RangeValueRule::Range& state,
-                                                 const drake::optional<api::rules::RangeValueRule::Range>& next_state,
-                                                 const drake::optional<double>& duration_until) {
+                                                 const std::optional<api::rules::RangeValueRule::Range>& next_state,
+                                                 const std::optional<double>& duration_until) {
   const api::rules::RangeValueRule rule = rulebook_->GetRangeValueRule(id);
   ValidateRuleState(rule, state);
   if (next_state.has_value()) {
@@ -38,11 +38,11 @@ void ManualRangeValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
   states_[id] = state_result;
 }
 
-drake::optional<api::rules::RangeValueRuleStateProvider::StateResult> ManualRangeValueRuleStateProvider::DoGetState(
+std::optional<api::rules::RangeValueRuleStateProvider::StateResult> ManualRangeValueRuleStateProvider::DoGetState(
     const api::rules::Rule::Id& id) const {
   const auto it = states_.find(id);
   if (it == states_.end()) {
-    return drake::nullopt;
+    return std::nullopt;
   }
   return it->second;
 }

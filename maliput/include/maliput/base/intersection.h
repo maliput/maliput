@@ -1,9 +1,9 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/intersection.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/phase_provider.h"
@@ -34,11 +34,11 @@ class Intersection : public api::Intersection {
 
   virtual ~Intersection() = default;
 
-  drake::optional<api::rules::PhaseProvider::Result> Phase() const override;
+  std::optional<api::rules::PhaseProvider::Result> Phase() const override;
 
   void SetPhase(const api::rules::Phase::Id& phase_id,
-                const drake::optional<api::rules::Phase::Id>& next_phase = drake::nullopt,
-                const drake::optional<double>& duration_until = drake::nullopt) override;
+                const std::optional<api::rules::Phase::Id>& next_phase = std::nullopt,
+                const std::optional<double>& duration_until = std::nullopt) override;
 
  private:
   ManualPhaseProvider* phase_provider_{};

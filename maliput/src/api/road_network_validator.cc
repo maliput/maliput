@@ -137,7 +137,7 @@ void WalkPhases(const RoadNetwork& road_network, std::function<void(const rules:
   MALIPUT_THROW_UNLESS(phase_ring_book != nullptr);
   const std::vector<rules::PhaseRing::Id> phase_ring_ids = phase_ring_book->GetPhaseRings();
   for (const rules::PhaseRing::Id& phase_ring_id : phase_ring_ids) {
-    const drake::optional<rules::PhaseRing> phase_ring = phase_ring_book->GetPhaseRing(phase_ring_id);
+    const std::optional<rules::PhaseRing> phase_ring = phase_ring_book->GetPhaseRing(phase_ring_id);
     MALIPUT_THROW_UNLESS(phase_ring.has_value());
     for (const auto& phase_id_phase : phase_ring->phases()) {
       evaluate_phase(phase_id_phase.second);

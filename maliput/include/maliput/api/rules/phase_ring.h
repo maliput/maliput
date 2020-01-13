@@ -1,10 +1,10 @@
 #pragma once
 
+#include <optional>
 #include <unordered_map>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/type_specific_identifier.h"
 
@@ -27,7 +27,7 @@ class PhaseRing final {
     /// the actual duration is determined by the PhaseProvider and may depend on
     /// events like a vehicle arriving at a left-turn lane or a pedestrian
     /// hitting a crosswalk button.
-    drake::optional<double> duration_until;
+    std::optional<double> duration_until;
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(PhaseRing);
@@ -40,7 +40,7 @@ class PhaseRing final {
   /// @param id the unique ID of this phase ring
   /// @param phases the phases within this ring.
   /// @param next_phases specifies, for each phase, possible next phases. This
-  /// can be drake::nullopt, in which case, no next phases will be specified.
+  /// can be std::nullopt, in which case, no next phases will be specified.
   ///
   /// @throws std::exception if `phases` is empty, `phases` contains duplicate
   /// Phase::Id's, the phases define different sets of RightOfWayRule::Ids and
@@ -50,7 +50,7 @@ class PhaseRing final {
   /// defines a next phase that is not in `phases`.
   PhaseRing(
       const Id& id, const std::vector<Phase>& phases,
-      const drake::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases = drake::nullopt);
+      const std::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases = std::nullopt);
 
   /// Returns the phase ring's identifier.
   const Id& id() const { return id_; }

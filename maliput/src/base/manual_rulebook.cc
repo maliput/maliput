@@ -2,12 +2,11 @@
 
 #include <algorithm>
 #include <iterator>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/rule.h"
 #include "maliput/common/maliput_hash.h"

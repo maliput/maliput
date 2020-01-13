@@ -43,7 +43,7 @@ api::rules::Phase CreatePhase(const api::rules::Phase::Id& id) {
 GTEST_TEST(IntersectionBookTest, BasicTest) {
   ManualPhaseProvider phase_provider;
   const api::rules::PhaseRing phase_ring(api::rules::PhaseRing::Id("phase_ring_id"),
-                                         {CreatePhase(api::rules::Phase::Id("phase_id"))}, drake::nullopt);
+                                         {CreatePhase(api::rules::Phase::Id("phase_id"))}, std::nullopt);
   const Intersection::Id id("my intersection");
   const std::vector<api::LaneSRange> region;
   auto intersection = std::make_unique<Intersection>(id, region, phase_ring, &phase_provider);
@@ -68,7 +68,7 @@ GTEST_TEST(IntersectionBookTest, FindIntersections) {
   const double tolerance = 1e-3;
   ManualPhaseProvider phase_provider;
   const api::rules::PhaseRing phase_ring(api::rules::PhaseRing::Id("phase_ring_id"),
-                                         {CreatePhase(api::rules::Phase::Id("phase_id"))}, drake::nullopt);
+                                         {CreatePhase(api::rules::Phase::Id("phase_id"))}, std::nullopt);
   const Intersection::Id kIntersectionIdA("intersection_a");
   const std::vector<api::LaneSRange> region_a{{
       LaneSRange{api::LaneId{"lane_a_1"}, api::SRange{0., 20.}},

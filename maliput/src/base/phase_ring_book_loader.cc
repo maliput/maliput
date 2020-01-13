@@ -129,8 +129,8 @@ void ConfirmBulbsExist(const BulbGroup& bulb_group, const YAML::Node& bulbs_node
   }
 }
 
-drake::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_book, const YAML::Node& phase_node) {
-  drake::optional<BulbStates> result;
+std::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_book, const YAML::Node& phase_node) {
+  std::optional<BulbStates> result;
   const YAML::Node& traffic_light_states_node = phase_node["TrafficLightStates"];
   if (traffic_light_states_node.IsDefined()) {
     MALIPUT_THROW_UNLESS(traffic_light_states_node.IsMap());
@@ -224,11 +224,11 @@ void VerifyPhaseExists(const std::vector<Phase>& phases, const Phase::Id& phase_
   MALIPUT_THROW_UNLESS(it != phases.end());
 }
 
-drake::optional<const std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>>> BuildNextPhases(
+std::optional<const std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>>> BuildNextPhases(
     const std::vector<Phase>& phases, const YAML::Node& phase_ring_node) {
   const YAML::Node& graph_node = phase_ring_node["PhaseTransitionGraph"];
   if (!graph_node.IsDefined()) {
-    return drake::nullopt;
+    return std::nullopt;
   }
   std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>> result;
   MALIPUT_THROW_UNLESS(phase_ring_node.IsMap());
@@ -243,7 +243,7 @@ drake::optional<const std::unordered_map<Phase::Id, std::vector<PhaseRing::NextP
       MALIPUT_THROW_UNLESS(next_phase_node["ID"].IsDefined());
       const Phase::Id next_phase_id(next_phase_node["ID"].as<std::string>());
       VerifyPhaseExists(phases, next_phase_id);
-      drake::optional<double> duration_until = drake::nullopt;
+      std::optional<double> duration_until = std::nullopt;
       if (next_phase_node["duration_until"].IsDefined()) {
         duration_until = next_phase_node["duration_until"].as<double>();
       }

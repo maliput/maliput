@@ -88,7 +88,7 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
   const int kStrict = api::rules::Rule::State::kStrict;
   const int kBestEffort = api::rules::Rule::State::kBestEffort;
   {
-    const drake::optional<api::rules::RuleRegistry::QueryResult> right_of_way_rule_states =
+    const std::optional<api::rules::RuleRegistry::QueryResult> right_of_way_rule_states =
         rule_registry->GetPossibleStatesOfRuleType(RightOfWayRuleTypeId());
     EXPECT_TRUE(right_of_way_rule_states.has_value());
     EXPECT_EQ(right_of_way_rule_states->type_id, RightOfWayRuleTypeId());
@@ -116,7 +116,7 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
     }
   }
   {
-    const drake::optional<api::rules::RuleRegistry::QueryResult> direction_usage_rule_states =
+    const std::optional<api::rules::RuleRegistry::QueryResult> direction_usage_rule_states =
         rule_registry->GetPossibleStatesOfRuleType(DirectionUsageRuleTypeId());
     EXPECT_TRUE(direction_usage_rule_states.has_value());
     EXPECT_EQ(direction_usage_rule_states->type_id, DirectionUsageRuleTypeId());
@@ -145,7 +145,7 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
     }
   }
   {
-    const drake::optional<api::rules::RuleRegistry::QueryResult> speed_limit_rule_states =
+    const std::optional<api::rules::RuleRegistry::QueryResult> speed_limit_rule_states =
         rule_registry->GetPossibleStatesOfRuleType(SpeedLimitRuleTypeId());
     EXPECT_TRUE(speed_limit_rule_states.has_value());
     EXPECT_EQ(speed_limit_rule_states->type_id, SpeedLimitRuleTypeId());

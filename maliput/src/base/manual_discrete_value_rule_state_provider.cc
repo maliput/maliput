@@ -18,8 +18,8 @@ void ManualDiscreteValueRuleStateProvider::ValidateRuleState(
 
 void ManualDiscreteValueRuleStateProvider::SetState(
     const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& state,
-    const drake::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
-    const drake::optional<double>& duration_until) {
+    const std::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
+    const std::optional<double>& duration_until) {
   const api::rules::DiscreteValueRule rule = rulebook_->GetDiscreteValueRule(id);
   ValidateRuleState(rule, state);
   if (next_state.has_value()) {
@@ -40,11 +40,11 @@ void ManualDiscreteValueRuleStateProvider::SetState(
   states_[id] = state_result;
 }
 
-drake::optional<api::rules::DiscreteValueRuleStateProvider::StateResult>
-ManualDiscreteValueRuleStateProvider::DoGetState(const api::rules::Rule::Id& id) const {
+std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> ManualDiscreteValueRuleStateProvider::DoGetState(
+    const api::rules::Rule::Id& id) const {
   const auto it = states_.find(id);
   if (it == states_.end()) {
-    return drake::nullopt;
+    return std::nullopt;
   }
   return it->second;
 }

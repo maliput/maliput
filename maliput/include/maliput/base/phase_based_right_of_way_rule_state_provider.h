@@ -1,7 +1,8 @@
 #pragma once
 
+#include <optional>
+
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/right_of_way_rule.h"
@@ -41,7 +42,7 @@ class PhaseBasedRightOfWayRuleStateProvider final : public api::rules::RightOfWa
   const api::rules::PhaseProvider& phase_provider() const { return *phase_provider_; }
 
  private:
-  drake::optional<api::rules::RightOfWayRuleStateProvider::RightOfWayResult> DoGetState(
+  std::optional<api::rules::RightOfWayRuleStateProvider::RightOfWayResult> DoGetState(
       const api::rules::RightOfWayRule::Id& id) const final;
 
   const api::rules::PhaseRingBook* phase_ring_book_{};

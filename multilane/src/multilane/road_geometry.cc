@@ -106,7 +106,7 @@ const api::Junction* RoadGeometry::do_junction(int index) const { return junctio
 const api::BranchPoint* RoadGeometry::do_branch_point(int index) const { return branch_points_[index].get(); }
 
 api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_position,
-                                                       const drake::optional<api::RoadPosition>& hint) const {
+                                                       const std::optional<api::RoadPosition>& hint) const {
   api::RoadPositionResult road_position_result;
 
   // If a `hint` is supplied, simply use the `hint` lane; otherwise, search

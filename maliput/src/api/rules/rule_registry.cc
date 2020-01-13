@@ -33,7 +33,7 @@ bool HasValue(const std::vector<RangeValueRule::Range>& ranges, const RangeValue
 
 void RuleRegistry::RegisterRangeValueRule(const Rule::TypeId& type_id,
                                           const std::vector<RangeValueRule::Range>& all_possible_ranges) {
-  MALIPUT_THROW_UNLESS(GetPossibleStatesOfRuleType(type_id) == drake::nullopt);
+  MALIPUT_THROW_UNLESS(GetPossibleStatesOfRuleType(type_id) == std::nullopt);
   MALIPUT_THROW_UNLESS(!all_possible_ranges.empty());
   for (const RangeValueRule::Range& range : all_possible_ranges) {
     MALIPUT_THROW_UNLESS(std::count(all_possible_ranges.begin(), all_possible_ranges.end(), range) == 1);
@@ -44,7 +44,7 @@ void RuleRegistry::RegisterRangeValueRule(const Rule::TypeId& type_id,
 
 void RuleRegistry::RegisterDiscreteValueRule(const Rule::TypeId& type_id,
                                              const std::vector<DiscreteValueRule::DiscreteValue>& all_possible_values) {
-  MALIPUT_THROW_UNLESS(GetPossibleStatesOfRuleType(type_id) == drake::nullopt);
+  MALIPUT_THROW_UNLESS(GetPossibleStatesOfRuleType(type_id) == std::nullopt);
   MALIPUT_THROW_UNLESS(!all_possible_values.empty());
   for (const DiscreteValueRule::DiscreteValue& value_state : all_possible_values) {
     MALIPUT_THROW_UNLESS(std::count(all_possible_values.begin(), all_possible_values.end(), value_state) == 1);
@@ -62,23 +62,21 @@ const std::map<Rule::TypeId, std::vector<DiscreteValueRule::DiscreteValue>>& Rul
   return discrete_rule_types_;
 }
 
-drake::optional<RuleRegistry::QueryResult> RuleRegistry::GetPossibleStatesOfRuleType(
-    const Rule::TypeId& type_id) const {
+std::optional<RuleRegistry::QueryResult> RuleRegistry::GetPossibleStatesOfRuleType(const Rule::TypeId& type_id) const {
   const auto range_value_rule_type_it = range_rule_types_.find(type_id);
   if (range_value_rule_type_it != range_rule_types_.end()) {
     return {RuleRegistry::QueryResult{range_value_rule_type_it->first /* type_id */,
                                       range_value_rule_type_it->second /* range_values */,
-                                      drake::nullopt /* discrete_values*/}};
+                                      std::nullopt /* discrete_values*/}};
   }
 
   const auto discrete_value_rule_type_it = discrete_rule_types_.find(type_id);
   if (discrete_value_rule_type_it != discrete_rule_types_.end()) {
-    return {RuleRegistry::QueryResult{discrete_value_rule_type_it->first /* type_id */,
-                                      drake::nullopt /* range_values */,
+    return {RuleRegistry::QueryResult{discrete_value_rule_type_it->first /* type_id */, std::nullopt /* range_values */,
                                       discrete_value_rule_type_it->second /* discrete_values*/}};
   }
 
-  return drake::nullopt;
+  return std::nullopt;
 }
 
 RangeValueRule RuleRegistry::BuildRangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id,

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
@@ -26,8 +26,8 @@ class ManualPhaseProvider : public api::rules::PhaseProvider {
   /// in this provider, or if @p initial_duration_until is defined when
   /// @p next_phase is undefined
   void AddPhaseRing(const api::rules::PhaseRing::Id& id, const api::rules::Phase::Id& initial_phase,
-                    const drake::optional<api::rules::Phase::Id>& initial_next_phase = drake::nullopt,
-                    const drake::optional<double>& initial_duration_until = drake::nullopt);
+                    const std::optional<api::rules::Phase::Id>& initial_next_phase = std::nullopt,
+                    const std::optional<double>& initial_duration_until = std::nullopt);
 
   /// Sets the current phase of a PhaseRing.
   ///
@@ -35,11 +35,11 @@ class ManualPhaseProvider : public api::rules::PhaseProvider {
   /// provider, or if @p duration_until is defined when @p next_phase is
   /// undefined.
   void SetPhase(const api::rules::PhaseRing::Id& id, const api::rules::Phase::Id& phase,
-                const drake::optional<api::rules::Phase::Id>& next_phase = drake::nullopt,
-                const drake::optional<double>& duration_until = drake::nullopt);
+                const std::optional<api::rules::Phase::Id>& next_phase = std::nullopt,
+                const std::optional<double>& duration_until = std::nullopt);
 
  private:
-  drake::optional<api::rules::PhaseProvider::Result> DoGetPhase(const api::rules::PhaseRing::Id& id) const override;
+  std::optional<api::rules::PhaseProvider::Result> DoGetPhase(const api::rules::PhaseRing::Id& id) const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

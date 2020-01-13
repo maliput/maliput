@@ -34,7 +34,7 @@ namespace test {
 }
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const drake::optional<BulbStates>& a, const drake::optional<BulbStates>& b) {
+                                   const std::optional<BulbStates>& a, const std::optional<BulbStates>& b) {
   drake::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.has_value(), b.has_value()));

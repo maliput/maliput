@@ -27,9 +27,9 @@ void VerifyAllPhasesHaveSameCoverage(const std::vector<Phase>& phases) {
       MALIPUT_THROW_UNLESS(r.discrete_value_rule_states().count(s.first) == 1);
     }
     // Require both set of bulb states to be defined or undefined together.
-    MALIPUT_THROW_UNLESS((r.bulb_states() == drake::nullopt && phase.bulb_states() == drake::nullopt) ||
-                         (r.bulb_states() != drake::nullopt && phase.bulb_states() != drake::nullopt));
-    if (r.bulb_states() != drake::nullopt) {
+    MALIPUT_THROW_UNLESS((r.bulb_states() == std::nullopt && phase.bulb_states() == std::nullopt) ||
+                         (r.bulb_states() != std::nullopt && phase.bulb_states() != std::nullopt));
+    if (r.bulb_states() != std::nullopt) {
       MALIPUT_THROW_UNLESS(phase.bulb_states()->size() == r.bulb_states()->size());
       for (const auto& s : *phase.bulb_states()) {
         MALIPUT_THROW_UNLESS(r.bulb_states()->count(s.first) == 1);
@@ -51,7 +51,7 @@ void VerifyNextPhases(const std::vector<Phase>& phases,
 }  // namespace
 
 PhaseRing::PhaseRing(const Id& id, const std::vector<Phase>& phases,
-                     const drake::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases)
+                     const std::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases)
     : id_(id) {
   MALIPUT_THROW_UNLESS(phases.size() >= 1);
   for (const Phase& phase : phases) {
@@ -59,7 +59,7 @@ PhaseRing::PhaseRing(const Id& id, const std::vector<Phase>& phases,
     auto result = phases_.emplace(phase.id(), phase);
     MALIPUT_THROW_UNLESS(result.second);
   }
-  if (next_phases != drake::nullopt) {
+  if (next_phases != std::nullopt) {
     next_phases_ = *next_phases;
     VerifyNextPhases(phases, next_phases_);
   } else {

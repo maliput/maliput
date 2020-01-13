@@ -62,7 +62,7 @@ class RoadGeometry : public api::RoadGeometry {
   // TODO(agalbachicar) Take into account `h` coordinate to return by minimum
   //                    `h` and then minimum `r`.
   api::RoadPositionResult DoToRoadPosition(const api::GeoPosition& geo_position,
-                                           const drake::optional<api::RoadPosition>& hint) const override;
+                                           const std::optional<api::RoadPosition>& hint) const override;
 
   // TODO(agalbachicar) Needs implementation.
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::GeoPosition& geo_position,

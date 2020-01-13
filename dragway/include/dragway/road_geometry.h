@@ -2,6 +2,7 @@
 
 #include <limits>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "dragway/branch_point.h"
@@ -66,7 +67,7 @@ class RoadGeometry final : public api::RoadGeometry {
   const IdIndex& DoById() const override { return id_index_; }
 
   api::RoadPositionResult DoToRoadPosition(const api::GeoPosition& geo_position,
-                                           const drake::optional<api::RoadPosition>& hint) const final;
+                                           const std::optional<api::RoadPosition>& hint) const final;
 
   // Forwards the call to
   // maliput::geometry_base::BruteForceFindRoadPositionsStrategy().

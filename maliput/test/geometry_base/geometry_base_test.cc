@@ -361,7 +361,7 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
 GTEST_TEST(GeometryBaseRoadGeometryTest, UnimplementedMethods) {
   const MockRoadGeometry dut(api::RoadGeometryId("dut"), 1., 1., 1.);
   // Ensure that the not-actually-implemented methods throw an exception.
-  EXPECT_THROW(dut.ToRoadPosition(api::GeoPosition(), drake::nullopt), std::exception);
+  EXPECT_THROW(dut.ToRoadPosition(api::GeoPosition(), std::nullopt), std::exception);
   EXPECT_THROW(dut.FindRoadPositions(api::GeoPosition(), 1.), std::exception);
 }
 

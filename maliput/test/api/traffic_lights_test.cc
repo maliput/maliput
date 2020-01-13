@@ -96,10 +96,10 @@ GTEST_TEST(BulbConstructorTest, EmptyAndNullOptStateVector) {
   std::vector<std::unique_ptr<Bulb>> test_cases;
   test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("empty_state_vector"), GeoPosition(0, 0, 0),
                                               Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
-                                              drake::nullopt /* arrow_orientation_rad */, std::vector<BulbState>{}));
-  test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("drake::nullopt_state_vector"), GeoPosition(0, 0, 0),
+                                              std::nullopt /* arrow_orientation_rad */, std::vector<BulbState>{}));
+  test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("std::nullopt_state_vector"), GeoPosition(0, 0, 0),
                                               Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
-                                              drake::nullopt /* arrow_orientation_rad */, drake::nullopt /* states */));
+                                              std::nullopt /* arrow_orientation_rad */, std::nullopt /* states */));
 
   for (const auto& test_case : test_cases) {
     EXPECT_EQ(test_case->states().size(), 2);
@@ -157,7 +157,7 @@ GTEST_TEST(DefaultBulbStateTest, CorrectDefaultAndIsValidStateQueries) {
   const Bulb::Id b_id("id");
   for (const auto& test_case : test_cases) {
     const Bulb dut(b_id, GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
-                   drake::nullopt /* arrow_orientation_rad */, test_case.states);
+                   std::nullopt /* arrow_orientation_rad */, test_case.states);
     EXPECT_EQ(dut.GetDefaultState(), test_case.default_state);
     for (const auto& state : test_case.states) {
       EXPECT_TRUE(dut.IsValidState(state));

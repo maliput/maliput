@@ -126,7 +126,7 @@ std::vector<SRangeGetIntersectionBuildFlags> GetIntersectionTestParameters() {
 }
 
 TEST_P(SRangeGetIntersectionTest, GetIntersection) {
-  const drake::optional<SRange> dut =
+  const std::optional<SRange> dut =
       build_config_.s_range.GetIntersection(build_config_.intersect, build_config_.tolerance);
   if (build_config_.expects_nullopt) {
     EXPECT_FALSE(dut.has_value());

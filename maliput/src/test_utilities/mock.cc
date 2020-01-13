@@ -1,5 +1,6 @@
 #include "maliput/test_utilities/mock.h"
 
+#include <optional>
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
@@ -13,8 +14,6 @@
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/segment.h"
-
-#include "drake/common/drake_optional.h"
 
 namespace maliput {
 namespace api {
@@ -66,7 +65,7 @@ class MockBranchPoint final : public BranchPoint {
   const RoadGeometry* do_road_geometry() const override { return road_geometry_; }
   const LaneEndSet* DoGetConfluentBranches(const LaneEnd&) const override { return nullptr; }
   const LaneEndSet* DoGetOngoingBranches(const LaneEnd&) const override { return nullptr; }
-  drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd&) const override { return drake::nullopt; }
+  std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd&) const override { return std::nullopt; }
   const LaneEndSet* DoGetASide() const override { return lane_end_set_a_.get(); }
   const LaneEndSet* DoGetBSide() const override { return lane_end_set_b_.get(); }
 
@@ -114,7 +113,7 @@ class MockLane final : public Lane {
   };
   const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which) const override { return nullptr; }
   const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override { return nullptr; }
-  drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return drake::nullopt; }
+  std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return std::nullopt; }
 
   LaneId id_;
   Segment* segment_{};
@@ -222,7 +221,7 @@ class MockRoadGeometry : public RoadGeometry {
     return i == 0 ? start_bp_.get() : end_bp_.get();
   }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const drake::optional<RoadPosition>&) const override {
+  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const std::optional<RoadPosition>&) const override {
     return RoadPositionResult();
   }
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
@@ -271,7 +270,7 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   int do_num_branch_points() const override { return 1; }
   const BranchPoint* do_branch_point(int) const override { return nullptr; }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const drake::optional<RoadPosition>&) const override {
+  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const std::optional<RoadPosition>&) const override {
     return api::RoadPositionResult();
   }
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
@@ -330,11 +329,11 @@ class MockRoadRulebook : public rules::RoadRulebook {
     throw std::out_of_range("Unknown Id.");
   }
 
-  drake::optional<RightOfWayRule> right_of_way_rule_{};
-  drake::optional<DirectionUsageRule> direction_usage_rule_{};
-  drake::optional<SpeedLimitRule> speed_limit_rule_{};
-  drake::optional<DiscreteValueRule> discrete_value_rule_{};
-  drake::optional<RangeValueRule> range_value_rule_{};
+  std::optional<RightOfWayRule> right_of_way_rule_{};
+  std::optional<DirectionUsageRule> direction_usage_rule_{};
+  std::optional<SpeedLimitRule> speed_limit_rule_{};
+  std::optional<DiscreteValueRule> discrete_value_rule_{};
+  std::optional<RangeValueRule> range_value_rule_{};
 };
 
 // Creates rules
@@ -379,8 +378,8 @@ class MockContiguityRoadRulebook final : public rules::RoadRulebook {
     throw std::out_of_range("Unknown Id.");
   }
 
-  drake::optional<DiscreteValueRule> discrete_value_rule_{};
-  drake::optional<RangeValueRule> range_value_rule_{};
+  std::optional<DiscreteValueRule> discrete_value_rule_{};
+  std::optional<RangeValueRule> range_value_rule_{};
 };
 
 class MockTrafficLightBook final : public rules::TrafficLightBook {
@@ -414,16 +413,16 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
     return phase_ring_ids;
   }
 
-  drake::optional<rules::PhaseRing> DoGetPhaseRing(const rules::PhaseRing::Id& id) const override {
-    return phase_rings_.find(id) != phase_rings_.end() ? drake::optional<rules::PhaseRing>{phase_rings_.at(id)}
-                                                       : drake::optional<rules::PhaseRing>{};
+  std::optional<rules::PhaseRing> DoGetPhaseRing(const rules::PhaseRing::Id& id) const override {
+    return phase_rings_.find(id) != phase_rings_.end() ? std::optional<rules::PhaseRing>{phase_rings_.at(id)}
+                                                       : std::optional<rules::PhaseRing>{};
   }
 
-  drake::optional<rules::PhaseRing> DoFindPhaseRing(const rules::RightOfWayRule::Id&) const override {
-    return drake::nullopt;
+  std::optional<rules::PhaseRing> DoFindPhaseRing(const rules::RightOfWayRule::Id&) const override {
+    return std::nullopt;
   }
 
-  drake::optional<rules::PhaseRing> DoFindPhaseRing(const rules::Rule::Id&) const override { return drake::nullopt; }
+  std::optional<rules::PhaseRing> DoFindPhaseRing(const rules::Rule::Id&) const override { return std::nullopt; }
 
   std::unordered_map<rules::PhaseRing::Id, rules::PhaseRing> phase_rings_;
 };
@@ -434,7 +433,7 @@ class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateP
   MockRightOfWayRuleStateProvider() {}
 
  private:
-  drake::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id&) const override { return drake::nullopt; }
+  std::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id&) const override { return std::nullopt; }
 };
 
 class MockPhaseProvider final : public rules::PhaseProvider {
@@ -443,7 +442,7 @@ class MockPhaseProvider final : public rules::PhaseProvider {
   MockPhaseProvider() {}
 
  private:
-  drake::optional<Result> DoGetPhase(const rules::PhaseRing::Id&) const override { return drake::nullopt; }
+  std::optional<Result> DoGetPhase(const rules::PhaseRing::Id&) const override { return std::nullopt; }
 };
 
 class MockIntersection final : public Intersection {
@@ -452,10 +451,10 @@ class MockIntersection final : public Intersection {
   MockIntersection(const Intersection::Id& id, const rules::PhaseRing& ring) : Intersection(id, {}, ring) {}
 
  private:
-  drake::optional<rules::PhaseProvider::Result> Phase() const override { return drake::nullopt; }
+  std::optional<rules::PhaseProvider::Result> Phase() const override { return std::nullopt; }
 
-  void SetPhase(const api::rules::Phase::Id&, const drake::optional<api::rules::Phase::Id>& next_phase = drake::nullopt,
-                const drake::optional<double>& duration_until = drake::nullopt) override {}
+  void SetPhase(const api::rules::Phase::Id&, const std::optional<api::rules::Phase::Id>& next_phase = std::nullopt,
+                const std::optional<double>& duration_until = std::nullopt) override {}
 };
 
 class MockIntersectionBook final : public IntersectionBook {
@@ -485,8 +484,8 @@ class MockDiscreteValueRuleStateProvider : public rules::DiscreteValueRuleStateP
   MockDiscreteValueRuleStateProvider() = default;
 
  private:
-  drake::optional<rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(const Rule::Id&) const override {
-    return drake::nullopt;
+  std::optional<rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(const Rule::Id&) const override {
+    return std::nullopt;
   }
 };
 
@@ -496,8 +495,8 @@ class MockRangeValueRuleStateProvider : public rules::RangeValueRuleStateProvide
   MockRangeValueRuleStateProvider() = default;
 
  private:
-  drake::optional<rules::RangeValueRuleStateProvider::StateResult> DoGetState(const Rule::Id&) const override {
-    return drake::nullopt;
+  std::optional<rules::RangeValueRuleStateProvider::StateResult> DoGetState(const Rule::Id&) const override {
+    return std::nullopt;
   }
 };
 
@@ -807,7 +806,7 @@ std::unique_ptr<BulbGroup> CreateBulbGroup(bool add_missing_bulb_group) {
   const BulbGroup::Id bulb_group_id{add_missing_bulb_group ? "MissingBulbGroupId" : "BulbGroupId"};
   std::vector<std::unique_ptr<Bulb>> bulbs;
   bulbs.push_back(std::make_unique<Bulb>(Bulb::Id{"BulbId"}, GeoPosition(), Rotation(), rules::BulbColor::kRed,
-                                         rules::BulbType::kRound, drake::nullopt /* arrow_orientation_rad */,
+                                         rules::BulbType::kRound, std::nullopt /* arrow_orientation_rad */,
                                          std::vector<rules::BulbState>{rules::BulbState::kOn}));
   return std::make_unique<BulbGroup>(bulb_group_id, GeoPosition(), Rotation(), std::move(bulbs));
 }

@@ -1,13 +1,13 @@
 #include "maliput/base/traffic_light_book_loader.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "drake/common/drake_optional.h"
 #include "drake/common/find_resource.h"
 #include "maliput/api/rules/traffic_light_book.h"
 #include "maliput/api/rules/traffic_lights.h"
@@ -41,15 +41,15 @@ class TestLoading2x2IntersectionTrafficLightbook : public ::testing::Test {
 
     bulbs.push_back(std::make_unique<Bulb>(
         Bulb::Id("RedBulb"), GeoPosition(0, 0, 0.3937), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
-        BulbColor::kRed, BulbType::kRound, drake::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
+        BulbColor::kRed, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
         Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
         Bulb::Id("YellowBulb"), GeoPosition(0, 0, 0), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
-        BulbColor::kYellow, BulbType::kRound, drake::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
+        BulbColor::kYellow, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
         Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
         Bulb::Id("GreenBulb"), GeoPosition(0, 0, -0.3937), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
-        BulbColor::kGreen, BulbType::kRound, drake::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
+        BulbColor::kGreen, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
         Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
         Bulb::Id("YellowLeftArrowBulb"), GeoPosition(0, -0.3937, -0.3937),

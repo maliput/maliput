@@ -34,7 +34,7 @@ class ManualRightOfWayRuleStateProvider final : public api::rules::RightOfWayRul
   void SetState(const api::rules::RightOfWayRule::Id& id, const api::rules::RightOfWayRule::State::Id& state);
 
  private:
-  drake::optional<api::rules::RightOfWayRuleStateProvider::RightOfWayResult> DoGetState(
+  std::optional<api::rules::RightOfWayRuleStateProvider::RightOfWayResult> DoGetState(
       const api::rules::RightOfWayRule::Id& id) const final;
 
   std::unordered_map<api::rules::RightOfWayRule::Id, api::rules::RightOfWayRule::State::Id> states_;

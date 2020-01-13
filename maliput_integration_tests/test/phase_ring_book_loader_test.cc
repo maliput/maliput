@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -24,7 +25,6 @@
 #include "multilane/builder.h"
 #include "multilane/loader.h"
 
-#include "drake/common/drake_optional.h"
 #include "drake/common/find_resource.h"
 
 namespace maliput {
@@ -355,7 +355,7 @@ class TestLoading2x2IntersectionPhasebook : public ::testing::Test {
                                  Bulb::Id("YellowLeftArrowBulb")},
                     BulbState::kOff}}})}),
         expected_next_phases_({{Phase::Id("NorthSouthPhase"), {{Phase::Id("EastWestPhase"), 45.0}}},
-                               {Phase::Id("EastWestPhase"), {{Phase::Id("NorthSouthPhase"), drake::nullopt}}}}) {}
+                               {Phase::Id("EastWestPhase"), {{Phase::Id("NorthSouthPhase"), std::nullopt}}}}) {}
 
   const std::string filepath_;
   const std::unique_ptr<const RoadGeometry> road_geometry_;
@@ -370,8 +370,8 @@ TEST_F(TestLoading2x2IntersectionPhasebook, LoadFromFile) {
       LoadPhaseRingBookFromFile(rulebook_.get(), traffic_light_book_.get(), filepath_);
   EXPECT_NE(phase_ring_book, nullptr);
   const PhaseRing::Id ring_id("2x2Intersection");
-  const drake::optional<PhaseRing> ring = phase_ring_book->GetPhaseRing(PhaseRing::Id(ring_id));
-  EXPECT_NE(ring, drake::nullopt);
+  const std::optional<PhaseRing> ring = phase_ring_book->GetPhaseRing(PhaseRing::Id(ring_id));
+  EXPECT_NE(ring, std::nullopt);
   EXPECT_EQ(ring->id(), ring_id);
   const auto& phases = ring->phases();
   EXPECT_EQ(phases.size(), expected_phases_.size());

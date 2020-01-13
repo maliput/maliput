@@ -1,11 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "drake/common/autodiff.h"
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "drake/common/symbolic.h"
 
 #include "maliput/api/lane_data.h"
@@ -211,8 +211,8 @@ class Lane {
   const LaneEndSet* GetOngoingBranches(const LaneEnd::Which which_end) const { return DoGetOngoingBranches(which_end); }
 
   /// Returns the default ongoing LaneEnd connected at @p which_end,
-  /// or drake::nullopt if no default branch has been established at @p which_end.
-  drake::optional<LaneEnd> GetDefaultBranch(const LaneEnd::Which which_end) const {
+  /// or std::nullopt if no default branch has been established at @p which_end.
+  std::optional<LaneEnd> GetDefaultBranch(const LaneEnd::Which which_end) const {
     return DoGetDefaultBranch(which_end);
   }
 
@@ -259,7 +259,7 @@ class Lane {
 
   virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which which_end) const = 0;
 
-  virtual drake::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
+  virtual std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
 
   // drake::AutoDiffXd overload of DoToGeoPosition().
   virtual GeoPositionT<drake::AutoDiffXd> DoToGeoPositionAutoDiff(const LanePositionT<drake::AutoDiffXd>&) const {

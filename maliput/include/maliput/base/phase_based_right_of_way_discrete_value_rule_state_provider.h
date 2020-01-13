@@ -1,7 +1,8 @@
 #pragma once
 
+#include <optional>
+
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/discrete_value_rule_state_provider.h"
 #include "maliput/api/rules/phase_provider.h"
@@ -42,7 +43,7 @@ class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public api::rul
   const api::rules::PhaseProvider& phase_provider() const { return *phase_provider_; }
 
  private:
-  drake::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
+  std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 
   const api::rules::PhaseRingBook* phase_ring_book_{};

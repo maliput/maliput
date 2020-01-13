@@ -52,7 +52,7 @@ TEST_F(IntersectionTest, BasicTest) {
   ManualPhaseProvider phase_provider;
   Intersection dut(intersection_id, ranges_a, dummy_ring_, &phase_provider);
   EXPECT_EQ(dut.id(), intersection_id);
-  EXPECT_EQ(dut.Phase(), drake::nullopt);
+  EXPECT_EQ(dut.Phase(), std::nullopt);
   phase_provider.AddPhaseRing(dummy_ring_.id(), dummy_phase_1_.id());
   EXPECT_EQ(dut.Phase()->state, dummy_phase_1_.id());
   dut.SetPhase(dummy_phase_2_.id(), dummy_phase_1_.id(), kDurationUntil);
@@ -64,8 +64,8 @@ TEST_F(IntersectionTest, BasicTest) {
   EXPECT_EQ(dut.region().size(), ranges_a.size());
   EXPECT_EQ(dut.region().at(0).lane_id(), ranges_a.at(0).lane_id());
   EXPECT_EQ(dut.ring_id(), dummy_ring_.id());
-  EXPECT_EQ(dut.bulb_states(), drake::nullopt);
-  EXPECT_THROW(dut.SetPhase(dummy_phase_1_.id(), drake::nullopt, kDurationUntil), std::exception);
+  EXPECT_EQ(dut.bulb_states(), std::nullopt);
+  EXPECT_THROW(dut.SetPhase(dummy_phase_1_.id(), std::nullopt, kDurationUntil), std::exception);
 }
 
 TEST_F(IntersectionTest, Includes) {

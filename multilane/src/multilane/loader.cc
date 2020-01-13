@@ -3,14 +3,13 @@
 #include <cmath>
 #include <cstring>
 #include <map>
+#include <optional>
 #include <regex>
 #include <string>
 #include <tuple>
 #include <utility>
 
 #include "yaml-cpp/yaml.h"
-
-#include "drake/common/drake_optional.h"
 
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
@@ -40,11 +39,11 @@ struct ParsedReference {
   // Endpoint's direction.
   Direction direction;
   // When `type` == kConnection, is one of the extents of the Connection.
-  // Otherwise, it must be drake::nullopt.
-  drake::optional<api::LaneEnd::Which> end;
-  // When `type` == kConnection, is `id` connection's lane index", or drake::nullopt
+  // Otherwise, it must be std::nullopt.
+  std::optional<api::LaneEnd::Which> end;
+  // When `type` == kConnection, is `id` connection's lane index", or std::nullopt
   // if referring to a connection's reference curve.
-  drake::optional<int> lane_id;
+  std::optional<int> lane_id;
 };
 
 // Enumerates the types of curve within a connection where endpoints may be
@@ -59,24 +58,24 @@ struct ParsedAnchorPoint {
   // Type of curve.
   AnchorPointType type;
   // When `type` == kLane, is the lane ID that the endpoint refers to, or
-  // drake::nullopt if referring to a connection's reference curve.
-  drake::optional<int> lane_id;
+  // std::nullopt if referring to a connection's reference curve.
+  std::optional<int> lane_id;
 };
 
 // TODO(agalbachicar)    Once std::variant is added, move this to:
-// using StartSpec = std::drake::optional<std::variant<StartReference::Spec,
+// using StartSpec = std::std::optional<std::variant<StartReference::Spec,
 //                                              StartLane::Spec>>
 struct StartSpec {
-  drake::optional<StartReference::Spec> ref_spec;
-  drake::optional<StartLane::Spec> lane_spec;
+  std::optional<StartReference::Spec> ref_spec;
+  std::optional<StartLane::Spec> lane_spec;
 };
 
 // TODO(agalbachicar)    Once std::variant is added, move this to:
-// using EndSpec = std::drake::optional<std::variant<EndReference::Spec,
+// using EndSpec = std::std::optional<std::variant<EndReference::Spec,
 //                                            EndLane::Spec>>
 struct EndSpec {
-  drake::optional<EndReference::Spec> ref_spec;
-  drake::optional<EndLane::Spec> lane_spec;
+  std::optional<EndReference::Spec> ref_spec;
+  std::optional<EndLane::Spec> lane_spec;
 };
 
 // Converts `degrees` angle into radians.
@@ -112,7 +111,7 @@ EndpointZ ParseEndpointZ(const YAML::Node& node) {
   MALIPUT_DEMAND(node.IsSequence());
   MALIPUT_DEMAND(node.size() == 3 || node.size() == 4);
   return EndpointZ(node[0].as<double>(), node[1].as<double>(), deg_to_rad(node[2].as<double>()),
-                   node.size() == 4 ? drake::optional<double>(deg_to_rad(node[3].as<double>())) : drake::nullopt);
+                   node.size() == 4 ? std::optional<double>(deg_to_rad(node[3].as<double>())) : std::nullopt);
 }
 
 // Parses a YAML `node` and returns an Endpoint object from it.
@@ -190,25 +189,25 @@ LaneLayout ResolveLaneLayout(const YAML::Node& node, double default_left_shoulde
 
 // Looks for the Endpoint in `point_catalog` given `endpoint_key` description.
 // `endpoint_key` should be a bare Endpoint in "points" YAML map.
-// @return An drake::optional<Endpoint> with the Endpoint or drake::nullopt if it is not
+// @return An std::optional<Endpoint> with the Endpoint or std::nullopt if it is not
 // found inside `point_catalog`.
-drake::optional<Endpoint> FindEndpointInCatalog(const std::string& endpoint_key,
-                                                const std::map<std::string, Endpoint>& point_catalog) {
+std::optional<Endpoint> FindEndpointInCatalog(const std::string& endpoint_key,
+                                              const std::map<std::string, Endpoint>& point_catalog) {
   auto it = point_catalog.find(endpoint_key);
-  return it == point_catalog.end() ? drake::nullopt : drake::optional<Endpoint>(it->second);
+  return it == point_catalog.end() ? std::nullopt : std::optional<Endpoint>(it->second);
 }
 
 // Looks for the Connection in `connection_catalog` given `connection_key`
 // description. `connection_key` should be the token specified to reference a
 // connection, its reference curve or one of its lanes, the end and the
 // direction.
-// @return An drake::optional<const Connection*> with the Connection or drake::nullopt if it
+// @return An std::optional<const Connection*> with the Connection or std::nullopt if it
 // is not found inside `connection_catalog`.
-drake::optional<const Connection*> FindConnectionInCatalog(
+std::optional<const Connection*> FindConnectionInCatalog(
     const std::string& connection_key, const std::map<std::string, const Connection*>& connection_catalog) {
   return connection_catalog.find(connection_key) == connection_catalog.end()
-             ? drake::nullopt
-             : drake::optional<const Connection*>(connection_catalog.at(connection_key));
+             ? std::nullopt
+             : std::optional<const Connection*>(connection_catalog.at(connection_key));
 }
 
 // Returns the Direction that `direction_key` sets to the Endpoint / EndpointZ.
@@ -260,9 +259,8 @@ ParsedReference ResolveEndpointReference(const std::string& endpoint_key) {
     parsed_reference.id = pieces_match[1].str();
     parsed_reference.direction = ResolveDirection(pieces_match[4].str());
     parsed_reference.end = {ResolveEnd(pieces_match[2].str())};
-    parsed_reference.lane_id = pieces_match[3].str() == "ref"
-                                   ? drake::nullopt
-                                   : drake::optional<int>(std::atoi(pieces_match[3].str().c_str()));
+    parsed_reference.lane_id =
+        pieces_match[3].str() == "ref" ? std::nullopt : std::optional<int>(std::atoi(pieces_match[3].str().c_str()));
   } else {
     MALIPUT_THROW_MESSAGE("Unknown endpoint reference");
   }
@@ -296,10 +294,10 @@ ParsedAnchorPoint ParseAnchorPoint(const std::string anchor_key) {
 // must go first and then a string that points to the Endpoint. It will be
 // looked for inside `point_catalog` or a Connection will be selected from
 // `connection_catalog`.
-// @return An drake::optional<std::pair<ParsedCurve, StartSpec>> with the point
+// @return An std::optional<std::pair<ParsedCurve, StartSpec>> with the point
 // information when it is possible to identify. When the point refers to a
-// Connection that is not in `connection_catalog`, drake::nullopt is returned.
-drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
+// Connection that is not in `connection_catalog`, std::nullopt is returned.
+std::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
     const YAML::Node& node, const std::map<std::string, Endpoint>& point_catalog,
     const std::map<std::string, const Connection*>& connection_catalog) {
   MALIPUT_DEMAND(node.IsSequence());
@@ -313,7 +311,7 @@ drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
 
   StartSpec spec{};
   if (parsed_reference.type == ReferenceType::kPoint) {
-    drake::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
+    const std::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
     MALIPUT_DEMAND(endpoint.has_value());
     if (parsed_anchor_point.type == AnchorPointType::kReference) {
       spec.ref_spec = StartReference().at(endpoint.value(), parsed_reference.direction);
@@ -321,9 +319,10 @@ drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
       spec.lane_spec = StartLane(parsed_anchor_point.lane_id.value()).at(endpoint.value(), parsed_reference.direction);
     }
   } else if (parsed_reference.type == ReferenceType::kConnection) {
-    drake::optional<const Connection*> connection = FindConnectionInCatalog(parsed_reference.id, connection_catalog);
+    const std::optional<const Connection*> connection =
+        FindConnectionInCatalog(parsed_reference.id, connection_catalog);
     if (!connection) {
-      return drake::nullopt;
+      return std::nullopt;
     }
     if (parsed_anchor_point.type == AnchorPointType::kReference) {
       MALIPUT_DEMAND(!parsed_reference.lane_id.has_value());
@@ -349,10 +348,10 @@ drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> ResolveEndpoint(
 // element will be checked to be a scalar of string type. It must refer to
 // either a point in `point_catalog` or to an EndpointZ of any Connection in
 // `connection_catalog`.
-// @return An drake::optional<std::pair<ParsedCurve, EndSpec>> with the point
+// @return An std::optional<std::pair<ParsedCurve, EndSpec>> with the point
 // information when it is possible to identify. When the point refers to a
-//  Connection that is not in `connection_catalog`, drake::nullopt is returned.
-drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
+//  Connection that is not in `connection_catalog`, std::nullopt is returned.
+std::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
     const YAML::Node& node, const std::map<std::string, Endpoint>& point_catalog,
     const std::map<std::string, const Connection*>& connection_catalog) {
   MALIPUT_DEMAND(node.IsSequence());
@@ -372,7 +371,7 @@ drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
     const ParsedReference parsed_reference = ResolveEndpointReference(endpoint_key);
 
     if (parsed_reference.type == ReferenceType::kPoint) {
-      drake::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
+      const std::optional<Endpoint> endpoint = FindEndpointInCatalog(parsed_reference.id, point_catalog);
       MALIPUT_DEMAND(endpoint.has_value());
       if (parsed_anchor_point.type == AnchorPointType::kReference) {
         spec.ref_spec = EndReference().z_at(endpoint.value().z(), parsed_reference.direction);
@@ -381,9 +380,10 @@ drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> ResolveEndpointZ(
             EndLane(parsed_anchor_point.lane_id.value()).z_at(endpoint.value().z(), parsed_reference.direction);
       }
     } else if (parsed_reference.type == ReferenceType::kConnection) {
-      drake::optional<const Connection*> connection = FindConnectionInCatalog(parsed_reference.id, connection_catalog);
+      const std::optional<const Connection*> connection =
+          FindConnectionInCatalog(parsed_reference.id, connection_catalog);
       if (!connection) {
-        return drake::nullopt;
+        return std::nullopt;
       }
       if (parsed_anchor_point.type == AnchorPointType::kReference) {
         MALIPUT_DEMAND(!parsed_reference.lane_id.has_value());
@@ -444,7 +444,7 @@ const Connection* MaybeMakeConnection(std::string id, const YAML::Node& node,
   const Connection::Type geometry_type = node["length"] ? Connection::kLine : Connection::kArc;
 
   // Resolve start endpoint.
-  drake::optional<std::pair<ParsedAnchorPoint, StartSpec>> start_spec =
+  const std::optional<std::pair<ParsedAnchorPoint, StartSpec>> start_spec =
       ResolveEndpoint(node["start"], point_catalog, connection_catalog);
   if (!start_spec.has_value()) {
     return nullptr;
@@ -455,7 +455,7 @@ const Connection* MaybeMakeConnection(std::string id, const YAML::Node& node,
   //                     "explicit_end" is used, the Endpoint it refers to
   //                     actually matches within linear and angular tolerance
   //                     the new Connection's end Endpoint.
-  drake::optional<std::pair<ParsedAnchorPoint, EndSpec>> end_spec =
+  const std::optional<std::pair<ParsedAnchorPoint, EndSpec>> end_spec =
       ResolveEndpointZ(node["explicit_end"] ? node["explicit_end"] : node["z_end"], point_catalog, connection_catalog);
   if (!end_spec.has_value()) {
     return nullptr;

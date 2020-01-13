@@ -1,6 +1,6 @@
 #pragma once
 
-#include "drake/common/drake_optional.h"
+#include <optional>
 
 namespace maliput {
 namespace api {
@@ -18,14 +18,14 @@ struct StateProviderResult {
     /// relative to when the state is queried to a state provider.
     /// Users should treat this as advisory since it is tentative and
     /// subject to change at any point in time.
-    drake::optional<double> duration_until;
+    std::optional<double> duration_until;
   };
 
   /// The rule's current state.
   T state;
   /// The rule's next state, if known. Users should treat this as advisory
   /// since it is tentative and subject to change at any point in time.
-  drake::optional<Next> next;
+  std::optional<Next> next;
 };
 
 }  // namespace rules

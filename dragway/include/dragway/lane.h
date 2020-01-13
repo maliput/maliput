@@ -1,9 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include "drake/common/autodiff.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 
@@ -134,7 +134,7 @@ class Lane final : public api::Lane {
 
   const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd::Which which_end) const final;
 
-  drake::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const final;
+  std::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const final;
 
   double do_length() const final { return length_; }
 

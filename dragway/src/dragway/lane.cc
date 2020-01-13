@@ -4,6 +4,7 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "drake/math/saturate.h"
@@ -54,7 +55,7 @@ const api::LaneEndSet* Lane::DoGetOngoingBranches(api::LaneEnd::Which which_end)
   return branch_point_->GetOngoingBranches({this, which_end});
 }
 
-drake::optional<api::LaneEnd> Lane::DoGetDefaultBranch(api::LaneEnd::Which which_end) const {
+std::optional<api::LaneEnd> Lane::DoGetDefaultBranch(api::LaneEnd::Which which_end) const {
   return branch_point_->GetDefaultBranch({this, which_end});
 }
 

@@ -1,10 +1,9 @@
 #include "maliput/base/manual_phase_ring_book.h"
 
+#include <optional>
 #include <stdexcept>
 
 #include <gtest/gtest.h>
-
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
@@ -50,23 +49,23 @@ TEST_F(ManualPhaseRingBookTest, BasicTest) {
   EXPECT_NO_THROW(dut.AddPhaseRing(ring));
   EXPECT_EQ(dut.GetPhaseRings().size(), 1);
   EXPECT_EQ(dut.GetPhaseRings()[0], ring.id());
-  drake::optional<PhaseRing> result = dut.GetPhaseRing(ring_id);
+  std::optional<PhaseRing> result = dut.GetPhaseRing(ring_id);
   EXPECT_TRUE(result.has_value());
   EXPECT_EQ(result->id(), ring_id);
   const PhaseRing::Id unknown_ring_id("unknown ring");
-  EXPECT_EQ(dut.GetPhaseRing(unknown_ring_id), drake::nullopt);
+  EXPECT_EQ(dut.GetPhaseRing(unknown_ring_id), std::nullopt);
   for (const auto rule_id : {rule_id_a, rule_id_b}) {
     result = dut.FindPhaseRing(rule_id);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->id(), ring_id);
   }
   const Rule::Id unknown_rule_id("unknown rule");
-  EXPECT_EQ(dut.FindPhaseRing(unknown_rule_id), drake::nullopt);
+  EXPECT_EQ(dut.FindPhaseRing(unknown_rule_id), std::nullopt);
   EXPECT_THROW(dut.RemovePhaseRing(unknown_ring_id), std::logic_error);
   EXPECT_NO_THROW(dut.RemovePhaseRing(ring_id));
-  EXPECT_EQ(dut.GetPhaseRing(ring_id), drake::nullopt);
+  EXPECT_EQ(dut.GetPhaseRing(ring_id), std::nullopt);
   for (const auto rule_id : {rule_id_a, rule_id_b}) {
-    EXPECT_EQ(dut.FindPhaseRing(rule_id), drake::nullopt);
+    EXPECT_EQ(dut.FindPhaseRing(rule_id), std::nullopt);
   }
 }
 
@@ -106,20 +105,20 @@ TEST_F(ManualPhaseRingBookTest, RightOfWayRuleApiTest) {
   EXPECT_NO_THROW(dut.AddPhaseRing(ring));
 
   const PhaseRing::Id unknown_ring_id("unknown ring");
-  EXPECT_EQ(dut.GetPhaseRing(unknown_ring_id), drake::nullopt);
+  EXPECT_EQ(dut.GetPhaseRing(unknown_ring_id), std::nullopt);
 
   for (const auto rule_id : {row_rule_id_a, row_rule_id_b}) {
-    const drake::optional<PhaseRing> result = dut.FindPhaseRing(rule_id);
+    const std::optional<PhaseRing> result = dut.FindPhaseRing(rule_id);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->id(), ring_id);
   }
   const RightOfWayRule::Id unknown_row_rule_id("unknown rule");
-  EXPECT_EQ(dut.FindPhaseRing(unknown_row_rule_id), drake::nullopt);
+  EXPECT_EQ(dut.FindPhaseRing(unknown_row_rule_id), std::nullopt);
   EXPECT_THROW(dut.RemovePhaseRing(unknown_ring_id), std::logic_error);
   EXPECT_NO_THROW(dut.RemovePhaseRing(ring_id));
-  EXPECT_EQ(dut.GetPhaseRing(ring_id), drake::nullopt);
+  EXPECT_EQ(dut.GetPhaseRing(ring_id), std::nullopt);
   for (const auto rule_id : {row_rule_id_a, row_rule_id_b}) {
-    EXPECT_EQ(dut.FindPhaseRing(rule_id), drake::nullopt);
+    EXPECT_EQ(dut.FindPhaseRing(rule_id), std::nullopt);
   }
 }
 

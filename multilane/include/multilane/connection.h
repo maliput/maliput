@@ -2,13 +2,13 @@
 
 #include <cmath>
 #include <memory>
+#include <optional>
 #include <ostream>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/common/maliput_abort.h"
 #include "multilane/road_curve.h"
@@ -75,7 +75,7 @@ class EndpointZ {
   // Constructs an EndpointZ with all zero parameters.
   EndpointZ() = default;
 
-  EndpointZ(double z, double z_dot, double theta, drake::optional<double> theta_dot)
+  EndpointZ(double z, double z_dot, double theta, std::optional<double> theta_dot)
       : z_(z), z_dot_(z_dot), theta_(theta), theta_dot_(theta_dot) {}
 
   /// Returns an EndpointZ with reversed direction.
@@ -91,16 +91,16 @@ class EndpointZ {
 
   double theta() const { return theta_; }
 
-  const drake::optional<double>& theta_dot() const { return theta_dot_; }
+  const std::optional<double>& theta_dot() const { return theta_dot_; }
 
-  drake::optional<double>& get_mutable_theta_dot() { return theta_dot_; }
+  std::optional<double>& get_mutable_theta_dot() { return theta_dot_; }
 
  private:
   double z_{};
   double z_dot_{};
 
   double theta_{};
-  drake::optional<double> theta_dot_{};
+  std::optional<double> theta_dot_{};
 };
 
 /// Streams a string representation of `endpoint_z` into `out`. Returns

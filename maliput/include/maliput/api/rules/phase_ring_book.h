@@ -1,9 +1,9 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
@@ -24,17 +24,17 @@ class PhaseRingBook {
   /// Gets a list of all PhaseRings within this book.
   std::vector<PhaseRing::Id> GetPhaseRings() const { return DoGetPhaseRings(); }
 
-  /// Gets the specified PhaseRing. Returns drake::nullopt if @p ring_id is
+  /// Gets the specified PhaseRing. Returns std::nullopt if @p ring_id is
   /// unrecognized.
-  drake::optional<PhaseRing> GetPhaseRing(const PhaseRing::Id& ring_id) const { return DoGetPhaseRing(ring_id); }
+  std::optional<PhaseRing> GetPhaseRing(const PhaseRing::Id& ring_id) const { return DoGetPhaseRing(ring_id); }
 
   /// Finds and returns the PhaseRing containing the specified
-  /// RightOfWayRule. Returns drake::nullopt if @p rule_id is unrecognized.
-  drake::optional<PhaseRing> FindPhaseRing(const RightOfWayRule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
+  /// RightOfWayRule. Returns std::nullopt if @p rule_id is unrecognized.
+  std::optional<PhaseRing> FindPhaseRing(const RightOfWayRule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
 
   /// Finds and returns the PhaseRing containing the specified
-  /// Rule. Returns drake::nullopt if @p rule_id is unrecognized.
-  drake::optional<PhaseRing> FindPhaseRing(const Rule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
+  /// Rule. Returns std::nullopt if @p rule_id is unrecognized.
+  std::optional<PhaseRing> FindPhaseRing(const Rule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
 
  protected:
   PhaseRingBook() = default;
@@ -42,11 +42,11 @@ class PhaseRingBook {
  private:
   virtual std::vector<PhaseRing::Id> DoGetPhaseRings() const = 0;
 
-  virtual drake::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const = 0;
+  virtual std::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const = 0;
 
-  virtual drake::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const = 0;
+  virtual std::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const = 0;
 
-  virtual drake::optional<PhaseRing> DoFindPhaseRing(const Rule::Id& rule_id) const = 0;
+  virtual std::optional<PhaseRing> DoFindPhaseRing(const Rule::Id& rule_id) const = 0;
 };
 
 }  // namespace rules

@@ -2,12 +2,13 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
+
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/unique_id.h"
@@ -112,7 +113,7 @@ class Bulb final {
   /// will be thrown. An exception will also be thrown if this parameter is
   /// defined for non-arrow BulbType values.
   ///
-  /// @param states The possible states of this bulb. If this is drake::nullopt or an
+  /// @param states The possible states of this bulb. If this is std::nullopt or an
   /// empty vector, this bulb has states {BulbState::kOff, BulbState::kOn}.
   ///
   /// @param bounding_box The bounding box of the bulb. See BoundingBox for
@@ -120,10 +121,8 @@ class Bulb final {
   ///
   /// @throws common::assertion_error When `unique_id.bulb_id != id`.
   Bulb(const Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
-       const BulbColor& color, const BulbType& type,
-       const drake::optional<double>& arrow_orientation_rad = drake::nullopt,
-       const drake::optional<std::vector<BulbState>>& states = drake::nullopt,
-       BoundingBox bounding_box = BoundingBox());
+       const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad = std::nullopt,
+       const std::optional<std::vector<BulbState>>& states = std::nullopt, BoundingBox bounding_box = BoundingBox());
 
   /// Returns this Bulb instance's ID.
   const Id& id() const { return id_; }
@@ -151,7 +150,7 @@ class Bulb final {
 
   /// Returns the arrow's orientation. Only applicable if type() returns
   /// BulbType::kArrow. See constructor's documentation for semantics.
-  drake::optional<double> arrow_orientation_rad() const { return arrow_orientation_rad_; }
+  std::optional<double> arrow_orientation_rad() const { return arrow_orientation_rad_; }
 
   /// Returns the possible states of this bulb.
   const std::vector<BulbState>& states() const { return states_; }
@@ -193,7 +192,7 @@ class Bulb final {
   Rotation orientation_bulb_group_;
   BulbColor color_ = BulbColor::kRed;
   BulbType type_ = BulbType::kRound;
-  drake::optional<double> arrow_orientation_rad_ = drake::nullopt;
+  std::optional<double> arrow_orientation_rad_ = std::nullopt;
   std::vector<BulbState> states_;
   BoundingBox bounding_box_;
   const BulbGroup* bulb_group_{};

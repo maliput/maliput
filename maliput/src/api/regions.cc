@@ -42,7 +42,7 @@ bool SRange::Intersects(const SRange& s_range, double tolerance) const {
            (std::min(s_range.s0(), s_range.s1()) > wider_s_range.s1()));
 }
 
-drake::optional<SRange> SRange::GetIntersection(const SRange& s_range, double tolerance) const {
+std::optional<SRange> SRange::GetIntersection(const SRange& s_range, double tolerance) const {
   if (Intersects(s_range, tolerance)) {
     const SRange wider_s_range(std::min(s0(), s1()) - tolerance, std::max(s0(), s1()) + tolerance);
     const double max = std::max(s_range.s0(), s_range.s1()) >= wider_s_range.s1()
@@ -52,9 +52,9 @@ drake::optional<SRange> SRange::GetIntersection(const SRange& s_range, double to
                            ? std::min(s0(), s1())
                            : std::min(s_range.s0(), s_range.s1());
 
-    return drake::optional<SRange>{SRange(min, max)};
+    return std::optional<SRange>{SRange(min, max)};
   }
-  return drake::nullopt;
+  return std::nullopt;
 }
 
 bool LaneSRange::Intersects(const LaneSRange& lane_s_range, const double tolerance) const {

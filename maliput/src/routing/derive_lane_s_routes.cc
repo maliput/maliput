@@ -1,6 +1,6 @@
 #include "maliput/routing/derive_lane_s_routes.h"
 
-#include "drake/common/drake_optional.h"
+#include <optional>
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
@@ -23,7 +23,7 @@ bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane* lane) {
 }
 
 // Returns the S coordinate in @p lane that is on the border with @p next_lane.
-drake::optional<double> DetermineEdgeS(const api::Lane* lane, const api::Lane* next_lane) {
+std::optional<double> DetermineEdgeS(const api::Lane* lane, const api::Lane* next_lane) {
   MALIPUT_DEMAND(lane != nullptr);
   MALIPUT_DEMAND(next_lane != nullptr);
   if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kFinish), next_lane)) {
@@ -32,7 +32,7 @@ drake::optional<double> DetermineEdgeS(const api::Lane* lane, const api::Lane* n
   if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kStart), next_lane)) {
     return 0.;
   }
-  return drake::nullopt;
+  return std::nullopt;
 }
 
 }  // namespace
@@ -65,18 +65,18 @@ std::vector<api::LaneSRoute> DeriveLaneSRoutes(const api::RoadPosition& start, c
       MALIPUT_DEMAND(lane != nullptr);
       if (i == 0) {
         MALIPUT_DEMAND(lane->id() == start.lane->id());
-        const drake::optional<double> first_end_s = DetermineEdgeS(lane, lane_sequence.at(1));
+        const std::optional<double> first_end_s = DetermineEdgeS(lane, lane_sequence.at(1));
         MALIPUT_DEMAND(first_end_s.has_value());
         ranges.emplace_back(lane->id(), api::SRange(start_s, first_end_s.value()));
       } else if (i + 1 == lane_sequence.size()) {
         MALIPUT_DEMAND(lane->id() == end.lane->id());
         MALIPUT_DEMAND(i > 0);
-        const drake::optional<double> last_start_s = DetermineEdgeS(lane, lane_sequence.at(i - 1));
+        const std::optional<double> last_start_s = DetermineEdgeS(lane, lane_sequence.at(i - 1));
         MALIPUT_DEMAND(last_start_s.has_value());
         ranges.emplace_back(lane->id(), api::SRange(last_start_s.value(), end_s));
       } else {
-        const drake::optional<double> middle_start_s = DetermineEdgeS(lane, lane_sequence.at(i - 1));
-        const drake::optional<double> middle_end_s = DetermineEdgeS(lane, lane_sequence.at(i + 1));
+        const std::optional<double> middle_start_s = DetermineEdgeS(lane, lane_sequence.at(i - 1));
+        const std::optional<double> middle_end_s = DetermineEdgeS(lane, lane_sequence.at(i + 1));
         MALIPUT_DEMAND(middle_start_s && middle_end_s);
         ranges.emplace_back(lane->id(), api::SRange(middle_start_s.value(), middle_end_s.value()));
       }

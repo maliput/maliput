@@ -21,16 +21,16 @@ PhaseBasedRightOfWayDiscreteValueRuleStateProvider::PhaseBasedRightOfWayDiscrete
   MALIPUT_DEMAND(phase_ring_book_ != nullptr && phase_provider != nullptr);
 }
 
-drake::optional<DiscreteValueRuleStateProvider::StateResult>
+std::optional<DiscreteValueRuleStateProvider::StateResult>
 PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const Rule::Id& rule_id) const {
-  drake::optional<PhaseRing> ring = phase_ring_book_->FindPhaseRing(rule_id);
+  std::optional<PhaseRing> ring = phase_ring_book_->FindPhaseRing(rule_id);
   if (ring.has_value()) {
-    const drake::optional<PhaseProvider::Result> phase_result = phase_provider_->GetPhase(ring->id());
+    const std::optional<PhaseProvider::Result> phase_result = phase_provider_->GetPhase(ring->id());
     if (phase_result.has_value()) {
       const Phase::Id phase_id = phase_result->state;
       const Phase& phase = ring->phases().at(phase_id);
       const DiscreteValueRule::DiscreteValue value = phase.discrete_value_rule_states().at(rule_id);
-      drake::optional<DiscreteValueRuleStateProvider::StateResult::Next> next = drake::nullopt;
+      std::optional<DiscreteValueRuleStateProvider::StateResult::Next> next = std::nullopt;
       if (phase_result->next.has_value()) {
         const Phase::Id next_phase_id = phase_result->next->state;
         const Phase& next_phase = ring->phases().at(next_phase_id);
@@ -40,7 +40,7 @@ PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const Rule::Id& r
       return DiscreteValueRuleStateProvider::StateResult{value, next};
     }
   }
-  return drake::nullopt;
+  return std::nullopt;
 }
 
 }  // namespace maliput

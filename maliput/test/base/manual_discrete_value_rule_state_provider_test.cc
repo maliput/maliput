@@ -73,7 +73,7 @@ TEST_F(ManualDiscreteRuleStateProviderTest, SetStateTest) {
 
   // Sets a valid state, next state and duration until.
   EXPECT_NO_THROW(dut.SetState(kRuleId, kStateA, {kStateB}, {kDurationUntil}));
-  const drake::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
+  const std::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
   EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kStateA));
   EXPECT_TRUE(result->next.has_value());
@@ -105,7 +105,7 @@ class GetCurrentYieldGroupTest : public ::testing::Test {
     road_rulebook_ = std::make_unique<ManualRulebook>();
     road_rulebook_->AddRule(DiscreteValueRule{kRuleId, kTypeId, kLaneSRoute, {kStateDiscreteValue}});
     discrete_value_rule_state_provider_ = std::make_unique<ManualDiscreteValueRuleStateProvider>(road_rulebook_.get());
-    discrete_value_rule_state_provider_->SetState(kRuleId, kStateDiscreteValue, drake::nullopt, drake::nullopt);
+    discrete_value_rule_state_provider_->SetState(kRuleId, kStateDiscreteValue, std::nullopt, std::nullopt);
   }
 
   std::unique_ptr<ManualRulebook> road_rulebook_;
@@ -145,7 +145,7 @@ class GetCurrentBulbGroupTest : public ::testing::Test {
     road_rulebook_ = std::make_unique<ManualRulebook>();
     road_rulebook_->AddRule(DiscreteValueRule{kRuleId, kTypeId, api::test::CreateLaneSRoute(), {kStateDiscreteValue}});
     discrete_value_rule_state_provider_ = std::make_unique<ManualDiscreteValueRuleStateProvider>(road_rulebook_.get());
-    discrete_value_rule_state_provider_->SetState(kRuleId, kStateDiscreteValue, drake::nullopt, drake::nullopt);
+    discrete_value_rule_state_provider_->SetState(kRuleId, kStateDiscreteValue, std::nullopt, std::nullopt);
   }
 
   std::unique_ptr<ManualRulebook> road_rulebook_;

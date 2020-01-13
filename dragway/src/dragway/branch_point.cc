@@ -1,3 +1,5 @@
+#include <optional>
+
 #include "dragway/branch_point.h"
 
 #include "dragway/lane.h"
@@ -29,7 +31,7 @@ const api::LaneEndSet* BranchPoint::DoGetOngoingBranches(const api::LaneEnd& end
   }
 }
 
-drake::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(const api::LaneEnd& end) const {
+std::optional<api::LaneEnd> BranchPoint::DoGetDefaultBranch(const api::LaneEnd& end) const {
   // The result should be an ongoing branch for the given input. Thus, a Start
   // input should yield a Finish output (since start connects to finish) and
   // vice-versa.

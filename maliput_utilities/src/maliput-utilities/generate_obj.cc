@@ -56,7 +56,7 @@ std::string FormatDrakeVector3AsRow(const drake::Vector3<double>& vec) {
   return fmt::format("{} {} {}", std::to_string(vec.x()), std::to_string(vec.y()), std::to_string(vec.z()));
 }
 
-std::string FormatMaterial(const Material& mat) {
+std::string FormatMaterial(const Material& mat, int precision) {
   return fmt::format(
       "newmtl {}\n"
       "Ka {}\n"
@@ -64,9 +64,9 @@ std::string FormatMaterial(const Material& mat) {
       "Ks {}\n"
       "Ns {}\n"
       "illum 2\n"
-      "d {}\n",
+      "d {:.{p}f}\n",
       mat.name, FormatDrakeVector3AsRow(mat.ambient), FormatDrakeVector3AsRow(mat.diffuse),
-      FormatDrakeVector3AsRow(mat.specular), mat.shinines, 1.0 - mat.transparency);
+      FormatDrakeVector3AsRow(mat.specular), mat.shinines, 1.0 - mat.transparency, fmt::arg("p", precision));
 }
 
 // Compute the maximum step in s-coordinates that can approximate the distance
@@ -941,6 +941,7 @@ void GenerateObjFile(const api::RoadGeometry* rg, const std::string& dirpath, co
 
   const std::string obj_filename = fileroot + ".obj";
   const std::string mtl_filename = fileroot + ".mtl";
+  const int precision = std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) - std::log10(rg->linear_tolerance())));
 
   // Create the requested OBJ file.
   {
@@ -961,7 +962,6 @@ void GenerateObjFile(const api::RoadGeometry* rg, const std::string& dirpath, co
     // so we want `n` such that `0.5 * 10^(-n) < ε / (sqrt(3) * 10)`.
     // This yields:  `n > log10(sqrt(3) * 5) - log10(ε)`.
     MALIPUT_DEMAND(rg->linear_tolerance() > 0.);
-    const int precision = std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) - std::log10(rg->linear_tolerance())));
 
     std::ofstream os(dirpath + "/" + obj_filename, std::ios::binary);
     fmt::print(os,
@@ -1001,7 +1001,7 @@ mtllib {}
        << "# DON'T BE A HERO.  Do not edit by hand.\n\n";
     for (const auto& matPair : meshes) {
       const Material& mat = matPair.second.second;
-      os << FormatMaterial(mat);
+      os << FormatMaterial(mat, precision);
     }
   }
 }

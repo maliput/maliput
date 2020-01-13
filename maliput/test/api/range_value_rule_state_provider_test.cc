@@ -21,7 +21,7 @@ class MockRangeValueRuleStateProvider : public RangeValueRuleStateProvider {
   static RangeValueRule::Range MakeNextRange();
 
  private:
-  drake::optional<StateResult> DoGetState(const Rule::Id& id) const override {
+  std::optional<StateResult> DoGetState(const Rule::Id& id) const override {
     if (id == kRuleId) {
       return StateResult{MakeCurrentRange(), StateResult::Next{MakeNextRange(), {123.456} /* duration */}};
     }
@@ -51,7 +51,7 @@ RangeValueRule::Range MockRangeValueRuleStateProvider::MakeNextRange() {
 
 GTEST_TEST(RangeValueRuleStateProviderTest, ExerciseInterface) {
   const MockRangeValueRuleStateProvider dut;
-  const drake::optional<RangeValueRuleStateProvider::StateResult> result =
+  const std::optional<RangeValueRuleStateProvider::StateResult> result =
       dut.GetState(MockRangeValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());

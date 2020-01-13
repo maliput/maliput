@@ -1,7 +1,8 @@
 #pragma once
 
+#include <optional>
+
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/rule.h"
@@ -25,14 +26,14 @@ class RangeValueRuleStateProvider {
   /// Gets the state of the RangeValueRule identified by `id`.
   ///
   /// Returns a StateResult struct bearing the state of the rule with the
-  /// specified `id`. If `id` is unrecognized, drake::nullopt is returned.
-  drake::optional<StateResult> GetState(const Rule::Id& id) const { return DoGetState(id); }
+  /// specified `id`. If `id` is unrecognized, std::nullopt is returned.
+  std::optional<StateResult> GetState(const Rule::Id& id) const { return DoGetState(id); }
 
  protected:
   RangeValueRuleStateProvider() = default;
 
  private:
-  virtual drake::optional<StateResult> DoGetState(const Rule::Id& id) const = 0;
+  virtual std::optional<StateResult> DoGetState(const Rule::Id& id) const = 0;
 };
 
 }  // namespace rules

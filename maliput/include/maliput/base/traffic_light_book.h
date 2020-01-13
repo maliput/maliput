@@ -1,10 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/drake_optional.h"
 #include "maliput/api/rules/traffic_light_book.h"
 #include "maliput/api/rules/traffic_lights.h"
 

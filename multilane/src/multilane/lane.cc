@@ -31,7 +31,7 @@ const api::LaneEndSet* Lane::DoGetOngoingBranches(api::LaneEnd::Which which_end)
   return GetBranchPoint(which_end)->GetOngoingBranches({this, which_end});
 }
 
-drake::optional<api::LaneEnd> Lane::DoGetDefaultBranch(api::LaneEnd::Which which_end) const {
+std::optional<api::LaneEnd> Lane::DoGetDefaultBranch(api::LaneEnd::Which which_end) const {
   return GetBranchPoint(which_end)->GetDefaultBranch({this, which_end});
 }
 
