@@ -2,8 +2,8 @@
 
 #include <map>
 #include <utility>
-#include <variant>
 #include <vector>
+#include <variant>
 
 #include "drake/common/drake_copyable.h"
 
@@ -31,14 +31,14 @@ using RangeValueRuleTypeAndValues = std::pair<Rule::TypeId, std::vector<RangeVal
 /// validation when building rule instances.
 class RuleRegistry {
  public:
-  /// Contains rule type information.
+  /// Holds a rule type information for a query.
   struct QueryResult {
-    using Ranges = std::vector<RangeValueRule::Range>;                     //--CHECK
-    using DiscreteValues = std::vector<DiscreteValueRule::DiscreteValue>;  //--CHECK
+    using Ranges = std::vector<RangeValueRule::Range>;
+    using DiscreteValues = std::vector<DiscreteValueRule::DiscreteValue>;
 
     Rule::TypeId type_id;
-    /// Variant to contain whether ranges of a RangeValueRule or discrete values of a DiscreteValueRule.
-    std::variant<std::vector<RangeValueRule::Range>, std::vector<DiscreteValueRule::DiscreteValue>> rule_values;
+    /// Holds either `Ranges` or `DiscreteValues` for the rule type.
+    std::variant<Ranges, DiscreteValues> rule_values;
   };
 
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RuleRegistry);

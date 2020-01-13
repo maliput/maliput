@@ -12,6 +12,32 @@
 #include "maliput/common/maliput_hash.h"
 #include "maliput/common/maliput_throw.h"
 
+namespace {
+
+using IdVariant = std::variant<maliput::api::rules::RightOfWayRule::Id, maliput::api::rules::SpeedLimitRule::Id,
+                               maliput::api::rules::DirectionUsageRule::Id, maliput::api::rules::Rule::Id>;
+}  // namespace
+
+namespace std {
+
+template <class HashAlgorithm>
+void hash_append(HashAlgorithm& hasher, const IdVariant& item) noexcept {
+  using maliput::common::hash_append;
+  if (std::get_if<maliput::api::rules::RightOfWayRule::Id>(&item)) {
+    hash_append(hasher, std::get<maliput::api::rules::RightOfWayRule::Id>(item));
+  }
+  if (std::get_if<maliput::api::rules::SpeedLimitRule::Id>(&item)) {
+    hash_append(hasher, std::get<maliput::api::rules::SpeedLimitRule::Id>(item));
+  }
+  if (std::get_if<maliput::api::rules::DirectionUsageRule::Id>(&item)) {
+    hash_append(hasher, std::get<maliput::api::rules::DirectionUsageRule::Id>(item));
+  }
+  if (std::get_if<maliput::api::rules::Rule::Id>(&item)) {
+    hash_append(hasher, std::get<maliput::api::rules::Rule::Id>(item));
+  }
+}
+
+}  // namespace std
 namespace maliput {
 
 using api::LaneId;
@@ -25,33 +51,6 @@ using api::rules::Rule;
 using api::rules::SpeedLimitRule;
 
 using QueryResults = api::rules::RoadRulebook::QueryResults;
-
-namespace {
-
-struct IdVariant {
-  std::variant<RightOfWayRule::Id, SpeedLimitRule::Id, DirectionUsageRule::Id, Rule::Id> rule;
-
-  template <class HashAlgorithm>
-  friend void hash_append(HashAlgorithm& hasher, const IdVariant& item) noexcept {
-    using maliput::common::hash_append;
-    if (std::get_if<RightOfWayRule::Id>(&item.rule)) {
-      hash_append(hasher, std::get<RightOfWayRule::Id>(item.rule));
-    }
-    if (std::get_if<SpeedLimitRule::Id>(&item.rule)) {
-      hash_append(hasher, std::get<SpeedLimitRule::Id>(item.rule));
-    }
-    if (std::get_if<DirectionUsageRule::Id>(&item.rule)) {
-      hash_append(hasher, std::get<DirectionUsageRule::Id>(item.rule));
-    }
-    if (std::get_if<Rule::Id>(&item.rule)) {
-      hash_append(hasher, std::get<Rule::Id>(item.rule));
-    }
-  }
-};
-
-bool operator==(const IdVariant& lhs, const IdVariant& rhs) { return (lhs.rule == rhs.rule); }
-
-}  // namespace
 
 class ManualRulebook::Impl {
  public:
@@ -115,24 +114,23 @@ class ManualRulebook::Impl {
     QueryResults result;
     for (const LaneSRange& range : ranges) {
       for (const IdVariant& id : index_->FindRules(range, tolerance)) {
-        if (std::get_if<RightOfWayRule::Id>(&id.rule)) {
-          result.right_of_way.emplace(std::get<RightOfWayRule::Id>(id.rule),
-                                      right_of_ways_.at(std::get<RightOfWayRule::Id>(id.rule)));
-        } else if (std::get_if<SpeedLimitRule::Id>(&id.rule)) {
-          result.speed_limit.emplace(std::get<SpeedLimitRule::Id>(id.rule),
-                                     speed_limits_.at(std::get<SpeedLimitRule::Id>(id.rule)));
-        } else if (std::get_if<DirectionUsageRule::Id>(&id.rule)) {
-          result.direction_usage.emplace(std::get<DirectionUsageRule::Id>(id.rule),
-                                         direction_usage_rules_.at(std::get<DirectionUsageRule::Id>(id.rule)));
-        } else if (std::get_if<Rule::Id>(&id.rule)) {
-          if (range_value_rules_.find(std::get<Rule::Id>(id.rule)) != range_value_rules_.end()) {
-            result.range_value_rules.emplace(std::get<Rule::Id>(id.rule),
-                                             range_value_rules_.at(std::get<Rule::Id>(id.rule)));
-          } else if (discrete_value_rules_.find(std::get<Rule::Id>(id.rule)) != discrete_value_rules_.end()) {
-            result.discrete_value_rules.emplace(std::get<Rule::Id>(id.rule),
-                                                discrete_value_rules_.at(std::get<Rule::Id>(id.rule)));
+        if (std::get_if<RightOfWayRule::Id>(&id)) {
+          result.right_of_way.emplace(std::get<RightOfWayRule::Id>(id),
+                                      right_of_ways_.at(std::get<RightOfWayRule::Id>(id)));
+        } else if (std::get_if<SpeedLimitRule::Id>(&id)) {
+          result.speed_limit.emplace(std::get<SpeedLimitRule::Id>(id),
+                                     speed_limits_.at(std::get<SpeedLimitRule::Id>(id)));
+        } else if (std::get_if<DirectionUsageRule::Id>(&id)) {
+          result.direction_usage.emplace(std::get<DirectionUsageRule::Id>(id),
+                                         direction_usage_rules_.at(std::get<DirectionUsageRule::Id>(id)));
+        } else if (std::get_if<Rule::Id>(&id)) {
+          if (range_value_rules_.find(std::get<Rule::Id>(id)) != range_value_rules_.end()) {
+            result.range_value_rules.emplace(std::get<Rule::Id>(id), range_value_rules_.at(std::get<Rule::Id>(id)));
+          } else if (discrete_value_rules_.find(std::get<Rule::Id>(id)) != discrete_value_rules_.end()) {
+            result.discrete_value_rules.emplace(std::get<Rule::Id>(id),
+                                                discrete_value_rules_.at(std::get<Rule::Id>(id)));
           } else {
-            throw std::out_of_range("IdVariant::rule:" + std::get<Rule::Id>(id.rule).string() + " could not be found.");
+            throw std::out_of_range("IdVariant::rule:" + std::get<Rule::Id>(id).string() + " could not be found.");
           }
         } else {
           std::stringstream s;

@@ -1,7 +1,8 @@
 #include "maliput/base/rule_registry_loader.h"
+
 #include <fstream>
-#include <variant>
 #include <fmt/format.h>
+#include <variant>
 #include "fmt/ostream.h"
 
 #include <gtest/gtest.h>
@@ -93,7 +94,7 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
     EXPECT_TRUE(right_of_way_rule_states.has_value());
     EXPECT_EQ(right_of_way_rule_states->type_id, RightOfWayRuleTypeId());
     const auto discrete_values_ptr =
-        std::get_if<std::vector<api::rules::DiscreteValueRule::DiscreteValue>>(&right_of_way_rule_states->rule_values);
+        std::get_if<api::rules::RuleRegistry::QueryResult::DiscreteValues>(&right_of_way_rule_states->rule_values);
     EXPECT_NE(discrete_values_ptr, nullptr);
 
     for (const auto& discrete_value : *discrete_values_ptr) {
@@ -123,8 +124,8 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
         rule_registry->GetPossibleStatesOfRuleType(DirectionUsageRuleTypeId());
     EXPECT_TRUE(direction_usage_rule_states.has_value());
     EXPECT_EQ(direction_usage_rule_states->type_id, DirectionUsageRuleTypeId());
-    const auto discrete_values_ptr = std::get_if<std::vector<api::rules::DiscreteValueRule::DiscreteValue>>(
-        &direction_usage_rule_states->rule_values);
+    const auto discrete_values_ptr =
+        std::get_if<api::rules::RuleRegistry::QueryResult::DiscreteValues>(&direction_usage_rule_states->rule_values);
     EXPECT_NE(discrete_values_ptr, nullptr);
 
     for (const auto& discrete_value : *discrete_values_ptr) {
@@ -155,7 +156,7 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
     EXPECT_TRUE(speed_limit_rule_states.has_value());
     EXPECT_EQ(speed_limit_rule_states->type_id, SpeedLimitRuleTypeId());
     const auto range_values_ptr =
-        std::get_if<std::vector<api::rules::RangeValueRule::Range>>(&speed_limit_rule_states->rule_values);
+        std::get_if<api::rules::RuleRegistry::QueryResult::Ranges>(&speed_limit_rule_states->rule_values);
     EXPECT_NE(range_values_ptr, nullptr);
 
     for (const auto& range_value : *range_values_ptr) {
