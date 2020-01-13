@@ -21,7 +21,10 @@ class SRange {
   SRange() = default;
 
   /// Constructs range [s0 --> s1].
-  SRange(double s0, double s1) : s0_(s0), s1_(s1) {}
+  ///
+  /// @throws common::assertion_error When 's0' is less than zero.
+  /// @throws common::assertion_error When 's1' is less than zero.
+  SRange(double s0, double s1);
 
   /// Gets s0 value.
   double s0() const { return s0_; }
@@ -30,10 +33,14 @@ class SRange {
   double s1() const { return s1_; }
 
   /// Sets s0 value.
-  void set_s0(double s0) { s0_ = s0; }
+  ///
+  /// @throws common::assertion_error When 's0' is less than zero.
+  void set_s0(double s0);
 
   /// Sets s1 value.
-  void set_s1(double s1) { s1_ = s1; }
+  ///
+  /// @throws common::assertion_error When 's1' is less than zero.
+  void set_s1(double s1);
 
   /// Returns the size of this SRange (i.e., |s1() - s0()|).
   double size() const { return std::fabs(s1() - s0()); }
