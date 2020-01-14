@@ -22,8 +22,8 @@ class SRange {
 
   /// Constructs range [s0 --> s1].
   ///
-  /// @throws common::assertion_error When 's0' is less than zero.
-  /// @throws common::assertion_error When 's1' is less than zero.
+  /// @throws common::assertion_error When 's0' is negative.
+  /// @throws common::assertion_error When 's1' is negative.
   SRange(double s0, double s1);
 
   /// Gets s0 value.
@@ -34,12 +34,12 @@ class SRange {
 
   /// Sets s0 value.
   ///
-  /// @throws common::assertion_error When 's0' is less than zero.
+  /// @throws common::assertion_error When 's0' is negative.
   void set_s0(double s0);
 
   /// Sets s1 value.
   ///
-  /// @throws common::assertion_error When 's1' is less than zero.
+  /// @throws common::assertion_error When 's1' is negative.
   void set_s1(double s1);
 
   /// Returns the size of this SRange (i.e., |s1() - s0()|).
