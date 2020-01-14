@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "maliput/api/rules/phase.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -78,6 +79,24 @@ std::vector<Intersection*> IntersectionBook::FindIntersections(const std::vector
     }
   }
   return intersections;
+}
+
+api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::TrafficLight::Id& id) {
+  for (const auto& intersection : GetIntersections()) {
+    if (intersection->Includes(id)) {
+      return intersection;
+    }
+  }
+  return nullptr;
+}
+
+api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) {
+  for (const auto& intersection : GetIntersections()) {
+    if (intersection->Includes(id)) {
+      return intersection;
+    }
+  }
+  return nullptr;
 }
 
 }  // namespace maliput

@@ -60,11 +60,26 @@ class Intersection {
   /// Returns the current bulb states within the intersection.
   const std::optional<rules::BulbStates> bulb_states() const;
 
+  /// Returns the current discrete value rule states within the intersection.
+  const std::optional<rules::DiscreteValueRuleStates> DiscreteValueRuleStates() const;
+
+  /// Determines whether the rules::TrafficLight::Id is within this Intersection.
+  ///
+  /// @param id A rules::TrafficLight::Id.
+  /// @returns True When `id` is within this Intersection.
+  bool Includes(const rules::TrafficLight::Id& id) const;
+
+  /// Determines whether the rules::DiscreteValueRule::Id is within this Intersection.
+  ///
+  /// @param id A rules::DiscreteValueRule::Id.
+  /// @returns True When `id` is within this Intersection.
+  bool Includes(const rules::DiscreteValueRule::Id& id) const;
+
   /// Determines whether `geo_position` is within this Intersection::Region().
   ///
   /// @param geo_position A GeoPosition in the World Frame.
   /// @param road_geometry The RoadGeometry where Intersection::Region() is contained. It must not be nullptr.
-  /// @returns True when `geo_position` is within Intersection::Region(). `geo_position` is contained if
+  /// @returns True When `geo_position` is within Intersection::Region(). `geo_position` is contained if
   /// the distance to the closest LanePosition in Intersection::Region() is less or equal than the linear tolerance of
   /// the `road_geometry`.
   ///

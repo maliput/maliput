@@ -474,6 +474,9 @@ class MockIntersectionBook final : public IntersectionBook {
     }
     return nullptr;
   }
+  api::Intersection* DoGetFindIntersection(const api::rules::TrafficLight::Id& id) override { return nullptr; };
+
+  api::Intersection* DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) override { return nullptr; };
 
   MockIntersection intersection_;
 };
