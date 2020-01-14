@@ -61,7 +61,7 @@ class Intersection {
   const std::optional<rules::BulbStates> bulb_states() const;
 
   /// Returns the current discrete value rule states within the intersection.
-  const drake::optional<rules::DiscreteValueRuleStates> DiscreteValueRuleStates() const;
+  const std::optional<rules::DiscreteValueRuleStates> DiscreteValueRuleStates() const;
 
   /// Determines whether the rules::TrafficLight::Id is within this Intersection.
   ///

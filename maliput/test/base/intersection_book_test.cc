@@ -108,20 +108,18 @@ class IntersectionBookTest : public ::testing::Test {
   const double kTolerance = 1e-3;
 
   IntersectionBookTest() {
-    phase_provider_1.AddPhaseRing(kPhaseRing1.id(), kPhase1.id());
-    phase_provider_2.AddPhaseRing(kPhaseRing2.id(), kPhase2.id());
-    phase_provider_3.AddPhaseRing(kPhaseRing3.id(), kPhase3.id());
-    auto intersection_a = std::make_unique<Intersection>(kIntersectionIdA, region_a, kPhaseRing1, &phase_provider_1);
-    auto intersection_b = std::make_unique<Intersection>(kIntersectionIdB, region_b, kPhaseRing2, &phase_provider_2);
-    auto intersection_c = std::make_unique<Intersection>(kIntersectionIdC, region_c, kPhaseRing3, &phase_provider_3);
+    phase_provider.AddPhaseRing(kPhaseRing1.id(), kPhase1.id());
+    phase_provider.AddPhaseRing(kPhaseRing2.id(), kPhase2.id());
+    phase_provider.AddPhaseRing(kPhaseRing3.id(), kPhase3.id());
+    auto intersection_a = std::make_unique<Intersection>(kIntersectionIdA, region_a, kPhaseRing1, &phase_provider);
+    auto intersection_b = std::make_unique<Intersection>(kIntersectionIdB, region_b, kPhaseRing2, &phase_provider);
+    auto intersection_c = std::make_unique<Intersection>(kIntersectionIdC, region_c, kPhaseRing3, &phase_provider);
     intersection_book.AddIntersection(std::move(intersection_a));
     intersection_book.AddIntersection(std::move(intersection_b));
     intersection_book.AddIntersection(std::move(intersection_c));
   }
 
-  ManualPhaseProvider phase_provider_1;
-  ManualPhaseProvider phase_provider_2;
-  ManualPhaseProvider phase_provider_3;
+  ManualPhaseProvider phase_provider;
   IntersectionBook intersection_book;
 };
 

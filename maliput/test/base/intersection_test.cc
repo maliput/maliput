@@ -41,11 +41,11 @@ class IntersectionTest : public ::testing::Test {
   const api::rules::TrafficLight::Id traffic_light{"traffic_light"};
   const api::rules::UniqueBulbId unique_bulb_id{traffic_light, api::rules::BulbGroup::Id("bulb_group"),
                                                 api::rules::Bulb::Id("bulb")};
-  const drake::optional<api::rules::BulbStates> bulb_states_1_ =
-      drake::optional<api::rules::BulbStates>({{unique_bulb_id, api::rules::BulbState::kOff}});
+  const std::optional<api::rules::BulbStates> bulb_states_1_ =
+      std::optional<api::rules::BulbStates>({{unique_bulb_id, api::rules::BulbState::kOff}});
 
-  const drake::optional<api::rules::BulbStates> bulb_states_2_ =
-      drake::optional<api::rules::BulbStates>({{unique_bulb_id, api::rules::BulbState::kOn}});
+  const std::optional<api::rules::BulbStates> bulb_states_2_ =
+      std::optional<api::rules::BulbStates>({{unique_bulb_id, api::rules::BulbState::kOn}});
 
   const api::rules::Phase dummy_phase_1_;
   const api::rules::Phase dummy_phase_2_;
