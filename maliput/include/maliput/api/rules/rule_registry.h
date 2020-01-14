@@ -2,8 +2,8 @@
 
 #include <map>
 #include <utility>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #include "drake/common/drake_copyable.h"
 

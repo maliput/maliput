@@ -1,8 +1,8 @@
 #include "maliput/base/rule_registry_loader.h"
 
 #include <fstream>
-#include <fmt/format.h>
 #include <variant>
+#include <fmt/format.h>
 #include "fmt/ostream.h"
 
 #include <gtest/gtest.h>

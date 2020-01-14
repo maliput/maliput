@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <variant>
 
 #include "maliput/api/rules/rule.h"
 #include "maliput/common/maliput_hash.h"
