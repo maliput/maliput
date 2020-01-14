@@ -108,31 +108,31 @@ class IntersectionBookTest : public ::testing::Test {
   const double kTolerance = 1e-3;
 
   IntersectionBookTest() {
-    phase_provider.AddPhaseRing(kPhaseRing1.id(), kPhase1.id());
-    phase_provider.AddPhaseRing(kPhaseRing2.id(), kPhase2.id());
-    phase_provider.AddPhaseRing(kPhaseRing3.id(), kPhase3.id());
-    auto intersection_a = std::make_unique<Intersection>(kIntersectionIdA, region_a, kPhaseRing1, &phase_provider);
-    auto intersection_b = std::make_unique<Intersection>(kIntersectionIdB, region_b, kPhaseRing2, &phase_provider);
-    auto intersection_c = std::make_unique<Intersection>(kIntersectionIdC, region_c, kPhaseRing3, &phase_provider);
-    intersection_book.AddIntersection(std::move(intersection_a));
-    intersection_book.AddIntersection(std::move(intersection_b));
-    intersection_book.AddIntersection(std::move(intersection_c));
+    phase_provider_.AddPhaseRing(kPhaseRing1.id(), kPhase1.id());
+    phase_provider_.AddPhaseRing(kPhaseRing2.id(), kPhase2.id());
+    phase_provider_.AddPhaseRing(kPhaseRing3.id(), kPhase3.id());
+    auto intersection_a = std::make_unique<Intersection>(kIntersectionIdA, region_a, kPhaseRing1, &phase_provider_);
+    auto intersection_b = std::make_unique<Intersection>(kIntersectionIdB, region_b, kPhaseRing2, &phase_provider_);
+    auto intersection_c = std::make_unique<Intersection>(kIntersectionIdC, region_c, kPhaseRing3, &phase_provider_);
+    intersection_book_.AddIntersection(std::move(intersection_a));
+    intersection_book_.AddIntersection(std::move(intersection_b));
+    intersection_book_.AddIntersection(std::move(intersection_c));
   }
 
-  ManualPhaseProvider phase_provider;
-  IntersectionBook intersection_book;
+  ManualPhaseProvider phase_provider_;
+  IntersectionBook intersection_book_;
 };
 
 TEST_F(IntersectionBookTest, FindIntersections) {
-  EXPECT_EQ(intersection_book.FindIntersections({}, kTolerance).size(), 0);
+  EXPECT_EQ(intersection_book_.FindIntersections({}, kTolerance).size(), 0);
   {
-    const std::vector<maliput::api::Intersection*> dut{intersection_book.FindIntersections(region_a, kTolerance)};
+    const std::vector<maliput::api::Intersection*> dut{intersection_book_.FindIntersections(region_a, kTolerance)};
     EXPECT_EQ(dut.size(), 2);
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdA));
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdC));
   }
   {
-    const std::vector<maliput::api::Intersection*> dut(intersection_book.FindIntersections(region_c, kTolerance));
+    const std::vector<maliput::api::Intersection*> dut(intersection_book_.FindIntersections(region_c, kTolerance));
     EXPECT_EQ(dut.size(), 3);
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdA));
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdB));
@@ -140,22 +140,22 @@ TEST_F(IntersectionBookTest, FindIntersections) {
   }
   {
     const std::vector<maliput::api::Intersection*> dut(
-        intersection_book.FindIntersections({LaneSRange{api::LaneId{"lane_c_1"}, api::SRange{0., 10.}}}, kTolerance));
+        intersection_book_.FindIntersections({LaneSRange{api::LaneId{"lane_c_1"}, api::SRange{0., 10.}}}, kTolerance));
     EXPECT_EQ(dut.size(), 1);
     EXPECT_EQ(dut[0]->id(), kIntersectionIdC);
   }
 }
 
 TEST_F(IntersectionBookTest, FindIntersectionByTrafficLightId) {
-  EXPECT_EQ(intersection_book.FindIntersection(kTrafficLightIdAPhase1)->id(), kIntersectionIdA);
-  EXPECT_EQ(intersection_book.FindIntersection(kTrafficLightIdBPhase2)->id(), kIntersectionIdB);
-  EXPECT_EQ(intersection_book.FindIntersection(kTrafficLightIdAPhase3)->id(), kIntersectionIdC);
+  EXPECT_EQ(intersection_book_.FindIntersection(kTrafficLightIdAPhase1)->id(), kIntersectionIdA);
+  EXPECT_EQ(intersection_book_.FindIntersection(kTrafficLightIdBPhase2)->id(), kIntersectionIdB);
+  EXPECT_EQ(intersection_book_.FindIntersection(kTrafficLightIdAPhase3)->id(), kIntersectionIdC);
 }
 
 TEST_F(IntersectionBookTest, FindIntersectionByDiscreteValueRuleId) {
-  EXPECT_EQ(intersection_book.FindIntersection(kDiscreteValueRuleIdAPhase1)->id(), Intersection::Id(kIntersectionIdA));
-  EXPECT_EQ(intersection_book.FindIntersection(kDiscreteValueRuleIdBPhase2)->id(), Intersection::Id(kIntersectionIdB));
-  EXPECT_EQ(intersection_book.FindIntersection(kDiscreteValueRuleIdAPhase3)->id(), Intersection::Id(kIntersectionIdC));
+  EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdAPhase1)->id(), Intersection::Id(kIntersectionIdA));
+  EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdBPhase2)->id(), Intersection::Id(kIntersectionIdB));
+  EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdAPhase3)->id(), Intersection::Id(kIntersectionIdC));
 }
 
 }  // namespace
