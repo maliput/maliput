@@ -42,18 +42,24 @@ GTEST_TEST(SRangeTest, NondefaultConstructionAndAccessors) {
   }
   // Inverted order is allowed and preserved:
   {
-    SRange dut(79., 23.);
+    const SRange dut(79., 23.);
     EXPECT_EQ(dut.s0(), 79.);
     EXPECT_EQ(dut.s1(), 23.);
+  }
+  {
+    EXPECT_THROW(SRange(-10., 50.);, common::assertion_error);
+    EXPECT_THROW(SRange(10., -50.);, common::assertion_error);
   }
 }
 
 GTEST_TEST(SRangeTest, Setters) {
   SRange dut;
   dut.set_s0(26.);
-  dut.set_s1(-90.);
+  dut.set_s1(90.);
   EXPECT_EQ(dut.s0(), 26.);
-  EXPECT_EQ(dut.s1(), -90.);
+  EXPECT_EQ(dut.s1(), 90.);
+  EXPECT_THROW(dut.set_s0(-90.), common::assertion_error);
+  EXPECT_THROW(dut.set_s1(-90.), common::assertion_error);
 }
 
 GTEST_TEST(SRangeTest, Copying) {
@@ -72,14 +78,14 @@ GTEST_TEST(SRangeTest, Assignment) {
 GTEST_TEST(SRangeTest, Size) {
   const SRange dut1(2., 5.);
   EXPECT_EQ(dut1.size(), 3.);
-  const SRange dut2(5., -2.);
-  EXPECT_EQ(dut2.size(), 7.);
+  const SRange dut2(50., 2.);
+  EXPECT_EQ(dut2.size(), 48.);
 }
 
 GTEST_TEST(SRangeTest, WithS) {
   const SRange dut1(2., 5.);
   EXPECT_TRUE(dut1.WithS());
-  const SRange dut2(5., -2.);
+  const SRange dut2(5., 2.);
   EXPECT_FALSE(dut2.WithS());
   const SRange dut3(6., 6.);
   EXPECT_FALSE(dut3.WithS());

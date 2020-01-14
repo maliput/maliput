@@ -31,20 +31,35 @@ bool IsContiguous(const LaneSRange& lane_range_a, const LaneSRange& lane_range_b
          lane_a_rot.Distance(lane_b_rot) < road_geometry->angular_tolerance();
 }
 
+SRange::SRange(double s0, double s1) : s0_(s0), s1_(s1) {
+  MALIPUT_THROW_UNLESS(s0_ >= 0);
+  MALIPUT_THROW_UNLESS(s1_ >= 0);
+}
+
+void SRange::set_s0(double s0) {
+  MALIPUT_THROW_UNLESS(s0 >= 0);
+  s0_ = s0;
+}
+
+void SRange::set_s1(double s1) {
+  MALIPUT_THROW_UNLESS(s1 >= 0);
+  s1_ = s1;
+}
+
 bool SRange::Intersects(const SRange& s_range, double tolerance) const {
   MALIPUT_THROW_UNLESS(std::min(s0(), s1()) >= 0 && std::min(s_range.s0(), s_range.s1()) >= 0);
   if (tolerance < 0.) {
     // When it is negative, tolerance's absolute value can not be bigger than half size of minor SRange.
     MALIPUT_THROW_UNLESS(std::min(size(), s_range.size()) / 2. >= std::fabs(tolerance));
   }
-  const SRange wider_s_range(std::min(s0(), s1()) - tolerance, std::max(s0(), s1()) + tolerance);
+  const SRange wider_s_range(std::max(std::min(s0(), s1()) - tolerance, 0.), std::max(s0(), s1()) + tolerance);
   return !((std::max(s_range.s0(), s_range.s1()) < wider_s_range.s0()) ||
            (std::min(s_range.s0(), s_range.s1()) > wider_s_range.s1()));
 }
 
 std::optional<SRange> SRange::GetIntersection(const SRange& s_range, double tolerance) const {
   if (Intersects(s_range, tolerance)) {
-    const SRange wider_s_range(std::min(s0(), s1()) - tolerance, std::max(s0(), s1()) + tolerance);
+    const SRange wider_s_range(std::max(std::min(s0(), s1()) - tolerance, 0.), std::max(s0(), s1()) + tolerance);
     const double max = std::max(s_range.s0(), s_range.s1()) >= wider_s_range.s1()
                            ? std::max(s0(), s1())
                            : std::max(s_range.s0(), s_range.s1());
