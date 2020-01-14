@@ -1,6 +1,7 @@
 #include "maliput/base/rule_registry_loader.h"
 
 #include <fstream>
+#include <variant>
 #include <fmt/format.h>
 #include "fmt/ostream.h"
 
@@ -92,8 +93,11 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
         rule_registry->GetPossibleStatesOfRuleType(RightOfWayRuleTypeId());
     EXPECT_TRUE(right_of_way_rule_states.has_value());
     EXPECT_EQ(right_of_way_rule_states->type_id, RightOfWayRuleTypeId());
-    EXPECT_TRUE(right_of_way_rule_states->discrete_values.has_value());
-    for (const auto& discrete_value : *(right_of_way_rule_states->discrete_values)) {
+    const auto discrete_values_ptr =
+        std::get_if<api::rules::RuleRegistry::QueryResult::DiscreteValues>(&right_of_way_rule_states->rule_values);
+    EXPECT_NE(discrete_values_ptr, nullptr);
+
+    for (const auto& discrete_value : *discrete_values_ptr) {
       if (discrete_value.value == "Go") {
         EXPECT_EQ(discrete_value.severity, kStrict);
         EXPECT_NE(discrete_value.related_rules.find(VehicleStopInZoneBehaviorRuleTypeId().string()),
@@ -120,9 +124,11 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
         rule_registry->GetPossibleStatesOfRuleType(DirectionUsageRuleTypeId());
     EXPECT_TRUE(direction_usage_rule_states.has_value());
     EXPECT_EQ(direction_usage_rule_states->type_id, DirectionUsageRuleTypeId());
-    EXPECT_TRUE(direction_usage_rule_states->discrete_values.has_value());
+    const auto discrete_values_ptr =
+        std::get_if<api::rules::RuleRegistry::QueryResult::DiscreteValues>(&direction_usage_rule_states->rule_values);
+    EXPECT_NE(discrete_values_ptr, nullptr);
 
-    for (const auto& discrete_value : *(direction_usage_rule_states->discrete_values)) {
+    for (const auto& discrete_value : *discrete_values_ptr) {
       if (discrete_value.value == "Bidirectional") {
         EXPECT_EQ(discrete_value.severity, kStrict);
         EXPECT_EQ(discrete_value.related_rules.size(), 0);
@@ -149,9 +155,11 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
         rule_registry->GetPossibleStatesOfRuleType(SpeedLimitRuleTypeId());
     EXPECT_TRUE(speed_limit_rule_states.has_value());
     EXPECT_EQ(speed_limit_rule_states->type_id, SpeedLimitRuleTypeId());
-    EXPECT_TRUE(speed_limit_rule_states->range_values.has_value());
+    const auto range_values_ptr =
+        std::get_if<api::rules::RuleRegistry::QueryResult::Ranges>(&speed_limit_rule_states->rule_values);
+    EXPECT_NE(range_values_ptr, nullptr);
 
-    for (const auto& range_value : *(speed_limit_rule_states->range_values)) {
+    for (const auto& range_value : *range_values_ptr) {
       if (range_value.description == "Interstate highway - day time") {
         EXPECT_DOUBLE_EQ(range_value.min, 16.6);
         EXPECT_DOUBLE_EQ(range_value.max, 27.8);
