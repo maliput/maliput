@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/autodiff.h"
-
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
@@ -16,8 +14,6 @@ static constexpr double kX0 = 23.;
 static constexpr double kX1 = 75.;
 static constexpr double kX2 = 0.567;
 
-// TODO(jadecastro) Use CompareMatrices() to implement the
-// LanePositionT<T>::srh() accessor checks once AutoDiff supported.
 #define CHECK_ALL_LANE_POSITION_ACCESSORS(dut, _s, _r, _h) \
   do {                                                     \
     EXPECT_EQ(dut.s(), _s);                                \
@@ -35,7 +31,7 @@ static constexpr double kX2 = 0.567;
 template <typename T>
 class LanePositionTest : public ::testing::Test {};
 
-typedef ::testing::Types<double, drake::AutoDiffXd> Implementations;
+typedef ::testing::Types<double> Implementations;
 TYPED_TEST_CASE(LanePositionTest, Implementations);
 
 TYPED_TEST(LanePositionTest, DefaultConstructor) {
@@ -93,8 +89,6 @@ TYPED_TEST(LanePositionTest, MakeDouble) {
 
 #undef CHECK_ALL_LANE_POSITION_ACCESSORS
 
-// TODO(jadecastro) Use CompareMatrices() to implement the
-// GeoPositionT<T>::xyz() accessor checks once AutoDiff supported.
 #define CHECK_ALL_GEO_POSITION_ACCESSORS(dut, _x, _y, _z) \
   do {                                                    \
     EXPECT_EQ(dut.x(), _x);                               \

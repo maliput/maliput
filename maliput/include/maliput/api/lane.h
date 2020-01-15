@@ -4,8 +4,6 @@
 #include <optional>
 #include <string>
 
-#include "drake/common/autodiff.h"
-
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
@@ -110,17 +108,9 @@ class Lane {
   /// structures `LanePositionT<T>` and `GeoPositionT<T>` are used in place of
   /// `LanePosition` and `GeoPosition`, respectively.
   ///
-  /// When the arguments are of type drake::AutoDiffXd, the return value is a
-  /// GeoPositionT<drake::AutoDiffXd> containing the same partial derivatives as those
-  /// appearing in lane_pos.  The provided lane_pos must be internally
-  /// consistent; the s, r, and h variables must have derivatives of equal size,
-  /// and where the i-th derivative of one variable is taken with respect to the
-  /// same quantity as the i-th derviative of another variable.
-  ///
   /// Instantiated templates for the following kinds of T's are provided:
   ///
   /// - double
-  /// - drake::AutoDiffXd
   ///
   /// They are already available to link against in the containing library.
   ///
@@ -140,29 +130,14 @@ class Lane {
   /// structures `LanePositionResultT<T>` and `GeoPositionT<T>` are used in
   /// place of `LanePositionResult` and `GeoPosition`, respectively.
   ///
-  /// When the arguments are of type drake::AutoDiffXd, the return value is a
-  /// LanePositionResultT<drake::AutoDiffXd> containing the same partial
-  /// derivatives as those appearing in `geo_pos`. The provided geo_pos must
-  /// be internally consistent; the x, y, and z variables must have derivatives
-  /// of equal size, and where the i-th derivative of one variable is taken
-  /// with respect to the same quantity as the i-th derivative of another
-  /// variable.
-  /// Result nearest position and distance will also contain @p geo_pos's
-  /// partial derivatives.
-  ///
   /// Instantiated templates for the following kinds of T's are provided:
   ///
   /// - double
-  /// - drake::AutoDiffXd
   ///
   /// They are already available to link against in the containing library.
   ///
   /// @note This is an experimental API that is not necessarily implemented in
   /// all back-end implementations.
-  //
-  // TODO(jadecastro): Consider having the client enforce the geo_pos drake::AutoDiffXd
-  // coherency contract rather than api::Lane.  Reevaluate this once an AutoDiff
-  // consumer for api::ToLanePositionT() exists.
   //
   // TODO(jadecastro): Apply this implementation in all the subclasses of
   // `api::Lane`.
@@ -257,21 +232,6 @@ class Lane {
   virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which which_end) const = 0;
 
   virtual std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
-
-  // drake::AutoDiffXd overload of DoToGeoPosition().
-  virtual GeoPositionT<drake::AutoDiffXd> DoToGeoPositionAutoDiff(const LanePositionT<drake::AutoDiffXd>&) const {
-    MALIPUT_THROW_MESSAGE(
-        "DoToGeoPosition has been instantiated with drake::AutoDiffXd arguments, "
-        "but a Lane backend has not overridden its drake::AutoDiffXd specialization.");
-  }
-
-  // drake::AutoDiffXd overload of DoToLanePosition().
-  virtual LanePositionResultT<drake::AutoDiffXd> DoToLanePositionAutoDiff(
-      const GeoPositionT<drake::AutoDiffXd>&) const {
-    MALIPUT_THROW_MESSAGE(
-        "DoToLanePosition has been instantiated with drake::AutoDiffXd arguments, "
-        "but a Lane backend has not overridden its drake::AutoDiffXd specialization.");
-  }
 
   // TODO(jadecastro): Template the entire `api::Lane` class to prevent explicit
   // virtual functions for each member function.

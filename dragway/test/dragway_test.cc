@@ -135,27 +135,6 @@ class MaliputDragwayLaneTest : public ::testing::Test {
           EXPECT_NEAR(geo_position.y(), expected.y_offset + r, linear_tolerance);
           EXPECT_DOUBLE_EQ(geo_position.z(), h);
 
-          // Tests Lane::ToGeoPositionAutoDiff().
-          // Seed lane_position with the partial derivatives
-          // ∂s/∂s = 1, ∂r/∂s = 0., ∂h/∂s = 0, etc.
-          drake::AutoDiffXd s_autodiff{s, drake::Vector3<double>(1., 0., 0.)};
-          drake::AutoDiffXd r_autodiff{r, drake::Vector3<double>(0., 1., 0.)};
-          drake::AutoDiffXd h_autodiff{h, drake::Vector3<double>(0., 0., 1.)};
-          api::LanePositionT<drake::AutoDiffXd> lane_position_ad{s_autodiff, r_autodiff, h_autodiff};
-
-          const api::GeoPositionT<drake::AutoDiffXd> geo_position_ad =
-              lane->ToGeoPositionT<drake::AutoDiffXd>(lane_position_ad);
-          EXPECT_DOUBLE_EQ(geo_position_ad.x().value(), s);
-          EXPECT_NEAR(geo_position_ad.y().value(), expected.y_offset + r, linear_tolerance);
-          EXPECT_DOUBLE_EQ(geo_position_ad.z().value(), h);
-
-          // For the s-coordinate, expect the following derivatives for
-          // geo_position: ∂x/∂s = 1, ∂y/∂s = 0., ∂z/∂s = 0 (the world x-y-z
-          // axis has the same orientation as Dragway's s-r-h axis).
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(1., 0., 0.), geo_position_ad.x().derivatives()));
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(0., 1., 0.), geo_position_ad.y().derivatives()));
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(0., 0., 1.), geo_position_ad.z().derivatives()));
-
           // Tests Lane::GetOrientation().
           const api::Rotation rotation = lane->GetOrientation(lane_position);
           EXPECT_TRUE(api::test::IsRotationClose(rotation, api::Rotation::FromRpy(0.0, 0.0, 0.0), kAngularTolerance));
@@ -272,22 +251,6 @@ class MaliputDragwayLaneTest : public ::testing::Test {
     x_test_cases_ = x_values;
     y_test_cases_ = y_values;
     z_test_cases_ = z_values;
-  }
-
-  std::vector<int> GetTransgressedBoundaries(const api::GeoPositionT<drake::AutoDiffXd>& geo_position) {
-    const int kXIndex = 0;
-    const int kYIndex = 1;
-    const int kZIndex = 2;
-
-    std::vector<int> result{};
-    const double x = geo_position.x().value();
-    if (x < min_x_ || x > max_x_) result.push_back(kXIndex);
-    const double y = geo_position.y().value();
-    if (y < min_y_ || y > max_y_) result.push_back(kYIndex);
-    const double z = geo_position.z().value();
-    if (z < min_z_ || z > max_z_) result.push_back(kZIndex);
-
-    return result;
   }
 
   std::unique_ptr<RoadGeometry> road_geometry_;
@@ -558,146 +521,6 @@ TEST_F(MaliputDragwayLaneTest, TestToLanePosition) {
       }
     }
   }
-}
-
-// Tests that drake::AutoDiffXd returns values whose sizes and values match what is
-// expected, and preserving any partial derivatives given to it.
-TEST_F(MaliputDragwayLaneTest, TestToLanePositionAutoDiff) {
-  MakeDragway(1 /* num lanes */);
-  PopulateGeoPositionTestCases();
-
-  for (const double x : x_test_cases_) {
-    for (const double y : y_test_cases_) {
-      for (const double z : z_test_cases_) {
-        // Define the partial derivatives with respect to geo_position's
-        // x-axis.  That is, seed geo_position with the partial derivatives
-        // ∂x/∂x = 1, ∂y/∂x = 0., ∂z/∂x = 0, etc.
-        drake::AutoDiffXd x_autodiff{x, drake::Vector3<double>(1., 0., 0.)};
-        drake::AutoDiffXd y_autodiff{y, drake::Vector3<double>(0., 1., 0.)};
-        drake::AutoDiffXd z_autodiff{z, drake::Vector3<double>(0., 0., 1.)};
-
-        api::GeoPositionT<drake::AutoDiffXd> geo_position{x_autodiff, y_autodiff, z_autodiff};
-
-        // Compute LanePositionT with and without the I/O arguments.
-        const api::LanePositionResultT<drake::AutoDiffXd> result =
-            lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position);
-
-        std::vector<drake::Vector3<double>> positional_derivatives{drake::Vector3<double>::Zero(),   // s
-                                                                   drake::Vector3<double>::Zero(),   // r
-                                                                   drake::Vector3<double>::Zero()};  // h
-        for (int i{0}; i < 3; ++i) positional_derivatives[i](i) = 1.;
-
-        if (result.distance == 0.) {
-          // `geo_position` is within the interior or on the boundary.
-          //
-          // For the x-coordinate, expect the following derivatives for
-          // lane_position within the interior: ∂s/∂x = 1, ∂r/∂x = 0., ∂h/∂x
-          // = 0 (Dragway's s-r-h axis has the same orientation as the x-y-z
-          // axis).  Verify that the derivatives of nearest position are the
-          // same as for geo_position.
-          for (int i{0}; i < 3; ++i) {
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], result.lane_position.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], result.nearest_position.xyz()(i).derivatives()));
-          }
-          // Expect ∂/∂x(distance) = 0., as distance remains unchanged when
-          // on the boundary or within the interior of the lane.
-          EXPECT_TRUE(CompareMatrices(drake::Vector3<double>::Zero(), result.distance.derivatives()));
-        } else {
-          // `geo_position` is outside of the lane.  In this case, the
-          // derivatives for distance and position depend on the region in
-          // which `geo_position` resides.
-          //
-          // For instance, take some (x, y, z) such that min_x ≮ x ≮ max_x,
-          // but min_y < y < max_y and min_z < z< max_z, then `geo_position`
-          // lies closest to the s-facet.  We expect ∂(distance)/∂x = 1 when x
-          // > max_x and -1 when x < min_x, but expect distance to be
-          // invariant to y and z (i.e. ∂(distance)/∂y = ∂(distance)/∂z = 0).
-          //
-          // We further expect
-          // ∂/∂x(lane_position.s()) = ∂/∂x(nearest_position.x()) = 0, but
-          // ∂/∂y(lane_position.r()) = ∂/∂y(nearest_position.y()) = 1 and
-          // ∂/∂z(lane_position.h()) = ∂/∂z(nearest_position.z()) = 1.
-          //
-          // The following diagram summarizes, slightly more generally, the
-          // expected behavior with respect to x and y when z = 0.  Note that
-          // we are depicting only the 2D subproblem for ease of
-          // visualization.
-          //
-          //  y                                      (+)  (+)  (#)
-          //  ^
-          //  |          y = max_y  -----------------(o)--(o)  (-)
-          //  |                     |                      |
-          //  +----> x              |     Dragway    (o)  (o)  (-)
-          //                        |                      |
-          //                        ------------------------
-          //                                               x = max_x
-          //
-          // Consider the points labeled above and let D = distance, LP =
-          // lane_position, NP = nearest_position.  The following should hold:
-          //
-          // (+):  ∂/∂x(D) = 0, ∂/∂y(D) = 1
-          //       ∂/∂x(LP.s()) = ∂/∂x(NP.x()) = 1
-          //       ∂/∂y(LP.r()) = ∂/∂y(NP.y()) = 0
-          // (-):  ∂/∂x(D) = 1, ∂/∂y(D) = 0
-          //       ∂/∂x(LP.s()) = ∂/∂x(NP.x()) = 0
-          //       ∂/∂y(LP.r()) = ∂/∂y(NP.y()) = 1
-          // (#):  ∂/∂x(D) = √2/2, ∂/∂y(D) = √2/2  (assuming # is equilateral)
-          //       ∂/∂x(LP.s()) = ∂/∂x(NP.x()) = 0
-          //       ∂/∂y(LP.r()) = ∂/∂y(NP.y()) = 0
-          // (o):  ∂/∂x(D) = 0, ∂/∂y(D) = 0
-          //       ∂/∂x(LP.s()) = ∂/∂x(NP.x()) = 1
-          //       ∂/∂y(LP.r()) = ∂/∂y(NP.y()) = 1
-          //       (Note these are the distance = 0 cases)
-          //
-          // The cross-derivatives ∂/∂y(LP.s()), ∂/∂y(NP.s()), ∂/∂x(LP.r()),
-          // ∂/∂x(NP.r()) should always be zero.  Similar principles apply
-          // in cases where z ≠ 0.
-          const drake::Vector3<double> derivative_candidates(
-              (x < min_x_) ? (x - min_x_) / result.distance.value() : (x - max_x_) / result.distance.value(),
-              (y < min_y_) ? (y - min_y_) / result.distance.value() : (y - max_y_) / result.distance.value(),
-              (z < min_z_) ? (z - min_z_) / result.distance.value() : (z - max_z_) / result.distance.value());
-          drake::Vector3<double> distance_derivatives = drake::Vector3<double>::Zero();
-
-          for (int index : GetTransgressedBoundaries(geo_position)) {
-            distance_derivatives(index) = derivative_candidates(index);
-            positional_derivatives[index](index) = 0.;  // (entry was = 1).
-          }
-          EXPECT_TRUE(CompareMatrices(distance_derivatives, result.distance.derivatives(),
-                                      1e-15 /* account for small numerical errors */));
-          for (int i{0}; i < 3; ++i) {
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], result.lane_position.srh()(i).derivatives()));
-            EXPECT_TRUE(CompareMatrices(positional_derivatives[i], result.nearest_position.xyz()(i).derivatives()));
-          }
-        }
-      }
-    }
-  }
-}
-
-TEST_F(MaliputDragwayLaneTest, ThrowIfGeoPosHasMismatchedDerivatives) {
-  MakeDragway(1 /* num lanes */);
-
-  // Expect the function to throw when given a triple whose derivatives have
-  // mismatched sizes.
-  drake::AutoDiffXd s{1., drake::Vector3<double>(1., 2., 3.)};
-  drake::AutoDiffXd r{5., drake::Vector2<double>(1., 2.)};
-  drake::AutoDiffXd h{7., drake::Vector1<double>(1.)};
-  api::LanePositionT<drake::AutoDiffXd> lane_position(s, r, h);
-
-  EXPECT_THROW(lane_->ToGeoPositionT<drake::AutoDiffXd>(lane_position), maliput::common::assertion_error);
-}
-
-TEST_F(MaliputDragwayLaneTest, ThrowIfLanePosHasMismatchedDerivatives) {
-  MakeDragway(1 /* num lanes */);
-
-  // Expect the function to throw when given a triple whose derivatives have
-  // mismatched sizes.
-  drake::AutoDiffXd x{1., drake::Vector3<double>(1., 2., 3.)};
-  drake::AutoDiffXd y{5., drake::Vector2<double>(1., 2.)};
-  drake::AutoDiffXd z{7., drake::Vector1<double>(1.)};
-  api::GeoPositionT<drake::AutoDiffXd> geo_position(x, y, z);
-
-  EXPECT_THROW(lane_->ToLanePositionT<drake::AutoDiffXd>(geo_position), common::assertion_error);
 }
 
 // Holds RoadPositionResult expected arguments.

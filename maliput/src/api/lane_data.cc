@@ -72,6 +72,6 @@ double Rotation::Distance(const Rotation& rot) const {
 }  // namespace api
 }  // namespace maliput
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_NONSYMBOLIC_SCALARS(class ::maliput::api::GeoPositionT)
+template class ::maliput::api::GeoPositionT<double>;
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_NONSYMBOLIC_SCALARS(class ::maliput::api::LanePositionT)
+template class ::maliput::api::LanePositionT<double>;
