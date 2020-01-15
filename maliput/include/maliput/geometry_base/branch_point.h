@@ -5,10 +5,10 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/passkey.h"
 #include "maliput/geometry_base/lane_end_set.h"
 
@@ -22,7 +22,7 @@ class RoadGeometry;
 /// geometry_base's implementation of api::BranchPoint.
 class BranchPoint : public api::BranchPoint {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BranchPoint);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BranchPoint);
 
   /// Constructs an empty BranchPoint.
   ///

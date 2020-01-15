@@ -3,13 +3,12 @@
 #include <memory>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/speed_limit_rule.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 
@@ -17,7 +16,7 @@ namespace maliput {
 /// api::rules::RoadRulebook abstract interface.
 class SimpleRulebook : public api::rules::RoadRulebook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(SimpleRulebook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(SimpleRulebook);
 
   /// Constructs an empty SimpleRulebook (i.e., containing no rules).
   SimpleRulebook();

@@ -3,13 +3,12 @@
 #include <optional>
 #include <unordered_map>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -32,7 +31,7 @@ using DiscreteValueRuleStates = std::unordered_map<Rule::Id, DiscreteValueRule::
 /// intersections.
 class Phase final {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Phase);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Phase);
 
   /// Unique identifier for a Phase.
   using Id = TypeSpecificIdentifier<Phase>;

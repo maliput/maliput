@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/intersection.h"
 #include "maliput/api/rules/traffic_lights.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -13,7 +13,7 @@ namespace api {
 /// Intersection.
 class IntersectionBook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(IntersectionBook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(IntersectionBook);
 
   virtual ~IntersectionBook() = default;
 

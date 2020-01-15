@@ -1,9 +1,8 @@
 #pragma once
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -31,7 +30,7 @@ class SpeedLimitRule {
                   ///  reflecting a road condition (e.g., a sharp curve).
   };
 
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(SpeedLimitRule);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(SpeedLimitRule);
 
   /// Constructs a SpeedLimitRule.
   ///

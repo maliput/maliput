@@ -78,7 +78,7 @@
 
 #else  // HAVE_SPDLOG
 
-#include "drake/common/drake_copyable.h"
+#include "maliput/common/maliput_copyable.h"
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -109,7 +109,7 @@ constexpr bool kHaveSpdlog = false;
 /// spdlog's API does change from time to time.
 class Logger {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Logger)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Logger)
 
   Logger() = default;
 
@@ -143,7 +143,7 @@ class Logger {
 // A stubbed-out version of `spdlog::sinks::sink`.
 class Sink {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Sink)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Sink)
   Sink() = default;
 };
 

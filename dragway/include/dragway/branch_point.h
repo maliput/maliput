@@ -5,10 +5,10 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace dragway {
@@ -20,7 +20,7 @@ class Lane;
 /// to itself, this LaneEndSet only contains one api::LaneEnd.
 class LaneEndSet final : public api::LaneEndSet {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet)
 
   explicit LaneEndSet(const api::Lane* lane, api::LaneEnd::Which which_end) : end_(lane, which_end) {}
 
@@ -37,7 +37,7 @@ class LaneEndSet final : public api::LaneEndSet {
 /// Dragway's implementation of api::BranchPoint.
 class BranchPoint final : public api::BranchPoint {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BranchPoint)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BranchPoint)
 
   /// Constructs a fully initialized BranchPoint for a Dragway lane.
   ///

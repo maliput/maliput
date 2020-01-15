@@ -2,16 +2,16 @@
 
 #include <memory>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/intersection.h"
 #include "maliput/api/intersection_book.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 
 /// A concrete implementation of the api::IntersectionBook abstract interface.
 class IntersectionBook : public api::IntersectionBook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(IntersectionBook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(IntersectionBook);
 
   IntersectionBook();
 

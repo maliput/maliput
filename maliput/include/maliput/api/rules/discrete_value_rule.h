@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -21,7 +20,7 @@ namespace rules {
 /// be in.
 class DiscreteValueRule : public Rule {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DiscreteValueRule);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DiscreteValueRule);
 
   /// Defines a discrete value for a DiscreteValueRule.
   struct DiscreteValue : public Rule::State {

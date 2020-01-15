@@ -3,10 +3,10 @@
 #include <memory>
 #include <optional>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 
@@ -14,7 +14,7 @@ namespace maliput {
 /// interface that allows the current phase to be manually set.
 class ManualPhaseProvider : public api::rules::PhaseProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(ManualPhaseProvider);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ManualPhaseProvider);
 
   ManualPhaseProvider();
 

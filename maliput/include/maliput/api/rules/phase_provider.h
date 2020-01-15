@@ -2,11 +2,10 @@
 
 #include <optional>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/state_provider_result.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -16,7 +15,7 @@ namespace rules {
 /// collection of PhaseRings.
 class PhaseProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseProvider);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseProvider);
 
   virtual ~PhaseProvider() = default;
 

@@ -2,10 +2,9 @@
 
 #include <optional>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/state_provider_result.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -14,7 +13,7 @@ namespace rules {
 /// Abstract interface for the provider of the RightOfWayRule.
 class RightOfWayRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RightOfWayRuleStateProvider)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RightOfWayRuleStateProvider)
 
   virtual ~RightOfWayRuleStateProvider() = default;
 

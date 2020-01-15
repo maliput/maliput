@@ -10,10 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/lane_data.h"
 #include "maliput/common/assertion_error.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/test_utilities/check_id_indexing.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 #include "multilane_test_utilities/multilane_types_compare.h"
@@ -865,7 +864,7 @@ namespace {
 // An encapsulated Multilane road build procedure.
 class BuildProcedure {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BuildProcedure);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BuildProcedure);
 
   // Constructs a named build procedure.
   explicit BuildProcedure(const std::string& name) : name_(name) {}
@@ -899,7 +898,7 @@ std::ostream& operator<<(
 // An encapsulated Multilane road turn build procedure.
 class TurnBuildProcedure : public BuildProcedure {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TurnBuildProcedure);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TurnBuildProcedure);
 
   // Constructs a named build procedure for a turn.
   // @param name Name for the build procedure.
@@ -997,7 +996,7 @@ class TurnBuildProcedure : public BuildProcedure {
 // start endpoint.
 class TurnUsingRefToRConn : public TurnBuildProcedure {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TurnUsingRefToRConn);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TurnUsingRefToRConn);
   using TurnBuildProcedure::TurnBuildProcedure;
 
   void ApplyTo(Builder* builder) const override {
@@ -1026,7 +1025,7 @@ class TurnUsingRefToRConn : public TurnBuildProcedure {
 // curved connection by reversing the endpoint.
 class TurnUsingRefToRRef : public TurnBuildProcedure {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TurnUsingRefToRRef);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TurnUsingRefToRRef);
   using TurnBuildProcedure::TurnBuildProcedure;
 
   void ApplyTo(Builder* builder) const override {
@@ -1056,7 +1055,7 @@ class TurnUsingRefToRRef : public TurnBuildProcedure {
 // reference lane at its start end.
 class TurnUsingStraightRefToCurvedRLane : public TurnBuildProcedure {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TurnUsingStraightRefToCurvedRLane);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TurnUsingStraightRefToCurvedRLane);
   using TurnBuildProcedure::TurnBuildProcedure;
 
   void ApplyTo(Builder* builder) const override {
@@ -1091,7 +1090,7 @@ class TurnUsingStraightRefToCurvedRLane : public TurnBuildProcedure {
 // reference lane at its start end.
 class TurnUsingCurvedRefToStraightRLane : public TurnBuildProcedure {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TurnUsingCurvedRefToStraightRLane);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TurnUsingCurvedRefToStraightRLane);
   using TurnBuildProcedure::TurnBuildProcedure;
 
   void ApplyTo(Builder* builder) const override {

@@ -2,8 +2,7 @@
 
 #include <string>
 
-#include "drake/common/drake_copyable.h"
-
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_hash.h"
 #include "maliput/common/maliput_throw.h"
 
@@ -16,7 +15,7 @@ namespace api {
 /// of guaranteeing uniqueness across the specified domain.
 class UniqueId {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(UniqueId);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(UniqueId);
 
   /// Constructs a UniqueId from the given `string`.
   ///

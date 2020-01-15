@@ -2,11 +2,10 @@
 
 #include <optional>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/state_provider_result.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -19,7 +18,7 @@ class DiscreteValueRuleStateProvider {
   /// DiscreteValueRuleStateProvider::GetState(const Rule::Id&).
   using StateResult = StateProviderResult<DiscreteValueRule::DiscreteValue>;
 
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(DiscreteValueRuleStateProvider)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(DiscreteValueRuleStateProvider)
 
   virtual ~DiscreteValueRuleStateProvider() = default;
 

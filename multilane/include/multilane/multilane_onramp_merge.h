@@ -4,10 +4,9 @@
 #include <memory>
 
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/maliput_copyable.h"
 #include "multilane/builder.h"
 #include "multilane/road_curve.h"
-
-#include "drake/common/drake_copyable.h"
 
 namespace maliput {
 namespace multilane {
@@ -72,7 +71,7 @@ struct MultilaneRoadCharacteristics {
 /// RoadGeometry.
 class MultilaneOnrampMerge {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MultilaneOnrampMerge)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MultilaneOnrampMerge)
 
   /// Constructor for the factory.
   ///

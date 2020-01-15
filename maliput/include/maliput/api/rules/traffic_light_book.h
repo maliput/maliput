@@ -3,8 +3,8 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/rules/traffic_lights.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -14,7 +14,7 @@ namespace rules {
 /// TrafficLight.
 class TrafficLightBook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLightBook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLightBook);
 
   virtual ~TrafficLightBook() = default;
 

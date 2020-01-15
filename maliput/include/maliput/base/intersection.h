@@ -3,19 +3,19 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/intersection.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/base/manual_phase_provider.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 
 /// A concrete implementation of the api::Intersection abstract interface.
 class Intersection : public api::Intersection {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Intersection)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Intersection)
 
   /// Constructs an Intersection instance.
   ///

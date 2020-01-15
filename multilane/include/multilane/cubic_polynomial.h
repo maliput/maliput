@@ -3,8 +3,7 @@
 #include <cmath>
 #include <ostream>
 
-#include "drake/common/drake_copyable.h"
-
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_unused.h"
 
 namespace maliput {
@@ -13,7 +12,7 @@ namespace multilane {
 /// A cubic polynomial, f(p) = a + b*p + c*p^2 + d*p^3.
 class CubicPolynomial {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(CubicPolynomial)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(CubicPolynomial)
 
   /// Default constructor, all zero coefficients.
   CubicPolynomial() : CubicPolynomial(0., 0., 0., 0.) {}

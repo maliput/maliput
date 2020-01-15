@@ -3,9 +3,9 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -15,7 +15,7 @@ class RoadGeometry;
 /// Directed, inclusive longitudinal (s value) range from s0 to s1.
 class SRange {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(SRange);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(SRange);
 
   /// Default constructor:  initializes s0 and s1 to zero.
   SRange() = default;
@@ -68,7 +68,7 @@ class SRange {
 /// Directed longitudinal range of a specific Lane, identified by a LaneId.
 class LaneSRange {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneSRange);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneSRange);
 
   /// Constructs a LaneSRange as `s_range` on Lane `lane_id`.
   LaneSRange(const LaneId& lane_id, const SRange& s_range) : lane_id_(lane_id), s_range_(s_range) {}
@@ -102,7 +102,7 @@ class LaneSRange {
 /// G1-continuous curve.)
 class LaneSRoute {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneSRoute);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneSRoute);
 
   /// Default constructor:  constructs an empty route.
   LaneSRoute() = default;

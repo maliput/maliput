@@ -2,9 +2,9 @@
 
 #include <cmath>
 
-#include "drake/common/drake_copyable.h"
 #include "drake/common/eigen_types.h"
 
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/common/maliput_unused.h"
 
@@ -17,7 +17,7 @@ namespace multilane {
 /// of an arc.
 class ArcRoadCurve : public RoadCurve {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(ArcRoadCurve)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ArcRoadCurve)
 
   /// Constructor. The reference curve is created from the circle `center`, the
   /// `radius`, initial angular position `theta0` and the angle span

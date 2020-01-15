@@ -3,13 +3,12 @@
 #include <memory>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/junction.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_copyable.h"
 
 #include "dragway/segment.h"
 
@@ -21,7 +20,7 @@ class RoadGeometry;
 /// Dragway's implementation of api::Junction.
 class Junction final : public api::Junction {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Junction)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Junction)
 
   /// Constructs a Junction with a single Segment.
   ///

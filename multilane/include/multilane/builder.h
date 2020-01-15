@@ -8,10 +8,9 @@
 #include <tuple>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/lane_data.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_copyable.h"
 
 #include "multilane/connection.h"
 #include "multilane/junction.h"
@@ -33,7 +32,7 @@ class StartReference {
   /// methods.
   class Spec {
    public:
-    DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Spec)
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Spec)
 
     const Endpoint& endpoint() const { return endpoint_; }
 
@@ -49,7 +48,7 @@ class StartReference {
     Endpoint endpoint_{};
   };
 
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(StartReference)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(StartReference)
 
   StartReference() = default;
 
@@ -83,7 +82,7 @@ class StartLane {
   /// Objects of this class should be created using StartLane::at() methods.
   class Spec {
    public:
-    DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Spec)
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Spec)
 
     const Endpoint& endpoint() const { return endpoint_; }
 
@@ -103,7 +102,7 @@ class StartLane {
     int lane_id_{};
   };
 
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(StartLane)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(StartLane)
 
   StartLane() = delete;
 
@@ -156,7 +155,7 @@ class EndReference {
   /// methods.
   class Spec {
    public:
-    DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Spec)
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Spec)
 
     const EndpointZ& endpoint_z() const { return endpoint_z_; }
 
@@ -172,7 +171,7 @@ class EndReference {
     EndpointZ endpoint_z_;
   };
 
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(EndReference)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(EndReference)
 
   EndReference() = default;
 
@@ -206,7 +205,7 @@ class EndLane {
   /// Objects of this class should be created using EndLane::z_at() methods.
   class Spec {
    public:
-    DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Spec)
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Spec)
 
     const EndpointZ& endpoint_z() const { return endpoint_z_; }
 
@@ -226,7 +225,7 @@ class EndLane {
     int lane_id_{};
   };
 
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(EndLane)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(EndLane)
 
   EndLane() = delete;
 
@@ -273,7 +272,7 @@ std::ostream& operator<<(std::ostream& out, const EndLane::Spec& end_spec);
 /// Wraps all the lane-related specifications in a Connection.
 class LaneLayout {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneLayout)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneLayout)
 
   /// Constructs a the lane layout of a connection.
   ///
@@ -331,7 +330,7 @@ std::ostream& operator<<(std::ostream& out, const LaneLayout& lane_layout);
 /// only, and derived code should instantiate Builder objects.
 class BuilderBase {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BuilderBase)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BuilderBase)
 
   BuilderBase() = default;
 
@@ -442,7 +441,7 @@ class BuilderBase {
 /// objects.
 class BuilderFactoryBase {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BuilderFactoryBase)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BuilderFactoryBase)
 
   BuilderFactoryBase() = default;
 
@@ -507,7 +506,7 @@ class BuilderFactoryBase {
 /// is the index in the RoadGeometry.
 class Builder : public BuilderBase {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Builder)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Builder)
 
   /// Constructs a Builder which can be used to specify and assemble a
   /// multilane implementation of an api::RoadGeometry.
@@ -576,7 +575,7 @@ class Builder : public BuilderBase {
   // would not be robust given the use of floating-point values in Endpoints.
   class EndpointFuzzyOrder {
    public:
-    DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EndpointFuzzyOrder)
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EndpointFuzzyOrder)
 
     // clang-format off
     explicit EndpointFuzzyOrder(const double linear_tolerance)
@@ -676,7 +675,7 @@ class Builder : public BuilderBase {
 /// Implements a BuilderFactoryBase to construct Builder objects.
 class BuilderFactory : public BuilderFactoryBase {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BuilderFactory)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BuilderFactory)
 
   BuilderFactory() = default;
 

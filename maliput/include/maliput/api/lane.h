@@ -5,11 +5,11 @@
 #include <string>
 
 #include "drake/common/autodiff.h"
-#include "drake/common/drake_copyable.h"
 #include "drake/common/symbolic.h"
 
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -33,7 +33,7 @@ using LaneId = TypeSpecificIdentifier<class Lane>;
 /// parameterizations (e.g., each Lane has its own reference curve).
 class Lane {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Lane)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Lane)
 
   virtual ~Lane() = default;
 

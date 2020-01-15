@@ -5,13 +5,12 @@
 #include <utility>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_copyable.h"
 
 #include "multilane/cubic_polynomial.h"
 #include "multilane/lane.h"
@@ -26,7 +25,7 @@ class LineLane;
 /// An api::Segment implementation.
 class Segment : public api::Segment {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Segment);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Segment);
 
   /// Constructs a new Segment.
   ///

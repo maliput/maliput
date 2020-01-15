@@ -4,14 +4,14 @@
 #include <limits>
 #include <utility>
 
-#include "drake/common/drake_copyable.h"
 #include "drake/common/drake_throw.h"
 #include "drake/common/eigen_types.h"
 
+#include "maliput/api/lane_data.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_unused.h"
 
-#include "maliput/api/lane_data.h"
 #include "multilane/road_curve.h"
 
 namespace maliput {
@@ -20,7 +20,7 @@ namespace multilane {
 /// RoadCurve specification for a reference curve that describes a line.
 class LineRoadCurve : public RoadCurve {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(LineRoadCurve)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(LineRoadCurve)
 
   /// Constructor. Computes a line from @p xy0 as the initial point of the line
   /// and @p dxy as the difference vector that connects the @p xy0 with the end

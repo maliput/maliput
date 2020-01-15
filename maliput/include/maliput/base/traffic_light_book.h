@@ -4,9 +4,9 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/rules/traffic_light_book.h"
 #include "maliput/api/rules/traffic_lights.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 
@@ -14,7 +14,7 @@ namespace maliput {
 /// interface. It allows users to obtain a TrafficLight using its ID.
 class TrafficLightBook : public api::rules::TrafficLightBook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLightBook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLightBook);
 
   TrafficLightBook();
 

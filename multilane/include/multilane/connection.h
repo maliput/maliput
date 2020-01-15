@@ -8,9 +8,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_copyable.h"
 #include "multilane/road_curve.h"
 
 namespace maliput {
@@ -27,7 +26,7 @@ namespace multilane {
 ///            reference path (radians, zero == x-direction).
 class EndpointXy {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EndpointXy)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EndpointXy)
 
   // Constructs an EndpointXy with all zero parameters.
   EndpointXy() = default;
@@ -71,7 +70,7 @@ std::ostream& operator<<(std::ostream& out, const EndpointXy& endpoint_xy);
 ///              certain s coordinate of the Segment surface.
 class EndpointZ {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EndpointZ)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EndpointZ)
   // Constructs an EndpointZ with all zero parameters.
   EndpointZ() = default;
 
@@ -114,7 +113,7 @@ std::ostream& operator<<(std::ostream& out, const EndpointZ& endpoint_z);
 /// out-of-plane aspects of an endpoint.
 class Endpoint {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Endpoint)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Endpoint)
 
   // Constructs an Endpoint with all zero parameters.
   Endpoint() = default;
@@ -147,7 +146,7 @@ std::ostream& operator<<(std::ostream& out, const Endpoint& endpoint);
 ///  * length: length of the line, which must be nonnegative.
 class LineOffset {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LineOffset)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LineOffset)
 
   LineOffset() = default;
 
@@ -172,7 +171,7 @@ std::ostream& operator<<(std::ostream& out, const LineOffset& line_offset);
 ///    * d_theta < 0 is clockwise ('veer to right')
 class ArcOffset {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(ArcOffset)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(ArcOffset)
 
   /// Constructs an ArcOffset with all zero parameters.
   ArcOffset() = default;
@@ -207,7 +206,7 @@ std::ostream& operator<<(std::ostream& out, const ArcOffset& arc_offset);
 /// of the endpoints.
 class Connection {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Connection)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Connection)
 
   /// Possible connection geometries:  line- or arc-segment.
   enum Type { kLine, kArc };
@@ -394,7 +393,7 @@ class Connection {
 /// Builder::MakeGroup() methods.
 class Group {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Group)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Group)
 
   Group() = default;
 
@@ -416,7 +415,7 @@ class Group {
 /// objects.
 class GroupFactoryBase {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(GroupFactoryBase)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(GroupFactoryBase)
 
   GroupFactoryBase() = default;
 
@@ -441,7 +440,7 @@ class GroupFactory : public GroupFactoryBase {
   // corresponding Segments specified by all the Connections in the Group.
   class RealGroup : public Group {
    public:
-    DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RealGroup)
+    MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RealGroup)
 
     // Constructs an empty Group with the specified `id`.
     explicit RealGroup(const std::string& id) : id_(id) {}
@@ -477,7 +476,7 @@ class GroupFactory : public GroupFactoryBase {
   };
 
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(GroupFactory)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(GroupFactory)
 
   GroupFactory() = default;
 

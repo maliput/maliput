@@ -5,12 +5,11 @@
 #include <utility>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/basic_id_index.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/geometry_base/branch_point.h"
 #include "maliput/geometry_base/junction.h"
@@ -39,7 +38,7 @@ namespace geometry_base {
 /// geometry_base's implementation of api::RoadGeometry.
 class RoadGeometry : public api::RoadGeometry {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry);
 
   /// Constructs an empty RoadGeometry with the specified tolerances.
   ///

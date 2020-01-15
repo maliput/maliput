@@ -7,11 +7,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/unique_id.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_hash.h"
 #include "maliput/common/passkey.h"
 
@@ -53,7 +52,7 @@ class BulbGroup;
 /// Models a bulb within a bulb group.
 class Bulb final {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Bulb);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Bulb);
 
   /// Unique identifier for a Bulb.
   using Id = TypeSpecificIdentifier<class Bulb>;
@@ -209,7 +208,7 @@ class TrafficLight;
 /// programmatically enforced.
 class BulbGroup final {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BulbGroup);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BulbGroup);
 
   /// Unique identifier for a BulbGroup.
   using Id = TypeSpecificIdentifier<BulbGroup>;
@@ -304,7 +303,7 @@ class BulbGroup final {
 /// not have access to right-of-way rules.
 class TrafficLight final {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLight);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLight);
 
   /// Unique identifier for a traffic light.
   using Id = TypeSpecificIdentifier<TrafficLight>;

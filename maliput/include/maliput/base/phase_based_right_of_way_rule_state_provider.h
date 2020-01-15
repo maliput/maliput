@@ -2,11 +2,11 @@
 
 #include <optional>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 
@@ -26,7 +26,7 @@ namespace maliput {
 /// with vehicles traveling on Street B and vice versa.
 class PhaseBasedRightOfWayRuleStateProvider final : public api::rules::RightOfWayRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseBasedRightOfWayRuleStateProvider)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseBasedRightOfWayRuleStateProvider)
 
   /// Constructs a PhaseBasedRuleStateProvider.
   ///

@@ -4,11 +4,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -45,7 +44,7 @@ namespace rules {
 /// Rule-to-BulbGroups relationship is stored in this class.
 class RightOfWayRule final {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RightOfWayRule);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RightOfWayRule);
 
   /// Unique identifier for a RightOfWayRule.
   using Id = TypeSpecificIdentifier<class RightOfWayRule>;
@@ -79,7 +78,7 @@ class RightOfWayRule final {
   /// lower-priority paths) must yield to vehicles with higher priority.
   class State final {
    public:
-    DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(State);
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(State);
 
     /// Unique identifier for a State
     using Id = TypeSpecificIdentifier<class State>;

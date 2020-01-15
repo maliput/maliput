@@ -18,6 +18,7 @@
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/rule_registry.h"
 #include "maliput/api/rules/traffic_light_book.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {

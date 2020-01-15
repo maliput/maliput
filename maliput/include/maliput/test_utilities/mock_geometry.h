@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "maliput/api/lane_data.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/geometry_base/branch_point.h"
 #include "maliput/geometry_base/junction.h"
 #include "maliput/geometry_base/lane.h"
@@ -34,7 +35,7 @@ namespace test {
 /// Mock api::RoadGeometry implementation; see mock_geometry.h.
 class MockRoadGeometry : public geometry_base::RoadGeometry {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry);
 
   /// Constructs an empty MockRoadGeometry with the specified tolerances.
   ///
@@ -60,7 +61,7 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
 /// Mock api::BranchPoint implementation; see mock_geometry.h.
 class MockBranchPoint : public geometry_base::BranchPoint {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockBranchPoint);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockBranchPoint);
 
   /// Constructs a partially-initialized MockBranchPoint.
   ///
@@ -73,7 +74,7 @@ class MockBranchPoint : public geometry_base::BranchPoint {
 /// Mock api::Junction implementation; see mock_geometry.h.
 class MockJunction : public geometry_base::Junction {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockJunction);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockJunction);
 
   /// Constructs a partially-initialized MockJunction.
   ///
@@ -86,7 +87,7 @@ class MockJunction : public geometry_base::Junction {
 /// Mock api::Segment implementation; see mock_geometry.h.
 class MockSegment : public geometry_base::Segment {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockSegment);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockSegment);
 
   /// Constructs a partially-initialized MockSegment.
   ///
@@ -99,7 +100,7 @@ class MockSegment : public geometry_base::Segment {
 /// Mock api::Lane implementation; see mock_geometry.h.
 class MockLane : public geometry_base::Lane {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
 
   /// Constructs a partially-initialized MockLane.
   ///

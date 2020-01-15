@@ -7,12 +7,12 @@
 
 #include "dragway/branch_point.h"
 #include "dragway/junction.h"
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/basic_id_index.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace dragway {
@@ -23,7 +23,7 @@ namespace dragway {
 /// dragway::Segment and dragway::Lane detailed class overview docs.
 class RoadGeometry final : public api::RoadGeometry {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry)
 
   /// Constructs a dragway RoadGeometry.
   ///

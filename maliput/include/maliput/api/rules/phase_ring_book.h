@@ -3,11 +3,10 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -17,7 +16,7 @@ namespace rules {
 /// PhaseRing.
 class PhaseRingBook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseRingBook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseRingBook);
 
   virtual ~PhaseRingBook() = default;
 

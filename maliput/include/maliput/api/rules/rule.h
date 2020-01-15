@@ -4,11 +4,10 @@
 #include <string>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/unique_id.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -79,7 +78,7 @@ class Rule {
     RelatedUniqueIds related_unique_ids;
   };
 
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rule);
 
   /// Constructs a Rule.
   ///
