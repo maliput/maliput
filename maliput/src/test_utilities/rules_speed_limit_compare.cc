@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/unused.h"
+#include "maliput/common/maliput_unused.h"
 #include "maliput/test_utilities/regions_test_utilities.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -22,7 +22,7 @@ namespace test {
 /// Predicate-formatter which tests equality of SpeedLimitRule.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::SpeedLimitRule& a,
                                    const rules::SpeedLimitRule& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.zone(), b.zone()));

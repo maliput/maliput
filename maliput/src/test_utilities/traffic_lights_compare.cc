@@ -2,8 +2,7 @@
 
 #include <algorithm>
 
-#include "drake/common/unused.h"
-
+#include "maliput/common/maliput_unused.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
@@ -33,7 +32,7 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Bulb::BoundingBox& a,
                                    const Bulb::BoundingBox& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   for (int i = 0; i < 3; ++i) {
     MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.p_BMin(i), b.p_BMin(i)));
@@ -43,7 +42,7 @@ namespace test {
 }
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const Bulb* a, const Bulb* b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->id(), b->id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->position_bulb_group(), b->position_bulb_group()));
@@ -64,7 +63,7 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const std::vector<const Bulb*>& a, const std::vector<const Bulb*>& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   const int smallest = std::min(a.size(), b.size());
@@ -76,7 +75,7 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const BulbGroup* a,
                                    const BulbGroup* b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->id(), b->id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->position_traffic_light(), b->position_traffic_light()));
@@ -87,7 +86,7 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const TrafficLight* a,
                                    const TrafficLight* b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->id(), b->id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a->position_road_network(), b->position_road_network()));

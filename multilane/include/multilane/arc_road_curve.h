@@ -98,7 +98,7 @@ class ArcRoadCurve : public RoadCurve {
     //      θ = θ₀ + (p * Δθ)
     // then:
     //      dheading/dp = dθ/dp = Δθ
-    drake::unused(p);
+    maliput::common::unused(p);
     return d_theta_;
   }
 

@@ -1,12 +1,11 @@
 #include "multilane/road_geometry.h"
 
-#include "drake/common/unused.h"
-
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_unused.h"
 
 namespace maliput {
 namespace multilane {
@@ -157,8 +156,8 @@ api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& g
 
 std::vector<api::RoadPositionResult> RoadGeometry::DoFindRoadPositions(const api::GeoPosition& geo_position,
                                                                        double radius) const {
-  drake::unused(geo_position);
-  drake::unused(radius);
+  maliput::common::unused(geo_position);
+  maliput::common::unused(radius);
   MALIPUT_ABORT_MESSAGE("Unimplemented method.");
 }
 

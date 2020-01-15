@@ -27,7 +27,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
 // Predicate-formatter which tests equality of LaneEnd.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const api::LaneEnd& a,
                                           const api::LaneEnd& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.lane, b.lane));
   ;

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/unused.h"
+#include "maliput/common/maliput_unused.h"
 #include "maliput/test_utilities/regions_test_utilities.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
@@ -27,7 +27,7 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const std::vector<rules::RightOfWayRule::Id>& a,
                                    const std::vector<rules::RightOfWayRule::Id>& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   const int smallest = std::min(a.size(), b.size());
@@ -39,7 +39,7 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const rules::RightOfWayRule::State& a, const rules::RightOfWayRule::State& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.type(), b.type()));
@@ -51,7 +51,7 @@ namespace test {
     const char* a_expression, const char* b_expression,
     const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& a,
     const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& largest =
@@ -73,7 +73,7 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const RightOfWayRule::RelatedBulbGroups& a,
                                    const RightOfWayRule::RelatedBulbGroups& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
 
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
@@ -98,7 +98,7 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::RightOfWayRule& a,
                                    const rules::RightOfWayRule& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.zone(), b.zone()));
@@ -117,7 +117,7 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const rules::RightOfWayRuleStateProvider::RightOfWayResult& a,
                                    const rules::RightOfWayRuleStateProvider::RightOfWayResult& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.state, b.state));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.next.has_value(), b.next.has_value()));

@@ -3,12 +3,12 @@
 #include <cmath>
 #include <memory>
 
-#include "drake/common/unused.h"
 #include "drake/math/saturate.h"
 
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/common/maliput_unused.h"
 #include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
 
 #include "dragway/branch_point.h"
@@ -122,7 +122,7 @@ int RoadGeometry::GetLaneIndex(const api::GeoPosition& geo_pos) const {
 
 api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& geo_pos,
                                                        const std::optional<api::RoadPosition>& hint) const {
-  drake::unused(hint);
+  maliput::common::unused(hint);
 
   // Computes the dragway's (x,y) segment surface coordinates.
   MALIPUT_DEMAND(junction_.num_segments() > 0);

@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <limits>
 
-#include "drake/common/unused.h"
 #include "drake/math/saturate.h"
 
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_unused.h"
 
 namespace maliput {
 namespace multilane {
@@ -123,7 +123,7 @@ bool ArcRoadCurve::IsValid(double r_min, double r_max, const api::HBounds& heigh
   //                          elevation.
   // TODO(maddog@tri.global)  Check for self-intersecting volumes (e.g., when
   //                          arc angle >= 2π).
-  drake::unused(height_bounds);
+  maliput::common::unused(height_bounds);
   MALIPUT_DEMAND(r_min <= r_max);
   // Whether or not user code pays attention to segment_bounds, at least
   // ensure that bounds are sane.  Given the singularity at the center of

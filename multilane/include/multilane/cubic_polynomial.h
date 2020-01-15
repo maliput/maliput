@@ -4,7 +4,8 @@
 #include <ostream>
 
 #include "drake/common/drake_copyable.h"
-#include "drake/common/unused.h"
+
+#include "maliput/common/maliput_unused.h"
 
 namespace maliput {
 namespace multilane {
@@ -73,7 +74,7 @@ class CubicPolynomial {
   //                         derivative of the actual linear function
   //                         involved in our bogus path-length approximation.
   double fake_gprime(double p) const {
-    drake::unused(p);
+    maliput::common::unused(p);
     // return df;  which is...
     return f_p(1.) - f_p(0.);
   }
