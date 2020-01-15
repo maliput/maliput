@@ -44,8 +44,6 @@
 #include <unordered_map>
 #include <utility>
 
-#include "drake/common/never_destroyed.h"
-
 #ifdef HAVE_SPDLOG
 
 #include <spdlog/sinks/dist_sink.h>
@@ -53,6 +51,7 @@
 
 #endif  // HAVE_SPDLOG
 
+#include "maliput/common/maliput_never_destroyed.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -85,7 +84,7 @@ std::shared_ptr<logging::Logger> onetime_create_log() {
 }  // namespace
 
 logging::Logger* log() {
-  static const drake::never_destroyed<std::shared_ptr<logging::Logger>> g_logger(onetime_create_log());
+  static const maliput::common::never_destroyed<std::shared_ptr<logging::Logger>> g_logger(onetime_create_log());
   return g_logger.access().get();
 }
 
