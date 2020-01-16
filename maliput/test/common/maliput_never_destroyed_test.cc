@@ -38,6 +38,7 @@
 
 #include "maliput/common/maliput_never_destroyed.h"
 
+#include <exception>
 #include <unordered_map>
 
 #include <gtest/gtest.h>

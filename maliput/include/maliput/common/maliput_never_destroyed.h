@@ -56,8 +56,12 @@ namespace common {
 /// because of the "indeterminate order of ... destruction" as mentioned in
 /// cppguide's
 /// <a href="https://drake.mit.edu/styleguide/cppguide.html#Static_and_Global_Variables">Static
-/// and Global Variables</a> section, but other solutions to this problem place
-///  the objects on the heap through an indirection.
+/// and Global Variables</a> ** section, but other solutions to this problem place
+/// the objects on the heap through an indirection.
+///
+/// ** This project follows rules listed in https://google.github.io/styleguide/cppguide.html but
+/// for the sake of limiting the number of editions to the copy, we keep push the decision
+/// to authors and reviewers discretion.
 ///
 /// Compared with other approaches, this mechanism more clearly describes the
 /// intent to readers, avoids "possible leak" warnings from memory-checking
