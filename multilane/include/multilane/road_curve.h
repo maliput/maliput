@@ -12,7 +12,6 @@
 #include "drake/systems/analysis/antiderivative_function.h"
 #include "drake/systems/analysis/scalar_initial_value_problem.h"
 #include "maliput/api/lane_data.h"
-#include "maliput/common/maliput_unused.h"
 #include "multilane/cubic_polynomial.h"
 
 namespace maliput {

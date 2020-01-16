@@ -6,8 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/common/maliput_unused.h"
-
 namespace maliput {
 namespace api {
 namespace rules {

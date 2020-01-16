@@ -10,7 +10,6 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
-#include "maliput/common/maliput_unused.h"
 
 #include "multilane/cubic_polynomial.h"
 #include "multilane/road_curve.h"

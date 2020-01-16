@@ -6,6 +6,7 @@
 #include "drake/common/eigen_types.h"
 
 #include "maliput/common/maliput_throw.h"
+#include "maliput/common/maliput_unused.h"
 
 #include "multilane/road_curve.h"
 

@@ -2,8 +2,6 @@
 
 #include "drake/math/saturate.h"
 
-#include "maliput/common/maliput_unused.h"
-
 namespace maliput {
 namespace multilane {
 

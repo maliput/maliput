@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/maliput_unused.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
