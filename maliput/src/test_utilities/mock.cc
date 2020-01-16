@@ -14,6 +14,7 @@
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {

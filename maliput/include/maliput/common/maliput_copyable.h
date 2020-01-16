@@ -3,7 +3,7 @@
 /// @file maliput_copyable.h
 /// Code in this file is inspired by:
 /// https://github.com/RobotLocomotion/drake/blob/master/common/drake_copyable.h
-/// ner
+///
 /// Drake's license follows:
 ///
 /// All components of Drake are licensed under the BSD 3-Clause License
