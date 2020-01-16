@@ -60,7 +60,7 @@ namespace common {
 /// the objects on the heap through an indirection.
 ///
 /// ** This project follows rules listed in https://google.github.io/styleguide/cppguide.html but
-/// for the sake of limiting the number of editions to the copy, we keep push the decision
+/// for the sake of limiting the number of editions to the copy, we delegate the decision
 /// to authors and reviewers discretion.
 ///
 /// Compared with other approaches, this mechanism more clearly describes the
