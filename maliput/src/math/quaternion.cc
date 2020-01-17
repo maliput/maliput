@@ -26,26 +26,26 @@ Quaternion::Quaternion(double angle, const Vector3& axis) {
 Quaternion::Quaternion(const Matrix3& rotation_matrix) {
   const double trace = rotation_matrix[0][0] + rotation_matrix[1][1] + rotation_matrix[2][2];
   if (trace > kTolerance) {
-    w_ = std::sqrt(1. + trace) / 2.;
-    const double s = 1. / (4. * w_);
+    w_ = std::sqrt(1 + trace) / 2;
+    const double s = 1.0 / (4 * w_);
     x_ = (rotation_matrix[2][1] - rotation_matrix[1][2]) * s;
     y_ = (rotation_matrix[0][2] - rotation_matrix[2][0]) * s;
     z_ = (rotation_matrix[1][0] - rotation_matrix[0][1]) * s;
   } else if (rotation_matrix[0][0] > rotation_matrix[1][1] && rotation_matrix[0][0] > rotation_matrix[2][2]) {
-    x_ = std::sqrt(1. + rotation_matrix[0][0] - rotation_matrix[1][1] - rotation_matrix[2][2]) / 2.;
-    const double s = 1. / (4. * x_);
+    x_ = std::sqrt(1.0 + rotation_matrix[0][0] - rotation_matrix[1][1] - rotation_matrix[2][2]) / 2;
+    const double s = 1.0 / (4 * x_);
     w_ = (rotation_matrix[2][1] - rotation_matrix[1][2]) * s;
     y_ = (rotation_matrix[1][0] + rotation_matrix[0][1]) * s;
     z_ = (rotation_matrix[0][2] + rotation_matrix[2][0]) * s;
   } else if (rotation_matrix[1][1] > rotation_matrix[2][2]) {
-    y_ = std::sqrt(1. - rotation_matrix[0][0] + rotation_matrix[1][1] - rotation_matrix[2][2]) / 2.;
-    const double s = 1. / (4. * y_);
+    y_ = std::sqrt(1.0 - rotation_matrix[0][0] + rotation_matrix[1][1] - rotation_matrix[2][2]) / 2;
+    const double s = 1.0 / (4 * y_);
     w_ = (rotation_matrix[0][2] - rotation_matrix[2][0]) * s;
     x_ = (rotation_matrix[0][1] + rotation_matrix[1][0]) * s;
     z_ = (rotation_matrix[1][2] + rotation_matrix[2][1]) * s;
   } else {
-    z_ = std::sqrt(1. - rotation_matrix[0][0] - rotation_matrix[1][1] + rotation_matrix[2][2]) / 2.;
-    const double s = 1. / (4. * z_);
+    z_ = std::sqrt(1.0 - rotation_matrix[0][0] - rotation_matrix[1][1] + rotation_matrix[2][2]) / 2;
+    const double s = 1.0 / (4 * z_);
     w_ = (rotation_matrix[1][0] - rotation_matrix[0][1]) * s;
     x_ = (rotation_matrix[0][2] + rotation_matrix[2][0]) * s;
     y_ = (rotation_matrix[1][2] + rotation_matrix[2][1]) * s;
@@ -81,15 +81,15 @@ Matrix3 Quaternion::ToRotationMatrix() const {
   const double tzz = tz * normalized_q.z();
 
   Matrix3 result;
-  result[0][0] = 1. - tyy + tzz;
+  result[0][0] = 1. - (tyy + tzz);
   result[0][1] = txy - twz;
   result[0][2] = txz + twy;
   result[1][0] = txy + twz;
-  result[1][1] = 1 - txx + tzz;
+  result[1][1] = 1 - (txx + tzz);
   result[1][2] = tyz - twx;
   result[2][0] = txz - twy;
   result[2][1] = tyz + twx;
-  result[2][2] = .1 - txx + tyy;
+  result[2][2] = 1 - (txx + tyy);
 
   return result;
 }
@@ -110,7 +110,7 @@ void Quaternion::SetFromTwoVectors(const Vector3& a, const Vector3& b) {
   // If `v1` and `v2` are not normalized, the magnitude (1 + `v1` dot `v2`)
   // is multiplied by k = norm(`v1`) * norm(`v2`)
   const double cos_theta = a.dot(b);
-  const double k = sqrt(a.norm() * a.norm() * b.norm() * b.norm());
+  const double k = std::sqrt(a.norm() * a.norm() * b.norm() * b.norm());
 
   if (std::abs(cos_theta / k + 1.) < kTolerance) {
     Vector3 other;
@@ -157,9 +157,11 @@ Quaternion& Quaternion::operator*=(const Quaternion& q) {
 
 Vector3 Quaternion::operator*(const Vector3& v) const { return TransformVector(v); }
 
+bool Quaternion::operator==(const Quaternion& other) const { return coeffs() == other.coeffs(); }
+
 Quaternion Quaternion::Inverse() const {
   const double sq_norm = squared_norm();
-  return (sq_norm > 0) ? Quaternion(conjugate().coeffs() / sq_norm) : Quaternion(0., 0., 0., 0.);
+  return (sq_norm > kTolerance) ? Quaternion(conjugate().coeffs() / sq_norm) : Quaternion(0., 0., 0., 0.);
 }
 
 Quaternion Quaternion::Slerp(double t, const Quaternion& other) const {
