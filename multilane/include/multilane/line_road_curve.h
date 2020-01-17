@@ -7,9 +7,9 @@
 #include "drake/common/drake_copyable.h"
 #include "drake/common/drake_throw.h"
 #include "drake/common/eigen_types.h"
-#include "drake/common/unused.h"
 
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_unused.h"
 
 #include "maliput/api/lane_data.h"
 #include "multilane/road_curve.h"
@@ -58,17 +58,17 @@ class LineRoadCurve : public RoadCurve {
   drake::Vector2<double> xy_of_p(double p) const override { return p0_ + p * dp_; }
 
   drake::Vector2<double> xy_dot_of_p(double p) const override {
-    drake::unused(p);
+    maliput::common::unused(p);
     return dp_;
   }
 
   double heading_of_p(double p) const override {
-    drake::unused(p);
+    maliput::common::unused(p);
     return heading_;
   }
 
   double heading_dot_of_p(double p) const override {
-    drake::unused(p);
+    maliput::common::unused(p);
     return 0.;
   }
 
@@ -78,9 +78,9 @@ class LineRoadCurve : public RoadCurve {
                                       const api::HBounds& height_bounds) const override;
 
   bool IsValid(double r_min, double r_max, const api::HBounds& height_bounds) const override {
-    drake::unused(r_min);
-    drake::unused(r_max);
-    drake::unused(height_bounds);
+    maliput::common::unused(r_min);
+    maliput::common::unused(r_max);
+    maliput::common::unused(height_bounds);
     return true;
   }
 
@@ -90,7 +90,7 @@ class LineRoadCurve : public RoadCurve {
   double FastCalcSFromP(double p, double r) const override;
 
   double CalcMinimumRadiusAtOffset(double r) const override {
-    drake::unused(r);
+    maliput::common::unused(r);
     return std::numeric_limits<double>::infinity();
   }
 

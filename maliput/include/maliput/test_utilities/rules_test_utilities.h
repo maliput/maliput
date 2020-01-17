@@ -6,8 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/unused.h"
-
 namespace maliput {
 namespace api {
 namespace rules {

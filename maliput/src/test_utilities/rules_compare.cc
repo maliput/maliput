@@ -1,10 +1,9 @@
 #include "maliput/test_utilities/rules_compare.h"
 
+#include "maliput/common/maliput_unused.h"
 #include "maliput/test_utilities/regions_test_utilities.h"
 
 #include <algorithm>
-
-#include "drake/common/unused.h"
 
 namespace maliput {
 namespace api {
@@ -20,8 +19,8 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const std::vector<DiscreteValueRule::DiscreteValue>& a,
                                    const std::vector<DiscreteValueRule::DiscreteValue>& b) {
-  drake::unused(a_expression);
-  drake::unused(b_expression);
+  maliput::common::unused(a_expression);
+  maliput::common::unused(b_expression);
 
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
@@ -34,8 +33,8 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const rules::DiscreteValueRule& a, const rules::DiscreteValueRule& b) {
-  drake::unused(a_expression);
-  drake::unused(b_expression);
+  maliput::common::unused(a_expression);
+  maliput::common::unused(b_expression);
 
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
@@ -53,8 +52,8 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const std::vector<rules::RangeValueRule::Range>& a,
                                    const std::vector<rules::RangeValueRule::Range>& b) {
-  drake::unused(a_expression);
-  drake::unused(b_expression);
+  maliput::common::unused(a_expression);
+  maliput::common::unused(b_expression);
 
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
@@ -67,8 +66,8 @@ namespace test {
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::RangeValueRule& a,
                                    const rules::RangeValueRule& b) {
-  drake::unused(a_expression);
-  drake::unused(b_expression);
+  maliput::common::unused(a_expression);
+  maliput::common::unused(b_expression);
 
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));

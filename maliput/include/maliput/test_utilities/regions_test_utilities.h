@@ -5,9 +5,8 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/unused.h"
-
 #include "maliput/api/regions.h"
+#include "maliput/common/maliput_unused.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
@@ -25,7 +24,7 @@ namespace test {
 /// Predicate-formatter which tests equality of SRange.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const SRange& a,
                                           const SRange& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   rules::test::AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s0(), b.s0()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.s1(), b.s1()));
@@ -35,7 +34,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
 /// Predicate-formatter which tests equality of LaneSRange.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const LaneSRange& a,
                                           const LaneSRange& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   rules::test::AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.lane_id(), b.lane_id()));
   MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.s_range(), b.s_range()));
@@ -45,7 +44,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
 /// Predicate-formatter which tests equality of std::vector<LaneSRange>.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                           const std::vector<LaneSRange>& a, const std::vector<LaneSRange>& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   rules::test::AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));
   const int smallest = std::min(a.size(), b.size());
@@ -58,7 +57,7 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
 /// Predicate-formatter which tests equality of LaneSRoute.
 inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const LaneSRoute& a,
                                           const LaneSRoute& b) {
-  drake::unused(a_expression, b_expression);
+  maliput::common::unused(a_expression, b_expression);
   rules::test::AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_REGIONS_IS_EQUAL(a.ranges(), b.ranges()));
   return c.result();

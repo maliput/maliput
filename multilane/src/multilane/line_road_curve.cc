@@ -1,6 +1,5 @@
 #include "multilane/line_road_curve.h"
 
-#include "drake/common/unused.h"
 #include "drake/math/saturate.h"
 
 namespace maliput {
@@ -9,12 +8,12 @@ namespace multilane {
 const double LineRoadCurve::kMinimumNorm = 1e-12;
 
 double LineRoadCurve::FastCalcPFromS(double s, double r) const {
-  drake::unused(r);
+  maliput::common::unused(r);
   return elevation().p_s(s / l_max());
 }
 
 double LineRoadCurve::FastCalcSFromP(double p, double r) const {
-  drake::unused(r);
+  maliput::common::unused(r);
   return l_max() * elevation().s_p(p);
 }
 

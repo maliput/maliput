@@ -5,7 +5,6 @@
 
 #include "drake/common/drake_copyable.h"
 #include "drake/common/eigen_types.h"
-#include "drake/common/unused.h"
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"

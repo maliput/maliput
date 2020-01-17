@@ -9,6 +9,7 @@
 
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/common/maliput_unused.h"
 
 namespace maliput {
 namespace multilane {
@@ -63,7 +64,7 @@ struct InverseArcLengthODEFunction {
   //      coordinates only).
   // @throws std::logic_error if preconditions are not met.
   double operator()(const double& s, const double& p, const drake::VectorX<double>& k) {
-    drake::unused(s);
+    maliput::common::unused(s);
     if (k.size() != 2) {
       throw std::logic_error(
           "Inverse arc length ODE expects only r and"
