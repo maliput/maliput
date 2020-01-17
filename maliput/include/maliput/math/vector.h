@@ -228,6 +228,9 @@ class Vector3 : public VectorBase<3, Vector3> {
 
   /// @return The z value by reference.
   double& z() { return values_[2]; }
+
+  /// @return `this` x `v`.
+  Vector3 cross(const Vector3& v) const;
 };
 
 /// A 4-dimensional vector.

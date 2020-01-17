@@ -35,8 +35,8 @@ add_dependencies_to_test(roll_pitch_yaw_test)
 add_dependencies_to_test(saturate_test)
 add_dependencies_to_test(vector_test)
 
-ament_add_pytest_test(vector_pytest
-  vector_test.py
+ament_add_pytest_test(math_pytest
+  math_test.py
   # Avoid pytest from importing the module stub
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )

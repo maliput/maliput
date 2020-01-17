@@ -16,7 +16,9 @@ from maliput.api import (
 )
 
 from maliput.math import (
-    Vector3
+    Quaternion,
+    Vector3,
+    Vector4
 )
 from dragway import create_dragway
 
@@ -38,6 +40,11 @@ def make_test_dragway(lane_width, length):
 # Returns a numpay.array from a vector.
 def make_np_array(vector):
     return np.array([vector.x(), vector.y(), vector.z()])
+
+# Returns true when `a` and `b` are element wise equal.
+def are_vector4_equal(a, b):
+    return a[0] == b[0] and a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
+
 
 # Tests the bindings for the API and backend implementations.
 class TestMaliput(unittest.TestCase):
@@ -77,9 +84,9 @@ class TestMaliput(unittest.TestCase):
         road_pos.pos = LanePosition(s=new_srh[0], r=new_srh[1], h=new_srh[2])
         self.assertTrue(np.allclose(make_np_array(road_pos.pos.srh()), new_srh))
         lane_orientation = lane_0.GetOrientation(lane_pos)
-        self.assertTrue(np.allclose(
-            lane_orientation.rpy().ToQuaternion().wxyz(),
-            lane_orientation.quat().wxyz(),
+        self.assertTrue(are_vector4_equal(
+            lane_orientation.rpy().ToQuaternion().coeffs(),
+            lane_orientation.quat().coeffs(),
         ))
 
         # Check that the getters are read-only.
@@ -108,21 +115,21 @@ class TestMaliput(unittest.TestCase):
         # Test Lane orientations for consistency.
         lane_start = LanePosition(0., 0., 0.)
         lane_end = LanePosition(lane_0.length(), 0., 0.)
-        self.assertTrue(np.allclose(
-            lane_0.GetOrientation(lane_start).quat().wxyz(),
-            [1., 0., 0., 0.]
+        self.assertTrue(are_vector4_equal(
+            lane_0.GetOrientation(lane_start).quat().coeffs(),
+            Vector4(1., 0., 0., 0.)
         ))
-        self.assertTrue(np.allclose(
-            lane_0.GetOrientation(lane_start).quat().wxyz(),
-            lane_0.GetOrientation(lane_end).quat().wxyz()
+        self.assertTrue(are_vector4_equal(
+            lane_0.GetOrientation(lane_start).quat().coeffs(),
+            lane_0.GetOrientation(lane_end).quat().coeffs()
         ))
-        self.assertTrue(np.allclose(
-            lane_1.GetOrientation(lane_start).quat().wxyz(),
-            lane_1.GetOrientation(lane_end).quat().wxyz()
+        self.assertTrue(are_vector4_equal(
+            lane_1.GetOrientation(lane_start).quat().coeffs(),
+            lane_1.GetOrientation(lane_end).quat().coeffs()
         ))
-        self.assertTrue(np.allclose(
-            lane_0.GetOrientation(lane_end).quat().wxyz(),
-            lane_1.GetOrientation(lane_end).quat().wxyz()
+        self.assertTrue(are_vector4_equal(
+            lane_0.GetOrientation(lane_end).quat().coeffs(),
+            lane_1.GetOrientation(lane_end).quat().coeffs()
         ))
 
         # Test the Lane <-> Geo space coordinate conversion.

@@ -4,8 +4,6 @@
 #include <ostream>
 #include <string>
 
-#include "drake/math/roll_pitch_yaw.h"
-
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/math/matrix.h"
@@ -138,7 +136,7 @@ class Rotation {
   /// expressing a roll around X, followed by pitch around Y,
   /// followed by yaw around Z (with all angles in radians).
   static Rotation FromRpy(const math::Vector3& rpy) {
-    return Rotation(math::RollPitchYaw(rpy.x(), rpy.y(), rpy.z()).ToQuaternion());
+    return FromQuat(math::RollPitchYaw(rpy.x(), rpy.y(), rpy.z()).ToQuaternion());
   }
 
   /// Constructs a Rotation expressing a @p roll around X, followed by
