@@ -42,7 +42,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "drake/common/drake_copyable.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace common {
@@ -73,7 +73,7 @@ namespace common {
 /// @code
 /// class Singleton {
 ///  public:
-///   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Singleton)
+///   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Singleton)
 ///   static Singleton& getInstance() {
 ///     static never_destroyed<Singleton> instance;
 ///     return instance.access();
@@ -104,7 +104,7 @@ namespace common {
 template <typename T>
 class never_destroyed {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(never_destroyed)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(never_destroyed)
 
   /// Passes the constructor arguments along to T using perfect forwarding.
   template <typename... Args>
