@@ -2,17 +2,16 @@
 
 #include <unordered_map>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 
 /// A trivial implementation of an api::rules::RightOfWayRuleStateProvider.
 class ManualRightOfWayRuleStateProvider final : public api::rules::RightOfWayRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(ManualRightOfWayRuleStateProvider)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ManualRightOfWayRuleStateProvider)
 
   /// Default constructor.
   ManualRightOfWayRuleStateProvider() {}

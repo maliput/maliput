@@ -5,11 +5,11 @@
 #include <vector>
 
 #include "dragway/lane.h"
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace dragway {
@@ -53,7 +53,7 @@ class Junction;
 */
 class Segment final : public api::Segment {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Segment)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Segment)
 
   /// Constructs a new dragway Segment.
   ///

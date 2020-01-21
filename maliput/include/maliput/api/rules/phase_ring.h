@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -30,7 +30,7 @@ class PhaseRing final {
     std::optional<double> duration_until;
   };
 
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(PhaseRing);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(PhaseRing);
 
   /// Unique identifier for a PhaseRing.
   using Id = TypeSpecificIdentifier<class PhaseRing>;

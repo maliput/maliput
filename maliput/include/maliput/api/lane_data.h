@@ -5,13 +5,13 @@
 #include <string>
 
 #include "drake/common/default_scalars.h"
-#include "drake/common/drake_copyable.h"
 #include "drake/common/eigen_types.h"
 #include "drake/common/extract_double.h"
 #include "drake/math/quaternion.h"
 #include "drake/math/roll_pitch_yaw.h"
 #include "drake/math/rotation_matrix.h"
 
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -64,7 +64,7 @@ std::ostream& operator<<(std::ostream& out, const LaneEnd::Which& which_end);
 template <typename T>
 class GeoPositionT {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(GeoPositionT)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(GeoPositionT)
 
   /// Default constructor, initializing all components to zero.
   GeoPositionT() : xyz_(T(0.), T(0.), T(0.)) {}
@@ -169,7 +169,7 @@ GeoPositionT<T> operator*(const GeoPositionT<T>& lhs, double rhs) {
 /// A 3-dimensional rotation.
 class Rotation {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rotation)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rotation)
 
   /// Default constructor, creating an identity Rotation.
   Rotation() : quaternion_(drake::Quaternion<double>::Identity()) {}
@@ -257,7 +257,7 @@ std::ostream& operator<<(std::ostream& out, const Rotation& rotation);
 template <typename T>
 class LanePositionT {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LanePositionT)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LanePositionT)
 
   /// Default constructor, initializing all components to zero.
   LanePositionT() : srh_(T(0.), T(0.), T(0.)) {}
@@ -385,7 +385,7 @@ struct RoadPositionResult {
 /// i.e., the minimum must be <= 0 and the maximum must be >= 0.
 class RBounds {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RBounds)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RBounds)
 
   /// Default constructor.
   RBounds() = default;
@@ -429,7 +429,7 @@ class RBounds {
 /// maximum must be `>= 0`.
 class HBounds {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(HBounds)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(HBounds)
 
   /// Default constructor.
   HBounds() = default;

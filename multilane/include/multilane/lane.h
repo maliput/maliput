@@ -3,13 +3,13 @@
 #include <memory>
 #include <optional>
 
-#include "drake/common/drake_copyable.h"
 #include "drake/common/eigen_types.h"
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_copyable.h"
 
 #include "multilane/cubic_polynomial.h"
 #include "multilane/road_curve.h"
@@ -25,7 +25,7 @@ typedef drake::Vector3<double> V3;
 /// Base class for the multilane implementation of api::Lane.
 class Lane : public api::Lane {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Lane)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Lane)
 
   /// Constructs a Lane.
   ///

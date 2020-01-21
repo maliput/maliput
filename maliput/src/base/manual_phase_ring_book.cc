@@ -16,7 +16,7 @@ using api::rules::Rule;
 
 class ManualPhaseRingBook::Impl {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
 
   Impl() {}
   ~Impl() {}

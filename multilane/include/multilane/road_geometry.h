@@ -3,12 +3,12 @@
 #include <memory>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/basic_id_index.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/maliput_copyable.h"
 #include "multilane/branch_point.h"
 #include "multilane/junction.h"
 
@@ -20,7 +20,7 @@ namespace multilane {
 /// a sensible road network.
 class RoadGeometry : public api::RoadGeometry {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry)
 
   /// Constructs an empty RoadGeometry with the specified tolerances and
   /// scale-length.

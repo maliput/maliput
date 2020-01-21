@@ -6,12 +6,12 @@
 
 #include <Eigen/Dense>
 
-#include "drake/common/drake_copyable.h"
 #include "drake/common/eigen_types.h"
 #include "drake/math/rotation_matrix.h"
 #include "drake/systems/analysis/antiderivative_function.h"
 #include "drake/systems/analysis/scalar_initial_value_problem.h"
 #include "maliput/api/lane_data.h"
+#include "maliput/common/maliput_copyable.h"
 #include "multilane/cubic_polynomial.h"
 
 namespace maliput {
@@ -25,7 +25,7 @@ namespace multilane {
 ///   Rot3(roll, pitch, yaw) * V = RotZ(yaw) * RotY(pitch) * RotX(roll) * V
 class Rot3 {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rot3)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rot3)
 
   Rot3(double roll, double pitch, double yaw) : rpy_(roll, pitch, yaw) {}
 
@@ -105,7 +105,7 @@ enum class ComputationPolicy {
 /// the RoadCurve's reference-curve, elevation, and superelevation functions.
 class RoadCurve {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadCurve)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadCurve)
 
   virtual ~RoadCurve() = default;
 

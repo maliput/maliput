@@ -2,10 +2,10 @@
 
 #include <optional>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/passkey.h"
 
 namespace maliput {
@@ -17,7 +17,7 @@ class Segment;
 /// geometry_base's implementation of api::Lane.
 class Lane : public api::Lane {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Lane);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Lane);
 
   /// Constructs a Lane.
   ///

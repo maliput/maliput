@@ -4,9 +4,9 @@
 #include <optional>
 #include <string>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -23,7 +23,7 @@ class LaneEndSet {
   // E.g., it could very well be a view into a database or tiled storage or
   // something.
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet)
 
   virtual ~LaneEndSet() = default;
 
@@ -62,7 +62,7 @@ class LaneEndSet {
 /// to those of LaneEnds on the other side.
 class BranchPoint {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BranchPoint)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BranchPoint)
 
   virtual ~BranchPoint() = default;
 

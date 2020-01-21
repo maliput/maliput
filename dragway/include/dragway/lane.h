@@ -73,7 +73,7 @@ class Segment;
 */
 class Lane final : public api::Lane {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Lane)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Lane)
 
   /// Constructs a dragway Lane.
   ///

@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
@@ -14,6 +12,7 @@
 #include "maliput/api/regions.h"
 #include "maliput/api/segment.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -33,7 +32,7 @@ class RoadGeometry {
  public:
   class IdIndex;
 
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry)
 
   virtual ~RoadGeometry() = default;
 
@@ -217,7 +216,7 @@ class RoadGeometry {
 /// BranchPoints) by their unique id's.
 class RoadGeometry::IdIndex {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(IdIndex)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(IdIndex)
   virtual ~IdIndex() = default;
 
   /// Returns the Lane identified by @p id, or `nullptr` if @p id is unknown.

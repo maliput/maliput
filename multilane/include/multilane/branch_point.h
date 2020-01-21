@@ -5,10 +5,10 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace multilane {
@@ -19,7 +19,7 @@ class Lane;
 /// An implementation of LaneEndSet.
 class LaneEndSet : public api::LaneEndSet {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet)
 
   LaneEndSet() = default;
   ~LaneEndSet() override = default;
@@ -38,7 +38,7 @@ class LaneEndSet : public api::LaneEndSet {
 /// An implementation of api::BranchPoint.
 class BranchPoint : public api::BranchPoint {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BranchPoint)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BranchPoint)
 
   /// Constructs an empty BranchPoint.
   ///

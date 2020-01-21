@@ -3,12 +3,11 @@
 #include <optional>
 #include <unordered_map>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/discrete_value_rule_state_provider.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -18,7 +17,7 @@ namespace maliput {
 /// api::rules::DiscreteValueRule instances.
 class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(ManualDiscreteValueRuleStateProvider)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ManualDiscreteValueRuleStateProvider)
 
   /// Constructs a ManualDiscreteValueRuleStateProvider.
   ///

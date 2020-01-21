@@ -14,7 +14,7 @@ using api::Intersection;
 
 class IntersectionBook::Impl {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
 
   Impl() = default;
   ~Impl() = default;

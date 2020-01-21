@@ -17,8 +17,7 @@
 #include "maliput/api/rules/rule_registry.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/api/rules/traffic_light_book.h"
-
-#include "drake/common/drake_copyable.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -26,7 +25,7 @@ namespace api {
 /// A container that aggregates everything pertaining to Maliput.
 class RoadNetwork {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadNetwork)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadNetwork)
 
   /// Constructs a RoadNetwork instance. After creation, you are encouraged to
   /// validate it using ValidateRoadNetwork(), which is defined in

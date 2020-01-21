@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -23,7 +23,7 @@ using JunctionId = TypeSpecificIdentifier<class Junction>;
 /// Junctions are grouped by RoadGeometry.
 class Junction {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Junction)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Junction)
 
   virtual ~Junction() = default;
 

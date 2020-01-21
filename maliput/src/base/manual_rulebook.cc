@@ -55,7 +55,7 @@ using QueryResults = api::rules::RoadRulebook::QueryResults;
 
 class ManualRulebook::Impl {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
 
   Impl() : index_(std::make_unique<RangeIndex>()) {}
   ~Impl() {}

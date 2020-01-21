@@ -3,10 +3,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -30,7 +29,7 @@ namespace rules {
 /// Each Lane location can be governed by at most one DirectionUsageRule.
 class DirectionUsageRule final {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DirectionUsageRule);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DirectionUsageRule);
 
   using Id = TypeSpecificIdentifier<class DirectionUsageRule>;
 
@@ -40,7 +39,7 @@ class DirectionUsageRule final {
   /// and the severity of this restriction.
   class State final {
    public:
-    DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(State);
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(State);
 
     /// Unique identifier for a State
     using Id = TypeSpecificIdentifier<class State>;

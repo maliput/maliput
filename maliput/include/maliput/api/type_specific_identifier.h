@@ -4,8 +4,7 @@
 #include <string>
 #include <utility>
 
-#include "drake/common/drake_copyable.h"
-
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_hash.h"
 #include "maliput/common/maliput_throw.h"
 
@@ -38,7 +37,7 @@ namespace api {
 template <typename T>
 class TypeSpecificIdentifier {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(TypeSpecificIdentifier);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(TypeSpecificIdentifier);
 
   /// The type whose instances are identified by this %TypeSpecificIdentifier.
   typedef T identified_type;

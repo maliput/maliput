@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -23,7 +23,7 @@ using SegmentId = TypeSpecificIdentifier<class Segment>;
 /// Segments are grouped by Junction.
 class Segment {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Segment)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Segment)
 
   virtual ~Segment() = default;
 

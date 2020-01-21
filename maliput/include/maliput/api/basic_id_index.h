@@ -2,12 +2,12 @@
 
 #include <unordered_map>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -16,7 +16,7 @@ namespace api {
 /// RoadGeometry::IdIndex interface.
 class BasicIdIndex : public RoadGeometry::IdIndex {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(BasicIdIndex);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(BasicIdIndex);
 
   BasicIdIndex() = default;
   ~BasicIdIndex() override = default;

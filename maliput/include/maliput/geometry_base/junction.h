@@ -6,11 +6,10 @@
 #include <utility>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/passkey.h"
 #include "maliput/geometry_base/segment.h"
 
@@ -22,7 +21,7 @@ class RoadGeometry;
 /// geometry_base's implementation of api::Junction.
 class Junction : public api::Junction {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Junction);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Junction);
 
   /// Constructs a Junction.
   ///

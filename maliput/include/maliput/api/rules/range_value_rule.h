@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -20,7 +19,7 @@ namespace rules {
 /// maximum value, the minimum value is typically zero.
 class RangeValueRule : public Rule {
  public:
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RangeValueRule);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RangeValueRule);
 
   /// Defines a range for a RangeValueRule.
   struct Range : public Rule::State {

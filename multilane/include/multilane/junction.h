@@ -4,10 +4,10 @@
 #include <memory>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_copyable.h"
 #include "multilane/road_curve.h"
 #include "multilane/segment.h"
 
@@ -17,7 +17,7 @@ namespace multilane {
 /// An api::Junction implementation.
 class Junction : public api::Junction {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Junction);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Junction);
 
   /// Constructs an empty Junction.
   ///

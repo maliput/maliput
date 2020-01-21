@@ -5,13 +5,12 @@
 #include <variant>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -41,7 +40,7 @@ class RuleRegistry {
     std::variant<Ranges, DiscreteValues> rule_values;
   };
 
-  DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RuleRegistry);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RuleRegistry);
   RuleRegistry() = default;
   virtual ~RuleRegistry() = default;
 

@@ -2,9 +2,8 @@
 
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/lane_data.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -13,7 +12,7 @@ namespace geometry_base {
 /// geometry_base's implementation of api::LaneEndSet.
 class LaneEndSet : public api::LaneEndSet {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(LaneEndSet);
 
   /// Constructs an empty LaneEndSet.
   LaneEndSet() = default;

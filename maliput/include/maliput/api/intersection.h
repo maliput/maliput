@@ -3,12 +3,12 @@
 #include <optional>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -19,7 +19,7 @@ namespace api {
 /// data structures and state providers.
 class Intersection {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Intersection)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Intersection)
 
   /// Unique identifier for an Intersection.
   using Id = TypeSpecificIdentifier<class Intersection>;

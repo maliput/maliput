@@ -3,14 +3,13 @@
 #include <map>
 #include <vector>
 
-#include "drake/common/drake_copyable.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -27,7 +26,7 @@ namespace rules {
 /// implementing the pure virtual methods declared in private scope.
 class RoadRulebook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(RoadRulebook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadRulebook);
 
   virtual ~RoadRulebook() = default;
 

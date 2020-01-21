@@ -14,6 +14,7 @@
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
@@ -34,7 +35,7 @@ using rules::TrafficLight;
 
 class MockLaneEndSet final : public LaneEndSet {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockLaneEndSet)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLaneEndSet)
   MockLaneEndSet() = default;
   void set_lane_end(const LaneEnd& lane_end) { lane_end_ = lane_end; }
 
@@ -50,7 +51,7 @@ class MockLaneEndSet final : public LaneEndSet {
 
 class MockBranchPoint final : public BranchPoint {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockBranchPoint)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockBranchPoint)
   explicit MockBranchPoint(const BranchPointId& id) : BranchPoint(), id_(id) {}
   void set_road_geometry(RoadGeometry* road_geometry) { road_geometry_ = road_geometry; }
   void set_lane_end_set_a(std::unique_ptr<MockLaneEndSet> lane_end_set_a) {
@@ -77,7 +78,7 @@ class MockBranchPoint final : public BranchPoint {
 
 class MockLane final : public Lane {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
   MockLane(const LaneId& id) : Lane(), id_(id) {}
   MockLane(const LaneId& id, const GeoPosition& start_gp, const Rotation& start_rot, const GeoPosition& end_gp,
            const Rotation& end_rot)
@@ -128,7 +129,7 @@ class MockLane final : public Lane {
 
 class MockSegment final : public Segment {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockSegment)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockSegment)
   MockSegment(const SegmentId& id) : Segment(), id_(id) {}
   void set_junction(Junction* junction) { junction_ = junction; }
   void set_lane(std::unique_ptr<MockLane> lane) { lane_ = std::move(lane); }
@@ -149,7 +150,7 @@ class MockSegment final : public Segment {
 
 class MockJunction final : public Junction {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockJunction)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockJunction)
   MockJunction(const JunctionId& id) : Junction(), id_(id) {}
   void set_road_geometry(RoadGeometry* road_geometry) { road_geometry_ = road_geometry; }
   void set_segment(std::unique_ptr<MockSegment> segment) { segment_ = std::move(segment); }
@@ -170,7 +171,7 @@ class MockJunction final : public Junction {
 
 class MockIdIndex final : public RoadGeometry::IdIndex {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIdIndex);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockIdIndex);
   MockIdIndex() = default;
   void add_lane_to_map(const LaneId& id, const Lane* lane) { lane_map_.emplace(id, lane); }
 
@@ -189,7 +190,7 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
 
 class MockRoadGeometry : public RoadGeometry {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry)
   MockRoadGeometry(const RoadGeometryId& id) : id_(id) {}
   MockRoadGeometry(const RoadGeometryId& id, const double& linear_tolerance, const double& angular_tolerance)
       : id_(id), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
@@ -242,7 +243,7 @@ class MockRoadGeometry : public RoadGeometry {
 
 class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockOneLaneIdIndex);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockOneLaneIdIndex);
   MockOneLaneIdIndex() : RoadGeometry::IdIndex() {}
 
  private:
@@ -260,7 +261,7 @@ class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
 
 class MockOneLaneRoadGeometry final : public RoadGeometry {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockOneLaneRoadGeometry)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockOneLaneRoadGeometry)
   MockOneLaneRoadGeometry() {}
 
  private:
@@ -284,7 +285,7 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
 
 class MockRoadRulebook : public rules::RoadRulebook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadRulebook)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadRulebook)
   MockRoadRulebook() {}
   void set_right_of_way(const RightOfWayRule& rule) { right_of_way_rule_ = rule; }
   void set_direction_usage(const DirectionUsageRule& rule) { direction_usage_rule_ = rule; }
@@ -340,7 +341,7 @@ class MockRoadRulebook : public rules::RoadRulebook {
 // based on CreateMockContiguousRoadGeometry() info.
 class MockContiguityRoadRulebook final : public rules::RoadRulebook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockContiguityRoadRulebook)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockContiguityRoadRulebook)
   MockContiguityRoadRulebook() {}
 
   void set_discrete_value_rule(const DiscreteValueRule& rule) { discrete_value_rule_ = rule; }
@@ -384,7 +385,7 @@ class MockContiguityRoadRulebook final : public rules::RoadRulebook {
 
 class MockTrafficLightBook final : public rules::TrafficLightBook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockTrafficLightBook)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockTrafficLightBook)
   MockTrafficLightBook() = default;
   void set_traffic_light(std::unique_ptr<TrafficLight> traffic_light) { traffic_light_ = std::move(traffic_light); }
 
@@ -399,7 +400,7 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
 
 class MockPhaseRingBook final : public rules::PhaseRingBook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockPhaseRingBook)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockPhaseRingBook)
   MockPhaseRingBook() {}
 
   void SetPhaseRing(const rules::PhaseRing& phase_ring) { phase_rings_.emplace(phase_ring.id(), phase_ring); }
@@ -429,7 +430,7 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
 
 class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRightOfWayRuleStateProvider)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRightOfWayRuleStateProvider)
   MockRightOfWayRuleStateProvider() {}
 
  private:
@@ -438,7 +439,7 @@ class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateP
 
 class MockPhaseProvider final : public rules::PhaseProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockPhaseProvider)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockPhaseProvider)
   MockPhaseProvider() {}
 
  private:
@@ -447,7 +448,7 @@ class MockPhaseProvider final : public rules::PhaseProvider {
 
 class MockIntersection final : public Intersection {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIntersection)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockIntersection)
   MockIntersection(const Intersection::Id& id, const rules::PhaseRing& ring) : Intersection(id, {}, ring) {}
 
  private:
@@ -459,7 +460,7 @@ class MockIntersection final : public Intersection {
 
 class MockIntersectionBook final : public IntersectionBook {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockIntersectionBook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockIntersectionBook);
   MockIntersectionBook() : intersection_(Intersection::Id("Mock"), CreatePhaseRing()) {}
 
  private:
@@ -483,7 +484,7 @@ class MockIntersectionBook final : public IntersectionBook {
 
 class MockDiscreteValueRuleStateProvider : public rules::DiscreteValueRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockDiscreteValueRuleStateProvider);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockDiscreteValueRuleStateProvider);
   MockDiscreteValueRuleStateProvider() = default;
 
  private:
@@ -494,7 +495,7 @@ class MockDiscreteValueRuleStateProvider : public rules::DiscreteValueRuleStateP
 
 class MockRangeValueRuleStateProvider : public rules::RangeValueRuleStateProvider {
  public:
-  DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(MockRangeValueRuleStateProvider);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRangeValueRuleStateProvider);
   MockRangeValueRuleStateProvider() = default;
 
  private:
