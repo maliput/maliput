@@ -1,4 +1,5 @@
 ament_add_gtest(saturate_test saturate_test.cc)
+ament_add_gtest(vector_test vector_test.cc)
 
 macro(add_dependencies_to_test target)
     if (TARGET ${target})
@@ -24,3 +25,4 @@ macro(add_dependencies_to_test target)
 endmacro()
 
 add_dependencies_to_test(saturate_test)
+add_dependencies_to_test(vector_test)
