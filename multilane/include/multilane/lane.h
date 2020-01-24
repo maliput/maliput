@@ -19,9 +19,6 @@ namespace multilane {
 
 class BranchPoint;
 
-typedef drake::Vector2<double> V2;
-typedef drake::Vector3<double> V3;
-
 /// Base class for the multilane implementation of api::Lane.
 class Lane : public api::Lane {
  public:

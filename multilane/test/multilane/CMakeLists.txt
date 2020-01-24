@@ -24,10 +24,11 @@ macro(add_dependencies_to_test target)
       )
 
       target_link_libraries(${target}
+          drake::drake
           maliput::api
           maliput::common
-          multilane_test_utilities
-          drake::drake)
+          maliput::math
+          multilane_test_utilities)
 
     endif()
 endmacro()

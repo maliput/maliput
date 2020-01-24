@@ -6,10 +6,9 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/eigen_types.h"
-
 #include "maliput/api/lane_data.h"
 #include "maliput/common/assertion_error.h"
+#include "maliput/math/vector.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 
 namespace maliput {
@@ -18,8 +17,8 @@ namespace {
 
 class MultilaneLineRoadCurveTest : public ::testing::Test {
  protected:
-  const drake::Vector2<double> kOrigin{10.0, 10.0};
-  const drake::Vector2<double> kDirection{10.0, 10.0};
+  const math::Vector2 kOrigin{10.0, 10.0};
+  const math::Vector2 kDirection{10.0, 10.0};
   const CubicPolynomial zp;
   const double kZeroTolerance{0.};
   const double kLinearTolerance{0.01};
@@ -107,17 +106,17 @@ TEST_F(MultilaneLineRoadCurveTest, IsValidTest) {
 TEST_F(MultilaneLineRoadCurveTest, ToCurveFrameTest) {
   const LineRoadCurve dut(kOrigin, kDirection, zp, zp, kLinearTolerance, kScaleLength, kComputationPolicy);
   // Checks over the base line.
-  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(drake::Vector3<double>(10.0, 10.0, 0.0), kRMin, kRMax, elevation_bounds),
-                              drake::Vector3<double>(0.0, 0.0, 0.0), kVeryExact));
-  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(drake::Vector3<double>(20.0, 20.0, 0.0), kRMin, kRMax, elevation_bounds),
-                              drake::Vector3<double>(1., 0.0, 0.0), kVeryExact));
-  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(drake::Vector3<double>(15.0, 15.0, 0.0), kRMin, kRMax, elevation_bounds),
-                              drake::Vector3<double>(0.5, 0.0, 0.0), kVeryExact));
+  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(math::Vector3(10.0, 10.0, 0.0), kRMin, kRMax, elevation_bounds),
+                              math::Vector3(0.0, 0.0, 0.0), kVeryExact));
+  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(math::Vector3(20.0, 20.0, 0.0), kRMin, kRMax, elevation_bounds),
+                              math::Vector3(1., 0.0, 0.0), kVeryExact));
+  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(math::Vector3(15.0, 15.0, 0.0), kRMin, kRMax, elevation_bounds),
+                              math::Vector3(0.5, 0.0, 0.0), kVeryExact));
   // Check with lateral and vertical deviation.
-  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(drake::Vector3<double>(11.0, 12.0, 5.0), kRMin, kRMax, elevation_bounds),
-                              drake::Vector3<double>(0.15, 0.707106781186547, 5.0), kVeryExact));
-  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(drake::Vector3<double>(11.0, 10.0, 7.0), kRMin, kRMax, elevation_bounds),
-                              drake::Vector3<double>(0.05, -0.707106781186547, 7.0), kVeryExact));
+  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(math::Vector3(11.0, 12.0, 5.0), kRMin, kRMax, elevation_bounds),
+                              math::Vector3(0.15, 0.707106781186547, 5.0), kVeryExact));
+  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(math::Vector3(11.0, 10.0, 7.0), kRMin, kRMax, elevation_bounds),
+                              math::Vector3(0.05, -0.707106781186547, 7.0), kVeryExact));
 }
 
 // Checks that l_max(), p_from_s() and s_from_p() with constant
@@ -172,13 +171,13 @@ TEST_F(MultilaneLineRoadCurveTest, WorldFunction) {
 
   // Checks for a flat curve.
   const LineRoadCurve flat_dut(kOrigin, kDirection, zp, zp, kLinearTolerance, kScaleLength, kComputationPolicy);
-  const drake::Vector3<double> p_versor = drake::Vector3<double>(kDirection.x(), kDirection.y(), 0.).normalized();
+  const math::Vector3 p_versor = math::Vector3(kDirection.x(), kDirection.y(), 0.).normalized();
   const Rot3 flat_rotation(0., 0., kHeading);
-  const drake::Vector3<double> kGeoOrigin(kOrigin.x(), kOrigin.y(), 0.);
+  const math::Vector3 kGeoOrigin(kOrigin.x(), kOrigin.y(), 0.);
   for (double p : p_vector) {
     for (double r : r_vector) {
       for (double h : h_vector) {
-        const drake::Vector3<double> geo_position =
+        const math::Vector3 geo_position =
             kGeoOrigin + p * kDirection.norm() * p_versor + flat_rotation.apply({0., r, h});
         EXPECT_TRUE(CompareMatrices(flat_dut.W_of_prh(p, r, h), geo_position, kVeryExact));
       }
@@ -193,13 +192,12 @@ TEST_F(MultilaneLineRoadCurveTest, WorldFunction) {
                                    kComputationPolicy);
   // Computes the rotation along the RoadCurve.
   const Rot3 elevated_rotation(0., -std::atan(linear_elevation.f_dot_p(0.)), kHeading);
-  const drake::Vector3<double> z_vector(0., 0., kDirection.norm());
+  const math::Vector3 z_vector(0., 0., kDirection.norm());
   for (double p : p_vector) {
     for (double r : r_vector) {
       for (double h : h_vector) {
-        const drake::Vector3<double> geo_position = kGeoOrigin + p * kDirection.norm() * p_versor +
-                                                    linear_elevation.f_p(p) * z_vector +
-                                                    elevated_rotation.apply({0., r, h});
+        const math::Vector3 geo_position = kGeoOrigin + p * kDirection.norm() * p_versor +
+                                           linear_elevation.f_p(p) * z_vector + elevated_rotation.apply({0., r, h});
         EXPECT_TRUE(CompareMatrices(elevated_dut.W_of_prh(p, r, h), geo_position, kVeryExact));
       }
     }
@@ -214,7 +212,7 @@ TEST_F(MultilaneLineRoadCurveTest, WorldFunction) {
   for (double p : p_vector) {
     for (double r : r_vector) {
       for (double h : h_vector) {
-        const drake::Vector3<double> geo_position =
+        const math::Vector3 geo_position =
             kGeoOrigin + p * kDirection.norm() * p_versor + superelevated_rotation.apply({0., r, h});
         EXPECT_TRUE(CompareMatrices(superelevated_dut.W_of_prh(p, r, h), geo_position, kVeryExact));
       }
@@ -237,11 +235,9 @@ TEST_F(MultilaneLineRoadCurveTest, WorldFunctionDerivative) {
   const double kDifferential = 1e-3;
   // Numerically evaluates the derivative of a road curve world function
   // with respect to p at [p, r, h] with a five-point stencil.
-  auto numeric_w_prime_of_prh = [kDifferential](const RoadCurve& dut, double p, double r,
-                                                double h) -> drake::Vector3<double> {
-    const drake::Vector3<double> dw =
-        -dut.W_of_prh(p + 2. * kDifferential, r, h) + 8. * dut.W_of_prh(p + kDifferential, r, h) -
-        8. * dut.W_of_prh(p - kDifferential, r, h) + dut.W_of_prh(p - 2. * kDifferential, r, h);
+  auto numeric_w_prime_of_prh = [kDifferential](const RoadCurve& dut, double p, double r, double h) -> math::Vector3 {
+    const math::Vector3 dw = -dut.W_of_prh(p + 2. * kDifferential, r, h) + 8. * dut.W_of_prh(p + kDifferential, r, h) -
+                             8. * dut.W_of_prh(p - kDifferential, r, h) + dut.W_of_prh(p - 2. * kDifferential, r, h);
     return dw / (12. * kDifferential);
   };
 
@@ -252,10 +248,10 @@ TEST_F(MultilaneLineRoadCurveTest, WorldFunctionDerivative) {
       for (double h : h_vector) {
         const Rot3 rotation = flat_dut.Rabg_of_p(p);
         const double g_prime = flat_dut.elevation().f_dot_p(p);
-        const drake::Vector3<double> w_prime = flat_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
-        const drake::Vector3<double> numeric_w_prime = numeric_w_prime_of_prh(flat_dut, p, r, h);
+        const math::Vector3 w_prime = flat_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
+        const math::Vector3 numeric_w_prime = numeric_w_prime_of_prh(flat_dut, p, r, h);
         EXPECT_TRUE(CompareMatrices(w_prime, numeric_w_prime, kQuiteExact));
-        const drake::Vector3<double> s_hat = flat_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
+        const math::Vector3 s_hat = flat_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
         EXPECT_TRUE(CompareMatrices(w_prime.normalized(), s_hat, kVeryExact));
       }
     }
@@ -273,10 +269,10 @@ TEST_F(MultilaneLineRoadCurveTest, WorldFunctionDerivative) {
       for (double h : h_vector) {
         const Rot3 rotation = elevated_dut.Rabg_of_p(p);
         const double g_prime = elevated_dut.elevation().f_dot_p(p);
-        const drake::Vector3<double> w_prime = elevated_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
-        const drake::Vector3<double> numeric_w_prime = numeric_w_prime_of_prh(elevated_dut, p, r, h);
+        const math::Vector3 w_prime = elevated_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
+        const math::Vector3 numeric_w_prime = numeric_w_prime_of_prh(elevated_dut, p, r, h);
         EXPECT_TRUE(CompareMatrices(w_prime, numeric_w_prime, kQuiteExact));
-        const drake::Vector3<double> s_hat = elevated_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
+        const math::Vector3 s_hat = elevated_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
         EXPECT_TRUE(CompareMatrices(w_prime.normalized(), s_hat, kVeryExact));
       }
     }
@@ -292,10 +288,10 @@ TEST_F(MultilaneLineRoadCurveTest, WorldFunctionDerivative) {
       for (double h : h_vector) {
         const Rot3 rotation = superelevated_dut.Rabg_of_p(p);
         const double g_prime = superelevated_dut.elevation().f_dot_p(p);
-        const drake::Vector3<double> w_prime = superelevated_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
-        const drake::Vector3<double> numeric_w_prime = numeric_w_prime_of_prh(superelevated_dut, p, r, h);
+        const math::Vector3 w_prime = superelevated_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
+        const math::Vector3 numeric_w_prime = numeric_w_prime_of_prh(superelevated_dut, p, r, h);
         EXPECT_TRUE(CompareMatrices(w_prime, numeric_w_prime, kQuiteExact));
-        const drake::Vector3<double> s_hat = superelevated_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
+        const math::Vector3 s_hat = superelevated_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
         EXPECT_TRUE(CompareMatrices(w_prime.normalized(), s_hat, kVeryExact));
       }
     }
@@ -310,13 +306,13 @@ TEST_F(MultilaneLineRoadCurveTest, ReferenceCurveRotation) {
   const LineRoadCurve flat_dut(kOrigin, kDirection, zp, zp, kLinearTolerance, kScaleLength, kComputationPolicy);
   const double kZeroRoll{0.};
   const double kZeroPitch{0.};
-  const drake::Vector3<double> kFlatRDirection{-10., 10., 0.};
+  const math::Vector3 kFlatRDirection{-10., 10., 0.};
   for (double p : p_vector) {
     const Rot3 rotation = flat_dut.Rabg_of_p(p);
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(rotation.pitch(), kZeroPitch, kVeryExact);
     EXPECT_NEAR(rotation.yaw(), kHeading, kVeryExact);
-    const drake::Vector3<double> r_versor = flat_dut.r_hat_of_Rabg(rotation);
+    const math::Vector3 r_versor = flat_dut.r_hat_of_Rabg(rotation);
     EXPECT_TRUE(CompareMatrices(r_versor, kFlatRDirection.normalized(), kVeryExact));
   }
 
@@ -327,13 +323,13 @@ TEST_F(MultilaneLineRoadCurveTest, ReferenceCurveRotation) {
   const LineRoadCurve elevated_dut(kOrigin, kDirection, linear_elevation, zp, kLinearTolerance, kScaleLength,
                                    kComputationPolicy);
   const double kLinearPitch{-std::atan(linear_elevation.f_dot_p(0.))};
-  const drake::Vector3<double> kElevatedRDirection{-10., 10., 0.};
+  const math::Vector3 kElevatedRDirection{-10., 10., 0.};
   for (double p : p_vector) {
     const Rot3 rotation = elevated_dut.Rabg_of_p(p);
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(rotation.pitch(), kLinearPitch, kVeryExact);
     EXPECT_NEAR(rotation.yaw(), kHeading, kVeryExact);
-    const drake::Vector3<double> r_versor = elevated_dut.r_hat_of_Rabg(rotation);
+    const math::Vector3 r_versor = elevated_dut.r_hat_of_Rabg(rotation);
     EXPECT_TRUE(CompareMatrices(r_versor, kElevatedRDirection.normalized(), kVeryExact));
   }
 
@@ -342,13 +338,13 @@ TEST_F(MultilaneLineRoadCurveTest, ReferenceCurveRotation) {
   const CubicPolynomial constant_offset_superelevation(kSuperelevationOffset / kDirection.norm(), 0., 0., 0.);
   const LineRoadCurve superelevated_dut(kOrigin, kDirection, zp, constant_offset_superelevation, kLinearTolerance,
                                         kScaleLength, kComputationPolicy);
-  const drake::Vector3<double> kSuperelevatedRDirection{-10., 10., 10. * std::sqrt(2.)};
+  const math::Vector3 kSuperelevatedRDirection{-10., 10., 10. * std::sqrt(2.)};
   for (double p : p_vector) {
     const Rot3 rotation = superelevated_dut.Rabg_of_p(p);
     EXPECT_NEAR(rotation.roll(), kSuperelevationOffset, kVeryExact);
     EXPECT_NEAR(rotation.pitch(), kZeroPitch, kVeryExact);
     EXPECT_NEAR(rotation.yaw(), kHeading, kVeryExact);
-    const drake::Vector3<double> r_versor = superelevated_dut.r_hat_of_Rabg(rotation);
+    const math::Vector3 r_versor = superelevated_dut.r_hat_of_Rabg(rotation);
     EXPECT_TRUE(CompareMatrices(r_versor, kSuperelevatedRDirection.normalized(), kVeryExact));
   }
 }

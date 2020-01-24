@@ -23,10 +23,11 @@ ament_target_dependencies(maliput-utilities
 )
 
 target_link_libraries(maliput-utilities
-    multilane::multilane
+    drake::drake
     maliput::api
     maliput::common
-    drake::drake
+    maliput::math
+    multilane::multilane
 )
 
 add_executable(yaml_to_obj

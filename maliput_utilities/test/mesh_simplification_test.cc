@@ -132,16 +132,16 @@ class GeoMeshSimplificationTest : public ::testing::Test {
   const int kVertexHIndex{7};
   const int kVertexIIndex{8};
 
-  const drake::Vector3<double> kNormalVector{0., 0., 1.};
-  const drake::Vector3<double> kVertexAPosition{0., 0., 0.};
-  const drake::Vector3<double> kVertexBPosition{1., 0., 0.};
-  const drake::Vector3<double> kVertexCPosition{1., 1., 0.};
-  const drake::Vector3<double> kVertexDPosition{0., 1., 0.};
-  const drake::Vector3<double> kVertexEPosition{2., 0., 0.};
-  const drake::Vector3<double> kVertexFPosition{2., 1., 0.};
-  const drake::Vector3<double> kVertexGPosition{3., 1., 1.};
-  const drake::Vector3<double> kVertexHPosition{2., 2., -1.};
-  const drake::Vector3<double> kVertexIPosition{0., 2., 1.};
+  const math::Vector3 kNormalVector{0., 0., 1.};
+  const math::Vector3 kVertexAPosition{0., 0., 0.};
+  const math::Vector3 kVertexBPosition{1., 0., 0.};
+  const math::Vector3 kVertexCPosition{1., 1., 0.};
+  const math::Vector3 kVertexDPosition{0., 1., 0.};
+  const math::Vector3 kVertexEPosition{2., 0., 0.};
+  const math::Vector3 kVertexFPosition{2., 1., 0.};
+  const math::Vector3 kVertexGPosition{3., 1., 1.};
+  const math::Vector3 kVertexHPosition{2., 2., -1.};
+  const math::Vector3 kVertexIPosition{0., 2., 1.};
 
   const int kFirstQuadIndex{0};
   const int kSecondQuadIndex{1};

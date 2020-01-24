@@ -13,6 +13,7 @@
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_hash.h"
 #include "maliput/common/passkey.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace api {
@@ -76,8 +77,8 @@ class Bulb final {
     /// (-0.0889m, -0.1778m, -0.1778m) and a `p_BMax` of (0.0889m, 0.1778m,
     /// 0.1778m).
     BoundingBox() : p_BMin(-0.0889, -0.1778, -0.1778), p_BMax(0.0889, 0.1778, 0.1778) {}
-    Eigen::Vector3d p_BMin;
-    Eigen::Vector3d p_BMax;
+    maliput::math::Vector3 p_BMin;
+    maliput::math::Vector3 p_BMax;
   };
 
   /// Constructs a Bulb instance.

@@ -46,11 +46,11 @@ FaceAdjacencyMap ComputeFaceAdjacencyMap(const std::vector<IndexFace>& faces) {
   return adjacent_faces_map;
 }
 
-const drake::Vector3<double>& GetMeshFaceVertexPosition(const GeoMesh& mesh, const IndexFace::Vertex& vertex) {
+const math::Vector3& GetMeshFaceVertexPosition(const GeoMesh& mesh, const IndexFace::Vertex& vertex) {
   return mesh.vertices().at(vertex.vertex_index)->v().xyz();
 }
 
-const drake::Vector3<double>& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFace::Vertex& vertex) {
+const math::Vector3& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFace::Vertex& vertex) {
   return mesh.normals().at(vertex.normal_index)->n().xyz();
 }
 
@@ -64,8 +64,8 @@ bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face, double toleran
   MALIPUT_DEMAND(plane != nullptr);
   const std::vector<IndexFace::Vertex>& face_vertices = face.vertices();
   MALIPUT_DEMAND(face_vertices.size() >= 3);
-  const drake::Vector3<double>& x0 = GetMeshFaceVertexPosition(mesh, face_vertices[0]);
-  const drake::Vector3<double>& n0 = GetMeshFaceVertexNormal(mesh, face_vertices[0]);
+  const math::Vector3& x0 = GetMeshFaceVertexPosition(mesh, face_vertices[0]);
+  const math::Vector3& n0 = GetMeshFaceVertexNormal(mesh, face_vertices[0]);
   *plane = Hyperplane3<double>(n0.normalized(), x0);
   return DoMeshVerticesLieOnPlane(mesh, face_vertices.begin() + 1, face_vertices.end(), *plane, tolerance);
 }
@@ -177,7 +177,7 @@ std::vector<FaceVertexIndex> SimplifyMeshFacesContour(const GeoMesh& mesh,
       [&mesh](const FaceVertexIndex& face_vertex_index) {
         return GetMeshFaceVertexPosition(mesh, MeshFaceVertexAt(mesh, face_vertex_index));
       },
-      [](const drake::Vector3<double>& start_vertex, const drake::Vector3<double>& end_vertex) {
+      [](const math::Vector3& start_vertex, const math::Vector3& end_vertex) {
         return ParametrizedLine3<double>{start_vertex, (end_vertex - start_vertex).normalized()};
       },
       tolerance, std::back_inserter(simplified_contour_indices));

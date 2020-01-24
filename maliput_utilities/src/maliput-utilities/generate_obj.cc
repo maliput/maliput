@@ -20,6 +20,7 @@
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace utility {
@@ -52,7 +53,7 @@ const std::vector<Material> kMaterial{
     {kGrayedLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9},
     {kGrayedMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}};
 
-std::string FormatDrakeVector3AsRow(const drake::Vector3<double>& vec) {
+std::string FormatDrakeVector3AsRow(const math::Vector3& vec) {
   return fmt::format("{} {} {}", std::to_string(vec.x()), std::to_string(vec.y()), std::to_string(vec.z()));
 }
 
@@ -562,11 +563,10 @@ void RenderBranchPoint(const api::BranchPoint* const branch_point, const double 
     // If distance in sr-plane is too close and distance along h-axis is
     // too close, then increase elevation and try again.
     for (const api::GeoPosition& previous_xyz : *previous_centers) {
-      const drake::Vector3<double> delta_xyz = previous_xyz.xyz() - center_xyz.xyz();
-      const drake::Vector3<double> delta_srh = orientation.matrix().transpose() * delta_xyz;
+      const math::Vector3 delta_xyz = previous_xyz.xyz() - center_xyz.xyz();
+      const math::Vector3 delta_srh = orientation.matrix().transpose() * delta_xyz;
 
-      if ((drake::Vector2<double>(delta_srh.x(), delta_srh.y()).norm() < sr_margin) &&
-          (std::abs(delta_srh.z()) < h_margin)) {
+      if ((math::Vector2(delta_srh.x(), delta_srh.y()).norm() < sr_margin) && (std::abs(delta_srh.z()) < h_margin)) {
         has_conflict = true;
         elevation += height;
         break;

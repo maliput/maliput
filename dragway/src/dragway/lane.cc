@@ -7,9 +7,8 @@
 #include <optional>
 #include <string>
 
-#include "drake/math/saturate.h"
-
 #include "maliput/common/maliput_abort.h"
+#include "maliput/math/saturate.h"
 
 #include "dragway/branch_point.h"
 #include "dragway/road_geometry.h"
@@ -78,8 +77,6 @@ api::Rotation Lane::DoGetOrientation(const api::LanePosition&) const {
 }
 
 api::LanePositionResult Lane::DoToLanePosition(const api::GeoPosition& geo_pos) const {
-  using drake::math::saturate;
-
   const double min_x{0.};
   const double max_x{length_};
   const double min_y{segment_bounds_.min() + y_offset_};
@@ -92,12 +89,11 @@ api::LanePositionResult Lane::DoToLanePosition(const api::GeoPosition& geo_pos) 
   const double z = geo_pos.z();
 
   api::LanePositionResult result;
+  result.nearest_position = {math::saturate(x, min_x, max_x), math::saturate(y, min_y, max_y),
+                             math::saturate(z, min_z, max_z)};
 
-  result.nearest_position = {saturate(x, min_x, max_x), saturate(y, min_y, max_y), saturate(z, min_z, max_z)};
-
-  const double distance_unsat = (geo_pos.xyz() - result.nearest_position.xyz()).norm();
-  using std::max;
-  result.distance = max(0., distance_unsat);
+  const double distance_unsat = (geo_pos - result.nearest_position).xyz().norm();
+  result.distance = std::max(0., distance_unsat);
 
   result.lane_position = {result.nearest_position.x(), result.nearest_position.y() - y_offset_,
                           result.nearest_position.z()};
