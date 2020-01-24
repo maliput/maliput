@@ -6,6 +6,7 @@ set(MATH_SOURCES
   matrix.cc
   quaternion.cc
   roll_pitch_yaw.cc
+  saturate.cc
   vector.cc)
 
 add_library(math ${MATH_SOURCES})
@@ -17,7 +18,9 @@ target_include_directories(math
 
 target_link_libraries(math
   PUBLIC
-    drake::drake)
+    common
+    drake::drake
+)
 
 ##############################################################################
 # Export
@@ -28,6 +31,7 @@ install(
     EXPORT ${PROJECT_NAME}-targets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
+    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 ament_export_libraries(math)
