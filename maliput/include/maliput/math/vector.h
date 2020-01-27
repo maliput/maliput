@@ -121,6 +121,29 @@ class VectorBase {
   std::array<double, N> values_{};
 };
 
+/// A N-dimensional vector.
+/// @tparam N Is the dimension of the vector.
+template <size_t N>
+class Vector : public VectorBase<N, Vector<N>> {
+ public:
+  /// Constructs a null N-dimensional vector.
+  Vector() : VectorBase<N, Vector<N>>() {}
+
+  /// Constructs a N-dimensional vector using initializing list;
+  Vector(std::initializer_list<double> values) : VectorBase<N, Vector<N>>(values) {}
+
+  /// Constructs a N-dimensional vector from a std::array object;
+  Vector(std::array<double, N> values) : VectorBase<N, Vector<N>>(values) {}
+
+  /// Reduce the vector's dimension.
+  /// @param index Is the number of element to remove.
+  /// @return A vector reduced by one dimension.
+  ///
+  /// @throw common::assertion_error When `index` is out of range.
+  /// @throw common::assertion_error When N is less than 2.
+  Vector<N - 1> reduce(size_t index) const;
+};
+
 /// A 2-dimensional vector.
 class Vector2 : public VectorBase<2, Vector2> {
  public:

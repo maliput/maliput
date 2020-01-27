@@ -7,6 +7,11 @@ namespace math {
 namespace {
 
 GTEST_TEST(VectorTest, Constructors) {
+  {  // N dimension vector
+    EXPECT_EQ(Vector<2>({0., 0.}), Vector<2>());
+    EXPECT_EQ(Vector<2>({5., 98.}), Vector<2>({5., 98.}));
+    EXPECT_EQ(Vector<2>({1., 2.}), Vector<2>(std::array<double, 2>{1., 2.}));
+  }
   {  // 2- dimension vector.
     EXPECT_EQ(Vector2(0., 0.), Vector2());
     EXPECT_EQ(Vector2(5., 98.), Vector2({5., 98.}));
@@ -52,6 +57,10 @@ GTEST_TEST(VectorTest, Constructors) {
 }
 
 GTEST_TEST(VectorTest, PublicMethods) {
+  {  // N dimension vector
+    const Vector<4> kDut{1., 2., 3., 4.};
+    EXPECT_EQ(kDut.reduce(1), Vector<3>({1., 3., 4.}));
+  }
   {  // 2- dimension vector.
     const Vector2 kDut{3., 4.};
     EXPECT_EQ(kDut.x(), 3.);

@@ -1,6 +1,7 @@
 find_package(ament_cmake_gtest REQUIRED)
 find_package(ament_cmake_pytest REQUIRED)
 
+ament_add_gtest(matrix_test matrix_test.cc)
 ament_add_gtest(saturate_test saturate_test.cc)
 ament_add_gtest(vector_test vector_test.cc)
 
@@ -27,6 +28,7 @@ macro(add_dependencies_to_test target)
     endif()
 endmacro()
 
+add_dependencies_to_test(matrix_test)
 add_dependencies_to_test(saturate_test)
 add_dependencies_to_test(vector_test)
 
