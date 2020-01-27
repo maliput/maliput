@@ -97,6 +97,7 @@ SRange GetSRange(const Lane* lane, const YAML::Node& lane_node) {
 
 // Returns a api::LaneSRange obtained from the `lane_s_range_node`.
 // @throws maliput::common::assertion_error when 'road_geometry' is nullptr.
+// @throws maliput::common::assertion_error when `lane_s_range_node` is ill-defined.
 // @throws maliput::common::assertion_error when lane id is undefined within `lane_s_range_node`.
 LaneSRange GetLaneSRangeFromYamlNode(const YAML::Node& lane_s_range_node, const api::RoadGeometry* road_geometry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
