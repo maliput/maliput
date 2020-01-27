@@ -5,7 +5,6 @@
 #include <string>
 
 #include "drake/common/autodiff.h"
-#include "drake/common/symbolic.h"
 
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
@@ -122,7 +121,6 @@ class Lane {
   ///
   /// - double
   /// - drake::AutoDiffXd
-  /// - drake::symbolic::Expression
   ///
   /// They are already available to link against in the containing library.
   ///
@@ -156,7 +154,6 @@ class Lane {
   ///
   /// - double
   /// - drake::AutoDiffXd
-  /// - drake::symbolic::Expression
   ///
   /// They are already available to link against in the containing library.
   ///
@@ -274,24 +271,6 @@ class Lane {
     MALIPUT_THROW_MESSAGE(
         "DoToLanePosition has been instantiated with drake::AutoDiffXd arguments, "
         "but a Lane backend has not overridden its drake::AutoDiffXd specialization.");
-  }
-
-  // drake::symbolic::Expression overload of DoToGeoPosition().
-  virtual GeoPositionT<drake::symbolic::Expression> DoToGeoPositionSymbolic(
-      const LanePositionT<drake::symbolic::Expression>&) const {
-    MALIPUT_THROW_MESSAGE(
-        "DoToGeoPosition has been instantiated with drake::symbolic::Expression "
-        "arguments, but a Lane backend has not overridden its "
-        "drake::symbolic::Expression specialization.");
-  }
-
-  // drake::symbolic::Expression overload of DoToLanePosition().
-  virtual LanePositionResultT<drake::symbolic::Expression> DoToLanePositionSymbolic(
-      const GeoPositionT<drake::symbolic::Expression>&) const {
-    MALIPUT_THROW_MESSAGE(
-        "DoToLanePosition has been instantiated with drake::symbolic::Expression "
-        "arguments, but a Lane backend has not overridden its "
-        "drake::symbolic::Expression specialization.");
   }
 
   // TODO(jadecastro): Template the entire `api::Lane` class to prevent explicit
