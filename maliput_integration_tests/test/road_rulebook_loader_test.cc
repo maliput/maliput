@@ -6,18 +6,26 @@
 #include <string>
 #include <vector>
 
+#include <fstream>
+#include <fmt/format.h>
+#include "fmt/ostream.h"
+
 #include <gtest/gtest.h>
 
 #include "maliput/api/lane.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/traffic_lights.h"
+#include "maliput/api/unique_id.h"
 #include "maliput/base/rule_registry.h"
 #include "maliput/base/traffic_light_book_loader.h"
 #include "maliput/common/filesystem.h"
+#include "maliput/test_utilities/mock.h"
+#include "maliput/test_utilities/rules_compare.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
@@ -35,9 +43,11 @@ using maliput::api::LaneId;
 using maliput::api::LaneSRange;
 using maliput::api::LaneSRoute;
 using maliput::api::SRange;
+using maliput::api::UniqueId;
 using maliput::api::rules::BulbGroup;
 using maliput::api::rules::DirectionUsageRule;
 using maliput::api::rules::DiscreteValueRule;
+using maliput::api::rules::RangeValueRule;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::Rule;
 using maliput::api::rules::TrafficLight;
@@ -325,6 +335,150 @@ TEST_F(TestLoading2x2IntersectionRules, LoadFromFile) {
     for (const auto& test_case : direction_usage_cases) {
       const DirectionUsageRule rule = rulebook->GetRule(test_case.id());
       EXPECT_TRUE(MALIPUT_IS_EQUAL(rule, test_case));
+    }
+  }
+}
+
+// Evaluates the loader by creating a temporary file. The test will remove the temporary
+// file when TestLoadingRulesFromYaml::TearDown() is called.
+class TestLoadingRulesFromYaml : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    directory_.set_as_temp();
+    directory_.append("LoadRulebookFromYamlTest");
+    ASSERT_TRUE(common::Filesystem::create_directory(directory_));
+
+    rules_string_ = GenerateRulebookString();
+    filepath_ = directory_.get_path() + "/rules_loader_test.yaml";
+
+    GenerateYamlFileFromString(rules_string_, filepath_);
+    road_geometry_ = api::test::CreateTwoLanesRoadGeometry();
+    rule_registry_ = api::test::CreateBasicRuleRegistry();
+  }
+  void TearDown() override {
+    if (!filepath_.empty()) {
+      EXPECT_TRUE(common::Filesystem::remove_file(common::Path(filepath_)));
+    }
+    ASSERT_TRUE(common::Filesystem::remove_directory(directory_));
+  }
+  // Returns a YAML string representation of an api::rules::Rulebook with three rules with different rule types.
+  std::string GenerateRulebookString() {
+    return fmt::format(
+        R"R(RoadRulebook:
+  - id: "rule1"
+    type: "Right-Of-Way Rule Type"
+    zone:
+      - lane_id: "lane_a"
+        s_range: [0, 100]
+      - lane_id: "lane_b"
+        s_range: [0, 50]
+    values:
+      - value: "Go"
+        severity: 0
+        related_rules:
+        - Yield Group: ["RightOfWayRuleType/lane2"]
+          Vehicle Stop In Zone Behavior: ["VehicleStopInZoneBehaviorRuleType/lane34"]
+        related_unique_ids:
+        - Bulb Group: ["TrafficLightId-BulbGroupId"]
+      - value: "Stop"
+        severity: 0
+        related_rules:
+        - Yield Group: ["RightOfWayRuleType/lane2"]
+        related_unique_ids:
+        - Bulb Group: ["TrafficLightId-BulbGroupId"]
+  - id: "rule2"
+    type: "Speed-Limit Rule Type"
+    zone:
+      - lane_id: "lane_a"
+        s_range: [0, 100]
+      - lane_id: "lane_b"
+        s_range: [0, 50]
+    ranges:
+      - range: [16.6, 27.8]
+        description : "Interstate highway - day time"
+        severity: 0
+        related_rules: []
+        related_unique_ids: []
+)R");
+  }
+
+  // Creates a vector of api::rules::DiscreteValueRule.
+  std::vector<api::rules::DiscreteValueRule> CreateDiscreteValueRules() {
+    std::vector<DiscreteValueRule::DiscreteValue> discrete_values;
+    discrete_values.push_back(
+        {Rule::State::kStrict,
+         Rule::RelatedRules{{"Yield Group", {Rule::Id{"RightOfWayRuleType/lane2"}}},
+                            {"Vehicle Stop In Zone Behavior", {Rule::Id{"VehicleStopInZoneBehaviorRuleType/lane34"}}}},
+         Rule::RelatedUniqueIds{{"Bulb Group", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Go"});
+    discrete_values.push_back(
+        {Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {Rule::Id{"RightOfWayRuleType/lane2"}}}},
+         Rule::RelatedUniqueIds{{"Bulb Group", {UniqueId{"TrafficLightId-BulbGroupId"}}}}, "Stop"});
+    DiscreteValueRule discrete_value_rule{
+        Rule::Id{"rule1"}, Rule::TypeId{"Right-Of-Way Rule Type"},
+        LaneSRoute{{{LaneId{"lane_a"}, SRange{0., 100.}}, {LaneId{"lane_b"}, SRange{0., 50.}}}}, discrete_values};
+    return {{discrete_value_rule}};
+  }
+
+  // Creates a vector of api::rules::RangeValueRules.
+  std::vector<api::rules::RangeValueRule> CreateRangeValueRules() {
+    std::vector<RangeValueRule::Range> range_values;
+    range_values.push_back({Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
+                            "Interstate highway - day time", 16.6, 27.8});
+    RangeValueRule range_value_rule{
+        Rule::Id{"rule2"}, Rule::TypeId{"Speed-Limit Rule Type"},
+        LaneSRoute{{{LaneId{"lane_a"}, SRange{0., 100.}}, {LaneId{"lane_b"}, SRange{0., 50.}}}}, range_values};
+    return {{range_value_rule}};
+  }
+
+  // Generates a YAML file located in 'filepath' from 'string_to_yaml''s content.
+  void GenerateYamlFileFromString(const std::string& string_to_yaml, const std::string& filepath) {
+    std::ofstream os(filepath);
+    fmt::print(os, string_to_yaml);
+  }
+
+  common::Path directory_;
+  std::string rules_string_;
+  std::string filepath_;
+  std::unique_ptr<api::RoadGeometry> road_geometry_;
+  std::unique_ptr<api::rules::RuleRegistry> rule_registry_;
+};
+
+TEST_F(TestLoadingRulesFromYaml, LoadFromFile) {
+  std::unique_ptr<api::rules::RoadRulebook> rulebook =
+      LoadRoadRulebookFromFile(road_geometry_.get(), filepath_, *rule_registry_.get());
+  api::rules::RoadRulebook::QueryResults rules = rulebook->Rules();
+  {  // Verify discrete value rules.
+    const std::vector<api::rules::DiscreteValueRule> expected_discrete_rules = CreateDiscreteValueRules();
+    const std::map<DiscreteValueRule::Id, DiscreteValueRule> ids_discrete_value_rules = rules.discrete_value_rules;
+    EXPECT_EQ(ids_discrete_value_rules.size(), expected_discrete_rules.size());
+    for (const auto& id_discrete_value_rule : ids_discrete_value_rules) {
+      const auto it =
+          std::find_if(expected_discrete_rules.begin(), expected_discrete_rules.end(),
+                       [id_discrete_value_rule](api::rules::DiscreteValueRule expected_discrete_rule) {
+                         return api::rules::test::IsEqual("DiscreteValueRule", "Expected DiscreteValueRule",
+                                                          id_discrete_value_rule.second,
+                                                          expected_discrete_rule) == testing::AssertionSuccess();
+                         return api::rules::test::IsEqual(
+                                    "DiscreteValues", "Expected DiscreteValues", id_discrete_value_rule.second.values(),
+                                    expected_discrete_rule.values()) == testing::AssertionSuccess();
+                       });
+      EXPECT_NE(it, expected_discrete_rules.end());
+    }
+  }
+  {  // Verify range value rules.
+    const std::vector<api::rules::RangeValueRule> expected_range_rules = CreateRangeValueRules();
+    const std::map<RangeValueRule::Id, RangeValueRule> ids_range_value_rules = rules.range_value_rules;
+    EXPECT_EQ(rules.range_value_rules.size(), expected_range_rules.size());
+    for (const auto& id_range_value_rule : ids_range_value_rules) {
+      const auto it = std::find_if(
+          expected_range_rules.begin(), expected_range_rules.end(),
+          [id_range_value_rule](api::rules::RangeValueRule expected_range_rule) {
+            return api::rules::test::IsEqual("RangeValueRule", "Expected RangeValueRule", id_range_value_rule.second,
+                                             expected_range_rule) == testing::AssertionSuccess();
+            return api::rules::test::IsEqual("RangeValues", "Expected RangeValues", id_range_value_rule.second.ranges(),
+                                             expected_range_rule.ranges()) == testing::AssertionSuccess();
+          });
+      EXPECT_NE(it, expected_range_rules.end());
     }
   }
 }

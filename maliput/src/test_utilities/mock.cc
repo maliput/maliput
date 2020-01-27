@@ -852,6 +852,21 @@ std::unique_ptr<IntersectionBook> CreateIntersectionBook() { return std::make_un
 
 std::unique_ptr<rules::RuleRegistry> CreateRuleRegistry() { return std::make_unique<rules::RuleRegistry>(); }
 
+std::unique_ptr<rules::RuleRegistry> CreateBasicRuleRegistry() {
+  std::unique_ptr<rules::RuleRegistry> rule_registry = std::make_unique<rules::RuleRegistry>();
+  const std::vector<DiscreteValueRule::DiscreteValue> discrete_values{
+      {Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {}}, {"Vehicle Stop In Zone Behavior", {}}},
+       Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Go"},
+      {Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {}}}, Rule::RelatedUniqueIds{{"Bulb Group", {}}},
+       "Stop"}};
+  rule_registry->RegisterDiscreteValueRule(Rule::TypeId("Right-Of-Way Rule Type"), discrete_values);
+  const std::vector<RangeValueRule::Range> range_values{
+      {Rule::State::kStrict, Rule::RelatedRules{{"Yield Group", {}}, {"Vehicle Stop In Zone Behavior", {}}},
+       Rule::RelatedUniqueIds{{"Bulb Group", {}}}, "Interstate highway - day time", 16.6, 27.8}};
+  rule_registry->RegisterRangeValueRule(Rule::TypeId("Speed-Limit Rule Type"), range_values);
+  return rule_registry;
+}
+
 std::unique_ptr<rules::DiscreteValueRuleStateProvider> CreateDiscreteValueRuleStateProvider() {
   return std::make_unique<MockDiscreteValueRuleStateProvider>();
 }

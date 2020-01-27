@@ -5,6 +5,7 @@
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/base/yaml_conversion.h"
 
 using maliput::api::rules::DiscreteValueRule;
 using maliput::api::rules::RangeValueRule;
@@ -44,59 +45,6 @@ struct convert<std::map<std::string, std::vector<T>>> {
 namespace maliput {
 namespace {
 
-// Constants to identify attributes of DiscreteValueRule Types and DiscreteValueRule Types.
-constexpr const char* const kValue = "value";
-constexpr const char* const kRange = "range";
-constexpr const char* const kDescription = "description";
-constexpr const char* const kSeverity = "severity";
-constexpr const char* const kRelatedRules = "related_rules";
-constexpr const char* const kRelatedUniqueIds = "related_unique_ids";
-// Label to identify rule type.
-enum class RuleType {
-  // Label for a DiscreteValueRule Type.
-  kDiscreteValueRuleType,
-  // Label for a RangeValueRule Type.
-  kRangeValueRuleType,
-  // Label for an unidentified rule type.
-  kUnknownRuleType,
-};
-
-// Determines whether the `rule_node` corresponds to a api::rules::DiscreteValueRule::DiscreteValue description.
-bool IsDiscreteValue(const YAML::Node& rule_node) {
-  if (!rule_node[kValue].IsDefined()) {
-    return false;
-  }
-  int attribute_count{1};
-  if (rule_node[kSeverity].IsDefined()) {
-    attribute_count++;
-  }
-  if (rule_node[kRelatedRules].IsDefined()) {
-    attribute_count++;
-  }
-  if (rule_node[kRelatedUniqueIds].IsDefined()) {
-    attribute_count++;
-  }
-  return rule_node.size() == attribute_count;
-}
-
-// Determines whether the `rule_node` corresponds to a api::rules::RangeValueRule::Range description.
-bool IsRangeValue(const YAML::Node& rule_node) {
-  if (!rule_node[kRange].IsDefined() || !rule_node[kDescription].IsDefined()) {
-    return false;
-  }
-  int attribute_count{2};
-  if (rule_node[kSeverity].IsDefined()) {
-    attribute_count++;
-  }
-  if (rule_node[kRelatedRules].IsDefined()) {
-    attribute_count++;
-  }
-  if (rule_node[kRelatedUniqueIds].IsDefined()) {
-    attribute_count++;
-  }
-  return rule_node.size() == attribute_count;
-}
-
 // Returns wether the `rule_nodes` refer to a RuleType::kDiscreteValueRuleType or
 // RuleType::kRangeValueRuleType. RuleType::kUnknownRuleType is returned if the rule type is not well-defined.
 RuleType EvaluateRuleType(const YAML::Node& rule_nodes) {
@@ -122,34 +70,17 @@ RuleType EvaluateRuleType(const YAML::Node& rule_nodes) {
   return rule_type;
 }
 
-// Returns the severity field value from the `node`.
-int GetSeverityFromYamlNode(const YAML::Node& node) {
-  if (node[kSeverity].IsDefined()) {
-    const int severity = node["severity"].as<int>();
-    MALIPUT_THROW_UNLESS(severity >= 0);
-    return severity;
-  }
-  return Rule::State::kStrict;
-}
-
 // Returns a Rule::RelatedRules containing the related_rules field value from the `node`.
 Rule::RelatedRules GetRelatedRuleFromYamlNode(const YAML::Node& node) {
-  return node[kRelatedRules].IsDefined() ? node[kRelatedRules].as<Rule::RelatedRules>() : Rule::RelatedRules{};
+  return node[RuleConstants::kRelatedRules].IsDefined() ? node[RuleConstants::kRelatedRules].as<Rule::RelatedRules>()
+                                                        : Rule::RelatedRules{};
 }
 
 // Returns a Rule::RelatedUniqueIds containing the related_unique_ids field value from the `node`.
 Rule::RelatedUniqueIds GetRelatedUniqueIdsFromYamlNode(const YAML::Node& node) {
-  return node[kRelatedUniqueIds].IsDefined() ? node[kRelatedUniqueIds].as<Rule::RelatedUniqueIds>()
-                                             : Rule::RelatedUniqueIds{};
-}
-
-// Returns a std::pair containing the min and max of the range field values from the node.
-std::pair<double, double> GetRangeMinMaxValuesFromYamlNode(const YAML::Node& node) {
-  MALIPUT_THROW_UNLESS(node[kRange].size() == 2);
-  double min = node[kRange][0].as<double>();
-  double max = node[kRange][1].as<double>();
-  MALIPUT_THROW_UNLESS(min <= max);
-  return std::make_pair(min, max);
+  return node[RuleConstants::kRelatedUniqueIds].IsDefined()
+             ? node[RuleConstants::kRelatedUniqueIds].as<Rule::RelatedUniqueIds>()
+             : Rule::RelatedUniqueIds{};
 }
 
 // Register a DiscreteValueRule type within the `rule_registry`.
@@ -161,7 +92,7 @@ void RegisterDiscreteValueRuleType(RuleRegistry* rule_registry, const std::strin
   for (const YAML::Node& rule_node : rule_nodes) {
     discrete_values.push_back(DiscreteValueRule::DiscreteValue{
         GetSeverityFromYamlNode(rule_node), GetRelatedRuleFromYamlNode(rule_node),
-        GetRelatedUniqueIdsFromYamlNode(rule_node), rule_node[kValue].as<std::string>()});
+        GetRelatedUniqueIdsFromYamlNode(rule_node), rule_node[DiscreteValueRuleConstants::kValue].as<std::string>()});
   }
   rule_registry->RegisterDiscreteValueRule(Rule::TypeId(rule_type_id), discrete_values);
 }
@@ -176,7 +107,7 @@ void RegisterRangeValueRuleType(RuleRegistry* rule_registry, const std::string& 
     const std::pair<double, double> min_max{GetRangeMinMaxValuesFromYamlNode(rule_node)};
     ranges.push_back(RangeValueRule::Range{GetSeverityFromYamlNode(rule_node), GetRelatedRuleFromYamlNode(rule_node),
                                            GetRelatedUniqueIdsFromYamlNode(rule_node),
-                                           rule_node[kDescription].as<std::string>(), min_max.first, min_max.second});
+                                           GetDescriptionFromYamlNode(rule_node), min_max.first, min_max.second});
   }
   rule_registry->RegisterRangeValueRule(Rule::TypeId(rule_type_id), ranges);
 }
