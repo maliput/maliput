@@ -78,11 +78,6 @@ api::GeoPositionT<drake::AutoDiffXd> Lane::DoToGeoPositionAutoDiff(
   return {lane_pos.s(), lane_pos.r() + drake::AutoDiffXd(Lane::y_offset()), lane_pos.h()};
 }
 
-api::GeoPositionT<drake::symbolic::Expression> Lane::DoToGeoPositionSymbolic(
-    const api::LanePositionT<drake::symbolic::Expression>& lane_pos) const {
-  return {lane_pos.s(), lane_pos.r() + drake::symbolic::Expression(Lane::y_offset()), lane_pos.h()};
-}
-
 api::Rotation Lane::DoGetOrientation(const api::LanePosition&) const {
   return api::Rotation();  // Default is Identity.
 }
@@ -94,11 +89,6 @@ api::LanePositionResult Lane::DoToLanePosition(const api::GeoPosition& geo_pos) 
 api::LanePositionResultT<drake::AutoDiffXd> Lane::DoToLanePositionAutoDiff(
     const api::GeoPositionT<drake::AutoDiffXd>& geo_pos) const {
   return ImplDoToLanePositionT<drake::AutoDiffXd>(geo_pos);
-}
-
-api::LanePositionResultT<drake::symbolic::Expression> Lane::DoToLanePositionSymbolic(
-    const api::GeoPositionT<drake::symbolic::Expression>& geo_pos) const {
-  return ImplDoToLanePositionT<drake::symbolic::Expression>(geo_pos);
 }
 
 template <typename T>

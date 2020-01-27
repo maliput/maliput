@@ -58,7 +58,6 @@ std::ostream& operator<<(std::ostream& out, const LaneEnd::Which& which_end);
 ///
 /// - double
 /// - drake::AutoDiffXd
-/// - drake::symbolic::Expression
 ///
 /// They are already available to link against in the containing library.
 template <typename T>
@@ -251,7 +250,6 @@ std::ostream& operator<<(std::ostream& out, const Rotation& rotation);
 ///
 /// - double
 /// - drake::AutoDiffXd
-/// - drake::symbolic::Expression
 ///
 /// They are already available to link against in the containing library.
 template <typename T>
@@ -311,7 +309,6 @@ using LanePosition = LanePositionT<double>;
 ///
 /// - double
 /// - drake::AutoDiffXd
-/// - drake::symbolic::Expression
 ///
 /// They are already available to link against in the containing library.
 template <typename T>

@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include "drake/common/autodiff.h"
-#include "drake/common/symbolic.h"
 
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
@@ -36,7 +35,7 @@ static constexpr double kX2 = 0.567;
 template <typename T>
 class LanePositionTest : public ::testing::Test {};
 
-typedef ::testing::Types<double, drake::AutoDiffXd, drake::symbolic::Expression> Implementations;
+typedef ::testing::Types<double, drake::AutoDiffXd> Implementations;
 TYPED_TEST_CASE(LanePositionTest, Implementations);
 
 TYPED_TEST(LanePositionTest, DefaultConstructor) {

@@ -154,16 +154,10 @@ class Lane final : public api::Lane {
 
   api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const final;
 
-  api::GeoPositionT<drake::symbolic::Expression> DoToGeoPositionSymbolic(
-      const api::LanePositionT<drake::symbolic::Expression>& lane_pos) const final;
-
   api::LanePositionResult DoToLanePosition(const api::GeoPosition& geo_pos) const final;
 
   api::LanePositionResultT<drake::AutoDiffXd> DoToLanePositionAutoDiff(
       const api::GeoPositionT<drake::AutoDiffXd>& geo_pos) const final;
-
-  api::LanePositionResultT<drake::symbolic::Expression> DoToLanePositionSymbolic(
-      const api::GeoPositionT<drake::symbolic::Expression>& geo_pos) const final;
 
   template <typename T>
   api::LanePositionResultT<T> ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos) const;

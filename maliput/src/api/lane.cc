@@ -24,12 +24,6 @@ GeoPositionT<drake::AutoDiffXd> Lane::ToGeoPositionT<drake::AutoDiffXd>(
 }
 
 template <>
-GeoPositionT<drake::symbolic::Expression> Lane::ToGeoPositionT<drake::symbolic::Expression>(
-    const LanePositionT<drake::symbolic::Expression>& lane_pos) const {
-  return DoToGeoPositionSymbolic(lane_pos);
-}
-
-template <>
 LanePositionResultT<double> Lane::ToLanePositionT<double>(const GeoPositionT<double>& geo_pos) const {
   return DoToLanePosition(geo_pos);
 }
@@ -62,12 +56,6 @@ LanePositionResultT<drake::AutoDiffXd> Lane::ToLanePositionT<drake::AutoDiffXd>(
   Eigen::internal::make_coherent(result.distance.derivatives(), deriv);
 
   return result;
-}
-
-template <>
-LanePositionResultT<drake::symbolic::Expression> Lane::ToLanePositionT<drake::symbolic::Expression>(
-    const GeoPositionT<drake::symbolic::Expression>& geo_pos) const {
-  return DoToLanePositionSymbolic(geo_pos);
 }
 
 bool IsWithinRange(double x, double min, double max, double tolerance) {
