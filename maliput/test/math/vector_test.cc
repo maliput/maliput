@@ -86,8 +86,8 @@ GTEST_TEST(VectorTest, Operators) {
     EXPECT_EQ(dut[1], 44.);
     EXPECT_NE(kDut, dut);
     EXPECT_EQ(kDut + dut, Vector2(36., 48.));
-    EXPECT_EQ(kDut - dut, Vector2(30., 40.));
-    EXPECT_EQ(kDut * dut, 275.);
+    EXPECT_EQ(dut - kDut, Vector2(30., 40.));
+    EXPECT_EQ(kDut.dot(dut), 275.);
     EXPECT_EQ(kDut * 2, Vector2(6., 8.));
     EXPECT_EQ(2 * kDut, Vector2(6., 8.));
     EXPECT_EQ(kDut / 2, Vector2(1.5, 2.));
@@ -110,8 +110,8 @@ GTEST_TEST(VectorTest, Operators) {
     EXPECT_EQ(dut[2], 55.);
     EXPECT_NE(kDut, dut);
     EXPECT_EQ(kDut + dut, Vector3(36., 48., 60.));
-    EXPECT_EQ(kDut - dut, Vector3(30., 40., 50.));
-    EXPECT_EQ(kDut * dut, 550.);
+    EXPECT_EQ(dut - kDut, Vector3(30., 40., 50.));
+    EXPECT_EQ(kDut.dot(dut), 550.);
     EXPECT_EQ(kDut * 2, Vector3(6., 8., 10.));
     EXPECT_EQ(2 * kDut, Vector3(6., 8., 10.));
     EXPECT_EQ(kDut / 2, Vector3(1.5, 2., 2.5));
@@ -137,8 +137,8 @@ GTEST_TEST(VectorTest, Operators) {
     EXPECT_EQ(dut[3], 66.);
     EXPECT_NE(kDut, dut);
     EXPECT_EQ(kDut + dut, Vector4(36., 48., 60., 72.));
-    EXPECT_EQ(kDut - dut, Vector4(30., 40., 50., 60.));
-    EXPECT_EQ(kDut * dut, 946.);
+    EXPECT_EQ(dut - kDut, Vector4(30., 40., 50., 60.));
+    EXPECT_EQ(kDut.dot(dut), 946.);
     EXPECT_EQ(kDut * 2, Vector4(6., 8., 10., 12.));
     EXPECT_EQ(2 * kDut, Vector4(6., 8., 10., 12.));
     EXPECT_EQ(kDut / 2, Vector4(1.5, 2., 2.5, 3.));

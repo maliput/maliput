@@ -37,6 +37,14 @@ VectorBase<N, Derived>::VectorBase(std::initializer_list<double> values) {
 }
 
 template <size_t N, typename Derived>
+double VectorBase<N, Derived>::dot(const VectorBase<N, Derived>& vector) const {
+  std::array<double, N> res{};
+  std::transform(vector.values_.cbegin(), vector.values_.cend(), values_.cbegin(), res.begin(),
+                 [](double a_value, double b_value) { return a_value * b_value; });
+  return std::accumulate(res.begin(), res.end(), 0);
+}
+
+template <size_t N, typename Derived>
 double VectorBase<N, Derived>::norm() const {
   std::array<double, N> squared;
   std::transform(values_.begin(), values_.end(), squared.begin(), [](double value) { return value * value; });
@@ -85,7 +93,7 @@ bool VectorBase<N, Derived>::operator!=(const VectorBase<N, Derived>& vector) co
 template <size_t N, typename Derived>
 Derived VectorBase<N, Derived>::operator+(const VectorBase<N, Derived>& vector) const {
   std::array<double, N> res{};
-  std::transform(vector.values_.cbegin(), vector.values_.cend(), values_.cbegin(), res.begin(),
+  std::transform(values_.cbegin(), values_.cend(), vector.values_.cbegin(), res.begin(),
                  [](double a_value, double b_value) { return a_value + b_value; });
   return Derived(res);
 }
@@ -93,17 +101,9 @@ Derived VectorBase<N, Derived>::operator+(const VectorBase<N, Derived>& vector) 
 template <size_t N, typename Derived>
 Derived VectorBase<N, Derived>::operator-(const VectorBase<N, Derived>& vector) const {
   std::array<double, N> res{};
-  std::transform(vector.values_.cbegin(), vector.values_.cend(), values_.cbegin(), res.begin(),
+  std::transform(values_.cbegin(), values_.cend(), vector.values_.cbegin(), res.begin(),
                  [](double a_value, double b_value) { return a_value - b_value; });
   return Derived(res);
-}
-
-template <size_t N, typename Derived>
-double VectorBase<N, Derived>::operator*(const VectorBase<N, Derived>& vector) const {
-  std::array<double, N> res{};
-  std::transform(vector.values_.cbegin(), vector.values_.cend(), values_.cbegin(), res.begin(),
-                 [](double a_value, double b_value) { return a_value * b_value; });
-  return std::accumulate(res.begin(), res.end(), 0);
 }
 
 template <size_t N, typename Derived>

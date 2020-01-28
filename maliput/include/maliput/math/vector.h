@@ -46,6 +46,9 @@ class VectorBase {
   /// @throws common::assertion_error when size of `values` differs with the N parameter
   VectorBase(std::initializer_list<double> values);
 
+  /// @returns Scalar vectorial product between vectors.
+  double dot(const VectorBase<N, Derived>& vector) const;
+
   /// @returns a double containing the norm of the vector.
   double norm() const;
 
@@ -84,10 +87,6 @@ class VectorBase {
 
   /// Substract operator overload.
   Derived operator-(const VectorBase<N, Derived>& vector) const;
-
-  /// Product operator overload between VectorBase<N, Derived> vectors.
-  /// @returns Scalar vectorial product between vectors.
-  double operator*(const VectorBase<N, Derived>& vector) const;
 
   /// Divide operator overload between a VectorBase<N, Derived> vector and a double.
   Derived operator/(double scalar) const;
