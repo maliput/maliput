@@ -152,9 +152,6 @@ class Lane final : public api::Lane {
 
   api::LanePositionResult DoToLanePosition(const api::GeoPosition& geo_pos) const final;
 
-  template <typename T>
-  api::LanePositionResultT<T> ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos) const;
-
   const Segment* segment_{};  // The segment to which this lane belongs.
   const api::LaneId id_;
   const int index_{};  // The index of this lane within a Segment.

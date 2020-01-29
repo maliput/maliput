@@ -78,33 +78,28 @@ api::Rotation Lane::DoGetOrientation(const api::LanePosition&) const {
 }
 
 api::LanePositionResult Lane::DoToLanePosition(const api::GeoPosition& geo_pos) const {
-  return ImplDoToLanePositionT<double>(geo_pos);
-}
-
-template <typename T>
-api::LanePositionResultT<T> Lane::ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos) const {
   using drake::math::saturate;
 
-  const T min_x{0.};
-  const T max_x{length_};
-  const T min_y{segment_bounds_.min() + y_offset_};
-  const T max_y{segment_bounds_.max() + y_offset_};
-  const T min_z{elevation_bounds_.min()};
-  const T max_z{elevation_bounds_.max()};
+  const double min_x{0.};
+  const double max_x{length_};
+  const double min_y{segment_bounds_.min() + y_offset_};
+  const double max_y{segment_bounds_.max() + y_offset_};
+  const double min_z{elevation_bounds_.min()};
+  const double max_z{elevation_bounds_.max()};
 
-  const T x = geo_pos.x();
-  const T y = geo_pos.y();
-  const T z = geo_pos.z();
+  const double x = geo_pos.x();
+  const double y = geo_pos.y();
+  const double z = geo_pos.z();
 
-  api::LanePositionResultT<T> result;
+  api::LanePositionResult result;
 
   result.nearest_position = {saturate(x, min_x, max_x), saturate(y, min_y, max_y), saturate(z, min_z, max_z)};
 
-  const T distance_unsat = (geo_pos.xyz() - result.nearest_position.xyz()).norm();
+  const double distance_unsat = (geo_pos.xyz() - result.nearest_position.xyz()).norm();
   using std::max;
-  result.distance = max(T(0.), distance_unsat);
+  result.distance = max(0., distance_unsat);
 
-  result.lane_position = {result.nearest_position.x(), result.nearest_position.y() - T(y_offset_),
+  result.lane_position = {result.nearest_position.x(), result.nearest_position.y() - y_offset_,
                           result.nearest_position.z()};
 
   return result;
