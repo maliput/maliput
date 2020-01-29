@@ -11,16 +11,43 @@ GTEST_TEST(VectorTest, Constructors) {
     EXPECT_EQ(Vector2(0., 0.), Vector2());
     EXPECT_EQ(Vector2(5., 98.), Vector2({5., 98.}));
     EXPECT_EQ(Vector2(1., 2.), Vector2(std::array<double, 2>{1., 2.}));
+    {
+      const Vector2 kDut{3., 4.};
+      Vector2 dut = kDut;
+      EXPECT_EQ(kDut, dut);
+    }
+    {
+      Vector2 dut = Vector2(45., 9.);
+      EXPECT_EQ(dut, Vector2(45., 9.));
+    }
   }
   {  // 3- dimension vector.
     EXPECT_EQ(Vector3(0., 0., 0.), Vector3());
     EXPECT_EQ(Vector3(5., 98., -35.), Vector3({5., 98., -35.}));
     EXPECT_EQ(Vector3(1., 2., 3.), Vector3(std::array<double, 3>{1., 2., 3.}));
   }
+  {
+    const Vector3 kDut{3., 4., 1.};
+    Vector3 dut = kDut;
+    EXPECT_EQ(kDut, dut);
+  }
+  {
+    Vector3 dut = Vector3(45., 9., 35.);
+    EXPECT_EQ(dut, Vector3(45., 9., 35.));
+  }
   {  // 4- dimension vector.
     EXPECT_EQ(Vector4(0., 0., 0., 0.), Vector4());
     EXPECT_EQ(Vector4(5., 98., -35., 56.), Vector4({5., 98., -35., 56.}));
     EXPECT_EQ(Vector4(1., 2., 3., 4.), Vector4(std::array<double, 4>{1., 2., 3., 4.}));
+  }
+  {
+    const Vector4 kDut{3., 4., 1., 10.};
+    Vector4 dut = kDut;
+    EXPECT_EQ(kDut, dut);
+  }
+  {
+    Vector4 dut = Vector4(45., 9., 35., 27.);
+    EXPECT_EQ(dut, Vector4(45., 9., 35., 27.));
   }
 }
 
@@ -78,6 +105,10 @@ GTEST_TEST(VectorTest, Operators) {
     const Vector2 kDut{3., 4.};
     Vector2 dut = kDut;
     EXPECT_EQ(kDut, dut);
+    dut = Vector2{1., 5.};
+    EXPECT_EQ(dut, Vector2(1., 5.));
+    dut = kDut;
+    EXPECT_EQ(kDut, dut);
     EXPECT_EQ(kDut[0], 3.);
     EXPECT_EQ(kDut[1], 4.);
     dut[0] = 33;
@@ -93,11 +124,15 @@ GTEST_TEST(VectorTest, Operators) {
     EXPECT_EQ(kDut / 2, Vector2(1.5, 2.));
     std::stringstream ss;
     ss << kDut;
-    EXPECT_EQ(ss.str(), "{ 3 4 }");
+    EXPECT_EQ(ss.str(), "{3, 4}");
   }
   {  // 3- dimension vector.
     const Vector3 kDut{3., 4., 5.};
     Vector3 dut = kDut;
+    EXPECT_EQ(kDut, dut);
+    dut = Vector3{1., 5., 25.};
+    EXPECT_EQ(dut, Vector3(1., 5., 25.));
+    dut = kDut;
     EXPECT_EQ(kDut, dut);
     EXPECT_EQ(kDut[0], 3.);
     EXPECT_EQ(kDut[1], 4.);
@@ -117,11 +152,15 @@ GTEST_TEST(VectorTest, Operators) {
     EXPECT_EQ(kDut / 2, Vector3(1.5, 2., 2.5));
     std::stringstream ss;
     ss << kDut;
-    EXPECT_EQ(ss.str(), "{ 3 4 5 }");
+    EXPECT_EQ(ss.str(), "{3, 4, 5}");
   }
   {  // 4- dimension vector.
     const Vector4 kDut{3., 4., 5., 6.};
     Vector4 dut = kDut;
+    EXPECT_EQ(kDut, dut);
+    dut = Vector4{1., 5., 25., -55.};
+    EXPECT_EQ(dut, Vector4(1., 5., 25., -55.));
+    dut = kDut;
     EXPECT_EQ(kDut, dut);
     EXPECT_EQ(kDut[0], 3.);
     EXPECT_EQ(kDut[1], 4.);
@@ -144,7 +183,7 @@ GTEST_TEST(VectorTest, Operators) {
     EXPECT_EQ(kDut / 2, Vector4(1.5, 2., 2.5, 3.));
     std::stringstream ss;
     ss << kDut;
-    EXPECT_EQ(ss.str(), "{ 3 4 5 6 }");
+    EXPECT_EQ(ss.str(), "{3, 4, 5, 6}");
   }
 }
 GTEST_TEST(VectorTest, StaticMethods) {
