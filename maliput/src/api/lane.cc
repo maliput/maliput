@@ -6,17 +6,6 @@
 namespace maliput {
 namespace api {
 
-// These instantiations must match the API documentation in lane.h.
-template <>
-GeoPositionT<double> Lane::ToGeoPositionT<double>(const LanePositionT<double>& lane_pos) const {
-  return DoToGeoPosition(lane_pos);
-}
-
-template <>
-LanePositionResultT<double> Lane::ToLanePositionT<double>(const GeoPositionT<double>& geo_pos) const {
-  return DoToLanePosition(geo_pos);
-}
-
 bool IsWithinRange(double x, double min, double max, double tolerance) {
   return ((min - tolerance) <= x) && (x <= (max + tolerance));
 }

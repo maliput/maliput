@@ -97,27 +97,7 @@ class Lane {
   /// @pre The s component of @p lane_pos must be in domain [0, Lane::length()].
   /// @pre The r component of @p lane_pos must be in domain [Rmin, Rmax]
   ///      derived from Lane::segment_bounds().
-  //
-  // TODO(jadecastro): Generalize `Lane::ToGeoPosition` (and possibly others)
-  // with another member function `Lane::ToGeoPositionT<T>()`.
   GeoPosition ToGeoPosition(const LanePosition& lane_pos) const { return DoToGeoPosition(lane_pos); }
-
-  // TODO(jadecastro): Apply this implementation in all the subclasses of
-  // `api::Lane`.
-  /// Generalization of ToGeoPosition to arbitrary scalar types, where the
-  /// structures `LanePositionT<T>` and `GeoPositionT<T>` are used in place of
-  /// `LanePosition` and `GeoPosition`, respectively.
-  ///
-  /// Instantiated templates for the following kinds of T's are provided:
-  ///
-  /// - double
-  ///
-  /// They are already available to link against in the containing library.
-  ///
-  /// @note This is an experimental API that is not necessarily implemented in
-  /// all back-end implementations.
-  template <typename T>
-  GeoPositionT<T> ToGeoPositionT(const LanePositionT<T>& lane_pos) const;
 
   /// Determines the LanePosition corresponding to GeoPosition @p geo_pos.
   ///
@@ -125,24 +105,6 @@ class Lane {
   /// `ToGeoPosition(result.lane_position)` is within `linear_tolerance()`
   ///  of `result.nearest_position`.
   LanePositionResult ToLanePosition(const GeoPosition& geo_pos) const { return DoToLanePosition(geo_pos); }
-
-  /// Generalization of ToLanePosition to arbitrary scalar types, where the
-  /// structures `LanePositionResultT<T>` and `GeoPositionT<T>` are used in
-  /// place of `LanePositionResult` and `GeoPosition`, respectively.
-  ///
-  /// Instantiated templates for the following kinds of T's are provided:
-  ///
-  /// - double
-  ///
-  /// They are already available to link against in the containing library.
-  ///
-  /// @note This is an experimental API that is not necessarily implemented in
-  /// all back-end implementations.
-  //
-  // TODO(jadecastro): Apply this implementation in all the subclasses of
-  // `api::Lane`.
-  template <typename T>
-  LanePositionResultT<T> ToLanePositionT(const GeoPositionT<T>& geo_pos) const;
 
   // TODO(maddog@tri.global) Method to convert LanePosition to that of
   //                         another Lane.  (Should assert that both
