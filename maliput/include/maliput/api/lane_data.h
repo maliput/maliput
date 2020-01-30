@@ -61,7 +61,7 @@ class GeoPosition {
   GeoPosition() : xyz_(0., 0., 0.) {}
 
   /// Fully parameterized constructor.
-  GeoPosition(const double& x, const double& y, const double& z) : xyz_(x, y, z) {}
+  GeoPosition(double x, double y, double z) : xyz_(x, y, z) {}
 
   /// Constructs a GeoPosition from a 3-vector @p xyz of the form `[x, y, z]`.
   static GeoPosition FromXyz(const drake::Vector3<double>& xyz) { return GeoPosition(xyz); }
@@ -76,15 +76,15 @@ class GeoPosition {
   /// Gets `x` value.
   double x() const { return xyz_.x(); }
   /// Sets `x` value.
-  void set_x(const double& x) { xyz_.x() = x; }
+  void set_x(double x) { xyz_.x() = x; }
   /// Gets `y` value.
   double y() const { return xyz_.y(); }
   /// Sets `y` value.
-  void set_y(const double& y) { xyz_.y() = y; }
+  void set_y(double y) { xyz_.y() = y; }
   /// Gets `z` value.
   double z() const { return xyz_.z(); }
   /// Sets `z` value.
-  void set_z(const double& z) { xyz_.z() = z; }
+  void set_z(double z) { xyz_.z() = z; }
   //@}
 
   /// Returns L^2 norm of 3-vector.
@@ -100,32 +100,16 @@ class GeoPosition {
   auto operator!=(const GeoPosition& rhs) const { return !(this->xyz() == rhs.xyz()); }
 
   /// Plus operator.
-  GeoPosition operator+(const GeoPosition& rhs) const {
-    drake::Vector3<double> result = this->xyz();
-    result += rhs.xyz();
-    return GeoPosition::FromXyz(result);
-  }
+  GeoPosition operator+(const GeoPosition& rhs) const { return GeoPosition::FromXyz(this->xyz() + rhs.xyz()); }
 
   /// Minus operator.
-  GeoPosition operator-(const GeoPosition& rhs) const {
-    drake::Vector3<double> result = this->xyz();
-    result -= rhs.xyz();
-    return GeoPosition::FromXyz(result);
-  }
+  GeoPosition operator-(const GeoPosition& rhs) const { return GeoPosition::FromXyz(this->xyz() - rhs.xyz()); }
 
   /// Multiplication by scalar operator.
-  friend GeoPosition operator*(double lhs, const GeoPosition& rhs) {
-    drake::Vector3<double> result = rhs.xyz();
-    result *= lhs;
-    return GeoPosition::FromXyz(result);
-  }
+  friend GeoPosition operator*(double lhs, const GeoPosition& rhs) { return GeoPosition::FromXyz(lhs * rhs.xyz()); }
 
   /// Multiplication by scalar operator.
-  GeoPosition operator*(double rhs) const {
-    drake::Vector3<double> result = this->xyz();
-    result *= rhs;
-    return GeoPosition::FromXyz(result);
-  }
+  GeoPosition operator*(double rhs) const { return GeoPosition::FromXyz(this->xyz() * rhs); }
 
  private:
   explicit GeoPosition(const drake::Vector3<double>& xyz) : xyz_(xyz) {}
@@ -226,7 +210,7 @@ class LanePosition {
   LanePosition() : srh_(0., 0., 0.) {}
 
   /// Fully parameterized constructor.
-  LanePosition(const double& s, const double& r, const double& h) : srh_(s, r, h) {}
+  LanePosition(double s, double r, double h) : srh_(s, r, h) {}
 
   /// Constructs a LanePosition from a 3-vector @p srh of the form `[s, r, h]`.
   static LanePosition FromSrh(const drake::Vector3<double>& srh) { return LanePosition(srh); }
@@ -241,15 +225,15 @@ class LanePosition {
   /// Gets `s` value.
   double s() const { return srh_.x(); }
   /// Sets `s` value.
-  void set_s(const double& s) { srh_.x() = s; }
+  void set_s(double s) { srh_.x() = s; }
   /// Gets `r` value.
   double r() const { return srh_.y(); }
   /// Sets `r` value.
-  void set_r(const double& r) { srh_.y() = r; }
+  void set_r(double r) { srh_.y() = r; }
   /// Gets `h` value.
   double h() const { return srh_.z(); }
   /// Sets `h` value.
-  void set_h(const double& h) { srh_.z() = h; }
+  void set_h(double h) { srh_.z() = h; }
   //@}
 
  private:
@@ -268,7 +252,7 @@ struct LanePositionResult {
   GeoPosition nearest_position;
   /// The Cartesian distance between `nearest_position` and the
   /// `geo_position` supplied to Lane::ToLanePosition().
-  double distance;
+  double distance{};
 };
 
 /// Streams a string representation of @p lane_position into @p out. Returns
