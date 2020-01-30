@@ -39,12 +39,12 @@ VectorBase<N, Derived>::VectorBase(std::initializer_list<double> values) {
 
 template <std::size_t N, typename Derived>
 double VectorBase<N, Derived>::dot(const VectorBase<N, Derived>& vector) const {
-  return std::inner_product(vector.values_.cbegin(), vector.values_.cend(), values_.cbegin(), 0);
+  return std::inner_product(vector.values_.cbegin(), vector.values_.cend(), values_.cbegin(), 0.);
 }
 
 template <std::size_t N, typename Derived>
 double VectorBase<N, Derived>::norm() const {
-  return std::sqrt(std::inner_product(values_.cbegin(), values_.cend(), values_.cbegin(), 0));
+  return std::sqrt(std::inner_product(values_.cbegin(), values_.cend(), values_.cbegin(), 0.));
 }
 
 template <std::size_t N, typename Derived>
