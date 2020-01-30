@@ -12,13 +12,13 @@ GTEST_TEST(VectorTest, Constructors) {
     EXPECT_EQ(Vector2(5., 98.), Vector2({5., 98.}));
     EXPECT_EQ(Vector2(1., 2.), Vector2(std::array<double, 2>{1., 2.}));
     {
-      const Vector2 kDut{3., 4.};
-      Vector2 dut = kDut;
-      EXPECT_EQ(kDut, dut);
+      const Vector2 kExpected{3., 4.};
+      const Vector2 kDut = kExpected;
+      EXPECT_EQ(kDut, kExpected);
     }
     {
-      Vector2 dut = Vector2(45., 9.);
-      EXPECT_EQ(dut, Vector2(45., 9.));
+      const Vector2 kDut = Vector2(45., 9.);
+      EXPECT_EQ(kDut, Vector2(45., 9.));
     }
   }
   {  // 3- dimension vector.
@@ -27,13 +27,13 @@ GTEST_TEST(VectorTest, Constructors) {
     EXPECT_EQ(Vector3(1., 2., 3.), Vector3(std::array<double, 3>{1., 2., 3.}));
   }
   {
-    const Vector3 kDut{3., 4., 1.};
-    Vector3 dut = kDut;
-    EXPECT_EQ(kDut, dut);
+    const Vector3 kExpected{3., 4., 1.};
+    const Vector3 kDut = kExpected;
+    EXPECT_EQ(kDut, kExpected);
   }
   {
-    Vector3 dut = Vector3(45., 9., 35.);
-    EXPECT_EQ(dut, Vector3(45., 9., 35.));
+    const Vector3 kDut = Vector3(45., 9., 35.);
+    EXPECT_EQ(kDut, Vector3(45., 9., 35.));
   }
   {  // 4- dimension vector.
     EXPECT_EQ(Vector4(0., 0., 0., 0.), Vector4());
@@ -41,13 +41,13 @@ GTEST_TEST(VectorTest, Constructors) {
     EXPECT_EQ(Vector4(1., 2., 3., 4.), Vector4(std::array<double, 4>{1., 2., 3., 4.}));
   }
   {
-    const Vector4 kDut{3., 4., 1., 10.};
-    Vector4 dut = kDut;
-    EXPECT_EQ(kDut, dut);
+    const Vector4 kExpected{3., 4., 1., 10.};
+    const Vector4 kDut = kExpected;
+    EXPECT_EQ(kDut, kExpected);
   }
   {
-    Vector4 dut = Vector4(45., 9., 35., 27.);
-    EXPECT_EQ(dut, Vector4(45., 9., 35., 27.));
+    const Vector4 kDut = Vector4(45., 9., 35., 27.);
+    EXPECT_EQ(kDut, Vector4(45., 9., 35., 27.));
   }
 }
 
