@@ -13,6 +13,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
 #include "maliput/test_utilities/check_id_indexing.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
@@ -954,7 +955,7 @@ class TurnBuildProcedure : public BuildProcedure {
       // the straight lane by construction, the resulting orientation is
       // rotated pi radians about the h-axis.
       const api::Rotation rrotation = curved_lane->GetOrientation({kS, -r, kH});
-      const drake::Quaternion<double> pi_rotation(drake::AngleAxis<double>(M_PI, drake::Vector3<double>::UnitZ()));
+      const math::Quaternion pi_rotation(drake::AngleAxis<double>(M_PI, drake::Vector3<double>{0., 0., 1.}));
       EXPECT_TRUE(api::test::IsRotationClose(straight_lane->GetOrientation({kS, r, kH}),
                                              // Applies a pi radians rotation around the h-axis to the curved
                                              // lane orientation (i.e. apply an intrinsic pi radians rotation

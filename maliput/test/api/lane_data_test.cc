@@ -6,6 +6,7 @@
 
 #include "maliput/common/assertion_error.h"
 #include "maliput/math/matrix.h"
+#include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
@@ -198,7 +199,7 @@ class RotationTest : public ::testing::Test {
     twist_quat_ = drake::Quaternion<double>(
         Eigen::AngleAxis<double>(M_PI * 2. / 3., drake::Vector3<double>(1.0, 1.0, 1.0).normalized()));
 
-    nonnormalized_twist_quat_ = drake::Quaternion<double>(7. * twist_quat_.coeffs());
+    nonnormalized_twist_quat_ = math::Quaternion(7. * twist_quat_.coeffs());
 
     twist_roll_ = M_PI / 2.;
     twist_pitch_ = 0.;
@@ -207,8 +208,8 @@ class RotationTest : public ::testing::Test {
     twist_matrix_ << 0., 0., 1., 1., 0., 0., 0., 1., 0.;
   }
 
-  drake::Quaternion<double> nonnormalized_twist_quat_;
-  drake::Quaternion<double> twist_quat_;
+  math::Quaternion nonnormalized_twist_quat_;
+  math::Quaternion twist_quat_;
   double twist_roll_;
   double twist_pitch_;
   double twist_yaw_;

@@ -7,16 +7,14 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/math/quaternion.h"
-
 #include "maliput/api/lane_data.h"
 #include "maliput/api/rules/traffic_light_book.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/traffic_light_book.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
 
-using drake::Quaternion;
 using maliput::api::GeoPosition;
 using maliput::api::Rotation;
 using maliput::api::rules::Bulb;
@@ -57,7 +55,7 @@ struct convert<GeoPosition> {
 template <>
 struct convert<Rotation> {
   static Node encode(const Rotation& rhs) {
-    const drake::Quaternion<double>& q = rhs.quat();
+    const maliput::math::Quaternion& q = rhs.quat();
     Node node;
     node.push_back(q.w());
     node.push_back(q.x());
@@ -74,8 +72,7 @@ struct convert<Rotation> {
     if (!node.IsSequence() || node.size() != 4) {
       return false;
     }
-    const drake::Quaternion<double> q(node[0].as<double>(), node[1].as<double>(), node[2].as<double>(),
-                                      node[3].as<double>());
+    const maliput::math::Quaternion q(node[0].as<double>(), node[1].as<double>(), node[2].as<double>(), node[3].as<double>());
     rhs.set_quat(q);
     return true;
   }
