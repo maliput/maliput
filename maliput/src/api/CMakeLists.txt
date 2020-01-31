@@ -31,11 +31,8 @@ target_link_libraries(api
   PUBLIC
     common
     drake::drake
+    math
 )
-target_link_libraries(api
-  PUBLIC
-    common
-    drake::drake)
 
 ##############################################################################
 # Export

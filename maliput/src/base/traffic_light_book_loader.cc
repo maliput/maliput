@@ -7,7 +7,6 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "drake/common/eigen_types.h"
 #include "drake/math/quaternion.h"
 
 #include "maliput/api/lane_data.h"
@@ -15,6 +14,7 @@
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/traffic_light_book.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/math/vector.h"
 
 using drake::Quaternion;
 using maliput::api::GeoPosition;
@@ -117,8 +117,8 @@ struct convert<Bulb::BoundingBox> {
     if (!max_node.IsDefined() || !max_node.IsSequence() || max_node.size() != 3) {
       return false;
     }
-    rhs.p_BMin = Eigen::Vector3d(min_node[0].as<double>(), min_node[1].as<double>(), min_node[2].as<double>());
-    rhs.p_BMax = Eigen::Vector3d(max_node[0].as<double>(), max_node[1].as<double>(), max_node[2].as<double>());
+    rhs.p_BMin = maliput::math::Vector3(min_node[0].as<double>(), min_node[1].as<double>(), min_node[2].as<double>());
+    rhs.p_BMax = maliput::math::Vector3(max_node[0].as<double>(), max_node[1].as<double>(), max_node[2].as<double>());
     return true;
   }
 };

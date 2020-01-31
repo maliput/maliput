@@ -10,6 +10,7 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
+#include "maliput/math/vector.h"
 #include "multilane/arc_road_curve.h"
 #include "multilane/cubic_polynomial.h"
 #include "multilane/line_road_curve.h"
@@ -28,7 +29,7 @@ GTEST_TEST(BruteForceIntegralTest, ArcRoadCurvePathLength) {
   const double kTheta0{M_PI / 4.0};
   const double kTheta1{3.0 * M_PI / 4.0};
   const double kDTheta{kTheta1 - kTheta0};
-  const drake::Vector2<double> kCenter{10.0, 10.0};
+  const math::Vector2 kCenter{10.0, 10.0};
   const double kLinearTolerance{0.01};
   const double kScaleLength{1.};
   const ComputationPolicy kComputationPolicy{ComputationPolicy::kPreferAccuracy};
@@ -103,8 +104,8 @@ std::vector<CubicPolynomial> GetCubicPolynomials() {
 // that are simple enough for fast analytical computations to be
 // accurate.
 std::vector<std::shared_ptr<RoadCurve>> GetSimpleLineRoadCurves() {
-  const drake::Vector2<double> kStart{1., 1.};
-  const drake::Vector2<double> kEnd{10., -8.};
+  const math::Vector2 kStart{1., 1.};
+  const math::Vector2 kEnd{10., -8.};
   const double kLinearTolerance{0.01};
   const double kScaleLength{1.};
   const CubicPolynomial zp{0., 0., 0., 0.};
@@ -122,8 +123,8 @@ std::vector<std::shared_ptr<RoadCurve>> GetSimpleLineRoadCurves() {
 
 // Returns a collection of LineRoadCurve instances for testing.
 std::vector<std::shared_ptr<RoadCurve>> GetLineRoadCurves() {
-  const drake::Vector2<double> kStart{0., 0.};
-  const drake::Vector2<double> kEnd{10., -8.};
+  const math::Vector2 kStart{0., 0.};
+  const math::Vector2 kEnd{10., -8.};
   const double kLinearTolerance{0.01};
   const double kScaleLength{1.};
 
@@ -142,7 +143,7 @@ std::vector<std::shared_ptr<RoadCurve>> GetLineRoadCurves() {
 // that are simple enough for fast analytical computations to be
 // accurate.
 std::vector<std::shared_ptr<RoadCurve>> GetSimpleArcRoadCurves() {
-  const drake::Vector2<double> kCenter{1., 1.};
+  const math::Vector2 kCenter{1., 1.};
   const double kRadius{12.0};
   const double kTheta0{M_PI / 9.};
   const double kDTheta{M_PI / 3.};
@@ -163,7 +164,7 @@ std::vector<std::shared_ptr<RoadCurve>> GetSimpleArcRoadCurves() {
 
 // Returns a collection of ArcRoadCurve instances for testing.
 std::vector<std::shared_ptr<RoadCurve>> GetArcRoadCurves() {
-  const drake::Vector2<double> kCenter{0., 0.};
+  const math::Vector2 kCenter{0., 0.};
   const double kRadius{10.0};
   const double kTheta0{M_PI / 6.};
   const double kDTheta{M_PI / 2.};

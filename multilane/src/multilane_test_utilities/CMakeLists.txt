@@ -19,11 +19,12 @@ target_include_directories(
 )
 
 target_link_libraries(multilane_test_utilities
-  multilane
+  drake::drake
   maliput::api
   maliput::common
   maliput::maliput_test_utilities
-  drake::drake
+  maliput::math
+  multilane
 )
 
 install(

@@ -66,11 +66,11 @@ enum MaterialType { Asphalt, Lane, Marker, HBounds, BranchPointGlow, GrayedAspha
 /// Material information for built meshes.
 struct Material {
   std::string name;
-  drake::Vector3<double> diffuse;   /// Kd
-  drake::Vector3<double> ambient;   /// Ka
-  drake::Vector3<double> specular;  /// Ks
-  double shinines;                  /// Ns
-  double transparency;              /// 1.0 - d
+  math::Vector3 diffuse;   /// Kd
+  math::Vector3 ambient;   /// Ka
+  math::Vector3 specular;  /// Ks
+  double shinines;         /// Ns
+  double transparency;     /// 1.0 - d
 
   friend bool operator==(const Material& matA, const Material& matB) { return matA.name == matB.name; }
 

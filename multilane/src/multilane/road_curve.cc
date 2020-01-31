@@ -3,13 +3,13 @@
 #include <algorithm>
 #include <memory>
 
-#include "drake/common/eigen_types.h"
 #include "drake/systems/analysis/integrator_base.h"
 #include "drake/systems/analysis/scalar_dense_output.h"
 
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/common/maliput_unused.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace multilane {
@@ -229,19 +229,19 @@ double RoadCurve::CalcGPrimeAsUsedForCalcSFromP(double p) const {
   return elevation().f_dot_p(p);
 }
 
-drake::Vector3<double> RoadCurve::W_of_prh(double p, double r, double h) const {
+math::Vector3 RoadCurve::W_of_prh(double p, double r, double h) const {
   // Calculates z (elevation) of (p,0,0).
   const double z = elevation().f_p(p) * l_max();
   // Calculates x,y of (p,0,0).
-  const drake::Vector2<double> xy = xy_of_p(p);
+  const math::Vector2 xy = xy_of_p(p);
   // Calculates orientation of (p,r,h) basis at (p,0,0).
   const Rot3 ypr = Rabg_of_p(p);
   // Rotates (0,r,h) and sums with mapped (p,0,0).
-  return ypr.apply({0., r, h}) + drake::Vector3<double>(xy.x(), xy.y(), z);
+  return ypr.apply({0., r, h}) + math::Vector3(xy.x(), xy.y(), z);
 }
 
-drake::Vector3<double> RoadCurve::W_prime_of_prh(double p, double r, double h, const Rot3& Rabg, double g_prime) const {
-  const drake::Vector2<double> G_prime = xy_dot_of_p(p);
+math::Vector3 RoadCurve::W_prime_of_prh(double p, double r, double h, const Rot3& Rabg, double g_prime) const {
+  const math::Vector2 G_prime = xy_dot_of_p(p);
 
   const Rot3& R = Rabg;
   const double alpha = R.roll();
@@ -273,19 +273,19 @@ drake::Vector3<double> RoadCurve::W_prime_of_prh(double p, double r, double h, c
   //   ∂Z(p)/∂p = l_max * (z / l_max) = l_max * g'(p)
   //
   //   ∂R_αβγ/∂p = (∂R_αβγ/∂α ∂R_αβγ/∂β ∂R_αβγ/∂γ)*(dα/dp, dβ/dp, dγ/dp)
-  return drake::Vector3<double>(G_prime.x(), G_prime.y(), l_max() * g_prime) +
+  return math::Vector3(G_prime.x(), G_prime.y(), l_max() * g_prime) +
 
-         drake::Vector3<double>((((sa * sg) + (ca * sb * cg)) * r + ((ca * sg) - (sa * sb * cg)) * h),
-                                (((-sa * cg) + (ca * sb * sg)) * r - ((ca * cg) + (sa * sb * sg)) * h),
-                                ((ca * cb) * r + (-sa * cb) * h)) *
+         math::Vector3((((sa * sg) + (ca * sb * cg)) * r + ((ca * sg) - (sa * sb * cg)) * h),
+                       (((-sa * cg) + (ca * sb * sg)) * r - ((ca * cg) + (sa * sb * sg)) * h),
+                       ((ca * cb) * r + (-sa * cb) * h)) *
              d_alpha +
 
-         drake::Vector3<double>(((sa * cb * cg) * r + (ca * cb * cg) * h), ((sa * cb * sg) * r + (ca * cb * sg) * h),
-                                ((-sa * sb) * r - (ca * sb) * h)) *
+         math::Vector3(((sa * cb * cg) * r + (ca * cb * cg) * h), ((sa * cb * sg) * r + (ca * cb * sg) * h),
+                       ((-sa * sb) * r - (ca * sb) * h)) *
              d_beta +
 
-         drake::Vector3<double>((((-ca * cg) - (sa * sb * sg)) * r + ((+sa * cg) - (ca * sb * sg)) * h),
-                                (((-ca * sg) + (sa * sb * cg)) * r + ((sa * sg) + (ca * sb * cg)) * h), 0) *
+         math::Vector3((((-ca * cg) - (sa * sb * sg)) * r + ((+sa * cg) - (ca * sb * sg)) * h),
+                       (((-ca * sg) + (sa * sb * cg)) * r + ((sa * sg) + (ca * sb * cg)) * h), 0) *
              d_gamma;
 }
 
@@ -299,8 +299,8 @@ Rot3 RoadCurve::Orientation(double p, double r, double h) const {
   const double real_g_prime = elevation().f_dot_p(p);
 
   // Calculate s,r basis vectors at (s,r,h)...
-  const drake::Vector3<double> s_hat = s_hat_of_prh(p, r, h, Rabg, real_g_prime);
-  const drake::Vector3<double> r_hat = r_hat_of_Rabg(Rabg);
+  const math::Vector3 s_hat = s_hat_of_prh(p, r, h, Rabg, real_g_prime);
+  const math::Vector3 r_hat = r_hat_of_Rabg(Rabg);
   // ...and then derive orientation from those basis vectors.
   //
   // (s_hat  r_hat  h_hat) is an orthonormal basis, obtained by rotating the
@@ -315,18 +315,18 @@ Rot3 RoadCurve::Orientation(double p, double r, double h) const {
   //   r_hat = (- ca * sg + sa * sb * cg, ca * cg + sa * sb * sg, sa * cb)
   // We solve the above for a, b, g.
   const double gamma = std::atan2(s_hat.y(), s_hat.x());
-  const double beta = std::atan2(-s_hat.z(), drake::Vector2<double>(s_hat.x(), s_hat.y()).norm());
+  const double beta = std::atan2(-s_hat.z(), math::Vector2(s_hat.x(), s_hat.y()).norm());
   const double cb = std::cos(beta);
   const double alpha = std::atan2(r_hat.z() / cb, ((r_hat.y() * s_hat.x()) - (r_hat.x() * s_hat.y())) / cb);
   return {alpha, beta, gamma};
 }
 
-drake::Vector3<double> RoadCurve::s_hat_of_prh(double p, double r, double h, const Rot3& Rabg, double g_prime) const {
-  const drake::Vector3<double> W_prime = W_prime_of_prh(p, r, h, Rabg, g_prime);
+math::Vector3 RoadCurve::s_hat_of_prh(double p, double r, double h, const Rot3& Rabg, double g_prime) const {
+  const math::Vector3 W_prime = W_prime_of_prh(p, r, h, Rabg, g_prime);
   return W_prime * (1.0 / W_prime.norm());
 }
 
-drake::Vector3<double> RoadCurve::r_hat_of_Rabg(const Rot3& Rabg) const { return Rabg.apply({0., 1., 0.}); }
+math::Vector3 RoadCurve::r_hat_of_Rabg(const Rot3& Rabg) const { return Rabg.apply({0., 1., 0.}); }
 
 }  // namespace multilane
 }  // namespace maliput

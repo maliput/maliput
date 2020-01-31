@@ -13,6 +13,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/math/vector.h"
 #include "maliput/test_utilities/check_id_indexing.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 #include "multilane_test_utilities/multilane_types_compare.h"
@@ -469,15 +470,15 @@ TEST_F(MultilaneBuilderReferenceCurvePrimitivesTest, LineSegment) {
   EXPECT_EQ(rg->junction(0)->segment(0)->id(), api::SegmentId("s:c0"));
   EXPECT_EQ(rg->junction(0)->segment(0)->num_lanes(), kNumLanes);
 
-  const drake::Vector3<double> r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
-  const drake::Vector3<double> start_reference_curve(kStart.xy().x(), kStart.xy().y(), kStart.z().z());
+  const math::Vector3 r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
+  const math::Vector3 start_reference_curve(kStart.xy().x(), kStart.xy().y(), kStart.z().z());
   for (int i = 0; i < kNumLanes; i++) {
     const api::Lane* lane = rg->junction(0)->segment(0)->lane(i);
     // Checks Lane's ID.
     EXPECT_EQ(lane->id().string(), std::string("l:c0_") + std::to_string(i));
     // Checks lane start geo position to verify that spacing is correctly
     // applied.
-    const drake::Vector3<double> lane_start_geo =
+    const math::Vector3 lane_start_geo =
         start_reference_curve + (kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor;
     EXPECT_TRUE(api::test::IsGeoPositionClose(lane->ToGeoPosition({0., 0., 0.}),
                                               api::GeoPosition::FromXyz(lane_start_geo), kLinearTolerance));
@@ -516,15 +517,15 @@ TEST_F(MultilaneBuilderReferenceCurvePrimitivesTest, ArcSegment) {
   EXPECT_EQ(rg->junction(0)->segment(0)->id(), api::SegmentId("s:c0"));
   EXPECT_EQ(rg->junction(0)->segment(0)->num_lanes(), kNumLanes);
 
-  const drake::Vector3<double> r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
-  const drake::Vector3<double> start_reference_curve(kStart.xy().x(), kStart.xy().y(), kStart.z().z());
+  const math::Vector3 r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
+  const math::Vector3 start_reference_curve(kStart.xy().x(), kStart.xy().y(), kStart.z().z());
   for (int i = 0; i < kNumLanes; i++) {
     const api::Lane* const lane = rg->junction(0)->segment(0)->lane(i);
     // Checks Lane's ID.
     EXPECT_EQ(lane->id().string(), std::string("l:c0_") + std::to_string(i));
     // Checks lane start geo position to verify that spacing is correctly
     // applied.
-    const drake::Vector3<double> lane_start_geo =
+    const math::Vector3 lane_start_geo =
         start_reference_curve + (kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor;
     EXPECT_TRUE(api::test::IsGeoPositionClose(lane->ToGeoPosition({0., 0., 0.}),
                                               api::GeoPosition::FromXyz(lane_start_geo), kLinearTolerance));
@@ -670,16 +671,16 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, FlatLineSegment) {
   EXPECT_EQ(rg->junction(0)->segment(0)->id(), api::SegmentId("s:c0"));
   EXPECT_EQ(rg->junction(0)->segment(0)->num_lanes(), kNumLanes);
 
-  const drake::Vector3<double> r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
-  const drake::Vector3<double> start_reference_curve =
-      drake::Vector3<double>(kStart.xy().x(), kStart.xy().y(), kStart.z().z()) + (kRefR0 - kLaneWidth) * r_versor;
+  const math::Vector3 r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
+  const math::Vector3 start_reference_curve =
+      math::Vector3(kStart.xy().x(), kStart.xy().y(), kStart.z().z()) + (kRefR0 - kLaneWidth) * r_versor;
   for (int i = 0; i < kNumLanes; i++) {
     const api::Lane* lane = rg->junction(0)->segment(0)->lane(i);
     // Checks Lane's ID.
     EXPECT_EQ(lane->id().string(), std::string("l:c0_") + std::to_string(i));
     // Checks lane start geo position to verify that spacing is correctly
     // applied.
-    const drake::Vector3<double> lane_start_geo =
+    const math::Vector3 lane_start_geo =
         start_reference_curve + (-kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor;
     EXPECT_TRUE(api::test::IsGeoPositionClose(lane->ToGeoPosition({0., 0., 0.}),
                                               api::GeoPosition::FromXyz(lane_start_geo), kLinearTolerance));
@@ -718,12 +719,12 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ElevatedEndLineSegment) {
   EXPECT_EQ(rg->junction(0)->segment(0)->id(), api::SegmentId("s:c0"));
   EXPECT_EQ(rg->junction(0)->segment(0)->num_lanes(), kNumLanes);
 
-  const drake::Vector3<double> r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
-  const drake::Vector3<double> start_reference_curve =
-      drake::Vector3<double>(kStart.xy().x(), kStart.xy().y(), kStart.z().z()) + (kRefR0 - kLaneWidth) * r_versor;
-  const drake::Vector3<double> end_reference_curve =
-      start_reference_curve + kLength * drake::Vector3<double>(std::cos(kStartHeading), std::sin(kStartHeading), 0.) +
-      drake::Vector3<double>(0., 0., 5.);
+  const math::Vector3 r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
+  const math::Vector3 start_reference_curve =
+      math::Vector3(kStart.xy().x(), kStart.xy().y(), kStart.z().z()) + (kRefR0 - kLaneWidth) * r_versor;
+  const math::Vector3 end_reference_curve =
+      start_reference_curve + kLength * math::Vector3(std::cos(kStartHeading), std::sin(kStartHeading), 0.) +
+      math::Vector3(0., 0., 5.);
 
   for (int i = 0; i < kNumLanes; i++) {
     const api::Lane* lane = rg->junction(0)->segment(0)->lane(i);
@@ -731,7 +732,7 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ElevatedEndLineSegment) {
     EXPECT_EQ(lane->id().string(), std::string("l:c0_") + std::to_string(i));
     // Checks lane start geo position to verify that spacing is correctly
     // applied.
-    const drake::Vector3<double> r_offset = (-kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor;
+    const math::Vector3 r_offset = (-kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor;
     EXPECT_TRUE(api::test::IsGeoPositionClose(lane->ToGeoPosition({0., 0., 0.}),
                                               api::GeoPosition::FromXyz(start_reference_curve + r_offset),
                                               kLinearTolerance));
@@ -774,16 +775,16 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ArcSegment) {
   EXPECT_EQ(rg->junction(0)->segment(0)->id(), api::SegmentId("s:c0"));
   EXPECT_EQ(rg->junction(0)->segment(0)->num_lanes(), kNumLanes);
 
-  const drake::Vector3<double> r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
-  const drake::Vector3<double> start_reference_curve =
-      drake::Vector3<double>(kStart.xy().x(), kStart.xy().y(), kStart.z().z()) + (kRefR0 - kLaneWidth) * r_versor;
+  const math::Vector3 r_versor(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
+  const math::Vector3 start_reference_curve =
+      math::Vector3(kStart.xy().x(), kStart.xy().y(), kStart.z().z()) + (kRefR0 - kLaneWidth) * r_versor;
   for (int i = 0; i < kNumLanes; i++) {
     const api::Lane* const lane = rg->junction(0)->segment(0)->lane(i);
     // Checks Lane's ID.
     EXPECT_EQ(lane->id().string(), std::string("l:c0_") + std::to_string(i));
     // Checks lane start geo position to verify that spacing is correctly
     // applied.
-    const drake::Vector3<double> lane_start_geo =
+    const math::Vector3 lane_start_geo =
         start_reference_curve + (-kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor;
     EXPECT_TRUE(api::test::IsGeoPositionClose(lane->ToGeoPosition({0., 0., 0.}),
                                               api::GeoPosition::FromXyz(lane_start_geo), kLinearTolerance));
@@ -822,13 +823,12 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ElevatedEndArcSegment) {
   EXPECT_EQ(rg->junction(0)->segment(0)->id(), api::SegmentId("s:c0"));
   EXPECT_EQ(rg->junction(0)->segment(0)->num_lanes(), kNumLanes);
 
-  const drake::Vector3<double> r_versor_start(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
-  const drake::Vector3<double> start_reference_curve =
-      drake::Vector3<double>(kStart.xy().x(), kStart.xy().y(), kStart.z().z()) + (kRefR0 - kLaneWidth) * r_versor_start;
-  const drake::Vector3<double> r_versor_end(-std::sin(kStartHeading + kDTheta), std::cos(kStartHeading + kDTheta), 0.);
-  const drake::Vector3<double> end_reference_curve = start_reference_curve +
-                                                     kRadius * drake::Vector3<double>(std::sqrt(2.), 0., 0.) +
-                                                     drake::Vector3<double>(0., 0., 5.);
+  const math::Vector3 r_versor_start(-std::sin(kStartHeading), std::cos(kStartHeading), 0.);
+  const math::Vector3 start_reference_curve =
+      math::Vector3(kStart.xy().x(), kStart.xy().y(), kStart.z().z()) + (kRefR0 - kLaneWidth) * r_versor_start;
+  const math::Vector3 r_versor_end(-std::sin(kStartHeading + kDTheta), std::cos(kStartHeading + kDTheta), 0.);
+  const math::Vector3 end_reference_curve =
+      start_reference_curve + kRadius * math::Vector3(std::sqrt(2.), 0., 0.) + math::Vector3(0., 0., 5.);
 
   for (int i = 0; i < kNumLanes; i++) {
     const api::Lane* const lane = rg->junction(0)->segment(0)->lane(i);
@@ -836,12 +836,12 @@ TEST_F(MultilaneBuilderLaneToLanePrimitivesTest, ElevatedEndArcSegment) {
     EXPECT_EQ(lane->id().string(), std::string("l:c0_") + std::to_string(i));
     // Checks lane start geo position to verify that spacing is correctly
     // applied.
-    const drake::Vector3<double> r_offset_start = (-kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor_start;
+    const math::Vector3 r_offset_start = (-kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor_start;
     EXPECT_TRUE(api::test::IsGeoPositionClose(lane->ToGeoPosition({0., 0., 0.}),
                                               api::GeoPosition::FromXyz(start_reference_curve + r_offset_start),
                                               kLinearTolerance));
     // Checks lane end geo position to verify elevation is correctly applied.
-    const drake::Vector3<double> r_offset_end = (-kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor_end;
+    const math::Vector3 r_offset_end = (-kRefR0 + static_cast<double>(i) * kLaneWidth) * r_versor_end;
     EXPECT_TRUE(api::test::IsGeoPositionClose(lane->ToGeoPosition({lane->length(), 0., 0.}),
                                               api::GeoPosition::FromXyz(end_reference_curve + r_offset_end),
                                               kLinearTolerance));
@@ -954,7 +954,7 @@ class TurnBuildProcedure : public BuildProcedure {
       // the straight lane by construction, the resulting orientation is
       // rotated pi radians about the h-axis.
       const api::Rotation rrotation = curved_lane->GetOrientation({kS, -r, kH});
-      const drake::Quaternion<double> pi_rotation(drake::AngleAxis<double>(M_PI, drake::Vector3<double>::UnitZ()));
+      const drake::Quaternion<double> pi_rotation(drake::AngleAxis<double>(M_PI, math::Vector3::UnitZ()));
       EXPECT_TRUE(api::test::IsRotationClose(straight_lane->GetOrientation({kS, r, kH}),
                                              // Applies a pi radians rotation around the h-axis to the curved
                                              // lane orientation (i.e. apply an intrinsic pi radians rotation

@@ -8,6 +8,7 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
+#include "maliput/math/vector.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "multilane/arc_road_curve.h"
 #include "multilane/cubic_polynomial.h"
@@ -196,20 +197,17 @@ TEST_F(MultilaneConnectionTest, ArcRoadCurveValidation) {
   std::unique_ptr<RoadCurve> road_curve = flat_dut.CreateRoadCurve();
   EXPECT_NE(dynamic_cast<ArcRoadCurve*>(road_curve.get()), nullptr);
   // Checks that the road curve starts and ends at given endpoints.
-  const drake::Vector3<double> flat_origin = road_curve->W_of_prh(0., 0., 0.);
-  EXPECT_TRUE(CompareMatrices(
-      drake::Vector3<double>(flat_dut.start().xy().x(), flat_dut.start().xy().y(), flat_dut.start().z().z()),
-      flat_origin, kZeroTolerance));
+  const math::Vector3 flat_origin = road_curve->W_of_prh(0., 0., 0.);
   EXPECT_TRUE(
-      CompareMatrices(drake::Vector3<double>(kStartEndpoint.xy().x(), kStartEndpoint.xy().y(), kStartEndpoint.z().z()),
+      CompareMatrices(math::Vector3(flat_dut.start().xy().x(), flat_dut.start().xy().y(), flat_dut.start().z().z()),
                       flat_origin, kZeroTolerance));
-  const drake::Vector3<double> flat_end = road_curve->W_of_prh(1., 0., 0.);
-  EXPECT_TRUE(
-      CompareMatrices(drake::Vector3<double>(flat_dut.end().xy().x(), flat_dut.end().xy().y(), flat_dut.end().z().z()),
-                      flat_end, kVeryExact));
-  EXPECT_TRUE(
-      CompareMatrices(drake::Vector3<double>(kEndEndpoint.xy().x(), kEndEndpoint.xy().y(), kEndEndpoint.z().z()),
-                      flat_end, kVeryExact));
+  EXPECT_TRUE(CompareMatrices(math::Vector3(kStartEndpoint.xy().x(), kStartEndpoint.xy().y(), kStartEndpoint.z().z()),
+                              flat_origin, kZeroTolerance));
+  const math::Vector3 flat_end = road_curve->W_of_prh(1., 0., 0.);
+  EXPECT_TRUE(CompareMatrices(math::Vector3(flat_dut.end().xy().x(), flat_dut.end().xy().y(), flat_dut.end().z().z()),
+                              flat_end, kVeryExact));
+  EXPECT_TRUE(CompareMatrices(math::Vector3(kEndEndpoint.xy().x(), kEndEndpoint.xy().y(), kEndEndpoint.z().z()),
+                              flat_end, kVeryExact));
   // Checks that elevation and superelevation polynomials are correctly built
   // for the trivial case of a flat dut.
   EXPECT_TRUE(test::IsCubicPolynomialClose(road_curve->elevation(), CubicPolynomial(), kZeroTolerance));
@@ -221,20 +219,19 @@ TEST_F(MultilaneConnectionTest, ArcRoadCurveValidation) {
                                kRightShoulder, kArcOffset, kLinearTolerance, kScaleLength, kComputationPolicy);
   std::unique_ptr<RoadCurve> complex_road_curve = complex_dut.CreateRoadCurve();
   // Checks that the road curve starts and ends at given endpoints.
-  const drake::Vector3<double> complex_origin = complex_road_curve->W_of_prh(0., 0., 0.);
+  const math::Vector3 complex_origin = complex_road_curve->W_of_prh(0., 0., 0.);
   EXPECT_TRUE(CompareMatrices(
-      drake::Vector3<double>(complex_dut.start().xy().x(), complex_dut.start().xy().y(), complex_dut.start().z().z()),
+      math::Vector3(complex_dut.start().xy().x(), complex_dut.start().xy().y(), complex_dut.start().z().z()),
       complex_origin, kZeroTolerance));
+  EXPECT_TRUE(CompareMatrices(math::Vector3(kStartEndpoint.xy().x(), kStartEndpoint.xy().y(), kStartEndpoint.z().z()),
+                              complex_origin, kZeroTolerance));
+  const math::Vector3 complex_end = complex_road_curve->W_of_prh(1., 0., 0.);
   EXPECT_TRUE(
-      CompareMatrices(drake::Vector3<double>(kStartEndpoint.xy().x(), kStartEndpoint.xy().y(), kStartEndpoint.z().z()),
-                      complex_origin, kZeroTolerance));
-  const drake::Vector3<double> complex_end = complex_road_curve->W_of_prh(1., 0., 0.);
+      CompareMatrices(math::Vector3(complex_dut.end().xy().x(), complex_dut.end().xy().y(), complex_dut.end().z().z()),
+                      complex_end, kVeryExact));
   EXPECT_TRUE(CompareMatrices(
-      drake::Vector3<double>(complex_dut.end().xy().x(), complex_dut.end().xy().y(), complex_dut.end().z().z()),
+      math::Vector3(kEndElevatedEndpoint.xy().x(), kEndElevatedEndpoint.xy().y(), kEndElevatedEndpoint.z().z()),
       complex_end, kVeryExact));
-  EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(kEndElevatedEndpoint.xy().x(), kEndElevatedEndpoint.xy().y(),
-                                                     kEndElevatedEndpoint.z().z()),
-                              complex_end, kVeryExact));
   EXPECT_TRUE(test::IsCubicPolynomialClose(
       complex_road_curve->elevation(), CubicPolynomial(0., 0., -0.32476276288217043, 0.549841841921447), kVeryExact));
   EXPECT_TRUE(test::IsCubicPolynomialClose(complex_road_curve->superelevation(),
@@ -253,20 +250,17 @@ TEST_F(MultilaneConnectionTest, LineRoadCurveValidation) {
   EXPECT_NE(dynamic_cast<LineRoadCurve*>(road_curve.get()), nullptr);
 
   // Checks that the road curve starts and ends at given endpoints.
-  const drake::Vector3<double> flat_origin = road_curve->W_of_prh(0., 0., 0.);
-  EXPECT_TRUE(CompareMatrices(
-      drake::Vector3<double>(flat_dut.start().xy().x(), flat_dut.start().xy().y(), flat_dut.start().z().z()),
-      flat_origin, kZeroTolerance));
+  const math::Vector3 flat_origin = road_curve->W_of_prh(0., 0., 0.);
   EXPECT_TRUE(
-      CompareMatrices(drake::Vector3<double>(kStartEndpoint.xy().x(), kStartEndpoint.xy().y(), kStartEndpoint.z().z()),
+      CompareMatrices(math::Vector3(flat_dut.start().xy().x(), flat_dut.start().xy().y(), flat_dut.start().z().z()),
                       flat_origin, kZeroTolerance));
-  const drake::Vector3<double> flat_end = road_curve->W_of_prh(1., 0., 0.);
-  EXPECT_TRUE(
-      CompareMatrices(drake::Vector3<double>(flat_dut.end().xy().x(), flat_dut.end().xy().y(), flat_dut.end().z().z()),
-                      flat_end, kVeryExact));
-  EXPECT_TRUE(
-      CompareMatrices(drake::Vector3<double>(kEndEndpoint.xy().x(), kEndEndpoint.xy().y(), kEndEndpoint.z().z()),
-                      flat_end, kVeryExact));
+  EXPECT_TRUE(CompareMatrices(math::Vector3(kStartEndpoint.xy().x(), kStartEndpoint.xy().y(), kStartEndpoint.z().z()),
+                              flat_origin, kZeroTolerance));
+  const math::Vector3 flat_end = road_curve->W_of_prh(1., 0., 0.);
+  EXPECT_TRUE(CompareMatrices(math::Vector3(flat_dut.end().xy().x(), flat_dut.end().xy().y(), flat_dut.end().z().z()),
+                              flat_end, kVeryExact));
+  EXPECT_TRUE(CompareMatrices(math::Vector3(kEndEndpoint.xy().x(), kEndEndpoint.xy().y(), kEndEndpoint.z().z()),
+                              flat_end, kVeryExact));
   // Checks that elevation and superelevation polynomials are correctly built
   // for the trivial case of a flat dut.
   EXPECT_TRUE(test::IsCubicPolynomialClose(road_curve->elevation(), CubicPolynomial(), kZeroTolerance));
@@ -279,20 +273,19 @@ TEST_F(MultilaneConnectionTest, LineRoadCurveValidation) {
   std::unique_ptr<RoadCurve> complex_road_curve = complex_dut.CreateRoadCurve();
 
   // Checks that the road curve starts and ends at given endpoints.
-  const drake::Vector3<double> complex_origin = complex_road_curve->W_of_prh(0., 0., 0.);
+  const math::Vector3 complex_origin = complex_road_curve->W_of_prh(0., 0., 0.);
   EXPECT_TRUE(CompareMatrices(
-      drake::Vector3<double>(complex_dut.start().xy().x(), complex_dut.start().xy().y(), complex_dut.start().z().z()),
+      math::Vector3(complex_dut.start().xy().x(), complex_dut.start().xy().y(), complex_dut.start().z().z()),
       complex_origin, kZeroTolerance));
+  EXPECT_TRUE(CompareMatrices(math::Vector3(kStartEndpoint.xy().x(), kStartEndpoint.xy().y(), kStartEndpoint.z().z()),
+                              complex_origin, kZeroTolerance));
+  const math::Vector3 complex_end = complex_road_curve->W_of_prh(1., 0., 0.);
   EXPECT_TRUE(
-      CompareMatrices(drake::Vector3<double>(kStartEndpoint.xy().x(), kStartEndpoint.xy().y(), kStartEndpoint.z().z()),
-                      complex_origin, kZeroTolerance));
-  const drake::Vector3<double> complex_end = complex_road_curve->W_of_prh(1., 0., 0.);
+      CompareMatrices(math::Vector3(complex_dut.end().xy().x(), complex_dut.end().xy().y(), complex_dut.end().z().z()),
+                      complex_end, kVeryExact));
   EXPECT_TRUE(CompareMatrices(
-      drake::Vector3<double>(complex_dut.end().xy().x(), complex_dut.end().xy().y(), complex_dut.end().z().z()),
+      math::Vector3(kEndElevatedEndpoint.xy().x(), kEndElevatedEndpoint.xy().y(), kEndElevatedEndpoint.z().z()),
       complex_end, kVeryExact));
-  EXPECT_TRUE(CompareMatrices(drake::Vector3<double>(kEndElevatedEndpoint.xy().x(), kEndElevatedEndpoint.xy().y(),
-                                                     kEndElevatedEndpoint.z().z()),
-                              complex_end, kVeryExact));
   EXPECT_TRUE(test::IsCubicPolynomialClose(complex_road_curve->elevation(),
                                            CubicPolynomial(0., 0., -0.646446609406726, 0.764297739604484), kVeryExact));
   EXPECT_TRUE(test::IsCubicPolynomialClose(complex_road_curve->superelevation(),
@@ -400,8 +393,8 @@ TEST_P(MultilaneConnectionEndpointZTest, LineLaneEndpoints) {
   const LineOffset kLineOffset{kLineLength};
   const Connection dut(kId, start_endpoint, end_z, num_lanes, r0, kLaneWidth, kLeftShoulder, kRightShoulder,
                        kLineOffset, kLinearTolerance, kScaleLength, kComputationPolicy);
-  const drake::Vector2<double> kDirection{45. - kStartXy.x(), 5. - kStartXy.y()};
-  const drake::Vector2<double> kNormalDirection = drake::Vector2<double>(kDirection.y(), -kDirection.x()).normalized();
+  const math::Vector2 kDirection{45. - kStartXy.x(), 5. - kStartXy.y()};
+  const math::Vector2 kNormalDirection = math::Vector2(kDirection.y(), -kDirection.x()).normalized();
 
   for (int i = 0; i < num_lanes; i++) {
     // Start endpoints.

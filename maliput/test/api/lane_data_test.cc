@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "maliput/common/assertion_error.h"
+#include "maliput/math/vector.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 
@@ -40,14 +41,14 @@ GTEST_TEST(LanePositionTest, ParameterizedConstructor) {
 
 GTEST_TEST(LanePositionTest, ConstructionFromVector) {
   // Check the conversion-construction from a 3-vector.
-  const LanePosition dut = LanePosition::FromSrh(drake::Vector3<double>(kX0, kX1, kX2));
+  const LanePosition dut = LanePosition::FromSrh(math::Vector3(kX0, kX1, kX2));
   CHECK_ALL_LANE_POSITION_ACCESSORS(dut, kX0, kX1, kX2);
 }
 
 GTEST_TEST(LanePositionTest, VectorSetter) {
   // Check the vector-based setter.
   LanePosition dut(kX0, kX1, kX2);
-  const drake::Vector3<double> srh(9., 7., 8.);
+  const math::Vector3 srh(9., 7., 8.);
   dut.set_srh(srh);
   CHECK_ALL_LANE_POSITION_ACCESSORS(dut, srh.x(), srh.y(), srh.z());
 }
@@ -94,14 +95,14 @@ GTEST_TEST(GeoPositionTest, ParameterizedConstructor) {
 
 GTEST_TEST(GeoPositionTest, ConstructionFromVector) {
   // Check the conversion-construction from a 3-vector.
-  const GeoPosition dut = GeoPosition::FromXyz(drake::Vector3<double>(kX0, kX1, kX2));
+  const GeoPosition dut = GeoPosition::FromXyz(math::Vector3(kX0, kX1, kX2));
   CHECK_ALL_GEO_POSITION_ACCESSORS(dut, kX0, kX1, kX2);
 }
 
 GTEST_TEST(GeoPositionTest, VectorSetter) {
   // Check the vector-based setter.
   GeoPosition dut(kX0, kX1, kX2);
-  const drake::Vector3<double> xyz(9., 7., 8.);
+  const math::Vector3 xyz(9., 7., 8.);
   dut.set_xyz(xyz);
   CHECK_ALL_GEO_POSITION_ACCESSORS(dut, xyz.x(), xyz.y(), xyz.z());
 }
@@ -172,25 +173,26 @@ GTEST_TEST(GeoPosition, DistanceTest) {
   const GeoPosition dut(25., 85., 12.);
   EXPECT_NEAR(dut.Distance({66.0, 90.0, -25.0}), 55.452682532047085, kLinearTolerance);
 }
+
 // An arbitrary very small number (that passes the tests).
 const double kRotationTolerance = 1e-15;
 
-#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                                      \
-  do {                                                                                                             \
-    EXPECT_TRUE(CompareMatrices(dut.quat().coeffs(), drake::Vector4<double>(_x, _y, _z, _w), kRotationTolerance)); \
-    EXPECT_TRUE(CompareMatrices(dut.rpy().vector(), drake::Vector3<double>(_ro, _pi, _ya), kRotationTolerance));   \
-    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                              \
-    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                             \
-    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                               \
-    EXPECT_TRUE(CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                                           \
+#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                             \
+  do {                                                                                                    \
+    EXPECT_TRUE(CompareMatrices(dut.quat().coeffs(), math::Vector4(_x, _y, _z, _w), kRotationTolerance)); \
+    EXPECT_TRUE(CompareMatrices(dut.rpy().vector(), math::Vector3(_ro, _pi, _ya), kRotationTolerance));   \
+    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                     \
+    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                    \
+    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                      \
+    EXPECT_TRUE(CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                                  \
   } while (0)
 
 class RotationTest : public ::testing::Test {
  protected:
   void SetUp() override {
     // A quaternion that rotates x->y, y->z, z->x...
-    twist_quat_ = drake::Quaternion<double>(
-        Eigen::AngleAxis<double>(M_PI * 2. / 3., drake::Vector3<double>(1.0, 1.0, 1.0).normalized()));
+    twist_quat_ =
+        drake::Quaternion<double>(Eigen::AngleAxis<double>(M_PI * 2. / 3., math::Vector3(1.0, 1.0, 1.0).normalized()));
 
     nonnormalized_twist_quat_ = drake::Quaternion<double>(7. * twist_quat_.coeffs());
 

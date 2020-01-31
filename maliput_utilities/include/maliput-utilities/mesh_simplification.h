@@ -13,6 +13,7 @@
 
 #include "maliput-utilities/mesh.h"
 #include "maliput/common/maliput_hash.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace utility {
@@ -99,13 +100,13 @@ using Hyperplane3 = Eigen::Hyperplane<T, 3>;
 /// @pre Given @p vertex belongs to the @p mesh.
 /// @warning If any of the preconditions is not met, this function will
 ///          abort execution.
-const drake::Vector3<double>& GetMeshFaceVertexPosition(const GeoMesh& mesh, const IndexFace::Vertex& vertex);
+const math::Vector3& GetMeshFaceVertexPosition(const GeoMesh& mesh, const IndexFace::Vertex& vertex);
 
 /// Gets normal vector of the @p vertex in the given @p mesh.
 /// @pre Given @p vertex belongs to the @p mesh.
 /// @warning If any of the preconditions is not met, this function will
 ///          abort execution.
-const drake::Vector3<double>& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFace::Vertex& vertex);
+const math::Vector3& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFace::Vertex& vertex);
 
 /// Checks if all the IndexFace::Vertex instances, from @p first to
 /// @p last, in the given @p mesh lie on the provided @p plane by
@@ -119,8 +120,8 @@ template <typename InputIt>
 bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const Hyperplane3<double>& plane,
                               double tolerance) {
   return std::all_of(first, last, [&mesh, &plane, tolerance](const IndexFace::Vertex& vertex) {
-    const drake::Vector3<double>& x = GetMeshFaceVertexPosition(mesh, vertex);
-    const drake::Vector3<double>& n = GetMeshFaceVertexNormal(mesh, vertex);
+    const math::Vector3& x = GetMeshFaceVertexPosition(mesh, vertex);
+    const math::Vector3& n = GetMeshFaceVertexNormal(mesh, vertex);
     const double ctheta = std::abs(plane.normal().dot(n.normalized()));
     return (ctheta != 0. && plane.absDistance(x) / ctheta < tolerance);
   });

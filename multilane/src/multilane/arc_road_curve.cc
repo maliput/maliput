@@ -74,16 +74,16 @@ double saturate_on_wrapped_bounds(double theta, double theta_min, double theta_m
 
 }  // namespace
 
-drake::Vector3<double> ArcRoadCurve::ToCurveFrame(const drake::Vector3<double>& geo_coordinate, double r_min,
-                                                  double r_max, const api::HBounds& height_bounds) const {
+math::Vector3 ArcRoadCurve::ToCurveFrame(const math::Vector3& geo_coordinate, double r_min, double r_max,
+                                         const api::HBounds& height_bounds) const {
   MALIPUT_DEMAND(r_min <= r_max);
   // TODO(jadecastro): Lift the zero superelevation and zero elevation gradient
   // restriction.
-  const drake::Vector2<double> q(geo_coordinate.x(), geo_coordinate.y());
+  const math::Vector2 q(geo_coordinate.x(), geo_coordinate.y());
   MALIPUT_DEMAND(q != center_);
 
   // Define a vector from q to the center of the arc.
-  const drake::Vector2<double> v = q - center_;
+  const math::Vector2 v = q - center_;
 
   const double theta_min = std::min(theta0_, d_theta_ + theta0_);
   const double theta_max = std::max(theta0_, d_theta_ + theta0_);
@@ -108,7 +108,7 @@ drake::Vector3<double> ArcRoadCurve::ToCurveFrame(const drake::Vector3<double>& 
   // `a` coefficient is normalized by lane length).
   const double h_unsaturated = geo_coordinate.z() - elevation().a() * l_max();
   const double h = drake::math::saturate(h_unsaturated, height_bounds.min(), height_bounds.max());
-  return drake::Vector3<double>(p, r, h);
+  return math::Vector3(p, r, h);
 }
 
 bool ArcRoadCurve::IsValid(double r_min, double r_max, const api::HBounds& height_bounds) const {

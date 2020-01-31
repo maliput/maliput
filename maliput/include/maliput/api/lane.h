@@ -194,9 +194,6 @@ class Lane {
   virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which which_end) const = 0;
 
   virtual std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
-
-  // TODO(jadecastro): Template the entire `api::Lane` class to prevent explicit
-  // virtual functions for each member function.
   ///@}
 };
 

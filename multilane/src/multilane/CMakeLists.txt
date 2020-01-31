@@ -30,9 +30,10 @@ ament_target_dependencies(multilane
 )
 
 target_link_libraries(multilane
+  drake::drake
   maliput::api
   maliput::common
-  drake::drake
+  maliput::math
   yaml-cpp
 )
 

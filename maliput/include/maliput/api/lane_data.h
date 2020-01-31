@@ -4,15 +4,13 @@
 #include <ostream>
 #include <string>
 
-#include "drake/common/default_scalars.h"
-#include "drake/common/eigen_types.h"
-#include "drake/common/extract_double.h"
 #include "drake/math/quaternion.h"
 #include "drake/math/roll_pitch_yaw.h"
 #include "drake/math/rotation_matrix.h"
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace api {
@@ -64,12 +62,13 @@ class GeoPosition {
   GeoPosition(double x, double y, double z) : xyz_(x, y, z) {}
 
   /// Constructs a GeoPosition from a 3-vector @p xyz of the form `[x, y, z]`.
-  static GeoPosition FromXyz(const drake::Vector3<double>& xyz) { return GeoPosition(xyz); }
+  static GeoPosition FromXyz(const math::Vector3& xyz) { return GeoPosition(xyz); }
 
   /// Returns all components as 3-vector `[x, y, z]`.
-  const drake::Vector3<double>& xyz() const { return xyz_; }
+  const math::Vector3& xyz() const { return xyz_; }
+
   /// Sets all components from 3-vector `[x, y, z]`.
-  void set_xyz(const drake::Vector3<double>& xyz) { xyz_ = xyz; }
+  void set_xyz(const math::Vector3& xyz) { xyz_ = xyz; }
 
   /// @name Getters and Setters
   //@{
@@ -112,9 +111,9 @@ class GeoPosition {
   GeoPosition operator*(double rhs) const { return GeoPosition::FromXyz(this->xyz() * rhs); }
 
  private:
-  explicit GeoPosition(const drake::Vector3<double>& xyz) : xyz_(xyz) {}
+  explicit GeoPosition(const math::Vector3& xyz) : xyz_(xyz) {}
 
-  drake::Vector3<double> xyz_;
+  math::Vector3 xyz_;
 };
 
 /// Streams a string representation of @p geo_position into @p out. Returns
@@ -137,16 +136,14 @@ class Rotation {
   /// Constructs a Rotation from @p rpy, a vector of `[roll, pitch, yaw]`,
   /// expressing a roll around X, followed by pitch around Y,
   /// followed by yaw around Z (with all angles in radians).
-  static Rotation FromRpy(const drake::Vector3<double>& rpy) {
+  static Rotation FromRpy(const math::Vector3& rpy) {
     return Rotation(drake::math::RollPitchYaw<double>(rpy).ToQuaternion());
   }
 
   /// Constructs a Rotation expressing a @p roll around X, followed by
   /// @p pitch around Y, followed by @p yaw around Z (with all angles
   /// in radians).
-  static Rotation FromRpy(double roll, double pitch, double yaw) {
-    return FromRpy(drake::Vector3<double>(roll, pitch, yaw));
-  }
+  static Rotation FromRpy(double roll, double pitch, double yaw) { return FromRpy(math::Vector3(roll, pitch, yaw)); }
 
   /// Provides a quaternion representation of the rotation.
   const drake::Quaternion<double>& quat() const { return quaternion_; }
@@ -213,12 +210,13 @@ class LanePosition {
   LanePosition(double s, double r, double h) : srh_(s, r, h) {}
 
   /// Constructs a LanePosition from a 3-vector @p srh of the form `[s, r, h]`.
-  static LanePosition FromSrh(const drake::Vector3<double>& srh) { return LanePosition(srh); }
+  static LanePosition FromSrh(const math::Vector3& srh) { return LanePosition(srh); }
 
   /// Returns all components as 3-vector `[s, r, h]`.
-  const drake::Vector3<double>& srh() const { return srh_; }
+  const math::Vector3& srh() const { return srh_; }
+
   /// Sets all components from 3-vector `[s, r, h]`.
-  void set_srh(const drake::Vector3<double>& srh) { srh_ = srh; }
+  void set_srh(const math::Vector3& srh) { srh_ = srh; }
 
   /// @name Getters and Setters
   //@{
@@ -237,9 +235,9 @@ class LanePosition {
   //@}
 
  private:
-  explicit LanePosition(const drake::Vector3<double>& srh) : srh_(srh) {}
+  explicit LanePosition(const math::Vector3& srh) : srh_(srh) {}
 
-  drake::Vector3<double> srh_;
+  math::Vector3 srh_;
 };
 
 /// Included in the return result of Lane::ToLanePosition().
