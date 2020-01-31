@@ -53,117 +53,74 @@ std::ostream& operator<<(std::ostream& out, const LaneEnd::Which& which_end);
 
 /// A position in 3-dimensional geographical Cartesian space, i.e., in the world
 /// frame, consisting of three components x, y, and z.
-///
-/// Instantiated templates for the following kinds of T's are provided:
-///
-/// - double
-/// - drake::AutoDiffXd
-///
-/// They are already available to link against in the containing library.
-template <typename T>
-class GeoPositionT {
+class GeoPosition {
  public:
-  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(GeoPositionT)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(GeoPosition)
 
   /// Default constructor, initializing all components to zero.
-  GeoPositionT() : xyz_(T(0.), T(0.), T(0.)) {}
+  GeoPosition() : xyz_(0., 0., 0.) {}
 
   /// Fully parameterized constructor.
-  GeoPositionT(const T& x, const T& y, const T& z) : xyz_(x, y, z) {}
+  GeoPosition(double x, double y, double z) : xyz_(x, y, z) {}
 
-  /// Constructs a GeoPositionT from a 3-vector @p xyz of the form `[x, y, z]`.
-  static GeoPositionT<T> FromXyz(const drake::Vector3<T>& xyz) { return GeoPositionT<T>(xyz); }
+  /// Constructs a GeoPosition from a 3-vector @p xyz of the form `[x, y, z]`.
+  static GeoPosition FromXyz(const drake::Vector3<double>& xyz) { return GeoPosition(xyz); }
 
   /// Returns all components as 3-vector `[x, y, z]`.
-  const drake::Vector3<T>& xyz() const { return xyz_; }
+  const drake::Vector3<double>& xyz() const { return xyz_; }
   /// Sets all components from 3-vector `[x, y, z]`.
-  void set_xyz(const drake::Vector3<T>& xyz) { xyz_ = xyz; }
+  void set_xyz(const drake::Vector3<double>& xyz) { xyz_ = xyz; }
 
   /// @name Getters and Setters
   //@{
   /// Gets `x` value.
-  T x() const { return xyz_.x(); }
+  double x() const { return xyz_.x(); }
   /// Sets `x` value.
-  void set_x(const T& x) { xyz_.x() = x; }
+  void set_x(double x) { xyz_.x() = x; }
   /// Gets `y` value.
-  T y() const { return xyz_.y(); }
+  double y() const { return xyz_.y(); }
   /// Sets `y` value.
-  void set_y(const T& y) { xyz_.y() = y; }
+  void set_y(double y) { xyz_.y() = y; }
   /// Gets `z` value.
-  T z() const { return xyz_.z(); }
+  double z() const { return xyz_.z(); }
   /// Sets `z` value.
-  void set_z(const T& z) { xyz_.z() = z; }
+  void set_z(double z) { xyz_.z() = z; }
   //@}
 
   /// Returns L^2 norm of 3-vector.
-  T length() const { return xyz_.norm(); }
+  double length() const { return xyz_.norm(); }
 
-  /// Constructs a GeoPositionT<double> from other types, producing a clone if
-  /// already double.
-  GeoPositionT<double> MakeDouble() const {
-    return {drake::ExtractDoubleOrThrow(xyz_.x()), drake::ExtractDoubleOrThrow(xyz_.y()),
-            drake::ExtractDoubleOrThrow(xyz_.z())};
-  }
   /// Return the Cartesian distance to geo_position.
-  T Distance(const GeoPositionT<T>& geo_position) const;
+  double Distance(const GeoPosition& geo_position) const;
+
+  /// Equality operator.
+  auto operator==(const GeoPosition& rhs) const { return (this->xyz() == rhs.xyz()); }
+
+  /// Inequality operator.
+  auto operator!=(const GeoPosition& rhs) const { return !(this->xyz() == rhs.xyz()); }
+
+  /// Plus operator.
+  GeoPosition operator+(const GeoPosition& rhs) const { return GeoPosition::FromXyz(this->xyz() + rhs.xyz()); }
+
+  /// Minus operator.
+  GeoPosition operator-(const GeoPosition& rhs) const { return GeoPosition::FromXyz(this->xyz() - rhs.xyz()); }
+
+  /// Multiplication by scalar operator.
+  friend GeoPosition operator*(double lhs, const GeoPosition& rhs) { return GeoPosition::FromXyz(lhs * rhs.xyz()); }
+
+  /// Multiplication by scalar operator.
+  GeoPosition operator*(double rhs) const { return GeoPosition::FromXyz(this->xyz() * rhs); }
 
  private:
-  explicit GeoPositionT(const drake::Vector3<T>& xyz) : xyz_(xyz) {}
+  explicit GeoPosition(const drake::Vector3<double>& xyz) : xyz_(xyz) {}
 
-  drake::Vector3<T> xyz_;
+  drake::Vector3<double> xyz_;
 };
-
-// Alias for the double scalar type.
-using GeoPosition = GeoPositionT<double>;
 
 /// Streams a string representation of @p geo_position into @p out. Returns
 /// @p out. This method is provided for the purposes of debugging or
 /// text-logging. It is not intended for serialization.
 std::ostream& operator<<(std::ostream& out, const GeoPosition& geo_position);
-
-/// GeoPosition overload for the equality operator.
-template <typename T>
-auto operator==(const GeoPositionT<T>& lhs, const GeoPositionT<T>& rhs) {
-  return (lhs.xyz() == rhs.xyz());
-}
-
-/// GeoPosition overload for the inequality operator.
-template <typename T>
-auto operator!=(const GeoPositionT<T>& lhs, const GeoPositionT<T>& rhs) {
-  return !(lhs.xyz() == rhs.xyz());
-}
-
-/// GeoPosition overload for the plus operator.
-template <typename T>
-GeoPositionT<T> operator+(const GeoPositionT<T>& lhs, const GeoPositionT<T>& rhs) {
-  drake::Vector3<T> result = lhs.xyz();
-  result += rhs.xyz();
-  return GeoPositionT<T>::FromXyz(result);
-}
-
-/// GeoPosition overload for the minus operator.
-template <typename T>
-GeoPositionT<T> operator-(const GeoPositionT<T>& lhs, const GeoPositionT<T>& rhs) {
-  drake::Vector3<T> result = lhs.xyz();
-  result -= rhs.xyz();
-  return GeoPositionT<T>::FromXyz(result);
-}
-
-/// GeoPosition overload for the multiplication by scalar operator.
-template <typename T>
-GeoPositionT<T> operator*(double lhs, const GeoPositionT<T>& rhs) {
-  drake::Vector3<T> result = rhs.xyz();
-  result *= lhs;
-  return GeoPositionT<T>::FromXyz(result);
-}
-
-/// GeoPosition overload for the multiplication by scalar operator.
-template <typename T>
-GeoPositionT<T> operator*(const GeoPositionT<T>& lhs, double rhs) {
-  drake::Vector3<T> result = lhs.xyz();
-  result *= rhs;
-  return GeoPositionT<T>::FromXyz(result);
-}
 
 /// A 3-dimensional rotation.
 class Rotation {
@@ -245,87 +202,58 @@ std::ostream& operator<<(std::ostream& out, const Rotation& rotation);
 /// * r is lateral position, perpendicular to the reference line at s. +r is to
 ///   to the left when traveling in the direction of +s.
 /// * h is height above the road surface.
-///
-/// Instantiated templates for the following kinds of T's are provided:
-///
-/// - double
-/// - drake::AutoDiffXd
-///
-/// They are already available to link against in the containing library.
-template <typename T>
-class LanePositionT {
+class LanePosition {
  public:
-  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LanePositionT)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LanePosition)
 
   /// Default constructor, initializing all components to zero.
-  LanePositionT() : srh_(T(0.), T(0.), T(0.)) {}
+  LanePosition() : srh_(0., 0., 0.) {}
 
   /// Fully parameterized constructor.
-  LanePositionT(const T& s, const T& r, const T& h) : srh_(s, r, h) {}
+  LanePosition(double s, double r, double h) : srh_(s, r, h) {}
 
   /// Constructs a LanePosition from a 3-vector @p srh of the form `[s, r, h]`.
-  static LanePositionT<T> FromSrh(const drake::Vector3<T>& srh) { return LanePositionT<T>(srh); }
+  static LanePosition FromSrh(const drake::Vector3<double>& srh) { return LanePosition(srh); }
 
   /// Returns all components as 3-vector `[s, r, h]`.
-  const drake::Vector3<T>& srh() const { return srh_; }
+  const drake::Vector3<double>& srh() const { return srh_; }
   /// Sets all components from 3-vector `[s, r, h]`.
-  void set_srh(const drake::Vector3<T>& srh) { srh_ = srh; }
+  void set_srh(const drake::Vector3<double>& srh) { srh_ = srh; }
 
   /// @name Getters and Setters
   //@{
   /// Gets `s` value.
-  T s() const { return srh_.x(); }
+  double s() const { return srh_.x(); }
   /// Sets `s` value.
-  void set_s(const T& s) { srh_.x() = s; }
+  void set_s(double s) { srh_.x() = s; }
   /// Gets `r` value.
-  T r() const { return srh_.y(); }
+  double r() const { return srh_.y(); }
   /// Sets `r` value.
-  void set_r(const T& r) { srh_.y() = r; }
+  void set_r(double r) { srh_.y() = r; }
   /// Gets `h` value.
-  T h() const { return srh_.z(); }
+  double h() const { return srh_.z(); }
   /// Sets `h` value.
-  void set_h(const T& h) { srh_.z() = h; }
+  void set_h(double h) { srh_.z() = h; }
   //@}
 
-  /// Constructs a LanePositionT<double> from other types, producing a clone if
-  /// already double.
-  LanePositionT<double> MakeDouble() const {
-    return {drake::ExtractDoubleOrThrow(srh_.x()), drake::ExtractDoubleOrThrow(srh_.y()),
-            drake::ExtractDoubleOrThrow(srh_.z())};
-  }
-
  private:
-  explicit LanePositionT(const drake::Vector3<T>& srh) : srh_(srh) {}
+  explicit LanePosition(const drake::Vector3<double>& srh) : srh_(srh) {}
 
-  drake::Vector3<T> srh_;
+  drake::Vector3<double> srh_;
 };
 
-// Alias for the double scalar type.
-using LanePosition = LanePositionT<double>;
-
 /// Included in the return result of Lane::ToLanePosition().
-///
-/// Instantiated templates for the following kinds of T's are provided:
-///
-/// - double
-/// - drake::AutoDiffXd
-///
-/// They are already available to link against in the containing library.
-template <typename T>
-struct LanePositionResultT {
+struct LanePositionResult {
   /// The candidate LanePosition within the Lane' segment-bounds which
   /// is closest to a `geo_position` supplied to Lane::ToLanePosition()
   /// (measured by the Cartesian metric in the world frame).
-  LanePositionT<T> lane_position;
+  LanePosition lane_position;
   /// The position that exactly corresponds to `lane_position`.
-  GeoPositionT<T> nearest_position;
+  GeoPosition nearest_position;
   /// The Cartesian distance between `nearest_position` and the
   /// `geo_position` supplied to Lane::ToLanePosition().
-  T distance;
+  double distance{};
 };
-
-// Alias for the double scalar type.
-using LanePositionResult = LanePositionResultT<double>;
 
 /// Streams a string representation of @p lane_position into @p out. Returns
 /// @p out. This method is provided for the purposes of debugging or

@@ -3,7 +3,6 @@
 #include <memory>
 #include <optional>
 
-#include "drake/common/autodiff.h"
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
 
@@ -149,18 +148,9 @@ class Lane final : public api::Lane {
 
   api::GeoPosition DoToGeoPosition(const api::LanePosition& lane_pos) const final;
 
-  api::GeoPositionT<drake::AutoDiffXd> DoToGeoPositionAutoDiff(
-      const api::LanePositionT<drake::AutoDiffXd>& lane_pos) const final;
-
   api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const final;
 
   api::LanePositionResult DoToLanePosition(const api::GeoPosition& geo_pos) const final;
-
-  api::LanePositionResultT<drake::AutoDiffXd> DoToLanePositionAutoDiff(
-      const api::GeoPositionT<drake::AutoDiffXd>& geo_pos) const final;
-
-  template <typename T>
-  api::LanePositionResultT<T> ImplDoToLanePositionT(const api::GeoPositionT<T>& geo_pos) const;
 
   const Segment* segment_{};  // The segment to which this lane belongs.
   const api::LaneId id_;

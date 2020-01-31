@@ -24,8 +24,7 @@ std::ostream& operator<<(std::ostream& out, const LanePosition& lane_position) {
   return out << "(s = " << lane_position.s() << ", r = " << lane_position.r() << ", h = " << lane_position.h() << ")";
 }
 
-template <typename T>
-T GeoPositionT<T>::Distance(const GeoPositionT<T>& geo_position) const {
+double GeoPosition::Distance(const GeoPosition& geo_position) const {
   return (this->xyz() - geo_position.xyz()).norm();
 }
 
@@ -71,7 +70,3 @@ double Rotation::Distance(const Rotation& rot) const {
 
 }  // namespace api
 }  // namespace maliput
-
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_NONSYMBOLIC_SCALARS(class ::maliput::api::GeoPositionT)
-
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_NONSYMBOLIC_SCALARS(class ::maliput::api::LanePositionT)

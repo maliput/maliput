@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/autodiff.h"
-
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
@@ -16,8 +14,6 @@ static constexpr double kX0 = 23.;
 static constexpr double kX1 = 75.;
 static constexpr double kX2 = 0.567;
 
-// TODO(jadecastro) Use CompareMatrices() to implement the
-// LanePositionT<T>::srh() accessor checks once AutoDiff supported.
 #define CHECK_ALL_LANE_POSITION_ACCESSORS(dut, _s, _r, _h) \
   do {                                                     \
     EXPECT_EQ(dut.s(), _s);                                \
@@ -30,71 +26,48 @@ static constexpr double kX2 = 0.567;
     EXPECT_EQ(dut.srh().z(), _h);                          \
   } while (0)
 
-// Class for defining identical tests in LanePositionTest across different
-// scalar types, T.
-template <typename T>
-class LanePositionTest : public ::testing::Test {};
-
-typedef ::testing::Types<double, drake::AutoDiffXd> Implementations;
-TYPED_TEST_CASE(LanePositionTest, Implementations);
-
-TYPED_TEST(LanePositionTest, DefaultConstructor) {
+GTEST_TEST(LanePositionTest, DefaultConstructor) {
   // Check that default constructor obeys its contract.
-  using T = TypeParam;
-  const LanePositionT<T> dut;
-  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, T(0.), T(0.), T(0.));
+  const LanePosition dut;
+  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, 0., 0., 0.);
 }
 
-TYPED_TEST(LanePositionTest, ParameterizedConstructor) {
+GTEST_TEST(LanePositionTest, ParameterizedConstructor) {
   // Check the fully-parameterized constructor.
-  using T = TypeParam;
-  const LanePositionT<T> dut(kX0, kX1, kX2);
-  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, T(kX0), T(kX1), T(kX2));
+  const LanePosition dut(kX0, kX1, kX2);
+  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, kX0, kX1, kX2);
 }
 
-TYPED_TEST(LanePositionTest, ConstructionFromVector) {
+GTEST_TEST(LanePositionTest, ConstructionFromVector) {
   // Check the conversion-construction from a 3-vector.
-  using T = TypeParam;
-  const LanePositionT<T> dut = LanePositionT<T>::FromSrh(drake::Vector3<T>(kX0, kX1, kX2));
-  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, T(kX0), T(kX1), T(kX2));
+  const LanePosition dut = LanePosition::FromSrh(drake::Vector3<double>(kX0, kX1, kX2));
+  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, kX0, kX1, kX2);
 }
 
-TYPED_TEST(LanePositionTest, VectorSetter) {
+GTEST_TEST(LanePositionTest, VectorSetter) {
   // Check the vector-based setter.
-  using T = TypeParam;
-  LanePositionT<T> dut(kX0, kX1, kX2);
-  const drake::Vector3<T> srh(T(9.), T(7.), T(8.));
+  LanePosition dut(kX0, kX1, kX2);
+  const drake::Vector3<double> srh(9., 7., 8.);
   dut.set_srh(srh);
-  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, T(srh.x()), T(srh.y()), T(srh.z()));
+  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, srh.x(), srh.y(), srh.z());
 }
 
-TYPED_TEST(LanePositionTest, ComponentSetters) {
+GTEST_TEST(LanePositionTest, ComponentSetters) {
   // Check the individual component setters.
-  using T = TypeParam;
-  LanePositionT<T> dut(T(0.1), T(0.2), T(0.3));
+  LanePosition dut(0.1, 0.2, 0.3);
 
-  dut.set_s(T(99.));
-  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, T(99.), T(0.2), T(0.3));
+  dut.set_s(99.);
+  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, 99., 0.2, 0.3);
 
-  dut.set_r(T(2.3));
-  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, T(99.), T(2.3), T(0.3));
+  dut.set_r(2.3);
+  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, 99., 2.3, 0.3);
 
-  dut.set_h(T(42.));
-  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, T(99.), T(2.3), T(42.));
-}
-
-TYPED_TEST(LanePositionTest, MakeDouble) {
-  // Check that double conversion preserves the values.
-  using T = TypeParam;
-  LanePositionT<T> dut(T(0.1), T(0.2), T(0.3));
-
-  CHECK_ALL_LANE_POSITION_ACCESSORS(dut.MakeDouble(), 0.1, 0.2, 0.3);
+  dut.set_h(42.);
+  CHECK_ALL_LANE_POSITION_ACCESSORS(dut, 99., 2.3, 42.);
 }
 
 #undef CHECK_ALL_LANE_POSITION_ACCESSORS
 
-// TODO(jadecastro) Use CompareMatrices() to implement the
-// GeoPositionT<T>::xyz() accessor checks once AutoDiff supported.
 #define CHECK_ALL_GEO_POSITION_ACCESSORS(dut, _x, _y, _z) \
   do {                                                    \
     EXPECT_EQ(dut.x(), _x);                               \
@@ -107,110 +80,87 @@ TYPED_TEST(LanePositionTest, MakeDouble) {
     EXPECT_EQ(dut.xyz().z(), _z);                         \
   } while (0)
 
-// Class for defining identical tests in GeoPositionTest across different scalar
-// types, T.
-template <typename T>
-class GeoPositionTest : public ::testing::Test {};
-
-TYPED_TEST_CASE(GeoPositionTest, Implementations);
-
-TYPED_TEST(GeoPositionTest, DefaultConstructor) {
+GTEST_TEST(GeoPositionTest, DefaultConstructor) {
   // Check that default constructor obeys its contract.
-  using T = TypeParam;
-  const GeoPositionT<T> dut;
-  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, T(0.), T(0.), T(0.));
+  const GeoPosition dut;
+  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, 0., 0., 0.);
 }
 
-TYPED_TEST(GeoPositionTest, ParameterizedConstructor) {
+GTEST_TEST(GeoPositionTest, ParameterizedConstructor) {
   // Check the fully-parameterized constructor.
-  using T = TypeParam;
-  const GeoPositionT<T> dut(kX0, kX1, kX2);
-  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, T(kX0), T(kX1), T(kX2));
+  const GeoPosition dut(kX0, kX1, kX2);
+  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, kX0, kX1, kX2);
 }
 
-TYPED_TEST(GeoPositionTest, ConstructionFromVector) {
+GTEST_TEST(GeoPositionTest, ConstructionFromVector) {
   // Check the conversion-construction from a 3-vector.
-  using T = TypeParam;
-  const GeoPositionT<T> dut = GeoPositionT<T>::FromXyz(drake::Vector3<T>(T(kX0), T(kX1), T(kX2)));
-  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, T(kX0), T(kX1), T(kX2));
+  const GeoPosition dut = GeoPosition::FromXyz(drake::Vector3<double>(kX0, kX1, kX2));
+  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, kX0, kX1, kX2);
 }
 
-TYPED_TEST(GeoPositionTest, VectorSetter) {
+GTEST_TEST(GeoPositionTest, VectorSetter) {
   // Check the vector-based setter.
-  using T = TypeParam;
-  GeoPositionT<T> dut(kX0, kX1, kX2);
-  const drake::Vector3<T> xyz(T(9.), T(7.), T(8.));
+  GeoPosition dut(kX0, kX1, kX2);
+  const drake::Vector3<double> xyz(9., 7., 8.);
   dut.set_xyz(xyz);
-  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, T(xyz.x()), T(xyz.y()), T(xyz.z()));
+  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, xyz.x(), xyz.y(), xyz.z());
 }
 
-TYPED_TEST(GeoPositionTest, ComponentSetters) {
+GTEST_TEST(GeoPositionTest, ComponentSetters) {
   // Check the individual component setters.
-  using T = TypeParam;
-  GeoPositionT<T> dut(0.1, 0.2, 0.3);
+  GeoPosition dut(0.1, 0.2, 0.3);
 
-  dut.set_x(T(99.));
-  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, T(99.), T(0.2), T(0.3));
+  dut.set_x(99.);
+  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, 99., 0.2, 0.3);
 
-  dut.set_y(T(2.3));
-  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, T(99.), T(2.3), T(0.3));
+  dut.set_y(2.3);
+  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, 99., 2.3, 0.3);
 
-  dut.set_z(T(42.));
-  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, T(99.), T(2.3), T(42.));
-}
-
-TYPED_TEST(GeoPositionTest, MakeDouble) {
-  // Check that double conversion preserves the values.
-  using T = TypeParam;
-  GeoPositionT<T> dut(T(0.1), T(0.2), T(0.3));
-
-  CHECK_ALL_GEO_POSITION_ACCESSORS(dut.MakeDouble(), 0.1, 0.2, 0.3);
+  dut.set_z(42.);
+  CHECK_ALL_GEO_POSITION_ACCESSORS(dut, 99., 2.3, 42.);
 }
 
 #undef CHECK_ALL_GEO_POSITION_ACCESSORS
 
-TYPED_TEST(GeoPositionTest, EqualityInequalityOperators) {
+GTEST_TEST(GeoPositionTest, EqualityInequalityOperators) {
   // Checks that equality is true iff the constituent components are all equal,
   // and that inequality is true otherwise.
-  using T = TypeParam;
-  GeoPositionT<T> gp1(0.1, 0.2, 0.3);
-  GeoPositionT<T> gp2(0.1, 0.2, 0.3);
+  const GeoPosition gp1(0.1, 0.2, 0.3);
+  const GeoPosition gp2(0.1, 0.2, 0.3);
 
   EXPECT_TRUE(gp1 == gp2);
   EXPECT_FALSE(gp1 != gp2);
 
-  GeoPositionT<T> gp_xerror(gp2.x() + T(1e-6), gp2.y(), gp2.z());
+  const GeoPosition gp_xerror(gp2.x() + 1e-6, gp2.y(), gp2.z());
   EXPECT_FALSE(gp1 == gp_xerror);
   EXPECT_TRUE(gp1 != gp_xerror);
-  GeoPositionT<T> gp_yerror(gp2.x(), gp2.y() + T(1e-6), gp2.z());
+  const GeoPosition gp_yerror(gp2.x(), gp2.y() + 1e-6, gp2.z());
   EXPECT_FALSE(gp1 == gp_yerror);
   EXPECT_TRUE(gp1 != gp_xerror);
-  GeoPositionT<T> gp_zerror(gp2.x(), gp2.y(), gp2.z() + T(1e-6));
+  const GeoPosition gp_zerror(gp2.x(), gp2.y(), gp2.z() + 1e-6);
   EXPECT_FALSE(gp1 == gp_zerror);
   EXPECT_TRUE(gp1 != gp_xerror);
 }
 
-TYPED_TEST(GeoPositionTest, Length) {
+GTEST_TEST(GeoPositionTest, Length) {
   // Check length of the vector.
-  using T = TypeParam;
-  const GeoPositionT<T> dut(T(3.), T(4.), T(0.));
-  EXPECT_EQ(dut.length(), T(5.));
+  const GeoPosition dut(3., 4., 0.);
+  EXPECT_EQ(dut.length(), 5.);
 }
 
-TYPED_TEST(GeoPositionTest, VectorArithmeticOperators) {
+GTEST_TEST(GeoPositionTest, VectorArithmeticOperators) {
   // Check vector arithmetic operators +/- and multiply by scalar.
-  using T = TypeParam;
-  const GeoPositionT<T> gp1(T(1.), T(2.), T(3.));
-  const GeoPositionT<T> gp2(T(4.), T(5.), T(6.));
+  const GeoPosition gp1(1., 2., 3.);
+  const GeoPosition gp2(4., 5., 6.);
 
-  GeoPositionT<T> dut = gp1 + gp2;
-  EXPECT_TRUE(dut == GeoPositionT<T>(T(5.), T(7.), T(9.)));
+  GeoPosition dut = gp1 + gp2;
+  EXPECT_TRUE(dut == GeoPosition(5., 7., 9.));
   dut = gp1 - gp2;
-  EXPECT_TRUE(dut == GeoPositionT<T>(T(-3.), T(-3.), T(-3.)));
+  EXPECT_TRUE(dut == GeoPosition(-3., -3., -3.));
   dut = 2. * gp1;
-  EXPECT_TRUE(dut == GeoPositionT<T>(T(2.), T(4.), T(6.)));
+  EXPECT_TRUE(dut == GeoPosition(2., 4., 6.));
   dut = gp1 * 3.;
-  EXPECT_TRUE(dut == GeoPositionT<T>(T(3.), T(6.), T(9.)));
+  EXPECT_TRUE(dut == GeoPosition(3., 6., 9.));
 }
 
 GTEST_TEST(GeoPosition, DistanceTest) {
@@ -219,8 +169,7 @@ GTEST_TEST(GeoPosition, DistanceTest) {
   // >>> import math as m
   // >>> print(m.sqrt((66-25)**2 + ((90-85)**2) + ((-25-12)**2)))
   const double kLinearTolerance = 1e-15;
-  using T = double;
-  const GeoPositionT<T> dut(T(25.), T(85.), T(12.));
+  const GeoPosition dut(25., 85., 12.);
   EXPECT_NEAR(dut.Distance({66.0, 90.0, -25.0}), 55.452682532047085, kLinearTolerance);
 }
 // An arbitrary very small number (that passes the tests).
