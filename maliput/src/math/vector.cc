@@ -102,6 +102,14 @@ Derived VectorBase<N, Derived>::operator+(const VectorBase<N, Derived>& vector) 
 }
 
 template <std::size_t N, typename Derived>
+Derived& VectorBase<N, Derived>::operator+=(const VectorBase<N, Derived>& vector) {
+  std::array<double, N> res{};
+  std::transform(values_.cbegin(), values_.cend(), vector.values_.cbegin(), res.begin(), std::plus<double>());
+  values_ = res;
+  return static_cast<Derived&>(*this);
+}
+
+template <std::size_t N, typename Derived>
 Derived VectorBase<N, Derived>::operator-(const VectorBase<N, Derived>& vector) const {
   std::array<double, N> res{};
   std::transform(values_.cbegin(), values_.cend(), vector.values_.cbegin(), res.begin(), std::minus<double>());

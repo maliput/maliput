@@ -14,6 +14,10 @@ from maliput.api import (
     RoadPosition,
     Rotation
 )
+
+from maliput.math import (
+    Vector3
+)
 from dragway import create_dragway
 
 
@@ -31,6 +35,9 @@ def make_test_dragway(lane_width, length):
         maximum_height=kHeight, linear_tolerance=kTol,
         angular_tolerance=kTol)
 
+# Returns a numpay.array from a vector.
+def make_np_array(vector):
+    return np.array([vector.x(), vector.y(), vector.z()])
 
 # Tests the bindings for the API and backend implementations.
 class TestMaliput(unittest.TestCase):
@@ -38,19 +45,19 @@ class TestMaliput(unittest.TestCase):
         # Test the containers' constructors and accessors.
         srh = [4., 5., 6.]
         lane_pos = LanePosition(srh[0], srh[1], srh[2])
-        self.assertTrue(len(lane_pos.srh()) == 3)
-        self.assertTrue(np.allclose(lane_pos.srh(), srh))
+        self.assertTrue(len(make_np_array(lane_pos.srh())) == 3)
+        self.assertTrue(np.allclose(make_np_array(lane_pos.srh()), srh))
 
         lane_pos_alt = LanePosition(s=4., r=5., h=6.)
-        self.assertTrue(np.allclose(lane_pos_alt.srh(), srh))
+        self.assertTrue(np.allclose(make_np_array(lane_pos_alt.srh()), srh))
 
         xyz = [1., 2., 3.]
         geo_pos = GeoPosition(xyz[0], xyz[1], xyz[2])
-        self.assertTrue(len(geo_pos.xyz()) == 3)
-        self.assertTrue(np.allclose(geo_pos.xyz(), xyz))
+        self.assertTrue(len(make_np_array(geo_pos.xyz())) == 3)
+        self.assertTrue(np.allclose(make_np_array(geo_pos.xyz()), xyz))
 
         geo_pos_alt = GeoPosition(x=1., y=2., z=3.)
-        self.assertTrue(np.allclose(geo_pos_alt.xyz(), xyz))
+        self.assertTrue(np.allclose(make_np_array(geo_pos_alt.xyz()), xyz))
 
         RoadPosition()
         rg = make_test_dragway(lane_width=4., length=100.)
@@ -63,12 +70,12 @@ class TestMaliput(unittest.TestCase):
         lane_1 = segment.lane(1)
         road_pos = RoadPosition(lane=lane_0, pos=lane_pos)
         self.assertEqual(road_pos.lane.id().string(), lane_0.id().string())
-        self.assertTrue(np.allclose(road_pos.pos.srh(), lane_pos.srh()))
+        self.assertTrue(np.allclose(make_np_array(road_pos.pos.srh()), make_np_array(lane_pos.srh())))
         road_pos.lane = lane_1
         self.assertEqual(road_pos.lane.id().string(), lane_1.id().string())
         new_srh = [42., 43., 44.]
         road_pos.pos = LanePosition(s=new_srh[0], r=new_srh[1], h=new_srh[2])
-        self.assertTrue(np.allclose(road_pos.pos.srh(), new_srh))
+        self.assertTrue(np.allclose(make_np_array(road_pos.pos.srh()), new_srh))
         lane_orientation = lane_0.GetOrientation(lane_pos)
         self.assertTrue(np.allclose(
             lane_orientation.rpy().ToQuaternion().wxyz(),
@@ -76,9 +83,9 @@ class TestMaliput(unittest.TestCase):
         ))
 
         # Check that the getters are read-only.
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             lane_pos.srh()[0] = 0.
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             geo_pos.xyz()[0] = 0.
 
         # Test RoadGeometryId accessors.
@@ -122,16 +129,16 @@ class TestMaliput(unittest.TestCase):
         lane_pos = LanePosition(0., 0., 0.)
         geo_pos_result = lane_0.ToGeoPosition(lane_pos)
         geo_pos_expected = GeoPosition(0., -kLaneWidth / 2., 0.)
-        self.assertTrue(np.allclose(geo_pos_result.xyz(),
-                                    geo_pos_expected.xyz()))
+        self.assertTrue(np.allclose(make_np_array(geo_pos_result.xyz()),
+                                    make_np_array(geo_pos_expected.xyz())))
 
         geo_pos = GeoPosition(1., kLaneWidth / 2., 3.)
         lane_pos_result = lane_1.ToLanePosition(geo_pos)
         lane_pos_result_expected = \
             LanePositionResult(LanePosition(1., 0., 3.), GeoPosition(0., 0., 0.), 0.)
-        self.assertTrue(np.allclose(lane_pos_result.lane_position.srh(),
-                                    lane_pos_result_expected.lane_position.srh()))
-        self.assertTrue(np.allclose(lane_pos_result.nearest_position.xyz(), geo_pos.xyz()))
+        self.assertTrue(np.allclose(make_np_array(lane_pos_result.lane_position.srh()),
+                                    make_np_array(lane_pos_result_expected.lane_position.srh())))
+        self.assertTrue(np.allclose(make_np_array(lane_pos_result.nearest_position.xyz()), make_np_array(geo_pos.xyz())))
         self.assertTrue(lane_pos_result.distance == lane_pos_result_expected.distance)
 
     # TODO(jadecastro) Add more maliput backends as needed.

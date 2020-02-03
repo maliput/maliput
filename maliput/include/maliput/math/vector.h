@@ -96,6 +96,9 @@ class VectorBase {
   /// Add operator overload.
   Derived operator+(const VectorBase<N, Derived>& vector) const;
 
+  /// Add and assignment operator overload.
+  Derived& operator+=(const VectorBase<N, Derived>& vector);
+
   /// Substract operator overload.
   Derived operator-(const VectorBase<N, Derived>& vector) const;
 
