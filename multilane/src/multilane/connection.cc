@@ -116,7 +116,7 @@ Connection::Connection(const std::string& id, const Endpoint& start, const Endpo
 Endpoint Connection::LaneStart(int lane_index) const {
   MALIPUT_DEMAND(lane_index >= 0 && lane_index < num_lanes_);
   const double r = lane_offset(lane_index);
-  const math::Vector3 position = road_curve_->W_of_prh(0., r, 0.);
+  const drake::Vector3<double> position = road_curve_->W_of_prh(0., r, 0.);
   const Rot3 rotation = road_curve_->Orientation(0., r, 0.);
   // Let t be the arc-length xy projection of the lane centerline and t_of_p be
   // a linear function of p (given that p <--> s is a linear relation too).
@@ -127,7 +127,7 @@ Endpoint Connection::LaneStart(int lane_index) const {
   // The same applies to theta_dot.
 
   // Computes w_prime to obtain ∂z/∂p.
-  const math::Vector3 w_prime =
+  const drake::Vector3<double> w_prime =
       road_curve_->W_prime_of_prh(0., r, 0., road_curve_->Rabg_of_p(0.), road_curve_->elevation().f_dot_p(0.));
   // Computes ∂p/∂t based on Connection geometry type.
 
@@ -150,7 +150,7 @@ Endpoint Connection::LaneStart(int lane_index) const {
 Endpoint Connection::LaneEnd(int lane_index) const {
   MALIPUT_DEMAND(lane_index >= 0 && lane_index < num_lanes_);
   const double r = lane_offset(lane_index);
-  const math::Vector3 position = road_curve_->W_of_prh(1., r, 0.);
+  const drake::Vector3<double> position = road_curve_->W_of_prh(1., r, 0.);
   const Rot3 rotation = road_curve_->Orientation(1., r, 0.);
   // Let t be the arc-length xy projection of the lane centerline and t_of_p be
   // a linear function of p (given that p <--> s is a linear relation too).
@@ -161,7 +161,7 @@ Endpoint Connection::LaneEnd(int lane_index) const {
   // The same applies to theta_dot.
 
   // Computes w_prime to obtain ∂z/∂p.
-  const math::Vector3 w_prime =
+  const drake::Vector3<double> w_prime =
       road_curve_->W_prime_of_prh(1., r, 0., road_curve_->Rabg_of_p(1.), road_curve_->elevation().f_dot_p(1.));
   // Computes ∂p/∂t based on Connection geometry type.
 
@@ -198,8 +198,8 @@ CubicPolynomial MakeCubic(double dX, double Y0, double dY, double Ydot0, double 
 std::unique_ptr<RoadCurve> Connection::CreateRoadCurve() const {
   switch (type_) {
     case Connection::kLine: {
-      const math::Vector2 xy0(start_.xy().x(), start_.xy().y());
-      const math::Vector2 dxy(end_.xy().x() - start_.xy().x(), end_.xy().y() - start_.xy().y());
+      const drake::Vector2<double> xy0(start_.xy().x(), start_.xy().y());
+      const drake::Vector2<double> dxy(end_.xy().x() - start_.xy().x(), end_.xy().y() - start_.xy().y());
       const CubicPolynomial elevation(
           MakeCubic(dxy.norm(), start_.z().z(), end_.z().z() - start_.z().z(), start_.z().z_dot(), end_.z().z_dot()));
       const CubicPolynomial superelevation(MakeCubic(dxy.norm(), start_.z().theta(),
@@ -209,7 +209,7 @@ std::unique_ptr<RoadCurve> Connection::CreateRoadCurve() const {
                                              computation_policy_);
     };
     case Connection::kArc: {
-      const math::Vector2 center(cx_, cy_);
+      const drake::Vector2<double> center(cx_, cy_);
       const double arc_length = radius_ * std::abs(d_theta_);
       const CubicPolynomial elevation(
           MakeCubic(arc_length, start_.z().z(), end_.z().z() - start_.z().z(), start_.z().z_dot(), end_.z().z_dot()));

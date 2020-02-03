@@ -5,7 +5,6 @@
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/common/maliput_unused.h"
-#include "maliput/math/vector.h"
 
 #include "multilane/road_curve.h"
 
@@ -46,7 +45,7 @@ class ArcRoadCurve : public RoadCurve {
   ///         positive number.
   /// @throws maliput::common::assertion_error if @p scale_length is not a
   ///         positive number.
-  explicit ArcRoadCurve(const math::Vector2& center, double radius, double theta0, double d_theta,
+  explicit ArcRoadCurve(const drake::Vector2<double>& center, double radius, double theta0, double d_theta,
                         const CubicPolynomial& elevation, const CubicPolynomial& superelevation,
                         double linear_tolerance, double scale_length, ComputationPolicy computation_policy)
       : RoadCurve(linear_tolerance, scale_length, elevation, superelevation, computation_policy),
@@ -59,16 +58,16 @@ class ArcRoadCurve : public RoadCurve {
 
   ~ArcRoadCurve() override = default;
 
-  math::Vector2 xy_of_p(double p) const override {
+  drake::Vector2<double> xy_of_p(double p) const override {
     // The result will be computed with the following function:
     //      [x;y] = center + [radius * cos(θ); radius * sin(θ)]
     // and:
     //      θ = θ₀ + (p * Δθ)
     const double theta = theta_of_p(p);
-    return center_ + math::Vector2(radius_ * std::cos(theta), radius_ * std::sin(theta));
+    return center_ + drake::Vector2<double>(radius_ * std::cos(theta), radius_ * std::sin(theta));
   }
 
-  math::Vector2 xy_dot_of_p(double p) const override {
+  drake::Vector2<double> xy_dot_of_p(double p) const override {
     // Given:
     //      [x;y] = center + [radius * cos(θ); radius * sin(θ)]
     // and:
@@ -78,7 +77,7 @@ class ArcRoadCurve : public RoadCurve {
     //      [dx/dp; dy/dp] = [-radius * sin(θ) * dθ/dp; radius * cos(θ) * dθ/dp]
     //                     = [-radius * sin(θ) * Δθ; radius * cos(θ) * Δθ]
     const double theta = theta_of_p(p);
-    return math::Vector2(-radius_ * std::sin(theta) * d_theta_, radius_ * std::cos(theta) * d_theta_);
+    return drake::Vector2<double>(-radius_ * std::sin(theta) * d_theta_, radius_ * std::cos(theta) * d_theta_);
   }
 
   double heading_of_p(double p) const override {
@@ -104,8 +103,8 @@ class ArcRoadCurve : public RoadCurve {
 
   double l_max() const override { return radius_ * std::abs(d_theta_); }
 
-  math::Vector3 ToCurveFrame(const math::Vector3& geo_coordinate, double r_min, double r_max,
-                             const api::HBounds& height_bounds) const override;
+  drake::Vector3<double> ToCurveFrame(const drake::Vector3<double>& geo_coordinate, double r_min, double r_max,
+                                      const api::HBounds& height_bounds) const override;
 
   bool IsValid(double r_min, double r_max, const api::HBounds& height_bounds) const override;
 
@@ -130,7 +129,7 @@ class ArcRoadCurve : public RoadCurve {
 
   // Center of rotation in z=0 plane, world coordinates, for the arc reference
   // curve.
-  const math::Vector2 center_;
+  const drake::Vector2<double> center_;
   // The length of the radius of the arc.
   const double radius_{};
   // The angular position at which the piece of arc starts.

@@ -6,7 +6,6 @@
 
 #include "maliput/api/lane_data.h"
 #include "maliput/common/assertion_error.h"
-#include "maliput/math/vector.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 
 namespace maliput {
@@ -15,7 +14,7 @@ namespace {
 
 class MultilaneArcRoadCurveTest : public ::testing::Test {
  protected:
-  const math::Vector2 kCenter{10.0, 10.0};
+  const drake::Vector2<double> kCenter{10.0, 10.0};
   const double kRadius{10.0};
   const double kTheta0{M_PI / 4.0};
   const double kTheta1{3.0 * M_PI / 4.0};
@@ -88,24 +87,28 @@ TEST_F(MultilaneArcRoadCurveTest, ArcGeometryTest) {
 
   // Checks the evaluation of xy at different values over the reference curve.
   EXPECT_TRUE(CompareMatrices(
-      dut.xy_of_p(0.0), kCenter + math::Vector2(kRadius * std::cos(kTheta0), kRadius * std::sin(kTheta0)), kVeryExact));
-  EXPECT_TRUE(CompareMatrices(
-      dut.xy_of_p(0.5),
-      kCenter + math::Vector2(kRadius * std::cos(kTheta0 + kDTheta * 0.5), kRadius * std::sin(kTheta0 + kDTheta * 0.5)),
+      dut.xy_of_p(0.0), kCenter + drake::Vector2<double>(kRadius * std::cos(kTheta0), kRadius * std::sin(kTheta0)),
       kVeryExact));
+  EXPECT_TRUE(CompareMatrices(dut.xy_of_p(0.5),
+                              kCenter + drake::Vector2<double>(kRadius * std::cos(kTheta0 + kDTheta * 0.5),
+                                                               kRadius * std::sin(kTheta0 + kDTheta * 0.5)),
+                              kVeryExact));
   EXPECT_TRUE(CompareMatrices(
-      dut.xy_of_p(1.0), kCenter + math::Vector2(kRadius * std::cos(kTheta1), kRadius * std::sin(kTheta1)), kVeryExact));
+      dut.xy_of_p(1.0), kCenter + drake::Vector2<double>(kRadius * std::cos(kTheta1), kRadius * std::sin(kTheta1)),
+      kVeryExact));
   // Checks the derivative of xy at different values over the reference curve.
   EXPECT_TRUE(CompareMatrices(
       dut.xy_dot_of_p(0.0),
-      math::Vector2(-kRadius * std::sin(kTheta0) * kDTheta, kRadius * std::cos(kTheta0) * kDTheta), kVeryExact));
+      drake::Vector2<double>(-kRadius * std::sin(kTheta0) * kDTheta, kRadius * std::cos(kTheta0) * kDTheta),
+      kVeryExact));
   EXPECT_TRUE(CompareMatrices(dut.xy_dot_of_p(0.5),
-                              math::Vector2(-kRadius * std::sin(kTheta0 + 0.5 * kDTheta) * kDTheta,
-                                            kRadius * std::cos(kTheta0 + 0.5 * kDTheta) * kDTheta),
+                              drake::Vector2<double>(-kRadius * std::sin(kTheta0 + 0.5 * kDTheta) * kDTheta,
+                                                     kRadius * std::cos(kTheta0 + 0.5 * kDTheta) * kDTheta),
                               kVeryExact));
   EXPECT_TRUE(CompareMatrices(
       dut.xy_dot_of_p(1.0),
-      math::Vector2(-kRadius * std::sin(kTheta1) * kDTheta, kRadius * std::cos(kTheta1) * kDTheta), kVeryExact));
+      drake::Vector2<double>(-kRadius * std::sin(kTheta1) * kDTheta, kRadius * std::cos(kTheta1) * kDTheta),
+      kVeryExact));
   // Checks the heading at different values.
   EXPECT_NEAR(dut.heading_of_p(0.0), kTheta0 + M_PI / 2.0, kVeryExact);
   EXPECT_NEAR(dut.heading_of_p(0.5), kTheta0 + kDTheta / 2.0 + M_PI / 2.0, kVeryExact);
@@ -126,7 +129,7 @@ TEST_F(MultilaneArcRoadCurveTest, ArcGeometryTest) {
 // - Larger than the radius bounds.
 // - Bounds equal to the radius.
 GTEST_TEST(MultilaneArcRoadCurve, IsValidTest) {
-  const math::Vector2 kZeroCenter(0.0, 0.0);
+  const drake::Vector2<double> kZeroCenter(0.0, 0.0);
   const double kRadius = 10.0;
   const double kInitTheta = 0.0;
   const double kEndTheta1 = M_PI / 2.0;
@@ -177,31 +180,31 @@ TEST_F(MultilaneArcRoadCurveTest, ToCurveFrameTest) {
   const ArcRoadCurve dut(kCenter, kRadius, kTheta0, kDTheta, zp, zp, kLinearTolerance, kScaleLength,
                          kComputationPolicy);
   // Checks points over the composed curve.
-  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(math::Vector3(kCenter(0) + kRadius * std::cos(kTheta0),
-                                                             kCenter(1) + kRadius * std::sin(kTheta0), 0.0),
+  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(drake::Vector3<double>(kCenter(0) + kRadius * std::cos(kTheta0),
+                                                                      kCenter(1) + kRadius * std::sin(kTheta0), 0.0),
                                                kRMin, kRMax, height_bounds),
-                              math::Vector3(0.0, 0.0, 0.0), kVeryExact));
-  EXPECT_TRUE(
-      CompareMatrices(dut.ToCurveFrame(math::Vector3(kCenter(0) + kRadius * std::cos(kTheta0 + kDTheta / 2.0),
-                                                     kCenter(1) + kRadius * std::sin(kTheta0 + kDTheta / 2.0), 0.0),
-                                       kRMin, kRMax, height_bounds),
-                      math::Vector3(0.5, 0.0, 0.0), kVeryExact));
-  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(math::Vector3(kCenter(0) + kRadius * std::cos(kTheta1),
-                                                             kCenter(1) + kRadius * std::sin(kTheta1), 0.0),
+                              drake::Vector3<double>(0.0, 0.0, 0.0), kVeryExact));
+  EXPECT_TRUE(CompareMatrices(
+      dut.ToCurveFrame(drake::Vector3<double>(kCenter(0) + kRadius * std::cos(kTheta0 + kDTheta / 2.0),
+                                              kCenter(1) + kRadius * std::sin(kTheta0 + kDTheta / 2.0), 0.0),
+                       kRMin, kRMax, height_bounds),
+      drake::Vector3<double>(0.5, 0.0, 0.0), kVeryExact));
+  EXPECT_TRUE(CompareMatrices(dut.ToCurveFrame(drake::Vector3<double>(kCenter(0) + kRadius * std::cos(kTheta1),
+                                                                      kCenter(1) + kRadius * std::sin(kTheta1), 0.0),
                                                kRMin, kRMax, height_bounds),
-                              math::Vector3(1., 0.0, 0.0), kVeryExact));
+                              drake::Vector3<double>(1., 0.0, 0.0), kVeryExact));
   // Checks with lateral and vertical deviations.
   EXPECT_TRUE(CompareMatrices(
-      dut.ToCurveFrame(math::Vector3(kCenter(0) + (kRadius + 1.0) * std::cos(kTheta0 + M_PI / 8.0),
-                                     kCenter(1) + (kRadius + 1.0) * std::sin(kTheta0 + M_PI / 8.0), 6.0),
+      dut.ToCurveFrame(drake::Vector3<double>(kCenter(0) + (kRadius + 1.0) * std::cos(kTheta0 + M_PI / 8.0),
+                                              kCenter(1) + (kRadius + 1.0) * std::sin(kTheta0 + M_PI / 8.0), 6.0),
                        kRMin, kRMax, height_bounds),
-      math::Vector3(0.25, -1.0, 6.0), kVeryExact));
+      drake::Vector3<double>(0.25, -1.0, 6.0), kVeryExact));
   EXPECT_TRUE(CompareMatrices(
       dut.ToCurveFrame(
-          math::Vector3(kCenter(0) + (kRadius - 2.0) * std::cos(kTheta0 + kDTheta / 2.0 + M_PI / 8.0),
-                        kCenter(1) + (kRadius - 2.0) * std::sin(kTheta0 + kDTheta / 2.0 + M_PI / 8.0), 3.0),
+          drake::Vector3<double>(kCenter(0) + (kRadius - 2.0) * std::cos(kTheta0 + kDTheta / 2.0 + M_PI / 8.0),
+                                 kCenter(1) + (kRadius - 2.0) * std::sin(kTheta0 + kDTheta / 2.0 + M_PI / 8.0), 3.0),
           kRMin, kRMax, height_bounds),
-      math::Vector3(0.75, 2.0, 3.0), kVeryExact));
+      drake::Vector3<double>(0.75, 2.0, 3.0), kVeryExact));
 }
 
 // Checks that l_max(), p_from_s() and s_from_p() with constant
@@ -263,14 +266,15 @@ TEST_F(MultilaneArcRoadCurveTest, WorldFunction) {
   // Checks for a flat curve.
   const ArcRoadCurve flat_dut(kCenter, kRadius, kTheta0, kDTheta, zp, zp, kLinearTolerance, kScaleLength,
                               kComputationPolicy);
-  const math::Vector3 kGeoCenter(kCenter.x(), kCenter.y(), 0.);
+  const drake::Vector3<double> kGeoCenter(kCenter.x(), kCenter.y(), 0.);
   for (double p : p_vector) {
     for (double r : r_vector) {
       for (double h : h_vector) {
         const Rot3 flat_rotation(0., 0., flat_dut.heading_of_p(p));
         const double angle = kTheta0 + kDTheta * p;
-        const math::Vector3 geo_position = kGeoCenter + kRadius * math::Vector3(std::cos(angle), std::sin(angle), 0.) +
-                                           flat_rotation.apply({0., r, h});
+        const drake::Vector3<double> geo_position =
+            kGeoCenter + kRadius * drake::Vector3<double>(std::cos(angle), std::sin(angle), 0.) +
+            flat_rotation.apply({0., r, h});
         EXPECT_TRUE(CompareMatrices(flat_dut.W_of_prh(p, r, h), geo_position, kVeryExact));
       }
     }
@@ -283,7 +287,7 @@ TEST_F(MultilaneArcRoadCurveTest, WorldFunction) {
   const ArcRoadCurve elevated_dut(kCenter, kRadius, kTheta0, kDTheta, linear_elevation, zp, kLinearTolerance,
                                   kScaleLength, kComputationPolicy);
   // Computes the rotation along the RoadCurve.
-  const math::Vector3 z_vector(0., 0., kRadius * kDTheta);
+  const drake::Vector3<double> z_vector(0., 0., kRadius * kDTheta);
   const double kZeroRoll{0.};
   const double kLinearElevatedPitch = -std::atan(linear_elevation.f_dot_p(0.));
   for (double p : p_vector) {
@@ -291,8 +295,9 @@ TEST_F(MultilaneArcRoadCurveTest, WorldFunction) {
       for (double h : h_vector) {
         const Rot3 elevated_rotation(kZeroRoll, kLinearElevatedPitch, flat_dut.heading_of_p(p));
         const double angle = kTheta0 + kDTheta * p;
-        const math::Vector3 geo_position = kGeoCenter + kRadius * math::Vector3(std::cos(angle), std::sin(angle), 0.) +
-                                           linear_elevation.f_p(p) * z_vector + elevated_rotation.apply({0., r, h});
+        const drake::Vector3<double> geo_position =
+            kGeoCenter + kRadius * drake::Vector3<double>(std::cos(angle), std::sin(angle), 0.) +
+            linear_elevation.f_p(p) * z_vector + elevated_rotation.apply({0., r, h});
         EXPECT_TRUE(CompareMatrices(elevated_dut.W_of_prh(p, r, h), geo_position, kVeryExact));
       }
     }
@@ -308,8 +313,9 @@ TEST_F(MultilaneArcRoadCurveTest, WorldFunction) {
       for (double h : h_vector) {
         const Rot3 superelevated_rotation(kSuperelevationOffset, 0., flat_dut.heading_of_p(p));
         const double angle = kTheta0 + kDTheta * p;
-        const math::Vector3 geo_position = kGeoCenter + kRadius * math::Vector3(std::cos(angle), std::sin(angle), 0.) +
-                                           superelevated_rotation.apply({0., r, h});
+        const drake::Vector3<double> geo_position =
+            kGeoCenter + kRadius * drake::Vector3<double>(std::cos(angle), std::sin(angle), 0.) +
+            superelevated_rotation.apply({0., r, h});
         EXPECT_TRUE(CompareMatrices(superelevated_dut.W_of_prh(p, r, h), geo_position, kVeryExact));
       }
     }
@@ -331,26 +337,28 @@ TEST_F(MultilaneArcRoadCurveTest, WorldFunctionDerivative) {
   const double kDifferential = 1e-3;
   // Numerically evaluates the derivative of a road curve world function
   // with respect to p at [p, r, h] with a five-point stencil.
-  auto numeric_w_prime_of_prh = [kDifferential](const RoadCurve& dut, double p, double r, double h) -> math::Vector3 {
-    const math::Vector3 dw = -dut.W_of_prh(p + 2. * kDifferential, r, h) + 8. * dut.W_of_prh(p + kDifferential, r, h) -
-                             8. * dut.W_of_prh(p - kDifferential, r, h) + dut.W_of_prh(p - 2. * kDifferential, r, h);
+  auto numeric_w_prime_of_prh = [kDifferential](const RoadCurve& dut, double p, double r,
+                                                double h) -> drake::Vector3<double> {
+    const drake::Vector3<double> dw =
+        -dut.W_of_prh(p + 2. * kDifferential, r, h) + 8. * dut.W_of_prh(p + kDifferential, r, h) -
+        8. * dut.W_of_prh(p - kDifferential, r, h) + dut.W_of_prh(p - 2. * kDifferential, r, h);
     return dw / (12. * kDifferential);
   };
 
   // Checks for a flat curve.
   const ArcRoadCurve flat_dut(kCenter, kRadius, kTheta0, kDTheta, zp, zp, kLinearTolerance, kScaleLength,
                               kComputationPolicy);
-  const math::Vector3 kGeoCenter(kCenter.x(), kCenter.y(), 0.);
+  const drake::Vector3<double> kGeoCenter(kCenter.x(), kCenter.y(), 0.);
   for (double p : p_vector) {
     for (double r : r_vector) {
       for (double h : h_vector) {
         // Computes the rotation along the RoadCurve at [p, r, h].
         const Rot3 rotation = flat_dut.Rabg_of_p(p);
         const double g_prime = flat_dut.elevation().f_dot_p(p);
-        const math::Vector3 w_prime = flat_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
-        const math::Vector3 numeric_w_prime = numeric_w_prime_of_prh(flat_dut, p, r, h);
+        const drake::Vector3<double> w_prime = flat_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
+        const drake::Vector3<double> numeric_w_prime = numeric_w_prime_of_prh(flat_dut, p, r, h);
         EXPECT_TRUE(CompareMatrices(w_prime, numeric_w_prime, kQuiteExact));
-        const math::Vector3 s_hat = flat_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
+        const drake::Vector3<double> s_hat = flat_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
         EXPECT_TRUE(CompareMatrices(w_prime.normalized(), s_hat, kVeryExact));
       }
     }
@@ -368,10 +376,10 @@ TEST_F(MultilaneArcRoadCurveTest, WorldFunctionDerivative) {
         // Computes the rotation along the RoadCurve at [p, r, h].
         const Rot3 rotation = elevated_dut.Rabg_of_p(p);
         const double g_prime = elevated_dut.elevation().f_dot_p(p);
-        const math::Vector3 w_prime = elevated_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
-        const math::Vector3 numeric_w_prime = numeric_w_prime_of_prh(elevated_dut, p, r, h);
+        const drake::Vector3<double> w_prime = elevated_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
+        const drake::Vector3<double> numeric_w_prime = numeric_w_prime_of_prh(elevated_dut, p, r, h);
         EXPECT_TRUE(CompareMatrices(w_prime, numeric_w_prime, kQuiteExact));
-        const math::Vector3 s_hat = elevated_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
+        const drake::Vector3<double> s_hat = elevated_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
         EXPECT_TRUE(CompareMatrices(w_prime.normalized(), s_hat, kVeryExact));
       }
     }
@@ -388,10 +396,10 @@ TEST_F(MultilaneArcRoadCurveTest, WorldFunctionDerivative) {
         // Computes the rotation along the RoadCurve at [p, r, h].
         const Rot3 rotation = superelevated_dut.Rabg_of_p(p);
         const double g_prime = superelevated_dut.elevation().f_dot_p(p);
-        const math::Vector3 w_prime = superelevated_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
-        const math::Vector3 numeric_w_prime = numeric_w_prime_of_prh(superelevated_dut, p, r, h);
+        const drake::Vector3<double> w_prime = superelevated_dut.W_prime_of_prh(p, r, h, rotation, g_prime);
+        const drake::Vector3<double> numeric_w_prime = numeric_w_prime_of_prh(superelevated_dut, p, r, h);
         EXPECT_TRUE(CompareMatrices(w_prime, numeric_w_prime, kQuiteExact));
-        const math::Vector3 s_hat = superelevated_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
+        const drake::Vector3<double> s_hat = superelevated_dut.s_hat_of_prh(p, r, h, rotation, g_prime);
         EXPECT_TRUE(CompareMatrices(w_prime.normalized(), s_hat, kVeryExact));
       }
     }
@@ -422,29 +430,29 @@ TEST_F(MultilaneArcRoadCurveTest, ReferenceCurveRotation) {
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(rotation.pitch(), kZeroPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), 3. * M_PI / 4., kVeryExact);
-    math::Vector3 r_hat = flat_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(-0.707106781186548, -0.707106781186548, 0.), kVeryExact));
+    drake::Vector3<double> r_hat = flat_dut.r_hat_of_Rabg(rotation);
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(-0.707106781186548, -0.707106781186548, 0.), kVeryExact));
 
     rotation = flat_dut.Rabg_of_p(0.5);
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(rotation.pitch(), kZeroPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -M_PI, kVeryExact);
     r_hat = flat_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(0., -1., 0.), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0., -1., 0.), kVeryExact));
 
     rotation = flat_dut.Rabg_of_p(0.75);
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(rotation.pitch(), kZeroPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -7. * M_PI / 8., kVeryExact);
     r_hat = flat_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(0.382683432365090, -0.923879532511287, 0.), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0.382683432365090, -0.923879532511287, 0.), kVeryExact));
 
     rotation = flat_dut.Rabg_of_p(1.);
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(rotation.pitch(), kZeroPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -3. * M_PI / 4., kVeryExact);
     r_hat = flat_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(0.707106781186548, -0.707106781186548, 0.), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0.707106781186548, -0.707106781186548, 0.), kVeryExact));
   }
 
   // Checks for a linearly elevated curve.
@@ -462,29 +470,29 @@ TEST_F(MultilaneArcRoadCurveTest, ReferenceCurveRotation) {
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(wrap(rotation.pitch()), kElevationPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), 3. * M_PI / 4., kVeryExact);
-    math::Vector3 r_hat = elevated_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(-0.707106781186548, -0.707106781186548, 0.), kVeryExact));
+    drake::Vector3<double> r_hat = elevated_dut.r_hat_of_Rabg(rotation);
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(-0.707106781186548, -0.707106781186548, 0.), kVeryExact));
 
     rotation = elevated_dut.Rabg_of_p(0.5);
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(wrap(rotation.pitch()), kElevationPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -M_PI, kVeryExact);
     r_hat = elevated_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(0., -1., 0.), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0., -1., 0.), kVeryExact));
 
     rotation = elevated_dut.Rabg_of_p(0.75);
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(wrap(rotation.pitch()), kElevationPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -7. * M_PI / 8., kVeryExact);
     r_hat = elevated_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(0.382683432365090, -0.923879532511287, 0.), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0.382683432365090, -0.923879532511287, 0.), kVeryExact));
 
     rotation = elevated_dut.Rabg_of_p(1.);
     EXPECT_NEAR(rotation.roll(), kZeroRoll, kVeryExact);
     EXPECT_NEAR(wrap(rotation.pitch()), kElevationPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -3. * M_PI / 4., kVeryExact);
     r_hat = elevated_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(0.707106781186548, -0.707106781186548, 0.), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0.707106781186548, -0.707106781186548, 0.), kVeryExact));
   }
 
   // Checks for a curve with constant non zero superelevation.
@@ -500,32 +508,32 @@ TEST_F(MultilaneArcRoadCurveTest, ReferenceCurveRotation) {
     EXPECT_NEAR(wrap(rotation.roll()), kSuperelevationOffset, kVeryExact);
     EXPECT_NEAR(wrap(rotation.pitch()), kZeroPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), 3. * M_PI / 4., kVeryExact);
-    math::Vector3 r_hat = superelevated_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(
-        CompareMatrices(r_hat, math::Vector3(-0.353553390593274, -0.353553390593274, 0.866025403784439), kVeryExact));
+    drake::Vector3<double> r_hat = superelevated_dut.r_hat_of_Rabg(rotation);
+    EXPECT_TRUE(CompareMatrices(
+        r_hat, drake::Vector3<double>(-0.353553390593274, -0.353553390593274, 0.866025403784439), kVeryExact));
 
     rotation = superelevated_dut.Rabg_of_p(0.5);
     EXPECT_NEAR(rotation.roll(), kSuperelevationOffset, kVeryExact);
     EXPECT_NEAR(wrap(rotation.pitch()), kZeroPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -M_PI, kVeryExact);
     r_hat = superelevated_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(CompareMatrices(r_hat, math::Vector3(0.0, -0.5, 0.866025403784439), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0.0, -0.5, 0.866025403784439), kVeryExact));
 
     rotation = superelevated_dut.Rabg_of_p(0.75);
     EXPECT_NEAR(rotation.roll(), kSuperelevationOffset, kVeryExact);
     EXPECT_NEAR(wrap(rotation.pitch()), kZeroPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -7. * M_PI / 8., kVeryExact);
     r_hat = superelevated_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(
-        CompareMatrices(r_hat, math::Vector3(0.191341716182545, -0.461939766255643, 0.866025403784439), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0.191341716182545, -0.461939766255643, 0.866025403784439),
+                                kVeryExact));
 
     rotation = superelevated_dut.Rabg_of_p(1.);
     EXPECT_NEAR(rotation.roll(), kSuperelevationOffset, kVeryExact);
     EXPECT_NEAR(wrap(rotation.pitch()), kZeroPitch, kVeryExact);
     EXPECT_NEAR(wrap(rotation.yaw()), -3. * M_PI / 4., kVeryExact);
     r_hat = superelevated_dut.r_hat_of_Rabg(rotation);
-    EXPECT_TRUE(
-        CompareMatrices(r_hat, math::Vector3(0.353553390593274, -0.353553390593274, 0.866025403784439), kVeryExact));
+    EXPECT_TRUE(CompareMatrices(r_hat, drake::Vector3<double>(0.353553390593274, -0.353553390593274, 0.866025403784439),
+                                kVeryExact));
   }
 }
 

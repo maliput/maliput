@@ -35,8 +35,9 @@ GTEST_TEST(MultilaneSegmentsTest, MultipleLanes) {
   const ComputationPolicy kComputationPolicy{ComputationPolicy::kPreferAccuracy};
 
   RoadGeometry rg(api::RoadGeometryId{"apple"}, kLinearTolerance, kAngularTolerance, kScaleLength);
-  std::unique_ptr<RoadCurve> road_curve_1 = std::make_unique<LineRoadCurve>(
-      math::Vector2(100., -75.), math::Vector2(100., 50.), zp, zp, kLinearTolerance, kScaleLength, kComputationPolicy);
+  std::unique_ptr<RoadCurve> road_curve_1 =
+      std::make_unique<LineRoadCurve>(drake::Vector2<double>(100., -75.), drake::Vector2<double>(100., 50.), zp, zp,
+                                      kLinearTolerance, kScaleLength, kComputationPolicy);
   Segment* s1 = rg.NewJunction(api::JunctionId{"j1"})
                     ->NewSegment(api::SegmentId{"s1"}, std::move(road_curve_1), kRMin, kRMax, {0., kMaxHeight});
   EXPECT_EQ(s1->id(), api::SegmentId("s1"));

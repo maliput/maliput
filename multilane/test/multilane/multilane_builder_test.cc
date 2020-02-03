@@ -954,7 +954,7 @@ class TurnBuildProcedure : public BuildProcedure {
       // the straight lane by construction, the resulting orientation is
       // rotated pi radians about the h-axis.
       const api::Rotation rrotation = curved_lane->GetOrientation({kS, -r, kH});
-      const drake::Quaternion<double> pi_rotation(drake::AngleAxis<double>(M_PI, math::Vector3::UnitZ()));
+      const drake::Quaternion<double> pi_rotation(drake::AngleAxis<double>(M_PI, drake::Vector3<double>::UnitZ()));
       EXPECT_TRUE(api::test::IsRotationClose(straight_lane->GetOrientation({kS, r, kH}),
                                              // Applies a pi radians rotation around the h-axis to the curved
                                              // lane orientation (i.e. apply an intrinsic pi radians rotation
