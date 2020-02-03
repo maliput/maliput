@@ -35,8 +35,8 @@ namespace test {
   maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   for (int i = 0; i < 3; ++i) {
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.p_BMin(i), b.p_BMin(i)));
-    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.p_BMax(i), b.p_BMax(i)));
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.p_BMin[i], b.p_BMin[i]));
+    MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.p_BMax[i], b.p_BMax[i]));
   }
   return c.result();
 }

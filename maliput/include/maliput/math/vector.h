@@ -62,6 +62,9 @@ class VectorBase {
   /// @return A Derived with *this normalized.
   Derived normalized() const;
 
+  /// @return The dimension of `*this`.
+  std::size_t size() const { return values_.size(); };
+
   /// Assignment operator overload.
   /// @param other Derived object.
   Derived& operator=(const VectorBase<N, Derived>& other);
