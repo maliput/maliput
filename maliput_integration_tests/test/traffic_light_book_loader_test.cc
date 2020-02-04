@@ -43,24 +43,19 @@ class TestLoading2x2IntersectionTrafficLightbook : public ::testing::Test {
     const Rotation kRotation = Rotation::FromQuat(math::Quaternion(1, 0, 0, 0));
 
     bulbs.push_back(std::make_unique<Bulb>(
-        Bulb::Id("RedBulb"), GeoPosition(0, 0, 0.3937), kRotation,
-        BulbColor::kRed, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
-        Bulb::BoundingBox()));
+        Bulb::Id("RedBulb"), GeoPosition(0, 0, 0.3937), kRotation, BulbColor::kRed, BulbType::kRound, std::nullopt,
+        std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
-        Bulb::Id("YellowBulb"), GeoPosition(0, 0, 0), kRotation,
-        BulbColor::kYellow, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
-        Bulb::BoundingBox()));
+        Bulb::Id("YellowBulb"), GeoPosition(0, 0, 0), kRotation, BulbColor::kYellow, BulbType::kRound, std::nullopt,
+        std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
-        Bulb::Id("GreenBulb"), GeoPosition(0, 0, -0.3937), kRotation,
-        BulbColor::kGreen, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
-        Bulb::BoundingBox()));
+        Bulb::Id("GreenBulb"), GeoPosition(0, 0, -0.3937), kRotation, BulbColor::kGreen, BulbType::kRound, std::nullopt,
+        std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
-        Bulb::Id("YellowLeftArrowBulb"), GeoPosition(0, -0.3937, -0.3937),
-        kRotation, BulbColor::kYellow, BulbType::kArrow, 3.14,
-        std::vector<BulbState>({BulbState::kOff, BulbState::kBlinking}), Bulb::BoundingBox()));
+        Bulb::Id("YellowLeftArrowBulb"), GeoPosition(0, -0.3937, -0.3937), kRotation, BulbColor::kYellow,
+        BulbType::kArrow, 3.14, std::vector<BulbState>({BulbState::kOff, BulbState::kBlinking}), Bulb::BoundingBox()));
     bulb_groups.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("SouthFacingBulbs"), GeoPosition(0, 0, 0),
-                                                      kRotation,
-                                                      std::move(bulbs)));
+                                                      kRotation, std::move(bulbs)));
     south_facing_ = std::make_unique<const TrafficLight>(
         TrafficLight::Id("SouthFacing"), GeoPosition(1.875, 9.375, 6.0579),
         Rotation::FromQuat(math::Quaternion(0.707107, 0, 0, -0.707107)), std::move(bulb_groups));

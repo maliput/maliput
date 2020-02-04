@@ -72,7 +72,8 @@ struct convert<Rotation> {
     if (!node.IsSequence() || node.size() != 4) {
       return false;
     }
-    const maliput::math::Quaternion q(node[0].as<double>(), node[1].as<double>(), node[2].as<double>(), node[3].as<double>());
+    const maliput::math::Quaternion q(node[0].as<double>(), node[1].as<double>(), node[2].as<double>(),
+                                      node[3].as<double>());
     rhs.set_quat(q);
     return true;
   }
