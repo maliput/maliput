@@ -226,7 +226,7 @@ TEST_F(RotationTest, ConstructionFromQuaternion) {
 
 TEST_F(RotationTest, ConstructionFromRpyVector) {
   // Check the conversion-construction from a 3-vector of roll, pitch, yaw.
-  Rotation dut = Rotation::FromRpy(drake::Vector3<double>(twist_roll_, twist_pitch_, twist_yaw_));
+  Rotation dut = Rotation::FromRpy({twist_roll_, twist_pitch_, twist_yaw_});
   CHECK_ALL_ROTATION_ACCESSORS(dut, twist_quat_.w(), twist_quat_.x(), twist_quat_.y(), twist_quat_.z(), twist_roll_,
                                twist_pitch_, twist_yaw_, twist_matrix_);
 }
