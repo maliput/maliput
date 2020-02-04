@@ -8,7 +8,6 @@
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_unused.h"
-#include "maliput/math/vector.h"
 
 #include "multilane/road_curve.h"
 
@@ -41,9 +40,9 @@ class LineRoadCurve : public RoadCurve {
   /// positive number.
   /// @throws maliput::common::assertion_error if @p scale_length is not a
   /// positive number.
-  explicit LineRoadCurve(const math::Vector2& xy0, const math::Vector2& dxy, const CubicPolynomial& elevation,
-                         const CubicPolynomial& superelevation, double linear_tolerance, double scale_length,
-                         ComputationPolicy computation_policy)
+  explicit LineRoadCurve(const drake::Vector2<double>& xy0, const drake::Vector2<double>& dxy,
+                         const CubicPolynomial& elevation, const CubicPolynomial& superelevation,
+                         double linear_tolerance, double scale_length, ComputationPolicy computation_policy)
       : RoadCurve(linear_tolerance, scale_length, elevation, superelevation, computation_policy),
         p0_(xy0),
         dp_(dxy),
@@ -53,9 +52,9 @@ class LineRoadCurve : public RoadCurve {
 
   ~LineRoadCurve() override = default;
 
-  math::Vector2 xy_of_p(double p) const override { return p0_ + p * dp_; }
+  drake::Vector2<double> xy_of_p(double p) const override { return p0_ + p * dp_; }
 
-  math::Vector2 xy_dot_of_p(double p) const override {
+  drake::Vector2<double> xy_dot_of_p(double p) const override {
     maliput::common::unused(p);
     return dp_;
   }
@@ -72,8 +71,8 @@ class LineRoadCurve : public RoadCurve {
 
   double l_max() const override { return dp_.norm(); }
 
-  math::Vector3 ToCurveFrame(const math::Vector3& geo_coordinate, double r_min, double r_max,
-                             const api::HBounds& height_bounds) const override;
+  drake::Vector3<double> ToCurveFrame(const drake::Vector3<double>& geo_coordinate, double r_min, double r_max,
+                                      const api::HBounds& height_bounds) const override;
 
   bool IsValid(double r_min, double r_max, const api::HBounds& height_bounds) const override {
     maliput::common::unused(r_min);
@@ -94,10 +93,10 @@ class LineRoadCurve : public RoadCurve {
 
   // The first point in world coordinates over the z=0 plane of the reference
   // curve.
-  const math::Vector2 p0_{};
+  const drake::Vector2<double> p0_{};
   // The difference vector that joins the end point of the reference curve with
   // the first one, p0_.
-  const math::Vector2 dp_{};
+  const drake::Vector2<double> dp_{};
   // The constant angle deviation of dp_ with respect to the x axis of the world
   // frame.
   const double heading_{};

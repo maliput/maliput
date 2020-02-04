@@ -38,7 +38,7 @@ std::optional<api::LaneEnd> Lane::DoGetDefaultBranch(api::LaneEnd::Which which_e
 api::GeoPosition Lane::DoToGeoPosition(const api::LanePosition& lane_pos) const {
   // Recover parameter p from arc-length position s.
   const double p = p_from_s_at_r0_(lane_pos.s());
-  const math::Vector3 xyz = road_curve_->W_of_prh(p, lane_pos.r() + r0_, lane_pos.h());
+  const drake::Vector3<double> xyz = road_curve_->W_of_prh(p, lane_pos.r() + r0_, lane_pos.h());
   return {xyz.x(), xyz.y(), xyz.z()};
 }
 
@@ -78,8 +78,12 @@ api::LanePositionResult Lane::DoToLanePosition(const api::GeoPosition& geo_posit
   // Lane position is over the segment's road curve frame, so a change is
   // needed. That implies getting the path length s from p and translating the r
   // coordinate because of the offset.
-  const math::Vector3 lane_position_in_segment_curve_frame =
-      road_curve_->ToCurveFrame(geo_position.xyz(), r_min, r_max, elevation_bounds_);
+  const math::Vector3 geo_position_xyz{geo_position.xyz()};
+  const drake::Vector3<double> lane_position_in_segment_curve_frame_drake = road_curve_->ToCurveFrame(
+      {geo_position_xyz.x(), geo_position_xyz.y(), geo_position_xyz.z()}, r_min, r_max, elevation_bounds_);
+  const math::Vector3 lane_position_in_segment_curve_frame{lane_position_in_segment_curve_frame_drake.x(),
+                                                           lane_position_in_segment_curve_frame_drake.y(),
+                                                           lane_position_in_segment_curve_frame_drake.z()};
   const double s = s_from_p_at_r0_(lane_position_in_segment_curve_frame[0]);
   const api::LanePosition lane_position =
       api::LanePosition(s, lane_position_in_segment_curve_frame[1] - r0_, lane_position_in_segment_curve_frame[2]);

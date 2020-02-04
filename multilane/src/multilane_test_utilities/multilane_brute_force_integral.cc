@@ -5,7 +5,6 @@
 #include <limits>
 
 #include "maliput/common/maliput_throw.h"
-#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace multilane {
@@ -27,10 +26,10 @@ double BruteForcePathLengthIntegral(const RoadCurve& rc, double p_0, double p_1,
   // in the global frame for each interval boundary and sums up the path lengths
   // of the segments in the global frame that correspond to each one of those
   // intervals.
-  math::Vector3 geo_position_at_prev_p = rc.W_of_prh(p_0, r, h);
+  drake::Vector3<double> geo_position_at_prev_p = rc.W_of_prh(p_0, r, h);
   for (int i = 1; i <= iterations; ++i) {
     const double p = p_0 + d_p * static_cast<double>(i) / iterations;
-    const math::Vector3 geo_position_at_p = rc.W_of_prh(p, r, h);
+    const drake::Vector3<double> geo_position_at_p = rc.W_of_prh(p, r, h);
     const double ith_step_length = (geo_position_at_p - geo_position_at_prev_p).norm();
     if (maximum_step != nullptr) {
       // Keep track of the maximum step taken.

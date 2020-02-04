@@ -66,7 +66,9 @@ bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face, double toleran
   MALIPUT_DEMAND(face_vertices.size() >= 3);
   const math::Vector3& x0 = GetMeshFaceVertexPosition(mesh, face_vertices[0]);
   const math::Vector3& n0 = GetMeshFaceVertexNormal(mesh, face_vertices[0]);
-  *plane = Hyperplane3<double>(n0.normalized(), x0);
+  const drake::Vector3<double> x0_drake{x0.x(), x0.y(), x0.z()};
+  const drake::Vector3<double> n0_drake{n0.x(), n0.y(), n0.z()};
+  *plane = Hyperplane3<double>(n0_drake.normalized(), x0_drake);
   return DoMeshVerticesLieOnPlane(mesh, face_vertices.begin() + 1, face_vertices.end(), *plane, tolerance);
 }
 
@@ -172,15 +174,17 @@ std::vector<FaceVertexIndex> SimplifyMeshFacesContour(const GeoMesh& mesh,
   const int contour_vertex_count = contour_indices.size();
   if (contour_vertex_count <= 3) return contour_indices;
   std::vector<FaceVertexIndex> simplified_contour_indices;
-  ApplyDouglasPeuckerSimplification(
-      contour_indices.begin(), contour_indices.end() - 1,
-      [&mesh](const FaceVertexIndex& face_vertex_index) {
-        return GetMeshFaceVertexPosition(mesh, MeshFaceVertexAt(mesh, face_vertex_index));
-      },
-      [](const math::Vector3& start_vertex, const math::Vector3& end_vertex) {
-        return ParametrizedLine3<double>{start_vertex, (end_vertex - start_vertex).normalized()};
-      },
-      tolerance, std::back_inserter(simplified_contour_indices));
+  ApplyDouglasPeuckerSimplification(contour_indices.begin(), contour_indices.end() - 1,
+                                    [&mesh](const FaceVertexIndex& face_vertex_index) {
+                                      return GetMeshFaceVertexPosition(mesh, MeshFaceVertexAt(mesh, face_vertex_index));
+                                    },
+                                    [](const math::Vector3& start_vertex, const math::Vector3& end_vertex) {
+                                      const auto diff_normalized{(end_vertex - start_vertex).normalized()};
+                                      return ParametrizedLine3<double>{
+                                          {start_vertex.x(), start_vertex.y(), start_vertex.z()},
+                                          {diff_normalized.x(), diff_normalized.y(), diff_normalized.z()}};
+                                    },
+                                    tolerance, std::back_inserter(simplified_contour_indices));
   return simplified_contour_indices;
 }
 

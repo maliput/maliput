@@ -122,8 +122,10 @@ bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, 
   return std::all_of(first, last, [&mesh, &plane, tolerance](const IndexFace::Vertex& vertex) {
     const math::Vector3& x = GetMeshFaceVertexPosition(mesh, vertex);
     const math::Vector3& n = GetMeshFaceVertexNormal(mesh, vertex);
-    const double ctheta = std::abs(plane.normal().dot(n.normalized()));
-    return (ctheta != 0. && plane.absDistance(x) / ctheta < tolerance);
+    const drake::Vector3<double>& x_drake{x.x(), x.y(), x.z()};
+    const drake::Vector3<double>& n_drake{n.x(), n.y(), n.z()};
+    const double ctheta = std::abs(plane.normal().dot(n_drake.normalized()));
+    return (ctheta != 0. && plane.absDistance(x_drake) / ctheta < tolerance);
   });
 }
 
@@ -244,9 +246,13 @@ void ApplyDouglasPeuckerSimplification(InputIt first, InputIt last, VertexFn to_
 
   const auto edge = to_edge(to_vertex(*first), to_vertex(*last));
   auto farthest = std::max_element(first, last, [&edge, &to_vertex](const auto& lhs, const auto& rhs) {
-    return (edge.distance(to_vertex(lhs)) < edge.distance(to_vertex(rhs)));
+    const drake::Vector3<double> to_vertex_lhs_drake{to_vertex(lhs).x(), to_vertex(lhs).y(), to_vertex(lhs).z()};
+    const drake::Vector3<double> to_vertex_rhs_drake{to_vertex(rhs).x(), to_vertex(rhs).y(), to_vertex(rhs).z()};
+    return (edge.distance(to_vertex_lhs_drake) < edge.distance(to_vertex_rhs_drake));
   });
-  if (edge.distance(to_vertex(*farthest)) > tolerance) {
+  const math::Vector3 to_vertex_math{to_vertex(*farthest)};
+  const drake::Vector3<double> to_vertex_drake{to_vertex_math.x(), to_vertex_math.y(), to_vertex_math.z()};
+  if (edge.distance(to_vertex_drake) > tolerance) {
     ApplyDouglasPeuckerSimplification(first, farthest, to_vertex, to_edge, tolerance, output);
     ApplyDouglasPeuckerSimplification(farthest + 1, last, to_vertex, to_edge, tolerance, output);
   } else {

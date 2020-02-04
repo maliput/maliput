@@ -142,6 +142,9 @@ class GeoMeshSimplificationTest : public ::testing::Test {
   const math::Vector3 kVertexGPosition{3., 1., 1.};
   const math::Vector3 kVertexHPosition{2., 2., -1.};
   const math::Vector3 kVertexIPosition{0., 2., 1.};
+  const drake::Vector3<double> kNormalVectorDrake{kNormalVector.x(), kNormalVector.y(), kNormalVector.z()};
+  const drake::Vector3<double> kVertexAPositionDrake{kVertexAPosition.x(), kVertexAPosition.y(), kVertexAPosition.z()};
+  const drake::Vector3<double> kVertexCPositionDrake{kVertexCPosition.x(), kVertexCPosition.y(), kVertexCPosition.z()};
 
   const int kFirstQuadIndex{0};
   const int kSecondQuadIndex{1};
@@ -323,7 +326,7 @@ TEST_F(GeoMeshSimplificationTest, FaceVertexNormal) {
 }
 
 TEST_F(GeoMeshSimplificationTest, VerticesOnPlane) {
-  const Hyperplane3<double> planeA(kNormalVector, kVertexAPosition);
+  const Hyperplane3<double> planeA(kNormalVectorDrake, kVertexAPositionDrake);
 
   const std::vector<IndexFace::Vertex>& first_quad_vertices = faces()[kFirstQuadIndex].vertices();
   EXPECT_TRUE(
@@ -339,7 +342,7 @@ TEST_F(GeoMeshSimplificationTest, VerticesOnPlane) {
 }
 
 TEST_F(GeoMeshSimplificationTest, CoplanarFaces) {
-  const Hyperplane3<double> planeA(kNormalVector, kVertexAPosition);
+  const Hyperplane3<double> planeA(kNormalVectorDrake, kVertexAPositionDrake);
   EXPECT_TRUE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kFirstQuadIndex], planeA, kAlmostExact));
   EXPECT_TRUE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kSecondQuadIndex], planeA, kAlmostExact));
   EXPECT_FALSE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kTriangleIndex], planeA, kAlmostExact));
@@ -349,7 +352,7 @@ TEST_F(GeoMeshSimplificationTest, CoplanarFaces) {
 TEST_F(GeoMeshSimplificationTest, PlanarFaces) {
   Hyperplane3<double> plane;
   EXPECT_TRUE(IsMeshFacePlanar(mesh(), faces()[kFirstQuadIndex], kAlmostExact, &plane));
-  EXPECT_NEAR(plane.absDistance(kVertexCPosition), 0., kAlmostExact);
+  EXPECT_NEAR(plane.absDistance(kVertexCPositionDrake), 0., kAlmostExact);
   EXPECT_FALSE(IsMeshFacePlanar(mesh(), faces()[kThirdQuadIndex], kAlmostExact, &plane));
   // Triangle face would be planar BUT its specified normal does not
   // match that of the plane its vertices define.

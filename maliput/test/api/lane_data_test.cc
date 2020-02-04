@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "drake/common/eigen_types.h"
+
 #include "maliput/common/assertion_error.h"
 #include "maliput/math/vector.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
@@ -20,8 +22,7 @@ static constexpr double kX2 = 0.567;
     EXPECT_EQ(dut.s(), _s);                                \
     EXPECT_EQ(dut.r(), _r);                                \
     EXPECT_EQ(dut.h(), _h);                                \
-    EXPECT_EQ(dut.srh().rows(), 3);                        \
-    EXPECT_EQ(dut.srh().cols(), 1);                        \
+    EXPECT_EQ(dut.srh().size(), 3);                        \
     EXPECT_EQ(dut.srh().x(), _s);                          \
     EXPECT_EQ(dut.srh().y(), _r);                          \
     EXPECT_EQ(dut.srh().z(), _h);                          \
@@ -74,8 +75,7 @@ GTEST_TEST(LanePositionTest, ComponentSetters) {
     EXPECT_EQ(dut.x(), _x);                               \
     EXPECT_EQ(dut.y(), _y);                               \
     EXPECT_EQ(dut.z(), _z);                               \
-    EXPECT_EQ(dut.xyz().rows(), 3);                       \
-    EXPECT_EQ(dut.xyz().cols(), 1);                       \
+    EXPECT_EQ(dut.xyz().size(), 3);                       \
     EXPECT_EQ(dut.xyz().x(), _x);                         \
     EXPECT_EQ(dut.xyz().y(), _y);                         \
     EXPECT_EQ(dut.xyz().z(), _z);                         \
@@ -177,22 +177,23 @@ GTEST_TEST(GeoPosition, DistanceTest) {
 // An arbitrary very small number (that passes the tests).
 const double kRotationTolerance = 1e-15;
 
-#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                             \
-  do {                                                                                                    \
-    EXPECT_TRUE(CompareMatrices(dut.quat().coeffs(), math::Vector4(_x, _y, _z, _w), kRotationTolerance)); \
-    EXPECT_TRUE(CompareMatrices(dut.rpy().vector(), math::Vector3(_ro, _pi, _ya), kRotationTolerance));   \
-    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                     \
-    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                    \
-    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                      \
-    EXPECT_TRUE(CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                                  \
+// TODO(francocipollone): Replace drake::VectorN by maliput::VectorN once matrix compare functions is implemented.
+#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                                      \
+  do {                                                                                                             \
+    EXPECT_TRUE(CompareMatrices(dut.quat().coeffs(), drake::Vector4<double>(_x, _y, _z, _w), kRotationTolerance)); \
+    EXPECT_TRUE(CompareMatrices(dut.rpy().vector(), drake::Vector3<double>(_ro, _pi, _ya), kRotationTolerance));   \
+    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                              \
+    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                             \
+    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                               \
+    EXPECT_TRUE(CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                                           \
   } while (0)
 
 class RotationTest : public ::testing::Test {
  protected:
   void SetUp() override {
     // A quaternion that rotates x->y, y->z, z->x...
-    twist_quat_ =
-        drake::Quaternion<double>(Eigen::AngleAxis<double>(M_PI * 2. / 3., math::Vector3(1.0, 1.0, 1.0).normalized()));
+    twist_quat_ = drake::Quaternion<double>(
+        Eigen::AngleAxis<double>(M_PI * 2. / 3., drake::Vector3<double>(1.0, 1.0, 1.0).normalized()));
 
     nonnormalized_twist_quat_ = drake::Quaternion<double>(7. * twist_quat_.coeffs());
 

@@ -146,8 +146,8 @@ const Connection* Builder::Connect(const std::string& id, const LaneLayout& lane
   // Gets the initial heading and superelevation.
   const double start_heading = start_spec.endpoint().xy().heading();
   const double start_superelevation = start_spec.endpoint().z().theta();
-  const math::Vector3 start_lane_position(start_spec.endpoint().xy().x(), start_spec.endpoint().xy().y(),
-                                          start_spec.endpoint().z().z());
+  const drake::Vector3<double> start_lane_position(start_spec.endpoint().xy().x(), start_spec.endpoint().xy().y(),
+                                                   start_spec.endpoint().z().z());
   const double start_lane_offset =
       -lane_layout.ref_r0() + lane_width_ * static_cast<double>(start_spec.lane_id() - lane_layout.ref_lane());
 
@@ -155,8 +155,8 @@ const Connection* Builder::Connect(const std::string& id, const LaneLayout& lane
   // point to start_reference_position.
   const api::Rotation start_rotation =
       api::Rotation::FromRpy(start_superelevation, -std::atan(start_spec.endpoint().z().z_dot()), start_heading);
-  const math::Vector3 start_reference_position =
-      start_lane_position + start_rotation.matrix() * math::Vector3(0., -start_lane_offset, 0.);
+  const drake::Vector3<double> start_reference_position =
+      start_lane_position + start_rotation.matrix() * drake::Vector3<double>(0., -start_lane_offset, 0.);
 
   // Assigns the start endpoint.
   Endpoint start{EndpointXy(start_reference_position.x(), start_reference_position.y(), start_heading),
@@ -202,10 +202,10 @@ const Connection* Builder::Connect(const std::string& id, const LaneLayout& lane
   // point to start_reference_position.
   const api::Rotation start_rotation =
       api::Rotation::FromRpy(start_superelevation, -std::atan(start_z_dot), start_spec.endpoint().xy().heading());
-  const math::Vector3 start_lane_position{start_spec.endpoint().xy().x(), start_spec.endpoint().xy().y(),
-                                          start_spec.endpoint().z().z()};
-  const math::Vector3 start_reference_position =
-      start_lane_position + start_rotation.matrix() * math::Vector3(0., -start_lane_offset, 0.);
+  const drake::Vector3<double> start_lane_position{start_spec.endpoint().xy().x(), start_spec.endpoint().xy().y(),
+                                                   start_spec.endpoint().z().z()};
+  const drake::Vector3<double> start_reference_position =
+      start_lane_position + start_rotation.matrix() * drake::Vector3<double>(0., -start_lane_offset, 0.);
 
   // Assigns the start endpoint.
   Endpoint start{
@@ -255,8 +255,10 @@ namespace {
 
 // Determine the heading direction at an `r_offset` leftwards of the `lane`
 // centerline when traveling outwards from the specified `end`.
-math::Vector3 DirectionOutFromLane(const api::Lane* const lane, const api::LaneEnd::Which end, double r_offset) {
-  const math::Vector3 s_hat = math::Vector3::UnitX();
+drake::Vector3<double> DirectionOutFromLane(const api::Lane* const lane, const api::LaneEnd::Which end,
+                                            double r_offset) {
+  const drake::Vector3<double> s_hat = drake::Vector3<double>::UnitX();
+
   switch (end) {
     case api::LaneEnd::kStart: {
       return -(lane->GetOrientation({0., -r_offset, 0.}).matrix() * s_hat);
@@ -272,13 +274,13 @@ math::Vector3 DirectionOutFromLane(const api::Lane* const lane, const api::LaneE
 // leftwards of the centerlines when traveling outwards from their specified
 // end in `set` matches the reference `direction_at_r_offset`, down to the
 // given `angular_tolerance`.
-bool AreLanesDirectionsWithinTolerance(const math::Vector3& direction_at_r_offset, double r_offset,
+bool AreLanesDirectionsWithinTolerance(const drake::Vector3<double>& direction_at_r_offset, double r_offset,
                                        const api::LaneEndSet* set, double angular_tolerance) {
   MALIPUT_DEMAND(set != nullptr);
 
   for (int i = 0; i < set->size(); ++i) {
     const api::LaneEnd& le = set->get(i);
-    const math::Vector3 other_direction = DirectionOutFromLane(le.lane, le.end, r_offset);
+    const drake::Vector3<double> other_direction = DirectionOutFromLane(le.lane, le.end, r_offset);
     const double angular_deviation = std::acos(direction_at_r_offset.dot(other_direction));
     if (angular_deviation > angular_tolerance) {
       return false;
@@ -301,7 +303,7 @@ bool IsLaneContinuousAtBranchPointAlongROffset(const api::Lane* lane, const api:
   MALIPUT_DEMAND(parallel_set != nullptr);
   MALIPUT_DEMAND(antiparallel_set != nullptr);
 
-  const math::Vector3 direction = DirectionOutFromLane(lane, end, r_offset);
+  const drake::Vector3<double> direction = DirectionOutFromLane(lane, end, r_offset);
   return (AreLanesDirectionsWithinTolerance(direction, r_offset, parallel_set, angular_tolerance) &&
           AreLanesDirectionsWithinTolerance(-direction, r_offset, antiparallel_set, angular_tolerance));
 }
@@ -374,9 +376,9 @@ void Builder::AttachBranchPoint(const Endpoint& point, Lane* const lane, const a
   // other, B-side.  Do this by examining the dot-product of the heading
   // vectors (rather than goofing around with cyclic angle arithmetic).
   constexpr double kZeroROffset{0.};
-  const math::Vector3 direction = DirectionOutFromLane(lane, end, kZeroROffset);
+  const drake::Vector3<double> direction = DirectionOutFromLane(lane, end, kZeroROffset);
   const api::LaneEnd& old_le = bp->GetASide()->get(0);
-  const math::Vector3 old_direction = DirectionOutFromLane(old_le.lane, old_le.end, kZeroROffset);
+  const drake::Vector3<double> old_direction = DirectionOutFromLane(old_le.lane, old_le.end, kZeroROffset);
   if (direction.dot(old_direction) > 0.) {
     // Assert continuity before attaching the lane.
     MALIPUT_THROW_UNLESS(IsLaneContinuousAtBranchPoint(lane, end, bp->GetASide(), bp->GetBSide(), angular_tolerance_));
