@@ -5,6 +5,7 @@
 #include "drake/common/eigen_types.h"
 
 #include "maliput/common/assertion_error.h"
+#include "maliput/math/matrix.h"
 #include "maliput/math/vector.h"
 #include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
@@ -70,6 +71,8 @@ GTEST_TEST(LanePositionTest, ComponentSetters) {
 
 #undef CHECK_ALL_LANE_POSITION_ACCESSORS
 
+// TODO(jadecastro) Use CompareMatrices() to implement the
+// GeoPosition::xyz() accessor checks once AutoDiff supported.
 #define CHECK_ALL_GEO_POSITION_ACCESSORS(dut, _x, _y, _z) \
   do {                                                    \
     EXPECT_EQ(dut.x(), _x);                               \
@@ -209,13 +212,13 @@ class RotationTest : public ::testing::Test {
   double twist_roll_;
   double twist_pitch_;
   double twist_yaw_;
-  drake::Matrix3<double> twist_matrix_;
+  math::Matrix3 twist_matrix_;
 };
 
 TEST_F(RotationTest, DefaultConstructor) {
   // Check that default constructor obeys its contract.
   Rotation dut;
-  CHECK_ALL_ROTATION_ACCESSORS(dut, 1., 0., 0., 0., 0., 0., 0., drake::Matrix3<double>::Identity());
+  CHECK_ALL_ROTATION_ACCESSORS(dut, 1., 0., 0., 0., 0., 0., 0., math::Matrix3::Identity());
 }
 
 TEST_F(RotationTest, ConstructionFromQuaternion) {

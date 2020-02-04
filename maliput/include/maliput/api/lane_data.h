@@ -10,6 +10,7 @@
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/math/matrix.h"
 #include "maliput/math/vector.h"
 
 namespace maliput {
@@ -152,7 +153,7 @@ class Rotation {
   void set_quat(const drake::Quaternion<double>& quaternion) { quaternion_ = quaternion.normalized(); }
 
   /// Provides a 3x3 rotation matrix representation of "this" rotation.
-  drake::Matrix3<double> matrix() const { return drake::math::RotationMatrix<double>(quaternion_).matrix(); }
+  math::Matrix3 matrix() const { return drake::math::RotationMatrix<double>(quaternion_).matrix(); }
 
   /// Provides a representation of rotation as a vector of angles
   /// `[roll, pitch, yaw]` (in radians).
