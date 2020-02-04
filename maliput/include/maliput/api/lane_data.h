@@ -4,13 +4,13 @@
 #include <ostream>
 #include <string>
 
-#include "drake/math/quaternion.h"
 #include "drake/math/roll_pitch_yaw.h"
 #include "drake/math/rotation_matrix.h"
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/math/matrix.h"
+#include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
 
 namespace maliput {
@@ -128,11 +128,11 @@ class Rotation {
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Rotation)
 
   /// Default constructor, creating an identity Rotation.
-  Rotation() : quaternion_(drake::Quaternion<double>::Identity()) {}
+  Rotation() : quaternion_(math::Quaternion::Identity()) {}
 
-  /// Constructs a Rotation from a quaternion @p quaternion (which will be
+  /// Constructs a Rotation from a math::Quaternion @p quaternion (which will be
   /// normalized).
-  static Rotation FromQuat(const drake::Quaternion<double>& quaternion) { return Rotation(quaternion.normalized()); }
+  static Rotation FromQuat(const math::Quaternion& quaternion) { return Rotation(quaternion.normalized()); }
 
   /// Constructs a Rotation from @p rpy, a vector of `[roll, pitch, yaw]`,
   /// expressing a roll around X, followed by pitch around Y,
@@ -147,10 +147,10 @@ class Rotation {
   static Rotation FromRpy(double roll, double pitch, double yaw) { return FromRpy(math::Vector3(roll, pitch, yaw)); }
 
   /// Provides a quaternion representation of the rotation.
-  const drake::Quaternion<double>& quat() const { return quaternion_; }
+  const math::Quaternion& quat() const { return quaternion_; }
 
-  /// Sets value from a Quaternion @p quaternion (which will be normalized).
-  void set_quat(const drake::Quaternion<double>& quaternion) { quaternion_ = quaternion.normalized(); }
+  /// Sets value from a math::Quaternion @p quaternion (which will be normalized).
+  void set_quat(const math::Quaternion& quaternion) { quaternion_ = quaternion.normalized(); }
 
   /// Provides a 3x3 rotation matrix representation of "this" rotation.
   math::Matrix3 matrix() const { return drake::math::RotationMatrix<double>(quaternion_).matrix(); }
@@ -184,9 +184,9 @@ class Rotation {
   double Distance(const Rotation& rot) const;
 
  private:
-  explicit Rotation(const drake::Quaternion<double>& quat) : quaternion_(quat) {}
+  explicit Rotation(const math::Quaternion& quat) : quaternion_(quat) {}
 
-  drake::Quaternion<double> quaternion_;
+  math::Quaternion quaternion_;
 };
 
 /// Streams a string representation of @p rotation into @p out. Returns

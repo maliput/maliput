@@ -12,6 +12,7 @@
 #include "maliput/api/rules/traffic_light_book.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/filesystem.h"
+#include "maliput/math/quaternion.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 #include "maliput/test_utilities/traffic_lights_compare.h"
 #include "multilane/builder.h"
@@ -39,28 +40,25 @@ class TestLoading2x2IntersectionTrafficLightbook : public ::testing::Test {
     std::vector<std::unique_ptr<Bulb>> bulbs;
     std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
 
+    const Rotation kRotation = Rotation::FromQuat(math::Quaternion(1, 0, 0, 0));
+
     bulbs.push_back(std::make_unique<Bulb>(
-        Bulb::Id("RedBulb"), GeoPosition(0, 0, 0.3937), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
-        BulbColor::kRed, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
-        Bulb::BoundingBox()));
+        Bulb::Id("RedBulb"), GeoPosition(0, 0, 0.3937), kRotation, BulbColor::kRed, BulbType::kRound, std::nullopt,
+        std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
-        Bulb::Id("YellowBulb"), GeoPosition(0, 0, 0), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
-        BulbColor::kYellow, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
-        Bulb::BoundingBox()));
+        Bulb::Id("YellowBulb"), GeoPosition(0, 0, 0), kRotation, BulbColor::kYellow, BulbType::kRound, std::nullopt,
+        std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
-        Bulb::Id("GreenBulb"), GeoPosition(0, 0, -0.3937), Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
-        BulbColor::kGreen, BulbType::kRound, std::nullopt, std::vector<BulbState>({BulbState::kOn, BulbState::kOff}),
-        Bulb::BoundingBox()));
+        Bulb::Id("GreenBulb"), GeoPosition(0, 0, -0.3937), kRotation, BulbColor::kGreen, BulbType::kRound, std::nullopt,
+        std::vector<BulbState>({BulbState::kOn, BulbState::kOff}), Bulb::BoundingBox()));
     bulbs.push_back(std::make_unique<Bulb>(
-        Bulb::Id("YellowLeftArrowBulb"), GeoPosition(0, -0.3937, -0.3937),
-        Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)), BulbColor::kYellow, BulbType::kArrow, 3.14,
-        std::vector<BulbState>({BulbState::kOff, BulbState::kBlinking}), Bulb::BoundingBox()));
+        Bulb::Id("YellowLeftArrowBulb"), GeoPosition(0, -0.3937, -0.3937), kRotation, BulbColor::kYellow,
+        BulbType::kArrow, 3.14, std::vector<BulbState>({BulbState::kOff, BulbState::kBlinking}), Bulb::BoundingBox()));
     bulb_groups.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("SouthFacingBulbs"), GeoPosition(0, 0, 0),
-                                                      Rotation::FromQuat(drake::Quaternion<double>(1, 0, 0, 0)),
-                                                      std::move(bulbs)));
+                                                      kRotation, std::move(bulbs)));
     south_facing_ = std::make_unique<const TrafficLight>(
         TrafficLight::Id("SouthFacing"), GeoPosition(1.875, 9.375, 6.0579),
-        Rotation::FromQuat(drake::Quaternion<double>(0.707107, 0, 0, -0.707107)), std::move(bulb_groups));
+        Rotation::FromQuat(math::Quaternion(0.707107, 0, 0, -0.707107)), std::move(bulb_groups));
   }
 
   const std::string filepath_;
