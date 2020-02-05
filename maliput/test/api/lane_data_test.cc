@@ -8,7 +8,7 @@
 #include "maliput/math/matrix.h"
 #include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
-#include "maliput/test_utilities/eigen_matrix_compare.h"
+#include "maliput/test_utilities/maliput_math_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 
 namespace maliput {
@@ -181,15 +181,20 @@ GTEST_TEST(GeoPosition, DistanceTest) {
 // An arbitrary very small number (that passes the tests).
 const double kRotationTolerance = 1e-15;
 
-// TODO(francocipollone): Replace drake::VectorN by maliput::VectorN once matrix compare functions is implemented.
-#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                                      \
-  do {                                                                                                             \
-    EXPECT_TRUE(CompareMatrices(dut.quat().coeffs(), drake::Vector4<double>(_x, _y, _z, _w), kRotationTolerance)); \
-    EXPECT_TRUE(CompareMatrices(dut.rpy().vector(), drake::Vector3<double>(_ro, _pi, _ya), kRotationTolerance));   \
-    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                              \
-    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                             \
-    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                               \
-    EXPECT_TRUE(CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                                           \
+// TODO(francocipollone): Once RollPitchYaw and Quaternion implementation are
+//                        complete the followings arguments of the CompareVectors could be modified.
+#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                               \
+  do {                                                                                                      \
+    EXPECT_TRUE(math::test::CompareVectors(math::Vector4(dut.quat().coeffs().x(), dut.quat().coeffs().y(),  \
+                                                         dut.quat().coeffs().z(), dut.quat().coeffs().w()), \
+                                           math::Vector4(_x, _y, _z, _w), kRotationTolerance));             \
+    EXPECT_TRUE(math::test::CompareVectors(                                                                 \
+        math::Vector3(dut.rpy().roll_angle(), dut.rpy().pitch_angle(), dut.rpy().yaw_angle()),              \
+        math::Vector3(_ro, _pi, _ya), kRotationTolerance));                                                 \
+    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                       \
+    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                      \
+    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                        \
+    EXPECT_TRUE(math::test::CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                        \
   } while (0)
 
 class RotationTest : public ::testing::Test {
@@ -205,7 +210,7 @@ class RotationTest : public ::testing::Test {
     twist_pitch_ = 0.;
     twist_yaw_ = M_PI / 2.;
 
-    twist_matrix_ << 0., 0., 1., 1., 0., 0., 0., 1., 0.;
+    twist_matrix_ = {0., 0., 1., 1., 0., 0., 0., 1., 0.};
   }
 
   math::Quaternion nonnormalized_twist_quat_;

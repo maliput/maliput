@@ -65,6 +65,9 @@ class VectorBase {
   /// @return The dimension of `*this`.
   std::size_t size() const { return values_.size(); };
 
+  /// @return An array with the values.
+  std::array<double, N> to_array() const { return values_; }
+
   /// Assignment operator overload.
   /// @param other Derived object.
   Derived& operator=(const VectorBase<N, Derived>& other);
@@ -165,6 +168,9 @@ class Vector2 : public VectorBase<2, Vector2> {
   /// Constructs a 2-dimensional from double type arguments.;
   Vector2(double x, double y) : VectorBase<2, Vector2>({x, y}) {}
 
+  /// Constructs a Vector2 from a Vector<2>.
+  Vector2(const Vector<2>& other) : VectorBase<2, Vector2>({other[0], other[1]}) {}
+
   /// @return The x value.
   double x() const { return values_[0]; }
 
@@ -201,6 +207,9 @@ class Vector3 : public VectorBase<3, Vector3> {
 
   /// Constructs a 3-dimensional from double type arguments.;
   Vector3(double x, double y, double z) : VectorBase<3, Vector3>({x, y, z}) {}
+
+  /// Constructs a Vector3 from a Vector<3>.
+  Vector3(const Vector<3>& other) : VectorBase<3, Vector3>({other[0], other[1], other[2]}) {}
 
   /// @return The x value.
   double x() const { return values_[0]; }
@@ -247,6 +256,9 @@ class Vector4 : public VectorBase<4, Vector4> {
 
   /// Constructs a 4-dimensional from double type arguments.;
   Vector4(double x, double y, double z, double w) : VectorBase<4, Vector4>({x, y, z, w}) {}
+
+  /// Constructs a Vector4 from a Vector<4>.
+  Vector4(const Vector<4>& other) : VectorBase<4, Vector4>({other[0], other[1], other[2], other[3]}) {}
 
   /// @return The x value.
   double x() const { return values_[0]; }

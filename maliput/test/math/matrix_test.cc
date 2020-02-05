@@ -231,7 +231,6 @@ GTEST_TEST(MatrixTest, Operators) {
 }
 GTEST_TEST(MatrixTest, StaticMethods) {
   {  // 2- dimension matrix.
-
     EXPECT_EQ(Matrix<2>::Identity(), Matrix<2>({{1., 0.}, {0., 1.}}));
   }
   {  // 3- dimension matrix.
@@ -241,6 +240,11 @@ GTEST_TEST(MatrixTest, StaticMethods) {
     EXPECT_EQ(Matrix<4>::Identity(),
               Matrix<4>({{1., 0., 0., 0.}, {0., 1., 0., 0.}, {0., 0., 1., 0.}, {0., 0., 0., 1.}}));
   }
+}
+
+GTEST_TEST(MatrixTest, ExternalMethods) {
+  Matrix<3> kDut{1., 2., 3., 4., 5., 6., 7., 8., 9};
+  EXPECT_EQ((kDut * Vector3({1., 2., 3.})).z(), 50.);
 }
 
 }  // namespace

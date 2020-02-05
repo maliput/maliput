@@ -563,11 +563,7 @@ void RenderBranchPoint(const api::BranchPoint* const branch_point, const double 
     // If distance in sr-plane is too close and distance along h-axis is
     // too close, then increase elevation and try again.
     for (const api::GeoPosition& previous_xyz : *previous_centers) {
-      const math::Vector3 delta_xyz_maliput = previous_xyz.xyz() - center_xyz.xyz();
-      // TODO(francocipollone): Replace it by math::Vector3 once that math::matrix is implemented.
-      const drake::Vector3<double> delta_xyz{delta_xyz_maliput.x(), delta_xyz_maliput.y(), delta_xyz_maliput.z()};
-      const drake::Vector3<double> delta_srh_eigen = orientation.matrix().transpose() * delta_xyz;
-      const math::Vector3 delta_srh{delta_srh_eigen.x(), delta_srh_eigen.y(), delta_srh_eigen.z()};
+      const math::Vector3 delta_srh = orientation.matrix().transpose() * (previous_xyz.xyz() - center_xyz.xyz());
       if ((math::Vector2(delta_srh.x(), delta_srh.y()).norm() < sr_margin) && (std::abs(delta_srh.z()) < h_margin)) {
         has_conflict = true;
         elevation += height;

@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "maliput/math/vector.h"
-#include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 #include "multilane/arc_road_curve.h"
 #include "multilane/junction.h"

@@ -1,6 +1,7 @@
 #include "maliput/math/matrix.h"
 
 #include <algorithm>
+#include <numeric>
 
 #include "maliput/common/maliput_throw.h"
 
@@ -211,13 +212,6 @@ Matrix<N> Matrix<N>::operator/(double k) const {
   return res;
 }
 
-template <std::size_t N>
-Vector<N> Matrix<N>::operator*(const Vector<N>& vector) const {
-  std::array<double, N> res{};
-  std::transform(rows_.cbegin(), rows_.cend(), res.begin(), [vector](const Vector<N>& row) { return row.dot(vector); });
-  return res;
-}
-
 template <std::size_t N_>
 Matrix<N_> operator*(const Matrix<N_>& matrix, double k) {
   std::array<Vector<N_>, N_> res{};
@@ -243,6 +237,16 @@ std::ostream& operator<<(std::ostream& os, const Matrix<N_>& matrix) {
   return os;
 }
 
+template <std::size_t N, typename Derived>
+Derived operator*(const Matrix<N>& matrix, const VectorBase<N, Derived> vector) {
+  std::array<double, N> res{};
+  for (std::size_t r = 0; r < N; r++) {
+    const std::array<double, N> values{matrix.row(r).to_array()};
+    res[r] = std::inner_product(values.cbegin(), values.cend(), vector.to_array().cbegin(), 0.);
+  }
+  return res;
+}
+
 // Matrix<N> Explicit instanciations.
 template Matrix<2> operator*(const Matrix<2>&, double);
 template Matrix<3> operator*(const Matrix<3>&, double);
@@ -257,6 +261,11 @@ template class Matrix<1>;
 template class Matrix<2>;
 template class Matrix<3>;
 template class Matrix<4>;
+
+// Explicit instantiations for operator*.
+template Vector2 operator*(const Matrix<2>& matrix, const VectorBase<2, Vector2> vector);
+template Vector3 operator*(const Matrix<3>& matrix, const VectorBase<3, Vector3> vector);
+template Vector4 operator*(const Matrix<4>& matrix, const VectorBase<4, Vector4> vector);
 
 }  // namespace math
 }  // namespace maliput

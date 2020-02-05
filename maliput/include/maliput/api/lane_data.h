@@ -153,7 +153,7 @@ class Rotation {
   void set_quat(const math::Quaternion& quaternion) { quaternion_ = quaternion.normalized(); }
 
   /// Provides a 3x3 rotation matrix representation of "this" rotation.
-  math::Matrix3 matrix() const { return drake::math::RotationMatrix<double>(quaternion_).matrix(); }
+  math::Matrix3 matrix() const;
 
   /// Provides a representation of rotation as a vector of angles
   /// `[roll, pitch, yaw]` (in radians).

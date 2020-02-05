@@ -155,9 +155,6 @@ class Matrix {
   /// Divide operator overload between `this` and a scalar.
   Matrix<N> operator/(double k) const;
 
-  /// Product operator overload between `this` and a Vector<N>.
-  Vector<N> operator*(const Vector<N>& m_b) const;
-
   /// Product operator overload between a Matrix<N> and a scalar.
   template <std::size_t N_>
   friend Matrix<N_> operator*(const Matrix<N_>& matrix, double k);
@@ -173,6 +170,10 @@ class Matrix {
  private:
   std::array<Vector<N>, N> rows_;
 };
+
+/// Product operator overload between a Matrix<N> and a VectorBase<N, Derived>.
+template <std::size_t N, typename Derived>
+Derived operator*(const Matrix<N>& matrix, const VectorBase<N, Derived> vector);
 
 /// Convinient alias declaration.
 using Matrix2 = Matrix<2>;

@@ -51,6 +51,18 @@ GeoPosition Rotation::Apply(const GeoPosition& geo_position) const {
   // clang-format on
 }
 
+math::Matrix3 Rotation::matrix() const {
+  /// TODO(francocipollone): Replace drake call when maliput::math is fully implemented.
+  const auto matrix_drake{drake::math::RotationMatrix<double>(quaternion_).matrix()};
+  math::Matrix3 matrix{};
+  for (std::size_t i = 0; i < 3; i++) {
+    for (std::size_t j = 0; j < 3; j++) {
+      matrix[i][j] = matrix_drake(i, j);
+    }
+  }
+  return matrix;
+}
+
 double Rotation::Distance(const Rotation& rot) const {
   // Compute transformed unit vectors of a frame A.
   const GeoPosition as = this->Apply({1., 0., 0.});
