@@ -1,6 +1,6 @@
 #include "maliput/math/matrix.h"
 
-#include <cmath>
+#include <algorithm>
 
 #include "maliput/common/maliput_throw.h"
 
@@ -15,45 +15,31 @@ Matrix<N> Matrix<N>::Identity() {
   }
   return matrix;
 }
-
-template <std::size_t N>
-Matrix<N>::Matrix() : rows_() {
-  rows_.fill(Vector<N>{});
-}
-
 template <std::size_t N>
 Matrix<N>::Matrix(std::initializer_list<double> values) {
   MALIPUT_THROW_UNLESS(N >= 1);
   MALIPUT_THROW_UNLESS(values.size() == N * N);
-  std::size_t count_values{};
-  std::size_t count_rows{};
-  std::array<double, N> vector;
-  for (const auto& value : values) {
-    vector[count_values] = value;
-    count_values++;
-    if (count_values >= N) {
-      rows_[count_rows] = vector;
-      count_rows++;
-      count_values = 0;
-    }
+  for (std::size_t n = 0; n < N; n++) {
+    std::array<double, N> vector;
+    std::copy_n(values.begin() + n * N, N, vector.begin());
+    rows_[n] = vector;
   }
 }
 
 template <std::size_t N>
-Matrix<N>::Matrix(std::initializer_list<Vector<N>> values) {
+Matrix<N>::Matrix(std::initializer_list<Vector<N>> rows) {
   MALIPUT_THROW_UNLESS(N >= 1);
-  MALIPUT_THROW_UNLESS(values.size() == N);
+  MALIPUT_THROW_UNLESS(rows.size() == N);
   std::size_t count_rows{};
-  for (const auto& value : values) {
-    rows_[count_rows] = value;
+  for (const auto& row : rows) {
+    rows_[count_rows] = row;
     count_rows++;
   }
 }
 
 template <std::size_t N>
-Matrix<N>::Matrix(std::array<Vector<N>, N> values) : rows_(values) {
+Matrix<N>::Matrix(std::array<Vector<N>, N> rows) : rows_(rows) {
   MALIPUT_THROW_UNLESS(N >= 1);
-  MALIPUT_THROW_UNLESS(values.size() == N);
 }
 
 template <std::size_t N>
@@ -103,31 +89,37 @@ Matrix<N - 1> Matrix<N>::reduce(std::size_t row_index, std::size_t col_index) co
 }
 
 template <std::size_t N>
-double Matrix<N>::get_cofactor(std::size_t row_index, std::size_t col_index) const {
+double Matrix<N>::cofactor(std::size_t row_index, std::size_t col_index) const {
   MALIPUT_THROW_UNLESS(row_index < N);
   MALIPUT_THROW_UNLESS(col_index < N);
   MALIPUT_THROW_UNLESS(N > 1);
-  return std::pow(-1, row_index + col_index) * (this->reduce(row_index, col_index).determinant());
+  return (((row_index + col_index) % 2) == 0 ? 1. : -1.) * (this->reduce(row_index, col_index).determinant());
 }
 
 template <std::size_t N>
-const double Matrix<N>::determinant() const {
+double Matrix<N>::determinant() const {
   MALIPUT_THROW_UNLESS(N >= 1);
   double result{0};
-  switch (rows_.size()) {
-    case 2:
-      result = rows_[0][0] * rows_[1][1] - rows_[0][1] * rows_[1][0];
-      break;
-    case 1:
-      return rows_[0][0];
-      break;
-    default:
-      for (std::size_t j = 0; j < N; j++) {
-        result += rows_[0][j] * get_cofactor(0, j);
-      }
-      break;
+  if constexpr (N == 2) {
+    result = rows_[0][0] * rows_[1][1] - rows_[0][1] * rows_[1][0];
+  } else if constexpr (N == 1) {
+    return rows_[0][0];
+  } else {
+    for (std::size_t j = 0; j < N; j++) {
+      result += rows_[0][j] * cofactor(0, j);
+    }
   }
   return result;
+}
+
+template <std::size_t N>
+bool Matrix<N>::is_singular() const {
+  return abs(determinant()) < tolerance;
+}
+
+template <>
+double Matrix<1>::cofactor(std::size_t row, std::size_t col) const {
+  return 0.;
 }
 
 template <std::size_t N>
@@ -135,7 +127,7 @@ const Matrix<N> Matrix<N>::cofactor() const {
   Matrix<N> cofactor_matrix{};
   for (std::size_t i = 0; i < N; i++) {
     for (std::size_t j = 0; j < N; j++) {
-      cofactor_matrix[i][j] = get_cofactor(i, j);
+      cofactor_matrix[i][j] = cofactor(i, j);
     }
   }
   return cofactor_matrix;
@@ -148,9 +140,9 @@ const Matrix<N> Matrix<N>::adjoint() const {
 
 template <std::size_t N>
 const Matrix<N> Matrix<N>::inverse() const {
-  const double kDet = determinant();
-  if (kDet == 0) MALIPUT_THROW_MESSAGE("Imposible to calculate the inverse of singular matrix.");
-  return {(1 / kDet) * adjoint()};
+  const double d = determinant();
+  if (abs(d) < tolerance) MALIPUT_THROW_MESSAGE("Matrix is singular");
+  return {(1 / d) * adjoint()};
 }
 
 template <std::size_t N>
@@ -166,13 +158,13 @@ Matrix<N>& Matrix<N>::operator=(const Matrix<N>&& other) {
 }
 
 template <std::size_t N>
-Vector<N>& Matrix<N>::operator[](std::size_t index) {
+const Vector<N>& Matrix<N>::operator[](std::size_t index) const {
   MALIPUT_THROW_UNLESS(index < N);
   return rows_[index];
 }
 
 template <std::size_t N>
-Vector<N> Matrix<N>::operator[](std::size_t index) const {
+Vector<N>& Matrix<N>::operator[](std::size_t index) {
   MALIPUT_THROW_UNLESS(index < N);
   return rows_[index];
 }
@@ -249,12 +241,6 @@ std::ostream& operator<<(std::ostream& os, const Matrix<N_>& matrix) {
   }
   os << "}";
   return os;
-}
-
-// Specialization for Matrix<N>::get_cofactor method with N=1;
-template <>
-double Matrix<1>::get_cofactor(std::size_t row, std::size_t col) const {
-  return 0.;
 }
 
 // Matrix<N> Explicit instanciations.

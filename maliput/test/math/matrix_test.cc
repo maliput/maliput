@@ -64,7 +64,9 @@ GTEST_TEST(MatrixTest, PublicMethods) {
     EXPECT_EQ(kDut.col(1), Vector<2>({12., 5.}));
     EXPECT_EQ(kDut.transpose(), Matrix<2>({{1., 8.}, {12., 5.}}));
     EXPECT_EQ(kDut.determinant(), -91.);
-    EXPECT_EQ(kDut.get_cofactor(0, 1), -8.);
+    EXPECT_FALSE(kDut.is_singular());
+    EXPECT_TRUE(Matrix<2>({2., 2., 4., 4.}).is_singular());
+    EXPECT_EQ(kDut.cofactor(0, 1), -8.);
     EXPECT_EQ(kDut.cofactor(), Matrix<2>({{5., -8.}, {-12., 1.}}));
     EXPECT_EQ(kDut * kDut.inverse(), Matrix<2>::Identity());
     const Matrix<2> kResult = kDut * kDut.inverse();
@@ -84,7 +86,9 @@ GTEST_TEST(MatrixTest, PublicMethods) {
     EXPECT_EQ(kDut.col(2), Vector<3>({3., 3., 9.}));
     EXPECT_EQ(kDut.transpose(), Matrix<3>({{1., 8., 6.}, {12., 5., 14.}, {3., 3., 9.}}));
     EXPECT_EQ(kDut.determinant(), -399.);
-    EXPECT_EQ(kDut.get_cofactor(1, 1), -9.);
+    EXPECT_FALSE(kDut.is_singular());
+    EXPECT_TRUE(Matrix<3>({1., 2., 3., 4., 5., 6., 7., 8., 9.}).is_singular());
+    EXPECT_EQ(kDut.cofactor(1, 1), -9.);
     EXPECT_EQ(kDut.reduce(1, 1), Matrix<2>({{1., 3.}, {6., 9.}}));
     EXPECT_EQ(kDut.cofactor(), Matrix<3>({{3., -54., 82.}, {-66., -9., 58.}, {21., 21., -91}}));
     const Matrix<3> kResult = kDut * kDut.inverse();
@@ -106,7 +110,9 @@ GTEST_TEST(MatrixTest, PublicMethods) {
     EXPECT_EQ(kDut.col(3), Vector<4>({2., 7., 25, 8.}));
     EXPECT_EQ(kDut.transpose(), Matrix<4>({{1., 8., 6., 13.}, {12., 5., 14., 4.}, {3., 3., 9., 7.}, {2., 7., 25, 8.}}));
     EXPECT_EQ(kDut.determinant(), 6430.);
-    EXPECT_EQ(kDut.get_cofactor(2, 1), -90.);
+    EXPECT_FALSE(kDut.is_singular());
+    EXPECT_TRUE(Matrix<4>({1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.}).is_singular());
+    EXPECT_EQ(kDut.cofactor(2, 1), -90.);
     EXPECT_EQ(kDut.reduce(1, 2), Matrix<3>({{1., 12., 2.}, {6., 14., 25.}, {13., 4., 8.}}));
     EXPECT_EQ(kDut.cofactor(), Matrix<4>({{-117., 518., 375., -397.},
                                           {1148., 578., -3020., 488},
