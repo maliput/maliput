@@ -138,7 +138,7 @@ class Rotation {
   /// expressing a roll around X, followed by pitch around Y,
   /// followed by yaw around Z (with all angles in radians).
   static Rotation FromRpy(const math::Vector3& rpy) {
-    return Rotation(maliput::math::RollPitchYaw(rpy.x(), rpy.y(), rpy.z()).ToQuaternion());
+    return Rotation(math::RollPitchYaw(rpy.x(), rpy.y(), rpy.z()).ToQuaternion());
   }
 
   /// Constructs a Rotation expressing a @p roll around X, followed by
@@ -157,7 +157,7 @@ class Rotation {
 
   /// Provides a representation of rotation as a vector of angles
   /// `[roll, pitch, yaw]` (in radians).
-  maliput::math::RollPitchYaw rpy() const { return maliput::math::RollPitchYaw(quaternion_); }
+  math::RollPitchYaw rpy() const { return math::RollPitchYaw(quaternion_); }
 
   // TODO(maddog@tri.global)  Deprecate and/or remove roll()/pitch()/yaw(),
   //                          since they hide the call to rpy(), and since
