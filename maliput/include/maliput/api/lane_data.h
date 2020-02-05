@@ -4,13 +4,13 @@
 #include <ostream>
 #include <string>
 
-#include "drake/math/roll_pitch_yaw.h"
 #include "drake/math/rotation_matrix.h"
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/math/matrix.h"
 #include "maliput/math/quaternion.h"
+#include "maliput/math/roll_pitch_yaw.h"
 #include "maliput/math/vector.h"
 
 namespace maliput {
@@ -138,7 +138,7 @@ class Rotation {
   /// expressing a roll around X, followed by pitch around Y,
   /// followed by yaw around Z (with all angles in radians).
   static Rotation FromRpy(const math::Vector3& rpy) {
-    return Rotation(drake::math::RollPitchYaw<double>(rpy.x(), rpy.y(), rpy.z()).ToQuaternion());
+    return Rotation(math::RollPitchYaw(rpy.x(), rpy.y(), rpy.z()).ToQuaternion());
   }
 
   /// Constructs a Rotation expressing a @p roll around X, followed by
@@ -157,7 +157,7 @@ class Rotation {
 
   /// Provides a representation of rotation as a vector of angles
   /// `[roll, pitch, yaw]` (in radians).
-  drake::math::RollPitchYaw<double> rpy() const { return drake::math::RollPitchYaw<double>(quaternion_); }
+  math::RollPitchYaw rpy() const { return math::RollPitchYaw(quaternion_); }
 
   // TODO(maddog@tri.global)  Deprecate and/or remove roll()/pitch()/yaw(),
   //                          since they hide the call to rpy(), and since
