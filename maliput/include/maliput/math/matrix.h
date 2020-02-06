@@ -13,11 +13,14 @@ namespace math {
 
 /// A squared N-dimensional matrix.
 /// @tparam N Indicates the dimension of the matrix.
+///         Dimension must be 1x1 or greater.
 template <std::size_t N>
 class Matrix {
  public:
+  static_assert(N > 0, "0x0 Matrix are not allowed.");
+
   /// Tolerance value to determine the singularity of the matrix.
-  static constexpr double tolerance = 10e-15;
+  static constexpr double kTolerance = 1e-15;
 
   /// @return A N x N identity matrix.
   static Matrix<N> Identity();
@@ -26,24 +29,21 @@ class Matrix {
   Matrix() = default;
 
   /// Constructs a N x N matrix from a list of double.
-  /// @param values Elements of the matrix. The size of 'values' must match
-  /// with NxN. Elements will fill the matrix's rows from top to bottom.
+  /// @param values Elements of the matrix. The size of `values` must match
+  /// NxN. Elements will fill the matrix's rows from top to bottom.
   ///
   /// @throw common::assertion_error When N is not positive.
-  /// @throw common::assertion_error When 'values' size is not NxN.
-  Matrix(std::initializer_list<double> values);
+  /// @throw common::assertion_error When `values` size is not NxN.
+  Matrix(const std::initializer_list<double>& values);
 
   /// Constructs a N x N matrix from a list of Vector<N>.
-  /// @param rows Rows of the matrix. The size of 'rows' must match with N. It fills the matrix from top to bottom.
+  /// @param rows Rows of the matrix. The size of `rows` must be N. It fills the matrix from the 0-th to N-1-h.
   ///
-  /// @throw common::assertion_error When N is not positive.
-  /// @throw common::assertion_error When 'rows' size is not N.
-  Matrix(std::initializer_list<Vector<N>> rows);
+  /// @throw common::assertion_error When `rows` size is not N.
+  Matrix(const std::initializer_list<Vector<N>>& rows);
 
   /// Constructs a N x N matrix from an array of Vector<N>.
-  /// @param rows Rows of the matrix. The size of 'rows' must match with N. It fills the matrix from top to bottom.
-  ///
-  /// @throw common::assertion_error When N is not positive.
+  /// @param rows Rows of the matrix. The size of `rows` must match with N. It fills the matrix from top to bottom.
   Matrix(std::array<Vector<N>, N> rows);
 
   /// Copy constructor.
@@ -53,25 +53,25 @@ class Matrix {
   Matrix(Matrix<N>&& other) = default;
 
   /// Returns the `index`-th row of the matrix.
-  /// @param index Row number. The range allowed is [0, N).
+  /// @param index Row number. It must be in [0, N).
   /// @return A Vector<N>.
   ///
   /// @throw common::assertion_error When `index` is not in the range [0, N).
   const Vector<N> row(std::size_t index) const;
 
   /// Returns the `index`-th column of the matrix.
-  /// @param index Column number. The range allowed is [0, N).
+  /// @param index Column number. It must be in [0, N).
   /// @return A Vector<N>.
   ///
   /// @throw common::assertion_error When `index` is not in the range [0, N).
   const Vector<N> col(std::size_t index) const;
 
   /// @return A Matrix<N> whose elements match `this` transpose.
-  const Matrix<N> transpose() const;
+  Matrix<N> transpose() const;
 
   /// Reduce the matrix's dimension. N must be at least 2 to be reducible.
-  /// @param row Is the number of the row to be removed. The range allowed is [0, N).
-  /// @param col Is the number of the column to be removed. The range allowed is [0, N).
+  /// @param row Is the number of the row to be removed. It must be in [0, N).
+  /// @param col Is the number of the column to be removed. It must be in [0, N).
   /// @return A Matrix<N-1> which is the result of removing the `row`-th row and `col`-th column.
   ///
   /// @throw common::assertion_error When `row` or `col` are not in [0, N).
@@ -79,41 +79,36 @@ class Matrix {
   Matrix<N - 1> reduce(std::size_t row, std::size_t col) const;
 
   /// Calculates the cofactor of the element at `row` and `col`.
-  /// @param row Index of the matrix's rows. The range allowed is [0, N).
-  /// @param col Index of the matrix's cols. The range allowed is [0, N).
+  /// @param row Index of the matrix's rows. It must be in [0, N).
+  /// @param col Index of the matrix's cols. It must be in [0, N).
   /// @return The cofactor value.
   ///
   /// @throw common::assertion_error When `row` or `col` are not in [0, N).
-  /// @throw common::assertion_error When N is zero.
+  /// @throw common::assertion_error When N is one.
   double cofactor(std::size_t row, std::size_t col) const;
 
   /// Computes the determinant.
   /// @return The determinant value.
-  ///
-  /// @throw common::assertion_error When N is zero.
   double determinant() const;
 
   /// Determine the singularity.
   /// @return True when `this` matrix is singular.
-  ///
-  /// @throw common::assertion_error When N is zero.
   bool is_singular() const;
 
   /// @return The cofactor matrix.
   ///
   /// @throw common::assertion_error When N is one.
-  const Matrix<N> cofactor() const;
+  Matrix<N> cofactor() const;
 
   /// @return The adjoint matrix.
   ///
   /// @throw common::assertion_error When N is one.
-  const Matrix<N> adjoint() const;
+  Matrix<N> adjoint() const;
 
   /// @return The inverse matrix.
   ///
-  /// @throw common::assertion_error When N is zero.
   /// @throw common::assertion_error When matrix is singular.
-  const Matrix<N> inverse() const;
+  Matrix<N> inverse() const;
 
   /// Assignment operator overload.
   /// @param other Matrix<N> object.
@@ -125,13 +120,13 @@ class Matrix {
 
   /// Constant subscripting array operator overload.
   /// @param index The index of the matrix row.
-  /// @return A copy of the row at `index`.
+  /// @return A constant reference of the row at `index`.
   ///
   /// @throw common::assertion_error When `index` is out of range.
   const Vector<N>& operator[](std::size_t index) const;
 
   /// Subscripting array operator overload.
-  /// @param index The index of the matrix row.
+  /// @param index The index of the matrix row. It must be in [0, N).
   /// @return A mutable reference to the row at `index`.
   ///
   /// @throw common::assertion_error When `index` is out of range.

@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "drake/common/default_scalars.h"
-
 namespace maliput {
 namespace api {
 
@@ -52,15 +50,14 @@ GeoPosition Rotation::Apply(const GeoPosition& geo_position) const {
 }
 
 math::Matrix3 Rotation::matrix() const {
-  /// TODO(francocipollone): Replace drake call when maliput::math is fully implemented.
-  const auto matrix_drake{drake::math::RotationMatrix<double>(quaternion_).matrix()};
-  math::Matrix3 matrix{};
-  for (std::size_t i = 0; i < 3; i++) {
-    for (std::size_t j = 0; j < 3; j++) {
-      matrix[i][j] = matrix_drake(i, j);
-    }
-  }
-  return matrix;
+  /// TODO(francocipollone): Move the following implementation to maliput::math::Quaternion.
+  const math::Vector4 q{math::Vector4{quaternion_.w(), quaternion_.x(), quaternion_.y(), quaternion_.z()}.normalized()};
+  // clang-format off
+  return{
+    {1-2*(q.z()*q.z() + q.w()*q.w()),   2*(q.y()*q.z() - q.w()*q.x()),   2*(q.y()*q.w() + q.z()*q.x())},
+    {  2*(q.y()*q.z() + q.w()*q.x()), 1-2*(q.y()*q.y() + q.w()*q.w()),   2*(q.z()*q.w() - q.y()*q.x())},
+    {  2*(q.y()*q.w() - q.z()*q.x()),   2*(q.z()*q.w() + q.y()*q.x()), 1-2*(q.y()*q.y() + q.z()*q.z())}};
+  // clang-format on
 }
 
 double Rotation::Distance(const Rotation& rot) const {

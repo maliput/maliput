@@ -4,6 +4,7 @@
 
 set(TEST_UTILS_SOURCES
   check_id_indexing.cc
+  maliput_math_compare.cc
   maliput_types_compare.cc
   mock.cc
   mock_geometry.cc
@@ -30,6 +31,7 @@ ament_target_dependencies(maliput_test_utilities
 target_link_libraries(maliput_test_utilities
   api
   common
+  math
   geometry_base
   drake::drake)
 

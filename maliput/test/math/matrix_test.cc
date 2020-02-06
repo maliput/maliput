@@ -1,10 +1,13 @@
 #include "maliput/math/matrix.h"
+#include "maliput/test_utilities/maliput_math_compare.h"
 
 #include <gtest/gtest.h>
 
 namespace maliput {
 namespace math {
 namespace {
+
+static constexpr double kTolerance{1e-10};
 
 GTEST_TEST(MatrixTest, Constructors) {
   {  // 2- dimension matrix.
@@ -72,7 +75,7 @@ GTEST_TEST(MatrixTest, PublicMethods) {
     const Matrix<2> kResult = kDut * kDut.inverse();
     for (int i = 0; i < 2; i++) {
       for (int j = 0; j < 2; j++) {
-        EXPECT_NEAR(kResult[i][j], Matrix<2>::Identity()[i][j], 10e-6);
+        EXPECT_NEAR(kResult[i][j], Matrix<2>::Identity()[i][j], kTolerance);
       }
     }
   }
@@ -94,7 +97,7 @@ GTEST_TEST(MatrixTest, PublicMethods) {
     const Matrix<3> kResult = kDut * kDut.inverse();
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        EXPECT_NEAR(kResult[i][j], Matrix<3>::Identity()[i][j], 10e-6);
+        EXPECT_NEAR(kResult[i][j], Matrix<3>::Identity()[i][j], kTolerance);
       }
     }
   }
@@ -122,7 +125,7 @@ GTEST_TEST(MatrixTest, PublicMethods) {
     const Matrix<4> kResult = kDut * kDut.inverse();
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
-        EXPECT_NEAR(kResult[i][j], Matrix<4>::Identity()[i][j], 10e-6);
+        EXPECT_NEAR(kResult[i][j], Matrix<4>::Identity()[i][j], kTolerance);
       }
     }
   }

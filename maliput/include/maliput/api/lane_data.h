@@ -4,7 +4,7 @@
 #include <ostream>
 #include <string>
 
-#include "drake/math/rotation_matrix.h"
+#include "drake/math/roll_pitch_yaw.h"
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"

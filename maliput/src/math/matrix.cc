@@ -17,7 +17,7 @@ Matrix<N> Matrix<N>::Identity() {
   return matrix;
 }
 template <std::size_t N>
-Matrix<N>::Matrix(std::initializer_list<double> values) {
+Matrix<N>::Matrix(const std::initializer_list<double>& values) {
   MALIPUT_THROW_UNLESS(N >= 1);
   MALIPUT_THROW_UNLESS(values.size() == N * N);
   for (std::size_t n = 0; n < N; n++) {
@@ -28,8 +28,7 @@ Matrix<N>::Matrix(std::initializer_list<double> values) {
 }
 
 template <std::size_t N>
-Matrix<N>::Matrix(std::initializer_list<Vector<N>> rows) {
-  MALIPUT_THROW_UNLESS(N >= 1);
+Matrix<N>::Matrix(const std::initializer_list<Vector<N>>& rows) {
   MALIPUT_THROW_UNLESS(rows.size() == N);
   std::size_t count_rows{};
   for (const auto& row : rows) {
@@ -39,9 +38,7 @@ Matrix<N>::Matrix(std::initializer_list<Vector<N>> rows) {
 }
 
 template <std::size_t N>
-Matrix<N>::Matrix(std::array<Vector<N>, N> rows) : rows_(rows) {
-  MALIPUT_THROW_UNLESS(N >= 1);
-}
+Matrix<N>::Matrix(std::array<Vector<N>, N> rows) : rows_(rows) {}
 
 template <std::size_t N>
 const Vector<N> Matrix<N>::row(std::size_t index) const {
@@ -62,7 +59,7 @@ const Vector<N> Matrix<N>::col(std::size_t index) const {
 }
 
 template <std::size_t N>
-const Matrix<N> Matrix<N>::transpose() const {
+Matrix<N> Matrix<N>::transpose() const {
   std::array<Vector<N>, N> transposed{};
   for (std::size_t i = 0; i < N; i++) {
     transposed[i] = col(i);
@@ -99,7 +96,6 @@ double Matrix<N>::cofactor(std::size_t row_index, std::size_t col_index) const {
 
 template <std::size_t N>
 double Matrix<N>::determinant() const {
-  MALIPUT_THROW_UNLESS(N >= 1);
   double result{0};
   if constexpr (N == 2) {
     result = rows_[0][0] * rows_[1][1] - rows_[0][1] * rows_[1][0];
@@ -115,7 +111,7 @@ double Matrix<N>::determinant() const {
 
 template <std::size_t N>
 bool Matrix<N>::is_singular() const {
-  return abs(determinant()) < tolerance;
+  return abs(determinant()) < kTolerance;
 }
 
 template <>
@@ -124,7 +120,7 @@ double Matrix<1>::cofactor(std::size_t row, std::size_t col) const {
 }
 
 template <std::size_t N>
-const Matrix<N> Matrix<N>::cofactor() const {
+Matrix<N> Matrix<N>::cofactor() const {
   Matrix<N> cofactor_matrix{};
   for (std::size_t i = 0; i < N; i++) {
     for (std::size_t j = 0; j < N; j++) {
@@ -135,14 +131,14 @@ const Matrix<N> Matrix<N>::cofactor() const {
 }
 
 template <std::size_t N>
-const Matrix<N> Matrix<N>::adjoint() const {
+Matrix<N> Matrix<N>::adjoint() const {
   return cofactor().transpose();
 }
 
 template <std::size_t N>
-const Matrix<N> Matrix<N>::inverse() const {
+Matrix<N> Matrix<N>::inverse() const {
   const double d = determinant();
-  if (abs(d) < tolerance) MALIPUT_THROW_MESSAGE("Matrix is singular");
+  if (abs(d) < kTolerance) MALIPUT_THROW_MESSAGE("Matrix is singular");
   return {(1 / d) * adjoint()};
 }
 
@@ -257,7 +253,6 @@ template Matrix<4> operator*(double, const Matrix<4>&);
 template std::ostream& operator<<(std::ostream&, const Matrix<2>&);
 template std::ostream& operator<<(std::ostream&, const Matrix<3>&);
 template std::ostream& operator<<(std::ostream&, const Matrix<4>&);
-template class Matrix<1>;
 template class Matrix<2>;
 template class Matrix<3>;
 template class Matrix<4>;
