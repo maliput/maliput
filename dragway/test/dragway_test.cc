@@ -7,7 +7,6 @@
 
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/check_id_indexing.h"
-#include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 
 #include "dragway/branch_point.h"

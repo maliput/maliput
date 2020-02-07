@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "drake/common/default_scalars.h"
-
 namespace maliput {
 namespace api {
 
@@ -48,6 +46,17 @@ GeoPosition Rotation::Apply(const GeoPosition& geo_position) const {
         ((-sb) * geo_position.x()) +
         ((sa*cb) * geo_position.y()) +
         ((ca*cb) * geo_position.z()));
+  // clang-format on
+}
+
+math::Matrix3 Rotation::matrix() const {
+  /// TODO(francocipollone): Move the following implementation to maliput::math::Quaternion.
+  const math::Vector4 q{math::Vector4{quaternion_.w(), quaternion_.x(), quaternion_.y(), quaternion_.z()}.normalized()};
+  // clang-format off
+  return{
+    {1-2*(q.z()*q.z() + q.w()*q.w()),   2*(q.y()*q.z() - q.w()*q.x()),   2*(q.y()*q.w() + q.z()*q.x())},
+    {  2*(q.y()*q.z() + q.w()*q.x()), 1-2*(q.y()*q.y() + q.w()*q.w()),   2*(q.z()*q.w() - q.y()*q.x())},
+    {  2*(q.y()*q.w() - q.z()*q.x()),   2*(q.z()*q.w() + q.y()*q.x()), 1-2*(q.y()*q.y() + q.z()*q.z())}};
   // clang-format on
 }
 

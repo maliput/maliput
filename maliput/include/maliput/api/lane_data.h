@@ -4,7 +4,7 @@
 #include <ostream>
 #include <string>
 
-#include "drake/math/rotation_matrix.h"
+#include "drake/math/roll_pitch_yaw.h"
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
@@ -153,7 +153,7 @@ class Rotation {
   void set_quat(const math::Quaternion& quaternion) { quaternion_ = quaternion.normalized(); }
 
   /// Provides a 3x3 rotation matrix representation of "this" rotation.
-  math::Matrix3 matrix() const { return drake::math::RotationMatrix<double>(quaternion_).matrix(); }
+  math::Matrix3 matrix() const;
 
   /// Provides a representation of rotation as a vector of angles
   /// `[roll, pitch, yaw]` (in radians).

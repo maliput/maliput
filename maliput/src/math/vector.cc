@@ -148,6 +148,24 @@ std::ostream& operator<<(std::ostream& os, const VectorBase<N_, Derived_>& vecto
   return os;
 }
 
+template <size_t N>
+Vector<N - 1> Vector<N>::reduce(size_t index) const {
+  MALIPUT_THROW_UNLESS(N >= 2);
+  MALIPUT_THROW_UNLESS(index < N);
+  std::array<double, N - 1> reduced;
+  size_t count_elements{};
+  bool remove{true};
+  for (const auto& value : this->values_) {
+    if (remove && count_elements == index) {
+      remove = false;
+      continue;
+    }
+    reduced[count_elements] = value;
+    count_elements++;
+  }
+  return reduced;
+}
+
 Vector2 Vector2::UnitX() { return {1., 0.}; }
 
 Vector2 Vector2::UnitY() { return {0., 1.}; }
@@ -166,19 +184,45 @@ Vector4 Vector4::UnitZ() { return {0., 0., 1., 0.}; }
 
 Vector4 Vector4::UnitW() { return {0., 0., 0., 1.}; }
 
-// Explicit instantiations of commonly used templates instances.
-template class VectorBase<2, Vector2>;
-template class VectorBase<3, Vector3>;
-template class VectorBase<4, Vector4>;
+// Vector<N> Explicit instanciations.
+template Vector<1> operator*(const VectorBase<1, Vector<1>>&, double);
+template Vector<1> operator*(double, const VectorBase<1, Vector<1>>&);
+template Vector<2> operator*(const VectorBase<2, Vector<2>>&, double);
+template Vector<2> operator*(double, const VectorBase<2, Vector<2>>&);
+template Vector<3> operator*(const VectorBase<3, Vector<3>>&, double);
+template Vector<3> operator*(double, const VectorBase<3, Vector<3>>&);
+template Vector<4> operator*(const VectorBase<4, Vector<4>>&, double);
+template Vector<4> operator*(double, const VectorBase<4, Vector<4>>&);
+template std::ostream& operator<<(std::ostream&, const VectorBase<1, Vector<1>>&);
+template std::ostream& operator<<(std::ostream&, const VectorBase<2, Vector<2>>&);
+template std::ostream& operator<<(std::ostream&, const VectorBase<3, Vector<3>>&);
+template std::ostream& operator<<(std::ostream&, const VectorBase<4, Vector<4>>&);
+template class Vector<1>;
+template class Vector<2>;
+template class Vector<3>;
+template class Vector<4>;
+template class VectorBase<1, Vector<1>>;
+template class VectorBase<2, Vector<2>>;
+template class VectorBase<3, Vector<3>>;
+template class VectorBase<4, Vector<4>>;
+
+// Vector2 Explicit instanciations.
 template Vector2 operator*(const VectorBase<2, Vector2>&, double);
 template Vector2 operator*(double, const VectorBase<2, Vector2>&);
+template std::ostream& operator<<(std::ostream&, const VectorBase<2, Vector2>&);
+template class VectorBase<2, Vector2>;
+
+// Vector3 Explicit instanciations.
 template Vector3 operator*(const VectorBase<3, Vector3>&, double);
 template Vector3 operator*(double, const VectorBase<3, Vector3>&);
+template std::ostream& operator<<(std::ostream&, const VectorBase<3, Vector3>&);
+template class VectorBase<3, Vector3>;
+
+// Vector4 Explicit instanciations.
 template Vector4 operator*(const VectorBase<4, Vector4>&, double);
 template Vector4 operator*(double, const VectorBase<4, Vector4>&);
-template std::ostream& operator<<(std::ostream&, const VectorBase<2, Vector2>&);
-template std::ostream& operator<<(std::ostream&, const VectorBase<3, Vector3>&);
 template std::ostream& operator<<(std::ostream&, const VectorBase<4, Vector4>&);
+template class VectorBase<4, Vector4>;
 
 }  // namespace math
 }  // namespace maliput
