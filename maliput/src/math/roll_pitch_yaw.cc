@@ -22,6 +22,53 @@ RollPitchYaw& RollPitchYaw::set(double roll, double pitch, double yaw) {
 }
 
 void RollPitchYaw::SetFromQuaternion(const Quaternion& quaternion) {
+  // This is copied from ignition::math::Quaternion::Euler()
+  // TODO once a rotation matrix can be computed from a Quaternion,
+  // copy from Drake CalcRollPitchYawFromQuaternionAndRotationMatrix
+  Vector3 vec;
+  using std::asin;
+  using std::atan2;
+
+  double tol = 1e-15;
+
+  Quaternion copy = quaternion.normalized();
+  double squ = copy.w() * copy.w();
+  double sqx = copy.x() * copy.x();
+  double sqy = copy.y() * copy.y();
+  double sqz = copy.z() * copy.z();
+
+  // Pitch
+  double sarg = -2 * (copy.x() * copy.z() - copy.w() * copy.y());
+  if (sarg <= -1.0) {
+    vec.y() = -0.5 * M_PI;
+  } else if (sarg >= 1.0) {
+    vec.y() = 0.5 * M_PI;
+  } else {
+    vec.y() = asin(sarg);
+  }
+
+  // If the pitch angle is PI/2 or -PI/2, we can only compute
+  // the sum roll + yaw.  However, any combination that gives
+  // the right sum will produce the correct orientation, so we
+  // set yaw = 0 and compute roll.
+  // pitch angle is PI/2
+  if (std::abs(sarg - 1) < tol) {
+    vec.z() = 0;
+    vec.x() = atan2(2 * (copy.x() * copy.y() - copy.z() * copy.w()), squ - sqx + sqy - sqz);
+  }
+  // pitch angle is -PI/2
+  else if (std::abs(sarg + 1) < tol) {
+    vec.z() = 0;
+    vec.x() = atan2(-2 * (copy.x() * copy.y() - copy.z() * copy.w()), squ - sqx + sqy - sqz);
+  } else {
+    // Roll
+    vec.x() = atan2(2 * (copy.y() * copy.z() + copy.w() * copy.x()), squ - sqx - sqy + sqz);
+
+    // Yaw
+    vec.z() = atan2(2 * (copy.x() * copy.y() + copy.w() * copy.z()), squ + sqx - sqy - sqz);
+  }
+
+  this->set(vec);
 }
 
 const Vector3& RollPitchYaw::vector() const { return roll_pitch_yaw_; }
