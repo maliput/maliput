@@ -23,6 +23,7 @@ macro(add_dependencies_to_test target)
           common
           drake::drake
           math
+          maliput_test_utilities
       )
 
     endif()
