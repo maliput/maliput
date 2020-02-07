@@ -37,7 +37,7 @@ class Matrix {
   Matrix(const std::initializer_list<double>& values);
 
   /// Constructs a N x N matrix from a list of Vector<N>.
-  /// @param rows Rows of the matrix. The size of `rows` must be N. It fills the matrix from the 0-th to N-1-h.
+  /// @param rows Rows of the matrix. The size of `rows` must be N. It fills the matrix from the 0-th to N-1-th.
   ///
   /// @throw common::assertion_error When `rows` size is not N.
   Matrix(const std::initializer_list<Vector<N>>& rows);
@@ -119,7 +119,7 @@ class Matrix {
   Matrix<N>& operator=(const Matrix<N>&& other);
 
   /// Constant subscripting array operator overload.
-  /// @param index The index of the matrix row.
+  /// @param index The index of the matrix row. It must be in [0, N).
   /// @return A constant reference of the row at `index`.
   ///
   /// @throw common::assertion_error When `index` is out of range.
