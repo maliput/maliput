@@ -1,69 +1,91 @@
 #include "maliput/common/logger.h"
 
 #include <string>
-
 #include <gtest/gtest.h>
 
-#ifdef HAVE_SPDLOG
-#include <spdlog/sinks/dist_sink.h>
-#endif  // HAVE_SPDLOG
+#include "maliput/common/assertion_error.h"
 
 namespace maliput {
 namespace common {
 namespace test {
 namespace {
 
-// Evaluates the flag pointing to the internal use of spdlog when available.
-GTEST_TEST(LoggerTest, HaveSpdlogFlagTest) {
-#ifdef HAVE_SPDLOG
-  ASSERT_TRUE(logging::kHaveSpdlog);
-#else   // HAVE_SPDLOG
-  ASSERT_FALSE(logging::kHaveSpdlog);
-#endif  // HAVE_SPDLOG
+// Contains the value of a log line.
+struct SinkMsg {
+  std::string msg{};
+} result;
+
+// Sink implementation that dumps the log messages in a variable.
+class MockSink : public SinkBase {
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockSink);
+
+ public:
+  MockSink() = default;
+  ~MockSink() = default;
+
+  void log(const string_view_t& msg) override { result.msg = fmt::format(msg); }
+
+  void flush() override{};
+};
+
+GTEST_TEST(LoggerTest, GetInstance) { EXPECT_EQ(log(), log()); }
+
+GTEST_TEST(LoggerTest, SetSink) {
+  std::unique_ptr<SinkBase> dut_1 = std::make_unique<Sink>();
+  log()->set_sink(std::move(dut_1));
+  std::unique_ptr<SinkBase> dut_2 = std::make_unique<Sink>();
+  log()->set_sink(std::move(dut_2));
+  EXPECT_THROW(log()->set_sink(std::move(dut_1)), common::assertion_error);
 }
 
-// Regardless of having spdlog or not, the Logger pointer must not be nullptr.
-GTEST_TEST(LoggerTest, NonNullptrLogger) { ASSERT_NE(log(), nullptr); }
+GTEST_TEST(LoggerTest, Logger) {
+  std::unique_ptr<MockSink> mock_sink = std::make_unique<MockSink>();
+  log()->set_sink(std::move(mock_sink));
 
-// Abuse gtest internals to verify that logging actually prints when enabled,
-// and that the default level is INFO.
-GTEST_TEST(LoggerTest, CaptureOutputTest) {
-  testing::internal::CaptureStderr();
-  log()->debug("sample_debug_message");
-  log()->info("sample_info_message");
-  const std::string output_log = testing::internal::GetCapturedStderr();
-#ifdef HAVE_SPDLOG
-  EXPECT_TRUE(output_log.find("sample_info_message") != std::string::npos);
-  EXPECT_TRUE(output_log.find("sample_debug_message") == std::string::npos);
-#else   // HAVE_SPDLOG
-  EXPECT_EQ(output_log, "");
-#endif  // HAVE_SPDLOG
+  const std::string kString = "The value of PI is: ";
+  const double kPI = 3.1415926535;
+  set_log_level(logger::kLevelToString.at(logger::level::trace));
+  {
+    const std::string kMsg{"[TRACE]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->trace(" Hello World. {}{}.\n", kString, kPI);
+    EXPECT_EQ(result.msg, kMsg);
+  }
+  {
+    const std::string kMsg{"[DEBUG]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->debug(" Hello World. {}{}.\n", kString, kPI);
+    EXPECT_EQ(result.msg, kMsg);
+  }
+  {
+    const std::string kMsg{"[INFO]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->info(" Hello World. {}{}.\n", kString, kPI);
+    EXPECT_EQ(result.msg, kMsg);
+  }
+  {
+    const std::string kMsg{"[WARNING]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->warn(" Hello World. {}{}.\n", kString, kPI);
+    EXPECT_EQ(result.msg, kMsg);
+  }
+  {
+    const std::string kMsg{"[ERROR]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->error(" Hello World. {}{}.\n", kString, kPI);
+    EXPECT_EQ(result.msg, kMsg);
+  }
+  {
+    const std::string kMsg{"[CRITICAL]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->critical(" Hello World. {}{}.\n", kString, kPI);
+    EXPECT_EQ(result.msg, kMsg);
+  }
 }
-
-// Regardless of having spdlog or not, the Sink pointer must not be nullptr.
-GTEST_TEST(LoggerTest, NonNullptrSink) { ASSERT_NE(logging::get_dist_sink(), nullptr); }
-
-// When having spdlog, evaluates that the Sink can be casted to the subtype in the docstring.
-#ifdef HAVE_SPDLOG
-GTEST_TEST(LoggerTest, SinkTest) {
-  ASSERT_NE(dynamic_cast<spdlog::sinks::dist_sink_mt*>(logging::get_dist_sink()), nullptr);
-}
-#endif
 
 GTEST_TEST(LoggerTest, SetLogLevel) {
-#ifdef HAVE_SPDLOG
-  const std::vector<std::string> kLogLevels{"trace", "debug", "info", "warn", "err", "critical", "off"};
-  const std::string first_level = logging::set_log_level("unchanged");
-  std::string prev_level = "off";
-  logging::set_log_level(prev_level);
-  for (const std::string& level : kLogLevels) {
-    EXPECT_EQ(logging::set_log_level(level), prev_level);
-    prev_level = level;
+  result.msg = "";
+  EXPECT_EQ(set_log_level(logger::kLevelToString.at(logger::level::critical)),
+            logger::kLevelToString.at(logger::level::trace));
+  {
+    log()->error("Hello World");
+    EXPECT_EQ(result.msg, std::string{});
   }
-  logging::set_log_level(first_level);
-#else   // HAVE_SPDLOG
-  ASSERT_EQ(logging::set_log_level("any level name"), "");
-#endif  // HAVE_SPDLOG
+  EXPECT_THROW(set_log_level("wrong_level"), common::assertion_error);
 }
 
 }  // namespace

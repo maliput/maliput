@@ -574,13 +574,13 @@ std::unique_ptr<const api::RoadGeometry> BuildFrom(const BuilderFactoryBase& bui
     std::map<std::string, const Group*> cooked_groups;
     for (const auto& g : groups) {
       const std::string gid = g.first.as<std::string>();
-      DRAKE_SPDLOG_DEBUG(maliput::log(), "   create group '{}'", gid);
+      maliput::log()->debug("   create group '{}'", gid);
       Group* group = builder->MakeGroup(gid);
       YAML::Node cids_node = g.second;
       MALIPUT_DEMAND(cids_node.IsSequence());
       for (const YAML::Node& cid_node : cids_node) {
         const std::string cid = cid_node.as<std::string>();
-        DRAKE_SPDLOG_DEBUG(maliput::log(), "      add cnx '{}'", cid);
+        maliput::log()->debug("      add cnx '{}'", cid);
         group->Add(cooked_connections[cid]);
       }
     }

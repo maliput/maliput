@@ -69,7 +69,7 @@ MaliputImplementation GetMaliputImplementation(const std::string& filename) {
 int main(int argc, char* argv[]) {
   maliput::log()->debug("main()");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  maliput::logging::set_log_level(FLAGS_spdlog_level);
+  maliput::common::set_log_level(FLAGS_spdlog_level);
 
   if (FLAGS_yaml_file.empty()) {
     maliput::log()->critical("No input file specified.");
