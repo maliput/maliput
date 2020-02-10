@@ -1,5 +1,6 @@
 #pragma once
 
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/math/matrix.h"
 #include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
@@ -9,6 +10,8 @@ namespace math {
 
 class RollPitchYaw {
  public:
+  MALIPUT_DEFAULT_COPY_MOVE_ASSIGN(RollPitchYaw);
+
   /// Constructs a RollPitchYaw with zeros for each angle.
   RollPitchYaw() = default;
 
@@ -27,20 +30,6 @@ class RollPitchYaw {
   /// `-π <= r <= π`, `-π/2 <= p <= π/2`, `-π <= y <= n`.
   /// @param[in] quaternion unit Quaternion.
   explicit RollPitchYaw(const Quaternion& quaternion);
-
-  /// Copy constructor.
-  RollPitchYaw(const RollPitchYaw& other) = default;
-
-  /// Move constructor.
-  RollPitchYaw(RollPitchYaw&& other) = default;
-
-  /// Assignment operator overload.
-  /// @param other RollPitchYaw object.
-  RollPitchYaw& operator=(const RollPitchYaw& other) = default;
-
-  /// Move assignment operator overload.
-  /// @param other RollPitchYaw object.
-  RollPitchYaw& operator=(RollPitchYaw&& other) = default;
 
   /// Sets this RollPitchYaw from a 3x1 array of angles.
   /// @param[in] rpy 3x1 array with roll, pitch, yaw angles in radians.
