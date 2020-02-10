@@ -1,3 +1,4 @@
+#include <cmath>
 #include "maliput/math/roll_pitch_yaw.h"
 
 namespace maliput {
