@@ -58,13 +58,13 @@ GTEST_TEST(RollPitchYawTest, PublicMethods) {
         test::CompareMatrices(kDut.ToMatrix(), Matrix3({{0., 0., 1.}, {1., 0., 0.}, {0., 1., 0.}}), kTolerance));
     ExpectDoubleEq(kDut.ToQuaternion(), Quaternion(0.5, 0.5, 0.5, 0.5));
   }
-  // set_*_angle(double)
+  // mutable references
   {
     const RollPitchYaw kExpectedDut{0.1, -0.2, 0.3};
     RollPitchYaw kDut;
-    kDut.set_roll_angle(0.1);
-    kDut.set_pitch_angle(-0.2);
-    kDut.set_yaw_angle(0.3);
+    kDut.roll_angle() = 0.1;
+    kDut.pitch_angle() = -0.2;
+    kDut.yaw_angle() = 0.3;
     ExpectDoubleEq(kDut, kExpectedDut);
   }
   // set(double, double, double)

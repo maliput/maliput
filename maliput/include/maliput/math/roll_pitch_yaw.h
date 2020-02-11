@@ -104,25 +104,22 @@ class RollPitchYaw {
   const Vector3& vector() const;
 
   /// Returns the roll-angle underlying this RollPitchYaw.
-  double roll_angle() const;
+  double roll_angle() const { return roll_pitch_yaw_.x(); }
 
   /// Returns the pitch-angle underlying this RollPitchYaw.
-  double pitch_angle() const;
+  double pitch_angle() const { return roll_pitch_yaw_.y(); }
 
   /// Returns the yaw-angle underlying this RollPitchYaw.
-  double yaw_angle() const;
+  double yaw_angle() const { return roll_pitch_yaw_.z(); }
 
-  /// Sets the roll-angle underlying this RollPitchYaw.
-  /// @param[in] roll roll angle in radians.
-  void set_roll_angle(double r);
+  /// Mutable reference to roll angle.
+  double& roll_angle() { return roll_pitch_yaw_.x(); }
 
-  /// Sets the pitch-angle underlying this RollPitchYaw.
-  /// @param[in] pitch pitch angle in radians.
-  void set_pitch_angle(double p);
+  /// Mutable reference to pitch angle.
+  double& pitch_angle() { return roll_pitch_yaw_.y(); }
 
-  /// Sets the yaw-angle underlying this RollPitchYaw.
-  /// @param[in] yaw yaw angle in radians.
-  void set_yaw_angle(double y);
+  /// Mutable reference to yaw angle.
+  double& yaw_angle() { return roll_pitch_yaw_.z(); }
 
   /// Returns the 3x3 matrix representation of the rotation matrix that
   /// corresponds to this RollPitchYaw.

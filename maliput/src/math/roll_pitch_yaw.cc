@@ -110,18 +110,6 @@ void RollPitchYaw::SetFromQuaternion(const Quaternion& quaternion) {
 
 const Vector3& RollPitchYaw::vector() const { return roll_pitch_yaw_; }
 
-double RollPitchYaw::roll_angle() const { return roll_pitch_yaw_.x(); }
-
-double RollPitchYaw::pitch_angle() const { return roll_pitch_yaw_.y(); }
-
-double RollPitchYaw::yaw_angle() const { return roll_pitch_yaw_.z(); }
-
-void RollPitchYaw::set_roll_angle(double r) { roll_pitch_yaw_.x() = r; }
-
-void RollPitchYaw::set_pitch_angle(double p) { roll_pitch_yaw_.y() = p; }
-
-void RollPitchYaw::set_yaw_angle(double y) { roll_pitch_yaw_.z() = y; }
-
 Matrix3 RollPitchYaw::ToMatrix() const {
   const double& r = roll_pitch_yaw_.x();
   const double& p = roll_pitch_yaw_.y();
