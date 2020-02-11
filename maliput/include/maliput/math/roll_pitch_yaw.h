@@ -60,6 +60,9 @@ namespace math {
 /// ```
 class RollPitchYaw {
  public:
+  /// Tolerance value to determine nearness to the gimbal-lock singularity as cos(pitch_angle) -> 0.
+  static constexpr double kTolerance = 1e-15;
+
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RollPitchYaw);
 
   /// Constructs a RollPitchYaw with zeros for each angle.

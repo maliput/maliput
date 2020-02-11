@@ -68,8 +68,6 @@ void RollPitchYaw::SetFromQuaternion(const Quaternion& quaternion) {
   using std::asin;
   using std::atan2;
 
-  double tol = 1e-15;
-
   Quaternion copy = quaternion.normalized();
   double squ = copy.w() * copy.w();
   double sqx = copy.x() * copy.x();
@@ -91,12 +89,12 @@ void RollPitchYaw::SetFromQuaternion(const Quaternion& quaternion) {
   // the right sum will produce the correct orientation, so we
   // set yaw = 0 and compute roll.
   // pitch angle is PI/2
-  if (std::abs(sarg - 1) < tol) {
+  if (std::abs(sarg - 1) < kTolerance) {
     vec.z() = 0;
     vec.x() = atan2(2 * (copy.x() * copy.y() - copy.z() * copy.w()), squ - sqx + sqy - sqz);
   }
   // pitch angle is -PI/2
-  else if (std::abs(sarg + 1) < tol) {
+  else if (std::abs(sarg + 1) < kTolerance) {
     vec.z() = 0;
     vec.x() = atan2(-2 * (copy.x() * copy.y() - copy.z() * copy.w()), squ - sqx + sqy - sqz);
   } else {
