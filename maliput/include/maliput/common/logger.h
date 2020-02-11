@@ -103,17 +103,13 @@ const std::map<int, std::string> kLevelToString{
     {logger::level::warn, std::string{"warn"}},         {logger::level::error, std::string{"error"}},
     {logger::level::critical, std::string{"critical"}}, {logger::level::unchanged, std::string{"unchanged"}}};
 
-}  // namespace logger
-
-namespace {
-
 /// Convenient conversion from level enum to message.
 const std::map<int, std::string> kLevelToMessage{
     {logger::level::trace, "[TRACE] "},  {logger::level::debug, "[DEBUG] "}, {logger::level::info, "[INFO] "},
     {logger::level::warn, "[WARNING] "}, {logger::level::error, "[ERROR] "}, {logger::level::critical, "[CRITICAL] "},
 };
 
-}  // namespace
+}  // namespace logger
 
 /// Interface of a sink to dump all log messages.
 class SinkBase {
@@ -132,9 +128,8 @@ class SinkBase {
 
 /// Sink that uses `std::cout` to dump the log messages.
 class Sink : public SinkBase {
-  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Sink);
-
  public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Sink);
   Sink() = default;
   ~Sink() = default;
 
@@ -143,100 +138,98 @@ class Sink : public SinkBase {
   void flush() override{};
 };
 
-/// A logger for capturing the messages and dumping them in a specified sink.
-///   * The logger provides six type of message's level(trace, debug, info, warning, error, critical).
-///   * The logger could be "turned off" using maliput::log()->set_log_level(logging::level::off).
-///   * The sink, where the message will be delivered, must be selected using the set_sink() method.
+/// A logger class implementation.
+///
+/// Logger will dump all messages to a sink (@see SinkBase) which will be in charge
+/// of serializing the messages to the appropriate channel. By default, Sink
+/// implementation is used.
+///
+/// It provides six different log levels, @see logger::level , which can be filtered based
+/// on the severity of the  message.
 class Logger {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Logger);
 
   Logger() = default;
 
-  /// Log the message showing trace level prefix.
-  /// @param fmt Is a format string that contains literal text and replacement fields surrounded by braces {}.
+  /// \addtogroup levelmethods Logging Level Methods.
+  /// @param fmt Is a fmt format string. See https://github.com/fmtlib/fmt.
   /// @param args Is an argument list representing objects to be formatted.
+  /// @{
+
+  /// Log the message showing trace level prefix.
   template <typename... Args>
   void trace(string_view_t fmt, const Args&... args) {
     log(logger::level::trace, fmt, args...);
   }
 
   /// Log the message showing debug level prefix.
-  /// @param fmt Is a format string that contains literal text and replacement fields surrounded by braces {}.
-  /// @param args Is an argument list representing objects to be formatted.
   template <typename... Args>
   void debug(string_view_t fmt, const Args&... args) {
     log(logger::level::debug, fmt, args...);
   }
 
   /// Log the message showing info level prefix.
-  /// @param fmt Is a format string that contains literal text and replacement fields surrounded by braces {}.
-  /// @param args Is an argument list representing objects to be formatted.
   template <typename... Args>
   void info(string_view_t fmt, const Args&... args) {
     log(logger::level::info, fmt, args...);
   }
 
   /// Log the message showing warning level prefix.
-  /// @param fmt Is a format string that contains literal text and replacement fields surrounded by braces {}.
-  /// @param args Is an argument list representing objects to be formatted.
   template <typename... Args>
   void warn(string_view_t fmt, const Args&... args) {
     log(logger::level::warn, fmt, args...);
   }
 
   /// Log the message showing error level prefix.
-  /// @param fmt Is a format string that contains literal text and replacement fields surrounded by braces {}.
-  /// @param args Is an argument list representing objects to be formatted.
   template <typename... Args>
   void error(string_view_t fmt, const Args&... args) {
     log(logger::level::error, fmt, args...);
   }
 
   /// Log the message showing critical level prefix.
-  /// @param fmt Is a format string that contains literal text and replacement fields surrounded by braces {}.
-  /// @param args Is an argument list representing objects to be formatted.
   template <typename... Args>
   void critical(string_view_t fmt, const Args&... args) {
     log(logger::level::critical, fmt, args...);
   }
+  /// @}
 
-  /// Select a particular sink.
-  /// @param s Is a Sink implemented from common::SinkBase.
+  /// Select a sink.
+  /// @param sink Is a SinkBase implementation.
   ///
-  /// @throw common::assertion_error When `s` is nullptr.
-  void set_sink(std::unique_ptr<common::SinkBase> s);
+  /// @throw common::assertion_error When `sink` is nullptr.
+  void set_sink(std::unique_ptr<common::SinkBase> sink);
 
   /// Get the current sink.
   /// @return A pointer to the current sink.
   SinkBase* get_sink() { return sink_.get(); }
 
-  /// Sets the minimum level of messages to be log.
-  /// @param level Must be a level enum value from the level enumerations: `trace`, `debug`,
+  /// Sets the minimum level of messages to be logged.
+  /// @param log_level Must be a level enum value from the level enumerations: `trace`, `debug`,
   /// `info`, `warning`, `error`, `critical` or `off`.
-  /// @return The string value of the previous log level.
-  std::string set_level(logger::level l);
+  /// @return The string value of the previous log level. @see logger::kLevelToString.
+  std::string set_level(logger::level log_level);
 
  private:
-  /// Send the message to the sink.
-  /// @param lev Level of the message.
-  /// @param fmt Is a format string that contains literal text and replacement fields surrounded by braces {}.
-  /// @param args Is an argument list representing objects to be formatted.
+  // Send the message to the sink.
+  // @param log_level Level of the message.
+  // @param fmt Is a fmt format string. See https://github.com/fmtlib/fmt.
+  // @param args Is an argument list representing objects to be formatted.
   template <typename... Args>
-  void log(logger::level lev, const string_view_t& fmt, const Args&... args);
+  void log(logger::level log_level, const string_view_t& fmt, const Args&... args);
 
-  /// Sink where the messages will be dumped to.
+  // Sink where the messages will be dumped to.
   std::unique_ptr<common::SinkBase> sink_{std::make_unique<common::Sink>()};
 
-  /// Minimum level of messages to be log.
-  std::atomic<int> level_{logger::level::info};
+  // Minimum level of messages to be log.
+  logger::level level_{logger::level::info};
 };
 
 template <typename... Args>
 void Logger::log(logger::level lev, const string_view_t& fmt, const Args&... args) {
   if (lev >= level_) {
     fmt::memory_buffer msg;
-    format_to(msg, fmt::format(kLevelToMessage.at(lev)));
+    format_to(msg, fmt::format(logger::kLevelToMessage.at(lev)));
     format_to(msg, fmt::format(fmt, args...));
     sink_->log(to_string(msg));
   }
@@ -248,13 +241,15 @@ void Logger::log(logger::level lev, const string_view_t& fmt, const Args&... arg
 /// `info`, `warning`, `error`, `critical` or `off`.
 /// @return The string value of the previous log level.
 ///
-/// @throws maliput::common::assertion_error When `level` is not one of the
+/// @throw std::out_of_range When `level` is not one of the
 ///         predefined values.
+/// @relatesalso Logger.
 std::string set_log_level(const std::string& level);
 
 }  // namespace common
 
 /// Retrieve an instance of a logger to use for logger.
+/// @relatesalso common::Logger.
 common::Logger* log();
 
 }  // namespace maliput

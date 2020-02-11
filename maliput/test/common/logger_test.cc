@@ -10,11 +10,6 @@ namespace common {
 namespace test {
 namespace {
 
-// Contains the value of a log line.
-struct SinkMsg {
-  std::string msg{};
-} result;
-
 // Sink implementation that dumps the log messages in a variable.
 class MockSink : public SinkBase {
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockSink);
@@ -23,69 +18,81 @@ class MockSink : public SinkBase {
   MockSink() = default;
   ~MockSink() = default;
 
-  void log(const string_view_t& msg) override { result.msg = fmt::format(msg); }
-
+  const std::string& get_log_message() const { return log_message_; }
+  void log(const string_view_t& msg) override { log_message_ = fmt::format(msg); }
   void flush() override{};
+
+ private:
+  std::string log_message_{};
 };
 
-GTEST_TEST(LoggerTest, GetInstance) { EXPECT_EQ(log(), log()); }
+GTEST_TEST(LoggerTest, GetInstance) {
+  EXPECT_NE(log(), nullptr);
+  EXPECT_EQ(log(), log());
+}
 
 GTEST_TEST(LoggerTest, SetSink) {
   std::unique_ptr<SinkBase> dut_1 = std::make_unique<Sink>();
+  SinkBase* dut_1_ptr = dut_1.get();
   log()->set_sink(std::move(dut_1));
+  EXPECT_EQ(log()->get_sink(), dut_1_ptr);
   std::unique_ptr<SinkBase> dut_2 = std::make_unique<Sink>();
-  log()->set_sink(std::move(dut_2));
-  EXPECT_THROW(log()->set_sink(std::move(dut_1)), common::assertion_error);
 }
 
 GTEST_TEST(LoggerTest, Logger) {
   std::unique_ptr<MockSink> mock_sink = std::make_unique<MockSink>();
+  MockSink* mock_sink_ptr = mock_sink.get();
   log()->set_sink(std::move(mock_sink));
 
-  const std::string kString = "The value of PI is: ";
+  const std::string kMessage1 = " Hello World. {}{}.\n";
+  const std::string kMessage2 = "The value of PI is: ";
   const double kPI = 3.1415926535;
   set_log_level(logger::kLevelToString.at(logger::level::trace));
   {
-    const std::string kMsg{"[TRACE]  Hello World. The value of PI is: 3.1415926535.\n"};
-    log()->trace(" Hello World. {}{}.\n", kString, kPI);
-    EXPECT_EQ(result.msg, kMsg);
+    const std::string kExpectedMessage{"[TRACE]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->trace(kMessage1, kMessage2, kPI);
+    EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kMsg{"[DEBUG]  Hello World. The value of PI is: 3.1415926535.\n"};
-    log()->debug(" Hello World. {}{}.\n", kString, kPI);
-    EXPECT_EQ(result.msg, kMsg);
+    const std::string kExpectedMessage{"[DEBUG]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->debug(kMessage1, kMessage2, kPI);
+    EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kMsg{"[INFO]  Hello World. The value of PI is: 3.1415926535.\n"};
-    log()->info(" Hello World. {}{}.\n", kString, kPI);
-    EXPECT_EQ(result.msg, kMsg);
+    const std::string kExpectedMessage{"[INFO]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->info(kMessage1, kMessage2, kPI);
+    EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kMsg{"[WARNING]  Hello World. The value of PI is: 3.1415926535.\n"};
-    log()->warn(" Hello World. {}{}.\n", kString, kPI);
-    EXPECT_EQ(result.msg, kMsg);
+    const std::string kExpectedMessage{"[WARNING]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->warn(kMessage1, kMessage2, kPI);
+    EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kMsg{"[ERROR]  Hello World. The value of PI is: 3.1415926535.\n"};
-    log()->error(" Hello World. {}{}.\n", kString, kPI);
-    EXPECT_EQ(result.msg, kMsg);
+    const std::string kExpectedMessage{"[ERROR]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->error(kMessage1, kMessage2, kPI);
+    EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kMsg{"[CRITICAL]  Hello World. The value of PI is: 3.1415926535.\n"};
-    log()->critical(" Hello World. {}{}.\n", kString, kPI);
-    EXPECT_EQ(result.msg, kMsg);
+    const std::string kExpectedMessage{"[CRITICAL]  Hello World. The value of PI is: 3.1415926535.\n"};
+    log()->critical(kMessage1, kMessage2, kPI);
+    EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
 }
 
 GTEST_TEST(LoggerTest, SetLogLevel) {
-  result.msg = "";
+  std::unique_ptr<MockSink> mock_sink = std::make_unique<MockSink>();
+  MockSink* mock_sink_ptr = mock_sink.get();
+  log()->set_sink(std::move(mock_sink));
+
+  set_log_level(logger::kLevelToString.at(logger::level::trace));
   EXPECT_EQ(set_log_level(logger::kLevelToString.at(logger::level::critical)),
             logger::kLevelToString.at(logger::level::trace));
   {
     log()->error("Hello World");
-    EXPECT_EQ(result.msg, std::string{});
+    EXPECT_EQ(mock_sink_ptr->get_log_message(), std::string{});
   }
-  EXPECT_THROW(set_log_level("wrong_level"), common::assertion_error);
+  EXPECT_THROW(set_log_level("wrong_level"), std::out_of_range);
 }
 
 }  // namespace

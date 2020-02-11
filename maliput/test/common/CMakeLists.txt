@@ -24,6 +24,7 @@ macro(add_dependencies_to_test target)
 
     endif()
 endmacro()
+
 add_dependencies_to_test(logger_test)
 add_dependencies_to_test(maliput_abort_test)
 add_dependencies_to_test(maliput_hash_test)

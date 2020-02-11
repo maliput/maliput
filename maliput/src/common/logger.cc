@@ -43,27 +43,24 @@
 
 namespace maliput {
 namespace common {
+
 std::string Logger::set_level(logger::level l) {
   if (l == logger::level::unchanged) {
     return logger::kLevelToString.at(level_);
   } else {
-    const int r = level_;
+    logger::level r = level_;
     level_ = l;
     return logger::kLevelToString.at(r);
   }
 }
 
-void Logger::set_sink(std::unique_ptr<common::SinkBase> s) {
-  MALIPUT_THROW_UNLESS(s.get() != nullptr);
-  sink_ = (std::move(s));
+void Logger::set_sink(std::unique_ptr<common::SinkBase> sink) {
+  MALIPUT_THROW_UNLESS(sink.get() != nullptr);
+  sink_ = (std::move(sink));
 }
 
 std::string set_log_level(const std::string& level) {
-  try {
-    return log()->set_level(common::logger::kStringToLevel.at(level));
-  } catch (const std::out_of_range& e) {
-    MALIPUT_THROW_MESSAGE(fmt::format("{} is not a valid level.", level));
-  }
+  return log()->set_level(common::logger::kStringToLevel.at(level));
 }
 
 }  // namespace common
