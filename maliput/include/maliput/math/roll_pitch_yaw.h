@@ -60,7 +60,7 @@ namespace math {
 /// ```
 class RollPitchYaw {
  public:
-  MALIPUT_DEFAULT_COPY_MOVE_ASSIGN(RollPitchYaw);
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RollPitchYaw);
 
   /// Constructs a RollPitchYaw with zeros for each angle.
   RollPitchYaw() = default;
