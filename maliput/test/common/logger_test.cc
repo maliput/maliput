@@ -32,16 +32,16 @@ GTEST_TEST(LoggerTest, GetInstance) {
 }
 
 GTEST_TEST(LoggerTest, SetSink) {
-  std::unique_ptr<SinkBase> dut_1 = std::make_unique<Sink>();
-  SinkBase* dut_1_ptr = dut_1.get();
-  log()->set_sink(std::move(dut_1));
-  EXPECT_EQ(log()->get_sink(), dut_1_ptr);
-  std::unique_ptr<SinkBase> dut_2 = std::make_unique<Sink>();
+  std::unique_ptr<SinkBase> dut = std::make_unique<Sink>();
+  SinkBase* dut_ptr = dut.get();
+  log()->set_sink(std::move(dut));
+  EXPECT_EQ(log()->get_sink(), dut_ptr);
+  EXPECT_THROW(log()->set_sink(std::unique_ptr<SinkBase>()), common::assertion_error);
 }
 
 GTEST_TEST(LoggerTest, Logger) {
   std::unique_ptr<MockSink> mock_sink = std::make_unique<MockSink>();
-  MockSink* mock_sink_ptr = mock_sink.get();
+  const MockSink* mock_sink_ptr = mock_sink.get();
   log()->set_sink(std::move(mock_sink));
 
   const std::string kMessage1 = " Hello World. {}{}.\n";
@@ -88,10 +88,9 @@ GTEST_TEST(LoggerTest, SetLogLevel) {
   set_log_level(logger::kLevelToString.at(logger::level::trace));
   EXPECT_EQ(set_log_level(logger::kLevelToString.at(logger::level::critical)),
             logger::kLevelToString.at(logger::level::trace));
-  {
-    log()->error("Hello World");
-    EXPECT_EQ(mock_sink_ptr->get_log_message(), std::string{});
-  }
+
+  log()->error("Hello World");
+  EXPECT_EQ(mock_sink_ptr->get_log_message(), std::string{});
   EXPECT_THROW(set_log_level("wrong_level"), std::out_of_range);
 }
 

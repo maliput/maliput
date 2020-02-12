@@ -48,7 +48,7 @@ std::string Logger::set_level(logger::level l) {
   if (l == logger::level::unchanged) {
     return logger::kLevelToString.at(level_);
   } else {
-    logger::level r = level_;
+    const logger::level r = level_;
     level_ = l;
     return logger::kLevelToString.at(r);
   }
