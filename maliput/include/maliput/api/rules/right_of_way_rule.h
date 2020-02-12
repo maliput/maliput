@@ -136,7 +136,7 @@ class RightOfWayRule final {
   RightOfWayRule(const Id& id, const LaneSRoute& zone, ZoneType zone_type, const std::vector<State>& states,
                  const RelatedBulbGroups& related_bulb_groups)
       : id_(id), zone_(zone), zone_type_(zone_type), related_bulb_groups_(related_bulb_groups) {
-    DRAKE_THROW_UNLESS(states.size() >= 1);
+    MALIPUT_THROW_UNLESS(states.size() >= 1);
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
