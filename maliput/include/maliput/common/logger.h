@@ -193,7 +193,7 @@ class Logger {
   }
   /// @}
 
-  /// Select a sink.
+  /// Set a sink.
   /// @param sink Is a SinkBase implementation.
   ///
   /// @throw common::assertion_error When `sink` is nullptr.

@@ -44,13 +44,13 @@
 namespace maliput {
 namespace common {
 
-std::string Logger::set_level(logger::level l) {
-  if (l == logger::level::unchanged) {
+std::string Logger::set_level(logger::level log_level) {
+  if (log_level == logger::level::unchanged) {
     return logger::kLevelToString.at(level_);
   } else {
-    const logger::level r = level_;
-    level_ = l;
-    return logger::kLevelToString.at(r);
+    const logger::level previous_log_level = level_;
+    level_ = log_level;
+    return logger::kLevelToString.at(previous_log_level);
   }
 }
 
