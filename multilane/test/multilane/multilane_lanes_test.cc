@@ -7,7 +7,6 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/test_utilities/eigen_matrix_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 #include "multilane/arc_road_curve.h"
 #include "multilane/junction.h"
@@ -15,6 +14,7 @@
 #include "multilane/road_curve.h"
 #include "multilane/road_geometry.h"
 #include "multilane/segment.h"
+#include "multilane_test_utilities/eigen_matrix_compare.h"
 
 namespace maliput {
 namespace multilane {

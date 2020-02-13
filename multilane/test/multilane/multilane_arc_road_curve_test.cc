@@ -6,7 +6,7 @@
 
 #include "maliput/api/lane_data.h"
 #include "maliput/common/assertion_error.h"
-#include "maliput/test_utilities/eigen_matrix_compare.h"
+#include "multilane_test_utilities/eigen_matrix_compare.h"
 
 namespace maliput {
 namespace multilane {
