@@ -17,6 +17,7 @@ PYBIND11_MODULE(math, m) {
       .def("z", py::overload_cast<>(&math::Vector3::z));
   py::class_<math::RollPitchYaw>(m, "RollPitchYaw")
       .def(py::init<double, double, double>())
+      .def("ToQuaternion", &math::RollPitchYaw::ToQuaternion)
       .def("roll_angle", py::overload_cast<>(&math::RollPitchYaw::roll_angle))
       .def("pitch_angle", py::overload_cast<>(&math::RollPitchYaw::pitch_angle))
       .def("yaw_angle", py::overload_cast<>(&math::RollPitchYaw::yaw_angle));
