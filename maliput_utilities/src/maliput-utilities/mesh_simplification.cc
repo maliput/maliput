@@ -9,14 +9,8 @@ namespace maliput {
 namespace utility {
 namespace mesh {
 
-double DistanceToAPlane(const math::Vector3 plane_normal, const math::Vector3 plane_coordinate,
-                        const math::Vector3 coordinate) {
-  const double A{plane_normal.x()};
-  const double B{plane_normal.y()};
-  const double C{plane_normal.z()};
-  const double D{A * plane_coordinate.x() + B * plane_coordinate.y() + C * plane_coordinate.z()};
-  return std::abs((A * coordinate.x() + B * coordinate.y() + C * coordinate.z() - D) /
-                  std::sqrt(A * A + B * B + C * C));
+double DistanceToAPlane(const math::Vector3 n, const math::Vector3 p, const math::Vector3 q) {
+  return std::abs((n.dot(q) - n.dot(p)) / n.norm());
 }
 
 InverseFaceEdgeMap ComputeInverseFaceEdgeMap(const std::vector<IndexFace>& faces) {
@@ -65,34 +59,31 @@ const math::Vector3& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFac
 }
 
 template <typename InputIt>
-bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const math::Vector3& plane_normal,
-                              const math::Vector3& plane_coordinate, double tolerance) {
-  return std::all_of(
-      first, last, [&mesh, &plane_normal, &plane_coordinate, tolerance](const IndexFace::Vertex& vertex) {
-        const math::Vector3& x = GetMeshFaceVertexPosition(mesh, vertex);
-        const math::Vector3& n = GetMeshFaceVertexNormal(mesh, vertex);
-        const double ctheta = std::abs(plane_normal.dot(n.normalized()));
-        return (ctheta != 0. && DistanceToAPlane(plane_normal, plane_coordinate, x) / ctheta < tolerance);
-      });
+bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const math::Vector3& n,
+                              const math::Vector3& p, double tolerance) {
+  return std::all_of(first, last, [&mesh, &n, &p, tolerance](const IndexFace::Vertex& vertex) {
+    const math::Vector3& x = GetMeshFaceVertexPosition(mesh, vertex);
+    const math::Vector3& n = GetMeshFaceVertexNormal(mesh, vertex);
+    const double ctheta = std::abs(n.dot(n.normalized()));
+    return (ctheta != 0. && DistanceToAPlane(n, p, x) / ctheta < tolerance);
+  });
 }
 
-bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face, const math::Vector3& plane_normal,
-                                 const math::Vector3& plane_coordinate, double tolerance) {
+bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face, const math::Vector3& n,
+                                 const math::Vector3& p, double tolerance) {
   const std::vector<IndexFace::Vertex>& face_vertices = face.vertices();
-  return DoMeshVerticesLieOnPlane(mesh, face_vertices.begin(), face_vertices.end(), plane_normal, plane_coordinate,
-                                  tolerance);
+  return DoMeshVerticesLieOnPlane(mesh, face_vertices.begin(), face_vertices.end(), n, p, tolerance);
 }
 
-bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face, double tolerance, math::Vector3* plane_normal,
-                      math::Vector3* plane_coordinate) {
-  MALIPUT_DEMAND(plane_normal != nullptr);
-  MALIPUT_DEMAND(plane_coordinate != nullptr);
+bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face, double tolerance, math::Vector3* n,
+                      math::Vector3* p) {
+  MALIPUT_DEMAND(n != nullptr);
+  MALIPUT_DEMAND(p != nullptr);
   const std::vector<IndexFace::Vertex>& face_vertices = face.vertices();
   MALIPUT_DEMAND(face_vertices.size() >= 3);
-  *plane_coordinate = GetMeshFaceVertexPosition(mesh, face_vertices[0]);
-  *plane_normal = GetMeshFaceVertexNormal(mesh, face_vertices[0]);
-  return DoMeshVerticesLieOnPlane(mesh, face_vertices.begin() + 1, face_vertices.end(), *plane_normal,
-                                  *plane_coordinate, tolerance);
+  *p = GetMeshFaceVertexPosition(mesh, face_vertices[0]);
+  *n = GetMeshFaceVertexNormal(mesh, face_vertices[0]);
+  return DoMeshVerticesLieOnPlane(mesh, face_vertices.begin() + 1, face_vertices.end(), *n, *p, tolerance);
 }
 
 std::set<int> AggregateAdjacentCoplanarMeshFaces(const GeoMesh& mesh, int start_face_index,
@@ -107,10 +98,9 @@ std::set<int> AggregateAdjacentCoplanarMeshFaces(const GeoMesh& mesh, int start_
 
   // Traverse adjacent faces, collecting coplanar ones.
   std::set<int> mergeable_faces_indices{start_face_index};
-  math::Vector3 start_face_plane_normal;
-  math::Vector3 start_face_plane_coordinate;
-  if (IsMeshFacePlanar(mesh, faces[start_face_index], tolerance, &start_face_plane_normal,
-                       &start_face_plane_coordinate)) {
+  math::Vector3 start_face_n;
+  math::Vector3 start_face_p;
+  if (IsMeshFacePlanar(mesh, faces[start_face_index], tolerance, &start_face_n, &start_face_p)) {
     std::queue<int> faces_indices_to_visit({start_face_index});
     while (!faces_indices_to_visit.empty()) {
       int face_index = faces_indices_to_visit.front();
@@ -125,8 +115,7 @@ std::set<int> AggregateAdjacentCoplanarMeshFaces(const GeoMesh& mesh, int start_
         if (visited_faces_indices->count(adjacent_face_index) > 0) {
           continue;
         }
-        if (IsMeshFaceCoplanarWithPlane(mesh, faces[adjacent_face_index], start_face_plane_normal,
-                                        start_face_plane_coordinate, tolerance)) {
+        if (IsMeshFaceCoplanarWithPlane(mesh, faces[adjacent_face_index], start_face_n, start_face_p, tolerance)) {
           mergeable_faces_indices.insert(adjacent_face_index);
           faces_indices_to_visit.push(adjacent_face_index);
         }

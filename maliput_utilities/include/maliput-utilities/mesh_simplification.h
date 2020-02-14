@@ -18,14 +18,14 @@ namespace maliput {
 namespace utility {
 namespace mesh {
 
-/// Computes the minimum distance from a plane formed by a normal vector, `plane_normal` and a coordinate in the plane,
-/// `plane_coordinate`, to a extern `coordinate`.
-/// @param[in] plane_normal Is a vector normal to the plane.
-/// @param[in] plane_coordinate Is a coordinate in the plane.
-/// @param[in] coordinate Is a coordinate out of the plane.
-/// @return The minimum distance from the plane to the `coordinate`.
-double DistanceToAPlane(const math::Vector3 plane_normal, const math::Vector3 plane_coordinate,
-                        const math::Vector3 coordinate);
+/// Let $B$ be a plane in the 3D Inertial Frame defined by a point $p$ and a normal
+/// non-zero vector $n$, and let $q$ be another point in the 3D Inertial Frame. This method
+/// returns the Euclidean distance of $q$ to $B$.
+/// @param[in] n Is a vector normal to the plane.
+/// @param[in] p Is a coordinate in the plane.
+/// @param[in] q Is a coordinate out of the plane.
+/// @return The Euclidean distance of `q` point to the plane $B$.
+double DistanceToAPlane(const math::Vector3 n, const math::Vector3 p, const math::Vector3 q);
 
 /// Index for a directed edge in a GeoMesh.
 struct DirectedEdgeIndex {
@@ -118,7 +118,7 @@ const math::Vector3& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFac
 
 /// Checks if all the IndexFace::Vertex instances, from @p first to
 /// @p last, in the given @p mesh lie on the provided plane
-/// formed by @p plane_normal and @p plane_coordinate by
+/// defined by a normal non-zero vector @p n and a point @p p by
 /// verifying all of them are within one @p tolerance distance, in
 /// meters, away from it along the line subtended by its normal.
 /// @pre Given @p vertices belong to the @p mesh.
@@ -126,31 +126,30 @@ const math::Vector3& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFac
 ///          will abort execution.
 /// @tparam InputIt An IndexFace::Vertex container iterator type.
 template <typename InputIt>
-bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const math::Vector3& plane_normal,
-                              const math::Vector3& plane_coordinate, double tolerance);
+bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const math::Vector3& n,
+                              const math::Vector3& p, double tolerance);
 
 /// Checks if the @p face in the given @p mesh is coplanar with the
-/// given plane formed by @p plane_normal and @p plane_coordinate,
+/// given plane defined by a normal non-zero vector @p n and a point @p p,
 /// by verifying if all @p face vertices are within
 /// one @p tolerance distance, in meters, from it.
 /// @pre Given @p face belongs to the @p mesh.
 /// @warning If any of the preconditions is not met, this function
 ///          will abort execution.
-bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face, const math::Vector3& plane_normal,
-                                 const math::Vector3& plane_coordinate, double tolerance);
+bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face, const math::Vector3& n,
+                                 const math::Vector3& p, double tolerance);
 
 /// Checks if the @p face in the given @p mesh is planar, by verifying
 /// all @p face vertices lie on a plane using the given @p tolerance
 /// (see DoMeshVerticesLieOnPlane()). Said plane, built out of the
 /// first vertex position and normal in the @p face, is returned as
-/// a plane formed by @p plane_normal and @p plane_coordinate.
+/// a plane defined by a point @p n and normal non-zero vector @p p.
 /// @pre Given @p plane is not nullptr.
 /// @pre Given @p face belongs to the @p mesh.
 /// @pre Given @p face has at least three (3) vertices.
 /// @warning If any of the preconditions is not met, this function
 ///          will abort execution.
-bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face, double tolerance, math::Vector3* plane_normal,
-                      math::Vector3* plane_coordinate);
+bool IsMeshFacePlanar(const GeoMesh& mesh, const IndexFace& face, double tolerance, math::Vector3* n, math::Vector3* p);
 
 /// Aggregates all coplanar faces adjacent to the referred face in the @p mesh.
 /// @param mesh Mesh where faces are to be found.
