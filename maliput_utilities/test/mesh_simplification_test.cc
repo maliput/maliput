@@ -7,6 +7,15 @@ namespace utility {
 namespace mesh {
 namespace {
 
+GTEST_TEST(DistanceToAPlane, GetDistance) {
+  const math::Vector3 plane_normal{1., -3., 2.};
+  const math::Vector3 plane_coordinate{1., 2., 3.};
+  const math::Vector3 coordinate{6., 4., 8.};
+  const double kExpected{9 * std::sqrt(14) / 14};
+  const double kTolerance{1e-15};
+  EXPECT_NEAR(DistanceToAPlane(plane_normal, plane_coordinate, coordinate), kExpected, kTolerance);
+}
+
 // Tests equality and inequality operator overloads
 // for DirectedEdgeIndex instances.
 GTEST_TEST(DirectedEdgeIndexTest, Equality) {
@@ -142,9 +151,6 @@ class GeoMeshSimplificationTest : public ::testing::Test {
   const math::Vector3 kVertexGPosition{3., 1., 1.};
   const math::Vector3 kVertexHPosition{2., 2., -1.};
   const math::Vector3 kVertexIPosition{0., 2., 1.};
-  const drake::Vector3<double> kNormalVectorDrake{kNormalVector.x(), kNormalVector.y(), kNormalVector.z()};
-  const drake::Vector3<double> kVertexAPositionDrake{kVertexAPosition.x(), kVertexAPosition.y(), kVertexAPosition.z()};
-  const drake::Vector3<double> kVertexCPositionDrake{kVertexCPosition.x(), kVertexCPosition.y(), kVertexCPosition.z()};
 
   const int kFirstQuadIndex{0};
   const int kSecondQuadIndex{1};
@@ -326,37 +332,39 @@ TEST_F(GeoMeshSimplificationTest, FaceVertexNormal) {
 }
 
 TEST_F(GeoMeshSimplificationTest, VerticesOnPlane) {
-  const Hyperplane3<double> planeA(kNormalVectorDrake, kVertexAPositionDrake);
-
   const std::vector<IndexFace::Vertex>& first_quad_vertices = faces()[kFirstQuadIndex].vertices();
-  EXPECT_TRUE(
-      DoMeshVerticesLieOnPlane(mesh(), first_quad_vertices.begin(), first_quad_vertices.end(), planeA, kAlmostExact));
+  EXPECT_TRUE(DoMeshVerticesLieOnPlane(mesh(), first_quad_vertices.begin(), first_quad_vertices.end(), kNormalVector,
+                                       kVertexAPosition, kAlmostExact));
 
   const std::vector<IndexFace::Vertex>& second_quad_vertices = faces()[kSecondQuadIndex].vertices();
-  EXPECT_TRUE(
-      DoMeshVerticesLieOnPlane(mesh(), second_quad_vertices.begin(), second_quad_vertices.end(), planeA, kAlmostExact));
+  EXPECT_TRUE(DoMeshVerticesLieOnPlane(mesh(), second_quad_vertices.begin(), second_quad_vertices.end(), kNormalVector,
+                                       kVertexAPosition, kAlmostExact));
 
   const std::vector<IndexFace::Vertex>& triangle_vertices = faces()[kTriangleIndex].vertices();
-  EXPECT_FALSE(
-      DoMeshVerticesLieOnPlane(mesh(), triangle_vertices.begin(), triangle_vertices.end(), planeA, kAlmostExact));
+  EXPECT_FALSE(DoMeshVerticesLieOnPlane(mesh(), triangle_vertices.begin(), triangle_vertices.end(), kNormalVector,
+                                        kVertexAPosition, kAlmostExact));
 }
 
 TEST_F(GeoMeshSimplificationTest, CoplanarFaces) {
-  const Hyperplane3<double> planeA(kNormalVectorDrake, kVertexAPositionDrake);
-  EXPECT_TRUE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kFirstQuadIndex], planeA, kAlmostExact));
-  EXPECT_TRUE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kSecondQuadIndex], planeA, kAlmostExact));
-  EXPECT_FALSE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kTriangleIndex], planeA, kAlmostExact));
-  EXPECT_FALSE(IsMeshFaceCoplanarWithPlane(mesh(), faces()[kThirdQuadIndex], planeA, kAlmostExact));
+  EXPECT_TRUE(
+      IsMeshFaceCoplanarWithPlane(mesh(), faces()[kFirstQuadIndex], kNormalVector, kVertexAPosition, kAlmostExact));
+  EXPECT_TRUE(
+      IsMeshFaceCoplanarWithPlane(mesh(), faces()[kSecondQuadIndex], kNormalVector, kVertexAPosition, kAlmostExact));
+  EXPECT_FALSE(
+      IsMeshFaceCoplanarWithPlane(mesh(), faces()[kTriangleIndex], kNormalVector, kVertexAPosition, kAlmostExact));
+  EXPECT_FALSE(
+      IsMeshFaceCoplanarWithPlane(mesh(), faces()[kThirdQuadIndex], kNormalVector, kVertexAPosition, kAlmostExact));
 }
 
 TEST_F(GeoMeshSimplificationTest, PlanarFaces) {
-  Hyperplane3<double> plane;
-  EXPECT_TRUE(IsMeshFacePlanar(mesh(), faces()[kFirstQuadIndex], kAlmostExact, &plane));
-  EXPECT_NEAR(plane.absDistance(kVertexCPositionDrake), 0., kAlmostExact);
-  EXPECT_FALSE(IsMeshFacePlanar(mesh(), faces()[kThirdQuadIndex], kAlmostExact, &plane));
+  math::Vector3 plane_normal;
+  math::Vector3 plane_coordinate;
+  EXPECT_TRUE(IsMeshFacePlanar(mesh(), faces()[kFirstQuadIndex], kAlmostExact, &plane_normal, &plane_coordinate));
+  EXPECT_NEAR(DistanceToAPlane(plane_normal, plane_coordinate, kVertexCPosition), 0., kAlmostExact);
+  EXPECT_FALSE(IsMeshFacePlanar(mesh(), faces()[kThirdQuadIndex], kAlmostExact, &plane_normal, &plane_coordinate));
   // Triangle face would be planar BUT its specified normal does not
   // match that of the plane its vertices define.
-  EXPECT_FALSE(IsMeshFacePlanar(mesh(), faces()[kTriangleIndex], kAlmostExact, &plane));
+  EXPECT_FALSE(IsMeshFacePlanar(mesh(), faces()[kTriangleIndex], kAlmostExact, &plane_normal, &plane_coordinate));
 }
 
 TEST_F(GeoMeshSimplificationTest, FaceMerging) {
