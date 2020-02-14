@@ -1,7 +1,7 @@
 #pragma once
 
 /// @file
-/// To log with `maliput::logger`, you should:
+/// To log with `maliput::common::logger`, you should:
 ///
 /// <pre>
 ///   maliput::log()->trace("Trace message: {} {}", something, some_other);
@@ -10,6 +10,7 @@
 /// Similarly, it provides:
 ///
 /// <pre>
+///   maliput::log()->trace(...);
 ///   maliput::log()->debug(...);
 ///   maliput::log()->info(...);
 ///   maliput::log()->warn(...);
@@ -59,133 +60,195 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 /// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <map>
+#include <memory>
 #include <string>
-
-/// @note spdlog support is provided by Drake's installation.
-
-#ifdef DOXYGEN
-/// A preprocessor macro set by Drake's cmake
-/// configuration for spdlog at bundling time and available when
-/// incorporating Drake as a dependency with it.
-/// @see https://github.com/RobotLocomotion/drake/blob/master/tools/workspace/spdlog/package-create-cps.py#L28
-#define HAVE_SPDLOG
-#endif
-
-#ifdef HAVE_SPDLOG
-
-#include <spdlog/fmt/ostr.h>
-#include <spdlog/spdlog.h>
-
-#else  // HAVE_SPDLOG
-
-#include "maliput/common/maliput_copyable.h"
-
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#endif  // HAVE_SPDLOG
+#include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
+namespace common {
 
-#ifdef HAVE_SPDLOG
+using string_view_t = fmt::basic_string_view<char>;
 
-namespace logging {
+namespace logger {
 
-using Logger = spdlog::logger;
+/// Logging levels.
+enum level {
+  off = 0,
+  trace,
+  debug,
+  info,
+  warn,
+  error,
+  critical,
+  unchanged,
+};
 
-using Sink = spdlog::sinks::sink;
+/// Convenient conversion from string to level enum.
+const std::map<std::string, logger::level> kStringToLevel{
+    {std::string{"off"}, logger::level::off},           {std::string{"trace"}, logger::level::trace},
+    {std::string{"debug"}, logger::level::debug},       {std::string{"info"}, logger::level::info},
+    {std::string{"warn"}, logger::level::warn},         {std::string{"error"}, logger::level::error},
+    {std::string{"critical"}, logger::level::critical}, {std::string{"unchanged"}, logger::level::unchanged}};
 
-/// True only if spdlog is enabled in this build.
-constexpr bool kHaveSpdlog = true;
+/// Convenient conversion from level enum to string.
+const std::map<int, std::string> kLevelToString{
+    {logger::level::off, std::string{"off"}},           {logger::level::trace, std::string{"trace"}},
+    {logger::level::debug, std::string{"debug"}},       {logger::level::info, std::string{"info"}},
+    {logger::level::warn, std::string{"warn"}},         {logger::level::error, std::string{"error"}},
+    {logger::level::critical, std::string{"critical"}}, {logger::level::unchanged, std::string{"unchanged"}}};
 
-}  // namespace logging
+/// Convenient conversion from level enum to message.
+const std::map<int, std::string> kLevelToMessage{
+    {logger::level::trace, "[TRACE] "},  {logger::level::debug, "[DEBUG] "}, {logger::level::info, "[INFO] "},
+    {logger::level::warn, "[WARNING] "}, {logger::level::error, "[ERROR] "}, {logger::level::critical, "[CRITICAL] "},
+};
 
-#else  // HAVE_SPDLOG
-namespace logging {
-constexpr bool kHaveSpdlog = false;
+}  // namespace logger
 
-/// A stubbed-out version of `spdlog::logger`.
-/// Implements only those methods that we expect to use, as
-/// spdlog's API does change from time to time.
+/// Interface of a sink to dump all log messages.
+class SinkBase {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(SinkBase);
+  SinkBase() = default;
+  virtual ~SinkBase() = default;
+
+  /// Log the message
+  /// @param msg Is the message to be logged.
+  virtual void log(const string_view_t& msg) = 0;
+
+  /// Empty the buffer.
+  virtual void flush() = 0;
+};
+
+/// Sink that uses `std::cout` to dump the log messages.
+class Sink : public SinkBase {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Sink);
+  Sink() = default;
+  ~Sink() = default;
+
+  void log(const string_view_t& msg) override { fmt::print(msg); }
+
+  void flush() override{};
+};
+
+/// A logger class implementation.
+///
+/// Logger will dump all messages to a sink (@see SinkBase) which will be in charge
+/// of serializing the messages to the appropriate channel. By default, Sink
+/// implementation is used.
+///
+/// It provides six different log levels, @see logger::level , which can be filtered based
+/// on the severity of the  message.
 class Logger {
  public:
-  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Logger)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Logger);
 
   Logger() = default;
 
-  template <typename... Args>
-  void trace(const char*, const Args&...) {}
-  template <typename... Args>
-  void debug(const char*, const Args&...) {}
-  template <typename... Args>
-  void info(const char*, const Args&...) {}
-  template <typename... Args>
-  void warn(const char*, const Args&...) {}
-  template <typename... Args>
-  void error(const char*, const Args&...) {}
-  template <typename... Args>
-  void critical(const char*, const Args&...) {}
+  /// \addtogroup levelmethods Logging Level Methods.
+  /// @param fmt Is a fmt format string. See https://github.com/fmtlib/fmt.
+  /// @param args Is an argument list representing objects to be formatted.
+  /// @{
 
-  template <typename T>
-  void trace(const T&) {}
-  template <typename T>
-  void debug(const T&) {}
-  template <typename T>
-  void info(const T&) {}
-  template <typename T>
-  void warn(const T&) {}
-  template <typename T>
-  void error(const T&) {}
-  template <typename T>
-  void critical(const T&) {}
+  /// Log the message showing trace level prefix.
+  template <typename... Args>
+  void trace(string_view_t fmt, const Args&... args) {
+    log(logger::level::trace, fmt, args...);
+  }
+
+  /// Log the message showing debug level prefix.
+  template <typename... Args>
+  void debug(string_view_t fmt, const Args&... args) {
+    log(logger::level::debug, fmt, args...);
+  }
+
+  /// Log the message showing info level prefix.
+  template <typename... Args>
+  void info(string_view_t fmt, const Args&... args) {
+    log(logger::level::info, fmt, args...);
+  }
+
+  /// Log the message showing warning level prefix.
+  template <typename... Args>
+  void warn(string_view_t fmt, const Args&... args) {
+    log(logger::level::warn, fmt, args...);
+  }
+
+  /// Log the message showing error level prefix.
+  template <typename... Args>
+  void error(string_view_t fmt, const Args&... args) {
+    log(logger::level::error, fmt, args...);
+  }
+
+  /// Log the message showing critical level prefix.
+  template <typename... Args>
+  void critical(string_view_t fmt, const Args&... args) {
+    log(logger::level::critical, fmt, args...);
+  }
+  /// @}
+
+  /// Set a sink.
+  /// @param sink Is a SinkBase implementation.
+  ///
+  /// @throw common::assertion_error When `sink` is nullptr.
+  void set_sink(std::unique_ptr<common::SinkBase> sink);
+
+  /// Get the current sink.
+  /// @return A pointer to the current sink.
+  SinkBase* get_sink() { return sink_.get(); }
+
+  /// Sets the minimum level of messages to be logged.
+  /// @param log_level Must be a level enum value from the level enumerations: `trace`, `debug`,
+  /// `info`, `warning`, `error`, `critical` or `off`.
+  /// @return The string value of the previous log level. @see logger::kLevelToString.
+  std::string set_level(logger::level log_level);
+
+ private:
+  // Send the message to the sink.
+  // @param log_level Level of the message.
+  // @param fmt Is a fmt format string. See https://github.com/fmtlib/fmt.
+  // @param args Is an argument list representing objects to be formatted.
+  template <typename... Args>
+  void log(logger::level log_level, const string_view_t& fmt, const Args&... args);
+
+  // Sink where the messages will be dumped to.
+  std::unique_ptr<common::SinkBase> sink_{std::make_unique<common::Sink>()};
+
+  // Minimum level of messages to be log.
+  logger::level level_{logger::level::info};
 };
 
-// A stubbed-out version of `spdlog::sinks::sink`.
-class Sink {
- public:
-  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Sink)
-  Sink() = default;
-};
-
-}  // namespace logging
-
-#define SPDLOG_TRACE(logger, ...)
-#define SPDLOG_DEBUG(logger, ...)
-
-#endif  // HAVE_SPDLOG
-
-/// Retrieve an instance of a logger to use for logging; for example:
-///
-/// <pre>
-///   maliput::log()->info("potato!")
-/// </pre>
-///
-/// See the logger.h documentation for a short tutorial.
-logging::Logger* log();
-
-namespace logging {
-
-/// (Advanced) Retrieves the default sink for all Maliput logs.
-/// When spdlog is enabled, the return value can be cast to
-/// spdlog::sinks::dist_sink_mt and thus allows consumers of Maliput
-/// to redirect Maliput's text logs to locations other than the default
-/// of stderr.  When spdlog is disabled, the return value is an empty class.
-Sink* get_dist_sink();
+template <typename... Args>
+void Logger::log(logger::level lev, const string_view_t& fmt, const Args&... args) {
+  if (lev >= level_) {
+    fmt::memory_buffer msg;
+    format_to(msg, fmt::format(logger::kLevelToMessage.at(lev)));
+    format_to(msg, fmt::format(fmt, args...));
+    sink_->log(to_string(msg));
+  }
+}
 
 /// Invokes `maliput::log()->set_level(level)`.
 ///
-/// @param level Must be a string from spdlog enumerations: `trace`, `debug`,
-/// `info`, `warn`, `err`, `critical`, `off`, or `unchanged` (not an enum, but
-/// useful for command-line).
+/// @param level Must be a string from the level enumerations: `trace`, `debug`,
+/// `info`, `warning`, `error`, `critical` or `off`.
+/// @return The string value of the previous log level.
 ///
-/// @return The string value of the previous log level. When spdlog is
-///         disabled, an empty string is returned.
-///
-/// @throws maliput::common::assertion_error When `level` is not one of the
-///         predefined values for spdlog.
-/// @throws maliput::common::assertion_error When log()->level() is not one
-///         of the predefined values for spdlog.
+/// @throw std::out_of_range When `level` is not one of the
+///         predefined values.
+/// @relatesalso Logger.
 std::string set_log_level(const std::string& level);
 
-}  // namespace logging
+}  // namespace common
+
+/// Retrieve an instance of a logger to use for logger.
+/// @relatesalso common::Logger.
+common::Logger* log();
+
 }  // namespace maliput
