@@ -30,6 +30,15 @@ namespace mesh {
 ///          abort execution.
 double DistanceToAPlane(const math::Vector3 n, const math::Vector3 p, const math::Vector3 q);
 
+/// Let \f$F(t) = P + Rt\f$ be a parametric line in the 3D Inertial Frame defined by a point \f$P\f$
+/// and a vector \f$R\f$, and let \f$Q\f$ be another point in the 3D Inertial Frame. This function
+/// returns the Euclidean distance of \f$Q\f$ to \f$F(t)\f$.
+/// @param p Is the origin of the parametric line.
+/// @param r Is the direction of the parametric line.
+/// @param q Is a coordinate out of the line.
+/// @return The Euclidean distance of `q` point to the line \f$F(t)\f$.
+double DistanceToALine(const math::Vector3& p, const math::Vector3& r, const math::Vector3& q);
+
 /// Index for a directed edge in a GeoMesh.
 struct DirectedEdgeIndex {
   /// Returns this edge but reversed.
@@ -103,9 +112,6 @@ using FaceAdjacencyMap = std::unordered_map<int, std::vector<FaceEdgeIndex>>;
 /// @warning If any of the preconditions is not met, this function will
 ///          abort execution.
 FaceAdjacencyMap ComputeFaceAdjacencyMap(const std::vector<IndexFace>& faces);
-
-template <typename T>
-using Hyperplane3 = Eigen::Hyperplane<T, 3>;
 
 /// Gets global position of the @p vertex in the given @p mesh.
 /// @pre Given @p vertex belongs to the @p mesh.
@@ -238,8 +244,8 @@ const IndexFace::Vertex& MeshFaceVertexAt(const GeoMesh& mesh, const FaceVertexI
 /// @param to_vertex A function to retrieve the vertex associated with
 ///                  an element of the collection (may be a pass-through).
 /// @param to_edge A function to construct an edge out of a pair of
-///                vertices. Said edge MUST support a .distance() method
-///                taking a vertex as its sole argument.
+///                vertices. This function must return a std::pair containing
+///                the origin vertex and the unit direction vector of the parametric line.
 /// @param tolerance Simplification tolerance, in distance units.
 /// @param output Output iterator for the simplification result.
 /// @tparam InputIt Input iterators type.
@@ -254,15 +260,12 @@ void ApplyDouglasPeuckerSimplification(InputIt first, InputIt last, VertexFn to_
     return;
   }
 
-  const auto edge = to_edge(to_vertex(*first), to_vertex(*last));
-  auto farthest = std::max_element(first, last, [&edge, &to_vertex](const auto& lhs, const auto& rhs) {
-    const drake::Vector3<double> to_vertex_lhs_drake{to_vertex(lhs).x(), to_vertex(lhs).y(), to_vertex(lhs).z()};
-    const drake::Vector3<double> to_vertex_rhs_drake{to_vertex(rhs).x(), to_vertex(rhs).y(), to_vertex(rhs).z()};
-    return (edge.distance(to_vertex_lhs_drake) < edge.distance(to_vertex_rhs_drake));
+  const std::pair<math::Vector3, math::Vector3> point_and_direction = to_edge(to_vertex(*first), to_vertex(*last));
+  auto farthest = std::max_element(first, last, [&point_and_direction, &to_vertex](const auto& lhs, const auto& rhs) {
+    return DistanceToALine(point_and_direction.first, point_and_direction.second, to_vertex(lhs)) <
+           DistanceToALine(point_and_direction.first, point_and_direction.second, to_vertex(rhs));
   });
-  const math::Vector3 to_vertex_math{to_vertex(*farthest)};
-  const drake::Vector3<double> to_vertex_drake{to_vertex_math.x(), to_vertex_math.y(), to_vertex_math.z()};
-  if (edge.distance(to_vertex_drake) > tolerance) {
+  if (DistanceToALine(point_and_direction.first, point_and_direction.second, to_vertex(*farthest)) > tolerance) {
     ApplyDouglasPeuckerSimplification(first, farthest, to_vertex, to_edge, tolerance, output);
     ApplyDouglasPeuckerSimplification(farthest + 1, last, to_vertex, to_edge, tolerance, output);
   } else {
