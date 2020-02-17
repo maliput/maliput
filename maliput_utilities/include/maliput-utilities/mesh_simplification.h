@@ -18,13 +18,13 @@ namespace maliput {
 namespace utility {
 namespace mesh {
 
-/// Let $B$ be a plane in the 3D Inertial Frame defined by a point $p$ and a normal
-/// non-zero vector $n$, and let $q$ be another point in the 3D Inertial Frame. This method
-/// returns the Euclidean distance of $q$ to $B$.
+/// Let \f$B\f$ be a plane in the 3D Inertial Frame defined by a point \f$p\f$ and a normal
+/// non-zero vector \f$n\f$, and let \f$q\f$ be another point in the 3D Inertial Frame. This method
+/// returns the Euclidean distance of \f$q\f$ to \f$B\f$.
 /// @param[in] n Is a vector normal to the plane.
 /// @param[in] p Is a coordinate in the plane.
 /// @param[in] q Is a coordinate out of the plane.
-/// @return The Euclidean distance of `q` point to the plane $B$.
+/// @return The Euclidean distance of `q` point to the plane \f$B\f$.
 double DistanceToAPlane(const math::Vector3 n, const math::Vector3 p, const math::Vector3 q);
 
 /// Index for a directed edge in a GeoMesh.
