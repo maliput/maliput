@@ -13,7 +13,6 @@ macro(add_dependencies_to_test target)
 
       ament_target_dependencies(${target}
         "maliput"
-        "drake"
       )
 
       target_link_libraries(${target}
