@@ -51,7 +51,6 @@ class Junction : public api::Junction {
 
   ~Junction() override = default;
 
-#ifndef DRAKE_DOXYGEN_CXX
   // Notifies Junction of its parent RoadGeometry.
   // This may only be called, once, by a RoadGeometry.
   //
@@ -70,7 +69,6 @@ class Junction : public api::Junction {
   void AttachToRoadGeometry(common::Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry,
                             const std::function<void(const api::Segment*)>& segment_indexing_callback,
                             const std::function<void(const api::Lane*)>& lane_indexing_callback);
-#endif  // DRAKE_DOXYGEN_CXX
 
  private:
   // The non-template implementation of AddSegment<T>()

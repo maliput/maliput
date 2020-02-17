@@ -37,7 +37,6 @@ class Lane : public api::Lane {
   /// or nullptr if the finish end hasn't been added to a BranchPoint yet.
   BranchPoint* mutable_finish_branch_point() { return finish_branch_point_; }
 
-#ifndef DRAKE_DOXYGEN_CXX
   // Notifies Lane of its parent Segment.
   // This may only be called, once, by a Segment.
   //
@@ -66,7 +65,6 @@ class Lane : public api::Lane {
   // @pre `branch_point` is non-null.
   // @pre The "finish" BranchPoint has not already been set.
   void SetFinishBranchPoint(common::Passkey<BranchPoint>, BranchPoint* branch_point);
-#endif  // DRAKE_DOXYGEN_CXX
 
   ~Lane() override = default;
 

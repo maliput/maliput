@@ -1,7 +1,5 @@
 #include "maliput/geometry_base/segment.h"
 
-#include "drake/common/drake_throw.h"
-
 namespace maliput {
 namespace geometry_base {
 

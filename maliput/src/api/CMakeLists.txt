@@ -30,7 +30,6 @@ target_include_directories(api
 target_link_libraries(api
   PUBLIC
     common
-    drake::drake
     math
 )
 

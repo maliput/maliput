@@ -1,7 +1,4 @@
-#include "pybind11/eigen.h"
 #include "pybind11/pybind11.h"
-
-#include "drake/math/roll_pitch_yaw.h"
 
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"

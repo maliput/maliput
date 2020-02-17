@@ -5,8 +5,6 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/drake_throw.h"
-
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"

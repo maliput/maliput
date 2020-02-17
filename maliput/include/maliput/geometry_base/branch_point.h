@@ -50,7 +50,6 @@ class BranchPoint : public api::BranchPoint {
 
   ~BranchPoint() override = default;
 
-#ifndef DRAKE_DOXYGEN_CXX
   // Notifies BranchPoint of its parent RoadGeometry.
   // This may only be called, once, by a RoadGeometry.
   //
@@ -59,7 +58,6 @@ class BranchPoint : public api::BranchPoint {
   // @pre `road_geometry` is non-null.
   // @pre Parent RoadGeometry has not already been set.
   void AttachToRoadGeometry(common::Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry);
-#endif  // DRAKE_DOXYGEN_CXX
 
  private:
   // Common implementation for AddABranch() and AddBBranch().

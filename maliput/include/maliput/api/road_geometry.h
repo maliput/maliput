@@ -25,7 +25,7 @@ class Junction;
 using RoadGeometryId = TypeSpecificIdentifier<class RoadGeometry>;
 
 // TODO(maddog@tri.global)  This entire API should be templated on a
-//                          scalar type T like everything else in drake.
+//                          scalar type T.
 /// Abstract API for the geometry of a road network, including both
 /// the network topology and the geometry of its embedding in 3-space.
 class RoadGeometry {

@@ -29,16 +29,12 @@ macro(add_dependencies_to_test target)
           ${PROJECT_SOURCE_DIR}/test
       )
 
-      ament_target_dependencies(${target}
-          "drake"
-      )
-
       target_link_libraries(${target}
           api
           common
           maliput_test_utilities
           math
-          drake::drake)
+      )
 
     endif()
 endmacro()
