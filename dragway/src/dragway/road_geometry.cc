@@ -3,8 +3,6 @@
 #include <cmath>
 #include <memory>
 
-#include "drake/math/saturate.h"
-
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
@@ -170,9 +168,9 @@ api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::GeoPosition& g
       follows.
   */
   api::GeoPosition closest_position;
-  closest_position.set_x(drake::math::saturate(geo_pos.x(), min_x, max_x));
-  closest_position.set_y(drake::math::saturate(geo_pos.y(), min_y, max_y));
-  closest_position.set_z(drake::math::saturate(geo_pos.z(), min_z, max_z));
+  closest_position.set_x(std::clamp(geo_pos.x(), min_x, max_x));
+  closest_position.set_y(std::clamp(geo_pos.y(), min_y, max_y));
+  closest_position.set_z(std::clamp(geo_pos.z(), min_z, max_z));
 
   const int closest_lane_index = GetLaneIndex(closest_position);
   const Lane* closest_lane = dynamic_cast<const Lane*>(junction_.segment(0)->lane(closest_lane_index));

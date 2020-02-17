@@ -13,7 +13,7 @@ target_include_directories(
 target_link_libraries(dragway_test_utilities
   dragway
   maliput::api
-  drake::drake)
+)
 
 install(
     TARGETS dragway_test_utilities

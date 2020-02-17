@@ -20,13 +20,11 @@ target_link_libraries(dragway
   maliput::api
   maliput::common
   maliput::geometry_base
-  drake::drake
 )
 
 ament_target_dependencies(dragway
     "maliput-utilities"
     "maliput"
-    "drake"
 )
 
 ##############################################################################
