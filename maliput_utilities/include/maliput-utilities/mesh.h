@@ -271,10 +271,7 @@ class SrhFace {
     GeoFace geo_face;
     for (const api::LanePosition& srh : vertices_) {
       api::GeoPosition xyz(lane->ToGeoPosition(srh));
-      /// TODO(francocipollone): Once math::quaternion is implemented this could be replaced by math::Vector3.
-      const auto vector = lane->GetOrientation(srh).quat() *
-                          drake::Vector3<double>(normal_.srh().x(), normal_.srh().y(), normal_.srh().z());
-      api::GeoPosition n = api::GeoPosition::FromXyz({vector.x(), vector.y(), vector.z()});
+      api::GeoPosition n = api::GeoPosition::FromXyz(lane->GetOrientation(srh).quat() * normal_.srh());
       geo_face.push_vn(GeoVertex(xyz), GeoNormal(n));
     }
     return geo_face;

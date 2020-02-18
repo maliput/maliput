@@ -204,6 +204,34 @@ GTEST_TEST(VectorTest, Operators) {
     EXPECT_EQ(ss.str(), "{3, 4, 5, 6}");
   }
 }
+
+// The following test can be reproduced in Python with the following snippet:
+//
+// ```
+// import numpy as np
+//
+// a = [1, 2, 3]
+// b = [4, 5, 6]
+//
+// np.cross(a, a)
+// np.cross(a, b)
+// ```
+GTEST_TEST(Vector3, CorssProduct) {
+  const double kTolerance{1e-12};
+  const Vector3 a(1., 2., 3.);
+  const Vector3 b(4., 5., 6.);
+
+  Vector3 dut = a.cross(a);
+  EXPECT_NEAR(dut.x(), 0., kTolerance);
+  EXPECT_NEAR(dut.x(), 0., kTolerance);
+  EXPECT_NEAR(dut.x(), 0., kTolerance);
+
+  dut = a.cross(b);
+  EXPECT_NEAR(dut.x(), -3., kTolerance);
+  EXPECT_NEAR(dut.y(), 6., kTolerance);
+  EXPECT_NEAR(dut.z(), -3., kTolerance);
+}
+
 GTEST_TEST(VectorTest, StaticMethods) {
   {  // 2- dimension vector.
     EXPECT_EQ(Vector2::Zero(), Vector2(0., 0.));

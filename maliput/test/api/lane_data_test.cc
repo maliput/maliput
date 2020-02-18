@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/eigen_types.h"
-
 #include "maliput/common/assertion_error.h"
 #include "maliput/math/matrix.h"
 #include "maliput/math/quaternion.h"
@@ -183,27 +181,23 @@ const double kRotationTolerance = 1e-15;
 
 // TODO(francocipollone): Once RollPitchYaw and Quaternion implementation are
 //                        complete the followings arguments of the CompareVectors could be modified.
-#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                               \
-  do {                                                                                                      \
-    EXPECT_TRUE(math::test::CompareVectors(math::Vector4(dut.quat().coeffs().x(), dut.quat().coeffs().y(),  \
-                                                         dut.quat().coeffs().z(), dut.quat().coeffs().w()), \
-                                           math::Vector4(_x, _y, _z, _w), kRotationTolerance));             \
-    EXPECT_TRUE(math::test::CompareVectors(                                                                 \
-        math::Vector3(dut.rpy().roll_angle(), dut.rpy().pitch_angle(), dut.rpy().yaw_angle()),              \
-        math::Vector3(_ro, _pi, _ya), kRotationTolerance));                                                 \
-    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                       \
-    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                      \
-    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                        \
-    EXPECT_TRUE(math::test::CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                        \
+#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                                        \
+  do {                                                                                                               \
+    EXPECT_TRUE(math::test::CompareVectors(dut.quat().coeffs(), math::Vector4(_w, _x, _y, _z), kRotationTolerance)); \
+    EXPECT_TRUE(math::test::CompareVectors(                                                                          \
+        math::Vector3(dut.rpy().roll_angle(), dut.rpy().pitch_angle(), dut.rpy().yaw_angle()),                       \
+        math::Vector3(_ro, _pi, _ya), kRotationTolerance));                                                          \
+    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                                \
+    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                               \
+    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                                 \
+    EXPECT_TRUE(math::test::CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                                 \
   } while (0)
 
 class RotationTest : public ::testing::Test {
  protected:
   void SetUp() override {
     // A quaternion that rotates x->y, y->z, z->x...
-    twist_quat_ = drake::Quaternion<double>(
-        Eigen::AngleAxis<double>(M_PI * 2. / 3., drake::Vector3<double>(1.0, 1.0, 1.0).normalized()));
-
+    twist_quat_ = math::Quaternion(M_PI * 2. / 3., math::Vector3(1.0, 1.0, 1.0).normalized());
     nonnormalized_twist_quat_ = math::Quaternion(7. * twist_quat_.coeffs());
 
     twist_roll_ = M_PI / 2.;

@@ -176,6 +176,10 @@ Vector3 Vector3::UnitY() { return {0., 1., 0.}; }
 
 Vector3 Vector3::UnitZ() { return {0., 0., 1.}; }
 
+Vector3 Vector3::cross(const Vector3& v) const {
+  return {y() * v.z() - z() * v.y(), z() * v.x() - x() * v.z(), x() * v.y() - y() * v.x()};
+}
+
 Vector4 Vector4::UnitX() { return {1., 0., 0., 0.}; }
 
 Vector4 Vector4::UnitY() { return {0., 1., 0., 0.}; }
