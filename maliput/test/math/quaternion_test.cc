@@ -57,7 +57,7 @@ GTEST_TEST(Quaternion, VectorConstructor) {
 }
 
 GTEST_TEST(Quaternion, RotationMatrixRoundTrip) {
-  const double kMinAngle{- M_PI / 2.};
+  const double kMinAngle{-M_PI / 2.};
   const double kMaxAngle{kMinAngle + M_PI};
   const int kNAngles{5};
   const double kAngleStep{(kMaxAngle - kMinAngle) / static_cast<double>(kNAngles)};
