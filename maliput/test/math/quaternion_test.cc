@@ -403,7 +403,10 @@ GTEST_TEST(Quaternion, Slerp) {
   const Quaternion q2(RollPitchYaw(1.2, 2.3, -3.4).ToMatrix());
 
   const Quaternion q3 = q1.Slerp(1., q2);
-  EXPECT_TRUE(CompareVectors(Vector4(0.554528, -0.717339, 0.32579, 0.267925), q3.coeffs(), 1e-6));
+
+  // Degrading tolerance in this test on purpose because of the overhead in the
+  // computation and the expected result.
+  EXPECT_TRUE(CompareVectors(Vector4(0.554528, -0.717339, 0.32579, 0.267925), q3.coeffs(), 1e-6 /* tolerance */));
 }
 
 GTEST_TEST(Quaternion, Serialization) {
@@ -413,7 +416,42 @@ GTEST_TEST(Quaternion, Serialization) {
   EXPECT_EQ(ss.str(), "(w: 1, x: 2, y: 3, z: 4)");
 }
 
-// TODO(agalbachicar) Add tests for Quaternion::FromTwoVectors()
+GTEST_TEST(Quaternion, FromTwoVectors) {
+  const Vector3 kUnitX(1., 0., 0.);
+  const Vector3 kUnitY(0., 1., 0.);
+  const Vector3 kUnitZ(0., 0., 1.);
+
+  const double kW = std::sqrt(2.) / 2.;
+  const double kU = std::sqrt(2.) / 2.;
+
+  {  // X to Y.
+    const Quaternion dut = Quaternion::FromTwoVectors(kUnitX, kUnitY);
+    EXPECT_TRUE(CompareVectors(Vector4(kW, 0., 0., kU), dut.coeffs(), kTolerance));
+  }
+  {
+    Quaternion dut;
+    dut.SetFromTwoVectors(kUnitX, kUnitY);
+    EXPECT_TRUE(CompareVectors(Vector4(kW, 0., 0., kU), dut.coeffs(), kTolerance));
+  }
+  {  // Y to Z.
+    const Quaternion dut = Quaternion::FromTwoVectors(kUnitY, kUnitZ);
+    EXPECT_TRUE(CompareVectors(Vector4(kW, kU, 0., 0.), dut.coeffs(), kTolerance));
+  }
+  {
+    Quaternion dut;
+    dut.SetFromTwoVectors(kUnitY, kUnitZ);
+    EXPECT_TRUE(CompareVectors(Vector4(kW, kU, 0., 0.), dut.coeffs(), kTolerance));
+  }
+  {  // Z to X.
+    const Quaternion dut = Quaternion::FromTwoVectors(kUnitZ, kUnitX);
+    EXPECT_TRUE(CompareVectors(Vector4(kW, 0., kU, 0.), dut.coeffs(), kTolerance));
+  }
+  {
+    Quaternion dut;
+    dut.SetFromTwoVectors(kUnitZ, kUnitX);
+    EXPECT_TRUE(CompareVectors(Vector4(kW, 0., kU, 0.), dut.coeffs(), kTolerance));
+  }
+}
 
 }  // namespace
 }  // namespace test
