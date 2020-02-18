@@ -25,6 +25,9 @@ namespace mesh {
 /// @param[in] p Is a coordinate in the plane.
 /// @param[in] q Is a coordinate out of the plane.
 /// @return The Euclidean distance of `q` point to the plane \f$B\f$.
+/// @pre The norm of @p n is different from zero.
+/// @warning If any of the preconditions is not met, this function will
+///          abort execution.
 double DistanceToAPlane(const math::Vector3 n, const math::Vector3 p, const math::Vector3 q);
 
 /// Index for a directed edge in a GeoMesh.
@@ -143,8 +146,14 @@ bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face, con
 /// all @p face vertices lie on a plane using the given @p tolerance
 /// (see DoMeshVerticesLieOnPlane()). Said plane, built out of the
 /// first vertex position and normal in the @p face, is returned as
-/// a plane defined by a point @p n and normal non-zero vector @p p.
-/// @pre Given @p plane is not nullptr.
+/// a plane defined by a point @p p and a normal non-zero vector @p n.
+/// @param[in] mesh Is a World Frame mesh.
+/// @param[in] face Is a sequence of vertices with normals.
+/// @param[in] tolerance Is the tolerance to compute face planarity.
+/// @param[out] n Is a vector that with `p` define a plane that should contain all the face vertices.
+/// @param[out] p Is a point that with `n` define a plane that should contain all the face vertices.
+/// @pre Given @p n is not nullptr.
+/// @pre Given @p p is not nullptr.
 /// @pre Given @p face belongs to the @p mesh.
 /// @pre Given @p face has at least three (3) vertices.
 /// @warning If any of the preconditions is not met, this function

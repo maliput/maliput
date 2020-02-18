@@ -10,10 +10,17 @@ namespace {
 GTEST_TEST(DistanceToAPlane, GetDistance) {
   const math::Vector3 plane_normal{1., -3., 2.};
   const math::Vector3 plane_coordinate{1., 2., 3.};
-  const math::Vector3 coordinate{6., 4., 8.};
-  const double kExpected{9 * std::sqrt(14) / 14};
   const double kTolerance{1e-15};
-  EXPECT_NEAR(DistanceToAPlane(plane_normal, plane_coordinate, coordinate), kExpected, kTolerance);
+  {
+    const math::Vector3 coordinate{6., 4., 8.};
+    const double kExpectedDistanceToPlane{9 * std::sqrt(14) / 14};
+    EXPECT_NEAR(DistanceToAPlane(plane_normal, plane_coordinate, coordinate), kExpectedDistanceToPlane, kTolerance);
+  }
+  {
+    const math::Vector3 coordinate{3., 1., 0.5};
+    const double kExpectedDistanceToPlane{0.};
+    EXPECT_NEAR(DistanceToAPlane(plane_normal, plane_coordinate, coordinate), kExpectedDistanceToPlane, kTolerance);
+  }
 }
 
 // Tests equality and inequality operator overloads

@@ -10,7 +10,9 @@ namespace utility {
 namespace mesh {
 
 double DistanceToAPlane(const math::Vector3 n, const math::Vector3 p, const math::Vector3 q) {
-  return std::abs((n.dot(q) - n.dot(p)) / n.norm());
+  const double n_norm{n.norm()};
+  MALIPUT_DEMAND(n_norm != 0);
+  return std::abs((n.dot(q) - n.dot(p)) / n_norm);
 }
 
 InverseFaceEdgeMap ComputeInverseFaceEdgeMap(const std::vector<IndexFace>& faces) {
@@ -62,10 +64,10 @@ template <typename InputIt>
 bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const math::Vector3& n,
                               const math::Vector3& p, double tolerance) {
   return std::all_of(first, last, [&mesh, &n, &p, tolerance](const IndexFace::Vertex& vertex) {
-    const math::Vector3& x = GetMeshFaceVertexPosition(mesh, vertex);
-    const math::Vector3& n = GetMeshFaceVertexNormal(mesh, vertex);
-    const double ctheta = std::abs(n.dot(n.normalized()));
-    return (ctheta != 0. && DistanceToAPlane(n, p, x) / ctheta < tolerance);
+    const math::Vector3& x_vertex = GetMeshFaceVertexPosition(mesh, vertex);
+    const math::Vector3& n_vertex = GetMeshFaceVertexNormal(mesh, vertex);
+    const double ctheta = std::abs(n.dot(n_vertex.normalized()));
+    return (ctheta != 0. && DistanceToAPlane(n, p, x_vertex) / ctheta < tolerance);
   });
 }
 
