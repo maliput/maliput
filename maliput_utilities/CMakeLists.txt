@@ -12,8 +12,8 @@ project(maliput-utilities LANGUAGES C CXX VERSION 3.0.0)
 message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
 find_package(ament_cmake REQUIRED)
-find_package(drake_vendor REQUIRED)
 find_package(fmt 4.0.0 EXACT REQUIRED)
+find_package(gflags REQUIRED)
 find_package(maliput REQUIRED)
 ##############################################################################
 # Project Configuration
@@ -71,7 +71,6 @@ install(
 ament_export_include_directories(include)
 
 ament_export_dependencies(ament_cmake)
-ament_export_dependencies(drake)
 ament_export_dependencies(maliput)
 ament_export_interfaces(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 ament_package()

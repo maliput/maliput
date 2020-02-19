@@ -53,7 +53,7 @@ const std::vector<Material> kMaterial{
     {kGrayedLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9},
     {kGrayedMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}};
 
-std::string FormatDrakeVector3AsRow(const math::Vector3& vec) {
+std::string FormatVector3AsRow(const math::Vector3& vec) {
   return fmt::format("{} {} {}", std::to_string(vec.x()), std::to_string(vec.y()), std::to_string(vec.z()));
 }
 
@@ -65,9 +65,9 @@ std::string FormatMaterial(const Material& mat, int precision) {
       "Ks {}\n"
       "Ns {}\n"
       "illum 2\n"
-      "d {:.{p}f}\n",
-      mat.name, FormatDrakeVector3AsRow(mat.ambient), FormatDrakeVector3AsRow(mat.diffuse),
-      FormatDrakeVector3AsRow(mat.specular), mat.shinines, 1.0 - mat.transparency, fmt::arg("p", precision));
+      "d {:.{}f}\n",
+      mat.name, FormatVector3AsRow(mat.ambient), FormatVector3AsRow(mat.diffuse), FormatVector3AsRow(mat.specular),
+      mat.shinines, 1.0 - mat.transparency, precision);
 }
 
 // Compute the maximum step in s-coordinates that can approximate the distance
@@ -82,7 +82,7 @@ std::string FormatMaterial(const Material& mat, int precision) {
 // left most and right most lines of the `lane`'s segment
 // surface is bigger than `grid_unit` or the end of the `lane` is reached.
 double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_unit) {
-  DRAKE_DEMAND(lane != nullptr);
+  MALIPUT_DEMAND(lane != nullptr);
 
   const double length = lane->length();
   const double min_step = std::min(grid_unit, length - s0);

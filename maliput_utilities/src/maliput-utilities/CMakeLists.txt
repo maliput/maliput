@@ -18,7 +18,6 @@ target_include_directories(maliput-utilities
 
 ament_target_dependencies(maliput-utilities
   PUBLIC
-    "drake"
     "maliput"
 )
 
