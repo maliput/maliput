@@ -21,9 +21,9 @@ namespace mesh {
 /// Let \f$B\f$ be a plane in the 3D Inertial Frame defined by a point \f$p\f$ and a normal
 /// non-zero vector \f$n\f$, and let \f$q\f$ be another point in the 3D Inertial Frame. This method
 /// returns the Euclidean distance of \f$q\f$ to \f$B\f$.
-/// @param[in] n Is a vector normal to the plane.
-/// @param[in] p Is a coordinate in the plane.
-/// @param[in] q Is a coordinate out of the plane.
+/// @param n Is a vector normal to the plane.
+/// @param p Is a coordinate in the plane.
+/// @param q Is a coordinate out of the plane.
 /// @return The Euclidean distance of `q` point to the plane \f$B\f$.
 /// @pre The norm of @p n is different from zero.
 /// @warning If any of the preconditions is not met, this function will
