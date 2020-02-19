@@ -15,6 +15,11 @@ double DistanceToAPlane(const math::Vector3 n, const math::Vector3 p, const math
   return std::abs((n.dot(q) - n.dot(p)) / n_norm);
 }
 
+double DistanceToALine(const math::Vector3& p, const math::Vector3& r, const math::Vector3& q) {
+  const auto r_normalized{r.normalized()};
+  return ((q - p) - r_normalized.dot((q - p)) * r_normalized).norm();
+}
+
 InverseFaceEdgeMap ComputeInverseFaceEdgeMap(const std::vector<IndexFace>& faces) {
   InverseFaceEdgeMap inverse_face_edge_map;
   const int faces_count = static_cast<int>(faces.size());
@@ -182,26 +187,21 @@ const IndexFace::Vertex& MeshFaceVertexAt(const GeoMesh& mesh, const FaceVertexI
   return face_vertices.at(face_vertex_index.vertex_index);
 }
 
-template <typename T>
-using ParametrizedLine3 = Eigen::ParametrizedLine<T, 3>;
-
 std::vector<FaceVertexIndex> SimplifyMeshFacesContour(const GeoMesh& mesh,
                                                       const std::vector<FaceVertexIndex>& contour_indices,
                                                       double tolerance) {
   const int contour_vertex_count = contour_indices.size();
   if (contour_vertex_count <= 3) return contour_indices;
   std::vector<FaceVertexIndex> simplified_contour_indices;
-  ApplyDouglasPeuckerSimplification(contour_indices.begin(), contour_indices.end() - 1,
-                                    [&mesh](const FaceVertexIndex& face_vertex_index) {
-                                      return GetMeshFaceVertexPosition(mesh, MeshFaceVertexAt(mesh, face_vertex_index));
-                                    },
-                                    [](const math::Vector3& start_vertex, const math::Vector3& end_vertex) {
-                                      const auto diff_normalized{(end_vertex - start_vertex).normalized()};
-                                      return ParametrizedLine3<double>{
-                                          {start_vertex.x(), start_vertex.y(), start_vertex.z()},
-                                          {diff_normalized.x(), diff_normalized.y(), diff_normalized.z()}};
-                                    },
-                                    tolerance, std::back_inserter(simplified_contour_indices));
+  ApplyDouglasPeuckerSimplification(
+      contour_indices.begin(), contour_indices.end() - 1,
+      [&mesh](const FaceVertexIndex& face_vertex_index) {
+        return GetMeshFaceVertexPosition(mesh, MeshFaceVertexAt(mesh, face_vertex_index));
+      },
+      [](const math::Vector3& start_vertex, const math::Vector3& end_vertex) {
+        return std::pair<math::Vector3, math::Vector3>{start_vertex, {(end_vertex - start_vertex).normalized()}};
+      },
+      tolerance, std::back_inserter(simplified_contour_indices));
   return simplified_contour_indices;
 }
 

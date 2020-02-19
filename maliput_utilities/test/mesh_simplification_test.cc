@@ -23,6 +23,27 @@ GTEST_TEST(DistanceToAPlane, GetDistance) {
   }
 }
 
+GTEST_TEST(DistanceToALine, GetDistance) {
+  const math::Vector3 origin{1., -3., 2.};
+  const math::Vector3 direction{0., 1., 1.};
+  const double kTolerance{1e-15};
+  {  // Distance to a point out of the line.
+    const math::Vector3 coordinate{6., 4., 8.};
+    const double kExpectedDistance{math::Vector3{5., 0.5, -0.5}.norm()};
+    EXPECT_NEAR(DistanceToALine(origin, direction, coordinate), kExpectedDistance, kTolerance);
+  }
+  {  // Distance to a point ahead of the origin of the line.
+    const math::Vector3 coordinate{1., -2., 3.};
+    const double kExpectedDistance{0.};
+    EXPECT_NEAR(DistanceToALine(origin, direction, coordinate), kExpectedDistance, kTolerance);
+  }
+  {  // Distance to a point after the origin of the line.
+    const math::Vector3 coordinate{1., -4., 1.};
+    const double kExpectedDistance{0.};
+    EXPECT_NEAR(DistanceToALine(origin, direction, coordinate), kExpectedDistance, kTolerance);
+  }
+}
+
 // Tests equality and inequality operator overloads
 // for DirectedEdgeIndex instances.
 GTEST_TEST(DirectedEdgeIndexTest, Equality) {
