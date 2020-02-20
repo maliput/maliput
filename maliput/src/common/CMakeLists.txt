@@ -15,8 +15,8 @@ target_include_directories(common
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 target_link_libraries(common
-  PUBLIC
-    drake::drake
+  PRIVATE
+    fmt::fmt
 )
 
 ##############################################################################

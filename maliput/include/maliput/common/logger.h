@@ -60,19 +60,18 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 /// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <functional>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
-#include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <vector>
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace common {
-
-using string_view_t = fmt::basic_string_view<char>;
 
 namespace logger {
 
@@ -119,7 +118,7 @@ class SinkBase {
 
   /// Log the message
   /// @param msg Is the message to be logged.
-  virtual void log(const string_view_t& msg) = 0;
+  virtual void log(const std::string& msg) = 0;
 
   /// Empty the buffer.
   virtual void flush() = 0;
@@ -132,64 +131,79 @@ class Sink : public SinkBase {
   Sink() = default;
   ~Sink() = default;
 
-  void log(const string_view_t& msg) override { fmt::print(msg); }
+  void log(const std::string& msg) override;
 
   void flush() override{};
 };
 
 /// A logger class implementation.
 ///
-/// Logger will dump all messages to a sink (@see SinkBase) which will be in charge
+/// Logger will dump all messages to a sink (@ref SinkBase) which will be in charge
 /// of serializing the messages to the appropriate channel. By default, Sink
 /// implementation is used.
 ///
-/// It provides six different log levels, @see logger::level , which can be filtered based
-/// on the severity of the  message.
+/// It provides six different log levels, @ref logger::level , which can be filtered based
+/// on the severity of the message.
+///
+/// Comments about the design:
+/// - Given that fmt library is used to format the message to be logged it was consider neccesary
+///   to not expose the include in the header file and narrow it only to the implementation. That is why
+///   type-erasure was took into account within logger::log method.
+/// - Within logger::log method the variadic arguments are unpacked and serialized using a functor @ref Serialize .
+///   The alternative to the functor is to use a lambda expresion, but there is a bug in gcc that is not fixed until 8.1
+///   version.
+///   @see GCC bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85305.
+/// - Another way to do type-erasure is using std::any to allocate the variadic arguments, but this idea
+///   was dismissed given that it wouldn't allow the logger to manage all kind of types.
+/// @see StackOverflow thread:
+/// https://stackoverflow.com/questions/56517207/implementing-pimpl-based-wrapper-around-a-class-using-variadic-template-function
 class Logger {
  public:
+  /// Indicates the maximum number of arguments that a single log command is able to process.
+  static constexpr int kNumberOfArguments{100};
+
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Logger);
 
   Logger() = default;
 
   /// \addtogroup levelmethods Logging Level Methods.
-  /// @param fmt Is a fmt format string. See https://github.com/fmtlib/fmt.
-  /// @param args Is an argument list representing objects to be formatted.
+  /// @param args Is an argument list representing objects to be formatted. See https://github.com/fmtlib/fmt.
   /// @{
 
   /// Log the message showing trace level prefix.
   template <typename... Args>
-  void trace(string_view_t fmt, const Args&... args) {
-    log(logger::level::trace, fmt, args...);
+  void trace(const Args&... args) {
+    log(logger::level::trace, args...);
   }
 
   /// Log the message showing debug level prefix.
   template <typename... Args>
-  void debug(string_view_t fmt, const Args&... args) {
-    log(logger::level::debug, fmt, args...);
+  void debug(const Args&... args) {
+    log(logger::level::debug, args...);
   }
 
   /// Log the message showing info level prefix.
   template <typename... Args>
-  void info(string_view_t fmt, const Args&... args) {
-    log(logger::level::info, fmt, args...);
+  void info(const Args&... args) {
+    log(logger::level::info, args...);
   }
 
   /// Log the message showing warning level prefix.
   template <typename... Args>
-  void warn(string_view_t fmt, const Args&... args) {
-    log(logger::level::warn, fmt, args...);
+  void warn(const Args&... args) {
+    log(logger::level::warn, args...);
   }
 
   /// Log the message showing error level prefix.
   template <typename... Args>
-  void error(string_view_t fmt, const Args&... args) {
-    log(logger::level::error, fmt, args...);
+  void error(const Args&... args) {
+    log(logger::level::error, args...);
   }
 
   /// Log the message showing critical level prefix.
   template <typename... Args>
-  void critical(string_view_t fmt, const Args&... args) {
-    log(logger::level::critical, fmt, args...);
+  void critical(const Args&... args) {
+    log(logger::level::critical, args...);
   }
   /// @}
 
@@ -212,25 +226,45 @@ class Logger {
  private:
   // Send the message to the sink.
   // @param log_level Level of the message.
-  // @param fmt Is a fmt format string. See https://github.com/fmtlib/fmt.
-  // @param args Is an argument list representing objects to be formatted.
+  // @param args Is an argument list representing objects to be formatted using fmt library. See
+  // https://github.com/fmtlib/fmt.
   template <typename... Args>
-  void log(logger::level log_level, const string_view_t& fmt, const Args&... args);
+  void log(logger::level log_level, Args&&... args);
 
   // Sink where the messages will be dumped to.
   std::unique_ptr<common::SinkBase> sink_{std::make_unique<common::Sink>()};
 
   // Minimum level of messages to be log.
   logger::level level_{logger::level::info};
+
+  // Create a string from a list of strings.
+  // @param v Is a list of strings of fmt type. See https://github.com/fmtlib/fmt.
+  // @return A string created from the list `v` using fmt library.
+  const std::string format(const std::vector<std::string>& v) const;
+};
+
+/// Convenient functor for getting a string from a object that has serialization operator defined.
+struct Serialize {
+  /// @param t Object to apply the serialization.
+  /// @tparam T Type of t.
+  /// @return A string obtained from `t`
+  /// @see Logger.
+  template <typename T>
+  std::string operator()(const T& t) {
+    std::stringstream os;
+    os << t;
+    return os.str();
+  }
 };
 
 template <typename... Args>
-void Logger::log(logger::level lev, const string_view_t& fmt, const Args&... args) {
+void Logger::log(logger::level lev, Args&&... args) {
   if (lev >= level_) {
-    fmt::memory_buffer msg;
-    format_to(msg, fmt::format(logger::kLevelToMessage.at(lev)));
-    format_to(msg, fmt::format(fmt, args...));
-    sink_->log(to_string(msg));
+    std::string msg{};
+    msg += logger::kLevelToMessage.at(lev);
+    // Performing type-erasure in the header file.
+    msg += format(std::vector<std::string>{Serialize()(std::forward<Args>(args))...});
+    sink_->log(msg);
   }
 }
 
