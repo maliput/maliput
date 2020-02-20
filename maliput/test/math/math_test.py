@@ -1,5 +1,4 @@
 import unittest
-import numpy as np
 
 from maliput.math import (
   Quaternion,
