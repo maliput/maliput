@@ -156,6 +156,22 @@ class Quaternion {
   /// Forwards the call to `TransformVector(v)`.
   Vector3 operator*(const Vector3& v) const;
 
+  /// Operator equal to overload.
+  ///
+  /// Performs a coefficient wise comparison.
+  ///
+  /// @param other A quaternion to compare to `this` quaternion.
+  /// @return true When `this`' and `other`'s coefficients are equal.
+  bool operator==(const Quaternion& other) const;
+
+  /// Operator not equal to overload.
+  ///
+  /// Performs a coefficient wise comparison.
+  ///
+  /// @param other A quaternion to compare to `this` quaternion.
+  /// @return true When `this`' and `other`'s coefficients are not equal.
+  bool operator!=(const Quaternion& other) const { return !operator==(other); }
+
   /// @return A Quaternion that results from computing the inverse rotation.
   Quaternion Inverse() const;
 
@@ -171,6 +187,11 @@ class Quaternion {
 
   /// Evaluates if this quaternion is almost equal to `other` up to `precision`
   /// tolerance.
+  ///
+  /// `this` quaternion is approximately equal to `other` when the squared norm
+  /// of the vector difference from both quaternion's coefficients is smaller
+  /// than the minimum squared norm between `this` and `other` scaled with the
+  /// squared precision.
   ///
   /// @param other A Quaternion to compare with.
   /// @param precision The tolerance.
