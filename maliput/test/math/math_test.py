@@ -1,5 +1,4 @@
 import unittest
-import numpy as np
 
 from maliput.math import (
   Quaternion,
@@ -14,6 +13,7 @@ class TestMaliput(unittest.TestCase):
         Evaluates the constructor and accessors.
         '''
         kDut = Vector3(25., 158., 33.)
+        self.assertTrue(kDut.size(), 3.)
         self.assertTrue(kDut.x(), 25.)
         self.assertTrue(kDut.y(), 158.)
         self.assertTrue(kDut.z(), 33.)
@@ -28,6 +28,7 @@ class TestMaliput(unittest.TestCase):
         Evaluates the constructor and accessors.
         '''
         kDut = Vector4(25., 158., 33., 0.02)
+        self.assertTrue(kDut.size(), 4.)
         self.assertTrue(kDut.x(), 25.)
         self.assertTrue(kDut.y(), 158.)
         self.assertTrue(kDut.z(), 33.)

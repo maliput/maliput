@@ -15,6 +15,7 @@ PYBIND11_MODULE(math, m) {
       .def("__getitem__", py::overload_cast<std::size_t>(&math::Vector3::operator[]), py::is_operator())
       .def("__eq__", [](const math::Vector3& a, const math::Vector3& b) { return a == b; })
       .def("__ne__", [](const math::Vector3& a, const math::Vector3& b) { return a != b; })
+      .def("size", &math::Vector3::size)
       .def("x", py::overload_cast<>(&math::Vector3::x))
       .def("y", py::overload_cast<>(&math::Vector3::y))
       .def("z", py::overload_cast<>(&math::Vector3::z));
@@ -24,6 +25,7 @@ PYBIND11_MODULE(math, m) {
       .def("__getitem__", py::overload_cast<std::size_t>(&math::Vector4::operator[]), py::is_operator())
       .def("__eq__", [](const math::Vector4& a, const math::Vector4& b) { return a == b; })
       .def("__ne__", [](const math::Vector4& a, const math::Vector4& b) { return a != b; })
+      .def("size", &math::Vector4::size)
       .def("x", py::overload_cast<>(&math::Vector4::x))
       .def("y", py::overload_cast<>(&math::Vector4::y))
       .def("z", py::overload_cast<>(&math::Vector4::z))
