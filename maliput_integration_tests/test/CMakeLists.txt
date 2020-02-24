@@ -11,6 +11,7 @@ macro(add_dependencies_to_test target)
       target_link_libraries(${target}
         multilane::multilane
         multilane::multilane_test_utilities
+        maliput-utilities::maliput-utilities
         maliput::api
         maliput::maliput_test_utilities
         maliput::base
@@ -27,6 +28,7 @@ ament_add_gtest(derive_lane_s_routes_test derive_lane_s_routes_test.cc)
 ament_add_gtest(intersection_book_loader_test intersection_book_loader_test.cc)
 ament_add_gtest(phase_ring_book_loader_test phase_ring_book_loader_test.cc)
 ament_add_gtest(road_rulebook_loader_test road_rulebook_loader_test.cc)
+ament_add_gtest(segment_analysis_test segment_analysis_test.cc)
 ament_add_gtest(traffic_light_book_loader_test traffic_light_book_loader_test.cc)
 ament_add_gtest(waypoints_test waypoints_test.cc)
 
@@ -35,5 +37,6 @@ add_dependencies_to_test(derive_lane_s_routes_test)
 add_dependencies_to_test(intersection_book_loader_test)
 add_dependencies_to_test(phase_ring_book_loader_test)
 add_dependencies_to_test(road_rulebook_loader_test)
+add_dependencies_to_test(segment_analysis_test)
 add_dependencies_to_test(traffic_light_book_loader_test)
 add_dependencies_to_test(waypoints_test)

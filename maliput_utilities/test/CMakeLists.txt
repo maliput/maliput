@@ -7,7 +7,6 @@ ament_add_gtest(generate_obj_test generate_obj_test.cc WORKING_DIRECTORY ${TEST_
 ament_add_gtest(generate_string_test generate_string_test.cc WORKING_DIRECTORY ${TEST_PATH})
 ament_add_gtest(generate_urdf_test generate_urdf_test.cc WORKING_DIRECTORY ${TEST_PATH})
 ament_add_gtest(mesh_simplification_test mesh_simplification_test.cc WORKING_DIRECTORY ${TEST_PATH})
-ament_add_gtest(segment_analysis_test segment_analysis_test.cc WORKING_DIRECTORY ${TEST_PATH})
 ament_add_pytest_test(yaml_to_obj_test yaml_to_obj_test.py WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin TIMEOUT 360)
 
 macro(add_dependencies_to_test target)
@@ -39,7 +38,6 @@ add_dependencies_to_test(generate_obj_test)
 add_dependencies_to_test(generate_string_test)
 add_dependencies_to_test(generate_urdf_test)
 add_dependencies_to_test(mesh_simplification_test)
-add_dependencies_to_test(segment_analysis_test)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/MtlContent.mtl DESTINATION ${TEST_PATH})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/ChangeOrigin.obj DESTINATION ${TEST_PATH})
