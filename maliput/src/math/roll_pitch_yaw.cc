@@ -66,6 +66,11 @@ void RollPitchYaw::SetFromQuaternion(const Quaternion& quaternion) {
   // and efficiently calculate the roll-pitch-yaw angles (SpaceXYZ Euler angles)
   // that underlie `this` @RollPitchYaw, even when the pitch angle p is very
   // near a singularity (e.g., when p is within 1E-6 of π/2 or -π/2).
+  // This algorithm was created October 2016 by Paul Mitiguy for TRI (Toyota).
+  // More detail is in Chapter 6 Rotation Matrices II of the following:
+  // "Advanced Dynamics and Motion Simulation, For professional engineers and scientists,"
+  // Prodigy Press, Sunnyvale CA, 2017 (Paul Mitiguy).
+  // Available at www.MotionGenesis.com
   using std::abs;
   using std::atan2;
   using std::sqrt;
