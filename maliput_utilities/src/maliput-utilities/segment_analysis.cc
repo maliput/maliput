@@ -52,6 +52,9 @@ std::vector<std::unordered_set<const api::Segment*>> AnalyzeConfluentSegments(co
   std::unordered_set<const api::Segment*> visited;
   for (int junction_index = 0; junction_index < road_geometry->num_junctions(); ++junction_index) {
     const api::Junction* const junction = road_geometry->junction(junction_index);
+    if (!junction) {
+      continue;
+    }
     for (int segment_index = 0; segment_index < junction->num_segments(); ++segment_index) {
       const api::Segment* const segment = junction->segment(segment_index);
       // If segment has already been visited, skip it.
