@@ -139,10 +139,11 @@ Derived_ operator*(double scalar, const VectorBase<N_, Derived_>& vector) {
 template <std::size_t N_, typename Derived_>
 std::ostream& operator<<(std::ostream& os, const VectorBase<N_, Derived_>& vector) {
   os << "{";
-  for (const auto& value : vector.values_) {
-    os << value;
-    if (*(std::prev(vector.values_.cend())) == value) break;
-    os << ", ";
+  for (size_t i = 0; i < vector.size(); ++i) {
+    if (i != 0) {
+      os << ", ";
+    }
+    os << vector[i];
   }
   os << "}";
   return os;
