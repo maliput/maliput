@@ -53,6 +53,9 @@ std::string GenerateString(const api::RoadGeometry& road_geometry, const Generat
   const std::string junction_prefix = GetIndent(indent.junction);
   for (int ji = 0; ji < road_geometry.num_junctions(); ++ji) {
     const api::Junction* junction = road_geometry.junction(ji);
+    if (!junction) {
+      continue;
+    }
     if (options.include_junction_ids) {
       result << junction_prefix;
       if (options.include_type_labels) {
