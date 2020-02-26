@@ -1,5 +1,6 @@
 #include "maliput/api/lane_data.h"
 
+#include <cmath>
 #include <iostream>
 
 namespace maliput {
@@ -32,6 +33,10 @@ GeoPosition Rotation::Apply(const GeoPosition& geo_position) const {
 }
 
 math::Matrix3 Rotation::matrix() const { return quaternion_.ToRotationMatrix(); }
+
+Rotation Rotation::Reverse() const {
+  return Rotation::FromQuat(quaternion_ * math::Quaternion(M_PI, math::Vector3(0., 0., 1.)));
+}
 
 double Rotation::Distance(const Rotation& rot) const {
   // Compute transformed unit vectors of a frame A.

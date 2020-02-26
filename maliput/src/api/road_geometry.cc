@@ -24,31 +24,12 @@ GeoPosition LaneEndGeoPosition(const LaneEnd& lane_end) {
       LanePosition((lane_end.end == LaneEnd::kStart) ? 0. : lane_end.lane->length(), 0., 0.));
 }
 
-// Given a rotation representing the orientation of a (s,r,h) frame, return
-// the rotation corresponding to "going the other way instead", i.e., the
-// orientation of (-s,-r,h).  This is equivalent to a pre-rotation by PI in
-// the s/r plane.
-Rotation ReverseOrientation(const Rotation& rot) {
-  // TODO(maddog@tri.global)  Find a better way to do this, and probably move
-  //                          it into api::Rotation itself.  seancurtis-tri has
-  //                          volunteered, when the time comes.
-  const double ca = std::cos(rot.roll());
-  const double sa = std::sin(rot.roll());
-  const double cb = std::cos(rot.pitch());
-  const double sb = std::sin(rot.pitch());
-  const double cg = std::cos(rot.yaw());
-  const double sg = std::sin(rot.yaw());
-  return Rotation::FromRpy(std::atan2(-sa, ca),    // roll
-                           std::atan2(-sb, cb),    // pitch
-                           std::atan2(-sg, -cg));  // yaw
-}
-
 // Return the s/r/h orientation of the specified LaneEnd when travelling
 // *out from* the lane at that end.
 Rotation OrientationOutFromLane(const LaneEnd& lane_end) {
   switch (lane_end.end) {
     case LaneEnd::kStart: {
-      return ReverseOrientation(lane_end.lane->GetOrientation({0., 0., 0.}));
+      return lane_end.lane->GetOrientation({0., 0., 0.}).Reverse();
     }
     case LaneEnd::kFinish: {
       return lane_end.lane->GetOrientation({lane_end.lane->length(), 0., 0.});
@@ -146,9 +127,8 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     test_geo_position(*(bp->GetASide()));
     test_geo_position(*(bp->GetBSide()));
     // ...test orientation similarity.
-    const Rotation ref_rot = (bp->GetASide()->size() > 0)
-                                 ? OrientationOutFromLane(bp->GetASide()->get(0))
-                                 : ReverseOrientation(OrientationOutFromLane(bp->GetBSide()->get(0)));
+    const Rotation ref_rot = (bp->GetASide()->size() > 0) ? OrientationOutFromLane(bp->GetASide()->get(0))
+                                                          : OrientationOutFromLane(bp->GetBSide()->get(0)).Reverse();
     const auto test_orientation = [&](const LaneEndSet& ends, const Rotation& reference) {
       for (int bi = 0; bi < ends.size(); ++bi) {
         const LaneEnd le = ends.get(bi);
@@ -162,7 +142,7 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
       }
     };
     test_orientation(*(bp->GetASide()), ref_rot);
-    test_orientation(*(bp->GetBSide()), ReverseOrientation(ref_rot));
+    test_orientation(*(bp->GetBSide()), ref_rot.Reverse());
   }
 
   // Check that Lane left/right relationships within a Segment are

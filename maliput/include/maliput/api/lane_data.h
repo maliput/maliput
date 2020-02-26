@@ -173,6 +173,11 @@ class Rotation {
   /// Returns the rotated `geo_position` GeoPosition in the World Frame.
   GeoPosition Apply(const GeoPosition& geo_position) const;
 
+  /// Returns the rotation corresponding to "going the other way instead", i.e.,
+  /// the orientation of (-s,-r,h). This is equivalent to a pre-rotation by PI
+  /// in the s/r plane.
+  Rotation Reverse() const;
+
   /// Let $R_1$ be `this` rotation description, and let `rot` be $R_2$, another
   /// rotation description in the World Frame. Let $F_W_1$ and $F_W_2$ be the
   /// versors describing the basis of the World Frame. Then, let $F_R_1$ and
