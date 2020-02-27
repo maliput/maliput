@@ -11,6 +11,7 @@
 
 namespace maliput {
 namespace utility {
+namespace test {
 namespace {
 
 class MockGenerateStringTest : public ::testing::Test {
@@ -73,5 +74,6 @@ TEST_F(MockGenerateStringTest, WithLabels) {
 }
 
 }  // anonymous namespace
+}  // namespace test
 }  // namespace utility
 }  // namespace maliput
