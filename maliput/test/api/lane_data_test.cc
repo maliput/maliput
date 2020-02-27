@@ -310,6 +310,40 @@ GTEST_TEST(Rotation, DistanceTest) {
   const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
   EXPECT_NEAR(dut.Distance(Rotation::FromRpy(3.1, 0.1, 2.2)), 2.55482853419, kRotationTolerance);
 }
+
+GTEST_TEST(Rotation, ReverseTest) {
+  // Results in this test were derived with the following Python script:
+  // >>> import math as m
+  // >>> import numpy as np
+  // >>> def rotation_matrix (roll, pitch ,yaw):
+  // >>>     ca_r = m.cos(roll)
+  // >>>     sa_r = m.sin(roll)
+  // >>>     ca_p = m.cos(pitch)
+  // >>>     sa_p = m.sin(pitch)
+  // >>>     ca_y = m.cos(yaw)
+  // >>>     sa_y = m.sin(yaw)
+  // >>>     #build rotation matrix per axis
+  // >>>     rx = np.matrix([[1, 0, 0], [0, ca_r, -sa_r], [0, sa_r, ca_r]])
+  // >>>     ry = np.matrix([[ca_p, 0, sa_p], [0, 1, 0], [-sa_p, 0, ca_p]])
+  // >>>     rz = np.matrix([[ca_y, -sa_y, 0], [sa_y, ca_y, 0], [0, 0, 1]])
+  // >>>     return (rz * ry * rx)
+  // >>> rot_mat_a = rotation_matrix(0., 0., 0.)
+  // >>> rot_mat_b = rotation_matrix(0.,0.,m.pi)
+  // >>> rot_mat_reversed = rot_mat_b * rot_mat_a
+  // r_s = rot_mat_reversed * np.matrix([[1.],[0.],[0.]]); print(r_s)
+  // r_r = rot_mat_reversed * np.matrix([[0.],[1.],[0.]]); print(r_r)
+  // r_h = rot_mat_reversed * np.matrix([[0.],[0.],[1.]]); print(r_h)
+  // Tolerance has been empirically found for these testing values.
+  const double kLinearTolerance = 1e-15;
+  const Rotation dut = Rotation::FromRpy(0., 0., 0.).Reverse();
+  EXPECT_TRUE(math::test::CompareVectors(math::Vector3(-1., 0., 0.),
+                                         dut.quat().TransformVector(math::Vector3(1., 0., 0)), kLinearTolerance));
+  EXPECT_TRUE(math::test::CompareVectors(math::Vector3(0., -1., 0.),
+                                         dut.quat().TransformVector(math::Vector3(0., 1., 0)), kLinearTolerance));
+  EXPECT_TRUE(math::test::CompareVectors(math::Vector3(0., 0., 1.),
+                                         dut.quat().TransformVector(math::Vector3(0., 0., 1.)), kLinearTolerance));
+}
+
 #undef CHECK_ALL_ROTATION_ACCESSORS
 
 GTEST_TEST(RBoundsTest, DefaultConstructor) {
