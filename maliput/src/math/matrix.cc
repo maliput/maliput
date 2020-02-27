@@ -224,10 +224,11 @@ Matrix<N_> operator*(double k, const Matrix<N_>& matrix) {
 template <std::size_t N_>
 std::ostream& operator<<(std::ostream& os, const Matrix<N_>& matrix) {
   os << "{";
-  for (const auto& row : matrix.rows_) {
-    os << row;
-    if (*(std::prev(matrix.rows_.cend())) == row) break;
-    os << ",\n ";
+  for (std::size_t i = 0; i < N_; ++i) {
+    if (i != 0) {
+      os << ",\n";
+    }
+    os << matrix.row(i);
   }
   os << "}";
   return os;

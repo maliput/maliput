@@ -142,9 +142,16 @@ GTEST_TEST(MatrixTest, Operators) {
     EXPECT_EQ(kDut * dut, Matrix<2>({{51., 90.}, {44., 83.}}));
     EXPECT_EQ(kDut * 2, Matrix<2>({{2., 24.}, {16., 10.}}));
     EXPECT_EQ(2 * kDut, Matrix<2>({{2., 24.}, {16., 10.}}));
-    std::stringstream ss;
-    ss << kDut;
-    EXPECT_EQ(ss.str(), "{{1, 12},\n {8, 5}}");
+    {
+      std::stringstream ss;
+      ss << kDut;
+      EXPECT_EQ(ss.str(), "{{1, 12},\n{8, 5}}");
+    }
+    {
+      std::stringstream ss;
+      ss << Matrix<2>{{1, 1}, {1, 1}};
+      EXPECT_EQ(ss.str(), "{{1, 1},\n{1, 1}}");
+    }
   }
   {  // 3- dimension matrix.
     const Matrix<3> kDut{{1., 12., 3.}, {8., 5., 3.}, {6., 14., 9.}};
@@ -173,9 +180,16 @@ GTEST_TEST(MatrixTest, Operators) {
     EXPECT_EQ(kDut * dut, Matrix<3>({{51., 114., 41.}, {44., 107., 48.}, {74., 206., 107.}}));
     EXPECT_EQ(kDut * 2, Matrix<3>({{2., 24., 6.}, {16., 10., 6.}, {12., 28., 18.}}));
     EXPECT_EQ(2 * kDut, Matrix<3>({{2., 24., 6.}, {16., 10., 6.}, {12., 28., 18.}}));
-    std::stringstream ss;
-    ss << kDut;
-    EXPECT_EQ(ss.str(), "{{1, 12, 3},\n {8, 5, 3},\n {6, 14, 9}}");
+    {
+      std::stringstream ss;
+      ss << kDut;
+      EXPECT_EQ(ss.str(), "{{1, 12, 3},\n{8, 5, 3},\n{6, 14, 9}}");
+    }
+    {
+      std::stringstream ss;
+      ss << Matrix<3>{{1, 1, 1}, {2, 2, 2}, {2, 2, 2}};
+      EXPECT_EQ(ss.str(), "{{1, 1, 1},\n{2, 2, 2},\n{2, 2, 2}}");
+    }
   }
   {  // 4- dimension matrix.
     const Matrix<4> kDut{{1., 12., 3., 2.}, {8., 5., 3., 7.}, {6., 14., 9., 25.}, {13., 4., 7., 8.}};
@@ -215,9 +229,16 @@ GTEST_TEST(MatrixTest, Operators) {
             {{77., 120., 55., 113.}, {135., 128., 97., 131.}, {399., 281., 282., 336.}, {159., 186., 149., 203.}}));
     EXPECT_EQ(kDut * 2, Matrix<4>({{2., 24., 6., 4.}, {16., 10., 6., 14.}, {12., 28., 18., 50.}, {26., 8., 14., 16.}}));
     EXPECT_EQ(2 * kDut, Matrix<4>({{2., 24., 6., 4.}, {16., 10., 6., 14.}, {12., 28., 18., 50.}, {26., 8., 14., 16.}}));
-    std::stringstream ss;
-    ss << kDut;
-    EXPECT_EQ(ss.str(), "{{1, 12, 3, 2},\n {8, 5, 3, 7},\n {6, 14, 9, 25},\n {13, 4, 7, 8}}");
+    {
+      std::stringstream ss;
+      ss << kDut;
+      EXPECT_EQ(ss.str(), "{{1, 12, 3, 2},\n{8, 5, 3, 7},\n{6, 14, 9, 25},\n{13, 4, 7, 8}}");
+    }
+    {
+      std::stringstream ss;
+      ss << Matrix<4>{{1, 1, 1, 1}, {2, 2, 2, 2}, {2, 2, 2, 2}, {3, 3, 3, 3}};
+      EXPECT_EQ(ss.str(), "{{1, 1, 1, 1},\n{2, 2, 2, 2},\n{2, 2, 2, 2},\n{3, 3, 3, 3}}");
+    }
   }
 }
 GTEST_TEST(MatrixTest, StaticMethods) {
