@@ -61,51 +61,57 @@ RollPitchYaw& RollPitchYaw::set(double roll, double pitch, double yaw) {
 }
 
 void RollPitchYaw::SetFromQuaternion(const Quaternion& quaternion) {
-  // This is copied from ignition::math::Quaternion::Euler()
-  // TODO once a rotation matrix can be computed from a Quaternion,
-  // copy from Drake CalcRollPitchYawFromQuaternionAndRotationMatrix
-  Vector3 vec;
-  using std::asin;
+  // based on Drake's CalcRollPitchYawFromQuaternionAndRotationMatrix
+  // Uses a quaternion and its associated rotation matrix `R` to accurately
+  // and efficiently calculate the roll-pitch-yaw angles (SpaceXYZ Euler angles)
+  // that underlie `this` @RollPitchYaw, even when the pitch angle p is very
+  // near a singularity (e.g., when p is within 1E-6 of π/2 or -π/2).
+  // This algorithm was created October 2016 by Paul Mitiguy for TRI (Toyota).
+  // More detail is in Chapter 6 Rotation Matrices II of the following:
+  // "Advanced Dynamics and Motion Simulation, For professional engineers and scientists,"
+  // Prodigy Press, Sunnyvale CA, 2017 (Paul Mitiguy).
+  // Available at www.MotionGenesis.com
+  using std::abs;
   using std::atan2;
+  using std::sqrt;
+  const Matrix3 R = quaternion.ToRotationMatrix();
+  const Quaternion q = quaternion.normalized();
+  Vector3 vec;
 
-  Quaternion copy = quaternion.normalized();
-  double squ = copy.w() * copy.w();
-  double sqx = copy.x() * copy.x();
-  double sqy = copy.y() * copy.y();
-  double sqz = copy.z() * copy.z();
+  // Calculate pitch using lots of information in the rotation matrix.
+  // Rsum = abs( cos(pitch) ) is inherently non-negative.
+  // R20 = -sin(pitch) may be negative, zero, or positive.
+  const double R22 = R[2][2];
+  const double R21 = R[2][1];
+  const double R10 = R[1][0];
+  const double R00 = R[0][0];
+  const double Rsum = sqrt((R22 * R22 + R21 * R21 + R10 * R10 + R00 * R00) / 2);
+  const double R20 = R[2][0];
+  const double pitch = atan2(-R20, Rsum);
 
-  // Pitch
-  double sarg = -2 * (copy.x() * copy.z() - copy.w() * copy.y());
-  if (sarg <= -1.0) {
-    vec.y() = -0.5 * M_PI;
-  } else if (sarg >= 1.0) {
-    vec.y() = 0.5 * M_PI;
-  } else {
-    vec.y() = asin(sarg);
-  }
+  // Calculate roll and yaw from Steps 2-6 (documented in drake's roll_pitch_yaw.cc:
+  // https://github.com/RobotLocomotion/drake/blob/v0.15.0/math/roll_pitch_yaw.cc#L56-L95 ).
+  const double e0 = q.w(), e1 = q.x();
+  const double e2 = q.y(), e3 = q.z();
+  const double yA = e1 + e3, xA = e0 - e2;
+  const double yB = e3 - e1, xB = e0 + e2;
+  const double epsilon = std::numeric_limits<double>::epsilon();
+  const auto isSingularA = abs(yA) <= epsilon && abs(xA) <= epsilon;
+  const auto isSingularB = abs(yB) <= epsilon && abs(xB) <= epsilon;
+  const double zA = isSingularA ? double{0.0} : atan2(yA, xA);
+  const double zB = isSingularB ? double{0.0} : atan2(yB, xB);
+  double roll = zA - zB;  // First angle in rotation sequence.
+  double yaw = zA + zB;   // Third angle in rotation sequence.
 
-  // If the pitch angle is PI/2 or -PI/2, we can only compute
-  // the sum roll + yaw.  However, any combination that gives
-  // the right sum will produce the correct orientation, so we
-  // set yaw = 0 and compute roll.
-  // pitch angle is PI/2
-  if (std::abs(sarg - 1) < kTolerance) {
-    vec.z() = 0;
-    vec.x() = atan2(2 * (copy.x() * copy.y() - copy.z() * copy.w()), squ - sqx + sqy - sqz);
-  }
-  // pitch angle is -PI/2
-  else if (std::abs(sarg + 1) < kTolerance) {
-    vec.z() = 0;
-    vec.x() = atan2(-2 * (copy.x() * copy.y() - copy.z() * copy.w()), squ - sqx + sqy - sqz);
-  } else {
-    // Roll
-    vec.x() = atan2(2 * (copy.y() * copy.z() + copy.w() * copy.x()), squ - sqx - sqy + sqz);
+  // If necessary, modify angles roll and/or yaw to be between -pi and pi.
+  if (roll > M_PI) roll = roll - 2 * M_PI;
+  if (roll < -M_PI) roll = roll + 2 * M_PI;
+  if (yaw > M_PI) yaw = yaw - 2 * M_PI;
+  if (yaw < -M_PI) yaw = yaw + 2 * M_PI;
 
-    // Yaw
-    vec.z() = atan2(2 * (copy.x() * copy.y() + copy.w() * copy.z()), squ + sqx - sqy - sqz);
-  }
-
-  this->set(vec);
+  // Return in Drake/ROS conventional SpaceXYZ roll, pitch, yaw (roll-pitch-yaw) order
+  // (which is equivalent to BodyZYX yaw, pitch, roll order).
+  this->set(roll, pitch, yaw);
 }
 
 const Vector3& RollPitchYaw::vector() const { return roll_pitch_yaw_; }
