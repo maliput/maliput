@@ -596,6 +596,9 @@ GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
 
 void RenderSegment(const api::Segment* segment, const ObjFeatures& features, GeoMesh* asphalt_mesh, GeoMesh* lane_mesh,
                    GeoMesh* marker_mesh, GeoMesh* h_bounds_mesh) {
+  if (!segment || !segment->junction() || !segment->junction()->road_geometry()) {
+    return;
+  }
   const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
   const double base_grid_unit =
       features.off_grid_mesh_generation
@@ -622,6 +625,9 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
   }
   for (int li = 0; li < segment->num_lanes(); ++li) {
     const api::Lane* lane = segment->lane(li);
+    if (!lane) {
+      continue;
+    }
     const double grid_unit = PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
@@ -893,8 +899,14 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
   // Walk the network.
   for (int ji = 0; ji < rg->num_junctions(); ++ji) {
     const api::Junction* junction = rg->junction(ji);
+    if (!junction) {
+      continue;
+    }
     for (int si = 0; si < junction->num_segments(); ++si) {
       const api::Segment* segment = junction->segment(si);
+      if (!segment) {
+        continue;
+      }
       // TODO(maddog@tri.global)  Id's need well-defined comparison semantics.
       if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
         RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh);
@@ -908,6 +920,9 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
     std::vector<api::GeoPosition> rendered_centers;
     for (int bpi = 0; bpi < rg->num_branch_points(); ++bpi) {
       const api::BranchPoint* branch_point = rg->branch_point(bpi);
+      if (!branch_point) {
+        continue;
+      }
       RenderBranchPoint(branch_point, features.branch_point_elevation, features.branch_point_height, &branch_point_mesh,
                         &rendered_centers);
     }

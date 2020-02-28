@@ -25,13 +25,22 @@ std::unordered_set<const api::Segment*> FindConfluentSegments(const api::Segment
     // Loop over each Lane in the Segment.
     for (int lane_index = 0; lane_index < working_segment->num_lanes(); ++lane_index) {
       const api::Lane* const lane = working_segment->lane(lane_index);
+      if (!lane) {
+        continue;
+      }
       // Loop over each End of the Lane.
       for (const api::LaneEnd::Which end : {api::LaneEnd::kStart, api::LaneEnd::kFinish}) {
         const api::LaneEndSet* const confluent_set = lane->GetConfluentBranches(end);
+        if (!confluent_set) {
+          continue;
+        }
         // Loop over the set of confluent lanes.
         for (int i = 0; i < confluent_set->size(); ++i) {
           // Get confluent segment.
           const api::Segment* confluent_segment = confluent_set->get(i).lane->segment();
+          if (!confluent_segment) {
+            continue;
+          }
           // Is confluent segment in visited set?
           if (visited.find(confluent_segment) == visited.end()) {
             // Not yet:  then push onto end of workqueue, and mark as visited.
