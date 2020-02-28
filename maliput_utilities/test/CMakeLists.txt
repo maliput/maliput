@@ -17,18 +17,14 @@ macro(add_dependencies_to_test target)
       )
 
       ament_target_dependencies(${target}
-          "multilane"
           "maliput"
-          "drake"
       )
 
       target_link_libraries(${target}
           maliput-utilities
-          multilane::multilane
           maliput::api
           maliput::common
-          maliput::maliput_test_utilities
-          drake::drake)
+          maliput::maliput_test_utilities)
 
     endif()
 endmacro()
