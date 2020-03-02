@@ -147,14 +147,15 @@ class Sink : public SinkBase {
 ///
 /// Comments about the design:
 /// - Given that fmt library is used to format the message to be logged it was consider neccesary
-///   to not expose the include in the header file and narrow it only to the implementation. That is why
-///   type-erasure was took into account within logger::log method.
-/// - Within logger::log method the variadic arguments are unpacked and serialized using a functor @ref Serialize .
+///   not to expose the dependency in the header file and narrow it only to the implementation. That is why
+///   type-erasure was taken into account within Logger::log() method.
+/// - Within Logger::log() method the variadic arguments are unpacked and serialized using a functor @ref Serialize .
 ///   The alternative to the functor is to use a lambda expresion, but there is a bug in gcc that is not fixed until 8.1
 ///   version.
 ///   @see GCC bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85305.
 /// - Another way to do type-erasure is using std::any to allocate the variadic arguments, but this idea
-///   was dismissed given that it wouldn't allow the logger to manage all kind of types.
+///   was dismissed given that it wouldn't allow the logger to manage all kind of types, due to the fact that
+///   an overload of any_cast<T>() for each new type to be serialized would be required.
 /// @see StackOverflow thread:
 /// https://stackoverflow.com/questions/56517207/implementing-pimpl-based-wrapper-around-a-class-using-variadic-template-function
 class Logger {
