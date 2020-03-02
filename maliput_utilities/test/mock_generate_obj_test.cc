@@ -4,7 +4,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/road_geometry.h"
 #include "maliput/common/filesystem.h"
+#include "maliput/test_utilities/mock.h"
 
 namespace maliput {
 namespace utility {
@@ -40,7 +42,6 @@ TEST_F(MockGenerateObjTest, TwoLanesRoadGeometry) {
 
   ObjFeatures features;
   features.min_grid_resolution = 5.0;
-  features.simplify_mesh_threshold = 0.01;
   const std::string basename{"TwoLanesRoadGeometry"};
   GenerateObjFile(dut.get(), directory_.get_path(), basename, features);
 
