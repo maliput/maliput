@@ -11,6 +11,7 @@
   <build_depend>ament_cmake_doxygen</build_depend>
 
   <depend>drake_vendor</depend>
+  <depend>fmt</depend>
   <depend>maliput</depend>
   <depend>yaml-cpp</depend>
 

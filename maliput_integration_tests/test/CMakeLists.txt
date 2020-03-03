@@ -19,7 +19,8 @@ macro(add_dependencies_to_test target)
         maliput::routing
         dragway::dragway
         dragway::dragway_test_utilities
-        drake::drake)
+        drake::drake
+        fmt::fmt)
     endif()
 endmacro()
 

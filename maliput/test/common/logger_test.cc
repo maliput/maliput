@@ -1,7 +1,11 @@
 #include "maliput/common/logger.h"
+#include "maliput/math/vector.h"
+
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#include <gtest/gtest.h>
 
 #include <string>
-#include <gtest/gtest.h>
 
 #include "maliput/common/assertion_error.h"
 
@@ -19,7 +23,7 @@ class MockSink : public SinkBase {
   ~MockSink() = default;
 
   const std::string& get_log_message() const { return log_message_; }
-  void log(const string_view_t& msg) override { log_message_ = fmt::format(msg); }
+  void log(const std::string& msg) override { log_message_ = fmt::format(msg); }
   void flush() override{};
 
  private:
@@ -43,35 +47,35 @@ GTEST_TEST(LoggerTest, Logger) {
 
   const std::string kMessage1 = " Hello World. {}{}.\n";
   const std::string kMessage2 = "The value of PI is: ";
-  const double kPI = 3.1415926535;
+  const double kPI = 3.14159;
   set_log_level(logger::kLevelToString.at(logger::level::trace));
   {
-    const std::string kExpectedMessage{"[TRACE]  Hello World. The value of PI is: 3.1415926535.\n"};
+    const std::string kExpectedMessage{"[TRACE]  Hello World. The value of PI is: 3.14159.\n"};
     log()->trace(kMessage1, kMessage2, kPI);
     EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kExpectedMessage{"[DEBUG]  Hello World. The value of PI is: 3.1415926535.\n"};
+    const std::string kExpectedMessage{"[DEBUG]  Hello World. The value of PI is: 3.14159.\n"};
     log()->debug(kMessage1, kMessage2, kPI);
     EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kExpectedMessage{"[INFO]  Hello World. The value of PI is: 3.1415926535.\n"};
+    const std::string kExpectedMessage{"[INFO]  Hello World. The value of PI is: 3.14159.\n"};
     log()->info(kMessage1, kMessage2, kPI);
     EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kExpectedMessage{"[WARNING]  Hello World. The value of PI is: 3.1415926535.\n"};
+    const std::string kExpectedMessage{"[WARNING]  Hello World. The value of PI is: 3.14159.\n"};
     log()->warn(kMessage1, kMessage2, kPI);
     EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kExpectedMessage{"[ERROR]  Hello World. The value of PI is: 3.1415926535.\n"};
+    const std::string kExpectedMessage{"[ERROR]  Hello World. The value of PI is: 3.14159.\n"};
     log()->error(kMessage1, kMessage2, kPI);
     EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }
   {
-    const std::string kExpectedMessage{"[CRITICAL]  Hello World. The value of PI is: 3.1415926535.\n"};
+    const std::string kExpectedMessage{"[CRITICAL]  Hello World. The value of PI is: 3.14159.\n"};
     log()->critical(kMessage1, kMessage2, kPI);
     EXPECT_EQ(mock_sink_ptr->get_log_message(), kExpectedMessage);
   }

@@ -16,14 +16,10 @@ target_include_directories(maliput-utilities
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-ament_target_dependencies(maliput-utilities
-  "multilane"
-  "maliput"
-  "drake"
-)
-
 target_link_libraries(maliput-utilities
-    drake::drake
+  PRIVATE
+    fmt::fmt
+  PUBLIC
     maliput::api
     maliput::common
     maliput::math
@@ -33,8 +29,12 @@ target_link_libraries(maliput-utilities
 add_executable(yaml_to_obj
   yaml_to_obj.cc)
 
+ament_target_dependencies(yaml_to_obj
+  "multilane"
+  "maliput"
+)
+
 target_link_libraries(yaml_to_obj
-  PRIVATE
     yaml-cpp
     gflags
     multilane::multilane

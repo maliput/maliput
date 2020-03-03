@@ -15,6 +15,7 @@ message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
 find_package(ament_cmake REQUIRED)
 find_package(drake_vendor REQUIRED)
+find_package(fmt 4.0.0 EXACT REQUIRED)
 find_package(maliput REQUIRED)
 find_package(maliput-utilities REQUIRED)
 find_package(multilane REQUIRED)
