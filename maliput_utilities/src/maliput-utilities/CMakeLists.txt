@@ -26,22 +26,6 @@ target_link_libraries(maliput-utilities
     multilane::multilane
 )
 
-add_executable(yaml_to_obj
-  yaml_to_obj.cc)
-
-ament_target_dependencies(yaml_to_obj
-  "multilane"
-  "maliput"
-)
-
-target_link_libraries(yaml_to_obj
-    yaml-cpp
-    gflags
-    multilane::multilane
-    maliput-utilities
-    drake::drake
-)
-
 ##############################################################################
 # Export
 ##############################################################################
@@ -52,12 +36,6 @@ install(
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-install(TARGETS yaml_to_obj
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
 )
 
 ament_export_libraries(maliput-utilities)
