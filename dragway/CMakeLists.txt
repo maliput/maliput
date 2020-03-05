@@ -15,7 +15,7 @@ find_package(ament_cmake REQUIRED)
 
 find_package(maliput REQUIRED)
 find_package(maliput-utilities REQUIRED)
-find_package(pybind11 CONFIG REQUIRED)
+find_package(pybind11 REQUIRED)
 
 ##############################################################################
 # Project Configuration
