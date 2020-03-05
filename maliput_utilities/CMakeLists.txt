@@ -16,7 +16,6 @@ find_package(drake_vendor REQUIRED)
 find_package(fmt 4.0.0 EXACT REQUIRED)
 find_package(gflags REQUIRED)
 find_package(maliput REQUIRED)
-find_package(multilane REQUIRED)
 find_package(yaml-cpp REQUIRED)
 ##############################################################################
 # Project Configuration
@@ -59,7 +58,7 @@ if(BUILD_DOCS)
   find_package(ament_cmake_doxygen REQUIRED)
   ament_doxygen_generate(doxygen_maliput_utilities
     CONFIG_OVERLAY doc/Doxyfile.overlay.in
-    DEPENDENCIES maliput multilane)
+    DEPENDENCIES maliput)
 endif()
 
 ##############################################################################
@@ -76,7 +75,6 @@ ament_export_include_directories(include)
 ament_export_dependencies(ament_cmake)
 ament_export_dependencies(drake)
 ament_export_dependencies(maliput)
-ament_export_dependencies(multilane)
 ament_export_dependencies(yaml-cpp)
 ament_export_interfaces(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 ament_package()

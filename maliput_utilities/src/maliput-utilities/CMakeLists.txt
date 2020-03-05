@@ -16,6 +16,11 @@ target_include_directories(maliput-utilities
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
+ament_target_dependencies(maliput-utilities
+  PUBLIC
+    "maliput"
+)
+
 target_link_libraries(maliput-utilities
   PRIVATE
     fmt::fmt
@@ -23,7 +28,6 @@ target_link_libraries(maliput-utilities
     maliput::api
     maliput::common
     maliput::math
-    multilane::multilane
 )
 
 ##############################################################################
