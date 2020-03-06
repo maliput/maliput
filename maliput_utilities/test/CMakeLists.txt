@@ -10,7 +10,6 @@ ament_add_gtest(mock_generate_obj_test mock_generate_obj_test.cc WORKING_DIRECTO
 ament_add_gtest(mock_generate_string_test mock_generate_string_test.cc)
 ament_add_gtest(mock_generate_urdf_test mock_generate_urdf_test.cc)
 ament_add_gtest(mock_segment_analysis_test mock_segment_analysis_test.cc)
-ament_add_pytest_test(yaml_to_obj_test yaml_to_obj_test.py WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin TIMEOUT 360)
 
 macro(add_dependencies_to_test target)
     if (TARGET ${target})

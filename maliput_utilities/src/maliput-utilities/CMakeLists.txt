@@ -16,6 +16,11 @@ target_include_directories(maliput-utilities
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
+ament_target_dependencies(maliput-utilities
+  PUBLIC
+    "maliput"
+)
+
 target_link_libraries(maliput-utilities
   PRIVATE
     fmt::fmt
@@ -23,23 +28,6 @@ target_link_libraries(maliput-utilities
     maliput::api
     maliput::common
     maliput::math
-    multilane::multilane
-)
-
-add_executable(yaml_to_obj
-  yaml_to_obj.cc)
-
-ament_target_dependencies(yaml_to_obj
-  "multilane"
-  "maliput"
-)
-
-target_link_libraries(yaml_to_obj
-    yaml-cpp
-    gflags
-    multilane::multilane
-    maliput-utilities
-    drake::drake
 )
 
 ##############################################################################
@@ -52,12 +40,6 @@ install(
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-install(TARGETS yaml_to_obj
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
 )
 
 ament_export_libraries(maliput-utilities)
