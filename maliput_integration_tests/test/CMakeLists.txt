@@ -4,6 +4,7 @@ macro(add_dependencies_to_test target)
     if (TARGET ${target})
       ament_target_dependencies(${target}
         "maliput"
+        "maliput-utilities"
         "multilane"
         "dragway"
         "drake"
