@@ -57,19 +57,19 @@ class RoadNetwork {
 
   const rules::PhaseRingBook* phase_ring_book() const { return phase_ring_book_.get(); }
 
-  const rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider() const {
+  rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider() const {
     return right_of_way_rule_state_provider_.get();
   }
 
-  const rules::PhaseProvider* phase_provider() const { return phase_provider_.get(); }
+  rules::PhaseProvider* phase_provider() const { return phase_provider_.get(); }
 
   const rules::RuleRegistry* rule_registry() const { return rule_registry_.get(); }
 
-  const rules::DiscreteValueRuleStateProvider* discrete_value_rule_state_provider() const {
+  rules::DiscreteValueRuleStateProvider* discrete_value_rule_state_provider() const {
     return discrete_value_rule_state_provider_.get();
   }
 
-  const rules::RangeValueRuleStateProvider* range_value_rule_state_provider() const {
+  rules::RangeValueRuleStateProvider* range_value_rule_state_provider() const {
     return range_value_rule_state_provider_.get();
   }
 
