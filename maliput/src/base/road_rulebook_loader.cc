@@ -159,7 +159,7 @@ LaneSRange BuildLaneSRange(const api::RoadGeometry* road_geometry, const YAML::N
   const Lane* lane = road_geometry->ById().GetLane(lane_id);
   if (lane == nullptr) {
     MALIPUT_THROW_MESSAGE("Trying to generate a LaneSRange for [" + lane_id.string() +
-                          "], but couldn't be found at the RoadGeometry.");
+                          "], but the lane couldn't be found within the RoadGeometry.");
   }
   const SRange s_range = ObtainSRange(lane, lane_node);
   return LaneSRange(lane_id, s_range);
