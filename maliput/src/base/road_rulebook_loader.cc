@@ -157,7 +157,10 @@ LaneSRange BuildLaneSRange(const api::RoadGeometry* road_geometry, const YAML::N
   MALIPUT_THROW_UNLESS(lane_node["Lane"].IsDefined());
   const LaneId lane_id(lane_node["Lane"].as<std::string>());
   const Lane* lane = road_geometry->ById().GetLane(lane_id);
-  MALIPUT_THROW_UNLESS(lane != nullptr);
+  if (lane == nullptr) {
+    MALIPUT_THROW_MESSAGE("Trying to generate a LaneSRange for [" + lane_id.string() +
+                          "], but the lane couldn't be found within the RoadGeometry.");
+  }
   const SRange s_range = ObtainSRange(lane, lane_node);
   return LaneSRange(lane_id, s_range);
 }
