@@ -70,6 +70,10 @@ PhaseRing::PhaseRing(const Id& id, const std::vector<Phase>& phases,
   VerifyAllPhasesHaveSameCoverage(phases);
 }
 
+std::optional<Phase> PhaseRing::GetPhase(const Phase::Id& id) const {
+  return phases_.find(id) != phases_.end() ? std::optional<Phase>(phases_.at(id)) : std::nullopt;
+}
+
 }  // namespace rules
 }  // namespace api
 }  // namespace maliput
