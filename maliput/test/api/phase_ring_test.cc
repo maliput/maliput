@@ -105,6 +105,16 @@ TEST_F(PhaseRingTest, Accessors) {
   EXPECT_EQ(dut.next_phases().at(phase_id_2_).size(), 0);
 }
 
+TEST_F(PhaseRingTest, GetPhase) {
+  const PhaseRing dut(id_, {CreateFullPhase(phase_id_1_), CreateFullPhase(phase_id_2_)});
+  std::optional<Phase> phase_result = dut.GetPhase(phase_id_1_);
+  EXPECT_TRUE(phase_result.has_value());
+  EXPECT_EQ(phase_result->id(), phase_id_1_);
+
+  phase_result = dut.GetPhase(Phase::Id("UnknownPhase"));
+  EXPECT_FALSE(phase_result.has_value());
+}
+
 TEST_F(PhaseRingTest, NextPhases) {
   const double kDuration1{30};
   const double kDuration2{60};

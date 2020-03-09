@@ -55,6 +55,10 @@ class PhaseRing final {
   /// Returns the phase ring's identifier.
   const Id& id() const { return id_; }
 
+  /// Returns a Phase by its `id` or std::nullopt when it is not present in this
+  /// PhaseRing.
+  std::optional<Phase> GetPhase(const Phase::Id& id) const;
+
   /// Returns the catalog of phases.
   const std::unordered_map<Phase::Id, Phase>& phases() const { return phases_; }
 
