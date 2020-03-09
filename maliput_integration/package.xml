@@ -11,6 +11,8 @@
 
   <build_depend>ament_cmake_doxygen</build_depend>
 
+  <depend>dragway</depend>
+  <depend>libgflags-dev</depend>
   <depend>maliput</depend>
   <depend>maliput-utilities</depend>
   <depend>multilane</depend>

@@ -3,15 +3,17 @@
  * Instantiates a dragway with a user-specified number of lanes and outputs
  * a URDF model of it.
  */
+#include <limits>
+#include <string>
 
 #include <gflags/gflags.h>
 
+#include "dragway/road_geometry.h"
 #include "maliput-utilities/generate_urdf.h"
+#include "maliput/api/road_geometry.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
-
-#include "dragway/road_geometry.h"
 
 DEFINE_int32(num_lanes, 2, "The number of lanes.");
 DEFINE_double(length, 10, "The length of the dragway in meters.");
@@ -44,40 +46,40 @@ DEFINE_string(spdlog_level, "unchanged",
               "'off'");
 
 namespace maliput {
-namespace dragway {
+namespace integration {
 namespace {
 
 int exec(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  maliput::common::set_log_level(FLAGS_spdlog_level);
+  common::set_log_level(FLAGS_spdlog_level);
 
-  RoadGeometry road_geometry(api::RoadGeometryId{"Dragway with " + std::to_string(FLAGS_num_lanes) + " lanes."},
-                             FLAGS_num_lanes, FLAGS_length, FLAGS_lane_width, FLAGS_shoulder_width,
-                             FLAGS_maximum_height, std::numeric_limits<double>::epsilon(),
-                             std::numeric_limits<double>::epsilon());
+  const dragway::RoadGeometry road_geometry(
+      api::RoadGeometryId{"Dragway with " + std::to_string(FLAGS_num_lanes) + " lanes."}, FLAGS_num_lanes, FLAGS_length,
+      FLAGS_lane_width, FLAGS_shoulder_width, FLAGS_maximum_height, std::numeric_limits<double>::epsilon(),
+      std::numeric_limits<double>::epsilon());
 
   utility::ObjFeatures features;
 
   // Creates the destination directory if it does not already exist.
-  maliput::common::Path directory;
+  common::Path directory;
   directory.set_path(FLAGS_dirpath);
   if (!directory.exists()) {
-    maliput::common::Filesystem::create_directory_recursive(directory);
+    common::Filesystem::create_directory_recursive(directory);
   }
   MALIPUT_DEMAND(directory.exists());
 
   // The following is necessary for users to know where to find the resulting
   // files when this program is executed in a sandbox. This occurs, for example
   // when using `dragway_to_urdf`.
-  const maliput::common::Path my_path = maliput::common::Filesystem::get_cwd();
+  const common::Path my_path = maliput::common::Filesystem::get_cwd();
 
-  maliput::log()->info("Creating Dragway URDF in {}.", my_path.get_path());
+  log()->info("Creating Dragway URDF in {}.", my_path.get_path());
   utility::GenerateUrdfFile(&road_geometry, directory.get_path(), FLAGS_file_name_root, features);
   return 0;
 }
 
 }  // namespace
-}  // namespace dragway
+}  // namespace integration
 }  // namespace maliput
 
-int main(int argc, char* argv[]) { return maliput::dragway::exec(argc, argv); }
+int main(int argc, char* argv[]) { return maliput::integration::exec(argc, argv); }

@@ -14,7 +14,6 @@ message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 find_package(ament_cmake REQUIRED)
 
 find_package(maliput REQUIRED)
-find_package(maliput-utilities REQUIRED)
 find_package(pybind11 REQUIRED)
 
 ##############################################################################
@@ -59,7 +58,7 @@ if(BUILD_DOCS)
   find_package(ament_cmake_doxygen REQUIRED)
   ament_doxygen_generate(doxygen_dragway
     CONFIG_OVERLAY doc/Doxyfile.overlay.in
-    DEPENDENCIES maliput maliput-utilities
+    DEPENDENCIES maliput
   )
 endif()
 
@@ -76,7 +75,6 @@ ament_export_include_directories(include)
 
 ament_export_dependencies(ament_cmake)
 ament_export_dependencies(maliput)
-ament_export_dependencies(maliput-utilities)
 ament_export_interfaces(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 
 ament_package()
