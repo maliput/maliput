@@ -99,4 +99,13 @@ api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::Dis
   return nullptr;
 }
 
+api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::RightOfWayRule::Id& id) {
+  for (const auto& intersection : GetIntersections()) {
+    if (intersection->Includes(id)) {
+      return intersection;
+    }
+  }
+  return nullptr;
+}
+
 }  // namespace maliput

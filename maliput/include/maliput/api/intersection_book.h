@@ -39,6 +39,13 @@ class IntersectionBook {
   /// `id`, nullptr is returned.
   Intersection* FindIntersection(const rules::DiscreteValueRule::Id& id) { return DoGetFindIntersection(id); }
 
+  /// Find the intersection which contains api::rules::RightOfWayRule::Id.
+  ///
+  /// @param id A rules::RightOfWayRule::Id.
+  /// @returns The Intersection that contains `id`. When none of the Intersections have a rules::RightOfWayRule with
+  /// `id`, nullptr is returned.
+  Intersection* FindIntersection(const rules::RightOfWayRule::Id& id) { return DoGetFindIntersection(id); }
+
  protected:
   IntersectionBook() = default;
 
@@ -50,6 +57,8 @@ class IntersectionBook {
   virtual Intersection* DoGetFindIntersection(const rules::TrafficLight::Id& id) = 0;
 
   virtual Intersection* DoGetFindIntersection(const rules::DiscreteValueRule::Id& id) = 0;
+
+  virtual Intersection* DoGetFindIntersection(const rules::RightOfWayRule::Id& id) = 0;
 };
 
 }  // namespace api

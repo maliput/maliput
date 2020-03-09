@@ -63,6 +63,9 @@ class Intersection {
   /// Returns the current discrete value rule states within the intersection.
   const std::optional<rules::DiscreteValueRuleStates> DiscreteValueRuleStates() const;
 
+  /// Returns the current RightOfWayRule states within the intersection.
+  const std::optional<rules::RuleStates> RuleStates() const;
+
   /// Determines whether the rules::TrafficLight::Id is within this Intersection.
   ///
   /// @param id A rules::TrafficLight::Id.
@@ -74,6 +77,12 @@ class Intersection {
   /// @param id A rules::DiscreteValueRule::Id.
   /// @returns True When `id` is within this Intersection.
   bool Includes(const rules::DiscreteValueRule::Id& id) const;
+
+  /// Determines whether the rules::RightOfWayRule::Id is within this Intersection.
+  ///
+  /// @param id A rules::RightOfWayRule::Id.
+  /// @returns True When `id` is within this Intersection.
+  bool Includes(const rules::RightOfWayRule::Id& id) const;
 
   /// Determines whether `geo_position` is within this Intersection::Region().
   ///
