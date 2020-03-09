@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "drake/common/eigen_types.h"
 #include "maliput-utilities/mesh.h"
 #include "maliput/common/maliput_hash.h"
 #include "maliput/math/vector.h"

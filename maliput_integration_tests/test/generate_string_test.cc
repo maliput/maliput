@@ -5,7 +5,6 @@
 
 #include <gtest/gtest.h>
 
-#include "drake/common/find_resource.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/common/filesystem.h"
 #include "multilane/builder.h"
