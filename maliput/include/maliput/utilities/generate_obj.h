@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "maliput-utilities/mesh.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "utilities/mesh.h"
 
 namespace maliput {
 namespace utility {
