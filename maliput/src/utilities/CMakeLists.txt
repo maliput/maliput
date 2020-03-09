@@ -16,11 +16,6 @@ target_include_directories(utilities
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-ament_target_dependencies(utilities
-  PUBLIC
-    "maliput"
-)
-
 target_link_libraries(utilities
   PRIVATE
     fmt::fmt

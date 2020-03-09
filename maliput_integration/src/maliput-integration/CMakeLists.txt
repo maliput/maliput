@@ -13,9 +13,9 @@ ament_target_dependencies(dragway_to_urdf
 target_link_libraries(dragway_to_urdf
     dragway::dragway
     gflags
-    maliput::utilities
     maliput::common
     maliput::geometry_base
+    maliput::utilities
 )
 
 add_executable(yaml_to_obj
