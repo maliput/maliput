@@ -12,7 +12,7 @@ target_include_directories(dragway_py
 )
 
 target_link_libraries(dragway_py
-  PRIVATE dragway maliput::api
+  PRIVATE dragway maliput::api pybind11::module
 )
 
 ##############################################################################

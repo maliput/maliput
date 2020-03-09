@@ -17,7 +17,7 @@ find_package(drake_vendor REQUIRED)
 find_package(fmt 4.0.0 EXACT REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
-find_package(pybind11 CONFIG REQUIRED)
+find_package(pybind11 REQUIRED)
 
 ##############################################################################
 # Project Configuration
