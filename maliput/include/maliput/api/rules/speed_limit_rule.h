@@ -50,7 +50,7 @@ class SpeedLimitRule {
   }
 
   /// Returns the persistent identifier.
-  Id id() const { return id_; }
+  const Id& id() const { return id_; }
 
   /// Returns the zone to which this rule instance applies.
   const LaneSRange& zone() const { return zone_; }
