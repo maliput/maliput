@@ -13,7 +13,6 @@
   <depend>drake_vendor</depend>
   <depend>fmt</depend>
   <depend>maliput</depend>
-  <depend>maliput-utilities</depend>
   <depend>multilane</depend>
   <depend>dragway</depend>
 

@@ -15,7 +15,6 @@ find_package(ament_cmake REQUIRED)
 find_package(dragway REQUIRED)
 find_package(gflags REQUIRED)
 find_package(maliput REQUIRED)
-find_package(maliput-utilities REQUIRED)
 find_package(multilane REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
@@ -60,7 +59,7 @@ if(BUILD_DOCS)
   find_package(ament_cmake_doxygen REQUIRED)
   ament_doxygen_generate(doxygen_maliput_integration
     CONFIG_OVERLAY doc/Doxyfile.overlay.in
-    DEPENDENCIES dragway maliput maliput-utilities multilane
+    DEPENDENCIES dragway maliput multilane
   )
 endif()
 

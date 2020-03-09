@@ -1,4 +1,4 @@
-#include "maliput-utilities/mesh_simplification.h"
+#include "maliput/utilities/mesh_simplification.h"
 
 #include <algorithm>
 #include <queue>

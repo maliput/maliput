@@ -1,4 +1,4 @@
-#include "utilities/generate_obj.h"
+#include "maliput/utilities/generate_obj.h"
 
 #include <algorithm>
 #include <cmath>
@@ -19,8 +19,8 @@
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput/math/vector.h"
-#include "utilities/mesh.h"
-#include "utilities/mesh_simplification.h"
+#include "maliput/utilities/mesh.h"
+#include "maliput/utilities/mesh_simplification.h"
 
 namespace maliput {
 namespace utility {

@@ -1,4 +1,4 @@
-#include "utilities/generate_urdf.h"
+#include "maliput/utilities/generate_urdf.h"
 
 #include <cmath>
 

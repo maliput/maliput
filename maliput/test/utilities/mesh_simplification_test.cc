@@ -1,4 +1,4 @@
-#include "utilities/mesh_simplification.h"
+#include "maliput/utilities/mesh_simplification.h"
 
 #include <gtest/gtest.h>
 

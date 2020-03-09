@@ -1,4 +1,4 @@
-#include "utilities/generate_obj.h"
+#include "maliput/utilities/generate_obj.h"
 
 #include <cmath>
 
