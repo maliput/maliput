@@ -12,8 +12,7 @@ namespace rules {
 namespace test {
 
 // TODO(maddog@tri.global) Make the general-purpose assertion collection
-//                         machinery available (and used) by maliput in general,
-//                         or even drake.
+//                         machinery available (and used) by maliput in general.
 
 /// AssertionResultCollector helps with the creation of concise and well-traced
 /// testing subroutines when using googletest.

@@ -24,16 +24,12 @@ target_include_directories(
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-ament_target_dependencies(maliput_test_utilities
-  "drake"
-)
-
 target_link_libraries(maliput_test_utilities
   api
   common
   math
   geometry_base
-  drake::drake)
+)
 
 install(
     TARGETS maliput_test_utilities EXPORT ${PROJECT_NAME}-targets

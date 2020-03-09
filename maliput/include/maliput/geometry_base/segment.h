@@ -58,7 +58,6 @@ class Segment : public api::Segment {
     return raw_pointer;
   }
 
-#ifndef DRAKE_DOXYGEN_CXX
   // Notifies Segment of its parent Junction.
   // This may only be called, once, by a Junction.
   //
@@ -77,7 +76,6 @@ class Segment : public api::Segment {
   // @pre `callback` is non-empty.
   // @pre The lane indexing callback has not already been set.
   void SetLaneIndexingCallback(common::Passkey<Junction>, const std::function<void(const api::Lane*)>& callback);
-#endif  // DRAKE_DOXYGEN_CXX
 
   ~Segment() override = default;
 

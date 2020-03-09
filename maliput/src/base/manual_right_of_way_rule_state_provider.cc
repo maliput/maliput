@@ -3,8 +3,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "drake/common/drake_throw.h"
-
 namespace maliput {
 
 using api::rules::RightOfWayRule;

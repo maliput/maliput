@@ -17,7 +17,7 @@ target_link_libraries(routing
   PUBLIC
     api
     common
-    drake::drake)
+)
 
 ##############################################################################
 # Export

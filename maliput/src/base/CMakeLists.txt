@@ -37,7 +37,6 @@ target_link_libraries(base
   PUBLIC
     api
     common
-    drake::drake
     yaml-cpp)
 
 ##############################################################################
