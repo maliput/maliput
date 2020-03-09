@@ -38,6 +38,8 @@ class IntersectionBook : public api::IntersectionBook {
 
   api::Intersection* DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) override;
 
+  api::Intersection* DoGetFindIntersection(const api::rules::RightOfWayRule::Id& id) override;
+
   class Impl;
   std::unique_ptr<Impl> impl_;
 };

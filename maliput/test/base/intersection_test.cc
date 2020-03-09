@@ -79,6 +79,7 @@ TEST_F(IntersectionTest, BasicTest) {
   EXPECT_EQ(dut.ring_id(), dummy_ring_.id());
   EXPECT_EQ(dut.bulb_states().value().at(unique_bulb_id), api::rules::BulbState::kOn);
   EXPECT_EQ(dut.DiscreteValueRuleStates().value().at(rule_id_b), discrete_value_2);
+  EXPECT_EQ(dut.RuleStates().value().at(rule_id_a), api::rules::RightOfWayRule::State::Id("STOP"));
   dut.SetPhase(dummy_phase_1_.id(), dummy_phase_2_.id(), kDurationUntil);
   EXPECT_EQ(dut.bulb_states().value().at(unique_bulb_id), api::rules::BulbState::kOff);
   EXPECT_EQ(dut.DiscreteValueRuleStates().value().at(rule_id_b), discrete_value_1);
@@ -117,7 +118,7 @@ TEST_F(IntersectionTest, IncludesByTrafficLightId) {
   EXPECT_FALSE(dut.Includes(not_included_traffic_light));
 }
 
-TEST_F(IntersectionTest, IncludesByRuleId) {
+TEST_F(IntersectionTest, IncludesByDiscreteValueRuleId) {
   const double kDurationUntil{1};
   const api::rules::Rule::Id not_included_rule_id{"not_included_rule_id"};
   ManualPhaseProvider phase_provider;
@@ -125,6 +126,17 @@ TEST_F(IntersectionTest, IncludesByRuleId) {
   phase_provider.AddPhaseRing(dummy_ring_.id(), dummy_phase_1_.id());
 
   EXPECT_TRUE(dut.Includes(rule_id_b));
+  EXPECT_FALSE(dut.Includes(not_included_rule_id));
+}
+
+TEST_F(IntersectionTest, IncludesByRightOfWayRuleId) {
+  const double kDurationUntil{1};
+  const api::rules::RightOfWayRule::Id not_included_rule_id{"not_included_rule_id"};
+  ManualPhaseProvider phase_provider;
+  Intersection dut(kIntersectionId, ranges_a, dummy_ring_, &phase_provider);
+  phase_provider.AddPhaseRing(dummy_ring_.id(), dummy_phase_1_.id());
+
+  EXPECT_TRUE(dut.Includes(rule_id_a));
   EXPECT_FALSE(dut.Includes(not_included_rule_id));
 }
 

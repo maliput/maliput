@@ -59,7 +59,7 @@ GTEST_TEST(IntersectionBook, BasicTest) {
 }
 
 // Returns true when `intersections` has an Intersection whose ID is `expected_intersection_id`.
-bool HasIntersectionId(const std::vector<maliput::api::Intersection*>& intersections,
+bool HasIntersectionId(const std::vector<api::Intersection*>& intersections,
                        const Intersection::Id& expected_intersection_id) {
   return std::find_if(intersections.begin(), intersections.end(),
                       [expected_intersection_id](const maliput::api::Intersection* intersection) {
@@ -105,6 +105,9 @@ class IntersectionBookTest : public ::testing::Test {
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdAPhase1{"RightOfWayRuleType/rule_a/phase_id_1"};
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdBPhase2{"RightOfWayRuleType/rule_b/phase_id_2"};
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdAPhase3{"RightOfWayRuleType/rule_a/phase_id_3"};
+  const api::rules::RightOfWayRule::Id kRightOfWayRuleIdAPhase1{"rule_a/phase_id_1"};
+  const api::rules::RightOfWayRule::Id kRightOfWayRuleIdBPhase2{"rule_b/phase_id_2"};
+  const api::rules::RightOfWayRule::Id kRightOfWayRuleIdAPhase3{"rule_a/phase_id_3"};
   const double kTolerance = 1e-3;
 
   IntersectionBookTest() {
@@ -156,6 +159,12 @@ TEST_F(IntersectionBookTest, FindIntersectionByDiscreteValueRuleId) {
   EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdAPhase1)->id(), Intersection::Id(kIntersectionIdA));
   EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdBPhase2)->id(), Intersection::Id(kIntersectionIdB));
   EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdAPhase3)->id(), Intersection::Id(kIntersectionIdC));
+}
+
+TEST_F(IntersectionBookTest, FindIntersectionByRightOfWayRuleId) {
+  EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdAPhase1)->id(), Intersection::Id(kIntersectionIdA));
+  EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdBPhase2)->id(), Intersection::Id(kIntersectionIdB));
+  EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdAPhase3)->id(), Intersection::Id(kIntersectionIdC));
 }
 
 }  // namespace
