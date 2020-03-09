@@ -53,23 +53,23 @@ class RoadNetwork {
 
   const rules::TrafficLightBook* traffic_light_book() const { return traffic_light_book_.get(); }
 
-  IntersectionBook* intersection_book() const { return intersection_book_.get(); }
+  IntersectionBook* intersection_book() { return intersection_book_.get(); }
 
   const rules::PhaseRingBook* phase_ring_book() const { return phase_ring_book_.get(); }
 
-  rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider() const {
+  rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider() {
     return right_of_way_rule_state_provider_.get();
   }
 
-  rules::PhaseProvider* phase_provider() const { return phase_provider_.get(); }
+  rules::PhaseProvider* phase_provider() { return phase_provider_.get(); }
 
   const rules::RuleRegistry* rule_registry() const { return rule_registry_.get(); }
 
-  rules::DiscreteValueRuleStateProvider* discrete_value_rule_state_provider() const {
+  rules::DiscreteValueRuleStateProvider* discrete_value_rule_state_provider() {
     return discrete_value_rule_state_provider_.get();
   }
 
-  rules::RangeValueRuleStateProvider* range_value_rule_state_provider() const {
+  rules::RangeValueRuleStateProvider* range_value_rule_state_provider() {
     return range_value_rule_state_provider_.get();
   }
 
