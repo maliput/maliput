@@ -1,4 +1,4 @@
-#include "maliput-utilities/generate_obj.h"
+#include "maliput/utilities/generate_obj.h"
 
 #include <cmath>
 
@@ -40,7 +40,7 @@ class GenerateObjTest : public ::testing::Test {
 
   void ReadExpectedData(const std::string& filename, std::string* destination) {
     /* TODO: Discuss this. static constexpr const char* const kTestDataPath =
-        "maliput-utilities/test/data/";
+        "utilities/test/data/";
     const std::string absolute_path =
         FindResourceOrThrow(std::string(kTestDataPath) + filename);*/
     ReadAsString(filename, destination);

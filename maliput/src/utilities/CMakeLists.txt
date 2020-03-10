@@ -9,25 +9,20 @@ set(SOURCES
   mesh_simplification.cc
   segment_analysis.cc)
 
-add_library(maliput-utilities ${SOURCES})
+add_library(utilities ${SOURCES})
 
-target_include_directories(maliput-utilities
+target_include_directories(utilities
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-ament_target_dependencies(maliput-utilities
-  PUBLIC
-    "maliput"
-)
-
-target_link_libraries(maliput-utilities
+target_link_libraries(utilities
   PRIVATE
     fmt::fmt
   PUBLIC
-    maliput::api
-    maliput::common
-    maliput::math
+    api
+    common
+    math
 )
 
 ##############################################################################
@@ -35,11 +30,11 @@ target_link_libraries(maliput-utilities
 ##############################################################################
 
 install(
-    TARGETS maliput-utilities
+    TARGETS utilities
     EXPORT ${PROJECT_NAME}-targets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-ament_export_libraries(maliput-utilities)
+ament_export_libraries(utilities)

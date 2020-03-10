@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "maliput-utilities/generate_obj.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/utilities/generate_obj.h"
 
 namespace maliput {
 namespace utility {

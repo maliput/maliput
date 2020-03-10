@@ -1,4 +1,4 @@
-#include "maliput-utilities/segment_analysis.h"
+#include "maliput/utilities/segment_analysis.h"
 
 #include <memory>
 #include <set>

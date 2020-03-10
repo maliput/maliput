@@ -1,4 +1,4 @@
-#include "maliput-utilities/generate_string.h"
+#include "maliput/utilities/generate_string.h"
 
 #include <memory>
 #include <string>

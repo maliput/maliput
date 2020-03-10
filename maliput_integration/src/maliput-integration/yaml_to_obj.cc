@@ -9,7 +9,7 @@
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 
-#include "maliput-utilities/generate_obj.h"
+#include "maliput/utilities/generate_obj.h"
 
 #include "multilane/builder.h"
 #include "multilane/loader.h"

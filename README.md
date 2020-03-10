@@ -18,11 +18,11 @@ source ./bringup
   - If not building drake from source:
 
    ```sh
-   colcon build --packages-up-to maliput dragway multilane maliput-integration-tests maliput-utilities
+   colcon build --packages-up-to maliput dragway multilane maliput-integration-tests
    ```
 
   - If building drake from source:
 
    ```sh
-   colcon build --cmake-args -DWITH_PYTHON_VERSION=3 --packages-up-to maliput dragway multilane maliput-integration-tests maliput-utilities
+   colcon build --cmake-args -DWITH_PYTHON_VERSION=3 --packages-up-to maliput dragway multilane maliput-integration-tests
    ```
