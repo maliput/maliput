@@ -52,10 +52,10 @@ class TestMaliput(unittest.TestCase):
         self.assertTrue(kDut.yaw_angle() == m.pi/2)
         quat = kDut.ToQuaternion()
         kExpectedQuat = Quaternion(0.5, 0.5, 0.5, 0.5)
-        self.assertAlmostEqual(quat.w(),kExpectedQuat.w())
-        self.assertAlmostEqual(quat.x(),kExpectedQuat.x())
-        self.assertAlmostEqual(quat.y(),kExpectedQuat.y())
-        self.assertAlmostEqual(quat.z(),kExpectedQuat.z())
+        self.assertAlmostEqual(quat.w(), kExpectedQuat.w())
+        self.assertAlmostEqual(quat.x(), kExpectedQuat.x())
+        self.assertAlmostEqual(quat.y(), kExpectedQuat.y())
+        self.assertAlmostEqual(quat.z(), kExpectedQuat.z())
 
     def test_quaternion(self):
         '''
