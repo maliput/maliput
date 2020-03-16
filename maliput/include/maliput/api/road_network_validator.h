@@ -40,6 +40,9 @@ struct RoadNetworkValidatorOptions {
   /// Whether to check rules::BulbStates in rules::Phases consistency with
   /// respect to rules::Bulbs living in rules::TrafficLightBook.
   bool check_phase_bulb_states{true};
+  /// Whether to check  rules::DiscreteValueRule::Rule::State::related_rules
+  /// exist in RoadRulebook.
+  bool check_related_rules{true};
 };
 
 /// Validates a RoadNetwork.

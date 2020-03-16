@@ -199,6 +199,53 @@ void CheckPhasesBulbStates(const RoadNetwork& road_network) {
   WalkPhases(road_network, evaluate_phase);
 }
 
+// Evaluates if `rule_id` is in `discrete_value_rules` or `range_value_rules`.
+bool IsRuleIdIn(const rules::Rule::Id rule_id,
+                const std::map<rules::DiscreteValueRule::Id, rules::DiscreteValueRule> discrete_value_rules,
+                const std::map<rules::RangeValueRule::Id, rules::RangeValueRule> range_value_rules) {
+  return (discrete_value_rules.find(rule_id) != discrete_value_rules.end()) ||
+         (range_value_rules.find(rule_id) != range_value_rules.end());
+}
+
+// Evaluates if rules::DiscreteValueRules and rules::RangeValueRules contain
+// states whose Rule::RelatedRules point to existent rule::Rules in
+// `road_network.rulebook()`.
+void CheckRelatedRues(const RoadNetwork& road_network) {
+  const rules::RoadRulebook::QueryResults rules = road_network.rulebook()->Rules();
+
+  for (const auto& kv : rules.discrete_value_rules) {
+    for (const auto& value : kv.second.values()) {
+      for (const auto& group_related_rule_ids : value.related_rules) {
+        for (const auto& related_rule_id : group_related_rule_ids.second) {
+          if (!IsRuleIdIn(related_rule_id, rules.discrete_value_rules, rules.range_value_rules)) {
+            MALIPUT_THROW_MESSAGE("DiscreteValueRule(id:" + kv.first.string() +
+                                  ") has a DiscreteValue with a "
+                                  "RelatedRule pointing to id:" +
+                                  related_rule_id +
+                                  " and it does not exist in the "
+                                  "RoadRulebook.");
+          }
+        }
+      }
+    }
+  }
+
+  for (const auto& kv : rules.range_value_rules) {
+    for (const auto& range : kv.second.ranges()) {
+      for (const auto& group_related_rule_ids : range.related_rules) {
+        for (const auto& related_rule_id : group_related_rule_ids.second) {
+          if (!IsRuleIdIn(related_rule_id, rules.discrete_value_rules, rules.range_value_rules)) {
+            MALIPUT_THROW_MESSAGE("RangeValueRule(id:" + kv.first.string() +
+                                  ") has a Range with a related rule "
+                                  "pointing to id:" +
+                                  related_rule_id + " and it does not exist in the RoadRulebook.");
+          }
+        }
+      }
+    }
+  }
+}
+
 }  // namespace
 
 void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValidatorOptions& options) {
@@ -222,6 +269,9 @@ void ValidateRoadNetwork(const RoadNetwork& road_network, const RoadNetworkValid
   }
   if (options.check_phase_bulb_states) {
     CheckPhasesBulbStates(road_network);
+  }
+  if (options.check_related_rules) {
+    CheckRelatedRues(road_network);
   }
 }
 
