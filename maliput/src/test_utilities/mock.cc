@@ -574,6 +574,26 @@ DiscreteValueRule CreateDiscreteValueRule() {
                             DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
                                                              CreateEmptyRelatedUniqueIds(), "value2"}});
 }
+
+DiscreteValueRule CreateDiscreteValueRule(bool consistent_related_rule_groups) {
+  if (consistent_related_rule_groups) {
+    return DiscreteValueRule(
+        Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(),
+        {DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict,
+                                          Rule::RelatedRules{{"RelatedRulesGroup", {Rule::Id("dvrt/dvr_id")}}},
+                                          CreateEmptyRelatedUniqueIds(), "value1"},
+         DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                          CreateEmptyRelatedUniqueIds(), "value2"}});
+  }
+  return DiscreteValueRule(
+      Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"), CreateLaneSRoute(),
+      {DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict,
+                                        Rule::RelatedRules{{"RelatedRulesGroup", {Rule::Id("dvrt/DoesNotExist")}}},
+                                        CreateEmptyRelatedUniqueIds(), "value1"},
+       DiscreteValueRule::DiscreteValue{rules::Rule::State::kStrict, CreateEmptyRelatedRules(),
+                                        CreateEmptyRelatedUniqueIds(), "value2"}});
+}
+
 DiscreteValueRule CreateDiscreteValueRuleForContiguityTest() {
   return DiscreteValueRule(
       Rule::Id("dvrt/dvr_id"), Rule::TypeId("dvrt"),
@@ -595,6 +615,21 @@ RangeValueRule::Range CreateRange() {
 
 RangeValueRule CreateRangeValueRule() {
   return RangeValueRule(Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), CreateLaneSRoute(), {CreateRange()});
+}
+
+RangeValueRule CreateRangeValueRule(bool consistent_related_rule_groups) {
+  if (consistent_related_rule_groups) {
+    return RangeValueRule(
+        Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), CreateLaneSRoute(),
+        {RangeValueRule::Range{rules::Rule::State::kStrict,
+                               Rule::RelatedRules{{"RelatedRulesGroup", {Rule::Id("rvrt/rvr_id")}}},
+                               CreateEmptyRelatedUniqueIds(), "description", 123. /* min */, 456. /* max */}});
+  }
+  return RangeValueRule(
+      Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), CreateLaneSRoute(),
+      {RangeValueRule::Range{rules::Rule::State::kStrict,
+                             Rule::RelatedRules{{"RelatedRulesGroup", {Rule::Id("rvrt/DoesNotExist")}}},
+                             CreateEmptyRelatedUniqueIds(), "description", 123. /* min */, 456. /* max */}});
 }
 
 RangeValueRule CreateRangeValueRuleForContiguityTest() {
@@ -804,6 +839,27 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildF
   }
   if (build_flags.add_range_value_rule) {
     rulebook->set_range_value_rule(CreateRangeValueRule());
+  }
+  return std::move(rulebook);
+}
+
+std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookRelatedRulesBuildFlags& build_flags) {
+  auto rulebook = std::make_unique<MockRoadRulebook>();
+  if (build_flags.roadrulebook_flags.add_right_of_way) {
+    rulebook->set_right_of_way(CreateRightOfWayRule(build_flags.roadrulebook_flags.right_of_way_build_flags));
+  }
+  if (build_flags.roadrulebook_flags.add_direction_usage) {
+    rulebook->set_direction_usage(CreateDirectionUsageRule());
+  }
+  if (build_flags.roadrulebook_flags.add_speed_limit) {
+    rulebook->set_speed_limit(CreateSpeedLimitRule());
+  }
+  if (build_flags.roadrulebook_flags.add_discrete_value_rule) {
+    rulebook->set_discrete_value_rule(
+        CreateDiscreteValueRule(build_flags.consistent_related_rule_in_discrete_value_rule));
+  }
+  if (build_flags.roadrulebook_flags.add_range_value_rule) {
+    rulebook->set_range_value_rule(CreateRangeValueRule(build_flags.consistent_related_rule_in_range_value_rule));
   }
   return std::move(rulebook);
 }

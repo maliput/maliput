@@ -81,6 +81,16 @@ struct RoadRulebookBuildFlags {
   bool add_range_value_rule{false};
 };
 
+/// Holds RoadRulebook build configurations when RelatedRules consitency are
+/// under test.
+/// @see CreateRoadRulebook() docstring for full details on
+///      how this structure pairs with the function.
+struct RoadRulebookRelatedRulesBuildFlags {
+  RoadRulebookBuildFlags roadrulebook_flags;
+  bool consistent_related_rule_in_discrete_value_rule{false};
+  bool consistent_related_rule_in_range_value_rule{false};
+};
+
 /// Holds TrafficLight build configurations.
 /// @see CreateTrafficLight() docstring for full details on
 ///      how this structure pairs with the function.
@@ -252,6 +262,19 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook();
 /// When `build_flags.add_range_value` is true, a RangeValueRule
 /// is created with CreateRangeValueRule().
 std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookBuildFlags& build_flags);
+
+/// Returns an arbitrary rules::RoadRulebook.
+///
+/// @see CreateRoadRulebook(const RoadRulebookBuildFlags& build_flags) for
+/// rule construction logic.
+///
+/// When `build_flags.roadrulebook.add_discrete_value`,
+/// `build_flags.consistent_related_rule_in_discrete_value_rule` will create a
+/// self reference to provide a valid rule::Rule::Id as a RelatedRule.
+/// When `build_flags.roadrulebook.add_Range_value`,
+/// `build_flags.consistent_related_rule_in_range_value_rule` will create a
+/// self reference to provide a valid rule::Rule::Id as a RelatedRule.
+std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookRelatedRulesBuildFlags& build_flags);
 
 /// Returns an arbitrary rules::RoadRulebook.
 ///

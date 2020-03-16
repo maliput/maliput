@@ -337,6 +337,59 @@ TEST_P(PhaseBulbStatesTest, ChecksPhaseBulbStates) {
 INSTANTIATE_TEST_CASE_P(PhaseBulbStatesTestGroup, PhaseBulbStatesTest,
                         ::testing::ValuesIn(PhaseBulbStatesTestParameters()));
 
+// Holds the Rulebook's rule construction flags for the test and whether or not
+// it must throw.
+struct RelatedRulesBuildFlags {
+  RoadRulebookRelatedRulesBuildFlags rulebook_build_flags{};
+  bool expects_throw{false};
+};
+
+// Evaluates whether or not the validation detects inconsistent RelatedRules in
+// rules::Rule::States for both rules::DiscreteValueRule and
+// rules::RaneValueRule.
+class RelatedRulesTest : public ::testing::TestWithParam<RelatedRulesBuildFlags> {
+ protected:
+  void SetUp() override { build_flags_ = GetParam(); }
+
+  RelatedRulesBuildFlags build_flags_{};
+};
+
+// Returns a vector of test configurations to create different tests.
+std::vector<RelatedRulesBuildFlags> RelatedRulesTestParameters() {
+  return {
+      // Throws because of inconsistent RelatedRule in rules::DiscreteValueRule.
+      RelatedRulesBuildFlags{{{false, {}, false, false, true, true}, false, true}, true},
+      // Throws because of inconsistent RelatedRule in rules::RangeValueRule.
+      RelatedRulesBuildFlags{{{false, {}, false, false, true, true}, true, false}, true},
+      // Expects no throw because of correct construction.
+      RelatedRulesBuildFlags{{{false, {}, false, false, true, true}, true, true}, false},
+  };
+}
+
+TEST_P(RelatedRulesTest, ChecksRelatedRules) {
+  RoadNetwork road_network(test::CreateRoadGeometry(), test::CreateRoadRulebook(build_flags_.rulebook_build_flags),
+                           test::CreateTrafficLightBook(), test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
+                           test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
+                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+                           test::CreateRangeValueRuleStateProvider());
+
+  const RoadNetworkValidatorOptions options{false /* check_direction_usage_rule_coverage */,
+                                            false /* check_road_geometry_invariants */,
+                                            false /* check_road_geometry_hierarchy */,
+                                            false /* check_related_bulb_groups */,
+                                            false /* check_contiguity_rule_zones */,
+                                            false /* check_phase_discrete_value_rule_states */,
+                                            true /* check_phase_bulb_states */};
+
+  if (build_flags_.expects_throw) {
+    EXPECT_THROW(ValidateRoadNetwork(road_network, options), std::exception);
+  } else {
+    EXPECT_NO_THROW(ValidateRoadNetwork(road_network, options));
+  }
+}
+
+INSTANTIATE_TEST_CASE_P(RelatedRulesTestGroup, RelatedRulesTest, ::testing::ValuesIn(RelatedRulesTestParameters()));
+
 }  // namespace
 }  // namespace test
 }  // namespace api
