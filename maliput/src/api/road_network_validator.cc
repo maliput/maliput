@@ -69,23 +69,31 @@ void ThrowIfThereAreRoadGeometryInvariants(const RoadNetwork& road_network) {
 }
 
 // Evaluates that Junctions, Segments and BranchPoints are not empty, Lanes
-// have a BranchPoint at each endpoint.
+// have a BranchPoint at each endpoint. Also, IdIndex must contain references to
+// all entities within the RoadGeometry graph.
 void CheckRoadGeometryHierarchyConsistency(const RoadNetwork& road_network) {
-  MALIPUT_THROW_UNLESS(road_network.road_geometry()->num_junctions() > 0);
-  for (int i = 0; i < road_network.road_geometry()->num_junctions(); ++i) {
-    const Junction* junction = road_network.road_geometry()->junction(i);
+  const RoadGeometry* rg = road_network.road_geometry();
+  MALIPUT_THROW_UNLESS(rg != nullptr);
+
+  const RoadGeometry::IdIndex& id_index = rg->ById();
+  MALIPUT_THROW_UNLESS(rg->num_junctions() > 0);
+  for (int i = 0; i < rg->num_junctions(); ++i) {
+    const Junction* junction = rg->junction(i);
     MALIPUT_THROW_UNLESS(junction != nullptr);
-    MALIPUT_THROW_UNLESS(junction->road_geometry() == road_network.road_geometry());
+    MALIPUT_THROW_UNLESS(junction->road_geometry() == rg);
+    MALIPUT_THROW_UNLESS(junction == id_index.GetJunction(junction->id()));
     MALIPUT_THROW_UNLESS(junction->num_segments() > 0);
     for (int j = 0; j < junction->num_segments(); ++j) {
       const Segment* segment = junction->segment(j);
       MALIPUT_THROW_UNLESS(segment != nullptr);
       MALIPUT_THROW_UNLESS(segment->junction() == junction);
+      MALIPUT_THROW_UNLESS(segment == id_index.GetSegment(segment->id()));
       MALIPUT_THROW_UNLESS(segment->num_lanes() > 0);
       for (int k = 0; k < segment->num_lanes(); ++k) {
         const Lane* lane = segment->lane(k);
         MALIPUT_THROW_UNLESS(lane != nullptr);
         MALIPUT_THROW_UNLESS(lane->segment() == segment);
+        MALIPUT_THROW_UNLESS(lane == id_index.GetLane(lane->id()));
         const BranchPoint* bp_start = lane->GetBranchPoint(LaneEnd::Which::kStart);
         MALIPUT_THROW_UNLESS(bp_start != nullptr);
         const BranchPoint* bp_finish = lane->GetBranchPoint(LaneEnd::Which::kFinish);
@@ -94,11 +102,12 @@ void CheckRoadGeometryHierarchyConsistency(const RoadNetwork& road_network) {
     }
   }
 
-  MALIPUT_THROW_UNLESS(road_network.road_geometry()->num_branch_points() >= 2);
-  for (int i = 0; i < road_network.road_geometry()->num_branch_points(); ++i) {
-    const BranchPoint* bp = road_network.road_geometry()->branch_point(i);
+  MALIPUT_THROW_UNLESS(rg->num_branch_points() >= 2);
+  for (int i = 0; i < rg->num_branch_points(); ++i) {
+    const BranchPoint* bp = rg->branch_point(i);
     MALIPUT_THROW_UNLESS(bp != nullptr);
-    MALIPUT_THROW_UNLESS(bp->road_geometry() == road_network.road_geometry());
+    MALIPUT_THROW_UNLESS(bp->road_geometry() == rg);
+    MALIPUT_THROW_UNLESS(bp == id_index.GetBranchPoint(bp->id()));
     MALIPUT_THROW_UNLESS(bp->GetASide() != nullptr);
     MALIPUT_THROW_UNLESS(bp->GetBSide() != nullptr);
     MALIPUT_THROW_UNLESS(bp->GetASide()->size() != 0 || bp->GetBSide()->size() != 0);
