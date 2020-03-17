@@ -173,19 +173,36 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockIdIndex);
   MockIdIndex() = default;
+  void add_junction_to_map(const JunctionId& id, const Junction* junction) { junction_map_.emplace(id, junction); }
   void add_lane_to_map(const LaneId& id, const Lane* lane) { lane_map_.emplace(id, lane); }
+  void add_segment_to_map(const SegmentId& id, const Segment* segment) { segment_map_.emplace(id, segment); }
+  void add_branchpoint_to_map(const BranchPointId& id, const BranchPoint* branch_point) {
+    branch_point_map_.emplace(id, branch_point);
+  }
 
  private:
+  const BranchPoint* DoGetBranchPoint(const BranchPointId& branch_point_id) const override {
+    auto it = branch_point_map_.find(branch_point_id);
+    return (it == branch_point_map_.end()) ? nullptr : it->second;
+  }
+  const Junction* DoGetJunction(const JunctionId& junction_id) const override {
+    auto it = junction_map_.find(junction_id);
+    return (it == junction_map_.end()) ? nullptr : it->second;
+  }
   const Lane* DoGetLane(const LaneId& lane_id) const override {
     auto it = lane_map_.find(lane_id);
     return (it == lane_map_.end()) ? nullptr : it->second;
   }
+  const Segment* DoGetSegment(const SegmentId& segment_id) const override {
+    auto it = segment_map_.find(segment_id);
+    return (it == segment_map_.end()) ? nullptr : it->second;
+  }
   const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
-  const Segment* DoGetSegment(const SegmentId& segment_id) const override { return nullptr; }
-  const Junction* DoGetJunction(const JunctionId& junction_id) const override { return nullptr; }
-  const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
 
+  std::unordered_map<BranchPointId, const BranchPoint*> branch_point_map_;
+  std::unordered_map<JunctionId, const Junction*> junction_map_;
   std::unordered_map<LaneId, const Lane*> lane_map_;
+  std::unordered_map<SegmentId, const Segment*> segment_map_;
 };
 
 class MockRoadGeometry : public RoadGeometry {
@@ -198,6 +215,7 @@ class MockRoadGeometry : public RoadGeometry {
   void add_junction(std::unique_ptr<MockJunction> junction) { junctions_.push_back(std::move(junction)); }
   void set_start_bp(std::unique_ptr<MockBranchPoint> start_bp) { start_bp_ = std::move(start_bp); }
   void set_end_bp(std::unique_ptr<MockBranchPoint> end_bp) { end_bp_ = std::move(end_bp); }
+
   MockBranchPoint* start_bp() { return start_bp_.get(); }
   MockBranchPoint* end_bp() { return end_bp_.get(); }
   MockIdIndex* GetIdIndex() { return &mock_id_index_; }
@@ -637,23 +655,40 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& build_flags) {
   auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"));
+  auto* id_index = rg->GetIdIndex();
+
   if (build_flags.add_branchpoint) {
     auto start_bp = std::make_unique<MockBranchPoint>(BranchPointId("mock_start"));
     start_bp->set_road_geometry(rg.get());
+    if (build_flags.id_index_build_flags.add_branchpoint) {
+      id_index->add_branchpoint_to_map(start_bp->id(), start_bp.get());
+    }
     rg->set_start_bp(std::move(start_bp));
     auto end_bp = std::make_unique<MockBranchPoint>(BranchPointId("mock_end"));
     end_bp->set_road_geometry(rg.get());
+    if (build_flags.id_index_build_flags.add_branchpoint) {
+      id_index->add_branchpoint_to_map(end_bp->id(), end_bp.get());
+    }
     rg->set_end_bp(std::move(end_bp));
   }
   if (build_flags.add_junction) {
     auto junction = std::make_unique<MockJunction>(JunctionId("mock"));
     junction->set_road_geometry(rg.get());
+    if (build_flags.id_index_build_flags.add_junction) {
+      id_index->add_junction_to_map(junction->id(), junction.get());
+    }
     if (build_flags.add_segment) {
       auto segment = std::make_unique<MockSegment>(SegmentId("mock"));
       segment->set_junction(junction.get());
+      if (build_flags.id_index_build_flags.add_segment) {
+        id_index->add_segment_to_map(segment->id(), segment.get());
+      }
       if (build_flags.add_lane) {
         auto lane = std::make_unique<MockLane>(LaneId("mock"));
         lane->set_segment(segment.get());
+        if (build_flags.id_index_build_flags.add_lane) {
+          id_index->add_lane_to_map(lane->id(), lane.get());
+        }
         if (build_flags.add_branchpoint && build_flags.add_lane_end_set) {
           auto lane_end_set_start = std::make_unique<MockLaneEndSet>();
           lane_end_set_start->set_lane_end(LaneEnd(lane.get(), LaneEnd::Which::kStart));

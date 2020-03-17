@@ -23,6 +23,13 @@ namespace maliput {
 namespace api {
 namespace test {
 
+struct RoadGeometryIdIndexBuildFlags {
+  bool add_branchpoint{false};
+  bool add_junction{false};
+  bool add_lane{false};
+  bool add_segment{false};
+};
+
 /// Holds RoadGeometry build configuration.
 /// @see CreateRoadGeometry() docstring for full details on how this
 ///      structure pairs with the function.
@@ -33,6 +40,7 @@ struct RoadGeometryBuildFlags {
   bool add_branchpoint{false};
   bool add_lane_end_set{false};
   bool expects_throw{false};
+  RoadGeometryIdIndexBuildFlags id_index_build_flags{};
 };
 
 /// Holds RoadGeometry contiguity build configuration.
