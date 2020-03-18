@@ -182,19 +182,19 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
 
  private:
   const BranchPoint* DoGetBranchPoint(const BranchPointId& branch_point_id) const override {
-    auto it = branch_point_map_.find(branch_point_id);
+    const auto it = branch_point_map_.find(branch_point_id);
     return (it == branch_point_map_.end()) ? nullptr : it->second;
   }
   const Junction* DoGetJunction(const JunctionId& junction_id) const override {
-    auto it = junction_map_.find(junction_id);
+    const auto it = junction_map_.find(junction_id);
     return (it == junction_map_.end()) ? nullptr : it->second;
   }
   const Lane* DoGetLane(const LaneId& lane_id) const override {
-    auto it = lane_map_.find(lane_id);
+    const auto it = lane_map_.find(lane_id);
     return (it == lane_map_.end()) ? nullptr : it->second;
   }
   const Segment* DoGetSegment(const SegmentId& segment_id) const override {
-    auto it = segment_map_.find(segment_id);
+    const auto it = segment_map_.find(segment_id);
     return (it == segment_map_.end()) ? nullptr : it->second;
   }
   const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
