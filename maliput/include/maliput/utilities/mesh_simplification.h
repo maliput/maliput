@@ -135,7 +135,14 @@ const math::Vector3& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFac
 /// @tparam InputIt An IndexFace::Vertex container iterator type.
 template <typename InputIt>
 bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const math::Vector3& n,
-                              const math::Vector3& p, double tolerance);
+                              const math::Vector3& p, double tolerance) {
+  return std::all_of(first, last, [&mesh, &n, &p, tolerance](const IndexFace::Vertex& vertex) {
+    const math::Vector3& x_vertex = GetMeshFaceVertexPosition(mesh, vertex);
+    const math::Vector3& n_vertex = GetMeshFaceVertexNormal(mesh, vertex);
+    const double ctheta = std::abs(n.dot(n_vertex.normalized()));
+    return (ctheta != 0. && DistanceToAPlane(n, p, x_vertex) / ctheta < tolerance);
+  });
+}
 
 /// Checks if the @p face in the given @p mesh is coplanar with the
 /// given plane defined by a normal non-zero vector @p n and a point @p p,

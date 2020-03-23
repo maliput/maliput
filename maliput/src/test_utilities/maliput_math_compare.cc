@@ -12,7 +12,7 @@ template <std::size_t N, typename Derived>
 ::testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1,
                                           const math::VectorBase<N, Derived>& v2, double tolerance,
                                           CompareType compare_type) {
-  for (int i = 0; i < N; i++) {
+  for (int i = 0; i < static_cast<int>(N); i++) {
     // First handle the corner cases of positive infinity, negative infinity,
     // and NaN
     const auto both_positive_infinity =
@@ -68,8 +68,8 @@ template <std::size_t N, typename Derived>
 template <std::size_t N>
 ::testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2, double tolerance,
                                            CompareType compare_type) {
-  for (int ii = 0; ii < N; ii++) {
-    for (int jj = 0; jj < N; jj++) {
+  for (int ii = 0; ii < static_cast<int>(N); ii++) {
+    for (int jj = 0; jj < static_cast<int>(N); jj++) {
       // First handle the corner cases of positive infinity, negative infinity,
       // and NaN
       const auto both_positive_infinity = m1[ii][jj] == std::numeric_limits<double>::infinity() &&

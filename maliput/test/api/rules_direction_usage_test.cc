@@ -85,7 +85,7 @@ TEST_F(DirectionUsageTest, StateTypeMapperTest) {
       DirectionUsageRule::State::Type::kNoUse,         DirectionUsageRule::State::Type::kParking};
   EXPECT_EQ(dut.size(), expected_types.size());
   for (DirectionUsageRule::State::Type type : expected_types) {
-    EXPECT_EQ(dut.count(type), 1);
+    EXPECT_EQ(static_cast<int>(dut.count(type)), 1);
   }
 }
 

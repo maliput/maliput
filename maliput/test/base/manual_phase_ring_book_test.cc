@@ -47,7 +47,7 @@ struct ManualPhaseRingBookTest : public ::testing::Test {
 TEST_F(ManualPhaseRingBookTest, BasicTest) {
   ManualPhaseRingBook dut;
   EXPECT_NO_THROW(dut.AddPhaseRing(ring));
-  EXPECT_EQ(dut.GetPhaseRings().size(), 1);
+  EXPECT_EQ(static_cast<int>(dut.GetPhaseRings().size()), 1);
   EXPECT_EQ(dut.GetPhaseRings()[0], ring.id());
   std::optional<PhaseRing> result = dut.GetPhaseRing(ring_id);
   EXPECT_TRUE(result.has_value());

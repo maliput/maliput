@@ -72,7 +72,7 @@ GTEST_TEST(HashTest, HashAppendOptional) {
   hash_append(hash_nonempty1, nonempty1);
   hash_append(hash_nonempty2, nonempty2);
   EXPECT_EQ(hash_nonempty1.record(), hash_nonempty2.record());
-  EXPECT_EQ(hash_nonempty1.record().size(), 2);
+  EXPECT_EQ(static_cast<int>(hash_nonempty1.record().size()), 2);
 
   std::optional<int> empty1;
   std::optional<int> empty2;
@@ -81,7 +81,7 @@ GTEST_TEST(HashTest, HashAppendOptional) {
   hash_append(hash_empty1, empty1);
   hash_append(hash_empty2, empty2);
   EXPECT_EQ(hash_empty1.record(), hash_empty2.record());
-  EXPECT_EQ(hash_empty1.record().size(), 1);
+  EXPECT_EQ(static_cast<int>(hash_empty1.record().size()), 1);
 
   // We specifically want to ensure that the hasher is called in a different
   // way for the empty and non-empty cases.  Given that `hash_append` for

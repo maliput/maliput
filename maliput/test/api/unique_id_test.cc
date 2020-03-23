@@ -62,10 +62,10 @@ TYPED_TEST(UniqueIdSetTest, SetTypes) {
   // Insert a fresh, duplicate instance of "a".
   dut.insert(UniqueId("a"));
 
-  EXPECT_EQ(dut.size(), 3);
-  EXPECT_EQ(dut.count(UniqueId("a")), 1);
-  EXPECT_EQ(dut.count(UniqueId("b")), 1);
-  EXPECT_EQ(dut.count(UniqueId("c")), 1);
+  EXPECT_EQ(static_cast<int>(dut.size()), 3);
+  EXPECT_EQ(static_cast<int>(dut.count(UniqueId("a"))), 1);
+  EXPECT_EQ(static_cast<int>(dut.count(UniqueId("b"))), 1);
+  EXPECT_EQ(static_cast<int>(dut.count(UniqueId("c"))), 1);
 }
 
 // Test usage with ordered/unordered maps.
@@ -85,7 +85,7 @@ TYPED_TEST(UniqueIdMapTest, MapTypes) {
   // Insert a fresh, duplicate instance of "a".
   dut[UniqueId("a")] = 5;
 
-  EXPECT_EQ(dut.size(), 3);
+  EXPECT_EQ(static_cast<int>(dut.size()), 3);
   EXPECT_EQ(dut[UniqueId("a")], 5);
   EXPECT_EQ(dut[UniqueId("b")], 2);
   EXPECT_EQ(dut[UniqueId("c")], 3);

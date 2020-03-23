@@ -81,7 +81,7 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
     EXPECT_EQ(result->type_id, kTypeA);
     const auto ranges_ptr = std::get_if<RuleRegistry::QueryResult::Ranges>(&result->rule_values);
     EXPECT_NE(ranges_ptr, nullptr);
-    EXPECT_EQ(ranges_ptr->size(), 2);
+    EXPECT_EQ(static_cast<int>(ranges_ptr->size()), 2);
     EXPECT_EQ(ranges_ptr->at(0), kRangeA);
     EXPECT_EQ(ranges_ptr->at(1), kRangeB);
     EXPECT_EQ(std::get_if<RuleRegistry::QueryResult::DiscreteValues>(&result->rule_values), nullptr);
@@ -92,7 +92,7 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
     EXPECT_EQ(result->type_id, kTypeB);
     const auto ranges_ptr = std::get_if<RuleRegistry::QueryResult::Ranges>(&result->rule_values);
     EXPECT_NE(ranges_ptr, nullptr);
-    EXPECT_EQ(ranges_ptr->size(), 1);
+    EXPECT_EQ(static_cast<int>(ranges_ptr->size()), 1);
     EXPECT_EQ(ranges_ptr->at(0), kRangeA);
     EXPECT_EQ(std::get_if<RuleRegistry::QueryResult::DiscreteValues>(&result->rule_values), nullptr);
   }

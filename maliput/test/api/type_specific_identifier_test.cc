@@ -80,10 +80,10 @@ TYPED_TEST(TypeSpecificIdentifierSetTest, SetTypes) {
   // Insert a fresh, duplicate instance of "a".
   dut.insert(CId("a"));
 
-  EXPECT_EQ(dut.size(), 3);
-  EXPECT_EQ(dut.count(CId("a")), 1);
-  EXPECT_EQ(dut.count(CId("b")), 1);
-  EXPECT_EQ(dut.count(CId("c")), 1);
+  EXPECT_EQ(static_cast<int>(dut.size()), 3);
+  EXPECT_EQ(static_cast<int>(dut.count(CId("a"))), 1);
+  EXPECT_EQ(static_cast<int>(dut.count(CId("b"))), 1);
+  EXPECT_EQ(static_cast<int>(dut.count(CId("c"))), 1);
 }
 
 // Test usage with ordered/unordered maps.
@@ -103,7 +103,7 @@ TYPED_TEST(TypeSpecificIdentifierMapTest, MapTypes) {
   // Insert a fresh, duplicate instance of "a".
   dut[CId("a")] = 5;
 
-  EXPECT_EQ(dut.size(), 3);
+  EXPECT_EQ(static_cast<int>(dut.size()), 3);
   EXPECT_EQ(dut[CId("a")], 5);
   EXPECT_EQ(dut[CId("b")], 2);
   EXPECT_EQ(dut[CId("c")], 3);

@@ -5,6 +5,7 @@
 namespace maliput {
 namespace utility {
 namespace mesh {
+namespace test {
 namespace {
 
 GTEST_TEST(DistanceToAPlane, GetDistance) {
@@ -231,70 +232,70 @@ TEST_F(GeoMeshSimplificationTest, InverseFaceEdgeMapComputation) {
   InverseFaceEdgeMap map = ComputeInverseFaceEdgeMap(faces());
 
   // Tests first quad edges.
-  EXPECT_EQ(map.count(kABEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kABEdge)), 1);
   EXPECT_EQ(map.at(kABEdge), kFirstQuadAEdge);
   map.erase(kABEdge);
 
-  EXPECT_EQ(map.count(kBCEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kBCEdge)), 1);
   EXPECT_EQ(map.at(kBCEdge), kFirstQuadBEdge);
   map.erase(kBCEdge);
 
-  EXPECT_EQ(map.count(kCDEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kCDEdge)), 1);
   EXPECT_EQ(map.at(kCDEdge), kFirstQuadCEdge);
   map.erase(kCDEdge);
 
-  EXPECT_EQ(map.count(kDAEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kDAEdge)), 1);
   EXPECT_EQ(map.at(kDAEdge), kFirstQuadDEdge);
   map.erase(kDAEdge);
 
   // Tests second quad edges.
-  EXPECT_EQ(map.count(kCBEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kCBEdge)), 1);
   EXPECT_EQ(map.at(kCBEdge), kSecondQuadCEdge);
   map.erase(kCBEdge);
 
-  EXPECT_EQ(map.count(kBEEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kBEEdge)), 1);
   EXPECT_EQ(map.at(kBEEdge), kSecondQuadBEdge);
   map.erase(kBEEdge);
 
-  EXPECT_EQ(map.count(kEFEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kEFEdge)), 1);
   EXPECT_EQ(map.at(kEFEdge), kSecondQuadEEdge);
   map.erase(kEFEdge);
 
-  EXPECT_EQ(map.count(kFCEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kFCEdge)), 1);
   EXPECT_EQ(map.at(kFCEdge), kSecondQuadFEdge);
   map.erase(kFCEdge);
 
   // Tests triangle edges.
-  EXPECT_EQ(map.count(kFEEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kFEEdge)), 1);
   EXPECT_EQ(map.at(kFEEdge), kTriangleFEdge);
   map.erase(kFEEdge);
 
-  EXPECT_EQ(map.count(kEGEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kEGEdge)), 1);
   EXPECT_EQ(map.at(kEGEdge), kTriangleEEdge);
   map.erase(kEGEdge);
 
-  EXPECT_EQ(map.count(kGFEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kGFEdge)), 1);
   EXPECT_EQ(map.at(kGFEdge), kTriangleGEdge);
   map.erase(kGFEdge);
 
   // Tests third quad edges.
-  EXPECT_EQ(map.count(kDCEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kDCEdge)), 1);
   EXPECT_EQ(map.at(kDCEdge), kThirdQuadDEdge);
   map.erase(kDCEdge);
 
-  EXPECT_EQ(map.count(kCFEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kCFEdge)), 1);
   EXPECT_EQ(map.at(kCFEdge), kThirdQuadCEdge);
   map.erase(kCFEdge);
 
-  EXPECT_EQ(map.count(kFHEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kFHEdge)), 1);
   EXPECT_EQ(map.at(kFHEdge), kThirdQuadFEdge);
   map.erase(kFHEdge);
 
-  EXPECT_EQ(map.count(kHIEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kHIEdge)), 1);
   EXPECT_EQ(map.at(kHIEdge), kThirdQuadHEdge);
   map.erase(kHIEdge);
 
-  EXPECT_EQ(map.count(kIDEdge), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kIDEdge)), 1);
   EXPECT_EQ(map.at(kIDEdge), kThirdQuadIEdge);
   map.erase(kIDEdge);
 
@@ -304,7 +305,7 @@ TEST_F(GeoMeshSimplificationTest, InverseFaceEdgeMapComputation) {
 TEST_F(GeoMeshSimplificationTest, FaceAdjacencyMapComputation) {
   const FaceAdjacencyMap map = ComputeFaceAdjacencyMap(faces());
 
-  EXPECT_EQ(map.count(kFirstQuadIndex), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kFirstQuadIndex)), 1);
   {
     const std::vector<FaceEdgeIndex>& face_edges = map.at(kFirstQuadIndex);
     EXPECT_EQ(face_edges[kFirstQuadAEdge.edge_index], kNoEdge);
@@ -313,7 +314,7 @@ TEST_F(GeoMeshSimplificationTest, FaceAdjacencyMapComputation) {
     EXPECT_EQ(face_edges[kFirstQuadDEdge.edge_index], kNoEdge);
   }
 
-  EXPECT_EQ(map.count(kSecondQuadIndex), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kSecondQuadIndex)), 1);
   {
     const std::vector<FaceEdgeIndex>& face_edges = map.at(kSecondQuadIndex);
     EXPECT_EQ(face_edges[kSecondQuadCEdge.edge_index], kFirstQuadBEdge);
@@ -322,7 +323,7 @@ TEST_F(GeoMeshSimplificationTest, FaceAdjacencyMapComputation) {
     EXPECT_EQ(face_edges[kSecondQuadFEdge.edge_index], kThirdQuadCEdge);
   }
 
-  EXPECT_EQ(map.count(kTriangleIndex), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kTriangleIndex)), 1);
   {
     const std::vector<FaceEdgeIndex>& face_edges = map.at(kTriangleIndex);
     EXPECT_EQ(face_edges[kTriangleFEdge.edge_index], kSecondQuadEEdge);
@@ -330,7 +331,7 @@ TEST_F(GeoMeshSimplificationTest, FaceAdjacencyMapComputation) {
     EXPECT_EQ(face_edges[kTriangleGEdge.edge_index], kNoEdge);
   }
 
-  EXPECT_EQ(map.count(kThirdQuadIndex), 1);
+  EXPECT_EQ(static_cast<int>(map.count(kThirdQuadIndex)), 1);
   {
     const std::vector<FaceEdgeIndex>& face_edges = map.at(kThirdQuadIndex);
     EXPECT_EQ(face_edges[kThirdQuadDEdge.edge_index], kFirstQuadCEdge);
@@ -400,10 +401,10 @@ TEST_F(GeoMeshSimplificationTest, FaceMerging) {
   std::set<int> visited_faces;
   const std::set<int> merged_faces =
       AggregateAdjacentCoplanarMeshFaces(mesh(), kFirstQuadIndex, adjacency_map, kAlmostExact, &visited_faces);
-  EXPECT_EQ(merged_faces.count(kFirstQuadIndex), 1);
-  EXPECT_EQ(merged_faces.count(kSecondQuadIndex), 1);
-  EXPECT_EQ(merged_faces.count(kThirdQuadIndex), 0);
-  EXPECT_EQ(merged_faces.count(kTriangleIndex), 0);
+  EXPECT_EQ(static_cast<int>(merged_faces.count(kFirstQuadIndex)), 1);
+  EXPECT_EQ(static_cast<int>(merged_faces.count(kSecondQuadIndex)), 1);
+  EXPECT_EQ(static_cast<int>(merged_faces.count(kThirdQuadIndex)), 0);
+  EXPECT_EQ(static_cast<int>(merged_faces.count(kTriangleIndex)), 0);
 
   // In what follows, the test relies heavily on the fact that
   // std::set keys are integers and that this container uses
@@ -412,7 +413,7 @@ TEST_F(GeoMeshSimplificationTest, FaceMerging) {
   EXPECT_EQ(outer_edge, kFirstQuadAEdge);
 
   const std::vector<FaceVertexIndex> merged_face_contour = ComputeMeshFacesContour(merged_faces, adjacency_map);
-  ASSERT_EQ(merged_face_contour.size(), 6);
+  ASSERT_EQ(static_cast<int>(merged_face_contour.size()), 6);
   EXPECT_EQ(merged_face_contour[0].face_index, kFirstQuadIndex);
   EXPECT_EQ(merged_face_contour[0].vertex_index, 0);
   EXPECT_EQ(merged_face_contour[1].face_index, kSecondQuadIndex);
@@ -428,7 +429,7 @@ TEST_F(GeoMeshSimplificationTest, FaceMerging) {
 
   const std::vector<FaceVertexIndex> simplified_contour =
       SimplifyMeshFacesContour(mesh(), merged_face_contour, kAlmostExact);
-  ASSERT_EQ(simplified_contour.size(), 4);
+  ASSERT_EQ(static_cast<int>(simplified_contour.size()), 4);
   EXPECT_EQ(simplified_contour[0].face_index, kFirstQuadIndex);
   EXPECT_EQ(simplified_contour[0].vertex_index, 0);
   EXPECT_EQ(simplified_contour[1].face_index, kSecondQuadIndex);
@@ -466,6 +467,7 @@ TEST_F(GeoMeshSimplificationTest, MeshSimplification) {
 }
 
 }  // namespace
+}  // namespace test
 }  // namespace mesh
 }  // namespace utility
 }  // namespace maliput

@@ -196,26 +196,26 @@ TEST_F(ManualRulebookTest, FindRules) {
   const double kZeroTolerance = 0.;
 
   const RoadRulebook::QueryResults empty = dut.FindRules({}, kZeroTolerance);
-  EXPECT_EQ(empty.right_of_way.size(), 0);
-  EXPECT_EQ(empty.speed_limit.size(), 0);
-  EXPECT_EQ(empty.direction_usage.size(), 0);
-  EXPECT_EQ(empty.discrete_value_rules.size(), 0);
-  EXPECT_EQ(empty.range_value_rules.size(), 0);
+  EXPECT_EQ(static_cast<int>(empty.right_of_way.size()), 0);
+  EXPECT_EQ(static_cast<int>(empty.speed_limit.size()), 0);
+  EXPECT_EQ(static_cast<int>(empty.direction_usage.size()), 0);
+  EXPECT_EQ(static_cast<int>(empty.discrete_value_rules.size()), 0);
+  EXPECT_EQ(static_cast<int>(empty.range_value_rules.size()), 0);
 
   const RoadRulebook::QueryResults nonempty = dut.FindRules({kZone}, kZeroTolerance);
-  EXPECT_EQ(nonempty.right_of_way.size(), 1);
-  EXPECT_EQ(nonempty.speed_limit.size(), 1);
-  EXPECT_EQ(nonempty.direction_usage.size(), 1);
-  EXPECT_EQ(nonempty.discrete_value_rules.size(), 1);
-  EXPECT_EQ(nonempty.range_value_rules.size(), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.direction_usage.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.discrete_value_rules.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.range_value_rules.size()), 1);
 
   const LaneSRange kReversedZone(kZone.lane_id(), {kZone.s_range().s1(), kZone.s_range().s0()});
   const RoadRulebook::QueryResults reversed = dut.FindRules({kReversedZone}, kZeroTolerance);
-  EXPECT_EQ(reversed.right_of_way.size(), 1);
-  EXPECT_EQ(reversed.speed_limit.size(), 1);
-  EXPECT_EQ(reversed.direction_usage.size(), 1);
-  EXPECT_EQ(reversed.discrete_value_rules.size(), 1);
-  EXPECT_EQ(reversed.range_value_rules.size(), 1);
+  EXPECT_EQ(static_cast<int>(reversed.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(reversed.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(reversed.direction_usage.size()), 1);
+  EXPECT_EQ(static_cast<int>(reversed.discrete_value_rules.size()), 1);
+  EXPECT_EQ(static_cast<int>(reversed.range_value_rules.size()), 1);
 
   const double kNonzeroTolerance = 0.1;
 
@@ -225,22 +225,22 @@ TEST_F(ManualRulebookTest, FindRules) {
   const LaneSRange kNearbyRange(kZone.lane_id(),
                                 {kZone.s_range().s1() + (0.9 * kNonzeroTolerance), kZone.s_range().s1() + 50.});
   const RoadRulebook::QueryResults nearby = dut.FindRules({kNearbyRange}, kNonzeroTolerance);
-  EXPECT_EQ(nearby.right_of_way.size(), 1);
-  EXPECT_EQ(nearby.speed_limit.size(), 1);
-  EXPECT_EQ(nearby.direction_usage.size(), 1);
-  EXPECT_EQ(nearby.discrete_value_rules.size(), 1);
-  EXPECT_EQ(nearby.range_value_rules.size(), 1);
+  EXPECT_EQ(static_cast<int>(nearby.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(nearby.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(nearby.direction_usage.size()), 1);
+  EXPECT_EQ(static_cast<int>(nearby.discrete_value_rules.size()), 1);
+  EXPECT_EQ(static_cast<int>(nearby.range_value_rules.size()), 1);
 
   // Construct a range that sits just outside of the kNonzeroTolerance band
   // of kZone.s1.
   const LaneSRange kTooFarRange(kZone.lane_id(),
                                 {kZone.s_range().s1() + (1.1 * kNonzeroTolerance), kZone.s_range().s1() + 50.});
   const RoadRulebook::QueryResults toofar = dut.FindRules({kTooFarRange}, kNonzeroTolerance);
-  EXPECT_EQ(toofar.right_of_way.size(), 0);
-  EXPECT_EQ(toofar.speed_limit.size(), 0);
-  EXPECT_EQ(toofar.direction_usage.size(), 0);
-  EXPECT_EQ(toofar.discrete_value_rules.size(), 0);
-  EXPECT_EQ(toofar.range_value_rules.size(), 0);
+  EXPECT_EQ(static_cast<int>(toofar.right_of_way.size()), 0);
+  EXPECT_EQ(static_cast<int>(toofar.speed_limit.size()), 0);
+  EXPECT_EQ(static_cast<int>(toofar.direction_usage.size()), 0);
+  EXPECT_EQ(static_cast<int>(toofar.discrete_value_rules.size()), 0);
+  EXPECT_EQ(static_cast<int>(toofar.range_value_rules.size()), 0);
 }
 
 TEST_F(ManualRulebookTest, GetAllRules) {
@@ -256,35 +256,35 @@ TEST_F(ManualRulebookTest, GetAllRules) {
   dut.AddRule(kSpeedLimit);
   dut.AddRule(kRightOfWay);
   result = dut.Rules();
-  EXPECT_EQ(result.right_of_way.size(), 1);
-  EXPECT_EQ(result.speed_limit.size(), 1);
-  EXPECT_EQ(result.direction_usage.size(), 0);
-  EXPECT_EQ(result.discrete_value_rules.size(), 0);
-  EXPECT_EQ(result.range_value_rules.size(), 0);
+  EXPECT_EQ(static_cast<int>(result.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.direction_usage.size()), 0);
+  EXPECT_EQ(static_cast<int>(result.discrete_value_rules.size()), 0);
+  EXPECT_EQ(static_cast<int>(result.range_value_rules.size()), 0);
 
   dut.AddRule(kDirectionUsage);
   result = dut.Rules();
-  EXPECT_EQ(result.right_of_way.size(), 1);
-  EXPECT_EQ(result.speed_limit.size(), 1);
-  EXPECT_EQ(result.direction_usage.size(), 1);
-  EXPECT_EQ(result.discrete_value_rules.size(), 0);
-  EXPECT_EQ(result.range_value_rules.size(), 0);
+  EXPECT_EQ(static_cast<int>(result.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.direction_usage.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.discrete_value_rules.size()), 0);
+  EXPECT_EQ(static_cast<int>(result.range_value_rules.size()), 0);
 
   dut.AddRule(kDiscreteValueRule);
   result = dut.Rules();
-  EXPECT_EQ(result.right_of_way.size(), 1);
-  EXPECT_EQ(result.speed_limit.size(), 1);
-  EXPECT_EQ(result.direction_usage.size(), 1);
-  EXPECT_EQ(result.discrete_value_rules.size(), 1);
-  EXPECT_EQ(result.range_value_rules.size(), 0);
+  EXPECT_EQ(static_cast<int>(result.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.direction_usage.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.discrete_value_rules.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.range_value_rules.size()), 0);
 
   dut.AddRule(kRangeValueRule);
   result = dut.Rules();
-  EXPECT_EQ(result.right_of_way.size(), 1);
-  EXPECT_EQ(result.speed_limit.size(), 1);
-  EXPECT_EQ(result.direction_usage.size(), 1);
-  EXPECT_EQ(result.discrete_value_rules.size(), 1);
-  EXPECT_EQ(result.range_value_rules.size(), 1);
+  EXPECT_EQ(static_cast<int>(result.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.direction_usage.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.discrete_value_rules.size()), 1);
+  EXPECT_EQ(static_cast<int>(result.range_value_rules.size()), 1);
 }
 
 }  // namespace

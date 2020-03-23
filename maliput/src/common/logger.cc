@@ -95,7 +95,7 @@ std::string set_log_level(const std::string& level) {
 
 const std::string Logger::format(const std::vector<std::string>& v) const {
   std::array<std::string, kNumberOfArguments> args;
-  for (int i; i < v.size() && i < kNumberOfArguments; i++) {
+  for (int i = 0; i < static_cast<int>(v.size()) && i < kNumberOfArguments; i++) {
     args[i] = v[i];
   }
   return call_fmt_format(args);

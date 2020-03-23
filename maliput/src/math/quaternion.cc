@@ -769,6 +769,7 @@ Vector3 Quaternion::TransformVector(const Vector3& v) const {
 
 std::ostream& operator<<(std::ostream& os, const Quaternion& q) {
   os << "(w: " << q.w() << ", x: " << q.x() << ", y: " << q.y() << ", z: " << q.z() << ")";
+  return os;
 }
 
 }  // namespace math

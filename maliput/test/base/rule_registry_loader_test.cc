@@ -109,11 +109,11 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
         EXPECT_EQ(discrete_value.severity, kBestEffort);
         EXPECT_NE(discrete_value.related_rules.find(VehicleStopInZoneBehaviorRuleTypeId().string()),
                   discrete_value.related_rules.end());
-        EXPECT_EQ(discrete_value.related_unique_ids.size(), 0);
+        EXPECT_TRUE(discrete_value.related_unique_ids.empty());
       } else if (discrete_value.value == "StopThenGo") {
         EXPECT_EQ(discrete_value.severity, kStrict);
-        EXPECT_EQ(discrete_value.related_rules.size(), 0);
-        EXPECT_EQ(discrete_value.related_unique_ids.size(), 0);
+        EXPECT_TRUE(discrete_value.related_rules.empty());
+        EXPECT_TRUE(discrete_value.related_unique_ids.empty());
       } else {
         ADD_FAILURE() << "No more values for this rule type";
       }
@@ -131,20 +131,20 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
     for (const auto& discrete_value : *discrete_values_ptr) {
       if (discrete_value.value == "Bidirectional") {
         EXPECT_EQ(discrete_value.severity, kStrict);
-        EXPECT_EQ(discrete_value.related_rules.size(), 0);
-        EXPECT_EQ(discrete_value.related_unique_ids.size(), 0);
+        EXPECT_TRUE(discrete_value.related_rules.empty());
+        EXPECT_TRUE(discrete_value.related_unique_ids.empty());
       } else if (discrete_value.value == "WithS") {
         EXPECT_EQ(discrete_value.severity, kStrict);
-        EXPECT_EQ(discrete_value.related_rules.size(), 0);
-        EXPECT_EQ(discrete_value.related_unique_ids.size(), 0);
+        EXPECT_TRUE(discrete_value.related_rules.empty());
+        EXPECT_TRUE(discrete_value.related_unique_ids.empty());
       } else if (discrete_value.value == "AgaintsS") {
         EXPECT_EQ(discrete_value.severity, kStrict);
-        EXPECT_EQ(discrete_value.related_rules.size(), 0);
-        EXPECT_EQ(discrete_value.related_unique_ids.size(), 0);
+        EXPECT_TRUE(discrete_value.related_rules.empty());
+        EXPECT_TRUE(discrete_value.related_unique_ids.empty());
       } else if (discrete_value.value == "Undefined") {
         EXPECT_EQ(discrete_value.severity, kBestEffort);
-        EXPECT_EQ(discrete_value.related_rules.size(), 0);
-        EXPECT_EQ(discrete_value.related_unique_ids.size(), 0);
+        EXPECT_TRUE(discrete_value.related_rules.empty());
+        EXPECT_TRUE(discrete_value.related_unique_ids.empty());
       } else {
         ADD_FAILURE() << "No more values for this rule type";
       }
@@ -164,14 +164,14 @@ TEST_F(TestLoadingRuleTypesFromYaml, LoadFromFile) {
         EXPECT_DOUBLE_EQ(range_value.min, 16.6);
         EXPECT_DOUBLE_EQ(range_value.max, 27.8);
         EXPECT_EQ(range_value.severity, kStrict);
-        EXPECT_EQ(range_value.related_rules.size(), 0);
-        EXPECT_EQ(range_value.related_unique_ids.size(), 0);
+        EXPECT_TRUE(range_value.related_rules.empty());
+        EXPECT_TRUE(range_value.related_unique_ids.empty());
       } else if (range_value.description == "Arterial road in Ciudad Autonoma de Buenos Aires") {
         EXPECT_DOUBLE_EQ(range_value.min, 16.6);
         EXPECT_DOUBLE_EQ(range_value.max, 22.2);
         EXPECT_EQ(range_value.severity, kBestEffort);
-        EXPECT_EQ(range_value.related_rules.size(), 0);
-        EXPECT_EQ(range_value.related_unique_ids.size(), 0);
+        EXPECT_TRUE(range_value.related_rules.empty());
+        EXPECT_TRUE(range_value.related_unique_ids.empty());
       } else {
         ADD_FAILURE() << "No more values for this rule type";
       }

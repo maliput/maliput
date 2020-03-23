@@ -87,7 +87,7 @@ GTEST_TEST(RightOfWayRuleTest, Accessors) {
   EXPECT_EQ(dut.id(), RightOfWayRule::Id("dut_id"));
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), api::test::CreateLaneSRoute()));
   EXPECT_EQ(dut.zone_type(), RightOfWayRule::ZoneType::kStopExcluded);
-  EXPECT_EQ(dut.states().size(), 2);
+  EXPECT_EQ(static_cast<int>(dut.states().size()), 2);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states().at(RightOfWayRule::State::Id("s1")), api::test::NoYieldState()));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states().at(RightOfWayRule::State::Id("s2")), api::test::YieldState()));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.related_bulb_groups(), api::test::RelatedBulbGroups()));

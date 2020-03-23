@@ -127,16 +127,16 @@ class IntersectionBookTest : public ::testing::Test {
 };
 
 TEST_F(IntersectionBookTest, FindIntersections) {
-  EXPECT_EQ(intersection_book_.FindIntersections({}, kTolerance).size(), 0);
+  EXPECT_EQ(static_cast<int>(intersection_book_.FindIntersections({}, kTolerance).size()), 0);
   {
     const std::vector<maliput::api::Intersection*> dut{intersection_book_.FindIntersections(region_a, kTolerance)};
-    EXPECT_EQ(dut.size(), 2);
+    EXPECT_EQ(static_cast<int>(dut.size()), 2);
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdA));
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdC));
   }
   {
     const std::vector<maliput::api::Intersection*> dut(intersection_book_.FindIntersections(region_c, kTolerance));
-    EXPECT_EQ(dut.size(), 3);
+    EXPECT_EQ(static_cast<int>(dut.size()), 3);
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdA));
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdB));
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdC));
@@ -144,7 +144,7 @@ TEST_F(IntersectionBookTest, FindIntersections) {
   {
     const std::vector<maliput::api::Intersection*> dut(
         intersection_book_.FindIntersections({LaneSRange{api::LaneId{"lane_c_1"}, api::SRange{0., 10.}}}, kTolerance));
-    EXPECT_EQ(dut.size(), 1);
+    EXPECT_EQ(static_cast<int>(dut.size()), 1);
     EXPECT_EQ(dut[0]->id(), kIntersectionIdC);
   }
 }

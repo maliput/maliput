@@ -121,8 +121,8 @@ class MockLane final : public Lane {
   BranchPoint* start_bp_{};
   BranchPoint* end_bp_{};
   GeoPosition start_gp_{};
-  GeoPosition end_gp_{};
   Rotation start_rot_{};
+  GeoPosition end_gp_{};
   Rotation end_rot_{};
   LanePositionResult lane_position_result_{};
 };
@@ -206,7 +206,7 @@ class MockRoadGeometry : public RoadGeometry {
   RoadGeometryId do_id() const override { return id_; }
   int do_num_junctions() const override { return junctions_.size(); }
   const Junction* do_junction(int i) const override {
-    MALIPUT_THROW_UNLESS(i < junctions_.size());
+    MALIPUT_THROW_UNLESS(i < static_cast<int>(junctions_.size()));
     return junctions_[i].get();
   }
   int do_num_branch_points() const override {
@@ -247,7 +247,7 @@ class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
   MockOneLaneIdIndex() : RoadGeometry::IdIndex() {}
 
  private:
-  const Lane* DoGetLane(const LaneId&) const override { &mock_lane_; }
+  const Lane* DoGetLane(const LaneId&) const override { return &mock_lane_; }
 
   const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
 

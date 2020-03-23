@@ -22,14 +22,14 @@ GTEST_TEST(TrafficLightBookTest, BasicTest) {
   TrafficLightBook dut;
 
   const std::vector<const TrafficLight*> empty = dut.TrafficLights();
-  EXPECT_EQ(empty.size(), 0);
+  EXPECT_EQ(static_cast<int>(empty.size()), 0);
 
   dut.AddTrafficLight(std::move(traffic_light));
   EXPECT_EQ(dut.GetTrafficLight(TrafficLight::Id("unknown_traffic light")), nullptr);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetTrafficLight(id), traffic_light_ptr));
 
   const std::vector<const TrafficLight*> nonempty = dut.TrafficLights();
-  EXPECT_EQ(nonempty.size(), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.size()), 1);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(nonempty.at(0), traffic_light_ptr));
 }
 

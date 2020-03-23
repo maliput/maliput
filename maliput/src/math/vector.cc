@@ -153,7 +153,7 @@ template <size_t N>
 Vector<N - 1> Vector<N>::reduce(size_t index) const {
   MALIPUT_THROW_UNLESS(N >= 2);
   MALIPUT_THROW_UNLESS(index < N);
-  std::array<double, N - 1> reduced;
+  std::array<double, N - 1> reduced{};
   size_t count_elements{};
   bool remove{true};
   for (const auto& value : this->values_) {
