@@ -1,6 +1,6 @@
 # Maliput
 
-Road network runtime interface and reference backend Multilane
+Road network runtime interface.
 
 ## Build
 
@@ -18,11 +18,11 @@ source ./bringup
   - If not building drake from source:
 
    ```sh
-   colcon build --packages-up-to maliput multilane
+   colcon build --packages-up-to maliput
    ```
 
   - If building drake from source:
 
    ```sh
-   colcon build --cmake-args -DWITH_PYTHON_VERSION=3 --packages-up-to maliput multilane
+   colcon build --cmake-args -DWITH_PYTHON_VERSION=3 --packages-up-to maliput
    ```
