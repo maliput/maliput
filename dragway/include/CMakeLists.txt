@@ -1,2 +1,0 @@
-add_subdirectory(dragway)
-add_subdirectory(dragway_test_utilities)
