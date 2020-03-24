@@ -154,7 +154,7 @@ void hash_append(HashAlgorithm& hasher, const std::optional<T>& item) noexcept {
     hash_append(hasher, *item);
   }
   hash_append(hasher, item.has_value());
-};
+}
 
 /// Provides @ref hash_append for a range, as given by two iterators.
 template <class HashAlgorithm, class Iter>
@@ -178,7 +178,7 @@ void hash_append_range(
 template <class HashAlgorithm, class T1, class T2, class Compare, class Allocator>
 void hash_append(HashAlgorithm& hasher, const std::map<T1, T2, Compare, Allocator>& item) noexcept {
   return hash_append_range(hasher, item.begin(), item.end());
-};
+}
 
 /// Provides @ref hash_append for std::set.
 ///
@@ -187,7 +187,7 @@ void hash_append(HashAlgorithm& hasher, const std::map<T1, T2, Compare, Allocato
 template <class HashAlgorithm, class Key, class Compare, class Allocator>
 void hash_append(HashAlgorithm& hasher, const std::set<Key, Compare, Allocator>& item) noexcept {
   return hash_append_range(hasher, item.begin(), item.end());
-};
+}
 
 /// A hashing functor, somewhat like `std::hash`.  Given an item of type @p T,
 /// applies @ref hash_append to it, directing the bytes to append into the
