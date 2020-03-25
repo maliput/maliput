@@ -26,6 +26,8 @@ struct RoadNetworkValidatorOptions {
   /// - Every BranchPoint's A-Side and B-Side are not nullptr.
   /// - Every BranchPoint is not empty, i.e. either A-Side or B-Side have at
   ///   least one Lane.
+  /// - Every Junction, Segment, Lane and BranchPoint must be indexed in
+  ///   RoadGeometry::IdIndex.
   bool check_road_geometry_hierarchy{true};
   /// Whether to check that RelatedBulbGroups in RightOfWayRules have
   /// supporting TrafficLight objects in TrafficLightBook and BulbGroups are
