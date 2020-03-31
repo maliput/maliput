@@ -52,7 +52,7 @@ bool IsDiscreteValue(const YAML::Node& rule_node) {
   if (rule_node[RuleConstants::kRelatedUniqueIds].IsDefined()) {
     attribute_count++;
   }
-  return rule_node.size() == attribute_count;
+  return static_cast<int>(rule_node.size()) == attribute_count;
 }
 
 bool IsRangeValue(const YAML::Node& rule_node) {
@@ -70,7 +70,7 @@ bool IsRangeValue(const YAML::Node& rule_node) {
   if (rule_node[RuleConstants::kRelatedUniqueIds].IsDefined()) {
     attribute_count++;
   }
-  return rule_node.size() == attribute_count;
+  return static_cast<int>(rule_node.size()) == attribute_count;
 }
 
 int GetSeverityFromYamlNode(const YAML::Node& node) {

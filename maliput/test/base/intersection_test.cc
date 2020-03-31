@@ -108,7 +108,6 @@ TEST_F(IntersectionTest, IncludesByGeoPos) {
 }
 
 TEST_F(IntersectionTest, IncludesByTrafficLightId) {
-  const double kDurationUntil{1};
   const api::rules::TrafficLight::Id not_included_traffic_light{"not_included_traffic_light"};
   ManualPhaseProvider phase_provider;
   Intersection dut(kIntersectionId, ranges_a, dummy_ring_, &phase_provider);
@@ -119,7 +118,6 @@ TEST_F(IntersectionTest, IncludesByTrafficLightId) {
 }
 
 TEST_F(IntersectionTest, IncludesByDiscreteValueRuleId) {
-  const double kDurationUntil{1};
   const api::rules::Rule::Id not_included_rule_id{"not_included_rule_id"};
   ManualPhaseProvider phase_provider;
   Intersection dut(kIntersectionId, ranges_a, dummy_ring_, &phase_provider);
@@ -130,7 +128,6 @@ TEST_F(IntersectionTest, IncludesByDiscreteValueRuleId) {
 }
 
 TEST_F(IntersectionTest, IncludesByRightOfWayRuleId) {
-  const double kDurationUntil{1};
   const api::rules::RightOfWayRule::Id not_included_rule_id{"not_included_rule_id"};
   ManualPhaseProvider phase_provider;
   Intersection dut(kIntersectionId, ranges_a, dummy_ring_, &phase_provider);

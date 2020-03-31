@@ -707,6 +707,7 @@ Material GetMaterialFromMesh(const MaterialType mesh_material) {
     case GrayedMarker:
       return GetMaterialByName(kGrayedMarkerPaint);
   }
+  MALIPUT_THROW_MESSAGE("mesh_material is unrecognized.");
 }
 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,

@@ -19,7 +19,8 @@ using rules::TrafficLight;
 // Given a `LaneSRoute` this method checks the G1 contiguity
 // between of all its `LaneSRange`.
 void CheckLaneSRouteContiguity(const RoadGeometry* road_geometry, const LaneSRoute& lane_s_route) {
-  for (int i = 0; i < lane_s_route.ranges().size() - 1; ++i) {  // Iterating through the lanes of a rule.
+  // Iterating through the lanes of a rule.
+  for (int i = 0; i < static_cast<int>(lane_s_route.ranges().size()) - 1; ++i) {
     const LaneSRange lane_range_a = lane_s_route.ranges()[i];
     const LaneSRange lane_range_b = lane_s_route.ranges()[i + 1];
     if (!IsContiguous(lane_range_a, lane_range_b, road_geometry)) {

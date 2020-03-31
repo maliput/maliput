@@ -26,7 +26,6 @@ std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrateg
       for (int k = 0; k < segment->num_lanes(); ++k) {
         const api::Lane* lane = segment->lane(k);
         MALIPUT_THROW_UNLESS(lane != nullptr);
-        double distance{};
         maliput::api::GeoPosition nearest_position;
         const maliput::api::LanePositionResult result = lane->ToLanePosition(geo_position);
         if (radius == std::numeric_limits<double>::infinity() || result.distance <= radius) {

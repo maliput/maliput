@@ -22,7 +22,7 @@ static constexpr double kX2 = 0.567;
     EXPECT_EQ(dut.s(), _s);                                \
     EXPECT_EQ(dut.r(), _r);                                \
     EXPECT_EQ(dut.h(), _h);                                \
-    EXPECT_EQ(dut.srh().size(), 3);                        \
+    EXPECT_EQ(static_cast<int>(dut.srh().size()), 3);      \
     EXPECT_EQ(dut.srh().x(), _s);                          \
     EXPECT_EQ(dut.srh().y(), _r);                          \
     EXPECT_EQ(dut.srh().z(), _h);                          \
@@ -77,7 +77,7 @@ GTEST_TEST(LanePositionTest, ComponentSetters) {
     EXPECT_EQ(dut.x(), _x);                               \
     EXPECT_EQ(dut.y(), _y);                               \
     EXPECT_EQ(dut.z(), _z);                               \
-    EXPECT_EQ(dut.xyz().size(), 3);                       \
+    EXPECT_EQ(static_cast<int>(dut.xyz().size()), 3);     \
     EXPECT_EQ(dut.xyz().x(), _x);                         \
     EXPECT_EQ(dut.xyz().y(), _y);                         \
     EXPECT_EQ(dut.xyz().z(), _z);                         \

@@ -33,7 +33,7 @@ GTEST_TEST(FilterRoadPositionResultsTest, FilterRoadPositionResults) {
   EXPECT_TRUE(result.empty());
 
   result = FilterRoadPositionResults(unfiltered_positions, filter_always_true);
-  EXPECT_EQ(result.size(), 2);
+  EXPECT_EQ(static_cast<int>(result.size()), 2);
   EXPECT_EQ(result[0].road_position.lane, unfiltered_positions[0].road_position.lane);
   EXPECT_TRUE(api::test::IsLanePositionClose(result[0].road_position.pos, unfiltered_positions[0].road_position.pos,
                                              kZeroTolerance));
@@ -48,7 +48,7 @@ GTEST_TEST(FilterRoadPositionResultsTest, FilterRoadPositionResults) {
   EXPECT_NEAR(result[1].distance, unfiltered_positions[1].distance, kZeroTolerance);
 
   result = FilterRoadPositionResults(unfiltered_positions, filter_lane_1);
-  EXPECT_EQ(result.size(), 1);
+  EXPECT_EQ(static_cast<int>(result.size()), 1);
   EXPECT_EQ(result[0].road_position.lane, unfiltered_positions[1].road_position.lane);
   EXPECT_TRUE(api::test::IsLanePositionClose(result[0].road_position.pos, unfiltered_positions[1].road_position.pos,
                                              kZeroTolerance));

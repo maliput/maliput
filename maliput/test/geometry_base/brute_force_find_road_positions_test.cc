@@ -143,7 +143,7 @@ TEST_F(BruteForceTest, LaneInAndOutRadius) {
   std::vector<api::RoadPositionResult> results =
       BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), kRadius);
 
-  EXPECT_EQ(results.size(), 1);
+  EXPECT_EQ(static_cast<int>(results.size()), 1);
   const api::LanePosition kExpectedLanePosition{4., 5., 6.};
   const api::GeoPosition kExpectedGeoPosition{10., 11., 12.};
   const double kExpectedDistance = 3.;
@@ -159,7 +159,7 @@ TEST_F(BruteForceTest, LaneInAndOutRadius) {
                                2. * kDistance);
   results = BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), kRadius);
 
-  EXPECT_EQ(results.size(), 0);
+  EXPECT_TRUE(results.empty());
 }
 
 TEST_F(BruteForceTest, NullRoadGeometry) {
@@ -185,7 +185,7 @@ TEST_F(BruteForceTest, AllLanesCalled) {
   const std::vector<api::RoadPositionResult> results =
       BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), 4.);
 
-  EXPECT_EQ(results.size(), 3);
+  EXPECT_EQ(static_cast<int>(results.size()), 3);
   const api::LanePosition kExpectedLanePosition{4., 5., 6.};
   const api::GeoPosition kExpectedGeoPosition{10., 11., 12.};
   const double kExpectedDistance = 3.;

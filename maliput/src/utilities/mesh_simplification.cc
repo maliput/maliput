@@ -65,17 +65,6 @@ const math::Vector3& GetMeshFaceVertexNormal(const GeoMesh& mesh, const IndexFac
   return mesh.normals().at(vertex.normal_index)->n().xyz();
 }
 
-template <typename InputIt>
-bool DoMeshVerticesLieOnPlane(const GeoMesh& mesh, InputIt first, InputIt last, const math::Vector3& n,
-                              const math::Vector3& p, double tolerance) {
-  return std::all_of(first, last, [&mesh, &n, &p, tolerance](const IndexFace::Vertex& vertex) {
-    const math::Vector3& x_vertex = GetMeshFaceVertexPosition(mesh, vertex);
-    const math::Vector3& n_vertex = GetMeshFaceVertexNormal(mesh, vertex);
-    const double ctheta = std::abs(n.dot(n_vertex.normalized()));
-    return (ctheta != 0. && DistanceToAPlane(n, p, x_vertex) / ctheta < tolerance);
-  });
-}
-
 bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face, const math::Vector3& n,
                                  const math::Vector3& p, double tolerance) {
   const std::vector<IndexFace::Vertex>& face_vertices = face.vertices();

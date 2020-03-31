@@ -50,7 +50,7 @@ GTEST_TEST(FilterRuleByRuleTypeIdTest, BasicTest) {
   const api::rules::RoadRulebook::QueryResults dut =
       FilterRules(query_result, {RuleTypeFilter(Rule::TypeId("dvrt a"))}, {});
   EXPECT_EQ(dut.range_value_rules.size(), query_result.range_value_rules.size());
-  EXPECT_EQ(dut.discrete_value_rules.size(), 1);
+  EXPECT_EQ(static_cast<int>(dut.discrete_value_rules.size()), 1);
   EXPECT_NE(dut.discrete_value_rules.find(Rule::Id(Rule::Id("dvrt a/1"))), dut.discrete_value_rules.end());
 }
 

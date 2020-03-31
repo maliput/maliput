@@ -99,10 +99,10 @@ TEST_F(PhaseRingTest, Constructor) {
 TEST_F(PhaseRingTest, Accessors) {
   const PhaseRing dut(id_, {CreateFullPhase(phase_id_1_), CreateFullPhase(phase_id_2_)});
   EXPECT_EQ(dut.id(), id_);
-  EXPECT_EQ(dut.phases().size(), 2);
-  EXPECT_EQ(dut.next_phases().size(), 2);
-  EXPECT_EQ(dut.next_phases().at(phase_id_1_).size(), 0);
-  EXPECT_EQ(dut.next_phases().at(phase_id_2_).size(), 0);
+  EXPECT_EQ(static_cast<int>(dut.phases().size()), 2);
+  EXPECT_EQ(static_cast<int>(dut.next_phases().size()), 2);
+  EXPECT_EQ(static_cast<int>(dut.next_phases().at(phase_id_1_).size()), 0);
+  EXPECT_EQ(static_cast<int>(dut.next_phases().at(phase_id_2_).size()), 0);
 }
 
 TEST_F(PhaseRingTest, GetPhase) {
@@ -124,8 +124,8 @@ TEST_F(PhaseRingTest, NextPhases) {
   const PhaseRing dut(id_, {CreateFullPhase(phase_id_1_), CreateFullPhase(phase_id_2_)}, next_phases);
   const std::vector<PhaseRing::NextPhase> next_1 = dut.next_phases().at(phase_id_1_);
   const std::vector<PhaseRing::NextPhase> next_2 = dut.next_phases().at(phase_id_2_);
-  EXPECT_EQ(next_1.size(), 1);
-  EXPECT_EQ(next_2.size(), 1);
+  EXPECT_EQ(static_cast<int>(next_1.size()), 1);
+  EXPECT_EQ(static_cast<int>(next_2.size()), 1);
   EXPECT_EQ(next_1.at(0).id, phase_id_2_);
   EXPECT_EQ(next_2.at(0).id, phase_id_1_);
   EXPECT_EQ(*next_1.at(0).duration_until, kDuration1);

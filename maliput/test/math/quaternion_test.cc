@@ -487,7 +487,6 @@ GTEST_TEST(Quaternion, Inverse) {
   const double kX{0.306};
   const double kY{0.177};
   const double kZ{0.306};
-  const double kAnyOtherValue{0.};
 
   const Quaternion dut(kW, kX, kY, kZ);
   EXPECT_TRUE(

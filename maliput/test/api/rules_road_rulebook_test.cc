@@ -109,28 +109,28 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   const double kZeroTolerance = 0.;
 
   RoadRulebook::QueryResults nonempty = dut.FindRules({dut.kZone}, kZeroTolerance);
-  EXPECT_EQ(nonempty.right_of_way.size(), 1);
-  EXPECT_EQ(nonempty.speed_limit.size(), 1);
-  EXPECT_EQ(nonempty.direction_usage.size(), 1);
-  EXPECT_EQ(nonempty.discrete_value_rules.size(), 1);
-  EXPECT_EQ(nonempty.range_value_rules.size(), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.direction_usage.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.discrete_value_rules.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.range_value_rules.size()), 1);
 
   RoadRulebook::QueryResults empty = dut.FindRules({}, kZeroTolerance);
-  EXPECT_EQ(empty.right_of_way.size(), 0);
-  EXPECT_EQ(empty.speed_limit.size(), 0);
-  EXPECT_EQ(empty.direction_usage.size(), 0);
-  EXPECT_EQ(empty.discrete_value_rules.size(), 0);
-  EXPECT_EQ(empty.range_value_rules.size(), 0);
+  EXPECT_EQ(static_cast<int>(empty.right_of_way.size()), 0);
+  EXPECT_EQ(static_cast<int>(empty.speed_limit.size()), 0);
+  EXPECT_EQ(static_cast<int>(empty.direction_usage.size()), 0);
+  EXPECT_EQ(static_cast<int>(empty.discrete_value_rules.size()), 0);
+  EXPECT_EQ(static_cast<int>(empty.range_value_rules.size()), 0);
 
   const double kNegativeTolerance = -1.;
   EXPECT_THROW(dut.FindRules({}, kNegativeTolerance), maliput::common::assertion_error);
 
   nonempty = dut.Rules();
-  EXPECT_EQ(nonempty.right_of_way.size(), 1);
-  EXPECT_EQ(nonempty.speed_limit.size(), 1);
-  EXPECT_EQ(nonempty.direction_usage.size(), 1);
-  EXPECT_EQ(nonempty.discrete_value_rules.size(), 1);
-  EXPECT_EQ(nonempty.range_value_rules.size(), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.right_of_way.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.speed_limit.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.direction_usage.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.discrete_value_rules.size()), 1);
+  EXPECT_EQ(static_cast<int>(nonempty.range_value_rules.size()), 1);
 
   EXPECT_EQ(dut.GetRule(dut.kRightOfWay.id()).id(), dut.kRightOfWay.id());
   EXPECT_THROW(dut.GetRule(RightOfWayRule::Id("xxx")), std::out_of_range);

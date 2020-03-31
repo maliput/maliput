@@ -38,7 +38,7 @@ GTEST_TEST(BulbColorTest, MapperTest) {
   const std::vector<BulbColor> expected_colors{BulbColor::kRed, BulbColor::kYellow, BulbColor::kGreen};
   EXPECT_EQ(dut.size(), expected_colors.size());
   for (BulbColor color : expected_colors) {
-    EXPECT_EQ(dut.count(color), 1);
+    EXPECT_EQ(static_cast<int>(dut.count(color)), 1);
   }
 }
 
@@ -57,7 +57,7 @@ GTEST_TEST(BulbTypeTest, MapperTest) {
   const std::vector<BulbType> expected_types{BulbType::kRound, BulbType::kArrow};
   EXPECT_EQ(dut.size(), expected_types.size());
   for (BulbType type : expected_types) {
-    EXPECT_EQ(dut.count(type), 1);
+    EXPECT_EQ(static_cast<int>(dut.count(type)), 1);
   }
 }
 
@@ -76,7 +76,7 @@ GTEST_TEST(BulbStateTest, MapperTest) {
   const std::vector<BulbState> expected_states{BulbState::kOff, BulbState::kOn, BulbState::kBlinking};
   EXPECT_EQ(dut.size(), expected_states.size());
   for (BulbState state : expected_states) {
-    EXPECT_EQ(dut.count(state), 1);
+    EXPECT_EQ(static_cast<int>(dut.count(state)), 1);
   }
 }
 
@@ -102,7 +102,7 @@ GTEST_TEST(BulbConstructorTest, EmptyAndNullOptStateVector) {
                                               std::nullopt /* arrow_orientation_rad */, std::nullopt /* states */));
 
   for (const auto& test_case : test_cases) {
-    EXPECT_EQ(test_case->states().size(), 2);
+    EXPECT_EQ(static_cast<int>(test_case->states().size()), 2);
     EXPECT_EQ(test_case->GetDefaultState(), BulbState::kOff);
     EXPECT_TRUE(test_case->IsValidState(BulbState::kOff));
     EXPECT_TRUE(test_case->IsValidState(BulbState::kOn));
@@ -125,7 +125,7 @@ TEST_F(BulbTest, Accessors) {
   EXPECT_EQ(bulb_.orientation_bulb_group().matrix(), Rotation::FromRpy(4, 5, 6).matrix());
   EXPECT_EQ(bulb_.color(), BulbColor::kRed);
   EXPECT_EQ(bulb_.type(), BulbType::kRound);
-  EXPECT_EQ(bulb_.states().size(), 2);
+  EXPECT_EQ(static_cast<int>(bulb_.states().size()), 2);
   EXPECT_EQ(bulb_.states().at(0), BulbState::kOff);
   EXPECT_EQ(bulb_.states().at(1), BulbState::kOn);
   EXPECT_EQ(bulb_.GetDefaultState(), BulbState::kOff);
@@ -228,7 +228,7 @@ TEST_F(BulbGroupTest, Accessors) {
   EXPECT_EQ(bulb_group_->id(), kBulbGroupId);
   EXPECT_EQ(bulb_group_->position_traffic_light(), kBulbGroupPosition);
   EXPECT_EQ(bulb_group_->orientation_traffic_light().matrix(), kBulbGroupRotation.matrix());
-  EXPECT_EQ(bulb_group_->bulbs().size(), 3);
+  EXPECT_EQ(static_cast<int>(bulb_group_->bulbs().size()), 3);
   EXPECT_EQ(bulb_group_->GetBulb(Bulb::Id("unknown_bulb")), nullptr);
   EXPECT_EQ(bulb_group_->GetBulb(Bulb::Id("red_bulb")), red_bulb_ptr_);
   EXPECT_THROW(bulb_group_->unique_id(), common::assertion_error);
@@ -311,7 +311,7 @@ TEST_F(TrafficLightTest, Accessors) {
   EXPECT_EQ(traffic_light_->id(), kId);
   EXPECT_EQ(traffic_light_->position_road_network(), kTrafficLightPosition);
   EXPECT_EQ(traffic_light_->orientation_road_network().matrix(), kTrafficLightRotation.matrix());
-  EXPECT_EQ(traffic_light_->bulb_groups().size(), 4);
+  EXPECT_EQ(static_cast<int>(traffic_light_->bulb_groups().size()), 4);
   EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("unknown_bulb_group")), nullptr);
   EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("north_group")), north_bulb_group_);
 }
