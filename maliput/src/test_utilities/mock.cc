@@ -482,12 +482,12 @@ class MockIntersectionBook final : public IntersectionBook {
   MockIntersectionBook() : intersection_(Intersection::Id("Mock"), CreatePhaseRing()) {}
 
  private:
-  std::vector<api::Intersection*> DoGetIntersections() {
+  std::vector<api::Intersection*> DoGetIntersections() override {
     std::vector<api::Intersection*> result(1, &intersection_);
     return result;
   }
 
-  api::Intersection* DoGetIntersection(const api::Intersection::Id& id) {
+  api::Intersection* DoGetIntersection(const api::Intersection::Id& id) override {
     if (id == intersection_.id()) {
       return &intersection_;
     }
@@ -911,7 +911,7 @@ std::unique_ptr<BulbGroup> CreateBulbGroup(bool add_missing_bulb_group) {
 std::unique_ptr<TrafficLight> CreateTrafficLight(const TrafficLightBuildFlags& build_flags) {
   const TrafficLight::Id id(build_flags.add_missing_traffic_light ? "MissingTrafficLightId" : "TrafficLightId");
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
-  bulb_groups.push_back(std::move(std::move(CreateBulbGroup(build_flags.add_missing_bulb_group))));
+  bulb_groups.push_back(CreateBulbGroup(build_flags.add_missing_bulb_group));
   return std::make_unique<TrafficLight>(id, GeoPosition(), Rotation(), std::move(bulb_groups));
 }
 

@@ -32,7 +32,7 @@ GTEST_TEST(RollPitchYawTest, Constructors) {
   }
   {
     const RollPitchYaw kDut = RollPitchYaw{0.4, -0.5, 0.6};
-    ExpectDoubleEq(kDut, RollPitchYaw({0.4, -0.5, 0.6}));
+    ExpectDoubleEq(kDut, RollPitchYaw(0.4, -0.5, 0.6));
   }
 }
 

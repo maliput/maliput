@@ -92,10 +92,10 @@ class GeoPosition {
   double Distance(const GeoPosition& geo_position) const;
 
   /// Equality operator.
-  auto operator==(const GeoPosition& rhs) const { return (this->xyz() == rhs.xyz()); }
+  bool operator==(const GeoPosition& rhs) const { return (this->xyz() == rhs.xyz()); }
 
   /// Inequality operator.
-  auto operator!=(const GeoPosition& rhs) const { return !(this->xyz() == rhs.xyz()); }
+  bool operator!=(const GeoPosition& rhs) const { return !(this->xyz() == rhs.xyz()); }
 
   /// Plus operator.
   GeoPosition operator+(const GeoPosition& rhs) const { return GeoPosition::FromXyz(this->xyz() + rhs.xyz()); }

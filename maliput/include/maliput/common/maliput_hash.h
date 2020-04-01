@@ -222,7 +222,7 @@ class FNV1aHasher {
   }
 
   /// Feeds a single byte into this hash.
-  constexpr void add_byte(uint8_t byte) noexcept { hash_ = (hash_ ^ byte) * kFnvPrime; }
+  void add_byte(uint8_t byte) noexcept { hash_ = (hash_ ^ byte) * kFnvPrime; }
 
   /// Returns the hash.
   explicit constexpr operator size_t() noexcept { return hash_; }

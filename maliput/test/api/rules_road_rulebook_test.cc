@@ -59,7 +59,7 @@ class MockRulebook final : public RoadRulebook {
     return results;
   }
 
-  virtual QueryResults DoRules() const {
+  virtual QueryResults DoRules() const override {
     return QueryResults{{{kRightOfWay.id(), kRightOfWay}},
                         {{kSpeedLimit.id(), kSpeedLimit}},
                         {{kDirectionUsage.id(), kDirectionUsage}},
@@ -67,7 +67,7 @@ class MockRulebook final : public RoadRulebook {
                         {{kRangeValueRule.id(), kRangeValueRule}}};
   }
 
-  virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const {
+  virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const override {
     if (id != kRightOfWay.id()) {
       throw std::out_of_range("");
     }
