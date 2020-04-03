@@ -927,3 +927,292 @@
 ///
 /// > TODO:  Tell me more!
 ///
+/// @section rules_and_features_databases Rules and Features Databases
+///
+/// @subsection rules_of_the_road Rules of the Road: `RoadRulebook`
+///
+/// A `RoadRulebook` (see @ref road-rulebook-outline_img "figure" ) expresses the semantic
+/// "rules of the road" for a road network, as rule elements associated to
+/// components of a `RoadGeometry`.  In a real, physical road network, road
+/// rules are typically signaled to users via signs or striping, though
+/// some rules are expected to be prior knowledge (e.g., "We drive on the
+/// right-hand side here.").  `RoadRulebook` abstracts away from both the
+/// physical artifacts and the symbolic state of such signals, and directly
+/// represents the intended use of a road network at a semantic level.
+///
+/// We define three levels of knowledge of rules of the road:
+///  * *Physical* *Sensory* comprises the physical artifacts (or simulated model
+///    thereof) which signal rules to the sensors of humans or vehicles.
+///    E.g., a traffic light of certain design hanging above a road,
+///    emitting light; a white / black metal sign with numbers and words,
+///    posted next to the road; a sequence of short yellow stripes painted
+///    on the ground.
+///  * *Symbolic* is the discrete state of the signals, abstracted away from
+///    the specifics of the physical manifestation.  E.g., a traffic light
+///    with four bulbs, of which the red one and the green left-facing
+///    arrow are illuminated; a speed limit sign bearing a limit of 45
+///    miles per hour; a dashed-yellow lane separation line.
+///  * *Semantic* is the intended rules of the road, whether from implicit
+///    knowledge, or conveyed via symbols and signals.  E.g., cars
+///    traveling forward through the intersection must stop, but
+///    left-turning cars may proceed; the speed limit for a specific
+///    stretch of road is 45 mph; lane-change to the left in order to pass
+///    is permitted.
+///
+/// The `RoadRulebook` interface only concerns the semantic level, which
+/// is the level required to provide oracular /ado/ cars with interesting
+/// interactive behaviors. (Future API's may be developed to express
+/// the sensory and symbolic levels of expression, and to coordinate
+/// between all three as required.)
+///
+/// @anchor road-rulebook-outline_img
+/// @image html road-rulebook-outline.svg "`RoadRulebook` outline."
+///
+/// We distinguish two kinds of state:
+///  * *Static state* comprises the aspects of a simulation which are
+///    established before the simulation begins and which cannot evolve
+///    during the runtime of the simulation.  This can be considered to be
+///    the configuration of a simulation.
+///  * *Dynamic state* comprises the aspects of a simulation which can evolve
+///    during the runtime as the simulation's time progresses.
+///
+/// The `RoadRulebook` design decouples static state from dynamic
+/// state. Dynamic state needs to be managed during the runtime of a
+/// simulation, and different simulation frameworks have different
+/// requirements for how they store and manage dynamic state.  In
+/// particular, the `drake` system framework requires that all dynamic state
+/// can be externalized and collated into a single generic state vector
+/// (called the “Context”), and the `RoadRulebook` design facilitates such a
+/// scheme. Decoupling the dynamic and static state also aids development;
+/// once the (small) interface between the two is established, development
+/// of API’s for each kind of state can proceed in parallel.
+///
+/// `RoadRulebook` is an abstract interface which provides query methods to
+/// return rule instances which match some filter parameters, e.g., rules
+/// which involve a specified `Lane`.  Each flavor of rule is represented by
+/// a different `*Rule` class.  Rules are associated to a road network by
+/// referring to components of a `RoadGeometry` via component ID’s. Each
+/// rule is itself identified by a unique type-specific ID.  This ID is the
+/// handle for manipulating the rule during rulebook configuration, and for
+/// associating the rule with physical / symbolic models and/or dynamic state
+/// in a simulation.  A rule generally consists of static state, e.g., the
+/// speed limit as posted for a lane. Some rules may involve dynamic state
+/// as well. Any dynamic state will be provided by a separate entity, with
+/// an abstract interface for each flavor of dynamic state. For example, a
+/// `RightOfWayRule` may refer to dynamic state (e.g., if it represents a
+/// traffic light) via its `RightOfWayRule::Id`. An implementation of the
+/// `RightOfWayStateProvider` abstract interface will, via its `GetState()`
+/// method, return the current state for a given `RightOfWayRule::Id`.  How
+/// those states are managed and evolved over time is up to the
+/// implementation.
+///
+/// Road rules can generally be interpreted as restrictions on behavior,
+/// and absent any rules, behavior is unrestricted (by rules of the road).
+/// For example, if a `RoadRulebook` does not provide a `SpeedLimitRule`
+/// for some section of the road network, then there is no speed limit
+/// established for that section of road.  Whether or not an agent follows
+/// the rules is up to the agent; `RoadRulebook` merely provides the rules.
+///
+/// Six rule types are currently defined or proposed:
+///
+///  * `SpeedLimitRule` - speed limits
+///  * `RightOfWayRule` - control of right-of-way / priority on specific routes
+///  > * TODO: `DirectionUsageRule` - direction-of-travel specification
+///  > * TODO: `LaneChangeRule` - adjacent-lane transition restrictions
+///  > * TODO: `OngoingRouteRule` - turning restrictions
+///  > * TODO: `PreferentialUseRule` - lane-based vehicle-type restrictions (e.g.,
+///  >   HOV lanes)
+///
+/// @subsubsection common_region_entities Common Region Entities
+///
+/// A few common entities, which identify regions of the road network, occur in
+/// the various rule types:
+///
+///  * `LaneId`: unique ID of a `Lane` in a `RoadGeometry`;
+///  * `SRange`: inclusive longitudinal range @f$[s_0, s_1]@f$ between two
+///    s-coordinates;
+///  * `LaneSRange`: a `LaneId` paired with an `SRange`, describing a longitudinal
+///    range of a specific `Lane`;
+///  * `LaneSRoute`: a sequence of `LaneSRange`'s which describe a contiguous
+///    longitudinal path that may span multiple end-to-end connected `Lane`'s;
+///  * `LaneIdEnd`: a pair of `LaneId` and an "end" specifier, which describes
+///    either the start or finish of a specific `Lane`.
+///
+/// @subsubsection speed_limit_rules `SpeedLimitRule`: Speed Limits
+///
+/// A `SpeedLimitRule` describes speed limits on a longitudinal range of a Lane.
+/// It comprises:
+///
+///  * id
+///  * zone (`LaneSRange`)
+///  * maximum and minimum speed limits (in which a minimum of zero is
+///    effectively no minimum)
+///  * severity:
+///    * *strict* (e.g., in the US, black-on-white posted limit)
+///    * *advisory* (e.g., in the US, black-on-yellow advisory limit on curves)
+/// > * TODO: applicable vehicle type (for limits applying to specific types):
+/// >   * any
+/// >   * trucks
+/// >   * ...
+/// > * TODO: time-of-day/calendar condition
+///
+/// @subsubsection right_of_way_rule `RightOfWayRule`: Stopping and Yielding
+///
+/// `RightOfWayRule` describes which vehicles have right-of-way (also
+/// known as "priority"). Note that "right of way" does not mean "right
+/// to smash through obstacles".  A green light means
+/// that other cars should not enter an intersection, but the light turning
+/// green will not magically clear an intersection.  Even after acquiring
+/// the right-of-way, a vehicle should still respect the physical reality
+/// of its environment and operate in a safe manner. When operating on
+/// intersecting regions of the road network.  In the real world, such
+/// rules are typically signaled by stop signs, yield signs, and traffic
+/// lights, or are understood as implicit knowledge of the local laws
+/// (e.g., "vehicle on the right has priority at uncontrolled
+/// intersections").
+///
+/// A `RightOfWayRule` instance is a collection of `RightOfWayRule::State`
+/// elements which all describe the right-of-way rules pertaining to a
+/// specific `zone` in the road network.  The elements of a `RightOfWayRule` are:
+///
+/// <table>
+///   <tr><td>`id`          <td>unique `RightOfWayRule::Id`
+///   <tr><td>`zone`        <td>`LaneSRoute`
+///   <tr><td>`zone_type`   <td>`ZoneType enum {StopExcluded, StopAllowed}`
+///   <tr><td>`states`      <td>set of `State` mapped by `State::Id`
+/// </table>
+///
+/// The `zone` is a directed longitudinal path in the road network,
+/// represented as a `LaneSRoute`; the rule applies to any vehicle
+/// traversing forward through the `zone`.  The `zone_type` specifies
+/// whether or not vehicles are allowed to come to a stop within the
+/// `zone`.  If the type is `StopExcluded`, then vehicles should not
+/// enter the `zone` if they do not expect to be able to completely
+/// transit the `zone` while they have the right-of-way, and vehicles
+/// should continue to transit and exit the `zone` if they lose the
+/// right-of-way while in the `zone`.  `StopExcluded` implies a
+/// "stop line" at the beginning of the `zone`.  `StopAllowed` has
+/// none of these expectations or restrictions.
+///
+/// Each `State` comprises:
+///
+/// <table>
+///   <tr><td>`id`          <td>`State::Id` (unique within the context of the rule instance)
+///   <tr><td>`type`        <td>`State::Type enum: {Go, Stop, StopThenGo}`
+///   <tr><td>`yield_to`    <td>list of `RightOfWayRule::Id`
+/// </table>
+///
+/// The state's `type` indicates whether a vehicle can *Go* (has
+/// right-of-way), must *Stop* (does not have right-of-way), or must
+/// *StopThenGo* (has right-of-way after coming to a complete stop).
+/// The *Go* and *StopThenGo* types are modulated by `yield_to`, which is
+/// a (possibly empty) list of references to other rule instances
+/// whose right-of-way supersedes this rule.  A vehicle subject to a
+/// non-empty `yield_to` list does not necessarily have to stop, but its
+/// behavior should not hamper or interfere with the motion of
+/// vehicles which are controlled by rules in the `yield_to` list.
+///
+/// Only one `State` of a rule may be in effect at any given time.  A rule
+/// instance which defines only a single `State` is called a *static
+/// rule*; its meaning is entirely static and fixed for all time.
+/// Conversely, a right-of-way rule instance with multiple `State`
+/// elements is a *dynamic rule*.  Although the collection of possible
+/// `State`'s of a dynamic rule are fixed and described by the rule
+/// instance, knowing which `State` is in effect at any given time
+/// requires querying a `RightOfWayStateProvider`.
+///
+/// `RightOfWayStateProvider` is an abstract interface that provides a query
+/// method that accepts a `RightOfWayRule::Id` and returns a result containing:
+///
+/// <table>
+///   <tr><td>`current_id`          <td>`State::Id`
+///   <tr><td>`next_id`             <td>std::optional `State::Id`
+///   <tr><td>`next.duration_until` <td>std::optional `double`
+/// </table>
+///
+/// `current_id` is the current `State` of the rule.  `next_id` is the
+/// *next* `State` of the rule, if a transition is anticipated and the next
+/// state is known.  `next.duration_until` is the duration, if known,
+/// until the transition to the known next state.
+///
+/// Following are discussions on `RightOfWayRule` configurations
+/// for a few example scenarios.
+///
+/// *Example: Uncontrolled Midblock Pedestrian Crosswalk*
+///
+/// @anchor RoWR-lone-crosswalk
+/// @image html right-of-way-example-lone-crosswalk.svg "Uncontrolled midblock pedestrian crosswalk."
+///
+/// @ref RoWR-lone-crosswalk "Figure" illustrates a very simple scenario:
+///
+///   * One-way traffic flows northbound, crossed by an uncontrolled pedestrian
+///     crosswalk at midblock.
+///   * The pedestrian traffic route is not modeled in the road network, so only
+///     one zone (for the vehicular traffic intersecting the crosswalk) is involved.
+///
+/// With only one zone and no changing signals, a single, static
+/// `RightOfWayRule` is required:
+///
+/// <table>
+///   <tr><td>Rule + Zone <td>`zone_type`     <td>State `id`  <td>`type`  <td>`yield_to`
+///   <tr><td>"North"     <td>*StopExcluded*  <td>"static"    <td>*Go*    <td>---
+/// </table>
+///
+/// The `State::Id` chosen here ("static") is arbitrary.
+///
+/// The zone is a `LaneSRoute` spanning from the southern edge of the
+/// crosswalk to the northern edge,
+/// with zone-type *StopExcluded*, which means that stopping
+/// within the zone is not allowed.  The single state has type *Go*, which
+/// means that vehicles have the right-of-way to proceed.  (Note that
+/// "when it is safe to do so" is always implied with any rule.)
+/// Furthermore, that single state has an empty `yield_to` list, which
+/// means no intersecting paths have priority over this one. (In fact,
+/// there are no intersecting paths.)
+///
+/// This is a pretty trivial rule, since it has a single state which is
+/// always "Go".  However, it serves to capture the requirement that
+/// when a vehicle *does* stop, it should avoid stopping in the crosswalk.
+///
+/// Note that a more complete scenario, which actually modeled pedestrian
+/// traffic, would likely represent the crosswalk as a lane of its own
+/// (intersecting the vehicular lane) and the "North" rule would specify
+/// yielding to that crosswalk lane via the `yield_to` element.
+///
+/// *Example: One-way Side Street onto Two-Lane Artery*
+///
+/// @anchor RoWR-one-way-to-two-way
+/// @image html right-of-way-example-one-way-side-street.svg "Intersection with one-way side street onto two-lane artery."
+///
+/// @ref RoWR-one-way-to-two-way "Figure" is a scenario with an intersection:
+///
+///   * East-west traffic is two way and uncontrolled.
+///   * Northbound traffic is controlled by a stop sign.
+///   * There are four zones (paths) traversing the intersection
+///     (illustrated by the four arrows).
+///
+/// With four zones and no changing signals, four static rules are
+/// required.  The rules have been labeled by a combination of the initial
+/// heading and the turn direction of their paths. (E.g., "NB/Left" refers
+/// to "the northbound path that turns left".)  All the zones are of the
+/// *StopExcluded* type, so that detail has been omitted from the rule table:
+///
+///
+/// <table>
+///   <tr><td>Rule + Zone   <td>State `id`  <td>`type`        <td>`yield_to`
+///   <tr><td>"EB/Straight" <td>"static"    <td>*Go*          <td>---
+///   <tr><td>"WB/Straight" <td>"static"    <td>*Go*          <td>---
+///   <tr><td>"NB/Right"    <td>"static"    <td>*StopThenGo*  <td>"EB/Straight"
+///   <tr><td>"NB/Left"     <td>"static"    <td>*StopThenGo*  <td>"EB/Straight", "WB/Straight"
+/// </table>
+///
+/// The `State::Id`'s chosen here ("static") are arbitrary.
+///
+/// As in the earlier Pedestrian Crosswalk example, the static *Go* rules
+/// of the eastbound and westbound paths show that they always have the
+/// right-of-way, but vehicles are still required to avoid stopping in the
+/// intersection.  Traffic turning right onto the artery (following the
+/// "NB/Right" path) must stop at the stop sign, and then yield to any
+/// eastbound traffic.  Traffic turning left onto the artery must stop
+/// and then yield to both eastbound and westbound traffic.
+///
