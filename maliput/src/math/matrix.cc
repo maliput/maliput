@@ -1,6 +1,7 @@
 #include "maliput/math/matrix.h"
 
 #include <algorithm>
+#include <cmath>
 #include <numeric>
 
 #include "maliput/common/maliput_throw.h"
@@ -111,7 +112,7 @@ double Matrix<N>::determinant() const {
 
 template <std::size_t N>
 bool Matrix<N>::is_singular() const {
-  return abs(determinant()) < kTolerance;
+  return std::abs(determinant()) < kTolerance;
 }
 
 template <>
@@ -138,7 +139,7 @@ Matrix<N> Matrix<N>::adjoint() const {
 template <std::size_t N>
 Matrix<N> Matrix<N>::inverse() const {
   const double d = determinant();
-  if (abs(d) < kTolerance) MALIPUT_THROW_MESSAGE("Matrix is singular");
+  if (std::abs(d) < kTolerance) MALIPUT_THROW_MESSAGE("Matrix is singular");
   return {(1 / d) * adjoint()};
 }
 

@@ -246,8 +246,8 @@ class TrafficLightConstructorTest : public ::testing::Test {
 
 TEST_F(TrafficLightConstructorTest, DuplicatedBulbGroupIds) {
   std::vector<std::unique_ptr<BulbGroup>> bulb_group;
-  bulb_group.push_back(std::move(api::test::CreateBulbGroup(false /* add_missing_bulb_group */)));
-  bulb_group.push_back(std::move(api::test::CreateBulbGroup(false /* add_missing_bulb_group */)));
+  bulb_group.push_back(api::test::CreateBulbGroup(false /* add_missing_bulb_group */));
+  bulb_group.push_back(api::test::CreateBulbGroup(false /* add_missing_bulb_group */));
   EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)), common::assertion_error);
 }
 
