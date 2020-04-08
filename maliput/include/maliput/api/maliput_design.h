@@ -1,14 +1,13 @@
 // Copyright 2020 Toyota Research Institute
 /// @file maliput_design.h
+/// @page Maliput Design
 /// @author Matt Marjanović
 /// @author Chien-Liang Fok
 /// @author Agustin Alba Chicar
 /// @date September 25, 2019
+/// @tableofcontents
 ///
-/// @addtogroup Design
-/// @{
-///
-/// # Modeling Road Networks for Simulation
+/// @section Section1 Modeling Road Networks for Simulation
 ///
 /// This document describes `maliput`, a model of road networks for use in
 /// agent and traffic simulations.  At the core of `maliput` is a
@@ -19,7 +18,7 @@
 /// allow various sources of road network data to be expressed via the
 /// common `maliput` model.
 ///
-/// ## Objectives
+/// @subsection SubSection1 Objectives
 ///
 /// Driving happens on roads (most of the time); the *road network* is a
 /// fundamental structure in the task of driving.  Any non-trivial
@@ -62,11 +61,12 @@
 /// fragments of very large, complex road networks on-demand and disposing
 /// of fragments that are no longer immediately necessary.
 ///
-/// # Road Network Geometry
+/// @section Section2 Road Network Geometry
 ///
-/// ## Geometry Model
+/// @subsection SubSection2 Geometry Model
 ///
-/// ### Overview
+/// @subsubsection SubSubSection1 Overview
+///
 /// At the core of `maliput` is a mathematical model for the geometry of
 /// the space around a road network; it is a model of both the road
 /// surface and the volume proximal to that surface.  In the
@@ -129,12 +129,12 @@
 /// continuity requirements because Maliput has no notion of laterally-adjacent
 /// `Segments`.
 ///
-/// ### Scale Length and Tolerances
+/// @subsubsection SubSubSection2 Scale Length and Tolerances
 ///
 /// > TODO: Explain the concepts of linear tolerance, angular tolerance, and
 /// > characteristic scale length.
 ///
-/// ### `World` Frame versus `Lane` Frame
+/// @subsubsection SubSubSection3 `World` Frame versus `Lane` Frame
 ///
 /// Two types of coordinate frames are used in this model: the (single)
 /// `World`-frame and the (multiple) `Lane`-frames.  In both, distances
@@ -160,7 +160,7 @@
 /// > position.
 ///
 /// A `Lane`-frame is a right-handed orthonormal curvilinear coordinate system, with
-/// positions expressed as coordinates $(s,r,h)$.  Each `Lane` in a `RoadGeometry`
+/// positions expressed as coordinates @f$(s,r,h)@f$.  Each `Lane` in a `RoadGeometry`
 /// defines its own embedding into the `World`, and thus each `Lane`
 /// has its own `Lane`-frame.
 ///
@@ -215,7 +215,7 @@
 /// > `Lane`-frame of any `Lane`.  We anticipate needing an additional set of
 /// > surface/volume parameterizations in the future to complete the picture.
 ///
-/// ### Lanes as `Lanes`
+/// @subsubsection SubSubSection4 Lanes as `Lanes`
 ///
 /// A `Lane` represents a lane of travel in a road network, expressing a path
 /// along a stretch of asphalt as well as a parameterization of that asphalt
@@ -229,7 +229,7 @@
 /// W_L: (s,r,h) \mapsto (x,y,z), \text{ for } s \in [0, s_\text{max}]
 /// @f]
 ///
-/// The curve traced out by $W_L$ along longitudinal coordinate @f$s@f$ (while @f$r@f$
+/// The curve traced out by @f$W_L@f$ along longitudinal coordinate @f$s@f$ (while @f$r@f$
 /// and @f$h@f$ are fixed to zero) is called the *centerline* of the `Lane`:
 ///
 /// @f[
@@ -241,7 +241,7 @@
 /// despite the name).  @f$W_L@f$ is required to be @f$C^1@f$ continuous, and thus
 /// @f$C_L@f$ is also required to be @f$C^1@f$ continuous.
 ///
-/// The space of the `Lane` is bounded in $s$ by @f$s \in [0,
+/// The space of the `Lane` is bounded in @f$s@f$ by @f$s \in [0,
 /// s_\text{max}]@f$.  @f$s_\text{max}@f$ is called the *length* of the `Lane`
 /// and is in fact the path-length of the centerline @f$C_L@f$ (in both the
 /// `Lane`-frame and the `World`-frame).  The @f$s=0@f$ end of a `Lane` is
@@ -288,20 +288,20 @@
 /// `Lane` to describe the location of subterranean features (e.g., measurements
 /// made by ground-penetrating radar).
 ///
-/// > Note: Because of the orthogonality of the $(s,r,h)$ coordinates, a
-/// > curve with constant non-zero $(r,h)$ (imagine $r$ and $h$ "grid
-/// > lines") is basically a parallel curve to the centerline $C_L$.  Thus,
-/// > the shape of $C_L$ and/or the road surface may
-/// > produce limits to $(r,h)$ before such a curve develops a cusp.
+/// > Note: Because of the orthogonality of the @f$(s,r,h)@f$ coordinates, a
+/// > curve with constant non-zero @f$(r,h)@f$ (imagine $r$ and @f$h@f$ "grid
+/// > lines") is basically a parallel curve to the centerline @f$C_L@f$.  Thus,
+/// > the shape of @f$C_L@f$ and/or the road surface may
+/// > produce limits to @f$(r,h)@f$ before such a curve develops a cusp.
 /// > The current definitions of $B_\text{segment}$ and
 /// > $H_\text{lane}$ conflate the bounds of the /segment/ volume
 /// > (e.g., pavement and free space under bridges) with the bounds of the
-/// > /modeled/ volume (e.g., the bounds on $r$ and $h$ which maintain
-/// > $G^1$ continuity, avoiding cusps).  Hence, the road surface may continue
+/// > /modeled/ volume (e.g., the bounds on @f$r@f$ and @f$h@f$ which maintain
+/// > @f$G^1@f$ continuity, avoiding cusps).  Hence, the road surface may continue
 /// > into regions that cannot be properly represented by the parameterization
 /// > of a given `Lane`.
 ///
-/// ### Lanes Joined End-to-End via `BranchPoints`
+/// @subsubsection SubSubSection5 Lanes Joined End-to-End via `BranchPoints`
 ///
 /// `BranchPoints` are the points where `Lanes` are connected end-to-end.
 /// They are so named because they are the branch-points in the decision
@@ -317,7 +317,7 @@
 /// the earlier-stated requirement of overall @f$G^1@f$ continuity of the road surface
 /// and the conditions on @f$r@f$ and @f$h@f$ being path-lengths, this implies that:
 ///  1. The location of a `BranchPoint` is a well-defined point in the World frame.
-///  2. The tangent vectors of the $C_L$ curves are either parallel or
+///  2. The tangent vectors of the @f$C_L@f$ curves are either parallel or
 ///     antiparallel with each other at the
 ///     `BranchPoint`.  In fact, except for the signs of @f$\hat{s}@f$ and @f$\hat{r}@f$,
 ///     the frames of all the `Lanes` will have the same orientation and scale.
@@ -369,5 +369,3 @@
 /// (5): At the *finish* end of a `Lane`, this is just the tangent of @f$C_L@f$;
 /// at the *start* end of a `Lane`, it's the negative of the tangent, pointing
 /// in the @f$-s@f$ direction instead of the @f$+s@f$ direction.
-///
-/// @}
