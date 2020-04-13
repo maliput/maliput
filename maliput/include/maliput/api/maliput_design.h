@@ -1,13 +1,13 @@
 // Copyright 2020 Toyota Research Institute
 /// @file maliput_design.h
-/// @page Maliput Design
+/// @page maliput_design Maliput Design
 /// @author Matt Marjanović
 /// @author Chien-Liang Fok
 /// @author Agustin Alba Chicar
 /// @date September 25, 2019
 /// @tableofcontents
 ///
-/// @section Section1 Modeling Road Networks for Simulation
+/// @section modeling_road_networks_for_simulation Modeling Road Networks for Simulation
 ///
 /// This document describes `maliput`, a model of road networks for use in
 /// agent and traffic simulations.  At the core of `maliput` is a
@@ -18,7 +18,7 @@
 /// allow various sources of road network data to be expressed via the
 /// common `maliput` model.
 ///
-/// @subsection SubSection1 Objectives
+/// @subsection objectives Objectives
 ///
 /// Driving happens on roads (most of the time); the *road network* is a
 /// fundamental structure in the task of driving.  Any non-trivial
@@ -61,11 +61,11 @@
 /// fragments of very large, complex road networks on-demand and disposing
 /// of fragments that are no longer immediately necessary.
 ///
-/// @section Section2 Road Network Geometry
+/// @section road_network_goemetry Road Network Geometry
 ///
-/// @subsection SubSection2 Geometry Model
+/// @subsection geometry_model Geometry Model
 ///
-/// @subsubsection SubSubSection1 Overview
+/// @subsubsection overview Overview
 ///
 /// At the core of `maliput` is a mathematical model for the geometry of
 /// the space around a road network; it is a model of both the road
@@ -129,12 +129,12 @@
 /// continuity requirements because Maliput has no notion of laterally-adjacent
 /// `Segments`.
 ///
-/// @subsubsection SubSubSection2 Scale Length and Tolerances
+/// @subsubsection scale_length_and_tolerances Scale Length and Tolerances
 ///
 /// > TODO: Explain the concepts of linear tolerance, angular tolerance, and
 /// > characteristic scale length.
 ///
-/// @subsubsection SubSubSection3 `World` Frame versus `Lane` Frame
+/// @subsubsection world_frame_versus_lane_frame `World` Frame versus `Lane` Frame
 ///
 /// Two types of coordinate frames are used in this model: the (single)
 /// `World`-frame and the (multiple) `Lane`-frames.  In both, distances
@@ -215,7 +215,7 @@
 /// > `Lane`-frame of any `Lane`.  We anticipate needing an additional set of
 /// > surface/volume parameterizations in the future to complete the picture.
 ///
-/// @subsubsection SubSubSection4 Lanes as `Lanes`
+/// @subsubsection lanes_as_lanes Lanes as `Lanes`
 ///
 /// A `Lane` represents a lane of travel in a road network, expressing a path
 /// along a stretch of asphalt as well as a parameterization of that asphalt
@@ -289,19 +289,19 @@
 /// made by ground-penetrating radar).
 ///
 /// > Note: Because of the orthogonality of the @f$(s,r,h)@f$ coordinates, a
-/// > curve with constant non-zero @f$(r,h)@f$ (imagine $r$ and @f$h@f$ "grid
+/// > curve with constant non-zero @f$(r,h)@f$ (imagine @f$r@f$ and @f$h@f$ "grid
 /// > lines") is basically a parallel curve to the centerline @f$C_L@f$.  Thus,
 /// > the shape of @f$C_L@f$ and/or the road surface may
 /// > produce limits to @f$(r,h)@f$ before such a curve develops a cusp.
-/// > The current definitions of $B_\text{segment}$ and
-/// > $H_\text{lane}$ conflate the bounds of the /segment/ volume
+/// > The current definitions of @f$B_\text{segment}@f$ and
+/// > @f$H_\text{lane}@f$ conflate the bounds of the /segment/ volume
 /// > (e.g., pavement and free space under bridges) with the bounds of the
 /// > /modeled/ volume (e.g., the bounds on @f$r@f$ and @f$h@f$ which maintain
 /// > @f$G^1@f$ continuity, avoiding cusps).  Hence, the road surface may continue
 /// > into regions that cannot be properly represented by the parameterization
 /// > of a given `Lane`.
 ///
-/// @subsubsection SubSubSection5 Lanes Joined End-to-End via `BranchPoints`
+/// @subsubsection lanes_joined_via_branchpoints Lanes Joined End-to-End via `BranchPoints`
 ///
 /// `BranchPoints` are the points where `Lanes` are connected end-to-end.
 /// They are so named because they are the branch-points in the decision
