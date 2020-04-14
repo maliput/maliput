@@ -582,7 +582,8 @@
 /// Taking @f$G_{xy} = (G_x, G_y)@f$ and @f$G_z@f$ together,
 ///
 /// > @f[
-/// > \left(\begin{array}{c} G_{xy}\\ l_\text{max}G_z \end{array}\right): p_{SEG} \mapsto \left(\begin{array}{c}x\\y\\z\end{array}\right)
+/// > \left(\begin{array}{c} G_{xy}\\ l_\text{max}G_z \end{array}\right): p_{SEG} \mapsto
+/// >   \left(\begin{array}{c}x\\y\\z\end{array}\right)
 /// > @f]
 ///
 /// @f[
