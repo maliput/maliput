@@ -1182,7 +1182,8 @@
 /// *Example: One-way Side Street onto Two-Lane Artery*
 ///
 /// @anchor RoWR-one-way-to-two-way
-/// @image html right-of-way-example-one-way-side-street.svg "Intersection with one-way side street onto two-lane artery."
+/// @image html right-of-way-example-one-way-side-street.svg "Intersection with one-way side street onto two-lane
+/// artery."
 ///
 /// @ref RoWR-one-way-to-two-way "Figure" is a scenario with an intersection:
 ///
