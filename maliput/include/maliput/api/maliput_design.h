@@ -500,432 +500,488 @@
 /// * accessor for the default branch (ongoing `Lane`) for a given `Lane`
 /// * accessor for parent `RoadGeometry`
 ///
-/// @subsection concrete_implementation_maliput_multilane Concrete Implementation: `maliput::multilane`
-///
-/// So-named because it admits multiple `Lanes` per
-/// `Segment`, an advance over its predecessor (`monolane`) which only
-/// admitted a single `Lane` per `Segment`.
-///
-/// `multilane`  is an implementation of the
-/// `maliput` geometry API which synthesizes a road network from a small set
-/// of primitive building blocks, mimicking techniques used in the geometric
-/// design of real roads.  The basic geometry of a `Segment` is derived
-/// from the combination of a plane curve, an elevation
-/// function, and a superelevation function, combined together to define a
-/// ruled surface.  A `Segment` has a longitudinal *reference curve*
-/// (similar to a `Lane`'s centerline) and each of the `Lanes` of a
-/// `Segment` is defined via a constant lateral offset, along the segment
-/// surface, from that reference curve.
-///
-/// Three coordinate frames are involved in the following discussion:
-///  * @f$(x,y,z)@f$ is a position in the `World`-frame.
-///  * @f$(s,r,h)_{LANE,i}@f$ is a position in the `Lane`-frame (discussed
-///    in section @ref world_frame_versus_lane_frame ) of the `Lane` with
-///    index @f$i@f$.
-///  * @f$(p,r,h)_{SEG}@f$ is a position in a curvilinear reference frame of
-///    the `Segment`, analogous to @f$(s,r,h)_{LANE,i}@f$ for a `Lane`.
-///    The parameter @f$p_{SEG} \in [0, 1]@f$ spans the `Segment` longitudinally.
-///    @f$r_{SEG}@f$ is a lateral offset from the `Segment`'s reference curve,
-///    along the `Segment` surface. @f$h_SEG@f$ is height above the surface.
-///
-/// @subsubsection segment_geometry `Segment` Geometry
-///
-/// > TODO Reconsider the use of the word "geometry" below.
-/// > The geometry of a `Segment` is completely derived from a map
-/// >
-/// > @f[
-/// > W: (p,r,h)_{SEG} \mapsto (x,y,z)
-/// > @f]
-/// >
-/// > which we will construct in stages, starting with the `Segment` reference curve
-/// >
-/// > @f[
-/// > W(p_{SEG}) \equiv W(p_{SEG},0,0),
-/// > @f]
-/// >
-/// > followed by the `Segment` surface
-/// >
-/// > @f[
-/// > W(p_{SEG},r_{SEG}) \equiv W(p_{SEG},r_{SEG},0).
-/// > @f]
-///
-/// The construction of @f$W(p_{SEG},r_{SEG},h_{SEG})@f$ will involve
-/// three fundamental functions, @f$G_\text{xy}@f$, @f$G_z@f$, and @f$\Theta@f$.
-///
-/// The first fundamental function @f$G_\text{xy}@f$ defines a two dimensional
-/// *planar primitive curve* in the @f$xy@f$ -plane:
-///
-/// @f[
-/// G_{xy}: p_{SEG} \mapsto (x,y).
-/// @f]
-///
-/// This curve establishes the basic geometric primitive of the `Segment`
-/// (e.g., "constant-radius arc").
-/// We define @f$l@f$ as a path-length along this plane curve, in the range
-/// @f$[0, l_\text{max}]@f$, where @f$l_\text{max}@f$ is the total path-length
-/// of the curve.  @f$G_{xy}@f$ is specifically parameterized such that
-///
-/// @f[
-/// p_{SEG} \equiv \frac{l}{l_\text{max}};
-/// @f]
-///
-/// in other words, @f$p_{SEG}@f$ is linear in path-length along the planar
-/// primitive curve and @f$p_{SEG} \in [0,1]@f$.
-///
-/// The second fundamental function @f$G_z@f$ specifies elevation above the
-/// @f$(xy)@f$-plane (albeit with a peculiar scale factor):
-///
-/// @f[
-/// G_z: p_{SEG} \mapsto \frac{1}{l_\text{max}}z
-/// @f]
-///
-/// Taking @f$G_{xy} = (G_x, G_y)@f$ and @f$G_z@f$ together,
-///
-/// > @f[
-/// > \left(\begin{array}{c} G_{xy}\\ l_\text{max}G_z \end{array}\right): p_{SEG} \mapsto
-/// >   \left(\begin{array}{c}x\\y\\z\end{array}\right)
-/// > @f]
-///
-/// @f[
-/// \left(\begin{array}{c}x\\y\\z\end{array}\right) =
-/// W(p_{SEG}) =
-/// \left(\begin{array}{c} G_x(p_{SEG})\\
-///                        G_y(p_{SEG})\\
-///                        l_\text{max}G_z(p_{SEG}) \end{array}\right)
-/// @f]
-///
-/// defines the three dimensional *reference curve* @f$W(p_{SEG})@f$ for the `Segment`.
-/// @f$G_z@f$ is constructed with the scale factor of @f$1/l_\text{max}@f$ specifically
-/// so that:
-///
-/// @f[
-/// \begin{eqnarray*}
-///       z & = & l_\text{max} G_z(p_{SEG})\\
-///         & = & l_\text{max} G_z\left(\frac{l}{l_\text{max}}\right)\\
-/// \dot{z} & = & \frac{dz}{dl} = \frac{d}{dp_{SEG}}G_z(p_{SEG})
-/// \end{eqnarray*}
-/// @f]
-///
-/// This allows us to derive the first derivative of @f$G_z@f$ directly from
-/// the `World`-frame slope @f$\dot{z} = \frac{dz}{dl}@f$ of the segment
-/// surface along its reference curve.  This is convenient because @f$\dot{z}@f$
-/// is what a road designer would nominally specify as the "slope of the road"
-/// or the "grade of the road".
-///
-/// The third fundamental function @f$\Theta@f$ specifies the superelevation of
-/// the `Segment` surface:
-///
-/// @f[
-/// \Theta: p_{SEG} \mapsto \frac{1}{l_\text{max}}\theta
-/// @f]
-///
-/// Superelevation @f$\theta@f$ is the "twist" in a road, given as a right-handed
-/// angle of rotation around the tangent of the reference curve @f$W(p_{SEG})@f$.
-/// Zero superelevation leaves the surface parallel with the
-/// @f$xy@f$ plane. Note that superelevation becomes ambiguous when the
-/// tangent of the reference curve points in the @f$\hat{z}@f$ direction.
-///
-/// As with @f$G_z@f$, @f$\Theta@f$ is scaled so that:
-///
-/// @f[
-/// \begin{eqnarray*}
-///       \theta & = & l_\text{max} \Theta\left(\frac{l}{l_\text{max}}\right)\\
-/// \dot{\theta} & = &
-///               \frac{d\theta}{dl} = \frac{d}{dp_{SEG}}\Theta(p_{SEG})
-/// \end{eqnarray*}
-/// @f]
-///
-/// > With the three fundamental functions in hand, we can express the orientation
-/// > of the @f$(\hat{p},\hat{r},\hat{h})_{SEG}@f$ frame along the reference curve,
-/// > with respect to the `World`-frame, as a roll/pitch/yaw rotation:
-///
-/// We use all three fundamental functions to define a rotation
-///
-/// @f[
-/// \begin{align*}
-/// \mathbf{R}(p_{SEG}) &=
-///  \mathbf{R}_{\gamma(p_{SEG})}
-///  \mathbf{R}_{\beta(p_{SEG})} \mathbf{R}_{\alpha(p_{SEG})}
-/// \end{align*}
-/// @f]
-///
-/// where
-///
-/// @f[
-/// \begin{align*}
-///   \mathbf{R}_{\gamma(p_{SEG})} &=
-///   \left(\begin{array}{rrr}
-///   \cos\gamma & -\sin\gamma & 0 \\
-///   \sin\gamma &  \cos\gamma & 0 \\
-///            0 &           0 & 1
-///   \end{array}\right) & \text{(yaw)}\\
-/// \end{align*}
-/// @f]
-///
-/// @f[
-/// \begin{align*}
-///   \mathbf{R}_{\beta(p_{SEG})}  &=
-///   \left(\begin{array}{rrr}
-///    \cos\beta & 0 & \sin\beta \\
-///            0 & 1 &         0 \\
-///   -\sin\beta & 0 & \cos\beta
-///   \end{array}\right) & \text{(pitch)} \\
-/// \end{align*}
-/// @f]
-///
-/// @f[
-/// \begin{align*}
-///   \mathbf{R}_{\alpha(p_{SEG})} &=
-///   \left(\begin{array}{rrr}
-///   1 &          0 &           0 \\
-///   0 & \cos\alpha & -\sin\alpha \\
-///   0 & \sin\alpha &  \cos\alpha
-///   \end{array}\right) & \text{(roll)}
-/// \end{align*}
-/// @f]
-///
-/// and
-///
-/// @f[
-/// \begin{align*}
-/// \gamma(p_{SEG}) &=
-///   \mathrm{atan2}\negthickspace\left(\frac{dG_y}{dp_{SEG}},
-///                       \frac{dG_x}{dp_{SEG}}\right) & \text{(yaw)}\\
-/// \beta(p_{SEG})  &=
-///   \arctan\negthickspace\left(\frac{dG_z}
-///                                         {dp_{SEG}}\right)
-/// & \text{(pitch)} \\
-/// \alpha(p_{SEG}) &= l_\text{max}\Theta(p_{SEG}) & \text{(roll)}
-/// \end{align*}
-/// @f]
-///
-/// > Note that @f$\hat{p}_{SEG}@f$ is solely determined by @f$W(p_{SEG})@f$,
-/// > and as expected,
-/// > @f$\hat{p}_{SEG} = \frac{W'(p_{SEG})}{\lVert W'(p_{SEG})\rVert}@f$.
-///
-/// With @f$\mathbf{R}(p_{SEG})@f$ , we can extend the `Segment` reference curve @f$W(p_{SEG})@f$
-/// to construct the `Segment` *surface* @f$W(p_{SEG}, r_{SEG})@f$ as:
-///
-/// @f[
-/// \begin{align*}
-/// \left(\begin{array}{c}x\\y\\z\end{array}\right) =
-/// W(p_{SEG},r_{SEG}) = \left(
-/// \begin{array}{c}
-///    G_{xy}(p_{SEG})\\
-///    l_\text{max} G_z(p_{SEG})
-/// \end{array} \right) +
-/// \mathbf{R}(p_{SEG})\negthickspace
-/// \begin{pmatrix}
-/// 0\\ r_{SEG} \\ 0 \end{pmatrix}.
-/// \end{align*}
-/// @f]
-///
-/// This function defines a *ruled surface*.  For any @f$p_{SEG}@f$,
-/// @f$W(p_{SEG},r_{SEG})@f$ is linear in @f$r_{SEG}@f$ and motion along
-/// @f$r_{SEG}@f$ is in a straight line.
-///
-/// Now that we have the surface embedding @f$W(p_{SEG},r_{SEG})@f$,
-/// we can derive
-/// the basis vectors @f$(\hat{p}, \hat{r}, \hat{h})_{SEG}@f$ along the surface
-/// and the corresponding orientation @f$\mathbf{R}(p_{SEG},r_{SEG})@f$:
-///
-/// @f[
-/// \begin{align*}
-/// \mathbf{R}(p_{SEG},r_{SEG}) &=
-///                      \begin{pmatrix}\hat{p} & \hat{r} & \hat{h}\end{pmatrix}\\
-/// \hat{p}_{SEG} &=
-///  \frac{\partial_{p_{SEG}} W(p_{SEG},r_{SEG})}{\lVert\partial_{p_{SEG}} W(p_{SEG},r_{SEG})\rVert}\\
-/// \hat{r}_{SEG} &=
-///  \frac{\partial_{r_{SEG}} W(p_{SEG},r_{SEG})}{\lVert\partial_{r_{SEG}} W(p_{SEG},r_{SEG})\rVert}\\
-/// \hat{h}_{SEG} &= \hat{p}_{SEG} \times \hat{r}_{SEG}
-/// \end{align*}
-/// @f]
-///
-/// A few things are worth noting at this point:
-///
-///  * @f$\hat{r}_{SEG} = \mathbf{R}(p_{SEG}) \begin{pmatrix}0\\1\\0\end{pmatrix}@f$.
-///    Thus, @f$\hat{r}_{SEG}@f$ is independent of @f$r_{SEG}@f$.
-///  * @f$\mathbf{R}(p_{SEG},r_{SEG}) = \mathbf{R}(p_{SEG})@f$ along
-///    @f$r_{SEG} = 0@f$ just as it should be; the orientation along the
-///    `Segment`'s reference curve is consistent in both expressions.
-///  * @f$\hat{p}_{SEG}@f$ is *not necessarily* independent of
-///    @f$r_{SEG}@f$.  Consequently, @f$\mathbf{R}(p_{SEG},r_{SEG})@f$ is not
-///    necessarily equal to @f$\mathbf{R}(p_{SEG})@f$ for
-///    @f$r_{SEG}\ne 0@f$.  This will become important when we try to
-///    join `Segments` end-to-end preserving @f$G^1@f$ continuity, discussed in
-///    section @ref ensuring_g1_contiguity .
-///
-/// *Finally*, with @f$\mathbf{R}(p_{SEG},r_{SEG})@f$ in hand (and points 1 and
-/// 2 above), we can define the complete volumetric world map
-/// @f$W(p_{SEG},r_{SEG},h_{SEG})@f$ for a `Segment`'s geometry:
-///
-/// @f[
-/// \begin{align*}
-/// \begin{pmatrix}x\\y\\z\end{pmatrix} = W(p_{SEG},r_{SEG},h_{SEG}) = \left(
-/// \begin{array}{c}
-///    G_x(p_{SEG})\\
-///    G_y(p_{SEG})\\
-///    l_\text{max} G_z(p_{SEG})
-/// \end{array} \right) +
-/// \mathbf{R}(p_{SEG},r_{SEG})\negthickspace
-/// \begin{pmatrix}
-/// 0\\ r_{SEG} \\ h_{SEG} \end{pmatrix}.
-/// \end{align*}
-/// @f]
-///
-/// This is simply @f$W(p_{SEG},r_{SEG})@f$ displaced by @f$h_{SEG}@f$ along
-/// the surface normal @f$\hat{h}_{SEG}@f$.
-///
-/// @subsubsection lane_geometry `Lane` Geometry
-///
-/// A `Lane` derives its geometry from its `Segment`.  In `multilane`, the
-/// centerline of the `Lane` with index @f$i@f$ is a parallel curve with a constant
-/// lateral offset @f$r_i@f$ from the reference curve (at @f$r_{SEG} = 0@f$) of the
-/// `Segment`.  We can express this relationship as a transform between
-/// @f$(s,r,h)_{LANE,i}@f$ (`Lane`-frame) and @f$(p,r,h)_{SEG}@f$
-/// (`Segment`-frame):
-///
-/// @f[
-/// \begin{align*}
-/// \begin{pmatrix} p_{SEG}\\
-///                 r_{SEG}\\
-///                 h_{SEG} \end{pmatrix}
-/// &= \begin{pmatrix}    P(s_{LANE,i})\\
-///                    r_{LANE,i} + r_i\\
-///                          h_{LANE,i} \end{pmatrix}
-/// \end{align*}
-/// @f]
-///
-/// The tricky part here is @f$P:s_{LANE,i} \mapsto p_{SEG}@f$, which relates
-/// @f$s_{LANE,i}@f$ to @f$p_{SEG}@f$, and involves the
-/// path-length integral over @f$W(p_{SEG},r_{SEG})@f$.
-///
-/// `maliput` defines @f$s_{LANE,i}@f$ as the path-length along a `Lane`'s
-/// centerline, and in `multilane` that centerline is a curve with constant
-/// @f$r_{SEG} = r_i@f$.  Thus:
-///
-/// @f[
-/// \begin{align*}
-/// s_{LANE,i} = S(p_{SEG}) &=
-///  \left. \int \left\lVert \partial_{p_{SEG}}W(p_{SEG}, r_{SEG})
-///  \right\rVert dp_{SEG} \right\rvert_{r_{SEG} = r_i}.
-/// \end{align*}
-/// @f]
-///
-/// The function @f$P@f$ that we need is the inverse of the path-integral @f$S@f$.
-///
-/// Unfortunately, there is generally no closed-form solution for either
-/// @f$S@f$ or @f$P@f$, particularly if the surface is not flat.  `multilane` will
-/// compute @f$P(s_{LANE,i})@f$ and @f$S(p_{SEG})@f$ analytically if
-/// possible (e.g., for some flat surfaces) and otherwise will use more costly
-/// numerical methods to ensure accurate results. Which makes us
-/// wonder, perhaps the `Lane`-frame of `maliput` would be better off
-/// using an arbitrary longitudinal parameter @f$p_{LANE,i}@f$ which could
-/// be converted to a distance @f$s_{LANE,i}@f$ on demand, instead of the other
-/// way around.
-///
-/// > TODO: Derivation of orientation at arbitrary @f$(s,r,h)_{LANE,i}@f$ point.
-/// >
-/// > TODO: Derivation of motion-derivatives.
-/// >
-/// > TODO: Derivation of surface/path curvatures.
-///
-/// ### Available Implementations of @f$G_\text{xy}@f$, @f$G_z@f$, and @f$\Theta@f$
-///
-/// `multilane` currently implements one form for each of @f$G_{xy}@f$,
-/// @f$G_z@f$, and @f$\Theta@f$.  @f$G_{xy}@f$ is implemented for a constant curvature
-/// arc (which includes zero curvature, i.e., straight line segments).
-/// Elevation @f$G_z@f$ and superelevation @f$\Theta@f$ are implemented for cubic
-/// polynomials.  These forms were chosen because they provide the smallest,
-/// simplest set of primitives that allow for the assembly of fully
-/// three-dimensional road networks that maintain @f$G^1@f$ continuity across
-/// segment boundaries.
-///
-/// The exact form that @f$G_{xy}@f$ takes is:
-///
-/// @f[
-/// \begin{align*}
-/// \begin{pmatrix} x\\ y \end{pmatrix} = G_\text{xy}(p_{SEG}) &=
-///     \begin{pmatrix}x_0\\ y_0\end{pmatrix} +
-///     \left\lbrace \begin{array}
-///         \frac{1}{\kappa}\begin{pmatrix}
-///           \cos(\kappa l_\text{max} p_{SEG} + \gamma_0 - \frac{\pi}{2}) - \cos(\gamma_0 - \frac{\pi}{2})\\
-///           \sin(\kappa l_\text{max} p_{SEG} + \gamma_0 - \frac{\pi}{2}) - \sin(\gamma_0 - \frac{\pi}{2})
-///           \end{pmatrix} & \text{for }\kappa > 0\\
-///         l_\text{max} p_{SEG}
-///           \begin{pmatrix}\cos{\gamma_0}\\ \sin{\gamma_0}\end{pmatrix}
-///           & \text{for }\kappa = 0\\
-///         \frac{1}{\kappa}\begin{pmatrix}
-///           \cos(\kappa l_\text{max} p_{SEG} + \gamma_0 + \frac{\pi}{2}) - \cos(\gamma_0 + \frac{\pi}{2})\\
-///           \sin(\kappa l_\text{max} p_{SEG} + \gamma_0 + \frac{\pi}{2}) - \sin(\gamma_0 + \frac{\pi}{2})
-///           \end{pmatrix} & \text{for }\kappa < 0\\
-///     \end{array} \right\rbrace
-/// \end{align*}
-/// @f]
-///
-///
-/// where @f$\kappa@f$ is the signed curvature (positive is
-/// counterclockwise/leftward), @f$l_\text{max}@f$ is the arc length,
-/// @f$\begin{pmatrix}x_0\\y_0\end{pmatrix}@f$ is the
-/// starting point of the arc, and @f$\gamma_0@f$ is the initial yaw of the
-/// (tangent) of the arc (with @f$\gamma_0 = 0@f$ in the @f$+\hat{x}@f$
-/// direction).  Note that the @f$\kappa = 0@f$ expression is simply a line
-/// segment of length @f$l_\text{max}@f$, and it is the limit of the @f$\kappa
-/// \neq 0@f$ expressions as @f$\kappa \to 0@f$.
-///
-/// With regards to geometric road design, a constant curvature
-/// @f$G_\text{xy}@f$ does not provide a complete toolkit.  Most road designs
-/// involve clothoid spirals, which are plane curves with curvature that
-/// is /linear/ in path length.This is so that vehicles can navigate
-/// roads using continuous changes in steering angle, and, likewise, so that
-/// their occupants will experience continuous changes in radial acceleration.
-/// `multilane` is expected to extend support for clothoid @f$G_\text{xy}@f$
-/// in the future.
-///
-/// For @f$G_z@f$ and @f$\Theta@f$, a cubic polynomial is the lowest-degree polynomial
-/// which allows for independently specifying the value and the first derivative
-/// at both endpoints.  Thus, @f$G_z@f$ takes the form:
-///
-/// @f[
-/// \begin{align*}
-/// \begin{split}
-/// \frac{1}{l_\text{max}}z = G_z(p_{SEG}) &=
-///  \frac{z_0}{l_\text{max}} +
-///  \dot{z_0} p_{SEG} +
-///  \left(\frac{3(z_1 - z_0)}{l_\text{max}} - 2\dot{z_0} - \dot{z_1}\right)
-///    p_{SEG}^2 \\
-///  &\quad + \left(\dot{z_0} + \dot{z_1} - \frac{2(z_1 - z_0)}{l_\text{max}}\right)
-///    p_{SEG}^3
-/// \end{split}
-/// \end{align*}
-/// @f]
-///
-/// where @f$z_0@f$ and @f$z_1@f$ are the initial and final elevation
-/// respectively, and @f$\dot{z_0}@f$ and @f$\dot{z_1}@f$ are the initial and
-/// final @f$\frac{dz}{dl}@f$, which is simply the slope of the road as
-/// measured by the intuitive "rise over run".  @f$\Theta@f$ has an identical
-/// expression, with every @f$z@f$ replaced by @f$\theta@f$.  Note that
-/// @f$\dot{\theta} = \frac{d\theta}{dl}@f$, the rate of twisting of the road,
-/// is not particularly intuitive, but that's ok because in general
-/// @f$\dot{\theta_0}@f$ and @f$\dot{\theta_1}@f$ will be set by `multilane` and
-/// not by the road designer, as we will see in section @ref ensuring_g1_contiguity .
-///
-/// @subsubsection ensuring_g1_contiguity Ensuring G¹ Continuity
-///
-/// > TODO:  Tell me more!
-///
-/// @subsubsection builder_helper_interface `Builder` helper interface
-///
-/// Users are not expected to assemble a `multilane::RoadGeometry` by
-/// constructing individual instances of `multilane::Lane`, etc, by hand.
-/// Instead, `multilane` provides a `Builder` interface which handles
-/// many of the constraints involved in constructing a valid `RoadGeometry`.
-///
-/// > TODO:  Tell me more!
-///
-/// @subsubsection yaml_file_format YAML file format
-///
-/// > TODO:  Tell me more!
+/// @section rules_and_features_databases Rules and Features Databases
+///
+/// @subsection rules_of_the_road Rules of the Road: `RoadRulebook`
+///
+/// A `RoadRulebook` (see @ref road-rulebook-outline_img "figure" ) expresses the semantic
+/// "rules of the road" for a road network, as rule elements associated to
+/// components of a `RoadGeometry`.  In a real, physical road network, road
+/// rules are typically signaled to users via signs or striping, though
+/// some rules are expected to be prior knowledge (e.g., "We drive on the
+/// right-hand side here.").  `RoadRulebook` abstracts away from both the
+/// physical artifacts and the symbolic state of such signals, and directly
+/// represents the intended use of a road network at a semantic level.
+///
+/// We define three levels of knowledge of rules of the road:
+///  * *Physical* *Sensory* comprises the physical artifacts (or simulated model
+///    thereof) which signal rules to the sensors of humans or vehicles.
+///    E.g., a traffic light of certain design hanging above a road,
+///    emitting light; a white / black metal sign with numbers and words,
+///    posted next to the road; a sequence of short yellow stripes painted
+///    on the ground.
+///  * *Symbolic* is the discrete state of the signals, abstracted away from
+///    the specifics of the physical manifestation.  E.g., a traffic light
+///    with four bulbs, of which the red one and the green left-facing
+///    arrow are illuminated; a speed limit sign bearing a limit of 45
+///    miles per hour; a dashed-yellow lane separation line.
+///  * *Semantic* is the intended rules of the road, whether from implicit
+///    knowledge, or conveyed via symbols and signals.  E.g., cars
+///    traveling forward through the intersection must stop, but
+///    left-turning cars may proceed; the speed limit for a specific
+///    stretch of road is 45 mph; lane-change to the left in order to pass
+///    is permitted.
+///
+/// The `RoadRulebook` interface only concerns the semantic level, which
+/// is the level required to provide oracular /ado/ cars with interesting
+/// interactive behaviors. (Future API's may be developed to express
+/// the sensory and symbolic levels of expression, and to coordinate
+/// between all three as required.)
+///
+/// @anchor road-rulebook-outline_img
+/// @image html road-rulebook-outline.svg "`RoadRulebook` outline."
+///
+/// We distinguish two kinds of state:
+///  * *Static state* comprises the aspects of a simulation which are
+///    established before the simulation begins and which cannot evolve
+///    during the runtime of the simulation.  This can be considered to be
+///    the configuration of a simulation.
+///  * *Dynamic state* comprises the aspects of a simulation which can evolve
+///    during the runtime as the simulation's time progresses.
+///
+/// The `RoadRulebook` design decouples static state from dynamic
+/// state. Dynamic state needs to be managed during the runtime of a
+/// simulation, and different simulation frameworks have different
+/// requirements for how they store and manage dynamic state.  In
+/// particular, the `drake` system framework requires that all dynamic state
+/// can be externalized and collated into a single generic state vector
+/// (called the “Context”), and the `RoadRulebook` design facilitates such a
+/// scheme. Decoupling the dynamic and static state also aids development;
+/// once the (small) interface between the two is established, development
+/// of API’s for each kind of state can proceed in parallel.
+///
+/// `RoadRulebook` is an abstract interface which provides query methods to
+/// return rule instances which match some filter parameters, e.g., rules
+/// which involve a specified `Lane`.  Each flavor of rule is represented by
+/// a different `*Rule` class.  Rules are associated to a road network by
+/// referring to components of a `RoadGeometry` via component ID’s. Each
+/// rule is itself identified by a unique type-specific ID.  This ID is the
+/// handle for manipulating the rule during rulebook configuration, and for
+/// associating the rule with physical / symbolic models and/or dynamic state
+/// in a simulation.  A rule generally consists of static state, e.g., the
+/// speed limit as posted for a lane. Some rules may involve dynamic state
+/// as well. Any dynamic state will be provided by a separate entity, with
+/// an abstract interface for each flavor of dynamic state. For example, a
+/// `RightOfWayRule` may refer to dynamic state (e.g., if it represents a
+/// traffic light) via its `RightOfWayRule::Id`. An implementation of the
+/// `RightOfWayStateProvider` abstract interface will, via its `GetState()`
+/// method, return the current state for a given `RightOfWayRule::Id`.  How
+/// those states are managed and evolved over time is up to the
+/// implementation.
+///
+/// Road rules can generally be interpreted as restrictions on behavior,
+/// and absent any rules, behavior is unrestricted (by rules of the road).
+/// For example, if a `RoadRulebook` does not provide a `SpeedLimitRule`
+/// for some section of the road network, then there is no speed limit
+/// established for that section of road.  Whether or not an agent follows
+/// the rules is up to the agent; `RoadRulebook` merely provides the rules.
+///
+/// Six rule types are currently defined or proposed:
+///
+///  * `SpeedLimitRule` - speed limits
+///  * `RightOfWayRule` - control of right-of-way / priority on specific routes
+///  > * TODO: `DirectionUsageRule` - direction-of-travel specification
+///  > * TODO: `LaneChangeRule` - adjacent-lane transition restrictions
+///  > * TODO: `OngoingRouteRule` - turning restrictions
+///  > * TODO: `PreferentialUseRule` - lane-based vehicle-type restrictions (e.g.,
+///  >   HOV lanes)
+///
+/// @subsubsection common_region_entities Common Region Entities
+///
+/// A few common entities, which identify regions of the road network, occur in
+/// the various rule types:
+///
+///  * `LaneId`: unique ID of a `Lane` in a `RoadGeometry`;
+///  * `SRange`: inclusive longitudinal range @f$[s_0, s_1]@f$ between two
+///    s-coordinates;
+///  * `LaneSRange`: a `LaneId` paired with an `SRange`, describing a longitudinal
+///    range of a specific `Lane`;
+///  * `LaneSRoute`: a sequence of `LaneSRange`'s which describe a contiguous
+///    longitudinal path that may span multiple end-to-end connected `Lane`'s;
+///  * `LaneIdEnd`: a pair of `LaneId` and an "end" specifier, which describes
+///    either the start or finish of a specific `Lane`.
+///
+/// @subsubsection speed_limit_rules `SpeedLimitRule`: Speed Limits
+///
+/// A `SpeedLimitRule` describes speed limits on a longitudinal range of a Lane.
+/// It comprises:
+///
+///  * id
+///  * zone (`LaneSRange`)
+///  * maximum and minimum speed limits (in which a minimum of zero is
+///    effectively no minimum)
+///  * severity:
+///    * *strict* (e.g., in the US, black-on-white posted limit)
+///    * *advisory* (e.g., in the US, black-on-yellow advisory limit on curves)
+/// > * TODO: applicable vehicle type (for limits applying to specific types):
+/// >   * any
+/// >   * trucks
+/// >   * ...
+/// > * TODO: time-of-day/calendar condition
+///
+/// @subsubsection right_of_way_rule `RightOfWayRule`: Stopping and Yielding
+///
+/// `RightOfWayRule` describes which vehicles have right-of-way (also
+/// known as "priority"). Note that "right of way" does not mean "right
+/// to smash through obstacles".  A green light means
+/// that other cars should not enter an intersection, but the light turning
+/// green will not magically clear an intersection.  Even after acquiring
+/// the right-of-way, a vehicle should still respect the physical reality
+/// of its environment and operate in a safe manner. When operating on
+/// intersecting regions of the road network.  In the real world, such
+/// rules are typically signaled by stop signs, yield signs, and traffic
+/// lights, or are understood as implicit knowledge of the local laws
+/// (e.g., "vehicle on the right has priority at uncontrolled
+/// intersections").
+///
+/// A `RightOfWayRule` instance is a collection of `RightOfWayRule::State`
+/// elements which all describe the right-of-way rules pertaining to a
+/// specific `zone` in the road network.  The elements of a `RightOfWayRule` are:
+///
+/// <table>
+///   <tr><td>`id`          <td>unique `RightOfWayRule::Id`
+///   <tr><td>`zone`        <td>`LaneSRoute`
+///   <tr><td>`zone_type`   <td>`ZoneType enum {StopExcluded, StopAllowed}`
+///   <tr><td>`states`      <td>set of `State` mapped by `State::Id`
+/// </table>
+///
+/// The `zone` is a directed longitudinal path in the road network,
+/// represented as a `LaneSRoute`; the rule applies to any vehicle
+/// traversing forward through the `zone`.  The `zone_type` specifies
+/// whether or not vehicles are allowed to come to a stop within the
+/// `zone`.  If the type is `StopExcluded`, then vehicles should not
+/// enter the `zone` if they do not expect to be able to completely
+/// transit the `zone` while they have the right-of-way, and vehicles
+/// should continue to transit and exit the `zone` if they lose the
+/// right-of-way while in the `zone`.  `StopExcluded` implies a
+/// "stop line" at the beginning of the `zone`.  `StopAllowed` has
+/// none of these expectations or restrictions.
+///
+/// Each `State` comprises:
+///
+/// <table>
+///   <tr><td>`id`          <td>`State::Id` (unique within the context of the rule instance)
+///   <tr><td>`type`        <td>`State::Type enum: {Go, Stop, StopThenGo}`
+///   <tr><td>`yield_to`    <td>list of `RightOfWayRule::Id`
+/// </table>
+///
+/// The state's `type` indicates whether a vehicle can *Go* (has
+/// right-of-way), must *Stop* (does not have right-of-way), or must
+/// *StopThenGo* (has right-of-way after coming to a complete stop).
+/// The *Go* and *StopThenGo* types are modulated by `yield_to`, which is
+/// a (possibly empty) list of references to other rule instances
+/// whose right-of-way supersedes this rule.  A vehicle subject to a
+/// non-empty `yield_to` list does not necessarily have to stop, but its
+/// behavior should not hamper or interfere with the motion of
+/// vehicles which are controlled by rules in the `yield_to` list.
+///
+/// Only one `State` of a rule may be in effect at any given time.  A rule
+/// instance which defines only a single `State` is called a *static
+/// rule*; its meaning is entirely static and fixed for all time.
+/// Conversely, a right-of-way rule instance with multiple `State`
+/// elements is a *dynamic rule*.  Although the collection of possible
+/// `State`'s of a dynamic rule are fixed and described by the rule
+/// instance, knowing which `State` is in effect at any given time
+/// requires querying a `RightOfWayStateProvider`.
+///
+/// `RightOfWayStateProvider` is an abstract interface that provides a query
+/// method that accepts a `RightOfWayRule::Id` and returns a result containing:
+///
+/// <table>
+///   <tr><td>`current_id`          <td>`State::Id`
+///   <tr><td>`next_id`             <td>std::optional `State::Id`
+///   <tr><td>`next.duration_until` <td>std::optional `double`
+/// </table>
+///
+/// `current_id` is the current `State` of the rule.  `next_id` is the
+/// *next* `State` of the rule, if a transition is anticipated and the next
+/// state is known.  `next.duration_until` is the duration, if known,
+/// until the transition to the known next state.
+///
+/// Following are discussions on `RightOfWayRule` configurations
+/// for a few example scenarios.
+///
+/// *Example: Uncontrolled Midblock Pedestrian Crosswalk*
+///
+/// @anchor RoWR-lone-crosswalk
+/// @image html right-of-way-example-lone-crosswalk.svg "Uncontrolled midblock pedestrian crosswalk."
+///
+/// @ref RoWR-lone-crosswalk "Figure" illustrates a very simple scenario:
+///
+///   * One-way traffic flows northbound, crossed by an uncontrolled pedestrian
+///     crosswalk at midblock.
+///   * The pedestrian traffic route is not modeled in the road network, so only
+///     one zone (for the vehicular traffic intersecting the crosswalk) is involved.
+///
+/// With only one zone and no changing signals, a single, static
+/// `RightOfWayRule` is required:
+///
+/// <table>
+///   <tr><th>Rule + Zone <th>`zone_type`     <th>State `id`  <th>`type`  <th>`yield_to`
+///   <tr><td>"North"     <td>*StopExcluded*  <td>"static"    <td>*Go*    <td>---
+/// </table>
+///
+/// The `State::Id` chosen here ("static") is arbitrary.
+///
+/// The zone is a `LaneSRoute` spanning from the southern edge of the
+/// crosswalk to the northern edge,
+/// with zone-type *StopExcluded*, which means that stopping
+/// within the zone is not allowed.  The single state has type *Go*, which
+/// means that vehicles have the right-of-way to proceed.  (Note that
+/// "when it is safe to do so" is always implied with any rule.)
+/// Furthermore, that single state has an empty `yield_to` list, which
+/// means no intersecting paths have priority over this one. (In fact,
+/// there are no intersecting paths.)
+///
+/// This is a pretty trivial rule, since it has a single state which is
+/// always "Go".  However, it serves to capture the requirement that
+/// when a vehicle *does* stop, it should avoid stopping in the crosswalk.
+///
+/// Note that a more complete scenario, which actually modeled pedestrian
+/// traffic, would likely represent the crosswalk as a lane of its own
+/// (intersecting the vehicular lane) and the "North" rule would specify
+/// yielding to that crosswalk lane via the `yield_to` element.
+///
+/// *Example: One-way Side Street onto Two-Lane Artery*
+///
+/// @anchor RoWR-one-way-to-two-way
+/// @image html right-of-way-example-one-way-side-street.svg "Intersection with one-way side street onto two-lane
+/// artery."
+///
+/// @ref RoWR-one-way-to-two-way "Figure" is a scenario with an intersection:
+///
+///   * East-west traffic is two way and uncontrolled.
+///   * Northbound traffic is controlled by a stop sign.
+///   * There are four zones (paths) traversing the intersection
+///     (illustrated by the four arrows).
+///
+/// With four zones and no changing signals, four static rules are
+/// required.  The rules have been labeled by a combination of the initial
+/// heading and the turn direction of their paths. (E.g., "NB/Left" refers
+/// to "the northbound path that turns left".)  All the zones are of the
+/// *StopExcluded* type, so that detail has been omitted from the rule table:
+///
+///
+/// <table>
+///   <tr><th>Rule + Zone   <th>State `id`  <th>`type`        <th>`yield_to`
+///   <tr><td>"EB/Straight" <td>"static"    <td>*Go*          <td>---
+///   <tr><td>"WB/Straight" <td>"static"    <td>*Go*          <td>---
+///   <tr><td>"NB/Right"    <td>"static"    <td>*StopThenGo*  <td>"EB/Straight"
+///   <tr><td>"NB/Left"     <td>"static"    <td>*StopThenGo*  <td>"EB/Straight", "WB/Straight"
+/// </table>
+///
+/// The `State::Id`'s chosen here ("static") are arbitrary.
+///
+/// As in the earlier Pedestrian Crosswalk example, the static *Go* rules
+/// of the eastbound and westbound paths show that they always have the
+/// right-of-way, but vehicles are still required to avoid stopping in the
+/// intersection.  Traffic turning right onto the artery (following the
+/// "NB/Right" path) must stop at the stop sign, and then yield to any
+/// eastbound traffic.  Traffic turning left onto the artery must stop
+/// and then yield to both eastbound and westbound traffic.
+///
+/// *Example: Protected/Permitted Left Turn*
+///
+/// @anchor RoWR-protected-left
+/// @image html right-of-way-example-protected-left.svg "Intersection with protected/permitted left turn."
+///
+/// @ref RoWR-protected-left "Figure" provides a more complex scenario with a
+/// dynamic signal-controlled intersection:
+///   * The north-south street is one-way, northbound only.
+///   * East-west traffic is two-way, with a dedicated left-turn lane for
+///     eastbound traffic turning north.
+///   * "Right Turn on Red" is allowed (which affects both northbound and
+///     westbound vehicles).
+///   * In the signaling cycle, eastbound traffic has both a protected-left
+///     (green arrow) phase and a permitted-left (flashing yellow arrow) phase.
+///   * There are a total of seven zones (paths) traversing the intersection
+///     (illustrated by the seven arrows).
+///
+/// With seven zones, seven rule instances are required.  The rules have
+/// been labeled by a combination of the initial heading and the turn
+/// direction of their paths. (E.g., "NB/Left" refers to "the northbound
+/// path that turns left".)  All the zones are of the /StopExcluded/ type,
+/// so that detail has been omitted from the rule table:
+///
+/// <table>
+///   <tr><th>Rule + Zone   <th>State `id`      <th>`type`       <th>`yield_to`
+///   <tr><td rowspan="2"> "NB/Right"    <td>"Red"           <td>*StopThenGo* <td>"EB/Straight"
+///   <tr>                               <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"NB/Straight"  <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                               <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"NB/Left"      <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                               <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"EB/Straight"  <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                               <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="3">"EB/Left"     <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                              <td>"Green"         <td>*Go*         <td>---
+///   <tr>                              <td>"FlashingYellow"<td>*Go*         <td>"WB/Straight", "WB/Right"
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"WB/Right"    <td>"Red"           <td>*StopThenGo* <td>"NB/Straight", "EB/Left"
+///   <tr>                              <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"WB/Straight" <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                              <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+/// </table>
+///
+/// The `State::Id`'s have been chosen to loosely match the states of the
+/// corresponding traffic signals.  (Note that typically a "yellow light"
+/// confers the same right-of-way as a "green light"; the only difference
+/// is that the yellow indicates that a transition to red is imminent.)
+///
+/// Each rule has at least two states.  The straight-ahead rules
+/// ( `*`/Straight ) and the northbound left-turning rule ( NB/Left ) are quite
+/// straightforward: either "Stop" with no right-of-way or "Go" with full
+/// right-of-way.  The other turning rules are a bit more interesting.
+///
+/// Since "Right Turn on Red" is allowed, both the "NB/Right" and "WB/Right"
+/// rules have *StopThenGo* states (instead of *Stop* states) that must
+/// yield to other traffic.  "NB/Right" must yield to eastbound traffic,
+/// and "WB/Right" must yield to northbound traffic.
+///
+/// The "EB/Left" rule has two *Go* states.  One is the protected turn state, in
+/// which the left turn is given full priority over oncoming westbound traffic.
+/// The other is the permitted turn state, in which the left turn must yield
+/// to westbound traffic.  In the US, a possible traffic light configuration
+/// for such an intersection would signal the protected turn by a solid
+/// green arrow, and the permitted turn by a flashing yellow arrow.
+///
+/// *Example: Freeway Merge*
+///
+/// @anchor RoWR-freeway-merge
+/// @image html right-of-way-example-freeway-merge.svg "Entrance ramp merging onto a 2-lane (one-way) freeway."
+///
+/// @ref RoWR-freeway-merge "Figure" is a scenario with a freeway merge:
+///   * Freeway has two lanes of eastbound traffic.
+///   * Entrance ramp merges onto the freeway from the right (south).
+///   * Merging traffic must yield to traffic already on the freeway.
+///   * Two zones traverse the area where the merge occurs (illustrated by
+///     the two arrows).
+///
+/// This is a static scenario with two static rules:
+///
+/// <table>
+///   <tr><th>Rule + Zone <th>`zone_type`   <th>State `id` <th>`type` <th>`yield_to`
+///   <tr><td>"Freeway"   <td>`StopAllowed` <td>"static"   <td>*Go*   <td>---
+///   <tr><td>"Entrance"  <td>`StopAllowed` <td>"static"   <td>*Go*   <td>"Freeway"
+/// </table>
+///
+/// The `State::Id`'s chosen here ("static") are arbitrary.
+///
+/// The only constraint encoded by these two rules is that the "Entrance"
+/// traffic should yield to the "Freeway" traffic.  Note that unlike
+/// previous examples, both zones in this scenario have a zone-type of
+/// `StopAllowed`.  That means there are no "stop lines" (real or
+/// implicit) and no exclusion zones that are expected to be left
+/// unblocked by stopped traffic.  Both rules' static states are of type
+/// *Go*, as well; neither path is expected to stop.  Ideally, the entrance
+/// traffic never stops, but instead speeds up to seamlessly merge into
+/// the freeway flow.
+///
+/// > TODO `DirectionUsageRule`:
+/// `DirectionUsageRule`: Direction Usage
+///
+/// *Captures allowed direction-of-travel.*
+///
+///    * id
+///    * zone (`LaneSRange`)
+///    * allowed use:
+///      * *bidirectional* (e.g., non-striped single-lane residential street)
+///      * *unidirectional, s increasing*
+///      * *unidirectional, s decreasing*
+///      * *bidirectional, turning-only*
+///      * *no-traffic* (e.g., median strip)
+///      * *parking-lane*
+///    * time-of-day/calendar condition?
+///
+/// > TODO `LaneChangeRule`: Lane-change/Passing Restrictions
+/// `LaneChangeRule`: Lane-change/Passing Restrictions
+///
+/// *Captures restrictions on lateral/adjacent lane transitions.*
+///    * id
+///    * zone (`LaneSRange`)
+///    * applicable direction
+///      * to-left
+///      * to-right
+///    * constraint
+///      * allowed
+///      * forbidden
+///      * *discouraged?* (e.g., to capture solid white lines separating turn
+///        lanes from through traffic)
+///    * *Should this capture "passing vs lane-change" purpose, too, (e.g.,
+///      the white-vs-yellow distinction) or should that just be implied by
+///      `DirectionUsageRule`?*
+///    * time-of-day/calendar condition?
+///
+/// > TODO `OngoingRouteRule`: "Turning" Restrictions
+/// `OngoingRouteRule`: "Turning" Restrictions
+///
+/// *Captures restrictions on longitudinal/end-to-end lane transitions.*
+///    * id
+///    * applicable originating `LaneIdEnd`
+///    * ongoing `LaneIdEnd`
+///    * restricted vehicle type
+///      * (not) any
+///      * (not) bus
+///      * (not) truck
+///      * ...
+///    * time-of-day/calendar condition?
+///    * *(Or, maybe this concept is better represented by vehicle restrictions
+///      on the ongoing lane instead.)*
+///
+/// > TODO `PreferentialUseRule`: Vehicle Restrictions
+/// `PreferentialUseRule`: Vehicle Restrictions
+///
+/// *Captures vehicle-type traffic restrictions.*
+///    * id
+///    * zone (`LaneSRange`)
+///    * vehicle type
+///      * high-occupancy vehicles (HOV) only
+///      * no trucks
+///      * bus only
+///      * emergency vehicles only
+///      * etc
+///    * time-of-day/calendar condition?
+///    * *Should this should be merged with `DirectionUsageRule`, because
+///      lane usage/direction might be specified per vehicle type?*
+///
+/// > TODO Furniture and Physical Features
+/// Furniture and Physical Features
+///
+/// *Provide a database of physical features with spatial location and extent.*
+///
+/// In many cases these are related to rules in the `RoadRulebook` (e.g., signs
+/// and stripes are indicators for rules of the road).
+///    * linear features
+///      * striping
+///    * areal features
+///      * crosswalks
+///      * restricted medians
+///      * do-not-block zones
+///    * signage
+///      * stop lights, stop signs
+///      * turn restrictions
+///    * other (volumetric) furniture
+///      * benches
+///      * mailboxes
+///      * traffic cones
+///      * refrigerator that fell off a truck
+///    * potholes
 ///
 /// @section rules_and_features_databases Rules and Features Databases
 ///
