@@ -28,6 +28,7 @@ message(STATUS "\n\n========= Project Configuration ========\n")
 set(BUILD_SHARED_LIBS true)
 
 include(${PROJECT_SOURCE_DIR}/../cmake/DefaultCFlags.cmake)
+include(${PROJECT_SOURCE_DIR}/../cmake/SanitizersConfig.cmake)
 
 ament_python_install_package(${PROJECT_NAME})
 
