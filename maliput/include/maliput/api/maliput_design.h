@@ -1154,7 +1154,7 @@
 /// `RightOfWayRule` is required:
 ///
 /// <table>
-///   <tr><td>Rule + Zone <td>`zone_type`     <td>State `id`  <td>`type`  <td>`yield_to`
+///   <tr><th>Rule + Zone <th>`zone_type`     <th>State `id`  <th>`type`  <th>`yield_to`
 ///   <tr><td>"North"     <td>*StopExcluded*  <td>"static"    <td>*Go*    <td>---
 /// </table>
 ///
@@ -1200,7 +1200,7 @@
 ///
 ///
 /// <table>
-///   <tr><td>Rule + Zone   <td>State `id`  <td>`type`        <td>`yield_to`
+///   <tr><th>Rule + Zone   <th>State `id`  <th>`type`        <th>`yield_to`
 ///   <tr><td>"EB/Straight" <td>"static"    <td>*Go*          <td>---
 ///   <tr><td>"WB/Straight" <td>"static"    <td>*Go*          <td>---
 ///   <tr><td>"NB/Right"    <td>"static"    <td>*StopThenGo*  <td>"EB/Straight"
@@ -1216,4 +1216,197 @@
 /// "NB/Right" path) must stop at the stop sign, and then yield to any
 /// eastbound traffic.  Traffic turning left onto the artery must stop
 /// and then yield to both eastbound and westbound traffic.
+///
+/// *Example: Protected/Permitted Left Turn*
+///
+/// @anchor RoWR-protected-left
+/// @image html right-of-way-example-protected-left.svg "Intersection with protected/permitted left turn."
+///
+/// @ref RoWR-protected-left "Figure" provides a more complex scenario with a
+/// dynamic signal-controlled intersection:
+///   * The north-south street is one-way, northbound only.
+///   * East-west traffic is two-way, with a dedicated left-turn lane for
+///     eastbound traffic turning north.
+///   * "Right Turn on Red" is allowed (which affects both northbound and
+///     westbound vehicles).
+///   * In the signaling cycle, eastbound traffic has both a protected-left
+///     (green arrow) phase and a permitted-left (flashing yellow arrow) phase.
+///   * There are a total of seven zones (paths) traversing the intersection
+///     (illustrated by the seven arrows).
+///
+/// With seven zones, seven rule instances are required.  The rules have
+/// been labeled by a combination of the initial heading and the turn
+/// direction of their paths. (E.g., "NB/Left" refers to "the northbound
+/// path that turns left".)  All the zones are of the /StopExcluded/ type,
+/// so that detail has been omitted from the rule table:
+///
+/// <table>
+///   <tr><th>Rule + Zone   <th>State `id`      <th>`type`       <th>`yield_to`
+///   <tr><td rowspan="2"> "NB/Right"    <td>"Red"           <td>*StopThenGo* <td>"EB/Straight"
+///   <tr>                               <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"NB/Straight"  <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                               <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"NB/Left"      <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                               <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"EB/Straight"  <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                               <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="3">"EB/Left"     <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                              <td>"Green"         <td>*Go*         <td>---
+///   <tr>                              <td>"FlashingYellow"<td>*Go*         <td>"WB/Straight", "WB/Right"
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"WB/Right"    <td>"Red"           <td>*StopThenGo* <td>"NB/Straight", "EB/Left"
+///   <tr>                              <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+///   <tr><td rowspan="2">"WB/Straight" <td>"Red"           <td>*Stop*       <td>---
+///   <tr>                              <td>"Green"         <td>*Go*         <td>---
+///   <tr><th> <th> <th> <th>
+/// </table>
+///
+/// The `State::Id`'s have been chosen to loosely match the states of the
+/// corresponding traffic signals.  (Note that typically a "yellow light"
+/// confers the same right-of-way as a "green light"; the only difference
+/// is that the yellow indicates that a transition to red is imminent.)
+///
+/// Each rule has at least two states.  The straight-ahead rules
+/// ( `*`/Straight ) and the northbound left-turning rule ( NB/Left ) are quite
+/// straightforward: either "Stop" with no right-of-way or "Go" with full
+/// right-of-way.  The other turning rules are a bit more interesting.
+///
+/// Since "Right Turn on Red" is allowed, both the "NB/Right" and "WB/Right"
+/// rules have *StopThenGo* states (instead of *Stop* states) that must
+/// yield to other traffic.  "NB/Right" must yield to eastbound traffic,
+/// and "WB/Right" must yield to northbound traffic.
+///
+/// The "EB/Left" rule has two *Go* states.  One is the protected turn state, in
+/// which the left turn is given full priority over oncoming westbound traffic.
+/// The other is the permitted turn state, in which the left turn must yield
+/// to westbound traffic.  In the US, a possible traffic light configuration
+/// for such an intersection would signal the protected turn by a solid
+/// green arrow, and the permitted turn by a flashing yellow arrow.
+///
+/// *Example: Freeway Merge*
+///
+/// @anchor RoWR-freeway-merge
+/// @image html right-of-way-example-freeway-merge.svg "Entrance ramp merging onto a 2-lane (one-way) freeway."
+///
+/// @ref RoWR-freeway-merge "Figure" is a scenario with a freeway merge:
+///   * Freeway has two lanes of eastbound traffic.
+///   * Entrance ramp merges onto the freeway from the right (south).
+///   * Merging traffic must yield to traffic already on the freeway.
+///   * Two zones traverse the area where the merge occurs (illustrated by
+///     the two arrows).
+///
+/// This is a static scenario with two static rules:
+///
+/// <table>
+///   <tr><th>Rule + Zone <th>`zone_type`   <th>State `id` <th>`type` <th>`yield_to`
+///   <tr><td>"Freeway"   <td>`StopAllowed` <td>"static"   <td>*Go*   <td>---
+///   <tr><td>"Entrance"  <td>`StopAllowed` <td>"static"   <td>*Go*   <td>"Freeway"
+/// </table>
+///
+/// The `State::Id`'s chosen here ("static") are arbitrary.
+///
+/// The only constraint encoded by these two rules is that the "Entrance"
+/// traffic should yield to the "Freeway" traffic.  Note that unlike
+/// previous examples, both zones in this scenario have a zone-type of
+/// `StopAllowed`.  That means there are no "stop lines" (real or
+/// implicit) and no exclusion zones that are expected to be left
+/// unblocked by stopped traffic.  Both rules' static states are of type
+/// *Go*, as well; neither path is expected to stop.  Ideally, the entrance
+/// traffic never stops, but instead speeds up to seamlessly merge into
+/// the freeway flow.
+///
+/// > TODO `DirectionUsageRule`:
+/// `DirectionUsageRule`: Direction Usage
+///
+/// *Captures allowed direction-of-travel.*
+///
+///    * id
+///    * zone (`LaneSRange`)
+///    * allowed use:
+///      * *bidirectional* (e.g., non-striped single-lane residential street)
+///      * *unidirectional, s increasing*
+///      * *unidirectional, s decreasing*
+///      * *bidirectional, turning-only*
+///      * *no-traffic* (e.g., median strip)
+///      * *parking-lane*
+///    * time-of-day/calendar condition?
+///
+/// > TODO `LaneChangeRule`: Lane-change/Passing Restrictions
+/// `LaneChangeRule`: Lane-change/Passing Restrictions
+///
+/// *Captures restrictions on lateral/adjacent lane transitions.*
+///    * id
+///    * zone (`LaneSRange`)
+///    * applicable direction
+///      * to-left
+///      * to-right
+///    * constraint
+///      * allowed
+///      * forbidden
+///      * *discouraged?* (e.g., to capture solid white lines separating turn
+///        lanes from through traffic)
+///    * *Should this capture "passing vs lane-change" purpose, too, (e.g.,
+///      the white-vs-yellow distinction) or should that just be implied by
+///      `DirectionUsageRule`?*
+///    * time-of-day/calendar condition?
+///
+/// > TODO `OngoingRouteRule`: "Turning" Restrictions
+/// `OngoingRouteRule`: "Turning" Restrictions
+///
+/// *Captures restrictions on longitudinal/end-to-end lane transitions.*
+///    * id
+///    * applicable originating `LaneIdEnd`
+///    * ongoing `LaneIdEnd`
+///    * restricted vehicle type
+///      * (not) any
+///      * (not) bus
+///      * (not) truck
+///      * ...
+///    * time-of-day/calendar condition?
+///    * *(Or, maybe this concept is better represented by vehicle restrictions
+///      on the ongoing lane instead.)*
+///
+/// > TODO `PreferentialUseRule`: Vehicle Restrictions
+/// `PreferentialUseRule`: Vehicle Restrictions
+///
+/// *Captures vehicle-type traffic restrictions.*
+///    * id
+///    * zone (`LaneSRange`)
+///    * vehicle type
+///      * high-occupancy vehicles (HOV) only
+///      * no trucks
+///      * bus only
+///      * emergency vehicles only
+///      * etc
+///    * time-of-day/calendar condition?
+///    * *Should this should be merged with `DirectionUsageRule`, because
+///      lane usage/direction might be specified per vehicle type?*
+///
+/// > TODO Furniture and Physical Features
+/// Furniture and Physical Features
+///
+/// *Provide a database of physical features with spatial location and extent.*
+///
+/// In many cases these are related to rules in the `RoadRulebook` (e.g., signs
+/// and stripes are indicators for rules of the road).
+///    * linear features
+///      * striping
+///    * areal features
+///      * crosswalks
+///      * restricted medians
+///      * do-not-block zones
+///    * signage
+///      * stop lights, stop signs
+///      * turn restrictions
+///    * other (volumetric) furniture
+///      * benches
+///      * mailboxes
+///      * traffic cones
+///      * refrigerator that fell off a truck
+///    * potholes
 ///
