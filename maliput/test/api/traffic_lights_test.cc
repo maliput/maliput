@@ -269,33 +269,40 @@ class TrafficLightTest : public ::testing::Test {
   const TrafficLight::Id kId{"four_way_stop"};
 
   TrafficLightTest() {
-    std::vector<std::unique_ptr<Bulb>> bulbs;
     std::vector<std::unique_ptr<BulbGroup>> bulb_group;
 
-    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("north_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
-                                           BulbType::kRound));
-    bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("north_group"), GeoPosition(0, 0.1, 0),
-                                                     Rotation::FromRpy(0, 0, M_PI_2), std::move(bulbs)));
-    north_bulb_group_ = bulb_group.back().get();
-
-    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("south_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
-                                           BulbType::kRound));
-    bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("south_group"), GeoPosition(0, -0.1, 0),
-                                                     Rotation::FromRpy(0, 0, -M_PI_2), std::move(bulbs)));
-    south_bulb_group_ = bulb_group.back().get();
-
-    bulbs.push_back(
-        std::make_unique<Bulb>(Bulb::Id("east_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
-    bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("east_group"), GeoPosition(0.1, 0., 0),
-                                                     kZeroRotation, std::move(bulbs)));
-    east_bulb_group_ = bulb_group.back().get();
-
-    bulbs.push_back(
-        std::make_unique<Bulb>(Bulb::Id("west_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
-    bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("west_group"), GeoPosition(-0.1, 0., 0),
-                                                     Rotation::FromRpy(0, 0, M_PI), std::move(bulbs)));
-    west_bulb_group_ = bulb_group.back().get();
-
+    {
+      std::vector<std::unique_ptr<Bulb>> bulbs;
+      bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("north_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
+                                             BulbType::kRound));
+      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("north_group"), GeoPosition(0, 0.1, 0),
+                                                       Rotation::FromRpy(0, 0, M_PI_2), std::move(bulbs)));
+      north_bulb_group_ = bulb_group.back().get();
+    }
+    {
+      std::vector<std::unique_ptr<Bulb>> bulbs;
+      bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("south_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
+                                             BulbType::kRound));
+      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("south_group"), GeoPosition(0, -0.1, 0),
+                                                       Rotation::FromRpy(0, 0, -M_PI_2), std::move(bulbs)));
+      south_bulb_group_ = bulb_group.back().get();
+    }
+    {
+      std::vector<std::unique_ptr<Bulb>> bulbs;
+      bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("east_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
+                                             BulbType::kRound));
+      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("east_group"), GeoPosition(0.1, 0., 0),
+                                                       kZeroRotation, std::move(bulbs)));
+      east_bulb_group_ = bulb_group.back().get();
+    }
+    {
+      std::vector<std::unique_ptr<Bulb>> bulbs;
+      bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("west_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
+                                             BulbType::kRound));
+      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("west_group"), GeoPosition(-0.1, 0., 0),
+                                                       Rotation::FromRpy(0, 0, M_PI), std::move(bulbs)));
+      west_bulb_group_ = bulb_group.back().get();
+    }
     traffic_light_ =
         std::make_unique<TrafficLight>(kId, kTrafficLightPosition, kTrafficLightRotation, std::move(bulb_group));
   }
