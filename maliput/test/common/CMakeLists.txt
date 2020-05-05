@@ -26,7 +26,7 @@ add_dependencies_to_test(maliput_never_destroyed_test)
 add_dependencies_to_test(maliput_passkey_test)
 add_dependencies_to_test(maliput_throw_test)
 
-# When a sanitizer is enabled, tests where assert are checked are disabled.
+# TODO(#335): When a sanitizer is enabled, tests where assert are checked are disabled.
 if (NOT ${SANITIZERS})
   ament_add_gtest(maliput_abort_test maliput_abort_test.cc)
   add_dependencies_to_test(maliput_abort_test)
