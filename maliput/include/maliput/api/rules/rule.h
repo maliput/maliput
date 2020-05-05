@@ -53,6 +53,20 @@ class Rule {
 
   /// Defines a base state for a Rule.
   struct State {
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(State);
+
+    /// Default constructor.
+    State() = default;
+
+    /// Creates a Rule::State.
+    /// @param severity A non-negative quantity that specifies the
+    ///                 level of enforcement. The smaller it is, the
+    ///                 more strictly the rule is enforced.
+    /// @param related_rules Contains groups of related rules.
+    /// @param related_unique_ids Contains groups of related unique ids.
+    State(int severity, RelatedRules related_rules, RelatedUniqueIds related_unique_ids)
+        : severity(severity), related_rules(related_rules), related_unique_ids(related_unique_ids) {}
+
     /// Defines common Rule severity levels. Specific rule types can choose to use
     /// these, or define their own custom levels.
     ///@{

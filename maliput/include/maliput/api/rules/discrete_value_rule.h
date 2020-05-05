@@ -24,6 +24,21 @@ class DiscreteValueRule : public Rule {
 
   /// Defines a discrete value for a DiscreteValueRule.
   struct DiscreteValue : public Rule::State {
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DiscreteValue);
+
+    /// Default constructor.
+    DiscreteValue() = default;
+
+    /// Creates a Rule::State.
+    /// @param severity A non-negative quantity that specifies the
+    ///                 level of enforcement. The smaller it is, the
+    ///                 more strictly the rule is enforced.
+    /// @param related_rules Contains groups of related rules.
+    /// @param related_unique_ids Contains groups of related unique ids.
+    /// @param value Is the discrete value contained in the rule.
+    DiscreteValue(int severity, RelatedRules related_rules, RelatedUniqueIds related_unique_ids, std::string value)
+        : Rule::State(severity, related_rules, related_unique_ids), value(value) {}
+
     bool operator==(const DiscreteValue& other) const { return value == other.value && Rule::State::operator==(other); }
     bool operator!=(const DiscreteValue& other) const { return !(*this == other); }
 
