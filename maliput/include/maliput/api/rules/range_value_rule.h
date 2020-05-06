@@ -23,6 +23,24 @@ class RangeValueRule : public Rule {
 
   /// Defines a range for a RangeValueRule.
   struct Range : public Rule::State {
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Range);
+
+    /// Default constructor.
+    Range() = default;
+
+    /// Creates a Rule::State.
+    /// @param severity A non-negative quantity that specifies the
+    ///                 level of enforcement. The smaller it is, the
+    ///                 more strictly the rule is enforced.
+    /// @param related_rules Contains groups of related rules.
+    /// @param related_unique_ids Contains groups of related unique ids.
+    /// @param description Semantics of the range quantity.
+    /// @param min Minimum value of the range.
+    /// @param max Maximum value of the range.
+    Range(int severity, RelatedRules related_rules, RelatedUniqueIds related_unique_ids, std::string description,
+          double min, double max)
+        : Rule::State(severity, related_rules, related_unique_ids), description(description), min(min), max(max) {}
+
     bool operator==(const Range& other) const {
       return min == other.min && max == other.max && description == other.description && Rule::State::operator==(other);
     }
