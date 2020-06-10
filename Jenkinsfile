@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def pipelines = ['gcc', 'clang', 'asan', 'ubsan']
+def pipelines = ['gcc', 'clang', 'asan', 'ubsan', 'scan_build']
 def branches = [:]
 
 for ( pipeline in pipelines ) {
