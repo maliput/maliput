@@ -265,6 +265,7 @@ void Logger::log(logger::level lev, Args&&... args) {
     msg += logger::kLevelToMessage.at(lev);
     // Performing type-erasure in the header file.
     msg += format(std::vector<std::string>{Serialize()(std::forward<Args>(args))...});
+    msg += "\n";
     sink_->log(msg);
   }
 }

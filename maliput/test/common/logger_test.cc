@@ -45,7 +45,7 @@ GTEST_TEST(LoggerTest, Logger) {
   const MockSink* mock_sink_ptr = mock_sink.get();
   log()->set_sink(std::move(mock_sink));
 
-  const std::string kMessage1 = " Hello World. {}{}.\n";
+  const std::string kMessage1 = " Hello World. {}{}.";
   const std::string kMessage2 = "The value of PI is: ";
   const double kPI = 3.14159;
   set_log_level(logger::kLevelToString.at(logger::level::trace));
