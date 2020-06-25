@@ -431,7 +431,7 @@
 /// that in considering intersection, we ignore the overlaps
 /// that may occur where `Segments` join end-to-end via their `Lanes`.)
 ///
-/// Every `Segment` must belong to one and only one `Junction`, and a
+/// Every `Segment` must belong to one and only one `Junction`, and
 /// every `Junction` must contain at least one `Segment`.
 ///
 /// When designing/implementing a `RoadGeometry`, it is good practice to
