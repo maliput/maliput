@@ -166,7 +166,9 @@ Matrix3 RollPitchYaw::CalcRotationMatrixDt(const Vector3& rpyDt) const {
   // When rotation matrix R is regarded as an implicit function of t as
   // R(r(t), p(t), y(t)), the ordinary derivative of R with respect to t is
   // Ṙ = ∂R/∂r * ṙ + ∂R/∂p * ṗ + ∂R/∂y * ẏ
-  const double rDt = rpyDt.x(), pDt = rpyDt.y(), yDt = rpyDt.z();
+  const double rDt = rpyDt.x();
+  const double pDt = rpyDt.y();
+  const double yDt = rpyDt.z();
   return R_r * rDt + R_p * pDt + R_y * yDt;
 }
 
