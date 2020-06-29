@@ -107,15 +107,15 @@ GTEST_TEST(RollPitchYawTest, OrdinaryDerivativeRotationMatrixRollPitchYaw) {
   const double s0 = sin(r), s1 = sin(p), s2 = sin(y);
   const double rDt = rpyDt.x(), pDt = rpyDt.y(), yDt = rpyDt.z();
   // clang-format off
-  Matrix3 MDt({-s1*c2*pDt - s2*c1*yDt,
-               s0*s2*rDt + s1*c0*c2*rDt + s0*c1*c2*pDt - c0*c2*yDt - s1*s0*s2*yDt,
-               s0*c2*yDt + s2*c0*rDt + c1*c0*c2*pDt - s1*s0*c2*rDt - s1*s2*c0*yDt,
-               c1*c2*yDt - s1*s2*pDt,
-               s1*s0*c2*yDt + s1*s2*c0*rDt + s0*s2*c1*pDt - s0*c2*rDt - s2*c0*yDt,
-               s0*s2*yDt + s1*c0*c2*yDt + s2*c1*c0*pDt - c0*c2*rDt - s1*s0*s2*rDt,
-               -c1*pDt,
-               c1*c0*rDt - s1*s0*pDt,
-               -s1*c0*pDt - s0*c1*rDt});
+  const Matrix3 MDt({-s1*c2*pDt - s2*c1*yDt,
+                     s0*s2*rDt + s1*c0*c2*rDt + s0*c1*c2*pDt - c0*c2*yDt - s1*s0*s2*yDt,
+                     s0*c2*yDt + s2*c0*rDt + c1*c0*c2*pDt - s1*s0*c2*rDt - s1*s2*c0*yDt,
+                     c1*c2*yDt - s1*s2*pDt,
+                     s1*s0*c2*yDt + s1*s2*c0*rDt + s0*s2*c1*pDt - s0*c2*rDt - s2*c0*yDt,
+                     s0*s2*yDt + s1*c0*c2*yDt + s2*c1*c0*pDt - c0*c2*rDt - s1*s0*s2*rDt,
+                     -c1*pDt,
+                     c1*c0*rDt - s1*s0*pDt,
+                     -s1*c0*pDt - s0*c1*rDt});
   // clang-format on
 
   EXPECT_TRUE(test::CompareMatrices(RDt, MDt, kTolerance));
