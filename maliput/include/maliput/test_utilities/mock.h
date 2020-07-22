@@ -125,6 +125,232 @@ struct PhaseBuildFlags {
   bool add_missing_bulb_state{false};
 };
 
+class MockLaneEndSet final : public LaneEndSet {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLaneEndSet)
+  MockLaneEndSet() = default;
+  void set_lane_end(const LaneEnd& lane_end) { lane_end_ = lane_end; }
+
+ private:
+  int do_size() const override { return 1; }
+  const LaneEnd& do_get(int index) const override {
+    MALIPUT_THROW_UNLESS(index != 0);
+    return lane_end_;
+  }
+
+  LaneEnd lane_end_;
+};
+
+class MockBranchPoint final : public BranchPoint {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockBranchPoint)
+  explicit MockBranchPoint(const BranchPointId& id) : BranchPoint(), id_(id) {}
+  void set_road_geometry(RoadGeometry* road_geometry) { road_geometry_ = road_geometry; }
+  void set_lane_end_set_a(std::unique_ptr<MockLaneEndSet> lane_end_set_a) {
+    lane_end_set_a_ = std::move(lane_end_set_a);
+  }
+  void set_lane_end_set_b(std::unique_ptr<MockLaneEndSet> lane_end_set_b) {
+    lane_end_set_b_ = std::move(lane_end_set_b);
+  }
+
+ private:
+  BranchPointId do_id() const override { return id_; }
+  const RoadGeometry* do_road_geometry() const override { return road_geometry_; }
+  const LaneEndSet* DoGetConfluentBranches(const LaneEnd&) const override { return nullptr; }
+  const LaneEndSet* DoGetOngoingBranches(const LaneEnd&) const override { return nullptr; }
+  std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd&) const override { return std::nullopt; }
+  const LaneEndSet* DoGetASide() const override { return lane_end_set_a_.get(); }
+  const LaneEndSet* DoGetBSide() const override { return lane_end_set_b_.get(); }
+
+  BranchPointId id_;
+  RoadGeometry* road_geometry_{};
+  std::unique_ptr<MockLaneEndSet> lane_end_set_a_;
+  std::unique_ptr<MockLaneEndSet> lane_end_set_b_;
+};
+
+class MockLane final : public Lane {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
+  MockLane(const LaneId& id) : Lane(), id_(id) {}
+  MockLane(const LaneId& id, const GeoPosition& start_gp, const Rotation& start_rot, const GeoPosition& end_gp,
+           const Rotation& end_rot)
+      : Lane(), id_(id), start_gp_(start_gp), start_rot_(start_rot), end_gp_(end_gp), end_rot_(end_rot) {}
+  MockLane(const LaneId& id, const LanePositionResult& lane_position_result)
+      : Lane(), id_(id), lane_position_result_(lane_position_result) {}
+  void set_segment(Segment* segment) { segment_ = segment; }
+  void set_start_bp(BranchPoint* start_bp) { start_bp_ = start_bp; }
+  void set_end_bp(BranchPoint* end_bp) { end_bp_ = end_bp; }
+
+ private:
+  LaneId do_id() const override { return id_; };
+  const Segment* do_segment() const override { return segment_; };
+  int do_index() const override { return 0; };
+  const Lane* do_to_left() const override { return nullptr; };
+  const Lane* do_to_right() const override { return nullptr; };
+  double do_length() const override { return 100; };
+  RBounds do_lane_bounds(double) const override { return RBounds(-1, 1); };
+  RBounds do_segment_bounds(double) const override { return RBounds(-1, 1); };
+  HBounds do_elevation_bounds(double, double) const override { return HBounds(0, 10); };
+  GeoPosition DoToGeoPosition(const LanePosition& lane_pos) const override {
+    return lane_pos.s() ? end_gp_ : start_gp_;
+  }
+  LanePositionResult DoToLanePosition(const GeoPosition&) const override { return lane_position_result_; }
+  Rotation DoGetOrientation(const LanePosition& lane_pos) const override {
+    return lane_pos.s() ? end_rot_ : start_rot_;
+  }
+  LanePosition DoEvalMotionDerivatives(const LanePosition&, const IsoLaneVelocity&) const override {
+    return LanePosition(0, 0, 0);
+  }
+  const BranchPoint* DoGetBranchPoint(const LaneEnd::Which end) const override {
+    return end == LaneEnd::Which::kStart ? start_bp_ : end_bp_;
+  };
+  const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which) const override { return nullptr; }
+  const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override { return nullptr; }
+  std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return std::nullopt; }
+
+  LaneId id_;
+  Segment* segment_{};
+  BranchPoint* start_bp_{};
+  BranchPoint* end_bp_{};
+  GeoPosition start_gp_{};
+  Rotation start_rot_{};
+  GeoPosition end_gp_{};
+  Rotation end_rot_{};
+  LanePositionResult lane_position_result_{};
+};
+
+class MockSegment final : public Segment {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockSegment)
+  MockSegment(const SegmentId& id) : Segment(), id_(id) {}
+  void set_junction(Junction* junction) { junction_ = junction; }
+  void set_lane(std::unique_ptr<MockLane> lane) { lane_ = std::move(lane); }
+
+ private:
+  SegmentId do_id() const override { return id_; }
+  const Junction* do_junction() const override { return junction_; }
+  int do_num_lanes() const override { return lane_ != nullptr ? 1 : 0; }
+  const Lane* do_lane(int index) const override {
+    MALIPUT_THROW_UNLESS(index == 0);
+    return lane_.get();
+  }
+
+  SegmentId id_;
+  Junction* junction_{};
+  std::unique_ptr<MockLane> lane_;
+};
+
+class MockJunction final : public Junction {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockJunction)
+  MockJunction(const JunctionId& id) : Junction(), id_(id) {}
+  void set_road_geometry(RoadGeometry* road_geometry) { road_geometry_ = road_geometry; }
+  void set_segment(std::unique_ptr<MockSegment> segment) { segment_ = std::move(segment); }
+
+ private:
+  JunctionId do_id() const override { return JunctionId("mock"); }
+  int do_num_segments() const override { return 1; }
+  const Segment* do_segment(int i) const override {
+    MALIPUT_THROW_UNLESS(i == 0);
+    return segment_.get();
+  }
+  const RoadGeometry* do_road_geometry() const override { return road_geometry_; }
+
+  JunctionId id_;
+  RoadGeometry* road_geometry_{};
+  std::unique_ptr<MockSegment> segment_;
+};
+
+class MockIdIndex final : public RoadGeometry::IdIndex {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockIdIndex);
+  MockIdIndex() = default;
+  void add_junction_to_map(const JunctionId& id, const Junction* junction) { junction_map_.emplace(id, junction); }
+  void add_lane_to_map(const LaneId& id, const Lane* lane) { lane_map_.emplace(id, lane); }
+  void add_segment_to_map(const SegmentId& id, const Segment* segment) { segment_map_.emplace(id, segment); }
+  void add_branchpoint_to_map(const BranchPointId& id, const BranchPoint* branch_point) {
+    branch_point_map_.emplace(id, branch_point);
+  }
+
+ private:
+  const BranchPoint* DoGetBranchPoint(const BranchPointId& branch_point_id) const override {
+    const auto it = branch_point_map_.find(branch_point_id);
+    return (it == branch_point_map_.end()) ? nullptr : it->second;
+  }
+  const Junction* DoGetJunction(const JunctionId& junction_id) const override {
+    const auto it = junction_map_.find(junction_id);
+    return (it == junction_map_.end()) ? nullptr : it->second;
+  }
+  const Lane* DoGetLane(const LaneId& lane_id) const override {
+    const auto it = lane_map_.find(lane_id);
+    return (it == lane_map_.end()) ? nullptr : it->second;
+  }
+  const Segment* DoGetSegment(const SegmentId& segment_id) const override {
+    const auto it = segment_map_.find(segment_id);
+    return (it == segment_map_.end()) ? nullptr : it->second;
+  }
+  const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
+
+  std::unordered_map<BranchPointId, const BranchPoint*> branch_point_map_;
+  std::unordered_map<JunctionId, const Junction*> junction_map_;
+  std::unordered_map<LaneId, const Lane*> lane_map_;
+  std::unordered_map<SegmentId, const Segment*> segment_map_;
+};
+
+class MockRoadGeometry : public RoadGeometry {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry)
+  MockRoadGeometry(const RoadGeometryId& id) : id_(id) {}
+  MockRoadGeometry(const RoadGeometryId& id, const double& linear_tolerance, const double& angular_tolerance)
+      : id_(id), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
+
+  void add_junction(std::unique_ptr<MockJunction> junction) { junctions_.push_back(std::move(junction)); }
+  void set_start_bp(std::unique_ptr<MockBranchPoint> start_bp) { start_bp_ = std::move(start_bp); }
+  void set_end_bp(std::unique_ptr<MockBranchPoint> end_bp) { end_bp_ = std::move(end_bp); }
+
+  MockBranchPoint* start_bp() { return start_bp_.get(); }
+  MockBranchPoint* end_bp() { return end_bp_.get(); }
+  MockIdIndex* GetIdIndex() { return &mock_id_index_; }
+
+ private:
+  RoadGeometryId do_id() const override { return id_; }
+  int do_num_junctions() const override { return junctions_.size(); }
+  const Junction* do_junction(int i) const override {
+    MALIPUT_THROW_UNLESS(i < static_cast<int>(junctions_.size()));
+    return junctions_[i].get();
+  }
+  int do_num_branch_points() const override {
+    if (start_bp_ != nullptr && end_bp_ != nullptr) {
+      return 2;
+    } else if (start_bp_ == nullptr && end_bp_ == nullptr) {
+      return 0;
+    }
+    return 1;
+  }
+  const BranchPoint* do_branch_point(int i) const override {
+    MALIPUT_THROW_UNLESS(i == 0 || i == 1);
+    return i == 0 ? start_bp_.get() : end_bp_.get();
+  }
+  const IdIndex& DoById() const override { return mock_id_index_; }
+  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const std::optional<RoadPosition>&) const override {
+    return RoadPositionResult();
+  }
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
+    return {{RoadPositionResult()}};
+  }
+  double do_linear_tolerance() const override { return linear_tolerance_; }
+  double do_angular_tolerance() const override { return angular_tolerance_; }
+  double do_scale_length() const override { return 0; }
+
+  MockIdIndex mock_id_index_;
+  RoadGeometryId id_;
+  double linear_tolerance_{0};
+  double angular_tolerance_{0};
+  std::vector<std::unique_ptr<MockJunction>> junctions_;
+  std::unique_ptr<MockBranchPoint> start_bp_;
+  std::unique_ptr<MockBranchPoint> end_bp_;
+};
+
 /// Returns a LaneSRoute containing an arbitrary route.
 LaneSRoute CreateLaneSRoute();
 
@@ -249,15 +475,6 @@ std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry();
 
 /// Returns an arbitrary two-lane RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry();
-
-/// Returns a RoadGeometry filled with `lanes`.
-/// The RoadGeometry is not completed. Its use is aimed to obtained the lanes by ById()->GetLane().
-/// @param lanes Is a vector of lanes to be added to the RoadGeometry's IdIndex.
-std::unique_ptr<RoadGeometry> CreateMultipleLanesRoadGeometry(const std::vector<Lane*>& lanes);
-
-/// Returns a Lane.
-/// @param id Id of the lane.
-std::unique_ptr<Lane> CreateLane(const LaneId& id);
 
 /// Returns an arbitrary rules::RoadRulebook.
 ///
