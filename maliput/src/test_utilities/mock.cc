@@ -684,6 +684,16 @@ PhaseRing CreatePhaseRing(const PhaseBuildFlags& build_flags) {
   return PhaseRing(PhaseRing::Id("mock"), {CreatePhase(build_flags)});
 }
 
+std::unique_ptr<Lane> CreateLane(const LaneId& id) { return std::make_unique<MockLane>(id); }
+
+std::unique_ptr<RoadGeometry> CreateMultipleLanesRoadGeometry(const std::vector<Lane*>& lanes) {
+  auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"));
+  for (const auto& lane : lanes) {
+    rg->GetIdIndex()->add_lane_to_map(lane->id(), lane);
+  }
+  return std::move(rg);
+}
+
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
   return std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"));
 }

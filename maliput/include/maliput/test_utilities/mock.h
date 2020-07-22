@@ -250,6 +250,15 @@ std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry();
 /// Returns an arbitrary two-lane RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry();
 
+/// Returns a RoadGeometry filled with `lanes`.
+/// The RoadGeometry is not completed. Its use is aimed to obtained the lanes by ById()->GetLane().
+/// @param lanes Is a vector of lanes to be added to the RoadGeometry's IdIndex.
+std::unique_ptr<RoadGeometry> CreateMultipleLanesRoadGeometry(const std::vector<Lane*>& lanes);
+
+/// Returns a Lane.
+/// @param id Id of the lane.
+std::unique_ptr<Lane> CreateLane(const LaneId& id);
+
 /// Returns an arbitrary rules::RoadRulebook.
 ///
 /// Forwards the call to CreateRoadRulebook() passing a default-constructed
