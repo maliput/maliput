@@ -1,0 +1,9 @@
+repositories:
+  ament_cmake_doxygen:
+    type: git
+    url: https://github.com/ToyotaResearchInstitute/ament_cmake_doxygen
+    version: master
+  pybind11:
+    type: git
+    url: https://github.com/RobotLocomotion/pybind11.git
+    version: 69a5d92a5ff9fe84581a1edeb6051a8c21d9eb97
