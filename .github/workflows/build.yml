@@ -1,0 +1,46 @@
+name: Compile and test
+
+on: [push, pull_request]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  PACKAGE_NAME: maliput
+  ROS_DISTRO: dashing
+  ROS_WS: ros_ws
+
+jobs:
+  compile_and_test:
+    name: Compile and test
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
+    - uses: ros-tooling/setup-ros2@0.0.11
+    - name: vcs import
+      shell: bash
+      working-directory: ${{runner.workspace}}/${{ env.PACKAGE_NAME }}/${{ env.ROS_WS }}
+      run: vcs import src < src/${PACKAGE_NAME}/.github/dependencies.repos
+    - name: colcon graph
+      shell: bash
+      working-directory: ${{runner.workspace}}/${{ env.PACKAGE_NAME }}/${{ env.ROS_WS }}
+      run: colcon graph
+    - name: rosdep install
+      shell: bash
+      working-directory: ${{runner.workspace}}/${{ env.PACKAGE_NAME }}/${{ env.ROS_WS }}
+      run: |
+        rosdep update;
+        rosdep install  -i -y --rosdistro ${ROS_DISTRO} --skip-keys "pybind11" --from-paths src
+    - name: colcon build
+      shell: bash
+      working-directory: ${{runner.workspace}}/${{ env.PACKAGE_NAME }}/${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon build --packages-up-to ${PACKAGE_NAME} --event-handlers=console_direct+;
+    - name: colcon test
+      shell: bash
+      working-directory: ${{runner.workspace}}/${{ env.PACKAGE_NAME }}/${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon test --packages-select ${PACKAGE_NAME} --event-handlers=console_direct+;
+        colcon test-result --verbose;
