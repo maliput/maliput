@@ -5,7 +5,7 @@ on: [push, pull_request]
 env:
   PACKAGE_NAME: maliput
   ROS_DISTRO: dashing
-  ROS_WS: ros_ws
+  ROS_WS: maliput_ws
 
 jobs:
   compile_and_test:
