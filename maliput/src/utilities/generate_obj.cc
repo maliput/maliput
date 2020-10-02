@@ -596,7 +596,8 @@ GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
 
 void RenderSegment(const api::Segment* segment, const ObjFeatures& features, GeoMesh* asphalt_mesh, GeoMesh* lane_mesh,
                    GeoMesh* marker_mesh, GeoMesh* h_bounds_mesh) {
-  if (!segment || !segment->junction() || !segment->junction()->road_geometry()) {
+  if (!segment || !segment->junction() || !segment->junction()->road_geometry() ||
+      static_cast<int>(segment->num_lanes()) == 0) {
     return;
   }
   const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
