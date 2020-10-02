@@ -602,7 +602,7 @@ GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
 // @param asphalt_mesh GeoFaces related to the asphalt mesh.
 // @param lane_mesh GeoFaces related to the lane mesh.
 // @param marker_mesh GeoFaces related to the maker mesh.
-// @param h_bounds_mesh GeoFaces related to the boundary mesh.
+// @param h_bounds_mesh GeoFaces related to the elevation boundary mesh.
 //
 // @throw maliput::common::assertion_error When `segment` is nullptr.
 // @throw maliput::common::assertion_error When '`segment`->junction()' is nullptr.
@@ -612,7 +612,7 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
   MALIPUT_THROW_UNLESS(segment != nullptr);
   MALIPUT_THROW_UNLESS(segment->junction() != nullptr);
   MALIPUT_THROW_UNLESS(segment->junction()->road_geometry() != nullptr);
-  if (static_cast<int>(segment->num_lanes()) == 0) {
+  if (segment->num_lanes() == 0) {
     maliput::log()->trace("The are no lanes to be rendered in Segment ID: {}.", segment->id().string());
     return;
   }
