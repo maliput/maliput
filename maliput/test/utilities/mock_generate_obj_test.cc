@@ -41,6 +41,10 @@ class MockGenerateObjTest : public ::testing::Test {
   std::vector<common::Path> paths_to_cleanup_;
 };
 
+// OBJ and MTL files generated from the GeneratedObjFile method are compared with the following files
+// located in the test path of maliput::utilities' tests:
+//  - TwoLanesRoadGeometry.mtl
+//  - TwoLanesRoadGeometry.obj
 TEST_F(MockGenerateObjTest, TwoLanesRoadGeometry) {
   const std::unique_ptr<const api::RoadGeometry> dut = api::test::CreateTwoLanesRoadGeometry();
 
