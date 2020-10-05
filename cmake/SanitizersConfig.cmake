@@ -22,6 +22,7 @@ endmacro()
 # Sanitizers Configuration
 ##############################################################################
 
+set(SANITIZERS off)
 if ("${CMAKE_CXX_COMPILER_ID} " MATCHES "Clang ")
   option(ADDRESS_SANITIZER "Enable Clang Address Sanitizer" OFF)
   option(UNDEFINED_SANITIZER "Enable Clang Undefined Behaviour Sanitizer" OFF)
