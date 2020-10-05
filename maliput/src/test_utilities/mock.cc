@@ -545,7 +545,7 @@ std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry() {
   junction_a->set_road_geometry(rg.get());
   junction_b->set_road_geometry(rg.get());
   segment_a->set_junction(junction_a.get());
-  segment_a->set_junction(junction_b.get());
+  segment_b->set_junction(junction_b.get());
   lane_a->set_segment(segment_a.get());
   lane_b->set_segment(segment_b.get());
   rg->GetIdIndex()->add_lane_to_map(lane_a->id(), lane_a.get());

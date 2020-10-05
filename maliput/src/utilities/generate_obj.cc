@@ -17,6 +17,7 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput/math/vector.h"
 #include "maliput/utilities/mesh.h"
@@ -594,9 +595,25 @@ GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
   return SimplifyMeshFaces(mesh, features.simplify_mesh_threshold);
 }
 
+// Render the `segment`'s lanes if any, to add the outcome to `asphalt_mesh`, `lane_mesh`, `marker_mesh` and
+// `h_bounds_mesh`.
+// @param segment Contains the lanes to be rendered.
+// @param features Holds parameters for generating an OBJ model.
+// @param asphalt_mesh GeoFaces related to the asphalt mesh.
+// @param lane_mesh GeoFaces related to the lane mesh.
+// @param marker_mesh GeoFaces related to the maker mesh.
+// @param h_bounds_mesh GeoFaces related to the elevation boundary mesh.
+//
+// @throw maliput::common::assertion_error When `segment` is nullptr.
+// @throw maliput::common::assertion_error When '`segment`->junction()' is nullptr.
+// @throw maliput::common::assertion_error When '`segment`->junction()->road_geometry()' is nullptr.
 void RenderSegment(const api::Segment* segment, const ObjFeatures& features, GeoMesh* asphalt_mesh, GeoMesh* lane_mesh,
                    GeoMesh* marker_mesh, GeoMesh* h_bounds_mesh) {
-  if (!segment || !segment->junction() || !segment->junction()->road_geometry()) {
+  MALIPUT_THROW_UNLESS(segment != nullptr);
+  MALIPUT_THROW_UNLESS(segment->junction() != nullptr);
+  MALIPUT_THROW_UNLESS(segment->junction()->road_geometry() != nullptr);
+  if (segment->num_lanes() == 0) {
+    maliput::log()->trace("The are no lanes to be rendered in Segment ID: {}.", segment->id().string());
     return;
   }
   const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
@@ -842,6 +859,7 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
   GeoMesh grayed_asphalt_mesh;
   GeoMesh grayed_lane_mesh;
   GeoMesh grayed_marker_mesh;
+  maliput::log()->trace("Generating RoadGeometry's meshes...");
 
   for (int ji = 0; ji < rg->num_junctions(); ++ji) {
     const api::Junction* junction = rg->junction(ji);
@@ -879,6 +897,7 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
       std::make_pair(std::move(grayed_asphalt_mesh), GetMaterialByName(kGrayedBlandAsphalt));
   meshes.hbounds_mesh["h_bounds"] = std::make_pair(std::move(h_bounds_mesh), GetMaterialByName(kHBoundsHaze));
 
+  maliput::log()->trace("Meshes generation completed.");
   return meshes;
 }
 
