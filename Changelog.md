@@ -1,6 +1,6 @@
 # Changelog
 
-## YYYY-MM-DD
+## 1.X.X YYYY-MM-DD
 
 ### API changes
 
