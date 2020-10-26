@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<package format="3">
   <name>maliput</name>
-  <version>0.6.2</version>
+  <version>1.0.0</version>
   <description>Maliput</description>
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
-  <license>TODO</license>
+  <license file="../LICENSE">BSD Clause 3</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <build_depend>ament_cmake_doxygen</build_depend>
