@@ -65,7 +65,7 @@ jobs:
       working-directory: ${{ env.ROS_WS }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
-        colcon CC=clang CXX=clang++ build --cmake-args -DCMAKE_LINKER=/usr/bin/llvm-ld --packages-up-to ${PACKAGE_NAME} --event-handlers=console_direct+;
+        CC=clang CXX=clang++ colcon build --cmake-args -DCMAKE_LINKER=/usr/bin/llvm-ld --packages-up-to ${PACKAGE_NAME} --event-handlers=console_direct+;
     - name: colcon test
       shell: bash
       working-directory: ${{ env.ROS_WS }}
