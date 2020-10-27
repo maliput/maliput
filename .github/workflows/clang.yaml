@@ -23,7 +23,7 @@ jobs:
       working-directory: ${{ env.ROS_WS }}
       shell: bash
       run: |
-        apt install clang-8 lldb-8 lld-8 clang-format-8 clang-tidy-8 libc++-8-dev libc++abi-8-dev
+        apt install -y clang-8 lldb-8 lld-8 clang-format-8 clang-tidy-8 libc++-8-dev libc++abi-8-dev
     - name: update clang alternatives
       working-directory: ${{ env.ROS_WS }}
       shell: bash
