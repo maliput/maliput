@@ -1,4 +1,4 @@
-name: Compile and test
+name: Compile and test with gcc
 
 on: [push, pull_request]
 
