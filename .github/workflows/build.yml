@@ -25,33 +25,39 @@ jobs:
             CC: clang
             CXX: clang++
             LINKER_PATH: /usr/bin/llvm-ld
-    if: matrix.gcc || github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'master')
+    env:
+      DO_BUILD: ${{ matrix.gcc }} || ${{ github.event_name }} == 'pull_request' || (${{ github.event_name }} == 'push' && ${{ github.ref }} == 'master')
     steps:
     - uses: actions/checkout@v2
+      if: ${{ env.DO_BUILD }}
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
     # use setup-ros action to get vcs, rosdep, and colcon
     - uses: ros-tooling/setup-ros@0.0.25
     - name: clang 8 install
-      if: matrix.clang
+      if: ${{ matrix.clang }} && ${{ github.event_name }} == 'pull_request'
       working-directory: ${{ env.ROS_WS }}
       shell: bash
       run: |
         ./src/${{ env.PACKAGE_NAME }}/.github/clang_suite_installation.sh
     - name: vcs import
+      if: ${{ env.DO_BUILD }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       run: vcs import src < src/${PACKAGE_NAME}/.github/dependencies.repos
     - run: colcon graph
+      if: ${{ env.DO_BUILD }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
     - name: rosdep install
+      if: ${{ env.DO_BUILD }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       run: |
         rosdep update;
         rosdep install  -i -y --rosdistro ${ROS_DISTRO} --skip-keys "pybind11" --from-paths src
     - name: colcon build
+      if: ${{ env.DO_BUILD }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       env:
@@ -62,6 +68,7 @@ jobs:
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon build --cmake-args -DCMAKE_LINKER=${LINKER_PATH} --packages-up-to ${PACKAGE_NAME} --event-handlers=console_direct+;
     - name: colcon test
+      if: ${{ env.DO_BUILD }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       run: |
