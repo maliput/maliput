@@ -57,9 +57,6 @@ jobs:
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       env:
-        CC: ${{ env.CC }}
-        CXX: ${{ env.CXX }}
-        LINKER_PATH: ${{ env.LINKER_PATH }}
         COMPILER_FLAG: ${{ matrix.COMPILER_FLAG }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
