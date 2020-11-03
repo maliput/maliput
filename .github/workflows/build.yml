@@ -28,6 +28,10 @@ jobs:
     env:
       DO_BUILD: ${{ matrix.gcc }} || ${{ github.event_name }} == 'pull_request' || (${{ github.event_name }} == 'push' && ${{ github.ref }} == 'master')
     steps:
+    - run: echo ${DO_BUILD}
+    - run: echo ${DO_BUILD_2}
+      env:
+        DO_BUILD_2: ${{ matrix.gcc }} || ${{ github.event_name }} == 'pull_request' || (${{ github.event_name }} == 'push' && ${{ github.ref }} == 'master')
     - uses: actions/checkout@v2
       if: ${{ env.DO_BUILD }}
       with:
