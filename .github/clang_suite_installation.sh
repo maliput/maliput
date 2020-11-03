@@ -10,14 +10,14 @@
 function install_clang_suite() {
   local version=$1
 
-  prereqs.apt install \
-              clang-${version} \
-              lldb-${version} \
-              lld-${version} \
-              clang-format-${version} \
-              clang-tidy-${version} \
-              libc++-${version}-dev \
-              libc++abi-${version}-dev
+  apt install -y \
+      clang-${version} \
+      lldb-${version} \
+      lld-${version} \
+      clang-format-${version} \
+      clang-tidy-${version} \
+      libc++-${version}-dev \
+      libc++abi-${version}-dev
 }
 
 #######################################
