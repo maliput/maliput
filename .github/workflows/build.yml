@@ -29,21 +29,17 @@ jobs:
       DO_BUILD: ${{ matrix.compiler == 'gcc' || github.event_name == 'pull_request' || ( github.event_name == 'push' && github.ref == 'master') }}
     steps:
     - run: echo ${DO_BUILD}
-    - run: echo ${DO_BUILD_2}
-      env:
-        DO_BUILD_2: ${{ matrix.compiler == 'gcc' || github.event_name == 'pull_request' || ( github.event_name == 'push' && github.ref == 'master') }}
     - uses: actions/checkout@v2
       if: ${{ env.DO_BUILD }}
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
     # use setup-ros action to get vcs, rosdep, and colcon
     - uses: ros-tooling/setup-ros@0.0.25
+      if: ${{ env.DO_BUILD }}
     - name: clang 8 install
-      if: ${{ matrix.clang }} && ${{ github.event_name }} == 'pull_request'
-      working-directory: ${{ env.ROS_WS }}
+      if: ${{ matrix.compiler == 'clang' && github.event_name == 'pull_request' }}
       shell: bash
-      run: |
-        ./src/${{ env.PACKAGE_NAME }}/.github/clang_suite_installation.sh
+      run: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}/.github/workflows/clang_suite_installation.sh
     - name: vcs import
       if: ${{ env.DO_BUILD }}
       shell: bash
