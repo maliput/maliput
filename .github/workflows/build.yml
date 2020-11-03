@@ -39,7 +39,7 @@ jobs:
     - name: clang 8 install
       if: ${{ matrix.compiler == 'clang' && github.event_name == 'pull_request' }}
       shell: bash
-      run: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}/.github/workflows/clang_suite_installation.sh
+      run: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}/.github/clang_suite_installation.sh
     - name: vcs import
       if: ${{ env.DO_BUILD == 'true' }}
       shell: bash
