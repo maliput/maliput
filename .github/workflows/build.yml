@@ -1,4 +1,4 @@
-name: Compile and test
+name: Compile and test with gcc and clang
 
 on: [push, pull_request]
 
@@ -13,32 +13,62 @@ jobs:
     runs-on: ubuntu-18.04
     container:
       image: ubuntu:18.04
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        include:
+          - compiler: gcc
+            CC: gcc
+            CXX: g++
+            LINKER_PATH: /usr/bin/ld
+          - compiler: clang
+            CC: clang
+            CXX: clang++
+            LINKER_PATH: /usr/bin/llvm-ld
+    env:
+      DO_BUILD: ${{ matrix.compiler == 'gcc' || github.event_name == 'pull_request' || ( github.event_name == 'push' && github.ref == 'master') }}
     steps:
+    - run: echo ${DO_BUILD}
     - uses: actions/checkout@v2
+      if: ${{ env.DO_BUILD == 'true' }}
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
     # use setup-ros action to get vcs, rosdep, and colcon
     - uses: ros-tooling/setup-ros@0.0.25
+      if: ${{ env.DO_BUILD == 'true' }}
+    - name: clang 8 install
+      if: ${{ matrix.compiler == 'clang' && github.event_name == 'pull_request' }}
+      shell: bash
+      run: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}/.github/clang_suite_installation.sh
     - name: vcs import
+      if: ${{ env.DO_BUILD == 'true' }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       run: vcs import src < src/${PACKAGE_NAME}/.github/dependencies.repos
     - run: colcon graph
+      if: ${{ env.DO_BUILD == 'true' }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
     - name: rosdep install
+      if: ${{ env.DO_BUILD == 'true' }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       run: |
         rosdep update;
         rosdep install  -i -y --rosdistro ${ROS_DISTRO} --skip-keys "pybind11" --from-paths src
     - name: colcon build
+      if: ${{ env.DO_BUILD == 'true' }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
+      env:
+        CC: ${{ matrix.CC }}
+        CXX: ${{ matrix.CXX }}
+        LINKER_PATH: ${{ matrix.LINKER_PATH }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
-        colcon build --packages-up-to ${PACKAGE_NAME} --event-handlers=console_direct+;
+        colcon build --cmake-args -DCMAKE_LINKER=${LINKER_PATH} --packages-up-to ${PACKAGE_NAME} --event-handlers=console_direct+;
     - name: colcon test
+      if: ${{ env.DO_BUILD == 'true' }}
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       run: |
