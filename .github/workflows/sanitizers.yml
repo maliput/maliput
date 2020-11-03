@@ -24,7 +24,7 @@ jobs:
           - sanitizer: ubsan
             COMPILER_FLAG: ' -DUNDEFINED_SANITIZER=On'
     env:
-      DO_BUILD: 'true' # ${{ github.event_name == 'pull_request' || ( github.event_name == 'push' && github.ref == 'master') }}
+      DO_BUILD: ${{ github.event_name == 'pull_request' || ( github.event_name == 'push' && github.ref == 'master') }}
       CC: clang
       CXX: clang++
       LINKER_PATH: /usr/bin/llvm-ld
