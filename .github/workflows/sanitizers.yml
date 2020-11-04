@@ -1,4 +1,4 @@
-name: Compile and test with clang sanitizers
+name: clang
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 
 jobs:
   compile_and_test:
-    name: Compile and test with clang sanitizer
+    name: Compile and test with sanitizer
     runs-on: ubuntu-18.04
     container:
       image: ubuntu:18.04

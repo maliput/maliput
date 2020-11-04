@@ -1,4 +1,4 @@
-name: Compile and test with gcc
+name: gcc
 
 on: [push, pull_request]
 
@@ -9,7 +9,7 @@ env:
 
 jobs:
   compile_and_test:
-    name: Compile and test with gcc
+    name: Compile and test
     runs-on: ubuntu-18.04
     container:
       image: ubuntu:18.04
