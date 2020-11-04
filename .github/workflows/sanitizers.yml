@@ -1,0 +1,70 @@
+name: Compile and test with gcc and clang
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  PACKAGE_NAME: maliput
+  ROS_DISTRO: dashing
+  ROS_WS: maliput_ws
+
+jobs:
+  compile_and_test:
+    name: Compile and test
+    runs-on: ubuntu-18.04
+    container:
+      image: ubuntu:18.04
+    strategy:
+      matrix:
+        sanitizer: [asan, ubsan, tsan]
+        include:
+          - sanitizer: asan
+            COMPILER_FLAG: ' -DADDRESS_SANITIZER=On'
+          - sanitizer: tsan
+            COMPILER_FLAG: ' -DTHREAD_SANITIZER=On'
+          - sanitizer: ubsan
+            COMPILER_FLAG: ' -DUNDEFINED_SANITIZER=On'
+    env:
+      CC: clang
+      CXX: clang++
+      LINKER_PATH: /usr/bin/llvm-ld
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
+    # use setup-ros action to get vcs, rosdep, and colcon
+    - uses: ros-tooling/setup-ros@0.0.25
+    - name: clang 8 install
+      shell: bash
+      run: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}/.github/clang_suite_installation.sh
+    - name: vcs import
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: vcs import src < src/${PACKAGE_NAME}/.github/dependencies.repos
+    - run: colcon graph
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+    - name: rosdep install
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: |
+        rosdep update;
+        rosdep install  -i -y --rosdistro ${ROS_DISTRO} --skip-keys "pybind11" --from-paths src
+    - name: colcon build
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      env:
+        COMPILER_FLAG: ${{ matrix.COMPILER_FLAG }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon build --cmake-args -DCMAKE_LINKER=${LINKER_PATH} ${COMPILER_FLAG} --packages-up-to ${PACKAGE_NAME} --event-handlers=console_direct+;
+    - name: colcon test
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon test --packages-select ${PACKAGE_NAME} --event-handlers=console_direct+;
+        colcon test-result --verbose;
