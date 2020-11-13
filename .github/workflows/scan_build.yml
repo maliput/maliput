@@ -12,8 +12,8 @@ env:
   ROS_WS: maliput_ws
 
 jobs:
-  compile_and_test:
-    name: Compile and test
+  static_analysis:
+    name: Static analysis
     runs-on: ubuntu-18.04
     container:
       image: ubuntu:18.04
