@@ -32,8 +32,8 @@ macro(add_dependencies_to_test target)
       target_link_libraries(${target}
           api
           common
-          maliput_test_utilities
           math
+          test_utilities
       )
 
     endif()

@@ -20,7 +20,7 @@ macro(add_dependencies_to_test target)
       target_link_libraries(${target}
           common
           math
-          maliput_test_utilities
+          test_utilities
       )
 
     endif()
