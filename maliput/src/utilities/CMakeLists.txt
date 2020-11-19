@@ -11,6 +11,11 @@ set(SOURCES
 
 add_library(utilities ${SOURCES})
 
+set_target_properties(utilities
+  PROPERTIES
+    OUTPUT_NAME maliput_utilities
+)
+
 target_include_directories(utilities
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

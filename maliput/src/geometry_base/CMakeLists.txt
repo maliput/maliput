@@ -12,6 +12,11 @@ set(SOURCES
 
 add_library(geometry_base ${SOURCES})
 
+set_target_properties(geometry_base
+  PROPERTIES
+    OUTPUT_NAME maliput_geometry_base
+)
+
 target_include_directories(geometry_base
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

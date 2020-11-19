@@ -28,6 +28,11 @@ set(BASE_SOURCES
 
 add_library(base ${BASE_SOURCES})
 
+set_target_properties(base
+  PROPERTIES
+    OUTPUT_NAME maliput_base
+)
+
 target_include_directories(base
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
