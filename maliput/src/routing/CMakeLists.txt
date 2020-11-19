@@ -8,6 +8,11 @@ set(ROUTING_SOURCES
 
 add_library(routing ${ROUTING_SOURCES})
 
+set_target_properties(routing
+  PROPERTIES
+    OUTPUT_NAME maliput_routing
+)
+
 target_include_directories(routing
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
