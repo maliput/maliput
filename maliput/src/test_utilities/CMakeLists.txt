@@ -15,16 +15,23 @@ set(TEST_UTILS_SOURCES
   rules_speed_limit_compare.cc
   traffic_lights_compare.cc)
 
-add_library(maliput_test_utilities ${TEST_UTILS_SOURCES})
+add_library(test_utilities ${TEST_UTILS_SOURCES})
+
+add_library(maliput::test_utilities ALIAS test_utilities)
+
+set_target_properties(test_utilities
+  PROPERTIES
+    OUTPUT_NAME maliput_test_utilities
+)
 
 target_include_directories(
-  maliput_test_utilities
+  test_utilities
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_link_libraries(maliput_test_utilities
+target_link_libraries(test_utilities
   maliput::api
   maliput::common
   maliput::math
@@ -32,10 +39,10 @@ target_link_libraries(maliput_test_utilities
 )
 
 install(
-    TARGETS maliput_test_utilities EXPORT ${PROJECT_NAME}-targets
+    TARGETS test_utilities EXPORT ${PROJECT_NAME}-targets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-ament_export_libraries(maliput_test_utilities)
+ament_export_libraries(test_utilities)

@@ -28,7 +28,7 @@ macro(add_dependencies_to_test target)
           maliput::api
           maliput::base
           fmt::fmt
-          maliput_test_utilities
+          test_utilities
       )
 
     endif()
