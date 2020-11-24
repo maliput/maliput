@@ -11,6 +11,8 @@ set(SOURCES
 
 add_library(utilities ${SOURCES})
 
+add_library(maliput::utilities ALIAS utilities)
+
 set_target_properties(utilities
   PROPERTIES
     OUTPUT_NAME maliput_utilities
@@ -25,9 +27,9 @@ target_link_libraries(utilities
   PRIVATE
     fmt::fmt
   PUBLIC
-    api
-    common
-    math
+    maliput::api
+    maliput::common
+    maliput::math
 )
 
 ##############################################################################

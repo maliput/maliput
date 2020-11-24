@@ -13,7 +13,9 @@ target_include_directories(api_py
 )
 
 target_link_libraries(api_py
-  PRIVATE api pybind11::module
+  PRIVATE
+    maliput::api
+    pybind11::module
 )
 
 # math module
@@ -27,7 +29,9 @@ target_include_directories(math_py
 )
 
 target_link_libraries(math_py
-  PRIVATE math pybind11::module
+  PRIVATE
+    maliput::math
+    pybind11::module
 )
 
 ##############################################################################

@@ -25,8 +25,8 @@ macro(add_dependencies_to_test target)
       )
 
       target_link_libraries(${target}
-          api
-          base
+          maliput::api
+          maliput::base
           fmt::fmt
           maliput_test_utilities
       )

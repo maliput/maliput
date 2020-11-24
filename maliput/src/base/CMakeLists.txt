@@ -28,6 +28,8 @@ set(BASE_SOURCES
 
 add_library(base ${BASE_SOURCES})
 
+add_library(maliput::base ALIAS base)
+
 set_target_properties(base
   PROPERTIES
     OUTPUT_NAME maliput_base
@@ -40,9 +42,10 @@ target_include_directories(base
 
 target_link_libraries(base
   PUBLIC
-    api
-    common
-    yaml-cpp)
+    maliput::api
+    maliput::common
+    yaml-cpp
+)
 
 ##############################################################################
 # Tests
