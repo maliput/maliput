@@ -9,6 +9,8 @@ set(COMMON_SOURCES
 
 add_library(common ${COMMON_SOURCES})
 
+add_library(maliput::common ALIAS common)
+
 set_target_properties(common
   PROPERTIES
     OUTPUT_NAME maliput_common

@@ -25,10 +25,10 @@ target_include_directories(
 )
 
 target_link_libraries(maliput_test_utilities
-  api
-  common
-  math
-  geometry_base
+  maliput::api
+  maliput::common
+  maliput::math
+  maliput::geometry_base
 )
 
 install(

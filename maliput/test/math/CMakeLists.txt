@@ -18,8 +18,8 @@ macro(add_dependencies_to_test target)
       )
 
       target_link_libraries(${target}
-          common
-          math
+          maliput::common
+          maliput::math
           maliput_test_utilities
       )
 

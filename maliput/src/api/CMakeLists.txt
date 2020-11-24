@@ -22,6 +22,8 @@ set(API_SOURCES
 
 add_library(api ${API_SOURCES})
 
+add_library(maliput::api ALIAS api)
+
 set_target_properties(api
   PROPERTIES
     OUTPUT_NAME maliput_api
@@ -34,8 +36,8 @@ target_include_directories(api
 
 target_link_libraries(api
   PUBLIC
-    common
-    math
+    maliput::common
+    maliput::math
 )
 
 ##############################################################################
