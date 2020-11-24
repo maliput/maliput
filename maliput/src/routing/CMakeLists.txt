@@ -8,6 +8,8 @@ set(ROUTING_SOURCES
 
 add_library(routing ${ROUTING_SOURCES})
 
+add_library(maliput::routing ALIAS routing)
+
 set_target_properties(routing
   PROPERTIES
     OUTPUT_NAME maliput_routing
@@ -20,8 +22,8 @@ target_include_directories(routing
 
 target_link_libraries(routing
   PUBLIC
-    api
-    common
+    maliput::api
+    maliput::common
 )
 
 ##############################################################################

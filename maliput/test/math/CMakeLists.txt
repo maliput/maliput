@@ -18,9 +18,9 @@ macro(add_dependencies_to_test target)
       )
 
       target_link_libraries(${target}
-          common
-          math
-          test_utilities
+          maliput::common
+          maliput::math
+          maliput::test_utilities
       )
 
     endif()

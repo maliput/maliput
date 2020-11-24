@@ -25,10 +25,11 @@ macro(add_dependencies_to_test target)
       )
 
       target_link_libraries(${target}
-          api
-          common
-          test_utilities
-          utilities)
+          maliput::api
+          maliput::common
+          maliput::test_utilities
+          maliput::utilities
+      )
 
     endif()
 endmacro()

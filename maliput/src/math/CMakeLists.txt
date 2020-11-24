@@ -11,6 +11,8 @@ set(MATH_SOURCES
 
 add_library(math ${MATH_SOURCES})
 
+add_library(maliput::math ALIAS math)
+
 set_target_properties(math
   PROPERTIES
     OUTPUT_NAME maliput_math
@@ -23,7 +25,7 @@ target_include_directories(math
 
 target_link_libraries(math
   PUBLIC
-    common
+    maliput::common
 )
 
 ##############################################################################

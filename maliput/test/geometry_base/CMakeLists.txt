@@ -13,8 +13,8 @@ macro(add_dependencies_to_test target)
       )
 
       target_link_libraries(${target}
-          api
-          test_utilities
+          maliput::api
+          maliput::test_utilities
       )
 
     endif()
