@@ -17,11 +17,11 @@ set(TEST_UTILS_SOURCES
 
 add_library(test_utilities ${TEST_UTILS_SOURCES})
 
-add_library(malidrive::test_utilities ALIAS test_utilities)
+add_library(maliput::test_utilities ALIAS test_utilities)
 
 set_target_properties(test_utilities
   PROPERTIES
-    OUTPUT_NAME malidrive_test_utilities
+    OUTPUT_NAME maliput_test_utilities
 )
 
 target_include_directories(
