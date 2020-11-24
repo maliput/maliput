@@ -11,6 +11,11 @@ set(MATH_SOURCES
 
 add_library(math ${MATH_SOURCES})
 
+set_target_properties(math
+  PROPERTIES
+    OUTPUT_NAME maliput_math
+)
+
 target_include_directories(math
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

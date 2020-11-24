@@ -9,6 +9,11 @@ set(COMMON_SOURCES
 
 add_library(common ${COMMON_SOURCES})
 
+set_target_properties(common
+  PROPERTIES
+    OUTPUT_NAME maliput_common
+)
+
 target_include_directories(common
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

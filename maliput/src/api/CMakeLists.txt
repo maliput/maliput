@@ -22,6 +22,11 @@ set(API_SOURCES
 
 add_library(api ${API_SOURCES})
 
+set_target_properties(api
+  PROPERTIES
+    OUTPUT_NAME maliput_api
+)
+
 target_include_directories(api
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
