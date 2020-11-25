@@ -24,7 +24,7 @@ set(BASE_SOURCES
   traffic_light_book.cc
   traffic_light_book_loader.cc
   yaml_conversion.cc
-  )
+)
 
 add_library(base ${BASE_SOURCES})
 
@@ -58,11 +58,11 @@ target_link_libraries(base
 include(CMakePackageConfigHelpers)
 
 install(
-    TARGETS base
-    EXPORT ${PROJECT_NAME}-targets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+  TARGETS base
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 ament_export_libraries(base)

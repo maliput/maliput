@@ -38,11 +38,11 @@ target_link_libraries(geometry_base
 ##############################################################################
 
 install(
-    TARGETS geometry_base
-    EXPORT ${PROJECT_NAME}-targets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+  TARGETS geometry_base
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 ament_export_libraries(geometry_base)

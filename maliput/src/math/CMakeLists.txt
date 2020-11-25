@@ -33,11 +33,11 @@ target_link_libraries(math
 ##############################################################################
 
 install(
-    TARGETS math
-    EXPORT ${PROJECT_NAME}-targets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+  TARGETS math
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 ament_export_libraries(math)
