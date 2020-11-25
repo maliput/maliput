@@ -31,11 +31,11 @@ target_link_libraries(common
 ##############################################################################
 
 install(
-    TARGETS common
-    EXPORT ${PROJECT_NAME}-targets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+  TARGETS common
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 ament_export_libraries(common)

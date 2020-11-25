@@ -37,11 +37,11 @@ target_link_libraries(utilities
 ##############################################################################
 
 install(
-    TARGETS utilities
-    EXPORT ${PROJECT_NAME}-targets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+  TARGETS utilities
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 ament_export_libraries(utilities)

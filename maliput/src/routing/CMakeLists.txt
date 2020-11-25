@@ -31,10 +31,11 @@ target_link_libraries(routing
 ##############################################################################
 
 install(
-    TARGETS routing
-    EXPORT ${PROJECT_NAME}-targets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
+  TARGETS routing
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 ament_export_libraries(routing)
