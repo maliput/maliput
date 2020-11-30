@@ -20,10 +20,6 @@ macro(add_dependencies_to_test target)
           ${CMAKE_CURRENT_SOURCE_DIR}
       )
 
-      ament_target_dependencies(${target}
-          "maliput"
-      )
-
       target_link_libraries(${target}
           maliput::api
           maliput::common
