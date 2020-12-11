@@ -7,6 +7,10 @@ pybind11_add_module(api_py api_py.cc)
 
 set_target_properties(api_py PROPERTIES OUTPUT_NAME "api")
 
+ament_target_dependencies(api_py
+  "maliput"
+)
+
 target_include_directories(api_py
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -28,6 +32,10 @@ target_include_directories(math_py
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
+ament_target_dependencies(math_py
+  "maliput"
+)
+
 target_link_libraries(math_py
   PRIVATE
     maliput::math
@@ -38,6 +46,7 @@ target_link_libraries(math_py
 # Install
 ##############################################################################
 
+message(STATUS "********* ${PYTHON_INSTALL_DIR}")
 install(TARGETS api_py
   DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}"
 )

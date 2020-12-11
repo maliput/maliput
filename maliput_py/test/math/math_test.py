@@ -1,7 +1,7 @@
 import math as m
 import unittest
 
-from maliput.math import (
+from maliput_py.math import (
   RollPitchYaw,
   Quaternion,
   Vector3,
