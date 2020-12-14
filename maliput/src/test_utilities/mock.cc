@@ -576,10 +576,10 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
   auto segment_b = std::make_unique<MockSegment>(SegmentId("mock_b"));
   segment_b->set_junction(junction_b.get());
   // Creates the start and end points of the Lanes.
-  InertialPosition start_gp_a;
-  InertialPosition end_gp_a;
-  InertialPosition start_gp_b;
-  InertialPosition end_gp_b;
+  InertialPosition start_ip_a;
+  InertialPosition end_ip_a;
+  InertialPosition start_ip_b;
+  InertialPosition end_ip_b;
   Rotation start_rot_a;
   Rotation end_rot_a;
   Rotation start_rot_b;
@@ -587,16 +587,16 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
 
   if (build_flags.add_linear_mismatch) {
     // Assign different positions for the lane 1 end and lane 2 start.
-    start_gp_a = InertialPosition(0, 0, 0);
-    end_gp_a = InertialPosition(10, 0, 0);
-    start_gp_b = InertialPosition(11, 0, 0);
-    end_gp_b = InertialPosition(21, 0, 0);
+    start_ip_a = InertialPosition(0, 0, 0);
+    end_ip_a = InertialPosition(10, 0, 0);
+    start_ip_b = InertialPosition(11, 0, 0);
+    end_ip_b = InertialPosition(21, 0, 0);
   } else {
     // Assign same position for the lane 1 end and lane 2 start.
-    start_gp_a = InertialPosition(0, 0, 0);
-    end_gp_a = InertialPosition(10, 0, 0);
-    start_gp_b = InertialPosition(10, 0, 0);
-    end_gp_b = InertialPosition(20, 0, 0);
+    start_ip_a = InertialPosition(0, 0, 0);
+    end_ip_a = InertialPosition(10, 0, 0);
+    start_ip_b = InertialPosition(10, 0, 0);
+    end_ip_b = InertialPosition(20, 0, 0);
   }
   if (build_flags.add_angular_mismatch) {
     // Assign different rotations for the lane 1 end and lane 2 start.
@@ -611,8 +611,8 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
     start_rot_b = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
     end_rot_b = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
   }
-  auto lane_a = std::make_unique<MockLane>(LaneId("mock_a"), start_gp_a, start_rot_a, end_gp_a, end_rot_a);
-  auto lane_b = std::make_unique<MockLane>(LaneId("mock_b"), start_gp_b, start_rot_b, end_gp_b, end_rot_b);
+  auto lane_a = std::make_unique<MockLane>(LaneId("mock_a"), start_ip_a, start_rot_a, end_ip_a, end_rot_a);
+  auto lane_b = std::make_unique<MockLane>(LaneId("mock_b"), start_ip_b, start_rot_b, end_ip_b, end_rot_b);
   lane_a->set_segment(segment_a.get());
   lane_b->set_segment(segment_b.get());
   rg->GetIdIndex()->add_lane_to_map(lane_a->id(), lane_a.get());

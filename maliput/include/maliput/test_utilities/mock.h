@@ -172,9 +172,9 @@ class MockLane final : public Lane {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
   MockLane(const LaneId& id) : Lane(), id_(id) {}
-  MockLane(const LaneId& id, const InertialPosition& start_gp, const Rotation& start_rot,
-           const InertialPosition& end_gp, const Rotation& end_rot)
-      : Lane(), id_(id), start_gp_(start_gp), start_rot_(start_rot), end_gp_(end_gp), end_rot_(end_rot) {}
+  MockLane(const LaneId& id, const InertialPosition& start_ip, const Rotation& start_rot,
+           const InertialPosition& end_ip, const Rotation& end_rot)
+      : Lane(), id_(id), start_ip_(start_ip), start_rot_(start_rot), end_ip_(end_ip), end_rot_(end_rot) {}
   MockLane(const LaneId& id, const LanePositionResult& lane_position_result)
       : Lane(), id_(id), lane_position_result_(lane_position_result) {}
   void set_segment(Segment* segment) { segment_ = segment; }
@@ -192,7 +192,7 @@ class MockLane final : public Lane {
   RBounds do_segment_bounds(double) const override { return RBounds(-1, 1); };
   HBounds do_elevation_bounds(double, double) const override { return HBounds(0, 10); };
   InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const override {
-    return lane_pos.s() ? end_gp_ : start_gp_;
+    return lane_pos.s() ? end_ip_ : start_ip_;
   }
   LanePositionResult DoToLanePosition(const InertialPosition&) const override { return lane_position_result_; }
   Rotation DoGetOrientation(const LanePosition& lane_pos) const override {
@@ -212,9 +212,9 @@ class MockLane final : public Lane {
   Segment* segment_{};
   BranchPoint* start_bp_{};
   BranchPoint* end_bp_{};
-  InertialPosition start_gp_{};
+  InertialPosition start_ip_{};
   Rotation start_rot_{};
-  InertialPosition end_gp_{};
+  InertialPosition end_ip_{};
   Rotation end_rot_{};
   LanePositionResult lane_position_result_{};
 };

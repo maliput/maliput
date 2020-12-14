@@ -118,7 +118,7 @@ class RoadGeometry {
   /// include the RoadPosition or RoadPositions with the minimum distance to
   /// @p inertial_position in the returned result.
   ///
-  /// @param inertial_position The geo position to convert into one or more
+  /// @param inertial_position The inertial position to convert into one or more
   ///        RoadPositions.
   /// @param radius The maximum distance from @p inertial_position to search. It must
   ///        not be negative.
