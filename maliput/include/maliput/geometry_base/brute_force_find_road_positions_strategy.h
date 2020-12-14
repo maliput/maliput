@@ -27,7 +27,7 @@ namespace geometry_base {
 ///         within it is nullptr.
 /// @throws maliput::common::assertion_error If radius is negative.
 std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrategy(
-    const maliput::api::RoadGeometry* rg, const maliput::api::GeoPosition& geo_position, double radius);
+    const maliput::api::RoadGeometry* rg, const maliput::api::InertialPosition& inertial_position, double radius);
 
 }  // namespace geometry_base
 }  // namespace maliput

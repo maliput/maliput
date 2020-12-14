@@ -7,27 +7,28 @@ namespace maliput {
 namespace api {
 namespace test {
 
-::testing::AssertionResult IsGeoPositionClose(const GeoPosition& pos1, const GeoPosition& pos2, double tolerance) {
+::testing::AssertionResult IsInertialPositionClose(const InertialPosition& pos1, const InertialPosition& pos2,
+                                                   double tolerance) {
   bool fails = false;
   std::string error_message;
   double delta = std::abs(pos1.x() - pos2.x());
   if (delta > tolerance) {
     fails = true;
-    error_message = error_message + "GeoPositions are different at x coordinate. " +
+    error_message = error_message + "InertialPositions are different at x coordinate. " +
                     "pos1.x(): " + std::to_string(pos1.x()) + " vs. " + "pos2.x(): " + std::to_string(pos2.x()) +
                     ", diff = " + std::to_string(delta) + ", tolerance = " + std::to_string(tolerance) + "\n";
   }
   delta = std::abs(pos1.y() - pos2.y());
   if (delta > tolerance) {
     fails = true;
-    error_message = error_message + "GeoPositions are different at y coordinate. " +
+    error_message = error_message + "InertialPositions are different at y coordinate. " +
                     "pos1.y(): " + std::to_string(pos1.y()) + " vs. " + "pos2.y(): " + std::to_string(pos2.y()) +
                     ", diff = " + std::to_string(delta) + ", tolerance = " + std::to_string(tolerance) + "\n";
   }
   delta = std::abs(pos1.z() - pos2.z());
   if (delta > tolerance) {
     fails = true;
-    error_message = error_message + "GeoPositions are different at z coordinate. " +
+    error_message = error_message + "InertialPositions are different at z coordinate. " +
                     "pos1.z(): " + std::to_string(pos1.z()) + " vs. " + "pos2.z(): " + std::to_string(pos2.z()) +
                     ", diff = " + std::to_string(delta) + ", tolerance = " + std::to_string(tolerance) + "\n";
   }

@@ -16,7 +16,7 @@ GTEST_TEST(TrafficLightBookTest, BasicTest) {
   const TrafficLight::Id id("my traffic light");
   std::vector<std::unique_ptr<BulbGroup>> empty_bulb_group{};
   auto traffic_light = std::make_unique<const TrafficLight>(
-      id, api::GeoPosition(10, 11, 12), api::Rotation::FromRpy(1, 2, 3), std::move(empty_bulb_group));
+      id, api::InertialPosition(10, 11, 12), api::Rotation::FromRpy(1, 2, 3), std::move(empty_bulb_group));
   const TrafficLight* traffic_light_ptr = traffic_light.get();
 
   TrafficLightBook dut;

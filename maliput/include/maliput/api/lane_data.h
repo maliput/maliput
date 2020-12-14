@@ -50,18 +50,18 @@ std::ostream& operator<<(std::ostream& out, const LaneEnd::Which& which_end);
 
 /// A position in 3-dimensional geographical Cartesian space, i.e., in the world
 /// frame, consisting of three components x, y, and z.
-class GeoPosition {
+class InertialPosition {
  public:
-  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(GeoPosition)
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(InertialPosition)
 
   /// Default constructor, initializing all components to zero.
-  GeoPosition() : xyz_(0., 0., 0.) {}
+  InertialPosition() : xyz_(0., 0., 0.) {}
 
   /// Fully parameterized constructor.
-  GeoPosition(double x, double y, double z) : xyz_(x, y, z) {}
+  InertialPosition(double x, double y, double z) : xyz_(x, y, z) {}
 
-  /// Constructs a GeoPosition from a 3-vector @p xyz of the form `[x, y, z]`.
-  static GeoPosition FromXyz(const math::Vector3& xyz) { return GeoPosition(xyz); }
+  /// Constructs a InertialPosition from a 3-vector @p xyz of the form `[x, y, z]`.
+  static InertialPosition FromXyz(const math::Vector3& xyz) { return InertialPosition(xyz); }
 
   /// Returns all components as 3-vector `[x, y, z]`.
   const math::Vector3& xyz() const { return xyz_; }
@@ -89,28 +89,34 @@ class GeoPosition {
   double length() const { return xyz_.norm(); }
 
   /// Return the Cartesian distance to geo_position.
-  double Distance(const GeoPosition& geo_position) const;
+  double Distance(const InertialPosition& geo_position) const;
 
   /// Equality operator.
-  bool operator==(const GeoPosition& rhs) const { return (this->xyz() == rhs.xyz()); }
+  bool operator==(const InertialPosition& rhs) const { return (this->xyz() == rhs.xyz()); }
 
   /// Inequality operator.
-  bool operator!=(const GeoPosition& rhs) const { return !(this->xyz() == rhs.xyz()); }
+  bool operator!=(const InertialPosition& rhs) const { return !(this->xyz() == rhs.xyz()); }
 
   /// Plus operator.
-  GeoPosition operator+(const GeoPosition& rhs) const { return GeoPosition::FromXyz(this->xyz() + rhs.xyz()); }
+  InertialPosition operator+(const InertialPosition& rhs) const {
+    return InertialPosition::FromXyz(this->xyz() + rhs.xyz());
+  }
 
   /// Minus operator.
-  GeoPosition operator-(const GeoPosition& rhs) const { return GeoPosition::FromXyz(this->xyz() - rhs.xyz()); }
+  InertialPosition operator-(const InertialPosition& rhs) const {
+    return InertialPosition::FromXyz(this->xyz() - rhs.xyz());
+  }
 
   /// Multiplication by scalar operator.
-  friend GeoPosition operator*(double lhs, const GeoPosition& rhs) { return GeoPosition::FromXyz(lhs * rhs.xyz()); }
+  friend InertialPosition operator*(double lhs, const InertialPosition& rhs) {
+    return InertialPosition::FromXyz(lhs * rhs.xyz());
+  }
 
   /// Multiplication by scalar operator.
-  GeoPosition operator*(double rhs) const { return GeoPosition::FromXyz(this->xyz() * rhs); }
+  InertialPosition operator*(double rhs) const { return InertialPosition::FromXyz(this->xyz() * rhs); }
 
  private:
-  explicit GeoPosition(const math::Vector3& xyz) : xyz_(xyz) {}
+  explicit InertialPosition(const math::Vector3& xyz) : xyz_(xyz) {}
 
   math::Vector3 xyz_;
 };
@@ -118,7 +124,7 @@ class GeoPosition {
 /// Streams a string representation of @p geo_position into @p out. Returns
 /// @p out. This method is provided for the purposes of debugging or
 /// text-logging. It is not intended for serialization.
-std::ostream& operator<<(std::ostream& out, const GeoPosition& geo_position);
+std::ostream& operator<<(std::ostream& out, const InertialPosition& geo_position);
 
 /// A 3-dimensional rotation.
 class Rotation {
@@ -170,8 +176,8 @@ class Rotation {
   /// Returns the yaw component of the Rotation (in radians).
   double yaw() const { return rpy().yaw_angle(); }
 
-  /// Returns the rotated `geo_position` GeoPosition in the World Frame.
-  GeoPosition Apply(const GeoPosition& geo_position) const;
+  /// Returns the rotated `geo_position` InertialPosition in the World Frame.
+  InertialPosition Apply(const InertialPosition& geo_position) const;
 
   /// Returns the rotation corresponding to "going the other way instead", i.e.,
   /// the orientation of (-s,-r,h). This is equivalent to a pre-rotation by PI
@@ -251,7 +257,7 @@ struct LanePositionResult {
   /// (measured by the Cartesian metric in the world frame).
   LanePosition lane_position;
   /// The position that exactly corresponds to `lane_position`.
-  GeoPosition nearest_position;
+  InertialPosition nearest_position;
   /// The Cartesian distance between `nearest_position` and the
   /// `geo_position` supplied to Lane::ToLanePosition().
   double distance{};
@@ -301,7 +307,7 @@ struct RoadPositionResult {
   /// The candidate RoadPosition.
   RoadPosition road_position;
   /// The position that exactly corresponds to `road_position`.
-  GeoPosition nearest_position;
+  InertialPosition nearest_position;
   /// The distance between `nearest_position` and the `geo_position` supplied
   /// to RoadGeometry::FindRoadPositions() or RoadGeometry::ToRoadPosition().
   double distance{};

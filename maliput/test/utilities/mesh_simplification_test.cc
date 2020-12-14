@@ -103,16 +103,16 @@ class GeoMeshSimplificationTest : public ::testing::Test {
   // simplified counterpart (simplified by merging coplanar faces
   // and removing redundant vertices).
   GeoMeshSimplificationTest() {
-    const GeoNormal kNormal(api::GeoPosition::FromXyz(kNormalVector));
-    const GeoVertex kVertexA(api::GeoPosition::FromXyz(kVertexAPosition));
-    const GeoVertex kVertexB(api::GeoPosition::FromXyz(kVertexBPosition));
-    const GeoVertex kVertexC(api::GeoPosition::FromXyz(kVertexCPosition));
-    const GeoVertex kVertexD(api::GeoPosition::FromXyz(kVertexDPosition));
-    const GeoVertex kVertexE(api::GeoPosition::FromXyz(kVertexEPosition));
-    const GeoVertex kVertexF(api::GeoPosition::FromXyz(kVertexFPosition));
-    const GeoVertex kVertexG(api::GeoPosition::FromXyz(kVertexGPosition));
-    const GeoVertex kVertexH(api::GeoPosition::FromXyz(kVertexHPosition));
-    const GeoVertex kVertexI(api::GeoPosition::FromXyz(kVertexIPosition));
+    const GeoNormal kNormal(api::InertialPosition::FromXyz(kNormalVector));
+    const GeoVertex kVertexA(api::InertialPosition::FromXyz(kVertexAPosition));
+    const GeoVertex kVertexB(api::InertialPosition::FromXyz(kVertexBPosition));
+    const GeoVertex kVertexC(api::InertialPosition::FromXyz(kVertexCPosition));
+    const GeoVertex kVertexD(api::InertialPosition::FromXyz(kVertexDPosition));
+    const GeoVertex kVertexE(api::InertialPosition::FromXyz(kVertexEPosition));
+    const GeoVertex kVertexF(api::InertialPosition::FromXyz(kVertexFPosition));
+    const GeoVertex kVertexG(api::InertialPosition::FromXyz(kVertexGPosition));
+    const GeoVertex kVertexH(api::InertialPosition::FromXyz(kVertexHPosition));
+    const GeoVertex kVertexI(api::InertialPosition::FromXyz(kVertexIPosition));
 
     GeoFace first_quad_face;
     first_quad_face.push_vn(kVertexA, kNormal);
@@ -453,7 +453,7 @@ TEST_F(GeoMeshSimplificationTest, FaceMerging) {
 TEST_F(GeoMeshSimplificationTest, MeshSimplification) {
   const std::string kDummyMaterial{"stone"};
   const int kPrecision{3};
-  const api::GeoPosition kOrigin(1., 2., 3.);
+  const api::InertialPosition kOrigin(1., 2., 3.);
   const int kZeroVertexIndexOffset{2};
   const int kZeroNormalIndexOffset{0};
   std::stringstream simplified_mesh_obj;

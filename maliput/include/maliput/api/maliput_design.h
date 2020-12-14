@@ -452,7 +452,7 @@
 ///
 /// @subsubsection basic_types Basic Types
 ///
-/// * `GeoPosition`
+/// * `InertialPosition`
 /// * `LanePosition`
 /// * `RoadPosition`
 /// * ...

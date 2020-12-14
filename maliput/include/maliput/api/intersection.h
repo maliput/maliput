@@ -86,7 +86,7 @@ class Intersection {
 
   /// Determines whether `geo_position` is within this Intersection::Region().
   ///
-  /// @param geo_position A GeoPosition in the World Frame.
+  /// @param geo_position A InertialPosition in the World Frame.
   /// @param road_geometry The RoadGeometry where Intersection::Region() is contained. It must not be nullptr.
   /// @returns True When `geo_position` is within Intersection::Region(). `geo_position` is contained if
   /// the distance to the closest LanePosition in Intersection::Region() is less or equal than the linear tolerance of
@@ -94,7 +94,7 @@ class Intersection {
   ///
   /// @throws common::assertion_error When `road_geometry` is nullptr.
   /// @throws common::assertion_error When Lanes in Intersection::Region() are not found in `road_geometry`.
-  bool Includes(const GeoPosition& geo_position, const RoadGeometry* road_geometry) const;
+  bool Includes(const InertialPosition& geo_position, const RoadGeometry* road_geometry) const;
 
   // TODO(liang.fok) Add method for obtaining the intersection's bounding box.
  private:

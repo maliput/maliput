@@ -67,19 +67,19 @@ class RoadGeometry {
   /// the RoadGeometry's object graph by their unique id's.
   const IdIndex& ById() const { return DoById(); }
 
-  /// Determines the RoadPosition corresponding to GeoPosition @p geo_position.
+  /// Determines the RoadPosition corresponding to InertialPosition @p geo_position.
   ///
   /// If @p hint is provided, its value is used to help determine the result.
   ///
   /// Returns a RoadPositionResult. Its RoadPosition is the point in the
   /// RoadGeometry's manifold which is, in the world frame, closest to
-  /// @p geo_position. Its GeoPosition is the world frame equivalent of the
+  /// @p geo_position. Its InertialPosition is the world frame equivalent of the
   /// RoadPosition and its distance is the Cartesian distance from
   /// @p geo_position to the nearest point.
   ///
   /// This method guarantees that its result satisfies the condition that
-  /// `result.lane->ToGeoPosition(result.pos)` is within `linear_tolerance()`
-  /// of the returned GeoPosition.
+  /// `result.lane->ToInertialPosition(result.pos)` is within `linear_tolerance()`
+  /// of the returned InertialPosition.
   ///
   /// The map from RoadGeometry to the world frame is not onto (as a bounded
   /// RoadGeometry cannot completely cover the unbounded Cartesian universe).
@@ -107,7 +107,7 @@ class RoadGeometry {
   //                          of an entity some small dT in the past, then one
   //                          might expect an updated RoadPosition which is
   //                          nearby (e.g., on the same Lane).
-  RoadPositionResult ToRoadPosition(const GeoPosition& geo_position,
+  RoadPositionResult ToRoadPosition(const InertialPosition& geo_position,
                                     const std::optional<RoadPosition>& hint = std::nullopt) const {
     return DoToRoadPosition(geo_position, hint);
   }
@@ -133,7 +133,7 @@ class RoadGeometry {
   /// Note that derivative implementations may choose to violate the above
   /// semantics for performance reasons. See docstrings of derivative
   /// implementations for details.
-  std::vector<RoadPositionResult> FindRoadPositions(const GeoPosition& geo_position, double radius) const {
+  std::vector<RoadPositionResult> FindRoadPositions(const InertialPosition& geo_position, double radius) const {
     MALIPUT_THROW_UNLESS(radius >= 0.);
     return DoFindRoadPositions(geo_position, radius);
   }
@@ -155,7 +155,7 @@ class RoadGeometry {
   std::vector<std::string> CheckInvariants() const;
 
   /// Samples `lane_s_route` at `path_length_sampling_rate` and converts those
-  /// LanePositions into GeoPositions.
+  /// LanePositions into InertialPositions.
   ///
   /// When `path_length_sampling_rate` is smaller than linear_tolerance, linear_tolerance
   /// will be used instead. When `path_length_sampling_rate` is bigger than total
@@ -165,14 +165,14 @@ class RoadGeometry {
   /// the last sampling step will be the remaining distance long only.
   ///
   /// @param lane_s_route A lane route.
-  /// @param path_length_sampling_rate The `s` coordinate sampling rate to sample `lane_s_route`. It must be postive.
-  /// @returns A vector of GeoPositions which result of mapping to the inertial frame
+  /// @param path_length_sampling_rate The `s` coordinate sampling rate to sample `lane_s_route`. It must be positive.
+  /// @returns A vector of InertialPositions which result of mapping to the inertial frame
   ///                the samples of LanePositions.
   /// @throws maliput::assertion_error When `path_length_sampling_rate` is not positive.
   /// @throws maliput::assertion_error When any LaneSRange in `lane_s_route.ranges()` refers to
   ///                an unknown Lane.
-  std::vector<GeoPosition> SampleAheadWaypoints(const LaneSRoute& lane_s_route,
-                                                double path_length_sampling_rate) const {
+  std::vector<InertialPosition> SampleAheadWaypoints(const LaneSRoute& lane_s_route,
+                                                     double path_length_sampling_rate) const {
     return DoSampleAheadWaypoints(lane_s_route, path_length_sampling_rate);
   }
 
@@ -196,10 +196,11 @@ class RoadGeometry {
 
   virtual const IdIndex& DoById() const = 0;
 
-  virtual RoadPositionResult DoToRoadPosition(const GeoPosition& geo_position,
+  virtual RoadPositionResult DoToRoadPosition(const InertialPosition& geo_position,
                                               const std::optional<RoadPosition>& hint) const = 0;
 
-  virtual std::vector<RoadPositionResult> DoFindRoadPositions(const GeoPosition& geo_position, double radius) const = 0;
+  virtual std::vector<RoadPositionResult> DoFindRoadPositions(const InertialPosition& geo_position,
+                                                              double radius) const = 0;
 
   virtual double do_linear_tolerance() const = 0;
 
@@ -207,7 +208,8 @@ class RoadGeometry {
 
   virtual double do_scale_length() const = 0;
 
-  virtual std::vector<GeoPosition> DoSampleAheadWaypoints(const LaneSRoute&, double path_length_sampling_rate) const;
+  virtual std::vector<InertialPosition> DoSampleAheadWaypoints(const LaneSRoute&,
+                                                               double path_length_sampling_rate) const;
   ///@}
 };
 

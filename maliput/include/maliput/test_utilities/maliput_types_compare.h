@@ -8,15 +8,16 @@ namespace maliput {
 namespace api {
 namespace test {
 
-// Compares equality within @p tolerance deviation of two GeoPosition objects.
-// @param pos1 A GeoPosition object to compare.
-// @param pos2 A GeoPosition object to compare.
-// @param tolerance An allowable absolute deviation for each GeoPosition's
+// Compares equality within @p tolerance deviation of two InertialPosition objects.
+// @param pos1 A InertialPosition object to compare.
+// @param pos2 A InertialPosition object to compare.
+// @param tolerance An allowable absolute deviation for each InertialPosition's
 // coordinate.
-// @return ::testing::AssertionFailure() When GeoPosition objects are different.
-// @return ::testing::AssertionSuccess() When GeoPosition objects are within
+// @return ::testing::AssertionFailure() When InertialPosition objects are different.
+// @return ::testing::AssertionSuccess() When InertialPosition objects are within
 // the @p tolerance deviation.
-::testing::AssertionResult IsGeoPositionClose(const GeoPosition& pos1, const GeoPosition& pos2, double tolerance);
+::testing::AssertionResult IsInertialPositionClose(const InertialPosition& pos1, const InertialPosition& pos2,
+                                                   double tolerance);
 
 // Compares equality within @p tolerance deviation of two LanePosition objects.
 // @param pos1 A LanePosition object to compare.

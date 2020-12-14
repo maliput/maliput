@@ -55,7 +55,7 @@ struct ObjFeatures {
   /// Height of rendered branch-point arrows
   double branch_point_height{0.5};
   /// Origin of OBJ coordinates relative to world-frame
-  api::GeoPosition origin{0., 0., 0.};
+  api::InertialPosition origin{0., 0., 0.};
   /// ID's of specific segments to be highlighted.  (If non-empty, then the
   /// Segments *not* specified on this list will be rendered as grayed-out.)
   std::vector<api::SegmentId> highlighted_segments;

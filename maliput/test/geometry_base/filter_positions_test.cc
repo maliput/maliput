@@ -19,8 +19,8 @@ GTEST_TEST(FilterRoadPositionResultsTest, FilterRoadPositionResults) {
   const api::Lane* kMockLane2{reinterpret_cast<const api::Lane*>(0xDeadC0de)};
 
   const std::vector<api::RoadPositionResult> unfiltered_positions{
-      {api::RoadPosition{kMockLane1, api::LanePosition{1., 2., 3}}, api::GeoPosition{4., 5., 6.}, 0.},
-      {api::RoadPosition{kMockLane2, api::LanePosition{7., 8., 9}}, api::GeoPosition{1., 2., 3.}, 1.},
+      {api::RoadPosition{kMockLane1, api::LanePosition{1., 2., 3}}, api::InertialPosition{4., 5., 6.}, 0.},
+      {api::RoadPosition{kMockLane2, api::LanePosition{7., 8., 9}}, api::InertialPosition{1., 2., 3.}, 1.},
   };
 
   const auto filter_always_true = [](const api::RoadPositionResult&) { return true; };
@@ -37,14 +37,14 @@ GTEST_TEST(FilterRoadPositionResultsTest, FilterRoadPositionResults) {
   EXPECT_EQ(result[0].road_position.lane, unfiltered_positions[0].road_position.lane);
   EXPECT_TRUE(api::test::IsLanePositionClose(result[0].road_position.pos, unfiltered_positions[0].road_position.pos,
                                              kZeroTolerance));
-  EXPECT_TRUE(api::test::IsGeoPositionClose(result[0].nearest_position, unfiltered_positions[0].nearest_position,
-                                            kZeroTolerance));
+  EXPECT_TRUE(api::test::IsInertialPositionClose(result[0].nearest_position, unfiltered_positions[0].nearest_position,
+                                                 kZeroTolerance));
   EXPECT_NEAR(result[0].distance, unfiltered_positions[0].distance, kZeroTolerance);
   EXPECT_EQ(result[1].road_position.lane, unfiltered_positions[1].road_position.lane);
   EXPECT_TRUE(api::test::IsLanePositionClose(result[1].road_position.pos, unfiltered_positions[1].road_position.pos,
                                              kZeroTolerance));
-  EXPECT_TRUE(api::test::IsGeoPositionClose(result[1].nearest_position, unfiltered_positions[1].nearest_position,
-                                            kZeroTolerance));
+  EXPECT_TRUE(api::test::IsInertialPositionClose(result[1].nearest_position, unfiltered_positions[1].nearest_position,
+                                                 kZeroTolerance));
   EXPECT_NEAR(result[1].distance, unfiltered_positions[1].distance, kZeroTolerance);
 
   result = FilterRoadPositionResults(unfiltered_positions, filter_lane_1);
@@ -52,8 +52,8 @@ GTEST_TEST(FilterRoadPositionResultsTest, FilterRoadPositionResults) {
   EXPECT_EQ(result[0].road_position.lane, unfiltered_positions[1].road_position.lane);
   EXPECT_TRUE(api::test::IsLanePositionClose(result[0].road_position.pos, unfiltered_positions[1].road_position.pos,
                                              kZeroTolerance));
-  EXPECT_TRUE(api::test::IsGeoPositionClose(result[0].nearest_position, unfiltered_positions[1].nearest_position,
-                                            kZeroTolerance));
+  EXPECT_TRUE(api::test::IsInertialPositionClose(result[0].nearest_position, unfiltered_positions[1].nearest_position,
+                                                 kZeroTolerance));
   EXPECT_NEAR(result[0].distance, unfiltered_positions[1].distance, kZeroTolerance);
 }
 

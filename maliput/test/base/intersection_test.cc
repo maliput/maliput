@@ -87,23 +87,23 @@ TEST_F(IntersectionTest, BasicTest) {
 }
 
 TEST_F(IntersectionTest, IncludesByGeoPos) {
-  const api::GeoPosition kGeoPos{11.8, 89., 1.};
+  const api::InertialPosition kGeoPos{11.8, 89., 1.};
   ManualPhaseProvider phase_provider;
   {
     const Intersection dut(kIntersectionId, ranges_a, dummy_ring_, &phase_provider);
-    EXPECT_TRUE(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()));
+    EXPECT_TRUE(dut.Includes(api::InertialPosition{11.8, 89., 1.}, road_geometry.get()));
   }
   {
     const Intersection dut(kIntersectionId, ranges_b, dummy_ring_, &phase_provider);
-    EXPECT_FALSE(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()));
+    EXPECT_FALSE(dut.Includes(api::InertialPosition{11.8, 89., 1.}, road_geometry.get()));
   }
   {
     const Intersection dut(kIntersectionId, ranges_c, dummy_ring_, &phase_provider);
-    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, road_geometry.get()), common::assertion_error);
+    EXPECT_THROW(dut.Includes(api::InertialPosition{11.8, 89., 1.}, road_geometry.get()), common::assertion_error);
   }
   {
     const Intersection dut(kIntersectionId, ranges_c, dummy_ring_, &phase_provider);
-    EXPECT_THROW(dut.Includes(api::GeoPosition{11.8, 89., 1.}, nullptr), common::assertion_error);
+    EXPECT_THROW(dut.Includes(api::InertialPosition{11.8, 89., 1.}, nullptr), common::assertion_error);
   }
 }
 

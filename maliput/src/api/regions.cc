@@ -23,8 +23,8 @@ bool IsContiguous(const LaneSRange& lane_range_a, const LaneSRange& lane_range_b
   const Lane* lane_b = road_geometry->ById().GetLane(lane_range_b.lane_id());
   MALIPUT_THROW_UNLESS(lane_b != nullptr);
   // Evaluates G1 contiguity at the end and start of `lane_a` and `lane_b` respectively.
-  const GeoPosition geo_position_a = lane_a->ToGeoPosition(LanePosition(lane_range_a.s_range().s1(), 0, 0));
-  const GeoPosition geo_position_b = lane_b->ToGeoPosition(LanePosition(lane_range_b.s_range().s0(), 0, 0));
+  const InertialPosition geo_position_a = lane_a->ToInertialPosition(LanePosition(lane_range_a.s_range().s1(), 0, 0));
+  const InertialPosition geo_position_b = lane_b->ToInertialPosition(LanePosition(lane_range_b.s_range().s0(), 0, 0));
   const Rotation lane_a_rot = lane_a->GetOrientation(LanePosition(lane_range_a.s_range().s1(), 0, 0));
   const Rotation lane_b_rot = lane_b->GetOrientation(LanePosition(lane_range_b.s_range().s0(), 0, 0));
   return geo_position_a.Distance(geo_position_b) < road_geometry->linear_tolerance() &&
@@ -90,7 +90,7 @@ bool LaneSRoute::Intersects(const LaneSRoute& lane_s_route, double tolerance) co
   return false;
 }
 
-bool IsIncluded(const GeoPosition& geo_position, const std::vector<LaneSRange>& lane_s_ranges,
+bool IsIncluded(const InertialPosition& geo_position, const std::vector<LaneSRange>& lane_s_ranges,
                 const RoadGeometry* road_geometry) {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
   MALIPUT_THROW_UNLESS(!lane_s_ranges.empty());

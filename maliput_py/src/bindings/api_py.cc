@@ -21,9 +21,9 @@ PYBIND11_MODULE(api, m) {
       .def(py::init<std::string>())
       .def("string", &api::RoadGeometryId::string, py::return_value_policy::reference_internal);
 
-  py::class_<api::GeoPosition>(m, "GeoPosition")
+  py::class_<api::InertialPosition>(m, "InertialPosition")
       .def(py::init<double, double, double>(), py::arg("x"), py::arg("y"), py::arg("z"))
-      .def("xyz", &api::GeoPosition::xyz, py::return_value_policy::reference_internal);
+      .def("xyz", &api::InertialPosition::xyz, py::return_value_policy::reference_internal);
 
   py::class_<api::LanePosition>(m, "LanePosition")
       .def(py::init<double, double, double>(), py::arg("s"), py::arg("r"), py::arg("h"))
@@ -31,7 +31,7 @@ PYBIND11_MODULE(api, m) {
 
   py::class_<api::LanePositionResult>(m, "LanePositionResult")
       .def(py::init<>())
-      .def(py::init<const api::LanePosition&, const api::GeoPosition&, double>(), py::arg("lane_position"),
+      .def(py::init<const api::LanePosition&, const api::InertialPosition&, double>(), py::arg("lane_position"),
            py::arg("nearest_position"), py::arg("distance"))
       .def_readwrite("lane_position", &api::LanePositionResult::lane_position)
       .def_readwrite("nearest_position", &api::LanePositionResult::nearest_position)
@@ -80,7 +80,7 @@ PYBIND11_MODULE(api, m) {
 
   py::class_<api::Lane>(m, "Lane")
       .def("ToLanePosition", &api::Lane::ToLanePosition)
-      .def("ToGeoPosition", &api::Lane::ToGeoPosition)
+      .def("ToInertialPosition", &api::Lane::ToInertialPosition)
       .def("GetOrientation", &api::Lane::GetOrientation)
       .def("length", &api::Lane::length)
       .def("id", &api::Lane::id);

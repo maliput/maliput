@@ -71,7 +71,7 @@ GTEST_TEST(LanePositionTest, ComponentSetters) {
 #undef CHECK_ALL_LANE_POSITION_ACCESSORS
 
 // TODO(jadecastro) Use CompareMatrices() to implement the
-// GeoPosition::xyz() accessor checks once AutoDiff supported.
+// InertialPosition::xyz() accessor checks once AutoDiff supported.
 #define CHECK_ALL_GEO_POSITION_ACCESSORS(dut, _x, _y, _z) \
   do {                                                    \
     EXPECT_EQ(dut.x(), _x);                               \
@@ -83,35 +83,35 @@ GTEST_TEST(LanePositionTest, ComponentSetters) {
     EXPECT_EQ(dut.xyz().z(), _z);                         \
   } while (0)
 
-GTEST_TEST(GeoPositionTest, DefaultConstructor) {
+GTEST_TEST(InertialPositionTest, DefaultConstructor) {
   // Check that default constructor obeys its contract.
-  const GeoPosition dut;
+  const InertialPosition dut;
   CHECK_ALL_GEO_POSITION_ACCESSORS(dut, 0., 0., 0.);
 }
 
-GTEST_TEST(GeoPositionTest, ParameterizedConstructor) {
+GTEST_TEST(InertialPositionTest, ParameterizedConstructor) {
   // Check the fully-parameterized constructor.
-  const GeoPosition dut(kX0, kX1, kX2);
+  const InertialPosition dut(kX0, kX1, kX2);
   CHECK_ALL_GEO_POSITION_ACCESSORS(dut, kX0, kX1, kX2);
 }
 
-GTEST_TEST(GeoPositionTest, ConstructionFromVector) {
+GTEST_TEST(InertialPositionTest, ConstructionFromVector) {
   // Check the conversion-construction from a 3-vector.
-  const GeoPosition dut = GeoPosition::FromXyz(math::Vector3(kX0, kX1, kX2));
+  const InertialPosition dut = InertialPosition::FromXyz(math::Vector3(kX0, kX1, kX2));
   CHECK_ALL_GEO_POSITION_ACCESSORS(dut, kX0, kX1, kX2);
 }
 
-GTEST_TEST(GeoPositionTest, VectorSetter) {
+GTEST_TEST(InertialPositionTest, VectorSetter) {
   // Check the vector-based setter.
-  GeoPosition dut(kX0, kX1, kX2);
+  InertialPosition dut(kX0, kX1, kX2);
   const math::Vector3 xyz(9., 7., 8.);
   dut.set_xyz(xyz);
   CHECK_ALL_GEO_POSITION_ACCESSORS(dut, xyz.x(), xyz.y(), xyz.z());
 }
 
-GTEST_TEST(GeoPositionTest, ComponentSetters) {
+GTEST_TEST(InertialPositionTest, ComponentSetters) {
   // Check the individual component setters.
-  GeoPosition dut(0.1, 0.2, 0.3);
+  InertialPosition dut(0.1, 0.2, 0.3);
 
   dut.set_x(99.);
   CHECK_ALL_GEO_POSITION_ACCESSORS(dut, 99., 0.2, 0.3);
@@ -125,54 +125,54 @@ GTEST_TEST(GeoPositionTest, ComponentSetters) {
 
 #undef CHECK_ALL_GEO_POSITION_ACCESSORS
 
-GTEST_TEST(GeoPositionTest, EqualityInequalityOperators) {
+GTEST_TEST(InertialPositionTest, EqualityInequalityOperators) {
   // Checks that equality is true iff the constituent components are all equal,
   // and that inequality is true otherwise.
-  const GeoPosition gp1(0.1, 0.2, 0.3);
-  const GeoPosition gp2(0.1, 0.2, 0.3);
+  const InertialPosition gp1(0.1, 0.2, 0.3);
+  const InertialPosition gp2(0.1, 0.2, 0.3);
 
   EXPECT_TRUE(gp1 == gp2);
   EXPECT_FALSE(gp1 != gp2);
 
-  const GeoPosition gp_xerror(gp2.x() + 1e-6, gp2.y(), gp2.z());
+  const InertialPosition gp_xerror(gp2.x() + 1e-6, gp2.y(), gp2.z());
   EXPECT_FALSE(gp1 == gp_xerror);
   EXPECT_TRUE(gp1 != gp_xerror);
-  const GeoPosition gp_yerror(gp2.x(), gp2.y() + 1e-6, gp2.z());
+  const InertialPosition gp_yerror(gp2.x(), gp2.y() + 1e-6, gp2.z());
   EXPECT_FALSE(gp1 == gp_yerror);
   EXPECT_TRUE(gp1 != gp_xerror);
-  const GeoPosition gp_zerror(gp2.x(), gp2.y(), gp2.z() + 1e-6);
+  const InertialPosition gp_zerror(gp2.x(), gp2.y(), gp2.z() + 1e-6);
   EXPECT_FALSE(gp1 == gp_zerror);
   EXPECT_TRUE(gp1 != gp_xerror);
 }
 
-GTEST_TEST(GeoPositionTest, Length) {
+GTEST_TEST(InertialPositionTest, Length) {
   // Check length of the vector.
-  const GeoPosition dut(3., 4., 0.);
+  const InertialPosition dut(3., 4., 0.);
   EXPECT_EQ(dut.length(), 5.);
 }
 
-GTEST_TEST(GeoPositionTest, VectorArithmeticOperators) {
+GTEST_TEST(InertialPositionTest, VectorArithmeticOperators) {
   // Check vector arithmetic operators +/- and multiply by scalar.
-  const GeoPosition gp1(1., 2., 3.);
-  const GeoPosition gp2(4., 5., 6.);
+  const InertialPosition gp1(1., 2., 3.);
+  const InertialPosition gp2(4., 5., 6.);
 
-  GeoPosition dut = gp1 + gp2;
-  EXPECT_TRUE(dut == GeoPosition(5., 7., 9.));
+  InertialPosition dut = gp1 + gp2;
+  EXPECT_TRUE(dut == InertialPosition(5., 7., 9.));
   dut = gp1 - gp2;
-  EXPECT_TRUE(dut == GeoPosition(-3., -3., -3.));
+  EXPECT_TRUE(dut == InertialPosition(-3., -3., -3.));
   dut = 2. * gp1;
-  EXPECT_TRUE(dut == GeoPosition(2., 4., 6.));
+  EXPECT_TRUE(dut == InertialPosition(2., 4., 6.));
   dut = gp1 * 3.;
-  EXPECT_TRUE(dut == GeoPosition(3., 6., 9.));
+  EXPECT_TRUE(dut == InertialPosition(3., 6., 9.));
 }
 
-GTEST_TEST(GeoPosition, DistanceTest) {
+GTEST_TEST(InertialPosition, DistanceTest) {
   // Check the `Distance` method.
   // Test compared to the following python script.
   // >>> import math as m
   // >>> print(m.sqrt((66-25)**2 + ((90-85)**2) + ((-25-12)**2)))
   const double kLinearTolerance = 1e-15;
-  const GeoPosition dut(25., 85., 12.);
+  const InertialPosition dut(25., 85., 12.);
   EXPECT_NEAR(dut.Distance({66.0, 90.0, -25.0}), 55.452682532047085, kLinearTolerance);
 }
 
@@ -272,9 +272,9 @@ GTEST_TEST(Rotation, ApplyTest) {
   // Tolerance has been empirically found for these testing values.
   const double kRotationTolerance = 1e-8;
   const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
-  const GeoPosition geo_position = dut.Apply({15., 33., 148.});
-  EXPECT_TRUE(
-      test::IsGeoPositionClose(geo_position, GeoPosition{43.93919835, -145.60056097, -9.37141893}, kRotationTolerance));
+  const InertialPosition geo_position = dut.Apply({15., 33., 148.});
+  EXPECT_TRUE(test::IsInertialPositionClose(geo_position, InertialPosition{43.93919835, -145.60056097, -9.37141893},
+                                            kRotationTolerance));
 }
 
 GTEST_TEST(Rotation, DistanceTest) {

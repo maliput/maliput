@@ -15,7 +15,7 @@
 #include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
 
-using maliput::api::GeoPosition;
+using maliput::api::InertialPosition;
 using maliput::api::Rotation;
 using maliput::api::rules::Bulb;
 using maliput::api::rules::BulbColor;
@@ -28,8 +28,8 @@ using maliput::api::rules::UniqueBulbId;
 namespace YAML {
 
 template <>
-struct convert<GeoPosition> {
-  static Node encode(const GeoPosition& rhs) {
+struct convert<InertialPosition> {
+  static Node encode(const InertialPosition& rhs) {
     Node node;
     node.push_back(rhs.x());
     node.push_back(rhs.y());
@@ -41,7 +41,7 @@ struct convert<GeoPosition> {
   // information:
   // https://github.com/jbeder/yaml-cpp/wiki/Tutorial#converting-tofrom-native-data-types
   // NOLINTNEXTLINE(runtime/references).
-  static bool decode(const Node& node, GeoPosition& rhs) {
+  static bool decode(const Node& node, InertialPosition& rhs) {
     if (!node.IsSequence() || node.size() != 3) {
       return false;
     }
@@ -224,7 +224,7 @@ std::unique_ptr<Bulb> BuildBulb(const YAML::Node& bulb_node) {
   MALIPUT_THROW_UNLESS(pose_node.IsMap());
   MALIPUT_THROW_UNLESS(pose_node["position_bulb_group"].IsDefined());
   MALIPUT_THROW_UNLESS(pose_node["orientation_bulb_group"].IsDefined());
-  const GeoPosition position_bulb_group = pose_node["position_bulb_group"].as<GeoPosition>();
+  const InertialPosition position_bulb_group = pose_node["position_bulb_group"].as<InertialPosition>();
   const Rotation orientation_bulb_group = pose_node["orientation_bulb_group"].as<Rotation>();
 
   const YAML::Node& bounding_box_node = bulb_node["BoundingBox"];
@@ -269,7 +269,7 @@ std::unique_ptr<BulbGroup> BuildBulbGroup(const YAML::Node& bulb_group_node) {
   MALIPUT_THROW_UNLESS(pose_node.IsMap());
   MALIPUT_THROW_UNLESS(pose_node["position_traffic_light"].IsDefined());
   MALIPUT_THROW_UNLESS(pose_node["orientation_traffic_light"].IsDefined());
-  const GeoPosition position_traffic_light = pose_node["position_traffic_light"].as<GeoPosition>();
+  const InertialPosition position_traffic_light = pose_node["position_traffic_light"].as<InertialPosition>();
   const Rotation orientation_traffic_light = pose_node["orientation_traffic_light"].as<Rotation>();
   const YAML::Node& bulbs_node = bulb_group_node["Bulbs"];
   MALIPUT_THROW_UNLESS(bulbs_node.IsDefined());
@@ -289,7 +289,7 @@ std::unique_ptr<TrafficLight> BuildTrafficLight(const YAML::Node& traffic_light_
   MALIPUT_THROW_UNLESS(pose_node.IsMap());
   MALIPUT_THROW_UNLESS(pose_node["position_road_network"].IsDefined());
   MALIPUT_THROW_UNLESS(pose_node["orientation_road_network"].IsDefined());
-  const GeoPosition position_road_network = pose_node["position_road_network"].as<GeoPosition>();
+  const InertialPosition position_road_network = pose_node["position_road_network"].as<InertialPosition>();
   const Rotation orientation_road_network = pose_node["orientation_road_network"].as<Rotation>();
 
   const YAML::Node& bulb_groups_node = traffic_light_node["BulbGroups"];
