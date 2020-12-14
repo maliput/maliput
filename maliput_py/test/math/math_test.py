@@ -1,15 +1,25 @@
+#!/usr/bin/env python3
+#
+# Copyright 2020 Toyota Research Institute
+#
+
+"""Unit tests for the math python binding"""
+
 import math as m
 import unittest
 
 from maliput.math import (
-  RollPitchYaw,
-  Quaternion,
-  Vector3,
-  Vector4,
+    RollPitchYaw,
+    Quaternion,
+    Vector3,
+    Vector4,
 )
 
-class TestMaliput(unittest.TestCase):
 
+class TestMaliput(unittest.TestCase):
+    """
+    Unit tests for the math python binding
+    """
     def test_vector3(self):
         '''
         Evaluates the constructor and accessors.
