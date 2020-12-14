@@ -48,9 +48,9 @@ target_link_libraries(math_py
 
 message(STATUS "********* ${PYTHON_INSTALL_DIR}")
 install(TARGETS api_py
-  DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}"
+  DESTINATION "${PYTHON_INSTALL_DIR}/maliput"
 )
 
 install(TARGETS math_py
-  DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}"
+  DESTINATION "${PYTHON_INSTALL_DIR}/maliput"
 )

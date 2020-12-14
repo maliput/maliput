@@ -27,7 +27,7 @@ set(BUILD_SHARED_LIBS true)
 include(${PROJECT_SOURCE_DIR}/../cmake/DefaultCFlags.cmake)
 include(${PROJECT_SOURCE_DIR}/../cmake/SanitizersConfig.cmake)
 
-ament_python_install_package(${PROJECT_NAME})
+ament_python_install_package("maliput")
 
 ament_environment_hooks(
   "${ament_cmake_package_templates_ENVIRONMENT_HOOK_LIBRARY_PATH}"
