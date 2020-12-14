@@ -19,8 +19,8 @@ for ( pipeline in pipelines ) {
             stage('[' + branchName + ']' + 'checkout_index') {
               sh 'src/maliput/ci/jenkins/checkout_index'
             }
-            withEnv(['COLCON_BUILD_EXTRA_ARGS=--packages-up-to maliput',
-                    'COLCON_TEST_EXTRA_ARGS=--packages-up-to maliput']) {
+            withEnv(['COLCON_BUILD_EXTRA_ARGS=--packages-up-to maliput maliput_py',
+                    'COLCON_TEST_EXTRA_ARGS=--packages-up-to maliput maliput_py']) {
               load './index/ci/jenkins/pipeline_' + branchName + '.groovy'
             }
           } finally {

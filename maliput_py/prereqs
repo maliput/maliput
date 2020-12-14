@@ -11,7 +11,7 @@ set -e pipefail
 
 source prereqs.lib
 
-prereqs.init 'The Maliput source distribution prerequisite setup script'
+prereqs.init 'The maliput_py source distribution prerequisite setup script'
 
 if prereqs.tag_applies "default|all"; then
     prereqs.assert_sudo

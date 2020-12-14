@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(maliput LANGUAGES C CXX VERSION 3.0.0)
+project(maliput_py LANGUAGES C CXX VERSION 3.0.0)
 
 ##############################################################################
 # Find 3rd Party Packages
@@ -12,9 +12,9 @@ project(maliput LANGUAGES C CXX VERSION 3.0.0)
 message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
 find_package(ament_cmake REQUIRED)
-find_package(fmt 4.0.0 EXACT REQUIRED)
-find_package(gflags REQUIRED)
-find_package(yaml-cpp REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(maliput REQUIRED)
+find_package(pybind11 REQUIRED)
 
 ##############################################################################
 # Project Configuration
@@ -27,6 +27,8 @@ set(BUILD_SHARED_LIBS true)
 include(${PROJECT_SOURCE_DIR}/../cmake/DefaultCFlags.cmake)
 include(${PROJECT_SOURCE_DIR}/../cmake/SanitizersConfig.cmake)
 
+ament_python_install_package("maliput")
+
 ament_environment_hooks(
   "${ament_cmake_package_templates_ENVIRONMENT_HOOK_LIBRARY_PATH}"
 )
@@ -34,7 +36,6 @@ ament_environment_hooks(
 ##############################################################################
 # Sources
 ##############################################################################
-add_subdirectory(include)
 add_subdirectory(src)
 
 ##############################################################################
@@ -58,7 +59,7 @@ endif()
 
 if(BUILD_DOCS)
   find_package(ament_cmake_doxygen REQUIRED)
-  ament_doxygen_generate(doxygen_maliput
+  ament_doxygen_generate(doxygen_maliput_py
     CONFIG_OVERLAY doc/Doxyfile.overlay.in
   )
 endif()
@@ -68,13 +69,9 @@ endif()
 ##############################################################################
 
 install(
-  DIRECTORY include/
-  DESTINATION include
+  PROGRAMS prereqs
+  DESTINATION share
 )
 
-ament_export_include_directories(include)
-
 ament_export_dependencies(ament_cmake)
-ament_export_dependencies(yaml-cpp)
-ament_export_interfaces(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 ament_package()
