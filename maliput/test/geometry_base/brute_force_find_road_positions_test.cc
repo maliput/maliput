@@ -39,24 +39,25 @@ class BruteForceTest : public ::testing::Test {
 
 class InertialPositionMatcher : public MatcherInterface<const api::InertialPosition&> {
  public:
-  InertialPositionMatcher(const api::InertialPosition& geo_position, double tolerance)
-      : geo_position_(geo_position), tolerance_(tolerance) {}
+  InertialPositionMatcher(const api::InertialPosition& inertial_position, double tolerance)
+      : inertial_position_(inertial_position), tolerance_(tolerance) {}
 
   bool MatchAndExplain(const api::InertialPosition& other, MatchResultListener*) const override {
-    return maliput::api::test::IsInertialPositionClose(geo_position_, other, tolerance_);
+    return maliput::api::test::IsInertialPositionClose(inertial_position_, other, tolerance_);
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within tolerance: [" << tolerance_ << "] of all x, y, and z coordinates in: [" << geo_position_ << "].";
+    *os << "is within tolerance: [" << tolerance_ << "] of all x, y, and z coordinates in: [" << inertial_position_
+        << "].";
   }
 
  private:
-  const api::InertialPosition geo_position_;
+  const api::InertialPosition inertial_position_;
   const double tolerance_{};
 };
 
-Matcher<const api::InertialPosition&> Matches(const api::InertialPosition& geo_position, double tolerance) {
-  return MakeMatcher(new InertialPositionMatcher(geo_position, tolerance));
+Matcher<const api::InertialPosition&> Matches(const api::InertialPosition& inertial_position, double tolerance) {
+  return MakeMatcher(new InertialPositionMatcher(inertial_position, tolerance));
 }
 
 class LaneMock final : public MockLane {

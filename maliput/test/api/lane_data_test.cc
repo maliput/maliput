@@ -267,14 +267,14 @@ GTEST_TEST(Rotation, ApplyTest) {
   // >>>     rz = np.matrix([[ca_y, -sa_y, 0], [sa_y, ca_y, 0], [0, 0, 1]])
   // >>>     return (rz * ry * rx)
   // >>> rot_mat = rotation_matrix(1.75,2.91,0.38)
-  // >>> geo_position = np.matrix([[15.],[33.],[148.]])
-  // >>> print (rot_mat*geo_position)
+  // >>> inertial_position = np.matrix([[15.],[33.],[148.]])
+  // >>> print (rot_mat*inertial_position)
   // Tolerance has been empirically found for these testing values.
   const double kRotationTolerance = 1e-8;
   const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
-  const InertialPosition geo_position = dut.Apply({15., 33., 148.});
-  EXPECT_TRUE(test::IsInertialPositionClose(geo_position, InertialPosition{43.93919835, -145.60056097, -9.37141893},
-                                            kRotationTolerance));
+  const InertialPosition inertial_position = dut.Apply({15., 33., 148.});
+  EXPECT_TRUE(test::IsInertialPositionClose(
+      inertial_position, InertialPosition{43.93919835, -145.60056097, -9.37141893}, kRotationTolerance));
 }
 
 GTEST_TEST(Rotation, DistanceTest) {

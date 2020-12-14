@@ -88,8 +88,8 @@ class InertialPosition {
   /// Returns L^2 norm of 3-vector.
   double length() const { return xyz_.norm(); }
 
-  /// Return the Cartesian distance to geo_position.
-  double Distance(const InertialPosition& geo_position) const;
+  /// Return the Cartesian distance to inertial_position.
+  double Distance(const InertialPosition& inertial_position) const;
 
   /// Equality operator.
   bool operator==(const InertialPosition& rhs) const { return (this->xyz() == rhs.xyz()); }
@@ -121,10 +121,10 @@ class InertialPosition {
   math::Vector3 xyz_;
 };
 
-/// Streams a string representation of @p geo_position into @p out. Returns
+/// Streams a string representation of @p inertial_position into @p out. Returns
 /// @p out. This method is provided for the purposes of debugging or
 /// text-logging. It is not intended for serialization.
-std::ostream& operator<<(std::ostream& out, const InertialPosition& geo_position);
+std::ostream& operator<<(std::ostream& out, const InertialPosition& inertial_position);
 
 /// A 3-dimensional rotation.
 class Rotation {
@@ -176,8 +176,8 @@ class Rotation {
   /// Returns the yaw component of the Rotation (in radians).
   double yaw() const { return rpy().yaw_angle(); }
 
-  /// Returns the rotated `geo_position` InertialPosition in the World Frame.
-  InertialPosition Apply(const InertialPosition& geo_position) const;
+  /// Returns the rotated `inertial_position` InertialPosition in the World Frame.
+  InertialPosition Apply(const InertialPosition& inertial_position) const;
 
   /// Returns the rotation corresponding to "going the other way instead", i.e.,
   /// the orientation of (-s,-r,h). This is equivalent to a pre-rotation by PI
@@ -253,13 +253,13 @@ class LanePosition {
 /// Included in the return result of Lane::ToLanePosition().
 struct LanePositionResult {
   /// The candidate LanePosition within the Lane' segment-bounds which
-  /// is closest to a `geo_position` supplied to Lane::ToLanePosition()
+  /// is closest to a `inertial_position` supplied to Lane::ToLanePosition()
   /// (measured by the Cartesian metric in the world frame).
   LanePosition lane_position;
   /// The position that exactly corresponds to `lane_position`.
   InertialPosition nearest_position;
   /// The Cartesian distance between `nearest_position` and the
-  /// `geo_position` supplied to Lane::ToLanePosition().
+  /// `inertial_position` supplied to Lane::ToLanePosition().
   double distance{};
 };
 
@@ -308,7 +308,7 @@ struct RoadPositionResult {
   RoadPosition road_position;
   /// The position that exactly corresponds to `road_position`.
   InertialPosition nearest_position;
-  /// The distance between `nearest_position` and the `geo_position` supplied
+  /// The distance between `nearest_position` and the `inertial_position` supplied
   /// to RoadGeometry::FindRoadPositions() or RoadGeometry::ToRoadPosition().
   double distance{};
 };

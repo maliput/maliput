@@ -11,7 +11,7 @@ namespace maliput {
 namespace geometry_base {
 
 std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrategy(
-    const maliput::api::RoadGeometry* rg, const maliput::api::InertialPosition& geo_position, double radius) {
+    const maliput::api::RoadGeometry* rg, const maliput::api::InertialPosition& inertial_position, double radius) {
   MALIPUT_THROW_UNLESS(rg != nullptr);
   MALIPUT_THROW_UNLESS(radius >= 0.);
 
@@ -27,7 +27,7 @@ std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrateg
         const api::Lane* lane = segment->lane(k);
         MALIPUT_THROW_UNLESS(lane != nullptr);
         maliput::api::InertialPosition nearest_position;
-        const maliput::api::LanePositionResult result = lane->ToLanePosition(geo_position);
+        const maliput::api::LanePositionResult result = lane->ToLanePosition(inertial_position);
         if (radius == std::numeric_limits<double>::infinity() || result.distance <= radius) {
           road_position_results.push_back(
               {api::RoadPosition(lane, result.lane_position), result.nearest_position, result.distance});

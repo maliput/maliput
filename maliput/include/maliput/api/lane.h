@@ -99,12 +99,14 @@ class Lane {
   ///      derived from Lane::segment_bounds().
   InertialPosition ToInertialPosition(const LanePosition& lane_pos) const { return DoToInertialPosition(lane_pos); }
 
-  /// Determines the LanePosition corresponding to InertialPosition @p geo_pos.
+  /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
   ///
   /// This method guarantees that its result satisfies the condition that
   /// `ToInertialPosition(result.lane_position)` is within `linear_tolerance()`
   ///  of `result.nearest_position`.
-  LanePositionResult ToLanePosition(const InertialPosition& geo_pos) const { return DoToLanePosition(geo_pos); }
+  LanePositionResult ToLanePosition(const InertialPosition& inertial_pos) const {
+    return DoToLanePosition(inertial_pos);
+  }
 
   // TODO(maddog@tri.global) Method to convert LanePosition to that of
   //                         another Lane.  (Should assert that both
@@ -181,7 +183,7 @@ class Lane {
 
   virtual InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const = 0;
 
-  virtual LanePositionResult DoToLanePosition(const InertialPosition& geo_pos) const = 0;
+  virtual LanePositionResult DoToLanePosition(const InertialPosition& inertial_pos) const = 0;
 
   virtual Rotation DoGetOrientation(const LanePosition& lane_pos) const = 0;
 

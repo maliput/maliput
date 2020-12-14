@@ -64,9 +64,9 @@ bool Intersection::Includes(const api::rules::RightOfWayRule::Id& id) const {
   return rule_states.has_value() ? rule_states.value().find(id) != rule_states.value().end() : false;
 }
 
-bool Intersection::Includes(const InertialPosition& geo_position, const RoadGeometry* road_geometry) const {
+bool Intersection::Includes(const InertialPosition& inertial_position, const RoadGeometry* road_geometry) const {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
-  return IsIncluded(geo_position, region_, road_geometry);
+  return IsIncluded(inertial_position, region_, road_geometry);
 }
 
 }  // namespace api

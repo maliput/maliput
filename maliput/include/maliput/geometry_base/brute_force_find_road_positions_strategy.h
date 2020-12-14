@@ -17,9 +17,9 @@ namespace geometry_base {
 ///
 /// @param rg The RoadGeometry over all these operations are performed. It
 ///        must not be nullptr.
-/// @param geo_position The geo position to convert into one or more
+/// @param inertial_position The geo position to convert into one or more
 ///        RoadPositions.
-/// @param radius The maximum distance from @p geo_position to search. It
+/// @param radius The maximum distance from @p inertial_position to search. It
 ///        must not be negative.
 /// @return A vector of RoadPositionResults representing the possible
 ///         RoadPositions.

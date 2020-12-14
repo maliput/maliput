@@ -112,7 +112,7 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     const LaneEnd ref_end = (bp->GetASide()->size() > 0) ? bp->GetASide()->get(0) : bp->GetBSide()->get(0);
     // ...test world frame position similarity.
     const InertialPosition ref_geo = LaneEndInertialPosition(ref_end);
-    const auto test_geo_position = [&](const LaneEndSet& ends) {
+    const auto test_inertial_position = [&](const LaneEndSet& ends) {
       for (int bi = 0; bi < ends.size(); ++bi) {
         const LaneEnd le = ends.get(bi);
         const double d = ref_geo.Distance(LaneEndInertialPosition(le));
@@ -124,8 +124,8 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
         }
       }
     };
-    test_geo_position(*(bp->GetASide()));
-    test_geo_position(*(bp->GetBSide()));
+    test_inertial_position(*(bp->GetASide()));
+    test_inertial_position(*(bp->GetBSide()));
     // ...test orientation similarity.
     const Rotation ref_rot = (bp->GetASide()->size() > 0) ? OrientationOutFromLane(bp->GetASide()->get(0))
                                                           : OrientationOutFromLane(bp->GetBSide()->get(0)).Reverse();
