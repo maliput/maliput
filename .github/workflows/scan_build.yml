@@ -8,6 +8,7 @@ on:
 
 env:
   PACKAGE_NAME: maliput
+  EXTRA_PACKAGE_NAME: maliput_py
   ROS_DISTRO: dashing
   ROS_WS: maliput_ws
 
@@ -48,5 +49,5 @@ jobs:
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         ./src/${PACKAGE_NAME}/.github/run_scan_build \
             --cmake-args -DCMAKE_LINKER=/usr/bin/llvm-ld \
-            --packages-up-to ${PACKAGE_NAME} \
+            --packages-up-to ${PACKAGE_NAME} ${EXTRA_PACKAGE_NAME} \
             --event-handlers=console_direct+;

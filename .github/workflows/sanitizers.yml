@@ -8,6 +8,7 @@ on:
 
 env:
   PACKAGE_NAME: maliput
+  EXTRA_PACKAGE_NAME: maliput_py
   ROS_DISTRO: dashing
   ROS_WS: maliput_ws
 
@@ -57,18 +58,48 @@ jobs:
       run: |
         rosdep update;
         rosdep install  -i -y --rosdistro ${ROS_DISTRO} --skip-keys "pybind11" --from-paths src
-    - name: colcon build
+    - name: colcon build libraries
       shell: bash
       working-directory: ${{ env.ROS_WS }}
-      env:
-        COMPILER_FLAG: ${{ matrix.COMPILER_FLAG }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
-        colcon build --cmake-args -DCMAKE_LINKER=${LINKER_PATH} ${COMPILER_FLAG} --packages-up-to ${PACKAGE_NAME} --event-handlers=console_direct+;
-    - name: colcon test
+        colcon build --packages-up-to ${EXTRA_PACKAGE_NAME} \
+          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
+          --event-handlers=console_direct+ \
+          ${COMPILER_FLAG} \
+          --cmake-args -DBUILD_TESTING=OFF;
+    - name: colcon build tests for maliput
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon build --packages-select ${PACKAGE_NAME} \
+          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
+          --event-handlers=console_direct+ \
+          ${COMPILER_FLAG} \
+          --cmake-args -DBUILD_TESTING=ON;
+    - name: colcon test for maliput
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon test --packages-select ${PACKAGE_NAME} --event-handlers=console_direct+;
         colcon test-result --verbose;
+    - name: colcon build tests for maliput_py
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon build --packages-select ${EXTRA_PACKAGE_NAME} \
+          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
+          --event-handlers=console_direct+ \
+          ${COMPILER_FLAG} \
+          --cmake-args -DBUILD_TESTING=ON;
+    - name: colcon test for maliput_py
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon test --packages-select ${EXTRA_PACKAGE_NAME} --event-handlers=console_direct+;
+        colcon test-result --verbose;
+
