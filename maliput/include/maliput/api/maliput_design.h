@@ -147,7 +147,9 @@
 /// Earth-fixed").  Or, it could be a locally-flat projection of the
 /// Earth's surface, e.g., a UTM ("Universal Transverse Mercator")
 /// projection coupled with elevation.  No specific projection is mandated
-/// by `maliput`.
+/// by `maliput`. To disambiguate for one or another `World`-frame choice, the
+/// API uses the preferred `InertialPosition` type which can be interpreted for
+/// one or another frame choice.
 ///
 /// > *Currently:*  @f$\hat{z}@f$ is assumed to be *up*, with @f$z@f$ representing an
 /// > altitude or elevation.  @f$\hat{x}@f$ and @f$\hat{y}@f$ span the horizontal
@@ -316,7 +318,7 @@
 /// of the `Lanes` joined at a `BranchPoint` are @f$G^1@f$ continuous.  Together with
 /// the earlier-stated requirement of overall @f$G^1@f$ continuity of the road surface
 /// and the conditions on @f$r@f$ and @f$h@f$ being path-lengths, this implies that:
-///  1. The location of a `BranchPoint` is a well-defined point in the World frame.
+///  1. The location of a `BranchPoint` is a well-defined point in the `World`-frame.
 ///  2. The tangent vectors of the @f$C_L@f$ curves are either parallel or
 ///     antiparallel with each other at the
 ///     `BranchPoint`.  In fact, except for the signs of @f$\hat{s}@f$ and @f$\hat{r}@f$,
@@ -379,7 +381,7 @@
 /// presents a different @f$(s,r,h)@f$ parameterization of that same pavement.
 ///
 /// We would like for the segment-bounds of each `Lane` to map to the
-/// same extent of physical space in the World frame, but that isn't always
+/// same extent of physical space in the `World`-frame, but that isn't always
 /// possible due to the geometric constraints of parallel curves.  However,
 /// we do require that the union of the segment-bounds of all `Lanes`
 /// in a `Segment` is simply-connected.  This means that:
@@ -421,7 +423,7 @@
 /// such as on-ramps, exit ramps, traffic circles, and a road that splits
 /// to go around an impassable monument.
 ///
-/// `Segments` which map to intersecting volumes in the World frame (in
+/// `Segments` which map to intersecting volumes in the `World`-frame (in
 /// terms of the union of the segment-bounds of their `Lanes`) are
 /// grouped together into a `Junction`.  The primary (sole?) purpose of a
 /// `Junction` is to indicate that objects in its component `Segments` may
