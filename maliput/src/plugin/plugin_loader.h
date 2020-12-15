@@ -1,17 +1,21 @@
+#pragma once
+
 #include <dlfcn.h>
 #include <memory>
 #include <stdexcept>
 #include <string>
 
+#include "tools.h"
+
 namespace maliput {
 namespace plugin {
 
 template <typename PluginBaseT>
-class Loader {
+class PluginLoader {
  public:
-  Loader(const char* file) {
+  PluginLoader(const std::string& file_path) {
     // load library
-    lhandle = dlopen(file, RTLD_LAZY);
+    lhandle = dlopen(GetPathToLib(file_path).c_str(), RTLD_LAZY);
     if (!lhandle) {
       throw std::runtime_error("Cannot load library: " + std::string(dlerror()));
     }
@@ -28,7 +32,7 @@ class Loader {
 
   std::unique_ptr<PluginBaseT> GetInstance() { return creator(); }
 
-  ~Loader() { dlclose(lhandle); }
+  ~PluginLoader() { dlclose(lhandle); }
 
  private:
   // the types of the class factories

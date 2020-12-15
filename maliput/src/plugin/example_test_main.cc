@@ -1,5 +1,5 @@
-#include "loader.h"
 #include "plugin_base.h"
+#include "plugin_loader.h"
 
 #include <gflags/gflags.h>
 
@@ -15,14 +15,7 @@ using namespace maliput::plugin;
 int main(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  // The macro that this uses is provided as a compile definition in the
-  // CMakeLists.txt file.
-  const std::string PluginLibDir = MALIPUT_PLUGIN_LIBDIR;
-  const std::string PluginLibName = FLAGS_lib_name;
-  const std::string PluginLibPath = PluginLibDir + "/" + PluginLibName;
-
-  std::cout << "PluginLibPath: " << PluginLibPath << std::endl;
-  Loader<PluginBase> loader{PluginLibPath.c_str()};
+  PluginLoader<PluginBase> loader{FLAGS_lib_name};
 
   // create an instance of the class
   std::unique_ptr<PluginBase> plugin_backend = loader.GetInstance();
