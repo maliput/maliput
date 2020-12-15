@@ -38,7 +38,7 @@ install(
 )
 
 add_executable(plugin_test
-               main.cc)
+  example_main.cc)
 
 target_compile_definitions(plugin_test
 PRIVATE
@@ -46,6 +46,7 @@ PRIVATE
 
 target_link_libraries(plugin_test
   dl
+  gflags
 )
 
 install(

@@ -3,6 +3,7 @@
 namespace maliput {
 namespace plugin {
 
+// Just for creating the library.
 
-} // namespace plugin
-} // namespace maliput
+}  // namespace plugin
+}  // namespace maliput
