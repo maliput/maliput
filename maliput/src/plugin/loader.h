@@ -1,11 +1,12 @@
 #include <dlfcn.h>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
 namespace maliput {
 namespace plugin {
 
-template <typename PluginBase>
+template <typename PluginBaseT>
 class Loader {
  public:
   Loader(const char* file) {
@@ -23,26 +24,17 @@ class Loader {
     if (dlsym_error) {
       throw std::runtime_error("Cannot load symbol create: " + std::string(dlsym_error));
     }
-    destroyer = (destroy_t*)dlsym(lhandle, "destroy");
-    dlsym_error = dlerror();
-    if (dlsym_error) {
-      throw std::runtime_error("Cannot load symbol destroy: " + std::string(dlsym_error));
-    }
   }
 
-  PluginBase* GetInstance() { return creator(); }
-
-  void DestroyInstance(PluginBase* instance) { destroyer(instance); }
+  std::unique_ptr<PluginBaseT> GetInstance() { return creator(); }
 
   ~Loader() { dlclose(lhandle); }
 
  private:
   // the types of the class factories
-  typedef PluginBase* create_t();
-  typedef void destroy_t(PluginBase*);
+  typedef std::unique_ptr<PluginBaseT> create_t();
 
-  create_t* creator{nullptr};
-  destroy_t* destroyer{nullptr};
+  create_t* creator;
   void* lhandle{nullptr};
 };
 

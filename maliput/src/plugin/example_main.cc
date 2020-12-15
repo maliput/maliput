@@ -5,6 +5,7 @@
 
 #include <dlfcn.h>
 #include <iostream>
+#include <memory>
 #include <string>
 
 DEFINE_string(lib_name, "libmaliput_plugin_1.so", "Name of the .so file to be loaded.");
@@ -24,9 +25,7 @@ int main(int argc, char* argv[]) {
   Loader<PluginBase> loader{PluginLibPath.c_str()};
 
   // create an instance of the class
-  PluginBase* plugin_backend = loader.GetInstance();
+  std::unique_ptr<PluginBase> plugin_backend = loader.GetInstance();
   // use the class
   std::cout << "The backend is: " << plugin_backend->BackendName() << '\n' << std::endl;
-  // destroy the class
-  loader.DestroyInstance(plugin_backend);
 }

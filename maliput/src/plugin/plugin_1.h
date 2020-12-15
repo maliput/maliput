@@ -1,3 +1,4 @@
+#include <memory>
 #include "plugin/plugin_base.h"
 
 namespace maliput {
@@ -9,8 +10,7 @@ class Plugin1 : public PluginBase {
 };
 
 // the class factories
-extern "C" PluginBase* create() { return new Plugin1; }
-extern "C" void destroy(PluginBase* p) { delete p; }
+extern "C" std::unique_ptr<PluginBase> create() { return std::make_unique<Plugin1>(); }
 
 }  // namespace plugin
 }  // namespace maliput
