@@ -1,4 +1,4 @@
-#include "plugin/plugin_2.h"
+#include "plugin_loader.h"
 
 namespace maliput {
 namespace plugin {

@@ -13,9 +13,9 @@ namespace plugin {
 template <typename PluginBaseT>
 class PluginLoader {
  public:
-  PluginLoader(const std::string& file_path) {
+  PluginLoader(const std::string& file_name) {
     // load library
-    lhandle = dlopen(GetPathToLib(file_path).c_str(), RTLD_LAZY);
+    lhandle = dlopen(GetPathToLib(file_name).c_str(), RTLD_LAZY);
     if (!lhandle) {
       throw std::runtime_error("Cannot load library: " + std::string(dlerror()));
     }
@@ -23,10 +23,10 @@ class PluginLoader {
     dlerror();
 
     // load the symbols
-    creator = (create_t*)dlsym(lhandle, "create");
+    creator = (create_t*)dlsym(lhandle, "LoadMaliputRoadNetwork");
     const char* dlsym_error = dlerror();
     if (dlsym_error) {
-      throw std::runtime_error("Cannot load symbol create: " + std::string(dlsym_error));
+      throw std::runtime_error("Cannot load symbol LoadMaliputRoadNetwork: " + std::string(dlsym_error));
     }
   }
 

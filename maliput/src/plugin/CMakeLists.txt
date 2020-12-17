@@ -2,28 +2,20 @@
 # Sources
 ##############################################################################
 
-add_library(plugin_1 plugin_1.cc)
+add_library(plugin_loader plugin_loader.cc)
+add_library(maliput::plugin_loader ALIAS plugin_loader)
 
-set_target_properties(plugin_1
+set_target_properties(plugin_loader
   PROPERTIES
-    OUTPUT_NAME maliput_plugin_1
+    OUTPUT_NAME maliput_plugin_loader
 )
 
-target_include_directories(plugin_1
-  PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-
-###############################
-
-add_library(plugin_2 plugin_2.cc)
-
-set_target_properties(plugin_2
-  PROPERTIES
-    OUTPUT_NAME maliput_plugin_2
+target_link_libraries(plugin_loader
+  dl
+  maliput::plugin_tools
 )
 
-target_include_directories(plugin_2
+target_include_directories(plugin_loader
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
@@ -46,25 +38,16 @@ target_include_directories(plugin_tools
 
 target_compile_definitions(plugin_tools
     PRIVATE
-      MALIPUT_PLUGIN_LIBDIR="${CMAKE_INSTALL_PREFIX}/plugin")
-
-###############################
-
-add_executable(example_test
-  example_test_main.cc)
-
-target_link_libraries(example_test
-  dl
-  gflags
-  maliput::plugin_tools
-)
+      MALIPUT_PLUGIN_LIBDIR="${CMAKE_INSTALL_PREFIX}/../plugins")
 
 ##############################################################################
 # Export
 ##############################################################################
 
 install(
-  TARGETS plugin_1 plugin_2 plugin_tools example_test
+  TARGETS plugin_tools plugin_loader
   EXPORT ${PROJECT_NAME}-targets
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/plugin"
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
