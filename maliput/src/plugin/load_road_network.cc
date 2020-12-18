@@ -1,10 +1,10 @@
-#include "maliput/api/load_road_network.h"
+#include "maliput/plugin/load_road_network.h"
 
 #include "maliput/plugin/road_network_plugin.h"
-#include "plugin/plugin_loader.h"
+#include "plugin_loader.h"
 
 namespace maliput {
-namespace api {
+namespace plugin {
 
 class LoadRoadNetworkPlugin::Impl {
  public:
@@ -14,7 +14,7 @@ class LoadRoadNetworkPlugin::Impl {
     road_network_plugin_ = plugin_loader_->GetInstance();
   }
 
-  std::unique_ptr<const RoadNetwork> GetRoadNetwork() { return road_network_plugin_->LoadRoadNetwork(); }
+  std::unique_ptr<const api::RoadNetwork> GetRoadNetwork() { return road_network_plugin_->LoadRoadNetwork(); }
 
   ~Impl() = default;
 
@@ -27,7 +27,7 @@ LoadRoadNetworkPlugin::LoadRoadNetworkPlugin(const std::string& lib_name) : impl
 
 LoadRoadNetworkPlugin::~LoadRoadNetworkPlugin() = default;
 
-std::unique_ptr<const RoadNetwork> LoadRoadNetworkPlugin::GetRoadNetwork() { return impl_->GetRoadNetwork(); }
+std::unique_ptr<const api::RoadNetwork> LoadRoadNetworkPlugin::GetRoadNetwork() { return impl_->GetRoadNetwork(); }
 
-}  // namespace api
+}  // namespace plugin
 }  // namespace maliput

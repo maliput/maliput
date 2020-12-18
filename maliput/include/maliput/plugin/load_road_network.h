@@ -6,13 +6,13 @@
 #include "maliput/api/road_network.h"
 
 namespace maliput {
-namespace api {
+namespace plugin {
 
 class LoadRoadNetworkPlugin {
  public:
   LoadRoadNetworkPlugin(const std::string& lib_name);
 
-  std::unique_ptr<const RoadNetwork> GetRoadNetwork();
+  std::unique_ptr<const api::RoadNetwork> GetRoadNetwork();
   ~LoadRoadNetworkPlugin();
 
  private:
@@ -20,5 +20,5 @@ class LoadRoadNetworkPlugin {
   std::unique_ptr<Impl> impl_;
 };
 
-}  // namespace api
+}  // namespace plugin
 }  // namespace maliput

@@ -7,7 +7,6 @@ set(API_SOURCES
   intersection.cc
   lane.cc
   lane_data.cc
-  load_road_network.cc
   regions.cc
   road_geometry.cc
   road_network.cc
@@ -39,7 +38,6 @@ target_link_libraries(api
   PUBLIC
     maliput::common
     maliput::math
-    maliput::plugin_loader
 )
 
 ##############################################################################
