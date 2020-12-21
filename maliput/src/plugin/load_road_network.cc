@@ -9,21 +9,27 @@ namespace plugin {
 class LoadRoadNetworkPlugin::Impl {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl);
-  Impl(const std::string& lib_name)
-      : plugin_loader_(std::make_unique<plugin::PluginLoader<plugin::RoadNetworkPlugin>>(lib_name)) {
+  Impl(const std::string& lib_name, const std::map<std::string, std::string>& parameters)
+      : plugin_loader_(std::make_unique<plugin::PluginLoader<plugin::RoadNetworkPlugin>>(lib_name)),
+        parameters_(parameters) {
     road_network_plugin_ = plugin_loader_->GetInstance();
   }
 
-  std::unique_ptr<const api::RoadNetwork> GetRoadNetwork() { return road_network_plugin_->LoadRoadNetwork(); }
+  std::unique_ptr<const api::RoadNetwork> GetRoadNetwork() {
+    return road_network_plugin_->LoadRoadNetwork(parameters_);
+  }
 
   ~Impl() = default;
 
  private:
   std::unique_ptr<plugin::PluginLoader<plugin::RoadNetworkPlugin>> plugin_loader_;
+  std::map<std::string, std::string> parameters_;
   std::unique_ptr<plugin::RoadNetworkPlugin> road_network_plugin_;
 };
 
-LoadRoadNetworkPlugin::LoadRoadNetworkPlugin(const std::string& lib_name) : impl_(std::make_unique<Impl>(lib_name)) {}
+LoadRoadNetworkPlugin::LoadRoadNetworkPlugin(const std::string& lib_name,
+                                             const std::map<std::string, std::string>& parameters)
+    : impl_(std::make_unique<Impl>(lib_name, parameters)) {}
 
 LoadRoadNetworkPlugin::~LoadRoadNetworkPlugin() = default;
 

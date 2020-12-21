@@ -7,7 +7,8 @@ namespace plugin {
 
 class RoadNetworkPlugin {
  public:
-  virtual std::unique_ptr<const maliput::api::RoadNetwork> LoadRoadNetwork() const = 0;
+  virtual std::unique_ptr<const maliput::api::RoadNetwork> LoadRoadNetwork(
+      const std::map<std::string, std::string> parameters) const = 0;
   virtual ~RoadNetworkPlugin() = default;
 };
 

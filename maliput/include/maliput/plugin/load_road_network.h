@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <memory>
 #include <string>
 
@@ -10,7 +11,7 @@ namespace plugin {
 
 class LoadRoadNetworkPlugin {
  public:
-  LoadRoadNetworkPlugin(const std::string& lib_name);
+  LoadRoadNetworkPlugin(const std::string& lib_name, const std::map<std::string, std::string>& parameters);
 
   std::unique_ptr<const api::RoadNetwork> GetRoadNetwork();
   ~LoadRoadNetworkPlugin();
