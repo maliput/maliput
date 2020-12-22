@@ -12,6 +12,7 @@ set_target_properties(plugin_loader
 
 target_link_libraries(plugin_loader
   dl
+  maliput::common
 )
 
 target_include_directories(plugin_loader

@@ -10,7 +10,7 @@ class LoadRoadNetworkPlugin::Impl {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl);
   Impl(const std::string& lib_name, const std::map<std::string, std::string>& parameters)
-      : plugin_loader_(std::make_unique<plugin::PluginLoader<plugin::RoadNetworkPlugin>>(lib_name)),
+      : plugin_loader_(std::make_unique<plugin::PluginLoader<plugin::RoadNetworkPlugin>>(lib_name, factory_method)),
         parameters_(parameters) {
     road_network_plugin_ = plugin_loader_->GetInstance();
   }
@@ -22,8 +22,9 @@ class LoadRoadNetworkPlugin::Impl {
   ~Impl() = default;
 
  private:
-  std::unique_ptr<plugin::PluginLoader<plugin::RoadNetworkPlugin>> plugin_loader_;
-  std::map<std::string, std::string> parameters_;
+  static constexpr char const* factory_method{"LoadMaliputRoadNetwork"};
+  const std::unique_ptr<plugin::PluginLoader<plugin::RoadNetworkPlugin>> plugin_loader_;
+  const std::map<std::string, std::string> parameters_;
   std::unique_ptr<plugin::RoadNetworkPlugin> road_network_plugin_;
 };
 
