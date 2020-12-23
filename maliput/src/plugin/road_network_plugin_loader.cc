@@ -1,4 +1,4 @@
-#include "maliput/plugin/load_road_network.h"
+#include "maliput/plugin/road_network_plugin_loader.h"
 
 #include "maliput/plugin/road_network_plugin.h"
 #include "plugin_loader.h"
@@ -6,7 +6,7 @@
 namespace maliput {
 namespace plugin {
 
-class LoadRoadNetworkPlugin::Impl {
+class RoadNetworkPluginLoader::Impl {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl);
   Impl(const std::string& lib_name, const std::map<std::string, std::string>& parameters)
@@ -28,13 +28,13 @@ class LoadRoadNetworkPlugin::Impl {
   std::unique_ptr<plugin::RoadNetworkPlugin> road_network_plugin_;
 };
 
-LoadRoadNetworkPlugin::LoadRoadNetworkPlugin(const std::string& lib_name,
-                                             const std::map<std::string, std::string>& parameters)
+RoadNetworkPluginLoader::RoadNetworkPluginLoader(const std::string& lib_name,
+                                                 const std::map<std::string, std::string>& parameters)
     : impl_(std::make_unique<Impl>(lib_name, parameters)) {}
 
-LoadRoadNetworkPlugin::~LoadRoadNetworkPlugin() = default;
+RoadNetworkPluginLoader::~RoadNetworkPluginLoader() = default;
 
-std::unique_ptr<const api::RoadNetwork> LoadRoadNetworkPlugin::GetRoadNetwork() { return impl_->GetRoadNetwork(); }
+std::unique_ptr<const api::RoadNetwork> RoadNetworkPluginLoader::GetRoadNetwork() { return impl_->GetRoadNetwork(); }
 
 }  // namespace plugin
 }  // namespace maliput

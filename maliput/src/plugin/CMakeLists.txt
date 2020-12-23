@@ -26,7 +26,7 @@ target_compile_definitions(plugin_loader
 
 ###############################
 
-add_library(plugin load_road_network.cc)
+add_library(plugin road_network_plugin_loader.cc)
 add_library(maliput::plugin ALIAS plugin)
 
 set_target_properties(plugin

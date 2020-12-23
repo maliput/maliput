@@ -1,3 +1,4 @@
+// Copyright 2020 Toyota Research Institute
 #include <string>
 
 #include "maliput/api/road_network.h"
@@ -11,7 +12,7 @@ class RoadNetworkPlugin {
   /// Returns a maliput::api::RoadNetwork.
   /// @param parameters Dictionary containing the arguments needed for creating the RoadNetwork.
   virtual std::unique_ptr<const maliput::api::RoadNetwork> LoadRoadNetwork(
-      const std::map<std::string, std::string> parameters) const = 0;
+      const std::map<std::string, std::string>& parameters) const = 0;
   virtual ~RoadNetworkPlugin() = default;
 };
 
