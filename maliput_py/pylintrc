@@ -1,0 +1,20 @@
+[MASTER]
+
+# Use multiple processes to speed up Pylint.
+jobs=4
+
+# Tells whether to display a full report or only the messages
+reports=no
+
+# Here's what we have disabled:
+# C0103 - invalid module name
+# F0401 - unable to import
+# R0903 - too-few-public-methods
+# R0914 - too many local variables
+disable=C0103,F0401,R0903,R0914
+
+# Default is to give warnings and return a non-zero error code on TODO, FIXME
+#       (check defaults with pylint --generate-rcfile > /tmp/pylintrc)
+# We aren't interested in those, but may be interested in CI failing on other
+# warning values, so just disable them here
+notes=
