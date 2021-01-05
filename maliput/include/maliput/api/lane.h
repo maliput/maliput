@@ -92,19 +92,21 @@ class Lane {
   /// `lane_bounds(s)`.
   HBounds elevation_bounds(double s, double r) const { return do_elevation_bounds(s, r); }
 
-  /// Returns the GeoPosition corresponding to the given LanePosition.
+  /// Returns the InertialPosition corresponding to the given LanePosition.
   ///
   /// @pre The s component of @p lane_pos must be in domain [0, Lane::length()].
   /// @pre The r component of @p lane_pos must be in domain [Rmin, Rmax]
   ///      derived from Lane::segment_bounds().
-  GeoPosition ToGeoPosition(const LanePosition& lane_pos) const { return DoToGeoPosition(lane_pos); }
+  InertialPosition ToInertialPosition(const LanePosition& lane_pos) const { return DoToInertialPosition(lane_pos); }
 
-  /// Determines the LanePosition corresponding to GeoPosition @p geo_pos.
+  /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
   ///
   /// This method guarantees that its result satisfies the condition that
-  /// `ToGeoPosition(result.lane_position)` is within `linear_tolerance()`
+  /// `ToInertialPosition(result.lane_position)` is within `linear_tolerance()`
   ///  of `result.nearest_position`.
-  LanePositionResult ToLanePosition(const GeoPosition& geo_pos) const { return DoToLanePosition(geo_pos); }
+  LanePositionResult ToLanePosition(const InertialPosition& inertial_pos) const {
+    return DoToLanePosition(inertial_pos);
+  }
 
   // TODO(maddog@tri.global) Method to convert LanePosition to that of
   //                         another Lane.  (Should assert that both
@@ -179,9 +181,9 @@ class Lane {
 
   virtual HBounds do_elevation_bounds(double s, double r) const = 0;
 
-  virtual GeoPosition DoToGeoPosition(const LanePosition& lane_pos) const = 0;
+  virtual InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const = 0;
 
-  virtual LanePositionResult DoToLanePosition(const GeoPosition& geo_pos) const = 0;
+  virtual LanePositionResult DoToLanePosition(const InertialPosition& inertial_pos) const = 0;
 
   virtual Rotation DoGetOrientation(const LanePosition& lane_pos) const = 0;
 

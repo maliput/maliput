@@ -51,10 +51,10 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
       : geometry_base::RoadGeometry(id, linear_tolerance, angular_tolerance, scale_length) {}
 
  private:
-  api::RoadPositionResult DoToRoadPosition(const api::GeoPosition& geo_position,
+  api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,
                                            const std::optional<api::RoadPosition>& hint) const override;
 
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::GeoPosition& geo_position,
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                            double radius) const override;
 };
 
@@ -114,11 +114,11 @@ class MockLane : public geometry_base::Lane {
   api::RBounds do_lane_bounds(double) const override;
   api::RBounds do_segment_bounds(double) const override;
   api::HBounds do_elevation_bounds(double, double) const override;
-  api::GeoPosition DoToGeoPosition(const api::LanePosition& lane_pos) const override;
+  api::InertialPosition DoToInertialPosition(const api::LanePosition& lane_pos) const override;
   api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const override;
   api::LanePosition DoEvalMotionDerivatives(const api::LanePosition& position,
                                             const api::IsoLaneVelocity& velocity) const override;
-  api::LanePositionResult DoToLanePosition(const api::GeoPosition& geo_position) const override;
+  api::LanePositionResult DoToLanePosition(const api::InertialPosition& inertial_position) const override;
 };
 
 }  // namespace test

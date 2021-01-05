@@ -17,7 +17,7 @@ using JunctionId = TypeSpecificIdentifier<class Junction>;
 /// A Junction is a closed set of Segments which have physically
 /// coplanar road surfaces, in the sense that RoadPositions with the
 /// same h value (height above surface) in the domains of two Segments
-/// map to the same GeoPosition.  The Segments need not be directly
+/// map to the same InertialPosition.  The Segments need not be directly
 /// connected to one another in the network topology.
 ///
 /// Junctions are grouped by RoadGeometry.

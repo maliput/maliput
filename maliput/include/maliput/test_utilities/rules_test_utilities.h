@@ -101,9 +101,9 @@ inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* 
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 
-/// Predicate-formatter which tests equality of GeoPosition.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const GeoPosition& a,
-                                          const GeoPosition& b) {
+/// Predicate-formatter which tests equality of InertialPosition.
+inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const InertialPosition& a,
+                                          const InertialPosition& b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
 }
 

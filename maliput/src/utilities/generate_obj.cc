@@ -89,9 +89,9 @@ double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_
   const double min_step = std::min(grid_unit, length - s0);
 
   const maliput::api::RBounds prev_lane_bounds = lane->lane_bounds(s0);
-  const maliput::api::GeoPosition prev_pos_center = lane->ToGeoPosition({s0, 0., 0.});
-  const maliput::api::GeoPosition prev_pos_left = lane->ToGeoPosition({s0, prev_lane_bounds.max(), 0.});
-  const maliput::api::GeoPosition prev_pos_right = lane->ToGeoPosition({s0, prev_lane_bounds.min(), 0.});
+  const maliput::api::InertialPosition prev_pos_center = lane->ToInertialPosition({s0, 0., 0.});
+  const maliput::api::InertialPosition prev_pos_left = lane->ToInertialPosition({s0, prev_lane_bounds.max(), 0.});
+  const maliput::api::InertialPosition prev_pos_right = lane->ToInertialPosition({s0, prev_lane_bounds.min(), 0.});
 
   // Start from minimum step.
   double step_best = min_step;
@@ -102,9 +102,11 @@ double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_
     const double s_proposed = s0 + step_proposed;
     const maliput::api::RBounds lane_bounds = lane->lane_bounds(s_proposed);
 
-    const maliput::api::GeoPosition proposed_pos_center_lane = lane->ToGeoPosition({s_proposed, 0., 0.});
-    const maliput::api::GeoPosition proposed_pos_left_lane = lane->ToGeoPosition({s_proposed, lane_bounds.max(), 0.});
-    const maliput::api::GeoPosition proposed_pos_right_lane = lane->ToGeoPosition({s_proposed, lane_bounds.min(), 0.});
+    const maliput::api::InertialPosition proposed_pos_center_lane = lane->ToInertialPosition({s_proposed, 0., 0.});
+    const maliput::api::InertialPosition proposed_pos_left_lane =
+        lane->ToInertialPosition({s_proposed, lane_bounds.max(), 0.});
+    const maliput::api::InertialPosition proposed_pos_right_lane =
+        lane->ToInertialPosition({s_proposed, lane_bounds.min(), 0.});
 
     // Calculate distance between geo positions for every lane.
     const double distance_from_center = (prev_pos_center.xyz() - proposed_pos_center_lane.xyz()).norm();
@@ -533,7 +535,7 @@ void DrawArrows(double elevation, double height, const api::LaneEndSet* set, Geo
 // overlaps with them); this list will be updated with the rendered
 // center of this BranchPoint.
 void RenderBranchPoint(const api::BranchPoint* const branch_point, const double base_elevation, const double height,
-                       GeoMesh* mesh, std::vector<api::GeoPosition>* previous_centers) {
+                       GeoMesh* mesh, std::vector<api::InertialPosition>* previous_centers) {
   if ((branch_point->GetASide()->size() == 0) && (branch_point->GetBSide()->size() == 0)) {
     // No branches?  Odd, but, oh, well... nothing to do here.
     return;
@@ -557,13 +559,13 @@ void RenderBranchPoint(const api::BranchPoint* const branch_point, const double 
     const api::LanePosition center_srh((reference_end.end == api::LaneEnd::kStart) ? 0. : reference_end.lane->length(),
                                        0., elevation);
     const api::Rotation orientation = reference_end.lane->GetOrientation(center_srh);
-    const api::GeoPosition center_xyz = reference_end.lane->ToGeoPosition(center_srh);
+    const api::InertialPosition center_xyz = reference_end.lane->ToInertialPosition(center_srh);
 
     has_conflict = false;
     // Compare center against every already-rendered center....
     // If distance in sr-plane is too close and distance along h-axis is
     // too close, then increase elevation and try again.
-    for (const api::GeoPosition& previous_xyz : *previous_centers) {
+    for (const api::InertialPosition& previous_xyz : *previous_centers) {
       const math::Vector3 delta_srh = orientation.matrix().transpose() * (previous_xyz.xyz() - center_xyz.xyz());
       if ((math::Vector2(delta_srh.x(), delta_srh.y()).norm() < sr_margin) && (std::abs(delta_srh.z()) < h_margin)) {
         has_conflict = true;
@@ -937,7 +939,7 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
   }
 
   if (features.draw_branch_points) {
-    std::vector<api::GeoPosition> rendered_centers;
+    std::vector<api::InertialPosition> rendered_centers;
     for (int bpi = 0; bpi < rg->num_branch_points(); ++bpi) {
       const api::BranchPoint* branch_point = rg->branch_point(bpi);
       if (!branch_point) {

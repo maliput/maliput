@@ -16,20 +16,21 @@ std::ostream& operator<<(std::ostream& out, const Rotation& rotation) {
              << ", yaw = " << roll_pitch_yaw.yaw_angle() << ")";
 }
 
-std::ostream& operator<<(std::ostream& out, const GeoPosition& geo_position) {
-  return out << "(x = " << geo_position.x() << ", y = " << geo_position.y() << ", z = " << geo_position.z() << ")";
+std::ostream& operator<<(std::ostream& out, const InertialPosition& inertial_position) {
+  return out << "(x = " << inertial_position.x() << ", y = " << inertial_position.y()
+             << ", z = " << inertial_position.z() << ")";
 }
 
 std::ostream& operator<<(std::ostream& out, const LanePosition& lane_position) {
   return out << "(s = " << lane_position.s() << ", r = " << lane_position.r() << ", h = " << lane_position.h() << ")";
 }
 
-double GeoPosition::Distance(const GeoPosition& geo_position) const {
-  return (this->xyz() - geo_position.xyz()).norm();
+double InertialPosition::Distance(const InertialPosition& inertial_position) const {
+  return (this->xyz() - inertial_position.xyz()).norm();
 }
 
-GeoPosition Rotation::Apply(const GeoPosition& geo_position) const {
-  return GeoPosition::FromXyz(quaternion_ * geo_position.xyz());
+InertialPosition Rotation::Apply(const InertialPosition& inertial_position) const {
+  return InertialPosition::FromXyz(quaternion_ * inertial_position.xyz());
 }
 
 math::Matrix3 Rotation::matrix() const { return quaternion_.ToRotationMatrix(); }
@@ -40,13 +41,13 @@ Rotation Rotation::Reverse() const {
 
 double Rotation::Distance(const Rotation& rot) const {
   // Compute transformed unit vectors of a frame A.
-  const GeoPosition as = this->Apply({1., 0., 0.});
-  const GeoPosition ar = this->Apply({0., 1., 0.});
-  const GeoPosition ah = this->Apply({0., 0., 1.});
+  const InertialPosition as = this->Apply({1., 0., 0.});
+  const InertialPosition ar = this->Apply({0., 1., 0.});
+  const InertialPosition ah = this->Apply({0., 0., 1.});
   // Compute transformed unit vectors of b frame B.
-  const GeoPosition bs = rot.Apply({1., 0., 0.});
-  const GeoPosition br = rot.Apply({0., 1., 0.});
-  const GeoPosition bh = rot.Apply({0., 0., 1.});
+  const InertialPosition bs = rot.Apply({1., 0., 0.});
+  const InertialPosition br = rot.Apply({0., 1., 0.});
+  const InertialPosition bh = rot.Apply({0., 0., 1.});
   // Compute angles between pairs of unit vectors.
   const double ds = std::acos(as.xyz().dot(bs.xyz()));
   const double dr = std::acos(ar.xyz().dot(br.xyz()));

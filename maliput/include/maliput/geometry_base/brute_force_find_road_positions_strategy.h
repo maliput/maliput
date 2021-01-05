@@ -17,9 +17,9 @@ namespace geometry_base {
 ///
 /// @param rg The RoadGeometry over all these operations are performed. It
 ///        must not be nullptr.
-/// @param geo_position The geo position to convert into one or more
+/// @param inertial_position The inertial position to convert into one or more
 ///        RoadPositions.
-/// @param radius The maximum distance from @p geo_position to search. It
+/// @param radius The maximum distance from @p inertial_position to search. It
 ///        must not be negative.
 /// @return A vector of RoadPositionResults representing the possible
 ///         RoadPositions.
@@ -27,7 +27,7 @@ namespace geometry_base {
 ///         within it is nullptr.
 /// @throws maliput::common::assertion_error If radius is negative.
 std::vector<maliput::api::RoadPositionResult> BruteForceFindRoadPositionsStrategy(
-    const maliput::api::RoadGeometry* rg, const maliput::api::GeoPosition& geo_position, double radius);
+    const maliput::api::RoadGeometry* rg, const maliput::api::InertialPosition& inertial_position, double radius);
 
 }  // namespace geometry_base
 }  // namespace maliput

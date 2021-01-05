@@ -81,23 +81,23 @@ GTEST_TEST(BulbStateTest, MapperTest) {
 }
 
 GTEST_TEST(BulbConstructorTest, ArrowWithoutOrientation) {
-  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"), GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen,
-                    BulbType::kArrow),
+  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"), InertialPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12),
+                    BulbColor::kGreen, BulbType::kArrow),
                std::exception);
 }
 
 GTEST_TEST(BulbConstructorTest, NonArrowWithOrientation) {
-  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"), GeoPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12), BulbColor::kGreen,
-                    BulbType::kRound, 0 /* arrow_orientation_rad */),
+  EXPECT_THROW(Bulb(Bulb::Id("other_dut_id"), InertialPosition(7, 8, 9), Rotation::FromRpy(10, 11, 12),
+                    BulbColor::kGreen, BulbType::kRound, 0 /* arrow_orientation_rad */),
                std::exception);
 }
 
 GTEST_TEST(BulbConstructorTest, EmptyAndNullOptStateVector) {
   std::vector<std::unique_ptr<Bulb>> test_cases;
-  test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("empty_state_vector"), GeoPosition(0, 0, 0),
+  test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("empty_state_vector"), InertialPosition(0, 0, 0),
                                               Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
                                               std::nullopt /* arrow_orientation_rad */, std::vector<BulbState>{}));
-  test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("std::nullopt_state_vector"), GeoPosition(0, 0, 0),
+  test_cases.push_back(std::make_unique<Bulb>(Bulb::Id("std::nullopt_state_vector"), InertialPosition(0, 0, 0),
                                               Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
                                               std::nullopt /* arrow_orientation_rad */, std::nullopt /* states */));
 
@@ -113,15 +113,15 @@ GTEST_TEST(BulbConstructorTest, EmptyAndNullOptStateVector) {
 class BulbTest : public ::testing::Test {
  public:
   BulbTest()
-      : bulb_(Bulb::Id("dut_id"), GeoPosition(1, 2, 3), Rotation::FromRpy(4, 5, 6), BulbColor::kRed, BulbType::kRound) {
-  }
+      : bulb_(Bulb::Id("dut_id"), InertialPosition(1, 2, 3), Rotation::FromRpy(4, 5, 6), BulbColor::kRed,
+              BulbType::kRound) {}
   const Bulb bulb_;
 };
 
 TEST_F(BulbTest, Accessors) {
   EXPECT_EQ(bulb_.id(), Bulb::Id("dut_id"));
   EXPECT_THROW(bulb_.unique_id(), common::assertion_error);
-  EXPECT_EQ(bulb_.position_bulb_group(), GeoPosition(1, 2, 3));
+  EXPECT_EQ(bulb_.position_bulb_group(), InertialPosition(1, 2, 3));
   EXPECT_EQ(bulb_.orientation_bulb_group().matrix(), Rotation::FromRpy(4, 5, 6).matrix());
   EXPECT_EQ(bulb_.color(), BulbColor::kRed);
   EXPECT_EQ(bulb_.type(), BulbType::kRound);
@@ -156,7 +156,7 @@ GTEST_TEST(DefaultBulbStateTest, CorrectDefaultAndIsValidStateQueries) {
                                             {{BulbState::kOff}, BulbState::kOff}};
   const Bulb::Id b_id("id");
   for (const auto& test_case : test_cases) {
-    const Bulb dut(b_id, GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
+    const Bulb dut(b_id, InertialPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound,
                    std::nullopt /* arrow_orientation_rad */, test_case.states);
     EXPECT_EQ(dut.GetDefaultState(), test_case.default_state);
     for (const auto& state : test_case.states) {
@@ -168,9 +168,9 @@ GTEST_TEST(DefaultBulbStateTest, CorrectDefaultAndIsValidStateQueries) {
 class BulbGroupConstructorTest : public ::testing::Test {
  protected:
   const BulbGroup::Id kDutId{"dut_id"};
-  const GeoPosition kDutPosition{1., 2., 3.};
+  const InertialPosition kDutPosition{1., 2., 3.};
   const Rotation kDutRotation{Rotation::FromRpy(0, 0, 0)};
-  const GeoPosition kZeroPosition{0., 0., 0.};
+  const InertialPosition kZeroPosition{0., 0., 0.};
   const Rotation kZeroRotation{Rotation::FromRpy(0, 0, 0)};
   const Bulb::Id kBulbId{"bulb_id"};
 };
@@ -183,7 +183,7 @@ TEST_F(BulbGroupConstructorTest, DuplicatedBulbIds) {
   std::vector<std::unique_ptr<Bulb>> bulbs;
   bulbs.push_back(std::make_unique<Bulb>(kBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
   bulbs.push_back(
-      std::make_unique<Bulb>(kBulbId, GeoPosition(0, 0, 0.3), kZeroRotation, BulbColor::kGreen, BulbType::kRound));
+      std::make_unique<Bulb>(kBulbId, InertialPosition(0, 0, 0.3), kZeroRotation, BulbColor::kGreen, BulbType::kRound));
   EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, std::move(bulbs)), common::assertion_error);
 }
 
@@ -198,21 +198,21 @@ TEST_F(BulbGroupConstructorTest, NullBulb) {
 class BulbGroupTest : public ::testing::Test {
  public:
   const BulbGroup::Id kBulbGroupId{"test_bulb_group"};
-  const GeoPosition kBulbGroupPosition{1., 2., 3.};
+  const InertialPosition kBulbGroupPosition{1., 2., 3.};
   const Rotation kBulbGroupRotation{Rotation::FromRpy(4., 5., 6.)};
 
   BulbGroupTest() {
     std::vector<std::unique_ptr<Bulb>> bulbs;
-    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("red_bulb"), GeoPosition(0, 0, -0.25), Rotation::FromRpy(0, 0, 0),
-                                           BulbColor::kRed, BulbType::kRound));
+    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("red_bulb"), InertialPosition(0, 0, -0.25),
+                                           Rotation::FromRpy(0, 0, 0), BulbColor::kRed, BulbType::kRound));
     red_bulb_ptr_ = bulbs.back().get();
 
-    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("yellow_bulb"), GeoPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0),
-                                           BulbColor::kYellow, BulbType::kRound));
+    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("yellow_bulb"), InertialPosition(0, 0, 0),
+                                           Rotation::FromRpy(0, 0, 0), BulbColor::kYellow, BulbType::kRound));
     yellow_bulb_ptr_ = bulbs.back().get();
 
-    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("green_bulb"), GeoPosition(0, 0, 0.25), Rotation::FromRpy(0, 0, 0),
-                                           BulbColor::kGreen, BulbType::kRound));
+    bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("green_bulb"), InertialPosition(0, 0, 0.25),
+                                           Rotation::FromRpy(0, 0, 0), BulbColor::kGreen, BulbType::kRound));
     green_bulb_ptr_ = bulbs.back().get();
 
     bulb_group_ = std::make_unique<BulbGroup>(kBulbGroupId, kBulbGroupPosition, kBulbGroupRotation, std::move(bulbs));
@@ -240,7 +240,7 @@ class TrafficLightConstructorTest : public ::testing::Test {
   const BulbGroup::Id kBulbGroupId{"bulb_group_id"};
   const Bulb::Id kGreenBulbId{"green_bulb"};
   const Bulb::Id kRedBulbId{"red_bulb"};
-  const GeoPosition kZeroPosition{0., 0., 0.};
+  const InertialPosition kZeroPosition{0., 0., 0.};
   const Rotation kZeroRotation{Rotation::FromRpy(0., 0., 0.)};
 };
 
@@ -262,9 +262,9 @@ TEST_F(TrafficLightConstructorTest, NullBulbGroup) {
 
 class TrafficLightTest : public ::testing::Test {
  public:
-  const GeoPosition kZeroPosition{0., 0., 0.};
+  const InertialPosition kZeroPosition{0., 0., 0.};
   const Rotation kZeroRotation{Rotation::FromRpy(0., 0., 0.)};
-  const GeoPosition kTrafficLightPosition{0, 0, 5};
+  const InertialPosition kTrafficLightPosition{0, 0, 5};
   const Rotation kTrafficLightRotation{kZeroRotation};
   const TrafficLight::Id kId{"four_way_stop"};
 
@@ -275,7 +275,7 @@ class TrafficLightTest : public ::testing::Test {
       std::vector<std::unique_ptr<Bulb>> bulbs;
       bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("north_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
                                              BulbType::kRound));
-      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("north_group"), GeoPosition(0, 0.1, 0),
+      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("north_group"), InertialPosition(0, 0.1, 0),
                                                        Rotation::FromRpy(0, 0, M_PI_2), std::move(bulbs)));
       north_bulb_group_ = bulb_group.back().get();
     }
@@ -283,7 +283,7 @@ class TrafficLightTest : public ::testing::Test {
       std::vector<std::unique_ptr<Bulb>> bulbs;
       bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("south_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
                                              BulbType::kRound));
-      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("south_group"), GeoPosition(0, -0.1, 0),
+      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("south_group"), InertialPosition(0, -0.1, 0),
                                                        Rotation::FromRpy(0, 0, -M_PI_2), std::move(bulbs)));
       south_bulb_group_ = bulb_group.back().get();
     }
@@ -291,7 +291,7 @@ class TrafficLightTest : public ::testing::Test {
       std::vector<std::unique_ptr<Bulb>> bulbs;
       bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("east_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
                                              BulbType::kRound));
-      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("east_group"), GeoPosition(0.1, 0., 0),
+      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("east_group"), InertialPosition(0.1, 0., 0),
                                                        kZeroRotation, std::move(bulbs)));
       east_bulb_group_ = bulb_group.back().get();
     }
@@ -299,7 +299,7 @@ class TrafficLightTest : public ::testing::Test {
       std::vector<std::unique_ptr<Bulb>> bulbs;
       bulbs.push_back(std::make_unique<Bulb>(Bulb::Id("west_bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed,
                                              BulbType::kRound));
-      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("west_group"), GeoPosition(-0.1, 0., 0),
+      bulb_group.push_back(std::make_unique<BulbGroup>(BulbGroup::Id("west_group"), InertialPosition(-0.1, 0., 0),
                                                        Rotation::FromRpy(0, 0, M_PI), std::move(bulbs)));
       west_bulb_group_ = bulb_group.back().get();
     }

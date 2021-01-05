@@ -172,9 +172,9 @@ class MockLane final : public Lane {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLane);
   MockLane(const LaneId& id) : Lane(), id_(id) {}
-  MockLane(const LaneId& id, const GeoPosition& start_gp, const Rotation& start_rot, const GeoPosition& end_gp,
-           const Rotation& end_rot)
-      : Lane(), id_(id), start_gp_(start_gp), start_rot_(start_rot), end_gp_(end_gp), end_rot_(end_rot) {}
+  MockLane(const LaneId& id, const InertialPosition& start_ip, const Rotation& start_rot,
+           const InertialPosition& end_ip, const Rotation& end_rot)
+      : Lane(), id_(id), start_ip_(start_ip), start_rot_(start_rot), end_ip_(end_ip), end_rot_(end_rot) {}
   MockLane(const LaneId& id, const LanePositionResult& lane_position_result)
       : Lane(), id_(id), lane_position_result_(lane_position_result) {}
   void set_segment(Segment* segment) { segment_ = segment; }
@@ -191,10 +191,10 @@ class MockLane final : public Lane {
   RBounds do_lane_bounds(double) const override { return RBounds(-1, 1); };
   RBounds do_segment_bounds(double) const override { return RBounds(-1, 1); };
   HBounds do_elevation_bounds(double, double) const override { return HBounds(0, 10); };
-  GeoPosition DoToGeoPosition(const LanePosition& lane_pos) const override {
-    return lane_pos.s() ? end_gp_ : start_gp_;
+  InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const override {
+    return lane_pos.s() ? end_ip_ : start_ip_;
   }
-  LanePositionResult DoToLanePosition(const GeoPosition&) const override { return lane_position_result_; }
+  LanePositionResult DoToLanePosition(const InertialPosition&) const override { return lane_position_result_; }
   Rotation DoGetOrientation(const LanePosition& lane_pos) const override {
     return lane_pos.s() ? end_rot_ : start_rot_;
   }
@@ -212,9 +212,9 @@ class MockLane final : public Lane {
   Segment* segment_{};
   BranchPoint* start_bp_{};
   BranchPoint* end_bp_{};
-  GeoPosition start_gp_{};
+  InertialPosition start_ip_{};
   Rotation start_rot_{};
-  GeoPosition end_gp_{};
+  InertialPosition end_ip_{};
   Rotation end_rot_{};
   LanePositionResult lane_position_result_{};
 };
@@ -332,10 +332,10 @@ class MockRoadGeometry : public RoadGeometry {
     return i == 0 ? start_bp_.get() : end_bp_.get();
   }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const std::optional<RoadPosition>&) const override {
+  api::RoadPositionResult DoToRoadPosition(const InertialPosition&, const std::optional<RoadPosition>&) const override {
     return RoadPositionResult();
   }
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const InertialPosition&, double) const override {
     return {{RoadPositionResult()}};
   }
   double do_linear_tolerance() const override { return linear_tolerance_; }

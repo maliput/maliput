@@ -69,9 +69,9 @@ class GeoVertex {
 
   GeoVertex() {}
 
-  explicit GeoVertex(const api::GeoPosition& v) : v_(v) {}
+  explicit GeoVertex(const api::InertialPosition& v) : v_(v) {}
 
-  const api::GeoPosition& v() const { return v_; }
+  const api::InertialPosition& v() const { return v_; }
 
   //// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
@@ -83,7 +83,7 @@ class GeoVertex {
   }
 
  private:
-  api::GeoPosition v_;
+  api::InertialPosition v_;
 };
 
 /// A world frame normal vector.
@@ -99,9 +99,9 @@ class GeoNormal {
 
   GeoNormal() {}
 
-  explicit GeoNormal(const api::GeoPosition& n) : n_(n) {}
+  explicit GeoNormal(const api::InertialPosition& n) : n_(n) {}
 
-  const api::GeoPosition& n() const { return n_; }
+  const api::InertialPosition& n() const { return n_; }
 
   //// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
@@ -113,7 +113,7 @@ class GeoNormal {
   }
 
  private:
-  api::GeoPosition n_;
+  api::InertialPosition n_;
 };
 
 /// A world frame face:  a sequence of vertices with corresponding normals.
@@ -165,11 +165,11 @@ class GeoMesh {
  public:
   GeoMesh() {}
 
-  void PushFace(const GeoFace& geo_face) {
+  void PushFace(const GeoFace& inertial_face) {
     IndexFace face;
-    for (size_t gi = 0; gi < geo_face.vertices().size(); ++gi) {
-      int vi = vertices_.push_back(geo_face.vertices()[gi]);
-      int ni = normals_.push_back(geo_face.normals()[gi]);
+    for (size_t gi = 0; gi < inertial_face.vertices().size(); ++gi) {
+      int vi = vertices_.push_back(inertial_face.vertices()[gi]);
+      int ni = normals_.push_back(inertial_face.normals()[gi]);
       face.push_vertex(vi, ni);
     }
     faces_.push_back(face);
@@ -206,7 +206,8 @@ class GeoMesh {
   /// normal_index_offset) which can be chained into a succeeding call to
   /// EmitObj().
   std::tuple<int, int> EmitObj(std::ostream& os, const std::string& material, int precision,
-                               const api::GeoPosition& origin, int vertex_index_offset, int normal_index_offset) const {
+                               const api::InertialPosition& origin, int vertex_index_offset,
+                               int normal_index_offset) const {
     if (faces_.empty()) {
       // Short-circuit if there is nothing to draw.
       return std::make_tuple(vertex_index_offset, normal_index_offset);
@@ -268,13 +269,13 @@ class SrhFace {
 
   /// Given a @p lane, calculates the corresponding GeoFace.
   GeoFace ToGeoFace(const api::Lane* lane) const {
-    GeoFace geo_face;
+    GeoFace inertial_face;
     for (const api::LanePosition& srh : vertices_) {
-      api::GeoPosition xyz(lane->ToGeoPosition(srh));
-      api::GeoPosition n = api::GeoPosition::FromXyz(lane->GetOrientation(srh).quat() * normal_.srh());
-      geo_face.push_vn(GeoVertex(xyz), GeoNormal(n));
+      api::InertialPosition xyz(lane->ToInertialPosition(srh));
+      api::InertialPosition n = api::InertialPosition::FromXyz(lane->GetOrientation(srh).quat() * normal_.srh());
+      inertial_face.push_vn(GeoVertex(xyz), GeoNormal(n));
     }
-    return geo_face;
+    return inertial_face;
   }
 
  private:

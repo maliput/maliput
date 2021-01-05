@@ -7,13 +7,13 @@ namespace maliput {
 namespace geometry_base {
 namespace test {
 
-api::RoadPositionResult MockRoadGeometry::DoToRoadPosition(const api::GeoPosition&,
+api::RoadPositionResult MockRoadGeometry::DoToRoadPosition(const api::InertialPosition&,
                                                            const std::optional<api::RoadPosition>&) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
-std::vector<api::RoadPositionResult> MockRoadGeometry::DoFindRoadPositions(const api::GeoPosition&, double) const {
+std::vector<api::RoadPositionResult> MockRoadGeometry::DoFindRoadPositions(const api::InertialPosition&, double) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
@@ -38,7 +38,7 @@ api::HBounds MockLane::do_elevation_bounds(double, double) const {
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
-api::GeoPosition MockLane::DoToGeoPosition(const api::LanePosition&) const {
+api::InertialPosition MockLane::DoToInertialPosition(const api::LanePosition&) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
@@ -53,7 +53,7 @@ api::LanePosition MockLane::DoEvalMotionDerivatives(const api::LanePosition&, co
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
-api::LanePositionResult MockLane::DoToLanePosition(const api::GeoPosition&) const {
+api::LanePositionResult MockLane::DoToLanePosition(const api::InertialPosition&) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }

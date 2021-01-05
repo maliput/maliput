@@ -63,10 +63,10 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   int do_num_branch_points() const override { return 1; }
   const BranchPoint* do_branch_point(int) const override { return nullptr; }
   const IdIndex& DoById() const override { return mock_id_index_; }
-  api::RoadPositionResult DoToRoadPosition(const GeoPosition&, const std::optional<RoadPosition>&) const override {
+  api::RoadPositionResult DoToRoadPosition(const InertialPosition&, const std::optional<RoadPosition>&) const override {
     return api::RoadPositionResult();
   }
-  std::vector<api::RoadPositionResult> DoFindRoadPositions(const GeoPosition&, double) const override {
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const InertialPosition&, double) const override {
     return {api::RoadPositionResult()};
   }
   double do_linear_tolerance() const override { return 0; }
@@ -576,10 +576,10 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
   auto segment_b = std::make_unique<MockSegment>(SegmentId("mock_b"));
   segment_b->set_junction(junction_b.get());
   // Creates the start and end points of the Lanes.
-  GeoPosition start_gp_a;
-  GeoPosition end_gp_a;
-  GeoPosition start_gp_b;
-  GeoPosition end_gp_b;
+  InertialPosition start_ip_a;
+  InertialPosition end_ip_a;
+  InertialPosition start_ip_b;
+  InertialPosition end_ip_b;
   Rotation start_rot_a;
   Rotation end_rot_a;
   Rotation start_rot_b;
@@ -587,16 +587,16 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
 
   if (build_flags.add_linear_mismatch) {
     // Assign different positions for the lane 1 end and lane 2 start.
-    start_gp_a = GeoPosition(0, 0, 0);
-    end_gp_a = GeoPosition(10, 0, 0);
-    start_gp_b = GeoPosition(11, 0, 0);
-    end_gp_b = GeoPosition(21, 0, 0);
+    start_ip_a = InertialPosition(0, 0, 0);
+    end_ip_a = InertialPosition(10, 0, 0);
+    start_ip_b = InertialPosition(11, 0, 0);
+    end_ip_b = InertialPosition(21, 0, 0);
   } else {
     // Assign same position for the lane 1 end and lane 2 start.
-    start_gp_a = GeoPosition(0, 0, 0);
-    end_gp_a = GeoPosition(10, 0, 0);
-    start_gp_b = GeoPosition(10, 0, 0);
-    end_gp_b = GeoPosition(20, 0, 0);
+    start_ip_a = InertialPosition(0, 0, 0);
+    end_ip_a = InertialPosition(10, 0, 0);
+    start_ip_b = InertialPosition(10, 0, 0);
+    end_ip_b = InertialPosition(20, 0, 0);
   }
   if (build_flags.add_angular_mismatch) {
     // Assign different rotations for the lane 1 end and lane 2 start.
@@ -611,8 +611,8 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
     start_rot_b = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
     end_rot_b = Rotation(Rotation::FromRpy(0.0, 0.0, 0.0));
   }
-  auto lane_a = std::make_unique<MockLane>(LaneId("mock_a"), start_gp_a, start_rot_a, end_gp_a, end_rot_a);
-  auto lane_b = std::make_unique<MockLane>(LaneId("mock_b"), start_gp_b, start_rot_b, end_gp_b, end_rot_b);
+  auto lane_a = std::make_unique<MockLane>(LaneId("mock_a"), start_ip_a, start_rot_a, end_ip_a, end_rot_a);
+  auto lane_b = std::make_unique<MockLane>(LaneId("mock_b"), start_ip_b, start_rot_b, end_ip_b, end_rot_b);
   lane_a->set_segment(segment_a.get());
   lane_b->set_segment(segment_b.get());
   rg->GetIdIndex()->add_lane_to_map(lane_a->id(), lane_a.get());
@@ -686,17 +686,17 @@ std::unique_ptr<rules::RoadRulebook> CreateRoadRulebook(const RoadRulebookRelate
 std::unique_ptr<BulbGroup> CreateBulbGroup(bool add_missing_bulb_group) {
   const BulbGroup::Id bulb_group_id{add_missing_bulb_group ? "MissingBulbGroupId" : "BulbGroupId"};
   std::vector<std::unique_ptr<Bulb>> bulbs;
-  bulbs.push_back(std::make_unique<Bulb>(Bulb::Id{"BulbId"}, GeoPosition(), Rotation(), rules::BulbColor::kRed,
+  bulbs.push_back(std::make_unique<Bulb>(Bulb::Id{"BulbId"}, InertialPosition(), Rotation(), rules::BulbColor::kRed,
                                          rules::BulbType::kRound, std::nullopt /* arrow_orientation_rad */,
                                          std::vector<rules::BulbState>{rules::BulbState::kOn}));
-  return std::make_unique<BulbGroup>(bulb_group_id, GeoPosition(), Rotation(), std::move(bulbs));
+  return std::make_unique<BulbGroup>(bulb_group_id, InertialPosition(), Rotation(), std::move(bulbs));
 }
 
 std::unique_ptr<TrafficLight> CreateTrafficLight(const TrafficLightBuildFlags& build_flags) {
   const TrafficLight::Id id(build_flags.add_missing_traffic_light ? "MissingTrafficLightId" : "TrafficLightId");
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
   bulb_groups.push_back(CreateBulbGroup(build_flags.add_missing_bulb_group));
-  return std::make_unique<TrafficLight>(id, GeoPosition(), Rotation(), std::move(bulb_groups));
+  return std::make_unique<TrafficLight>(id, InertialPosition(), Rotation(), std::move(bulb_groups));
 }
 
 std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() {

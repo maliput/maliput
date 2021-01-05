@@ -120,7 +120,7 @@ class Bulb final {
   /// details about the default value.
   ///
   /// @throws common::assertion_error When `unique_id.bulb_id != id`.
-  Bulb(const Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
+  Bulb(const Id& id, const InertialPosition& position_bulb_group, const Rotation& orientation_bulb_group,
        const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad = std::nullopt,
        const std::optional<std::vector<BulbState>>& states = std::nullopt, BoundingBox bounding_box = BoundingBox());
 
@@ -136,7 +136,7 @@ class Bulb final {
 
   /// Returns the linear offset of this bulb's frame relative to the frame of
   /// the bulb group that contains it.
-  const GeoPosition& position_bulb_group() const { return position_bulb_group_; }
+  const InertialPosition& position_bulb_group() const { return position_bulb_group_; }
 
   /// Returns the rotational offset of this bulb's frame relative to the frame
   /// of the bulb group that contains it.
@@ -188,7 +188,7 @@ class Bulb final {
 
  private:
   Id id_;
-  GeoPosition position_bulb_group_;
+  InertialPosition position_bulb_group_;
   Rotation orientation_bulb_group_;
   BulbColor color_ = BulbColor::kRed;
   BulbType type_ = BulbType::kRound;
@@ -239,7 +239,7 @@ class BulbGroup final {
   /// Bulb::Id in @p bulbs.
   /// @throws common::assertion_error When any of the Bulbs in @p bulbs is
   /// nullptr.
-  BulbGroup(const Id& id, const GeoPosition& position_traffic_light, const Rotation& orientation_traffic_light,
+  BulbGroup(const Id& id, const InertialPosition& position_traffic_light, const Rotation& orientation_traffic_light,
             std::vector<std::unique_ptr<Bulb>> bulbs);
 
   /// Returns this BulbGroup instance's unique identifier.
@@ -253,7 +253,7 @@ class BulbGroup final {
 
   /// Returns the linear offset of this bulb group's frame relative to the
   /// frame of the traffic light that contains it.
-  const GeoPosition& position_traffic_light() const { return position_traffic_light_; }
+  const InertialPosition& position_traffic_light() const { return position_traffic_light_; }
 
   /// Returns the rotational offset of this bulb group's frame relative to the
   /// frame of the traffic light that contains it.
@@ -283,7 +283,7 @@ class BulbGroup final {
 
  private:
   Id id_;
-  GeoPosition position_traffic_light_;
+  InertialPosition position_traffic_light_;
   Rotation orientation_traffic_light_;
   std::vector<std::unique_ptr<Bulb>> bulbs_;
   const TrafficLight* traffic_light_{};
@@ -335,7 +335,7 @@ class TrafficLight final {
   /// BulbGroup::Id in @p bulb_groups.
   /// @throws common::assertion_error When any of the BulbGroup in
   /// @p bulb_groups is nullptr.
-  TrafficLight(const Id& id, const GeoPosition& position_road_network, const Rotation& orientation_road_network,
+  TrafficLight(const Id& id, const InertialPosition& position_road_network, const Rotation& orientation_road_network,
                std::vector<std::unique_ptr<BulbGroup>> bulb_groups);
 
   /// Returns this traffic light's unique identifier.
@@ -343,7 +343,7 @@ class TrafficLight final {
 
   /// Returns this traffic light's frame's position within the road network's
   /// frame.
-  const GeoPosition& position_road_network() const { return position_road_network_; }
+  const InertialPosition& position_road_network() const { return position_road_network_; }
 
   const Rotation& orientation_road_network() const { return orientation_road_network_; }
 
@@ -355,7 +355,7 @@ class TrafficLight final {
 
  private:
   Id id_;
-  GeoPosition position_road_network_;
+  InertialPosition position_road_network_;
   Rotation orientation_road_network_;
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups_;
 };

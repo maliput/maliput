@@ -11,15 +11,15 @@ namespace api {
 namespace {
 
 // Tests the streaming string operators for the following Maliput abstractions:
-//   - GeoPosition
+//   - InertialPosition
 //   - LaneEnd::Which
 //   - LanePosition
 //   - Rotation
 GTEST_TEST(MaliputApiTest, TestLaneDataToStringStream) {
   std::stringstream buffer;
 
-  // Tests GeoPosition.
-  buffer << GeoPosition(1.5, 2.2, 3.7);
+  // Tests InertialPosition.
+  buffer << InertialPosition(1.5, 2.2, 3.7);
   EXPECT_EQ(buffer.str(), "(x = 1.5, y = 2.2, z = 3.7)");
   buffer.str("");
   buffer.clear();

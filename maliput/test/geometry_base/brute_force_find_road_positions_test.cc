@@ -37,39 +37,40 @@ class BruteForceTest : public ::testing::Test {
   const double kZeroTolerance{0.};
 };
 
-class GeoPositionMatcher : public MatcherInterface<const api::GeoPosition&> {
+class InertialPositionMatcher : public MatcherInterface<const api::InertialPosition&> {
  public:
-  GeoPositionMatcher(const api::GeoPosition& geo_position, double tolerance)
-      : geo_position_(geo_position), tolerance_(tolerance) {}
+  InertialPositionMatcher(const api::InertialPosition& inertial_position, double tolerance)
+      : inertial_position_(inertial_position), tolerance_(tolerance) {}
 
-  bool MatchAndExplain(const api::GeoPosition& other, MatchResultListener*) const override {
-    return maliput::api::test::IsGeoPositionClose(geo_position_, other, tolerance_);
+  bool MatchAndExplain(const api::InertialPosition& other, MatchResultListener*) const override {
+    return maliput::api::test::IsInertialPositionClose(inertial_position_, other, tolerance_);
   }
 
   void DescribeTo(std::ostream* os) const override {
-    *os << "is within tolerance: [" << tolerance_ << "] of all x, y, and z coordinates in: [" << geo_position_ << "].";
+    *os << "is within tolerance: [" << tolerance_ << "] of all x, y, and z coordinates in: [" << inertial_position_
+        << "].";
   }
 
  private:
-  const api::GeoPosition geo_position_;
+  const api::InertialPosition inertial_position_;
   const double tolerance_{};
 };
 
-Matcher<const api::GeoPosition&> Matches(const api::GeoPosition& geo_position, double tolerance) {
-  return MakeMatcher(new GeoPositionMatcher(geo_position, tolerance));
+Matcher<const api::InertialPosition&> Matches(const api::InertialPosition& inertial_position, double tolerance) {
+  return MakeMatcher(new InertialPositionMatcher(inertial_position, tolerance));
 }
 
 class LaneMock final : public MockLane {
  public:
   LaneMock(const api::LaneId& id, double distance) : MockLane(id), distance_(distance) {
-    ON_CALL(*this, DoToLanePosition(An<const api::GeoPosition&>()))
+    ON_CALL(*this, DoToLanePosition(An<const api::InertialPosition&>()))
         .WillByDefault(Invoke(this, &LaneMock::InternalDoToLanePosition));
   }
 
-  MOCK_CONST_METHOD1(DoToLanePosition, api::LanePositionResult(const api::GeoPosition&));
+  MOCK_CONST_METHOD1(DoToLanePosition, api::LanePositionResult(const api::InertialPosition&));
 
-  api::LanePositionResult InternalDoToLanePosition(const api::GeoPosition&) const {
-    return api::LanePositionResult{api::LanePosition(4., 5., 6.), api::GeoPosition(10., 11., 12.), distance_};
+  api::LanePositionResult InternalDoToLanePosition(const api::InertialPosition&) const {
+    return api::LanePositionResult{api::LanePosition(4., 5., 6.), api::InertialPosition(10., 11., 12.), distance_};
   }
 
  private:
@@ -141,35 +142,37 @@ TEST_F(BruteForceTest, LaneInAndOutRadius) {
       MakeOneLaneRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length, kDistance);
 
   std::vector<api::RoadPositionResult> results =
-      BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), kRadius);
+      BruteForceFindRoadPositionsStrategy(rg.get(), api::InertialPosition(1., 2., 3.), kRadius);
 
   EXPECT_EQ(static_cast<int>(results.size()), 1);
   const api::LanePosition kExpectedLanePosition{4., 5., 6.};
-  const api::GeoPosition kExpectedGeoPosition{10., 11., 12.};
+  const api::InertialPosition kExpectedInertialPosition{10., 11., 12.};
   const double kExpectedDistance = 3.;
   const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
   api::LaneId id = results.front().road_position.lane->id();
 
   EXPECT_TRUE(id == lanes.front()->id());
   EXPECT_TRUE(api::test::IsLanePositionClose(results.front().road_position.pos, kExpectedLanePosition, kZeroTolerance));
-  EXPECT_TRUE(api::test::IsGeoPositionClose(results.front().nearest_position, kExpectedGeoPosition, kZeroTolerance));
+  EXPECT_TRUE(
+      api::test::IsInertialPositionClose(results.front().nearest_position, kExpectedInertialPosition, kZeroTolerance));
   EXPECT_NEAR(results.front().distance, kExpectedDistance, kZeroTolerance);
 
   rg = MakeOneLaneRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length,
                                2. * kDistance);
-  results = BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), kRadius);
+  results = BruteForceFindRoadPositionsStrategy(rg.get(), api::InertialPosition(1., 2., 3.), kRadius);
 
   EXPECT_TRUE(results.empty());
 }
 
 TEST_F(BruteForceTest, NullRoadGeometry) {
-  EXPECT_THROW(BruteForceFindRoadPositionsStrategy(nullptr, api::GeoPosition(0., 0., 0.), 0.), common::assertion_error);
+  EXPECT_THROW(BruteForceFindRoadPositionsStrategy(nullptr, api::InertialPosition(0., 0., 0.), 0.),
+               common::assertion_error);
 }
 
 TEST_F(BruteForceTest, NegativeRadius) {
   std::unique_ptr<MockRoadGeometry> rg =
       MakeFullRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length);
-  EXPECT_THROW(BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(0., 0., 0.), -1.),
+  EXPECT_THROW(BruteForceFindRoadPositionsStrategy(rg.get(), api::InertialPosition(0., 0., 0.), -1.),
                common::assertion_error);
 }
 
@@ -179,15 +182,15 @@ TEST_F(BruteForceTest, AllLanesCalled) {
   const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
 
   for (auto lane : lanes) {
-    EXPECT_CALL(*lane, DoToLanePosition(Matches(api::GeoPosition(1., 2., 3.), kZeroTolerance)));
+    EXPECT_CALL(*lane, DoToLanePosition(Matches(api::InertialPosition(1., 2., 3.), kZeroTolerance)));
   }
 
   const std::vector<api::RoadPositionResult> results =
-      BruteForceFindRoadPositionsStrategy(rg.get(), api::GeoPosition(1., 2., 3.), 4.);
+      BruteForceFindRoadPositionsStrategy(rg.get(), api::InertialPosition(1., 2., 3.), 4.);
 
   EXPECT_EQ(static_cast<int>(results.size()), 3);
   const api::LanePosition kExpectedLanePosition{4., 5., 6.};
-  const api::GeoPosition kExpectedGeoPosition{10., 11., 12.};
+  const api::InertialPosition kExpectedInertialPosition{10., 11., 12.};
   const double kExpectedDistance = 3.;
   for (const auto road_position_result : results) {
     EXPECT_TRUE(std::any_of(
@@ -195,8 +198,8 @@ TEST_F(BruteForceTest, AllLanesCalled) {
         [id = road_position_result.road_position.lane->id()](LaneMock* lane) mutable { return id == lane->id(); }));
     EXPECT_TRUE(
         api::test::IsLanePositionClose(road_position_result.road_position.pos, kExpectedLanePosition, kZeroTolerance));
-    EXPECT_TRUE(
-        api::test::IsGeoPositionClose(road_position_result.nearest_position, kExpectedGeoPosition, kZeroTolerance));
+    EXPECT_TRUE(api::test::IsInertialPositionClose(road_position_result.nearest_position, kExpectedInertialPosition,
+                                                   kZeroTolerance));
     EXPECT_NEAR(road_position_result.distance, kExpectedDistance, kZeroTolerance);
   }
 }

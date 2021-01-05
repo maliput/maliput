@@ -33,7 +33,7 @@ std::unordered_map<BulbState, const char*, maliput::common::DefaultHash> BulbSta
   return result;
 }
 
-Bulb::Bulb(const Bulb::Id& id, const GeoPosition& position_bulb_group, const Rotation& orientation_bulb_group,
+Bulb::Bulb(const Bulb::Id& id, const InertialPosition& position_bulb_group, const Rotation& orientation_bulb_group,
            const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad,
            const std::optional<std::vector<BulbState>>& states, BoundingBox bounding_box)
     : id_(id),
@@ -73,7 +73,7 @@ UniqueBulbId Bulb::unique_id() const {
   return UniqueBulbId(bulb_group_->traffic_light()->id(), bulb_group_->id(), id_);
 }
 
-BulbGroup::BulbGroup(const BulbGroup::Id& id, const GeoPosition& position_traffic_light,
+BulbGroup::BulbGroup(const BulbGroup::Id& id, const InertialPosition& position_traffic_light,
                      const Rotation& orientation_traffic_light, std::vector<std::unique_ptr<Bulb>> bulbs)
     : id_(id),
       position_traffic_light_(position_traffic_light),
@@ -111,7 +111,7 @@ UniqueBulbGroupId BulbGroup::unique_id() const {
   return UniqueBulbGroupId(traffic_light_->id(), id_);
 }
 
-TrafficLight::TrafficLight(const TrafficLight::Id& id, const GeoPosition& position_road_network,
+TrafficLight::TrafficLight(const TrafficLight::Id& id, const InertialPosition& position_road_network,
                            const Rotation& orientation_road_network,
                            std::vector<std::unique_ptr<BulbGroup>> bulb_groups)
     : id_(id),

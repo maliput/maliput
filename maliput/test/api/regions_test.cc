@@ -317,28 +317,28 @@ INSTANTIATE_TEST_CASE_P(IsContiguousFunctionTestGroup, IsContiguousInvalidArgume
 
 GTEST_TEST(IsIncluded, BasicUsage) {
   const auto rg = test::CreateTwoLanesRoadGeometry();
-  {  // `geo_pos` does not map any Lane.
-    const GeoPosition geo_pos{80., 100., 45.};
+  {  // `inertial_pos` does not map any Lane.
+    const InertialPosition inertial_pos{80., 100., 45.};
     const LaneSRange lane_s_range_b{LaneId{"lane_b"}, SRange{0., 50.}};
     const std::vector<LaneSRange> region{lane_s_range_b};
-    EXPECT_FALSE(IsIncluded(geo_pos, region, rg.get()));
+    EXPECT_FALSE(IsIncluded(inertial_pos, region, rg.get()));
   }
-  const GeoPosition geo_pos{11.9, 89., 1.};
-  {  // `lane_s_range_a` includes `geo_pos`.
+  const InertialPosition inertial_pos{11.9, 89., 1.};
+  {  // `lane_s_range_a` includes `inertial_pos`.
     const LaneSRange lane_s_range_a{LaneId{"lane_a"}, SRange{0., 50.}};
     const LaneSRange lane_s_range_b{LaneId{"lane_b"}, SRange{0., 50.}};
     const std::vector<LaneSRange> region{lane_s_range_a, lane_s_range_b};
-    EXPECT_TRUE(IsIncluded(geo_pos, region, rg.get()));
+    EXPECT_TRUE(IsIncluded(inertial_pos, region, rg.get()));
   }
-  {  // `lane_a` includes `geo_pos` but `lane_s_range_a` does not.
+  {  // `lane_a` includes `inertial_pos` but `lane_s_range_a` does not.
     const LaneSRange lane_s_range_a{LaneId{"lane_a"}, SRange{0., 5.}};
     const std::vector<LaneSRange> region{lane_s_range_a};
-    EXPECT_FALSE(IsIncluded(geo_pos, region, rg.get()));
+    EXPECT_FALSE(IsIncluded(inertial_pos, region, rg.get()));
   }
-  {  // `lane_a` includes `geo_pos` but `lane_s_range_b`'s lane does not.
+  {  // `lane_a` includes `inertial_pos` but `lane_s_range_b`'s lane does not.
     const LaneSRange lane_s_range_b{LaneId{"lane_b"}, SRange{0., 50.}};
     const std::vector<LaneSRange> region{lane_s_range_b};
-    EXPECT_FALSE(IsIncluded(geo_pos, region, rg.get()));
+    EXPECT_FALSE(IsIncluded(inertial_pos, region, rg.get()));
   }
 }
 

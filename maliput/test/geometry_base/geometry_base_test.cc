@@ -73,10 +73,10 @@ GTEST_TEST(GeometryBaseLaneTest, UnimplementedMethods) {
   EXPECT_THROW(dut.lane_bounds(0.), std::exception);
   EXPECT_THROW(dut.segment_bounds(0.), std::exception);
   EXPECT_THROW(dut.elevation_bounds(0., 0.), std::exception);
-  EXPECT_THROW(dut.ToGeoPosition(api::LanePosition()), std::exception);
+  EXPECT_THROW(dut.ToInertialPosition(api::LanePosition()), std::exception);
   EXPECT_THROW(dut.GetOrientation(api::LanePosition()), std::exception);
   EXPECT_THROW(dut.EvalMotionDerivatives(api::LanePosition(), api::IsoLaneVelocity()), std::exception);
-  EXPECT_THROW(dut.ToLanePosition(api::GeoPosition()), std::exception);
+  EXPECT_THROW(dut.ToLanePosition(api::InertialPosition()), std::exception);
 }
 
 GTEST_TEST(GeometryBaseBranchPointTest, BasicConstruction) {
@@ -362,8 +362,8 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
 GTEST_TEST(GeometryBaseRoadGeometryTest, UnimplementedMethods) {
   const MockRoadGeometry dut(api::RoadGeometryId("dut"), 1., 1., 1.);
   // Ensure that the not-actually-implemented methods throw an exception.
-  EXPECT_THROW(dut.ToRoadPosition(api::GeoPosition(), std::nullopt), std::exception);
-  EXPECT_THROW(dut.FindRoadPositions(api::GeoPosition(), 1.), std::exception);
+  EXPECT_THROW(dut.ToRoadPosition(api::InertialPosition(), std::nullopt), std::exception);
+  EXPECT_THROW(dut.FindRoadPositions(api::InertialPosition(), 1.), std::exception);
 }
 
 }  // namespace
