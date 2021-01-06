@@ -63,10 +63,14 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
                 const std::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
                 const std::optional<double>& duration_until);
 
- private:
-  std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
-      const api::rules::Rule::Id& id) const final;
+ protected:
+  // This function has been marked as virtual because other providers might
+  // benefit from injecting their own getter and then forwarding calls to this
+  // function.
+  virtual std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
+      const api::rules::Rule::Id& id) const;
 
+ private:
   // @throws common::assertion_error When @p state is unrecognized in
   //         @p discrete_value_rule's values.
   void ValidateRuleState(const api::rules::DiscreteValueRule& discrete_value_rule,
