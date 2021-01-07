@@ -5,7 +5,9 @@
 #include "maliput/api/rules/discrete_value_rule_state_provider.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring_book.h"
+#include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/base/manual_discrete_value_rule_state_provider.h"
 #include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
@@ -24,7 +26,13 @@ namespace maliput {
 ///
 /// The rules above will ensure vehicles traveling on Street A do not collide
 /// with vehicles traveling on Street B and vice versa.
-class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public api::rules::DiscreteValueRuleStateProvider {
+///
+/// This state provider also acts as a ManualDiscreteValueRuleStateProvider, but
+/// it overrides the behavior for Right-Of-Way rules with the aforementioned
+/// one. At build time, it is expected that the loader calls
+/// ManualDiscreteValueRuleStateProvider::SetState() for those non Right-Of-Way
+/// rules that are part of the RoadRulebook.
+class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public ManualDiscreteValueRuleStateProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseBasedRightOfWayDiscreteValueRuleStateProvider)
 
@@ -32,7 +40,12 @@ class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public api::rul
   ///
   /// All pointer parameters are aliased; they must not be nullptr and their
   /// lifespans must exceed that of this instance.
-  PhaseBasedRightOfWayDiscreteValueRuleStateProvider(const api::rules::PhaseRingBook* phase_ring_book,
+  ///
+  /// @throws common::assertion_error When `rulebook` is nullptr.
+  /// @throws common::assertion_error When `phase_ring_book` is nullptr.
+  /// @throws common::assertion_error When `phase_provider` is nullptr.
+  PhaseBasedRightOfWayDiscreteValueRuleStateProvider(const api::rules::RoadRulebook* rulebook,
+                                                     const api::rules::PhaseRingBook* phase_ring_book,
                                                      const api::rules::PhaseProvider* phase_provider);
 
   ~PhaseBasedRightOfWayDiscreteValueRuleStateProvider() final = default;
@@ -42,6 +55,9 @@ class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public api::rul
   const api::rules::PhaseProvider& phase_provider() const { return *phase_provider_; }
 
  private:
+  // Gets the state for Right-Of-Way rules as the class docstring explain. When
+  // nothing can be told about the rule based on the phase,
+  // ManualDiscreteValueRuleStateProvider::DoGetState() is called.
   std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 

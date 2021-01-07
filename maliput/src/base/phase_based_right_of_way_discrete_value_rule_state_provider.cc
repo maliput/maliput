@@ -16,9 +16,12 @@ using api::rules::PhaseRingBook;
 using api::rules::Rule;
 
 PhaseBasedRightOfWayDiscreteValueRuleStateProvider::PhaseBasedRightOfWayDiscreteValueRuleStateProvider(
-    const PhaseRingBook* phase_ring_book, const PhaseProvider* phase_provider)
-    : phase_ring_book_(phase_ring_book), phase_provider_(phase_provider) {
-  MALIPUT_DEMAND(phase_ring_book_ != nullptr && phase_provider != nullptr);
+    const api::rules::RoadRulebook* rulebook, const PhaseRingBook* phase_ring_book, const PhaseProvider* phase_provider)
+    : ManualDiscreteValueRuleStateProvider(rulebook),
+      phase_ring_book_(phase_ring_book),
+      phase_provider_(phase_provider) {
+  MALIPUT_THROW_UNLESS(phase_ring_book_ != nullptr);
+  MALIPUT_THROW_UNLESS(phase_provider_ != nullptr);
 }
 
 std::optional<DiscreteValueRuleStateProvider::StateResult>
@@ -40,7 +43,7 @@ PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const Rule::Id& r
       return DiscreteValueRuleStateProvider::StateResult{value, next};
     }
   }
-  return std::nullopt;
+  return ManualDiscreteValueRuleStateProvider::DoGetState(rule_id);
 }
 
 }  // namespace maliput
