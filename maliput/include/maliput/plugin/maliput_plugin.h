@@ -19,6 +19,11 @@ using MaliputPluginId = api::TypeSpecificIdentifier<class MaliputPlugin>;
 /// MaliputPlugin loads a dynamic library.
 /// After construction, the id and type of the plugin are provided.
 /// I adition this allows you to execute any symbol from the library.
+/// The library must contain at least two methods which they are:
+/// @code{.cpp}
+/// extern "C" std::string GetMaliputPluginId();
+/// extern "C" MaliputPlugin::Type GetMaliputPluginType();
+/// @endcode
 class MaliputPlugin {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MaliputPlugin);
@@ -51,7 +56,7 @@ class MaliputPlugin {
   ///
   /// @throws maliput::common::assertion_error When `sym_name` is not found.
   template <typename ReturnType, typename... Args>
-  ReturnType ExecuteSymbol(const std::string& sym_name, Args&&... args) {
+  ReturnType ExecuteSymbol(const std::string& sym_name, Args&&... args) const {
     // Reset error string.
     dlerror();
     typedef ReturnType (*method_t)(Args...);
