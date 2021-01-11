@@ -24,6 +24,9 @@ namespace plugin {
 /// Interface class for creating a RoadNetwork loader functor.
 class RoadNetworkLoader {
  public:
+  /// @returns The entry point method name for getting an instance of the class.
+  static std::string GetEntryPoint() { return "MakeRoadNetworkLoader"; }
+
   /// Returns a maliput::api::RoadNetwork.
   /// @param properties Dictionary containing the arguments needed for creating the RoadNetwork.
   virtual std::unique_ptr<const maliput::api::RoadNetwork> operator()(
