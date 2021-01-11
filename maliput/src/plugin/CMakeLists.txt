@@ -14,6 +14,7 @@ target_link_libraries(plugin
   dl
   maliput::api
   maliput::common
+  maliput::utility
 )
 
 target_include_directories(plugin

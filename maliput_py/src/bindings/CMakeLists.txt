@@ -66,7 +66,6 @@ target_link_libraries(plugin_py
 # Install
 ##############################################################################
 
-message(STATUS "********* ${PYTHON_INSTALL_DIR}")
 install(TARGETS api_py
   DESTINATION "${PYTHON_INSTALL_DIR}/maliput"
 )
