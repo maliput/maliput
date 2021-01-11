@@ -70,17 +70,21 @@ class MaliputPlugin {
   }
 
  private:
-  /// Holds the symbol name that returns the id of the plugin.
+  // Holds the symbol name that returns the id of the plugin.
   static constexpr char const* kMaliputPluginIdSym{"GetMaliputPluginId"};
-  /// Holds the symbol name that returns the type of the plugin.
+  // Holds the symbol name that returns the type of the plugin.
   static constexpr char const* kMaliputPluginTypeSym{"GetMaliputPluginType"};
 
-  using LibraryHandleDeleter = std::function<void(void*)>;
-  /// Handle of the library.
-  std::unique_ptr<void, LibraryHandleDeleter> lib_handle_;
-  /// Id of the plugin.
+  // Functor that closes the DL library.
+  struct DLHandleDeleter {
+    void operator()(void* dl_handle) { dlclose(dl_handle); }
+  };
+
+  // Handle of the library.
+  std::unique_ptr<void, DLHandleDeleter> lib_handle_;
+  // Id of the plugin.
   MaliputPlugin::Id id_{"none"};
-  /// MaliputPluginType of the plugin.
+  // MaliputPluginType of the plugin.
   MaliputPluginType type_;
 };
 
