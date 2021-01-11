@@ -4,11 +4,12 @@
 #include "maliput/api/road_network.h"
 #include "maliput/plugin/maliput_plugin_type.h"
 
+/// @def REGISTER_ROAD_NETWORK_LOADER_PLUGIN(PluginName, RoadNetworkLoaderClass)
 /// Macro for automating the creation of the correspondant functions for the correct
 /// implementation of a RoadNetworkLoader plugin.
 ///
-/// `PluginName` is the name of the plugin and must be unique among all the plugins.
-/// `RoadNetworkLoaderClass` is the implementation of the maliput::plugin::RoadNetworkLoader.
+/// @param PluginName Is the name of the plugin and must be unique among all the plugins.
+/// @param RoadNetworkLoaderClass Is the implementation of the maliput::plugin::RoadNetworkLoader.
 #define REGISTER_ROAD_NETWORK_LOADER_PLUGIN(PluginName, RoadNetworkLoaderClass)            \
   extern "C" std::string GetMaliputPluginId() { return std::string(PluginName); }          \
   extern "C" maliput::plugin::MaliputPluginType GetMaliputPluginType() {                   \

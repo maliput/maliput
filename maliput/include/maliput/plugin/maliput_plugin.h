@@ -15,9 +15,14 @@ namespace maliput {
 namespace plugin {
 
 /// MaliputPlugin loads a dynamic library.
+///
 /// After construction, the id and type of the plugin are provided.
-/// I adition this allows you to execute any symbol from the library.
-/// The library must contain at least two methods which they are:
+/// Via MaliputPlugin::ExecuteSymbol() functions can be run from the library.
+/// It is thought to be the entry point of the plugin.
+/// Specific plugin implementations would specialize the template invocation with the
+/// necessary types so the functionality for the plugin can be achieved.
+///
+/// To be considered a maliput plugin, the following two functions must be defined:
 /// @code{.cpp}
 /// extern "C" std::string GetMaliputPluginId();
 /// extern "C" MaliputPlugin::Type GetMaliputPluginType();
@@ -28,11 +33,6 @@ class MaliputPlugin {
 
   /// Persistent identifier for a MaliputPlugin element.
   using Id = api::TypeSpecificIdentifier<class MaliputPlugin>;
-
-  /// Types of plugin.
-  enum class Type {
-    kRoadNetworkLoader,
-  };
 
   /// Constructs a MaliputPlugin
   /// @param path_to_lib Path to the library.

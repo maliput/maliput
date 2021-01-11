@@ -22,7 +22,7 @@ class MaliputPluginManager {
   /// It looks for plugins in the paths that are described in the environment variable called @ref
   /// kMaliputPluginPathEnv.
   /// Plugins will not be loaded twice and their uniqueness is determined by their id.
-  /// When a duplicate is found, the first one is dismissed.
+  /// When a duplicate is found, the most recently found plugin prevails.
   MaliputPluginManager();
 
   /// Get a pointer to an already loaded plugin.
