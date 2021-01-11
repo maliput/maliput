@@ -15,7 +15,7 @@ MaliputPlugin::MaliputPlugin(const std::string& path_to_lib) {
     MALIPUT_THROW_MESSAGE("Cannot load library: " + static_cast<std::string>(dlerror()));
   }
   id_ = MaliputPluginId(ExecuteSymbol<std::string>(kMaliputPluginIdSym));
-  type_ = ExecuteSymbol<MaliputPlugin::Type>(kMaliputPluginTypeSym);
+  type_ = ExecuteSymbol<MaliputPluginType>(kMaliputPluginTypeSym);
 }
 
 }  // namespace plugin

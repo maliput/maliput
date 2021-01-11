@@ -9,6 +9,7 @@
 
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/plugin/maliput_plugin_type.h"
 
 namespace maliput {
 namespace plugin {
@@ -43,8 +44,8 @@ class MaliputPlugin {
   /// @returns The Id of the plugin.
   std::string GetId() const { return id_.string(); }
 
-  /// @returns The Type of the plugin.
-  Type GetType() const { return type_; }
+  /// @returns The MaliputPluginType of the plugin.
+  MaliputPluginType GetType() const { return type_; }
 
   /// Finds and executes a symbol loaded by the plugin library.
   /// @tparam ReturnType The return type of the symbol that is executed.
@@ -78,8 +79,8 @@ class MaliputPlugin {
   std::unique_ptr<void, std::function<void(void*)>> lib_handle_;
   /// Id of the plugin.
   MaliputPluginId id_{"none"};
-  /// Type of the plugin.
-  Type type_;
+  /// MaliputPluginType of the plugin.
+  MaliputPluginType type_;
 };
 
 }  // namespace plugin
