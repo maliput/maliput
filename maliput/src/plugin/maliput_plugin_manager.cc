@@ -2,7 +2,7 @@
 
 #include "maliput/plugin/maliput_plugin_manager.h"
 #include "maliput/common/logger.h"
-#include "maliput/utility/filesystem.h"
+#include "maliput/utility/file_utils.h"
 
 namespace maliput {
 namespace plugin {
@@ -12,10 +12,10 @@ namespace {
 // @param env_var Environment variable.
 // @returns A list of shared objects filepaths.
 std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
-  const auto paths_from_env = maliput::utility::GetAllPathsFromEnvVar(env_var);
+  const auto paths_from_env = maliput::utility::GetAllPathsFromEnvironment(env_var);
   std::vector<std::string> filepaths{};
   for (const auto& path : paths_from_env) {
-    const auto filepaths_from_dir = maliput::utility::GetAllFilepathsFromDirectory(path, "so");
+    const auto filepaths_from_dir = maliput::utility::GetAllFilePathsFromDirectory(path, "so");
     filepaths.insert(filepaths.end(), filepaths_from_dir.begin(), filepaths_from_dir.end());
   }
   return std::move(filepaths);
@@ -31,23 +31,19 @@ MaliputPluginManager::MaliputPluginManager() {
   maliput::log()->info("Number of plugins loaded: {}", plugins_.size());
 }
 
-const MaliputPlugin* MaliputPluginManager::GetPlugin(const MaliputPluginId& id) const {
+const MaliputPlugin* MaliputPluginManager::GetPlugin(const MaliputPlugin::Id& id) const {
   const auto it = plugins_.find(id);
-  if (it == plugins_.end()) {
-    return nullptr;
-  }
-  return it->second.get();
+  return it == plugins_.end() ? nullptr : it->second.get();
 }
 
 void MaliputPluginManager::AddPlugin(const std::string& path_to_plugin) {
   MALIPUT_THROW_UNLESS(!path_to_plugin.empty());
   std::unique_ptr<MaliputPlugin> maliput_plugin = std::make_unique<MaliputPlugin>(path_to_plugin);
   const auto id = maliput_plugin->GetId();
-  if (plugins_.find(MaliputPluginId(id)) != plugins_.end()) {
-    maliput::log()->debug("Plugin with Id: {} is already loaded.", id);
-    return;
-  }
-  plugins_.emplace(MaliputPluginId(id), std::move(maliput_plugin));
+  const bool is_repeated{plugins_.find(MaliputPlugin::Id(id)) != plugins_.end()};
+  plugins_[MaliputPlugin::Id(id)] = std::move(maliput_plugin);
+  maliput::log()->info(
+      (is_repeated ? "A new version of Plugin Id: {} was loaded." : "Plugin Id: {} was correctly loaded."), id);
 }
 
 }  // namespace plugin

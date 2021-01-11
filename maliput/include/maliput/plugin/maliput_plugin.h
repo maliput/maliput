@@ -14,9 +14,6 @@
 namespace maliput {
 namespace plugin {
 
-/// Persistent identifier for a MaliputPlugin element.
-using MaliputPluginId = api::TypeSpecificIdentifier<class MaliputPlugin>;
-
 /// MaliputPlugin loads a dynamic library.
 /// After construction, the id and type of the plugin are provided.
 /// I adition this allows you to execute any symbol from the library.
@@ -28,6 +25,9 @@ using MaliputPluginId = api::TypeSpecificIdentifier<class MaliputPlugin>;
 class MaliputPlugin {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MaliputPlugin);
+
+  /// Persistent identifier for a MaliputPlugin element.
+  using Id = api::TypeSpecificIdentifier<class MaliputPlugin>;
 
   /// Types of plugin.
   enum class Type {
@@ -49,7 +49,7 @@ class MaliputPlugin {
 
   /// Finds and executes a symbol loaded by the plugin library.
   /// @tparam ReturnType The return type of the symbol that is executed.
-  /// @tparam Args Types of the symbol arguments.
+  /// @tparam Args Types of the argument list.
   ///
   /// @param sym_name Name of the symbol to execute.
   /// @param args Argument list for the symbol call.
@@ -64,7 +64,7 @@ class MaliputPlugin {
     const method_t method = (method_t)dlsym(lib_handle_.get(), sym_name.c_str());
     const char* dlsym_error = dlerror();
     if (dlsym_error) {
-      MALIPUT_THROW_MESSAGE("Cannot load symbol " + sym_name + " : " + static_cast<std::string>(dlsym_error));
+      MALIPUT_THROW_MESSAGE("Cannot load symbol " + sym_name + " : " + std::string(dlsym_error));
     }
     return method(std::forward<Args>(args)...);
   }
@@ -75,10 +75,11 @@ class MaliputPlugin {
   /// Holds the symbol name that returns the type of the plugin.
   static constexpr char const* kMaliputPluginTypeSym{"GetMaliputPluginType"};
 
+  using LibraryHandleDeleter = std::function<void(void*)>;
   /// Handle of the library.
-  std::unique_ptr<void, std::function<void(void*)>> lib_handle_;
+  std::unique_ptr<void, LibraryHandleDeleter> lib_handle_;
   /// Id of the plugin.
-  MaliputPluginId id_{"none"};
+  MaliputPlugin::Id id_{"none"};
   /// MaliputPluginType of the plugin.
   MaliputPluginType type_;
 };

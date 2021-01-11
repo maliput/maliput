@@ -11,24 +11,26 @@
 namespace maliput {
 namespace plugin {
 
-/// MaliputPluginManager is in charge of looking for all plugin libraries that are available to be loaded and
-/// create a collection of MaliputPlugin that will manage the lifetime of the loaded library.
+/// Manages the lifecycle of `MaliputPlugins`.
+/// Upon creation, it will try to load all the available plugins in path and made them available
+/// via GetPlugin().
 class MaliputPluginManager {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MaliputPluginManager);
 
   /// Constructs a MaliputPluginManager.
   /// It looks for plugins in the paths that are described in the environment variable called @ref
-  /// kMaliputPluginPathEnv. All the plugins that are found will be loaded unless that the id of the plugin is repeated,
-  /// in this case the plugin which was first loaded will remain active.
+  /// kMaliputPluginPathEnv.
+  /// Plugins will not be loaded twice and their uniqueness is determined by their id.
+  /// When a duplicate is found, the first one is dismissed.
   MaliputPluginManager();
 
   /// Get a pointer to an already loaded plugin.
-  /// @param id Is the MaliputPluginId of the plugin to get.
+  /// @param id Is the MaliputPlugin::Id of the plugin to get.
   /// @returns A MaliputPlugin pointer to the requested plugin. Returns nullptr when the plugin wasn't found.
-  const MaliputPlugin* GetPlugin(const MaliputPluginId& id) const;
+  const MaliputPlugin* GetPlugin(const MaliputPlugin::Id& id) const;
 
-  /// Loads a new plugin. If a plugin with the same id was already loaded then it aborts the loading of the new plugin.
+  /// Loads a new plugin. If a plugin with the same id was already loaded then it is replaced by the new one.
   /// @param path_to_plugin Path to new the plugin.
   void AddPlugin(const std::string& path_to_plugin);
 
@@ -37,7 +39,7 @@ class MaliputPluginManager {
   static constexpr char const* kMaliputPluginPathEnv{"MALIPUT_PLUGIN_PATH"};
 
   // Holds the loaded plugins.
-  std::unordered_map<MaliputPluginId, std::unique_ptr<MaliputPlugin>> plugins_;
+  std::unordered_map<MaliputPlugin::Id, std::unique_ptr<MaliputPlugin>> plugins_;
 };
 
 }  // namespace plugin

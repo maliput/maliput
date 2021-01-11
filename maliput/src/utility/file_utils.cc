@@ -1,8 +1,8 @@
 // Copyright 2021 Toyota Research Institute
-#include "maliput/utility/filesystem.h"
+#include "maliput/utility/file_utils.h"
 
 #include <iostream>
-// TODO(francocipollone): Remove "experimental" namespace once a newer version of GCC is used(8 or above).
+// TODO(#379): Remove "experimental" namespace once a newer version of GCC is used(8 or above).
 #include <experimental/filesystem>
 
 namespace maliput {
@@ -11,27 +11,27 @@ namespace fs = std::experimental::filesystem;
 
 namespace {
 
-// Extracts the extension of a file.
+// Extracts the suffix of a file.
 // @param filepath Path to a file.
-// @returns The extension of the file.
-std::string GetExtensionFromPath(const std::string& filepath) {
+// @returns The suffix of the file.
+std::string GetSuffixFromPath(const std::string& filepath) {
   auto it = filepath.find_last_of('.');
   return it == std::string::npos ? filepath : filepath.substr(it + 1);
 }
 
 }  // namespace
 
-std::vector<std::string> GetAllFilepathsFromDirectory(const std::string& directory_path,
-                                                      const std::optional<std::string>& extension) {
+std::vector<std::string> GetAllFilePathsFromDirectory(const std::string& directory_path,
+                                                      const std::optional<std::string>& ends_with_suffix) {
   std::vector<std::string> filepaths{};
   for (const auto& entry : fs::directory_iterator(directory_path)) {
     if (fs::is_directory(entry)) {
-      const auto more_paths = GetAllFilepathsFromDirectory(entry.path(), extension);
+      const auto more_paths = GetAllFilePathsFromDirectory(entry.path(), ends_with_suffix);
       filepaths.insert(filepaths.end(), more_paths.begin(), more_paths.end());
       continue;
     }
-    if (extension.has_value() && !extension.value().empty()) {
-      if (GetExtensionFromPath(entry.path()) != extension) {
+    if (ends_with_suffix.has_value() && !ends_with_suffix.value().empty()) {
+      if (GetSuffixFromPath(entry.path()) != ends_with_suffix) {
         continue;
       }
     }
@@ -40,7 +40,7 @@ std::vector<std::string> GetAllFilepathsFromDirectory(const std::string& directo
   return std::move(filepaths);
 }
 
-std::vector<std::string> GetAllPathsFromEnvVar(const std::string& env_var) {
+std::vector<std::string> GetAllPathsFromEnvironment(const std::string& env_var) {
   std::istringstream path_stream(std::string(std::getenv(env_var.c_str())));
   const std::string delimeter{":"};
   std::vector<std::string> paths;
