@@ -56,6 +56,7 @@ PYBIND11_MODULE(api, m) {
       .def("road_geometry", &api::RoadNetwork::road_geometry, py::return_value_policy::reference_internal);
 
   py::class_<api::RoadGeometry>(m, "RoadGeometry")
+      .def("id", &api::RoadGeometry::id)
       .def("num_junctions", &api::RoadGeometry::num_junctions)
       .def("junction", &api::RoadGeometry::junction, py::return_value_policy::reference_internal)
       .def("ById", &api::RoadGeometry::ById, py::return_value_policy::reference_internal);

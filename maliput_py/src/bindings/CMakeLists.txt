@@ -42,15 +42,38 @@ target_link_libraries(math_py
     pybind11::module
 )
 
+# plugin module
+pybind11_add_module(plugin_py plugin_py.cc)
+
+set_target_properties(plugin_py PROPERTIES OUTPUT_NAME "plugin")
+
+target_include_directories(plugin_py
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+)
+
+ament_target_dependencies(plugin_py
+  "maliput"
+)
+
+target_link_libraries(plugin_py
+  PRIVATE
+    maliput::plugin
+    pybind11::module
+)
+
 ##############################################################################
 # Install
 ##############################################################################
 
-message(STATUS "********* ${PYTHON_INSTALL_DIR}")
 install(TARGETS api_py
   DESTINATION "${PYTHON_INSTALL_DIR}/maliput"
 )
 
 install(TARGETS math_py
+  DESTINATION "${PYTHON_INSTALL_DIR}/maliput"
+)
+
+install(TARGETS plugin_py
   DESTINATION "${PYTHON_INSTALL_DIR}/maliput"
 )
