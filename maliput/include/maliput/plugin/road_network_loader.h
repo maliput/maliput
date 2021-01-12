@@ -1,4 +1,4 @@
-// Copyright 2020 Toyota Research Institute
+// Copyright 2021 Toyota Research Institute
 #include <string>
 
 #include "maliput/api/road_network.h"
