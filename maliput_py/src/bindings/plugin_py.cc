@@ -16,9 +16,11 @@ namespace {
 // Creates a maliput::api::RoadNetwork.
 // @param plugin_id Plugin implementation id to be used.
 // @param properties A dictionary containing configuration parameters for the road network builder.
-// @returns A fully constructed maliput::api::RoadNetwork.
+// @returns A maliput::api::RoadNetwork.
 //
 // @throws maliput::common::assertion_error When `plugin_id` is not found.
+// @throws maliput::common::assertion_error When the plugin isn't a RoadNetworkLoader plugin type.
+// @throws maliput::common::assertion_error When the RoadNetwork can't be loaded.
 std::unique_ptr<const maliput::api::RoadNetwork> CreateRoadNetworkFromPlugin(
     const std::string& plugin_id, const std::map<std::string, std::string>& properties) {
   // 'manager' is static for two main reasons:
@@ -28,7 +30,11 @@ std::unique_ptr<const maliput::api::RoadNetwork> CreateRoadNetworkFromPlugin(
   const plugin::MaliputPlugin* maliput_plugin = manager.GetPlugin(plugin::MaliputPlugin::Id(plugin_id));
   if (!maliput_plugin) {
     maliput::log()->error("{} plugin hasn't been found.", plugin_id);
-    MALIPUT_THROW_MESSAGE(plugin_id + "plugin hasn't been found.");
+    MALIPUT_THROW_MESSAGE(plugin_id + " plugin hasn't been found.");
+  }
+  if (maliput_plugin->GetType() != plugin::MaliputPluginType::kRoadNetworkLoader) {
+    maliput::log()->error("{} plugin should be a RoadNetworkLoader plugin type", plugin_id);
+    MALIPUT_THROW_MESSAGE(plugin_id + " plugin should be a RoadNetworkLoader plugin type.");
   }
   std::unique_ptr<maliput::plugin::RoadNetworkLoader> road_network_loader =
       maliput_plugin->ExecuteSymbol<std::unique_ptr<maliput::plugin::RoadNetworkLoader>>(
@@ -52,7 +58,7 @@ PYBIND11_MODULE(plugin, m) {
       .def("AddPlugin", &plugin::MaliputPluginManager::AddPlugin);
 
   m.def("create_road_network_from_plugin", &CreateRoadNetworkFromPlugin,
-        "Creates a maliput::api::plugin::RoadNetwork using a `plugin_id` implementation.", py::arg("plugin_id"),
+        "Creates a maliput::api::plugin::RoadNetwork using `plugin_id` implementation.", py::arg("plugin_id"),
         py::arg("properties"));
 }
 
