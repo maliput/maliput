@@ -2,6 +2,7 @@
 
 #include "maliput/utility/file_utils.h"
 
+#include <stdlib.h>
 #include <algorithm>
 #include <string>
 
@@ -83,6 +84,28 @@ TEST_F(GetAllFilePathsFromDirectoryTest, CheckReturnedFilePaths) {
           });
       EXPECT_NE(it, expected_filepaths.end());
     }
+  }
+}
+
+// Creates a environment variable and add two paths to it.
+class GetAllPathsFromEnvironmentTest : public ::testing::Test {
+ public:
+  void SetUp() override {
+    const std::string env_val{kPaths[0] + ":" + kPaths[1]};
+    ASSERT_TRUE(setenv(kEnvName.c_str(), env_val.c_str(), 1 /*replace*/) == 0);
+  }
+  void TearDown() override { ASSERT_TRUE(unsetenv(kEnvName.c_str()) == 0); }
+
+  const std::string kEnvName{"TEST_PATHS_FROM_ENV"};
+  const std::string kPaths[2]{{"/tmp/test/path/one"}, {"/tmp/test/path/two"}};
+};
+
+// Uses maliput::utility::GetAllPathsFromEnvironment() to get the environment variable value.
+TEST_F(GetAllPathsFromEnvironmentTest, GetPaths) {
+  const auto dut_result = maliput::utility::GetAllPathsFromEnvironment(kEnvName);
+  for (const auto& expected_path : kPaths) {
+    auto it = std::find(dut_result.begin(), dut_result.end(), expected_path);
+    EXPECT_NE(it, dut_result.end());
   }
 }
 
