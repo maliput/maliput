@@ -1,6 +1,6 @@
 // Copyright 2021 Toyota Research Institute
 // @file
-// This test file is highly coupled to the maliput::dumb_plugin library creation.
+// This test file is highly coupled to the maliput::dumb_plugin_x library creation.
 // By using the aforementioned library, maliput::plugin::MaliputPlugin class is tested.
 
 #include "maliput/plugin/maliput_plugin.h"
