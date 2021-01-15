@@ -8,6 +8,11 @@
 namespace maliput {
 namespace utility {
 
+/// Extracts the suffix of a file.
+/// @param filepath Path to a file.
+/// @returns The suffix of the file.
+std::string GetSuffixFromPath(const std::string& filepath);
+
 /// Get all filepaths from a particular directory.
 /// @param directory_path Path to the directory.
 /// @param ends_with_suffix When it is not nullopt, filepaths must end with the `ends_with_suffix` value.

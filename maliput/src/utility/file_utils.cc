@@ -9,17 +9,10 @@ namespace maliput {
 namespace utility {
 namespace fs = std::experimental::filesystem;
 
-namespace {
-
-// Extracts the suffix of a file.
-// @param filepath Path to a file.
-// @returns The suffix of the file.
 std::string GetSuffixFromPath(const std::string& filepath) {
   auto it = filepath.find_last_of('.');
   return it == std::string::npos ? filepath : filepath.substr(it + 1);
 }
-
-}  // namespace
 
 std::vector<std::string> GetAllFilePathsFromDirectory(const std::string& directory_path,
                                                       const std::optional<std::string>& ends_with_suffix) {
