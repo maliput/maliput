@@ -69,10 +69,5 @@ endif()
 # Export
 ##############################################################################
 
-install(
-  PROGRAMS prereqs
-  DESTINATION share
-)
-
 ament_export_dependencies(ament_cmake)
 ament_package()
