@@ -17,13 +17,13 @@ namespace {
 
 // Creates four files:
 //
-// tmp
-// ├── file_utils
-// │   ├── child_folder
-// │   │   ├── dumb_file_1.so
-// │   │   └── dumb_file_2.so
+// /tmp
+// ├── /file_utils
 // │   ├── dumb_file_1.txt
-// │   └── dumb_file_2.txt
+// │   ├── dumb_file_2.txt
+// │   └── /child_folder
+// │       ├── dumb_file_1.so
+// │       └── dumb_file_2.so
 class GetAllFilePathsFromDirectoryTest : public ::testing::Test {
  public:
   void SetUp() override {
@@ -32,15 +32,22 @@ class GetAllFilePathsFromDirectoryTest : public ::testing::Test {
     ASSERT_TRUE(common::Filesystem::create_directory_recursive(base_path));
     std::string suffix{"txt"};
     CreateTwoFilesInBasePath(base_path, suffix);
-    common::Path child_folder_path{base_path.get_path() + "/child_folder"};
+    child_folder_path = {base_path.get_path() + "/child_folder"};
     common::Filesystem::create_directory(child_folder_path);
     suffix = "so";
     CreateTwoFilesInBasePath(child_folder_path, suffix);
   }
 
-  void TearDown() override { ASSERT_TRUE(common::Filesystem::remove_directory(base_path)); }
+  void TearDown() override {
+    for (const common::Path& path : expected_filepaths) {
+      ASSERT_TRUE(common::Filesystem::remove_file(path));
+    }
+    ASSERT_TRUE(common::Filesystem::remove_directory(child_folder_path));
+    ASSERT_TRUE(common::Filesystem::remove_directory(base_path));
+  }
 
   common::Path base_path;
+  common::Path child_folder_path;
   std::vector<common::Path> expected_filepaths;
 
  private:
