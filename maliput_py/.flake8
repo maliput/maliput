@@ -1,0 +1,4 @@
+[flake8]
+# E226 - missing whitespace around arithmetic operator
+ignore = E226
+max-line-length = 100
