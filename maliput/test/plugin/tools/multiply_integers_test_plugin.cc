@@ -1,7 +1,7 @@
 // Copyright 2021 Toyota Research Institute
 // @file
 // This file is a basic maliput plugin implementation which aims to
-// be a test tool in order to verify the correct behaviour of MaliputManager class.
+// be a test tool in order to verify the correct behaviour of MaliputPluginManager class.
 // This file shall not be modified.
 
 #include <string>
@@ -11,15 +11,17 @@
 namespace maliput {
 namespace plugin {
 
-// Implementation of these methods is a requirement of MaliputManager.
+// Implementation of these methods is a requirement of MaliputPlugin.
 // @{
-extern "C" std::string GetMaliputPluginId() { return std::string("dumb_plugin_1"); }
+extern "C" std::string GetMaliputPluginId() { return std::string("multiply_integers_test_plugin"); }
+// This function must return a valid GetMaliputPluginType so MaliputPlugin can load it.
+// RoadNetworkLoader type was arbitrarily selected.
 extern "C" maliput::plugin::MaliputPluginType GetMaliputPluginType() {
   return maliput::plugin::MaliputPluginType::kRoadNetworkLoader;
 }
 // }@
 
-// Custom function callable from MaliputManager::ExecuteSymbol method.
+// Custom function callable from MaliputPlugin::ExecuteSymbol method.
 extern "C" int MultiplyIntegers(int a, int b) { return a * b; };
 
 }  // namespace plugin

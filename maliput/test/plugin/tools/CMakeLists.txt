@@ -2,35 +2,35 @@
 # Sources
 ##############################################################################
 
-add_library(dumb_plugin_1 dumb_plugin_1.cc)
-add_library(maliput::dumb_plugin_1 ALIAS dumb_plugin_1)
+add_library(multiply_integers_test_plugin multiply_integers_test_plugin.cc)
+add_library(maliput::multiply_integers_test_plugin ALIAS multiply_integers_test_plugin)
 
-set_target_properties(dumb_plugin_1
+set_target_properties(multiply_integers_test_plugin
   PROPERTIES
-    OUTPUT_NAME maliput_dumb_plugin_1
+    OUTPUT_NAME maliput_multiply_integers_test_plugin
 )
 
-ament_target_dependencies(dumb_plugin_1
+ament_target_dependencies(multiply_integers_test_plugin
     "maliput"
 )
 
-target_link_libraries(dumb_plugin_1
+target_link_libraries(multiply_integers_test_plugin
   maliput::plugin
 )
 
-add_library(dumb_plugin_2 dumb_plugin_2.cc)
-add_library(maliput::dumb_plugin_2 ALIAS dumb_plugin_2)
+add_library(sum_integers_test_plugin sum_integers_test_plugin.cc)
+add_library(maliput::sum_integers_test_plugin ALIAS sum_integers_test_plugin)
 
-set_target_properties(dumb_plugin_2
+set_target_properties(sum_integers_test_plugin
   PROPERTIES
-    OUTPUT_NAME maliput_dumb_plugin_2
+    OUTPUT_NAME maliput_sum_integers_test_plugin
 )
 
-ament_target_dependencies(dumb_plugin_2
+ament_target_dependencies(sum_integers_test_plugin
     "maliput"
 )
 
-target_link_libraries(dumb_plugin_2
+target_link_libraries(sum_integers_test_plugin
   maliput::plugin
 )
 
@@ -39,7 +39,7 @@ target_link_libraries(dumb_plugin_2
 ##############################################################################
 
 install(
-  TARGETS dumb_plugin_1 dumb_plugin_2
+  TARGETS multiply_integers_test_plugin sum_integers_test_plugin
   EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION ${TEST_PLUGIN_INSTALL_DIR}
   LIBRARY DESTINATION ${TEST_PLUGIN_INSTALL_DIR}
@@ -50,19 +50,19 @@ install(
 # Sources
 ##############################################################################
 
-add_library(dumb_plugin_3 dumb_plugin_3.cc)
-add_library(maliput::dumb_plugin_3 ALIAS dumb_plugin_3)
+add_library(lorem_ipsum_test_plugin lorem_ipsum_test_plugin.cc)
+add_library(maliput::lorem_ipsum_test_plugin ALIAS lorem_ipsum_test_plugin)
 
-set_target_properties(dumb_plugin_3
+set_target_properties(lorem_ipsum_test_plugin
   PROPERTIES
-    OUTPUT_NAME maliput_dumb_plugin_3
+    OUTPUT_NAME maliput_lorem_ipsum_test_plugin
 )
 
-ament_target_dependencies(dumb_plugin_3
+ament_target_dependencies(lorem_ipsum_test_plugin
     "maliput"
 )
 
-target_link_libraries(dumb_plugin_3
+target_link_libraries(lorem_ipsum_test_plugin
   maliput::plugin
 )
 
@@ -71,7 +71,7 @@ target_link_libraries(dumb_plugin_3
 ##############################################################################
 
 install(
-  TARGETS  dumb_plugin_3
+  TARGETS  lorem_ipsum_test_plugin
   EXPORT ${PROJECT_NAME}-targets
   # Intentionally this library is installed in a different location.
   ARCHIVE DESTINATION ${OTHER_TEST_PLUGIN_INSTALL_DIR}

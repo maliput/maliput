@@ -29,11 +29,11 @@ GTEST_TEST(MaliputPlugin, kWrongPath) {
 
 // MaliputPlugin's methods are tested loading a correct library.
 GTEST_TEST(MaliputPlugin, FunctionsCall) {
-  const std::string kLibraryPath{"/tmp/maliput/test/plugins/libmaliput_dumb_plugin_1.so"};
+  const std::string kLibraryPath{"/tmp/maliput/test/plugins/libmaliput_multiply_integers_test_plugin.so"};
   const std::string kCustomSymbol{"MultiplyIntegers"};
   const std::string kWrongSymbol{"WrongSymbol"};
   const MaliputPlugin maliput_plugin{kLibraryPath};
-  EXPECT_EQ("dumb_plugin_1", maliput_plugin.GetId());
+  EXPECT_EQ("multiply_integers_test_plugin", maliput_plugin.GetId());
   EXPECT_EQ(MaliputPluginType::kRoadNetworkLoader, maliput_plugin.GetType());
 
   EXPECT_THROW(maliput_plugin.ExecuteSymbol<double>(kWrongSymbol), maliput::common::assertion_error);

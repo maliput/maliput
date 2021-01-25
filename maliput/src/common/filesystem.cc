@@ -133,12 +133,6 @@ bool Filesystem::remove_file(const Path& path) {
     return path.is_file() && (std::remove((path.get_path()).c_str()) == 0);
 }
 
-void Filesystem::create_file(const Path& path, const std::string& content) {
-    std::ofstream ofs{path.get_path()};
-    ofs << content;
-    ofs.close();
-}
-
 Path Filesystem::get_cwd() {
     char* cwd = getcwd(NULL, 0);
     Path path(cwd);

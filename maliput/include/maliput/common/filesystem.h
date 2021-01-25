@@ -71,8 +71,6 @@ public:
     /* Returns false if path is not a file or file doesn't exists.
     Returns true otherwise. */
     static bool remove_file(const Path& path);
-    /* Creates a file in `path` filled with `content`.*/
-    static void create_file(const Path& path, const std::string& content);
     /* Returns false if path is not a directory or directory doesn't exists.
     Returns true otherwise. */
     static bool remove_directory(const Path& path);
