@@ -1,4 +1,9 @@
 [flake8]
-# E226 - missing whitespace around arithmetic operator
-ignore = E226
+# E226 - Missing whitespace around arithmetic operator.
+# D104 - Missing docstring in public package.
+# D200 - One-line docstring should fit on one line with quotes.
+# D204 - 1 blank line required after class docstring.
+# D300 - Use """triple double quotes""".
+# D400 - First line should end with a period.
+ignore = E226, D104, D200, D204, D300, D400
 max-line-length = 100
