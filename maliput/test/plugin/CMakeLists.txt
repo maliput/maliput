@@ -1,10 +1,10 @@
 ament_add_gtest(maliput_plugin_test maliput_plugin_test.cc)
 ament_add_gtest(maliput_plugin_manager_test maliput_plugin_manager_test.cc)
 
-# Variables holding the location to where
-# some testing library are installed.
+# Variables holding the location where
+# the testing libraries are installed.
 # Additionaly, these variables are passed as macros to the test
-# files using the target_compile_definitions feature.
+# files using the target_compile_definitions function.
 set(TEST_PLUGIN_INSTALL_DIR
     "/tmp/maliput/test/plugins/")
 set(OTHER_TEST_PLUGIN_INSTALL_DIR

@@ -69,12 +69,12 @@ class Filesystem
 public:
 
     /* Returns false if path is not a file or file doesn't exists.
-    Returns true otherwise. */
+    Returns true otherwhise. */
     static bool remove_file(const Path& path);
     /* Returns false if path is not a directory or directory doesn't exists.
     Returns true otherwise. */
     static bool remove_directory(const Path& path);
-    /* Returns false if it couldn't create the directory. True otherwise.*/
+    /* Returns false if it couldn't create the directory. False otherwise.*/
     static bool create_directory(const Path& path);
     /* Returns current working directory */
     static Path get_cwd();
