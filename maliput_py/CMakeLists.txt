@@ -44,9 +44,10 @@ add_subdirectory(src)
 
 if(BUILD_TESTING)
   find_package(ament_cmake_clang_format REQUIRED)
+  find_package(ament_cmake_flake8 REQUIRED)
   enable_testing()
   add_subdirectory(test)
-  add_test(NAME PYLINT COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/run_python_checks.sh)
+  ament_flake8("--config" ${CMAKE_CURRENT_SOURCE_DIR}/.flake8)
   ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
 endif()
 

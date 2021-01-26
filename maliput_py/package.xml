@@ -17,6 +17,7 @@
   <depend>pybind11</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
+  <test_depend>ament_cmake_flake8</test_depend>
   <test_depend>ament_cmake_pytest</test_depend>
 
   <export>
