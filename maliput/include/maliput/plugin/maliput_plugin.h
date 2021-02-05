@@ -27,6 +27,12 @@ namespace plugin {
 /// extern "C" std::string GetMaliputPluginId();
 /// extern "C" MaliputPlugin::Type GetMaliputPluginType();
 /// @endcode
+///
+/// @note When shared library and executable are compiled using `ubsan`(undefined behavior sanitizer)
+///       the property `ENABLE_EXPORTS` should be enabled on the executable target in order
+///       to instruct the linker to add all symbols to the dynamic symbol table.
+///       For further information see next
+///       [link](https://stackoverflow.com/questions/57361776/use-ubsan-with-dynamically-loaded-shared-libraries).
 class MaliputPlugin {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MaliputPlugin);
