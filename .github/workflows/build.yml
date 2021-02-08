@@ -19,7 +19,7 @@ jobs:
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
     # use setup-ros action to get vcs, rosdep, and colcon
-    - uses: ros-tooling/setup-ros@0.0.26
+    - uses: ros-tooling/setup-ros@0.1.2
     - name: vcs import
       shell: bash
       working-directory: ${{ env.ROS_WS }}
