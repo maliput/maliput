@@ -10,17 +10,18 @@
 ///
 /// @param PluginName Is the name of the plugin and must be unique among all the plugins.
 /// @param RoadNetworkLoaderClass Is the implementation of the maliput::plugin::RoadNetworkLoader.
-#define REGISTER_ROAD_NETWORK_LOADER_PLUGIN(PluginName, RoadNetworkLoaderClass)            \
-  extern "C" std::string GetMaliputPluginId() { return std::string(PluginName); }          \
-  extern "C" maliput::plugin::MaliputPluginType GetMaliputPluginType() {                   \
-    return maliput::plugin::MaliputPluginType::kRoadNetworkLoader;                         \
-  }                                                                                        \
-  extern "C" std::unique_ptr<maliput::plugin::RoadNetworkLoader> MakeRoadNetworkLoader() { \
-    return std::make_unique<RoadNetworkLoaderClass>();                                     \
-  }
+#define REGISTER_ROAD_NETWORK_LOADER_PLUGIN(PluginName, RoadNetworkLoaderClass) \
+  extern "C" char* GetMaliputPluginId() { return (char*)PluginName; }           \
+  extern "C" maliput::plugin::MaliputPluginType GetMaliputPluginType() {        \
+    return maliput::plugin::MaliputPluginType::kRoadNetworkLoader;              \
+  }                                                                             \
+  extern "C" maliput::plugin::RoadNetworkLoaderPtr MakeRoadNetworkLoader() { return new RoadNetworkLoaderClass(); }
 
 namespace maliput {
 namespace plugin {
+
+/// Additional name for the `MakeRoadNetworkLoader` method's return type.
+typedef void* RoadNetworkLoaderPtr;
 
 /// Interface class for creating a RoadNetwork loader functor.
 class RoadNetworkLoader {
