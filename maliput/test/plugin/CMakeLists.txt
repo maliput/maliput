@@ -24,6 +24,13 @@ macro(add_dependencies_to_test target)
           maliput::plugin
       )
 
+      # To avoid a false positive when running ubsan the symbols must be exported
+      # See https://stackoverflow.com/questions/57361776/use-ubsan-with-dynamically-loaded-shared-libraries
+      set_target_properties(${target}
+        PROPERTIES
+          ENABLE_EXPORTS ON
+      )
+
       target_compile_definitions(${target}
         PRIVATE
           TEST_MALIPUT_PLUGIN_LIBDIR="${TEST_PLUGIN_INSTALL_DIR}"
