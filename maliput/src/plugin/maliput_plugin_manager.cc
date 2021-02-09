@@ -18,7 +18,7 @@ std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
     const auto filepaths_from_dir = maliput::utility::GetAllFilePathsFromDirectory(path, "so");
     filepaths.insert(filepaths.end(), filepaths_from_dir.begin(), filepaths_from_dir.end());
   }
-  return std::move(filepaths);
+  return filepaths;
 }
 
 }  // namespace
