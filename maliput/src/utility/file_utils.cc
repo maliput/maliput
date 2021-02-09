@@ -30,7 +30,7 @@ std::vector<std::string> GetAllFilePathsFromDirectory(const std::string& directo
     }
     filepaths.push_back(entry.path());
   }
-  return std::move(filepaths);
+  return filepaths;
 }
 
 std::vector<std::string> GetAllPathsFromEnvironment(const std::string& env_var) {

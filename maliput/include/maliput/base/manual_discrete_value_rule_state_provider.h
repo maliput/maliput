@@ -68,7 +68,7 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   // benefit from injecting their own getter and then forwarding calls to this
   // function.
   virtual std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
-      const api::rules::Rule::Id& id) const;
+      const api::rules::Rule::Id& id) const override;
 
  private:
   // @throws common::assertion_error When @p state is unrecognized in
