@@ -76,7 +76,7 @@ TEST_F(MaliputPluginManagerTest, RepeatedPlugin) {
   const auto plugin = dut.GetPlugin(kPlugin3.id);
   EXPECT_EQ(kPlugin3.id.string(), plugin->GetId());
   std::string result{};
-  ASSERT_NO_THROW(result = plugin->ExecuteSymbol<std::string>(kPlugin3.custom_method));
+  ASSERT_NO_THROW(result = plugin->ExecuteSymbol<char*>(kPlugin3.custom_method));
   EXPECT_EQ("LoremIpsum", result);
 }
 

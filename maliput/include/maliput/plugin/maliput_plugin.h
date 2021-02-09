@@ -24,8 +24,8 @@ namespace plugin {
 ///
 /// To be considered a maliput plugin, the following two functions must be defined:
 /// @code{.cpp}
-/// extern "C" std::string GetMaliputPluginId();
-/// extern "C" MaliputPlugin::Type GetMaliputPluginType();
+/// extern "C" char* GetMaliputPluginId();
+/// extern "C" MaliputPluginType GetMaliputPluginType();
 /// @endcode
 ///
 /// @note When shared library and executable are compiled using `ubsan`(undefined behavior sanitizer)

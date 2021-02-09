@@ -13,7 +13,7 @@ namespace plugin {
 
 // Implementation of these methods is a requirement of MaliputPlugin.
 // @{
-extern "C" std::string GetMaliputPluginId() { return std::string("sum_integers_test_plugin"); }
+extern "C" char* GetMaliputPluginId() { return (char*)"sum_integers_test_plugin"; }
 // This function must return a valid GetMaliputPluginType so MaliputPlugin can load it.
 // RoadNetworkLoader type was arbitrarily selected.
 extern "C" maliput::plugin::MaliputPluginType GetMaliputPluginType() {
