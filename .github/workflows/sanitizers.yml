@@ -32,8 +32,8 @@ jobs:
           - sanitizer: ubsan
             COMPILER_FLAG: ' -DUNDEFINED_SANITIZER=On'
     env:
-      CC: clang
-      CXX: clang++
+      CC: clang-8
+      CXX: clang++-8
       LINKER_PATH: /usr/bin/llvm-ld
     steps:
     - uses: actions/checkout@v2
