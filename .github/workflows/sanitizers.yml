@@ -34,7 +34,7 @@ jobs:
     env:
       CC: clang-8
       CXX: clang++-8
-      LINKER_PATH: /usr/bin/llvm-ld
+      LINKER_PATH: /usr/bin/lld-8
     steps:
     - uses: actions/checkout@v2
       with:
