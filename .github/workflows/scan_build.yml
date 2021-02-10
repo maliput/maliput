@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-18.04
     container:
       image: ubuntu:18.04
+    env:
+      LINKER_PATH: /usr/bin/lld-8
     steps:
     - uses: actions/checkout@v2
       with:
@@ -48,6 +50,6 @@ jobs:
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         ./src/${PACKAGE_NAME}/.github/run_scan_build \
-            --cmake-args -DCMAKE_LINKER=/usr/bin/llvm-ld \
+            --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
             --packages-up-to ${PACKAGE_NAME} ${EXTRA_PACKAGE_NAME} \
             --event-handlers=console_direct+;
