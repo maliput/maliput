@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "maliput/api/road_geometry.h"
+#include "maliput/api/road_network.h"
 #include "maliput/api/segment.h"
 #include "maliput/utilities/mesh.h"
 
@@ -61,7 +62,17 @@ struct ObjFeatures {
   std::vector<api::SegmentId> highlighted_segments;
 };
 
-enum MaterialType { Asphalt, Lane, Marker, HBounds, BranchPointGlow, GrayedAsphalt, GrayedLane, GrayedMarker };
+enum class MaterialType {
+  Asphalt,
+  Lane,
+  Marker,
+  HBounds,
+  BranchPointGlow,
+  GrayedAsphalt,
+  GrayedLane,
+  GrayedMarker,
+  Sidewalk
+};
 
 /// Material information for built meshes.
 struct Material {
@@ -89,12 +100,16 @@ struct RoadGeometryMesh {
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> lane_grayed_marker_mesh;
 
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> branch_point_mesh;
+
+  std::map<std::string, std::pair<mesh::GeoMesh, Material>> sidewalk_mesh;
 };
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
 ///
-/// @param road_geometry the api::RoadGeometry to model.
-/// @param features  parameters for constructing the mesh.
+/// @param rg the api::RoadGeometry to model.
+/// @param features Parameters for constructing the mesh.
+/// @param lane_id The ID of the api::Lane to model.
+/// @param mesh_material The material to use for the api::Lane.
 /// @return A pair with of a mesh and the corresponding material
 /// @throws if @p mesh_material is not one of Lane's valid mesh materials
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
@@ -102,8 +117,10 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
 ///
-/// @param road_geometry  the api::RoadGeometry to model.
-/// @param features  parameters for constructing the mesh.
+/// @param rg The api::RoadGeometry to model.
+/// @param features Parameters for constructing the mesh.
+/// @param branch_point_id The ID of the api::BranchPoint to model.
+/// @param mesh_material The material to use for the api::BranchPoint.
 /// @return A pair with of a mesh and the corresponding material
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::BranchPointId& branch_point_id,
@@ -111,8 +128,10 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 
 /// Builds a map of meshes based on `features` properties and the RoadGeometry.
 ///
-/// @param road_geometry  the api::RoadGeometry to model.
-/// @param features  parameters for constructing the mesh.
+/// @param rg The api::RoadGeometry to model.
+/// @param features Parameters for constructing the mesh.
+/// @param segment_id The ID of the api::Segment to model.
+/// @param mesh_material The material to use for the api::Segment.
 /// @return A pair with of a mesh and the corresponding material
 /// @throws if @p mesh_material is not one of Segment's valid mesh materials
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
@@ -126,10 +145,10 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 /// @throws if @p mesh_material is not one of BranchPoint's valid mesh materials
 RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFeatures& features);
 
-/// Builds a map of meshes based on `features` properties and the RoadGeometry.
+/// Builds a map of meshes based on `features` properties and the api::RoadGeometry.
 ///
-/// @param road_geometry  the api::RoadGeometry to model.
-/// @param features  parameters for constructing the mesh.
+/// @param road_geometry The api::RoadGeometry to model.
+/// @param features Parameters for constructing the mesh.
 /// @return A map with the meshes. Keys will be std::string objects in the
 /// following list:
 ///   - asphalt
@@ -140,7 +159,31 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
 ///   - grayed_asphalt
 ///   - grayed_lane
 ///   - grayed_marker
+///   - sidewalk
 std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* road_geometry,
+                                                                      const ObjFeatures& features);
+
+/// Builds a map of meshes based on `features` properties and the api::RoadNetwork.
+///
+/// Rules in the api::RoadRulebook will be used to change the direction of the
+/// of the lanes and the type of lanes when that information is available.
+///
+/// @param road_network The api::RoadNetwork to model.
+/// @param features Parameters for constructing the mesh.
+/// @return A map with the meshes. Keys will be std::string objects in the
+/// following list:
+///   - asphalt
+///   - lane
+///   - marker
+///   - h_bounds
+///   - branch_point
+///   - grayed_asphalt
+///   - grayed_lane
+///   - grayed_marker
+///   - sidewalk
+///
+/// @throws maliput::common::assertion_error When @p road_geometry is nullptr.
+std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadNetwork* road_network,
                                                                       const ObjFeatures& features);
 
 /// Generates a Wavefront OBJ model of the road surface of an api::RoadGeometry.
@@ -158,7 +201,33 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
 ///
 /// The produced mesh covers the area within the segment-bounds of the
 /// road surface described by the RoadGeometry.
+///
+/// @throws maliput::common::assertion_error When @p road_geometry is nullptr.
+/// @throws maliput::common::assertion_error When @p road_geometry->linear_tolerance() is zero.
 void GenerateObjFile(const api::RoadGeometry* road_geometry, const std::string& dirpath, const std::string& fileroot,
+                     const ObjFeatures& features);
+
+/// Generates a Wavefront OBJ model of the road surface of an api::RoadGeometry.
+///
+/// Rules in the api::RoadRulebook will be used to change the direction of the
+/// of the lanes and the type of lanes when that information is available.
+///
+/// @param road_network The api::RoadNetwork to model.
+/// @param dirpath Directory component of the output pathnames.
+/// @param fileroot Root of the filename component of the output pathnames.
+/// @param features Parameters for constructing the mesh.
+///
+/// GenerateObjFile actually produces two files:  the first, named
+/// [@p dirpath]/[@p fileroot].obj, is a Wavefront OBJ containing the
+/// mesh which models the api::RoadNetwork.  The second file is a
+/// Wavefront MTL file named [@p dirpath]/[@p fileroot].mtl, containing
+/// descriptions of materials referenced by the OBJ file.
+///
+/// The produced mesh covers the area within the segment-bounds of the
+/// road surface described by the `road_network->road_geometry()`.
+///
+/// @throws maliput::common::assertion_error When @p road_network is nullptr.
+void GenerateObjFile(const api::RoadNetwork* road_network, const std::string& dirpath, const std::string& fileroot,
                      const ObjFeatures& features);
 
 /// Gets a Material based on `material_name` key.
@@ -172,6 +241,7 @@ void GenerateObjFile(const api::RoadGeometry* road_geometry, const std::string& 
 ///   - grayed_asphalt
 ///   - grayed_lane
 ///   - grayed_marker
+///   - sidewalk
 ///
 /// @param material_name The key to get the material.
 /// @return A const Material&
