@@ -10,6 +10,7 @@ ament_add_gtest(mock_generate_obj_test mock_generate_obj_test.cc WORKING_DIRECTO
 ament_add_gtest(mock_generate_string_test mock_generate_string_test.cc)
 ament_add_gtest(mock_generate_urdf_test mock_generate_urdf_test.cc)
 ament_add_gtest(mock_segment_analysis_test mock_segment_analysis_test.cc)
+ament_add_gtest(thread_pool_test thread_pool_test.cc)
 
 macro(add_dependencies_to_test target)
     if (TARGET ${target})
@@ -35,3 +36,4 @@ add_dependencies_to_test(mock_generate_obj_test)
 add_dependencies_to_test(mock_generate_string_test)
 add_dependencies_to_test(mock_generate_urdf_test)
 add_dependencies_to_test(mock_segment_analysis_test)
+add_dependencies_to_test(thread_pool_test thread_pool_test.cc)
