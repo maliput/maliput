@@ -21,6 +21,10 @@ namespace utility {
 /// - Run ThreadPool::Finish().
 /// - Optionally ThreadPool::cancel_pending() to hint the finalization of running tasks.
 /// - Query the std::future results for consumption.
+///
+/// @note The API is not guaranteed to be thread safe. This class is provided to speed up
+/// build and load processes among others which are necessary but not part of the API.
+/// Use it with caution.
 class ThreadPool {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ThreadPool);

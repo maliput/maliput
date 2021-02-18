@@ -75,13 +75,13 @@ GTEST_TEST(ThreadPoolTest, TasksWithDifferentExecutionTimes) {
   // Blocking tasks are first inserted in order to use all the available threads and keep them busy.
   std::mutex mutex{};
   std::condition_variable condition_variable{};
-  for (std::size_t i = 0; i < kNumberOfTasks / 2; i++) {
+  for (std::size_t i = 0; i < kNumberOfThreads; i++) {
     future_results.push_back(dut.Queue(WaitForCondition{&mutex, &condition_variable}));
   }
   dut.Start();
   std::this_thread::sleep_for(kSleepTime);
   // The next tasks should be on hold until the blocking tasks are completed.
-  for (std::size_t i = 0; i < kNumberOfTasks / 2; i++) {
+  for (std::size_t i = 0; i < kNumberOfTasks - kNumberOfThreads; i++) {
     future_results.push_back(dut.Queue(SleepAndIdentify{kSleepTime}));
   }
   // Unblocks the first tasks.
@@ -111,7 +111,6 @@ GTEST_TEST(ThreadPoolTest, CancelPendingTasks) {
 
   std::mutex mutex{};
   std::condition_variable condition_variable{};
-
   ThreadPool dut(kNumberOfThreads);
   std::vector<std::future<std::thread::id>> future_results;
   // Creates tasks that will wait for a condition variable.
@@ -135,7 +134,7 @@ GTEST_TEST(ThreadPoolTest, CancelPendingTasks) {
 
   std::size_t invalid_tasks_result_counter{};
   for (auto& future_result : future_results) {
-    // TODO(#371): Remove try catch clause. The std::future::valid() method should
+    // TODO(#395): Remove try catch clause. The std::future::valid() method should
     // return false when the task is deleted.
     try {
       future_result.get();

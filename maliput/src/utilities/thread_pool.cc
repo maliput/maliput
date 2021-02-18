@@ -1,3 +1,4 @@
+// Copyright 2020 Toyota Research Institute
 #include "maliput/utilities/thread_pool.h"
 
 #include "maliput/common/maliput_throw.h"
