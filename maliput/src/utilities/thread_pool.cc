@@ -29,6 +29,9 @@ void ThreadPool::Finish() {
     }
   }
   available_.notify_all();
+  for (const auto& future : futures_) {
+    future.wait();
+  }
   futures_.clear();
   is_running_ = false;
 }
