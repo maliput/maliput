@@ -21,7 +21,7 @@ struct WaitForCondition {
   // @param m Is a pointer to the mutex that is manages by the condition variable.
   // @param c Is a pointer to the condition variable.
   // @param counter Is a pointer to a counter that needs to be increased.
-  WaitForCondition(std::mutex* m, std::condition_variable* c, std::atomic<int>* counter)
+  WaitForCondition(std::mutex* m, std::condition_variable* c, std::atomic<std::size_t>* counter)
       : m(m), c(c), counter(counter) {
     MALIPUT_THROW_UNLESS(c != nullptr);
     MALIPUT_THROW_UNLESS(m != nullptr);
@@ -30,14 +30,14 @@ struct WaitForCondition {
 
   std::thread::id operator()() {
     std::unique_lock<std::mutex> l(*m);
-    counter->store(counter->load() + 1);
+    (*counter)++;
     c->wait(l);
     return std::this_thread::get_id();
   }
 
-  std::mutex* m;
-  std::condition_variable* c;
-  std::atomic<int>* counter;
+  std::mutex* m{nullptr};
+  std::condition_variable* c{nullptr};
+  std::atomic<std::size_t>* counter{nullptr};
 };
 
 // Functor that returns the id of the thread after a configurable time has passed.
@@ -81,19 +81,23 @@ GTEST_TEST(ThreadPoolTest, TasksWithDifferentExecutionTimes) {
   // Blocking tasks are first inserted in order to use all the available threads and keep them busy.
   std::mutex mutex{};
   std::condition_variable condition_variable{};
-  std::atomic<int> counter{0};
+  std::atomic<std::size_t> counter{0};
   for (std::size_t i = 0; i < kNumberOfThreads; i++) {
     future_results.push_back(dut.Queue(WaitForCondition{&mutex, &condition_variable, &counter}));
   }
-  dut.Start();
   // The next tasks should be on hold until the blocking tasks are completed.
   for (std::size_t i = 0; i < kNumberOfTasks - kNumberOfThreads; i++) {
     future_results.push_back(dut.Queue(SleepAndIdentify{kSleepTime}));
   }
+  dut.Start();
   // Check that all the blocking tasks are executed.
-  while (counter.load() < static_cast<int>(kNumberOfThreads)) {
+  const int max_iterations{5};
+  for (int i = 0; counter.load() < kNumberOfThreads; ++i) {
     std::this_thread::sleep_for(kSleepTime);
+    // The test is aborted if the condition isn't met after 5 iterations.
+    ASSERT_LE(i, max_iterations);
   }
+
   // Unblocks the first tasks.
   condition_variable.notify_all();
   std::this_thread::sleep_for(kSleepTime);
@@ -121,21 +125,24 @@ GTEST_TEST(ThreadPoolTest, CancelPendingTasks) {
 
   std::mutex mutex{};
   std::condition_variable condition_variable{};
-  std::atomic<int> counter{0};
+  std::atomic<std::size_t> counter{0};
   ThreadPool dut(kNumberOfThreads);
   std::vector<std::future<std::thread::id>> future_results;
   // Creates tasks that will wait for a condition variable.
   for (std::size_t i = 0; i < kNumberOfTasksToFinish; i++) {
     future_results.push_back(dut.Queue(WaitForCondition{&mutex, &condition_variable, &counter}));
   }
-  dut.Start();
   // Creates tasks that won't be able to be processed because there is no free thread.
   for (std::size_t i = 0; i < kNumberOfTasksToCancel; i++) {
     future_results.push_back(dut.Queue(SleepAndIdentify{kSleepTime}));
   }
+  dut.Start();
   // Check that all the blocking tasks are executed.
-  while (counter.load() < static_cast<int>(kNumberOfThreads)) {
+  const int max_iterations{5};
+  for (int i = 0; counter.load() < kNumberOfThreads; ++i) {
     std::this_thread::sleep_for(kSleepTime);
+    // The test is aborted if the condition isn't met after 5 iterations.
+    ASSERT_LE(i, max_iterations);
   }
 
   dut.cancel_pending();
