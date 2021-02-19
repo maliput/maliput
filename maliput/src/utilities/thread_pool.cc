@@ -22,13 +22,11 @@ void ThreadPool::Start() {
 }
 
 void ThreadPool::Finish() {
+  is_finished_ = true;
   {
-    std::unique_lock<std::mutex> lock(tasks_mutex_);
-    for (std::size_t i = 0; i < futures_.size(); i++) {
-      tasks_.push_back({});
-    }
+    std::unique_lock<std::mutex> l_t(tasks_mutex_);
+    available_.notify_all();
   }
-  available_.notify_all();
   for (const auto& future : futures_) {
     future.wait();
   }
@@ -50,19 +48,21 @@ void ThreadPool::DoWork() {
   }
   while (true) {
     std::packaged_task<void()> f;
-    {  // Picks a task.
+    {  // Picks a task
       std::unique_lock<std::mutex> l_t(tasks_mutex_);
       if (tasks_.empty()) {
-        available_.wait(l_t, [&] { return !tasks_.empty(); });
+        if (is_finished_.load()) {
+          break;
+        } else {
+          available_.wait(l_t);
+        }
+      } else {
+        f = std::move(tasks_.front());
+        tasks_.pop_front();
       }
-      f = std::move(tasks_.front());
-      tasks_.pop_front();
     }
     if (f.valid()) {
       f();
-    } else {
-      // if the task is invalid finishes the thread.
-      return;
     }
   }
 }

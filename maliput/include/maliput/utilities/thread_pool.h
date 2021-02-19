@@ -101,6 +101,9 @@ class ThreadPool {
 
   // Indicates whether the threads are started.
   std::atomic<bool> is_running_{false};
+
+  // Indicates whether the threads are finished.
+  std::atomic<bool> is_finished_{false};
 };
 
 }  // namespace utility
