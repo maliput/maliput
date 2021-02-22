@@ -103,7 +103,7 @@ def main(argv):
   excludes_args += EXTRA_EXCLUDE_ARGS
 
   colcon_extra_build_args = " ".join(argv[1:]) if(len(argv) > 1) else ""
-  cmd = "scan-build-8 --status-bugs --use-cc=clang --use-c++=clang++ {} colcon build {} ".format(excludes_args, colcon_extra_build_args)
+  cmd = "scan-build-8 --status-bugs --use-cc=clang-8 --use-c++=clang++-8 {} colcon build {} ".format(excludes_args, colcon_extra_build_args)
   print("scan-build command...\n--> " + cmd)
   return_code = os.system(cmd)
   if return_code > 255 :

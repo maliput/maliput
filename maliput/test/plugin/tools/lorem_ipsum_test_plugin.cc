@@ -13,9 +13,9 @@ namespace plugin {
 
 // Implementation of these methods is a requirement of MaliputPlugin.
 // @{
-extern "C" std::string GetMaliputPluginId() {
+extern "C" char* GetMaliputPluginId() {
   // This id is repeated on purpose in other implementation.
-  return std::string("multiply_integers_test_plugin");
+  return (char*)"multiply_integers_test_plugin";
 }
 // This function must return a valid GetMaliputPluginType so MaliputPlugin can load it.
 // RoadNetworkLoader type was arbitrarily selected.
@@ -25,7 +25,7 @@ extern "C" maliput::plugin::MaliputPluginType GetMaliputPluginType() {
 // }@
 
 // Custom function callable from MaliputPlugin::ExecuteSymbol method.
-extern "C" std::string GetAString() { return "LoremIpsum"; };
+extern "C" char* GetAString() { return (char*)"LoremIpsum"; };
 
 }  // namespace plugin
 }  // namespace maliput
