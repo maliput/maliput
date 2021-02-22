@@ -16,6 +16,7 @@ ThreadPool::~ThreadPool() { Finish(); }
 void ThreadPool::Start() {
   MALIPUT_THROW_UNLESS(!is_running_);
   MALIPUT_THROW_UNLESS(!is_finished_);
+  std::unique_lock<std::mutex> l_s(start_mutex_);
   is_running_ = true;
   start_.notify_all();
 }
@@ -41,7 +42,7 @@ void ThreadPool::cancel_pending() {
 void ThreadPool::DoWork() {
   {
     std::unique_lock<std::mutex> l_s(start_mutex_);
-    if (!is_running_.load()) {
+    if (!is_running_) {
       start_.wait(l_s, [&] { return is_running_.load(); });
     }
   }
