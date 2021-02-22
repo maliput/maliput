@@ -2,6 +2,7 @@
 #pragma once
 
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_throw.h"
 
 #include <atomic>
 #include <deque>
@@ -21,6 +22,7 @@ namespace utility {
 /// - Run ThreadPool::Finish().
 /// - Optionally ThreadPool::cancel_pending() to hint the finalization of running tasks.
 /// - Query the std::future results for consumption.
+/// - After calling ThreadPool::Finish() neither ThreadPool::Start() nor ThreadPool::Queue() methods should be called.
 ///
 /// @note The API is not guaranteed to be thread safe. This class is provided to speed up
 /// build and load processes among others which are necessary but not part of the API.
@@ -41,8 +43,10 @@ class ThreadPool {
   /// @param f Is the task.
   /// @tparam R Is the functor`s return type.
   /// @return A std::future<R> that will hold the result of `f`.
+  /// @throws maliput::common::assertion_error When Finish() method was already called.
   template <class F, class R = std::result_of_t<F&()>>
   std::future<R> Queue(F&& f) {
+    MALIPUT_THROW_UNLESS(!is_finished_);
     // Wrap the function object into a packaged task, splitting
     // execution from the return value.
     std::packaged_task<R()> packaged_task(std::forward<F>(f));

@@ -1,8 +1,6 @@
 // Copyright 2020 Toyota Research Institute
 #include "maliput/utilities/thread_pool.h"
 
-#include "maliput/common/maliput_throw.h"
-
 namespace maliput {
 namespace utility {
 
@@ -16,7 +14,8 @@ ThreadPool::ThreadPool(std::size_t n) {
 ThreadPool::~ThreadPool() { Finish(); }
 
 void ThreadPool::Start() {
-  MALIPUT_THROW_UNLESS(!is_running_.load());
+  MALIPUT_THROW_UNLESS(!is_running_);
+  MALIPUT_THROW_UNLESS(!is_finished_);
   is_running_ = true;
   start_.notify_all();
 }
@@ -48,10 +47,10 @@ void ThreadPool::DoWork() {
   }
   while (true) {
     std::packaged_task<void()> f;
-    {  // Picks a task
+    {  // Picks a task.
       std::unique_lock<std::mutex> l_t(tasks_mutex_);
       if (tasks_.empty()) {
-        if (is_finished_.load()) {
+        if (is_finished_) {
           break;
         } else {
           available_.wait(l_t);

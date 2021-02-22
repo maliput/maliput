@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/assertion_error.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -64,6 +65,9 @@ GTEST_TEST(ThreadPoolTest, BasicTaskPool) {
   for (std::size_t i = 0; i < kNumberOfTasks; i++) {
     EXPECT_EQ(i * i, future_results[i].get());
   }
+  // Once Finish() is called, Queue() and Start() aren't allowed anymore.
+  EXPECT_THROW(dut.Queue([]() { return "InvalidOperation"; }), maliput::common::assertion_error);
+  EXPECT_THROW(dut.Start(), maliput::common::assertion_error);
 }
 
 using namespace std::chrono_literals;
