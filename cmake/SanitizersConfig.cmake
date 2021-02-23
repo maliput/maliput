@@ -28,7 +28,7 @@ if ("${CMAKE_CXX_COMPILER_ID} " MATCHES "Clang ")
   option(THREAD_SANITIZER "Enable Clang Thread Sanitizer" OFF)
   option(UNDEFINED_SANITIZER "Enable Clang Undefined Behaviour Sanitizer" OFF)
 
-  check_sanitizers_exclusivity(ADDRESS_SANITIZER UNDEFINED_SANITIZER)
+  check_sanitizers_exclusivity(ADDRESS_SANITIZER THREAD_SANITIZER UNDEFINED_SANITIZER)
 
   # Address Sanitizer Configuration
   if (ADDRESS_SANITIZER)

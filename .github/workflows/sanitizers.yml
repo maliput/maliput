@@ -62,6 +62,8 @@ jobs:
     - name: colcon build libraries
       shell: bash
       working-directory: ${{ env.ROS_WS }}
+      env:
+        COMPILER_FLAG: ${{ matrix.COMPILER_FLAG }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon build --packages-up-to ${EXTRA_PACKAGE_NAME} \
@@ -72,6 +74,8 @@ jobs:
     - name: colcon build tests for maliput
       shell: bash
       working-directory: ${{ env.ROS_WS }}
+      env:
+        COMPILER_FLAG: ${{ matrix.COMPILER_FLAG }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon build --packages-select ${PACKAGE_NAME} \
@@ -89,6 +93,8 @@ jobs:
     - name: colcon build tests for maliput_py
       shell: bash
       working-directory: ${{ env.ROS_WS }}
+      env:
+        COMPILER_FLAG: ${{ matrix.COMPILER_FLAG }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon build --packages-select ${EXTRA_PACKAGE_NAME} \
