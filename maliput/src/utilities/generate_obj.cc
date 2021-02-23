@@ -40,6 +40,7 @@ const std::string kBranchPointGlow("branch_point_glow");
 const std::string kGrayedBlandAsphalt("grayed_bland_asphalt");
 const std::string kGrayedLaneHaze("grayed_lane_haze");
 const std::string kGrayedMarkerPaint("grayed_marker_paint");
+const std::string kSidewalk("sidewalk");
 
 // This vector holds the properties of different materials. Those properties
 // were taken from the original .mtl description that
@@ -52,7 +53,10 @@ const std::vector<Material> kMaterial{
     {kBranchPointGlow, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9},
     {kGrayedBlandAsphalt, {0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9},
     {kGrayedLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9},
-    {kGrayedMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9}};
+    {kGrayedMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9},
+    // TODO(#392): Find an appropriate mesh material configuration.
+    {kSidewalk, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9},
+};
 
 std::string FormatVector3AsRow(const math::Vector3& vec) {
   return fmt::format("{} {} {}", std::to_string(vec.x()), std::to_string(vec.y()), std::to_string(vec.z()));
@@ -605,12 +609,15 @@ GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
 // @param lane_mesh GeoFaces related to the lane mesh.
 // @param marker_mesh GeoFaces related to the maker mesh.
 // @param h_bounds_mesh GeoFaces related to the elevation boundary mesh.
+// @param sidewalk_mesh GeoFaces related to lanes that belong to a sidewalk mesh.
 //
 // @throw maliput::common::assertion_error When `segment` is nullptr.
 // @throw maliput::common::assertion_error When '`segment`->junction()' is nullptr.
 // @throw maliput::common::assertion_error When '`segment`->junction()->road_geometry()' is nullptr.
+
+// TODO(#392): Receive the RoadRulebook pointer to modify the mesh creation accordingly.
 void RenderSegment(const api::Segment* segment, const ObjFeatures& features, GeoMesh* asphalt_mesh, GeoMesh* lane_mesh,
-                   GeoMesh* marker_mesh, GeoMesh* h_bounds_mesh) {
+                   GeoMesh* marker_mesh, GeoMesh* h_bounds_mesh, GeoMesh* sidewalk_mesh) {
   MALIPUT_THROW_UNLESS(segment != nullptr);
   MALIPUT_THROW_UNLESS(segment->junction() != nullptr);
   MALIPUT_THROW_UNLESS(segment->junction()->road_geometry() != nullptr);
@@ -709,22 +716,24 @@ std::string BranchPointKey(const api::BranchPointId& id) { return "branch_point_
 
 Material GetMaterialFromMesh(const MaterialType mesh_material) {
   switch (mesh_material) {
-    case Asphalt:
+    case MaterialType::Asphalt:
       return GetMaterialByName(kBlandAsphalt);
-    case Lane:
+    case MaterialType::Lane:
       return GetMaterialByName(kLaneHaze);
-    case Marker:
+    case MaterialType::Marker:
       return GetMaterialByName(kMarkerPaint);
-    case HBounds:
+    case MaterialType::HBounds:
       return GetMaterialByName(kHBoundsHaze);
-    case BranchPointGlow:
+    case MaterialType::BranchPointGlow:
       return GetMaterialByName(kBranchPointGlow);
-    case GrayedAsphalt:
+    case MaterialType::GrayedAsphalt:
       return GetMaterialByName(kGrayedBlandAsphalt);
-    case GrayedLane:
+    case MaterialType::GrayedLane:
       return GetMaterialByName(kGrayedLaneHaze);
-    case GrayedMarker:
+    case MaterialType::GrayedMarker:
       return GetMaterialByName(kGrayedMarkerPaint);
+    case MaterialType::Sidewalk:
+      return GetMaterialByName(kSidewalk);
   }
   MALIPUT_THROW_MESSAGE("mesh_material is unrecognized.");
 }
@@ -732,7 +741,7 @@ Material GetMaterialFromMesh(const MaterialType mesh_material) {
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::LaneId& lane_id, const MaterialType& mesh_material) {
   MALIPUT_DEMAND(rg != nullptr);
-  MALIPUT_THROW_UNLESS(mesh_material != BranchPointGlow);
+  MALIPUT_THROW_UNLESS(mesh_material != MaterialType::BranchPointGlow);
 
   GeoMesh mesh;
   const api::RoadGeometry::IdIndex& road_index = rg->ById();
@@ -745,16 +754,16 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
           : PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
 
   switch (mesh_material) {
-    case Asphalt:
-    case GrayedAsphalt: {
+    case MaterialType::Asphalt:
+    case MaterialType::GrayedAsphalt: {
       GeoMesh segment_mesh;
       CoverLaneWithQuads(&segment_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                          [](double, double) { return 0.; }, features.off_grid_mesh_generation);
       mesh.AddFacesFrom(SimplifyMesh(segment_mesh, features));
       break;
     }
-    case Lane:
-    case GrayedLane: {
+    case MaterialType::Lane:
+    case MaterialType::GrayedLane: {
       if (features.draw_lane_haze) {
         GeoMesh haze_mesh;
         CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
@@ -764,8 +773,8 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
       }
       break;
     }
-    case Marker:
-    case GrayedMarker: {
+    case MaterialType::Marker:
+    case MaterialType::GrayedMarker: {
       const double grid_unit =
           PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
       if (features.draw_stripes) {
@@ -780,7 +789,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
       }
       break;
     }
-    case HBounds: {
+    case MaterialType::HBounds: {
       if (features.draw_elevation_bounds) {
         GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
         CoverLaneWithQuads(&upper_h_bounds_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
@@ -794,9 +803,14 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
       }
       break;
     }
-    case BranchPointGlow: {
+    case MaterialType::BranchPointGlow: {
       // Shouldn't occur due to above assertion, but handle anyway to quash warnings
       MALIPUT_THROW_MESSAGE("BranchPointGlow is not a valid Mesh Material type within this function call.");
+      break;
+    }
+    case MaterialType::Sidewalk: {
+      // TODO(#392): Implement this code path.
+      MALIPUT_THROW_MESSAGE("Sidewalk is not implemented yet.");
       break;
     }
   }
@@ -808,7 +822,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
                                              const api::BranchPointId& branch_point_id,
                                              const MaterialType& mesh_material) {
   MALIPUT_DEMAND(rg != nullptr);
-  MALIPUT_THROW_UNLESS(mesh_material == BranchPointGlow);
+  MALIPUT_THROW_UNLESS(mesh_material == MaterialType::BranchPointGlow);
 
   GeoMesh mesh;
   const api::RoadGeometry::IdIndex& road_index = rg->ById();
@@ -828,7 +842,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::SegmentId& segment_id, const MaterialType& mesh_material) {
   MALIPUT_DEMAND(rg != nullptr);
-  MALIPUT_THROW_UNLESS(mesh_material == Asphalt || mesh_material == GrayedAsphalt);
+  MALIPUT_THROW_UNLESS(mesh_material == MaterialType::Asphalt || mesh_material == MaterialType::GrayedAsphalt);
 
   GeoMesh mesh;
   const api::RoadGeometry::IdIndex& road_index = rg->ById();
@@ -861,6 +875,9 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
   GeoMesh grayed_asphalt_mesh;
   GeoMesh grayed_lane_mesh;
   GeoMesh grayed_marker_mesh;
+
+  GeoMesh sidewalk_mesh;
+
   maliput::log()->trace("Generating RoadGeometry's meshes...");
 
   for (int ji = 0; ji < rg->num_junctions(); ++ji) {
@@ -868,19 +885,21 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
     for (int si = 0; si < junction->num_segments(); ++si) {
       const api::Segment* segment = junction->segment(si);
       if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
-        RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh);
+        RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh, &sidewalk_mesh);
         for (int li = 0; li < segment->num_lanes(); ++li) {
           const api::Lane* lane = segment->lane(li);
-          meshes.lane_lane_mesh[LaneKey(lane->id())] = BuildMesh(rg, features, lane->id(), Lane);
-          meshes.lane_marker_mesh[MarkerKey(lane->id())] = BuildMesh(rg, features, lane->id(), Marker);
+          meshes.lane_lane_mesh[LaneKey(lane->id())] = BuildMesh(rg, features, lane->id(), MaterialType::Lane);
+          meshes.lane_marker_mesh[MarkerKey(lane->id())] = BuildMesh(rg, features, lane->id(), MaterialType::Marker);
         }
       } else {
-        RenderSegment(segment, features, &grayed_asphalt_mesh, &grayed_lane_mesh, &grayed_marker_mesh, &h_bounds_mesh);
+        RenderSegment(segment, features, &grayed_asphalt_mesh, &grayed_lane_mesh, &grayed_marker_mesh, &h_bounds_mesh,
+                      &sidewalk_mesh);
         for (int li = 0; li < segment->num_lanes(); ++li) {
           const api::Lane* lane = segment->lane(li);
-          meshes.lane_grayed_lane_mesh[GrayedLaneKey(lane->id())] = BuildMesh(rg, features, lane->id(), GrayedLane);
+          meshes.lane_grayed_lane_mesh[GrayedLaneKey(lane->id())] =
+              BuildMesh(rg, features, lane->id(), MaterialType::GrayedLane);
           meshes.lane_grayed_marker_mesh[GrayedMarkerKey(lane->id())] =
-              BuildMesh(rg, features, lane->id(), GrayedMarker);
+              BuildMesh(rg, features, lane->id(), MaterialType::GrayedMarker);
         }
       }
     }
@@ -890,7 +909,7 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
     for (int bpi = 0; bpi < rg->num_branch_points(); ++bpi) {
       const api::BranchPoint* branch_point = rg->branch_point(bpi);
       meshes.branch_point_mesh[BranchPointKey(branch_point->id())] =
-          BuildMesh(rg, features, branch_point->id(), BranchPointGlow);
+          BuildMesh(rg, features, branch_point->id(), MaterialType::BranchPointGlow);
     }
   }
 
@@ -898,6 +917,7 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
   meshes.grayed_asphalt_mesh["grayed_asphalt"] =
       std::make_pair(std::move(grayed_asphalt_mesh), GetMaterialByName(kGrayedBlandAsphalt));
   meshes.hbounds_mesh["h_bounds"] = std::make_pair(std::move(h_bounds_mesh), GetMaterialByName(kHBoundsHaze));
+  meshes.sidewalk_mesh["sidewalk"] = std::make_pair(std::move(sidewalk_mesh), GetMaterialByName(kSidewalk));
 
   maliput::log()->trace("Meshes generation completed.");
   return meshes;
@@ -905,6 +925,8 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
 
 std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* rg,
                                                                       const ObjFeatures& features) {
+  MALIPUT_THROW_UNLESS(rg != nullptr);
+
   GeoMesh asphalt_mesh;
   GeoMesh lane_mesh;
   GeoMesh marker_mesh;
@@ -914,6 +936,10 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
   GeoMesh grayed_asphalt_mesh;
   GeoMesh grayed_lane_mesh;
   GeoMesh grayed_marker_mesh;
+
+  // TODO(#392): Modify RenderSegment to get the RoadRulebook pointer and
+  // modify the mesh generation accordingly.
+  GeoMesh sidewalk_mesh;
 
   // TODO(agalbachicar)   Check features with respect to rg tolerance
   //                      properties.
@@ -931,9 +957,10 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
       }
       // TODO(maddog@tri.global)  Id's need well-defined comparison semantics.
       if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
-        RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh);
+        RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh, &sidewalk_mesh);
       } else {
-        RenderSegment(segment, features, &grayed_asphalt_mesh, &grayed_lane_mesh, &grayed_marker_mesh, &h_bounds_mesh);
+        RenderSegment(segment, features, &grayed_asphalt_mesh, &grayed_lane_mesh, &grayed_marker_mesh, &h_bounds_mesh,
+                      &sidewalk_mesh);
       }
     }
   }
@@ -959,11 +986,20 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
   meshes["grayed_asphalt"] = std::make_pair(std::move(grayed_asphalt_mesh), GetMaterialByName(kGrayedBlandAsphalt));
   meshes["grayed_lane"] = std::make_pair(std::move(grayed_lane_mesh), GetMaterialByName(kGrayedLaneHaze));
   meshes["grayed_marker"] = std::make_pair(std::move(grayed_marker_mesh), GetMaterialByName(kGrayedMarkerPaint));
+  meshes["sidewalk"] = std::make_pair(std::move(sidewalk_mesh), GetMaterialByName(kSidewalk));
   return meshes;
+}
+
+std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadNetwork* road_network,
+                                                                      const ObjFeatures& features) {
+  MALIPUT_THROW_UNLESS(road_network != nullptr);
+  return BuildMeshes(road_network->road_geometry(), features);
 }
 
 void GenerateObjFile(const api::RoadGeometry* rg, const std::string& dirpath, const std::string& fileroot,
                      const ObjFeatures& features) {
+  MALIPUT_THROW_UNLESS(rg != nullptr);
+
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes = BuildMeshes(rg, features);
   const GeoMesh& asphalt_mesh = meshes["asphalt"].first;
   const GeoMesh& lane_mesh = meshes["lane"].first;
@@ -973,10 +1009,13 @@ void GenerateObjFile(const api::RoadGeometry* rg, const std::string& dirpath, co
   const GeoMesh& grayed_asphalt_mesh = meshes["grayed_asphalt"].first;
   const GeoMesh& grayed_lane_mesh = meshes["grayed_lane"].first;
   const GeoMesh& grayed_marker_mesh = meshes["grayed_marker"].first;
+  const GeoMesh& sidewalk_mesh = meshes["sidewalk"].first;
 
   const std::string obj_filename = fileroot + ".obj";
   const std::string mtl_filename = fileroot + ".mtl";
-  const int precision = std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) - std::log10(rg->linear_tolerance())));
+
+  const int linear_tolerance = rg->linear_tolerance();
+  const int precision = std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) - std::log10(linear_tolerance)));
 
   // Create the requested OBJ file.
   {
@@ -996,7 +1035,7 @@ void GenerateObjFile(const api::RoadGeometry* rg, const std::string& dirpath, co
     // The bound on error due to rounding to `n` places is `0.5 * 10^(-n)`,
     // so we want `n` such that `0.5 * 10^(-n) < ε / (sqrt(3) * 10)`.
     // This yields:  `n > log10(sqrt(3) * 5) - log10(ε)`.
-    MALIPUT_DEMAND(rg->linear_tolerance() > 0.);
+    MALIPUT_THROW_UNLESS(linear_tolerance > 0.);
 
     std::ofstream os(dirpath + "/" + obj_filename, std::ios::binary);
     fmt::print(os,
@@ -1027,6 +1066,9 @@ mtllib {}
 
     std::tie(vertex_index_offset, normal_index_offset) =
         h_bounds_mesh.EmitObj(os, kHBoundsHaze, precision, features.origin, vertex_index_offset, normal_index_offset);
+
+    std::tie(vertex_index_offset, normal_index_offset) =
+        sidewalk_mesh.EmitObj(os, kSidewalk, precision, features.origin, vertex_index_offset, normal_index_offset);
   }
 
   // Create the MTL file referenced by the OBJ file.
@@ -1035,15 +1077,26 @@ mtllib {}
     os << "# GENERATED BY maliput::utility::GenerateObjFile()\n"
        << "# DON'T BE A HERO.  Do not edit by hand.\n\n";
     for (const auto& matPair : meshes) {
+      // TODO(#392): Implement me.
+      if (matPair.first == "sidewalk") {
+        continue;
+      }
       const Material& mat = matPair.second.second;
       os << FormatMaterial(mat, precision);
     }
   }
 }
 
+// TODO(#392): Requires proper implementation.
+void GenerateObjFile(const api::RoadNetwork* road_network, const std::string& dirpath, const std::string& fileroot,
+                     const ObjFeatures& features) {
+  MALIPUT_THROW_UNLESS(road_network != nullptr);
+  GenerateObjFile(road_network->road_geometry(), dirpath, fileroot, features);
+}
+
 const Material& GetMaterialByName(const std::string& material_name) {
   auto material = std::find(kMaterial.cbegin(), kMaterial.cend(), material_name);
-  MALIPUT_DEMAND(material != kMaterial.cend());
+  MALIPUT_THROW_UNLESS(material != kMaterial.cend());
   return *material;
 }
 

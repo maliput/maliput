@@ -1,10 +1,12 @@
 #include "maliput/utilities/generate_obj.h"
 
 #include <cmath>
+#include <memory>
 
 #include <gtest/gtest.h>
 
 #include "maliput/api/road_geometry.h"
+#include "maliput/api/road_network.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/mock.h"
 
@@ -47,6 +49,48 @@ class MockGenerateObjTest : public ::testing::Test {
 //  - TwoLanesRoadGeometry.obj
 TEST_F(MockGenerateObjTest, TwoLanesRoadGeometry) {
   const std::unique_ptr<const api::RoadGeometry> dut = api::test::CreateTwoLanesRoadGeometry();
+
+  const std::string basename{"TwoLanesRoadGeometry"};
+  std::string expected_obj_contents;
+  ReadAsString(basename + ".obj", &expected_obj_contents);
+  std::string expected_mtl_contents;
+  ReadAsString(basename + ".mtl", &expected_mtl_contents);
+
+  ObjFeatures features;
+  features.min_grid_resolution = 5.0;
+  GenerateObjFile(dut.get(), directory_.get_path(), basename, features);
+
+  common::Path actual_obj_path(directory_);
+  actual_obj_path.append(basename + ".obj");
+  EXPECT_TRUE(actual_obj_path.is_file());
+  paths_to_cleanup_.push_back(actual_obj_path);
+
+  common::Path actual_mtl_path(directory_);
+  actual_mtl_path.append(basename + ".mtl");
+  EXPECT_TRUE(actual_mtl_path.is_file());
+  paths_to_cleanup_.push_back(actual_mtl_path);
+
+  // Quick regression test on the OBJ and MTL.
+  std::string actual_obj_contents;
+  ReadAsString(actual_obj_path, &actual_obj_contents);
+  EXPECT_EQ(expected_obj_contents, actual_obj_contents);
+
+  std::string actual_mtl_contents;
+  ReadAsString(actual_mtl_path, &actual_mtl_contents);
+  EXPECT_EQ(expected_mtl_contents, actual_mtl_contents);
+}
+
+// OBJ and MTL files generated from the GeneratedObjFile method are compared with the following files
+// located in the test path of maliput::utilities' tests:
+//  - TwoLanesRoadGeometry.mtl
+//  - TwoLanesRoadGeometry.obj
+// Tests are run with an api::RoadNetwork instead of a api::RoadGeometry.
+TEST_F(MockGenerateObjTest, TwoLanesRoadNetwork) {
+  auto dut = std::make_unique<api::RoadNetwork>(
+      api::test::CreateTwoLanesRoadGeometry(), api::test::CreateRoadRulebook(), api::test::CreateTrafficLightBook(),
+      api::test::CreateIntersectionBook(), api::test::CreatePhaseRingBook(),
+      api::test::CreateRightOfWayRuleStateProvider(), api::test::CreatePhaseProvider(), api::test::CreateRuleRegistry(),
+      api::test::CreateDiscreteValueRuleStateProvider(), api::test::CreateRangeValueRuleStateProvider());
 
   const std::string basename{"TwoLanesRoadGeometry"};
   std::string expected_obj_contents;

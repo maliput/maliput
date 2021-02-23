@@ -545,6 +545,7 @@ std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook(const TrafficLig
 /// Returns an arbitrary rules::PhaseRingBook.
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook();
 
+/// Returns an arbitrary rules::PhaseRingBook based on `build_flags`.
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook(const PhaseBuildFlags& build_flags);
 
 /// Returns an arbitrary rules::RightOfWayRuleStateProvider.
