@@ -7,7 +7,8 @@ set(SOURCES
   generate_string.cc
   generate_urdf.cc
   mesh_simplification.cc
-  segment_analysis.cc)
+  segment_analysis.cc
+  thread_pool.cc)
 
 add_library(utilities ${SOURCES})
 
