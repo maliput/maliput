@@ -1,7 +1,10 @@
 name: scan_build
 
-# Disabled flows
-on: []
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 env:
   PACKAGE_NAME: maliput
