@@ -1,10 +1,6 @@
 name: clang
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
+on: []
 
 env:
   PACKAGE_NAME: maliput
