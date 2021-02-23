@@ -65,20 +65,20 @@ jobs:
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon build --packages-up-to ${EXTRA_PACKAGE_NAME} \
-          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
           --event-handlers=console_direct+ \
-          ${COMPILER_FLAG} \
-          --cmake-args -DBUILD_TESTING=OFF;
+          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
+            ${COMPILER_FLAG} \
+            -DBUILD_TESTING=OFF;
     - name: colcon build tests for maliput
       shell: bash
       working-directory: ${{ env.ROS_WS }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon build --packages-select ${PACKAGE_NAME} \
-          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
           --event-handlers=console_direct+ \
-          ${COMPILER_FLAG} \
-          --cmake-args -DBUILD_TESTING=ON;
+          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
+            ${COMPILER_FLAG} \
+            -DBUILD_TESTING=ON;
     - name: colcon test for maliput
       shell: bash
       working-directory: ${{ env.ROS_WS }}
@@ -92,10 +92,10 @@ jobs:
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon build --packages-select ${EXTRA_PACKAGE_NAME} \
-          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
           --event-handlers=console_direct+ \
-          ${COMPILER_FLAG} \
-          --cmake-args -DBUILD_TESTING=ON;
+          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
+            ${COMPILER_FLAG} \
+            -DBUILD_TESTING=ON;
     - name: colcon test for maliput_py
       shell: bash
       working-directory: ${{ env.ROS_WS }}
