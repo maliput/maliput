@@ -1014,7 +1014,7 @@ void GenerateObjFile(const api::RoadGeometry* rg, const std::string& dirpath, co
   const std::string obj_filename = fileroot + ".obj";
   const std::string mtl_filename = fileroot + ".mtl";
 
-  const int linear_tolerance = rg->linear_tolerance();
+  const double linear_tolerance = rg->linear_tolerance();
   const int precision = std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) - std::log10(linear_tolerance)));
 
   // Create the requested OBJ file.
