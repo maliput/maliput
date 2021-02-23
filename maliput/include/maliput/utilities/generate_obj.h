@@ -207,10 +207,10 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
 void GenerateObjFile(const api::RoadGeometry* road_geometry, const std::string& dirpath, const std::string& fileroot,
                      const ObjFeatures& features);
 
-/// Generates a Wavefront OBJ model of the road surface of an api::RoadGeometry.
+/// Generates a Wavefront OBJ model of the road surface of an api::RoadNetwork.
 ///
 /// Rules in the api::RoadRulebook will be used to change the direction of the
-/// of the lanes and the type of lanes when that information is available.
+/// lanes and the type of lanes when that information is available.
 ///
 /// @param road_network The api::RoadNetwork to model.
 /// @param dirpath Directory component of the output pathnames.
@@ -219,7 +219,7 @@ void GenerateObjFile(const api::RoadGeometry* road_geometry, const std::string& 
 ///
 /// GenerateObjFile actually produces two files:  the first, named
 /// [@p dirpath]/[@p fileroot].obj, is a Wavefront OBJ containing the
-/// mesh which models the api::RoadNetwork.  The second file is a
+/// mesh which models the api::RoadNetwork. The second file is a
 /// Wavefront MTL file named [@p dirpath]/[@p fileroot].mtl, containing
 /// descriptions of materials referenced by the OBJ file.
 ///
