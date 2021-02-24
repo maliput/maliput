@@ -25,9 +25,10 @@ endmacro()
 set(SANITIZERS off)
 if ("${CMAKE_CXX_COMPILER_ID} " MATCHES "Clang ")
   option(ADDRESS_SANITIZER "Enable Clang Address Sanitizer" OFF)
+  option(THREAD_SANITIZER "Enable Clang Thread Sanitizer" OFF)
   option(UNDEFINED_SANITIZER "Enable Clang Undefined Behaviour Sanitizer" OFF)
 
-  check_sanitizers_exclusivity(ADDRESS_SANITIZER UNDEFINED_SANITIZER)
+  check_sanitizers_exclusivity(ADDRESS_SANITIZER THREAD_SANITIZER UNDEFINED_SANITIZER)
 
   # Address Sanitizer Configuration
   if (ADDRESS_SANITIZER)
@@ -37,6 +38,16 @@ if ("${CMAKE_CXX_COMPILER_ID} " MATCHES "Clang ")
       set(SANITIZERS on)
   else()
       message(STATUS "Address Sanitizer - disabled")
+  endif()
+
+  # Thread Sanitizer Configuration
+  if (THREAD_SANITIZER)
+      message(STATUS "Thread Sanitizer - enabled")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=thread")
+      set(LDFLAGS "${LDFLAGS} -fsanitize=thread")
+      set(SANITIZERS on)
+  else()
+      message(STATUS "Thread Sanitizer - disabled")
   endif()
 
   # Undefined Behaviour Sanitizer Configuration
