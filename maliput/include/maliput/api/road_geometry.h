@@ -14,6 +14,7 @@
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace api {
@@ -176,6 +177,11 @@ class RoadGeometry {
     return DoSampleAheadWaypoints(lane_s_route, path_length_sampling_rate);
   }
 
+  /// @return maliput's Internal Inertial Frame translation with respect to
+  /// another arbitrary Inertial Frame with the same exact characteristics of
+  /// maliput's.
+  math::Vector3 internal_inertial_frame_translation() const { return do_internal_inertial_frame_translation(); }
+
  protected:
   RoadGeometry() = default;
 
@@ -210,6 +216,8 @@ class RoadGeometry {
 
   virtual std::vector<InertialPosition> DoSampleAheadWaypoints(const LaneSRoute&,
                                                                double path_length_sampling_rate) const;
+
+  virtual math::Vector3 do_internal_inertial_frame_translation() const = 0;
   ///@}
 };
 

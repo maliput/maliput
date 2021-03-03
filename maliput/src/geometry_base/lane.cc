@@ -83,5 +83,29 @@ std::optional<api::LaneEnd> Lane::DoGetDefaultBranch(api::LaneEnd::Which which_e
   return GetBranchPoint(which_end)->GetDefaultBranch({this, which_end});
 }
 
+api::InertialPosition Lane::DoToInertialPosition(const api::LanePosition& lane_pos) const {
+  const api::InertialPosition backend_inertial_position = DoToBackendInertialPosition(lane_pos);
+  return api::InertialPosition::FromXyz(backend_inertial_position.xyz() +
+                                        segment()->junction()->road_geometry()->internal_inertial_frame_translation());
+}
+
+api::InertialPosition Lane::DoToBackendInertialPosition(const api::LanePosition& lane_pos) const {
+  MALIPUT_THROW_MESSAGE(
+      "Unimplemented method. Please check the documentation of "
+      "maliput::geometry_base::Lane::DoToInertialPosition().");
+}
+
+api::LanePositionResult Lane::DoToLanePosition(const api::InertialPosition& inertial_pos) const {
+  const api::InertialPosition backend_inertial_position = api::InertialPosition::FromXyz(
+      inertial_pos.xyz() - segment()->junction()->road_geometry()->internal_inertial_frame_translation());
+  return DoToBackendLanePosition(backend_inertial_position);
+}
+
+api::LanePositionResult Lane::DoToBackendLanePosition(const api::InertialPosition& inertial_pos) const {
+  MALIPUT_THROW_MESSAGE(
+      "Unimplemented method. Please check the documentation of "
+      "maliput::geometry_base::Lane::DoToLanePosition().");
+}
+
 }  // namespace geometry_base
 }  // namespace maliput

@@ -12,8 +12,8 @@ namespace geometry_base {
 /// that exhaustively calls `ToLanePosition()` on all lanes and checks
 /// _distance_ with `radius`.
 ///
-/// Maliput backends could avoid implementing a custom implementation that knows
-/// about the geometry internals by forwarding calls to this function.
+/// @note Maliput backends could avoid implementing a custom implementation that
+/// knows about the geometry internals by forwarding calls to this function.
 ///
 /// @param rg The RoadGeometry over all these operations are performed. It
 ///        must not be nullptr.

@@ -9,6 +9,7 @@
 #include "maliput/geometry_base/lane.h"
 #include "maliput/geometry_base/road_geometry.h"
 #include "maliput/geometry_base/segment.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -43,12 +44,15 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
   /// @param linear_tolerance the linear tolerance
   /// @param angular_tolerance the angular tolerance
   /// @param scale_length the scale length
+  /// @param internal_inertial_frame_translation the internal inertial frame
+  ///        origin translation
   ///
   /// @throws std::exception if either `linear_tolerance` or
   ///         `angular_tolerance` or `scale_length` is non-positive.
   MockRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance,
-                   double scale_length)
-      : geometry_base::RoadGeometry(id, linear_tolerance, angular_tolerance, scale_length) {}
+                   double scale_length, const math::Vector3& internal_inertial_frame_translation)
+      : geometry_base::RoadGeometry(id, linear_tolerance, angular_tolerance, scale_length,
+                                    internal_inertial_frame_translation) {}
 
  private:
   api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,

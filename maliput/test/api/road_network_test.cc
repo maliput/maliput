@@ -32,6 +32,7 @@ class RoadNetworkTest : public ::testing::Test {
   const double linear_tolerance{1.};
   const double angular_tolerance{1.};
   const double scale_length{1.};
+  const math::Vector3 internal_inertial_frame_translation{0., 0., 0.};
 
   virtual void SetUp() {
     road_geometry_ = test::CreateRoadGeometry();
@@ -175,7 +176,8 @@ TEST_F(RoadNetworkTest, TestMemberMethodAccess) {
 
 TEST_F(RoadNetworkTest, Contains) {
   auto mock_road_geometry = std::make_unique<geometry_base::test::MockRoadGeometry>(
-      api::RoadGeometryId{"mock_road_geometry"}, linear_tolerance, angular_tolerance, scale_length);
+      api::RoadGeometryId{"mock_road_geometry"}, linear_tolerance, angular_tolerance, scale_length,
+      internal_inertial_frame_translation);
   auto mock_lane = std::make_unique<geometry_base::test::MockLane>(api::LaneId{"mock_lane"});
   auto mock_segment = std::make_unique<geometry_base::test::MockSegment>(api::SegmentId{"mock_segment"});
   auto mock_junction = std::make_unique<geometry_base::test::MockJunction>(api::JunctionId{"mock_junction"});

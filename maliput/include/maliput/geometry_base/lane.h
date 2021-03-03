@@ -4,6 +4,7 @@
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
+#include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/passkey.h"
@@ -86,6 +87,50 @@ class Lane : public api::Lane {
   const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd::Which which_end) const override;
 
   std::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
+
+  // @{
+  // Forwards the call to DoToBackendInertialPosition(lane_pos) and translates
+  // the result to account for api::RoadGeometry::internal_inertial_frame_translation().
+  //
+  // @note Backend implementations should not override this method and should
+  //       override DoToBackendInertialPosition() when making use of this frame
+  //       conversion.
+  // @note Backend implementations should override this method and should not
+  //       override DoToBackendInertialPostion() when they prefer to handle the
+  //       entire mapping process.
+  virtual api::InertialPosition DoToInertialPosition(const api::LanePosition& lane_pos) const override;
+
+  // Maps @p lane_pos into the backend (maliput's) Inertial Frame which does not
+  // include api::RoadGeometry::internal_inertial_frame_translation()
+  // translation.
+  //
+  // This method implementation @throws maliput::common::assertion_error as it
+  // must never be called as is. @see DoToInertialPosition() docstring to
+  // understand when to override each method accordingly.
+  virtual api::InertialPosition DoToBackendInertialPosition(const api::LanePosition& lane_pos) const;
+  // @}
+
+  // @{
+  // Translates @p inertial_pos with api::RoadGeometry::internal_inertial_frame_translation()
+  // and forwards the result to DoToBackendLanePosition().
+  //
+  // @note Backend implementations should not override this method and should
+  //       override DoToBackendLanePosition() when making use of this frame
+  //       conversion.
+  // @note Backend implementations should override this method and should not
+  //       override DoToBackendLanePosition() when they prefer to handle the
+  //       entire mapping process.
+  virtual api::LanePositionResult DoToLanePosition(const api::InertialPosition& inertial_pos) const override;
+
+  // Maps @p inertial_pos (measured in the backend (maliput's) Inertial Frame
+  // which does not include api::RoadGeometry::internal_inertial_frame_translation()
+  // translation) into this Lane Frame.
+  //
+  // This method implementation @throws maliput::common::assertion_error as it
+  // must never be called as is. @see DoToLanePosition() docstring to
+  // understand when to override each method accordingly.
+  virtual api::LanePositionResult DoToBackendLanePosition(const api::InertialPosition& inertial_pos) const;
+  // @}
 
   const api::LaneId id_;
   const api::Segment* segment_{};
