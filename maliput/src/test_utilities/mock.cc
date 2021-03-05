@@ -72,7 +72,7 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   double do_linear_tolerance() const override { return 0; }
   double do_angular_tolerance() const override { return 0; }
   double do_scale_length() const override { return 0; }
-  math::Vector3 do_internal_inertial_frame_translation() const override { return math::Vector3{0., 0., 0.}; }
+  math::Vector3 do_inertial_to_backend_frame_translation() const override { return math::Vector3{0., 0., 0.}; }
 
   MockOneLaneIdIndex mock_id_index_;
 };
@@ -568,7 +568,7 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
   // Creates the road geometry.
   auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"), build_flags.linear_tolerance,
                                                build_flags.angular_tolerance,
-                                               build_flags.internal_inertial_frame_translation);
+                                               build_flags.inertial_to_backend_frame_translation);
   // Creates the Junctions.
   auto junction_a = std::make_unique<MockJunction>(JunctionId("mock_a"));
   junction_a->set_road_geometry(rg.get());

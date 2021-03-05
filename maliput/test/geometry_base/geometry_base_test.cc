@@ -209,26 +209,26 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, BasicConstruction) {
   const double kValidLinearTolerance = 7.0;
   const double kValidAngularTolerance = 99.0;
   const double kValidScaleLength = 0.5;
-  const math::Vector3 kInternalInertialFrameTranslation{1., 2., 3.};
+  const math::Vector3 kInertialToBackendFrameTranslation{1., 2., 3.};
 
   // Tolerance/scale-length values must be positive.
   EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), 0., kValidAngularTolerance, kValidScaleLength,
-                                kInternalInertialFrameTranslation),
+                                kInertialToBackendFrameTranslation),
                std::exception);
   EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), kValidLinearTolerance, 0., kValidScaleLength,
-                                kInternalInertialFrameTranslation),
+                                kInertialToBackendFrameTranslation),
                std::exception);
   EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), kValidLinearTolerance, kValidAngularTolerance, 0.,
-                                kInternalInertialFrameTranslation),
+                                kInertialToBackendFrameTranslation),
                std::exception);
 
   const MockRoadGeometry dut(api::RoadGeometryId("dut"), kValidLinearTolerance, kValidAngularTolerance,
-                             kValidScaleLength, kInternalInertialFrameTranslation);
+                             kValidScaleLength, kInertialToBackendFrameTranslation);
   EXPECT_EQ(dut.id(), api::RoadGeometryId("dut"));
   EXPECT_EQ(dut.linear_tolerance(), kValidLinearTolerance);
   EXPECT_EQ(dut.angular_tolerance(), kValidAngularTolerance);
   EXPECT_EQ(dut.scale_length(), kValidScaleLength);
-  EXPECT_EQ(dut.internal_inertial_frame_translation(), kInternalInertialFrameTranslation);
+  EXPECT_EQ(dut.inertial_to_backend_frame_translation(), kInertialToBackendFrameTranslation);
 }
 
 GTEST_TEST(GeometryBaseRoadGeometryTest, AddingBranchPoints) {
@@ -238,10 +238,10 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, AddingBranchPoints) {
   MockBranchPoint* raw_branch_point1 = branch_point1.get();
 
   const double kSomePositiveDouble = 7.0;
-  const math::Vector3 kInternalInertialFrameTranslation{0., 0., 0.};
+  const math::Vector3 kInertialToBackendFrameTranslation{0., 0., 0.};
 
   MockRoadGeometry dut(api::RoadGeometryId("dut"), kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble,
-                       kInternalInertialFrameTranslation);
+                       kInertialToBackendFrameTranslation);
 
   // Test the empty dut.
   EXPECT_EQ(dut.num_branch_points(), 0);
@@ -273,10 +273,10 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, AddingJunctions) {
   MockJunction* raw_junction1 = junction1.get();
 
   const double kSomePositiveDouble = 7.0;
-  const math::Vector3 kInternalInertialFrameTranslation{0., 0., 0.};
+  const math::Vector3 kInertialToBackendFrameTranslation{0., 0., 0.};
 
   MockRoadGeometry dut(api::RoadGeometryId("dut"), kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble,
-                       kInternalInertialFrameTranslation);
+                       kInertialToBackendFrameTranslation);
 
   // Test the empty dut.
   EXPECT_EQ(dut.num_junctions(), 0);
@@ -313,9 +313,9 @@ class GeometryBaseRoadGeometryIndexingTest : public ::testing::Test {
 
   void SetUp() override {
     constexpr double kArbitrary{1.};
-    const math::Vector3 kInternalInertialFrameTranslation{0., 0., 0.};
+    const math::Vector3 kInertialToBackendFrameTranslation{0., 0., 0.};
     road_geometry_ = std::make_unique<MockRoadGeometry>(api::RoadGeometryId("dut"), kArbitrary, kArbitrary, kArbitrary,
-                                                        kInternalInertialFrameTranslation);
+                                                        kInertialToBackendFrameTranslation);
   }
 
   std::unique_ptr<RoadGeometry> road_geometry_;

@@ -47,18 +47,18 @@ class RoadGeometry : public api::RoadGeometry {
   /// @param linear_tolerance the linear tolerance
   /// @param angular_tolerance the angular tolerance
   /// @param scale_length the scale length
-  /// @param internal_inertial_frame_translation the internal inertial frame
-  ///        origin translation
+  /// @param inertial_to_backend_frame_translation the Inertial Frame to Backend
+  ///        Frame translation vector
   ///
   /// @throws maliput::common::assertion_error if either `linear_tolerance` or
   ///         `angular_tolerance` or `scale_length` is non-positive.
   RoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length,
-               const math::Vector3& internal_inertial_frame_translation)
+               const math::Vector3& inertial_to_backend_frame_translation)
       : id_(id),
         linear_tolerance_(linear_tolerance),
         angular_tolerance_(angular_tolerance),
         scale_length_(scale_length),
-        internal_inertial_frame_translation_(internal_inertial_frame_translation) {
+        inertial_to_backend_frame_translation_(inertial_to_backend_frame_translation) {
     MALIPUT_THROW_UNLESS(linear_tolerance_ > 0.);
     MALIPUT_THROW_UNLESS(angular_tolerance_ > 0.);
     MALIPUT_THROW_UNLESS(scale_length_ > 0.);
@@ -127,13 +127,15 @@ class RoadGeometry : public api::RoadGeometry {
 
   double do_scale_length() const override { return scale_length_; }
 
-  math::Vector3 do_internal_inertial_frame_translation() const override { return internal_inertial_frame_translation_; }
+  math::Vector3 do_inertial_to_backend_frame_translation() const override {
+    return inertial_to_backend_frame_translation_;
+  }
 
   api::RoadGeometryId id_;
   double linear_tolerance_{};
   double angular_tolerance_{};
   double scale_length_{};
-  math::Vector3 internal_inertial_frame_translation_{};
+  math::Vector3 inertial_to_backend_frame_translation_{};
   std::vector<std::unique_ptr<Junction>> junctions_;
   std::vector<std::unique_ptr<BranchPoint>> branch_points_;
   api::BasicIdIndex id_index_;

@@ -177,10 +177,14 @@ class RoadGeometry {
     return DoSampleAheadWaypoints(lane_s_route, path_length_sampling_rate);
   }
 
-  /// @return maliput's Internal Inertial Frame translation with respect to
-  /// another arbitrary Inertial Frame with the same exact characteristics of
-  /// maliput's.
-  math::Vector3 internal_inertial_frame_translation() const { return do_internal_inertial_frame_translation(); }
+  /// The Backend Frame is an inertial frame similar to the Inertial Frame that
+  /// differ one from another by an isometric transformation. This method
+  /// returns the translation vector between both frames.
+  ///
+  /// @return maliput's Inertial Frame to Backend Frame translation vector.
+  math::Vector3 inertial_to_backend_frame_translation() const { return do_inertial_to_backend_frame_translation(); }
+
+  // TODO(#400): Add RollPitchYaw inertial_to_backend_frame_rotation() const.
 
  protected:
   RoadGeometry() = default;
@@ -217,7 +221,7 @@ class RoadGeometry {
   virtual std::vector<InertialPosition> DoSampleAheadWaypoints(const LaneSRoute&,
                                                                double path_length_sampling_rate) const;
 
-  virtual math::Vector3 do_internal_inertial_frame_translation() const = 0;
+  virtual math::Vector3 do_inertial_to_backend_frame_translation() const = 0;
   ///@}
 };
 

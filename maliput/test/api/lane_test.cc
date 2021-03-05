@@ -30,7 +30,7 @@ class LaneTest : public ::testing::Test {
   const double s{1};
   const double r{2};
   const double h{3};
-  const math::Vector3 internal_inertial_frame_translation{0., 0., 0.};
+  const math::Vector3 inertial_to_backend_frame_translation{0., 0., 0.};
 };
 
 class LaneMock final : public geometry_base::test::MockLane {
@@ -56,8 +56,9 @@ class LaneMock final : public geometry_base::test::MockLane {
 class RoadGeometryMock final : public geometry_base::test::MockRoadGeometry {
  public:
   explicit RoadGeometryMock(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance,
-                            double scale_length, const math::Vector3& internal_inertial_frame_translation)
-      : MockRoadGeometry(id, linear_tolerance, angular_tolerance, scale_length, internal_inertial_frame_translation) {}
+                            double scale_length, const math::Vector3& inertial_to_backend_frame_translation)
+      : MockRoadGeometry(id, linear_tolerance, angular_tolerance, scale_length, inertial_to_backend_frame_translation) {
+  }
   void set_lanes(std::vector<LaneMock*> lanes) { lanes_.assign(lanes.begin(), lanes.end()); }
   std::vector<LaneMock*> get_lanes() { return lanes_; }
 
@@ -67,9 +68,9 @@ class RoadGeometryMock final : public geometry_base::test::MockRoadGeometry {
 
 std::unique_ptr<RoadGeometryMock> MakeFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance,
                                                        double angular_tolerance, double scale_length,
-                                                       const math::Vector3& internal_inertial_frame_translation) {
+                                                       const math::Vector3& inertial_to_backend_frame_translation) {
   auto road_geometry = std::make_unique<RoadGeometryMock>(id, linear_tolerance, angular_tolerance, scale_length,
-                                                          internal_inertial_frame_translation);
+                                                          inertial_to_backend_frame_translation);
   std::vector<LaneMock*> lanes;
 
   auto lane0 = std::make_unique<LaneMock>(api::LaneId("lane0"));
@@ -102,7 +103,7 @@ TEST_F(LaneTest, Contains) {
   const LanePosition false_lane_position = LanePosition(s + kLaneLength + linear_tolerance, r, h);
 
   auto rg = MakeFullRoadGeometry(api::RoadGeometryId("mock_road_geometry"), linear_tolerance, angular_tolerance,
-                                 scale_length, internal_inertial_frame_translation);
+                                 scale_length, inertial_to_backend_frame_translation);
 
   const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
 
