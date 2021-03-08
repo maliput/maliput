@@ -181,6 +181,9 @@ class RoadGeometry {
   /// differ one from another by an isometric transformation. This method
   /// returns the translation vector between both frames.
   ///
+  /// For an explanation on the two different frames, see the explanation in
+  /// maliput_design.h.
+  ///
   /// @return maliput's Inertial Frame to Backend Frame translation vector.
   math::Vector3 inertial_to_backend_frame_translation() const { return do_inertial_to_backend_frame_translation(); }
 
