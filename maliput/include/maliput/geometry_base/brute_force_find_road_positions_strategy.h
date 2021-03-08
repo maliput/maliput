@@ -15,7 +15,7 @@ namespace geometry_base {
 /// @note Maliput backends could avoid implementing a custom implementation that
 /// knows about the geometry internals by forwarding calls to this function. On
 /// the contrary, backends might decide not to use this function because, for
-/// example, time complexity.
+/// example, time complexity which is at least O(n^3).
 ///
 /// @param rg The RoadGeometry over all these operations are performed. It
 ///        must not be nullptr.
