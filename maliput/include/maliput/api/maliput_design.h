@@ -85,13 +85,6 @@
 ///  * The world containing the road network is approximated by an inertial,
 ///    locally (if not globally) flat, 3-dimensional Cartesian coordinate
 ///    system referred to as the *world frame*.
-///    * The API exposed frame is called `Inertial Frame` and is identical to
-///      the *world frame*. `maliput` implementations (_backends_) may require
-///      an isometric transform to another frame with the same characteristics
-///      due to geometry definition or world positioning of the road surface.
-///      This second frame will be called `Backend Frame` and they both use
-///      different names to *world frame* because they are both embedded in the
-///      _world_ via the following means.
 ///  * The road surface is a bounded compact orientable 2-dimensional manifold
 ///    embedded in the @f$ \mathbb{R}^3 @f$ world frame via a @f$ G^1 @f$
 ///    continuous map from @f$ \mathbb{R}^2 \to \mathbb{R}^3 @f$.
@@ -163,12 +156,19 @@
 /// > plane.  Typically, the "ENU" convention is used: @f$\hat{x}@f$ points *East*
 /// > and @f$\hat{y}@f$ points *North*.
 ///
-/// As differentiated before, the `World`-frame is identical to the
-/// `Inertial Frame` and another frame with the same characteristics is used for
-/// `maliput` implementations. This second frame is the `Backend Frame` which
-/// differs from the `Inertial Frame` by an isometric transform. The
-/// `Backend Frame` coordinates should use `Vector3` to properly differentiate
-/// from `InertialPositions` and must be part of backend implementations only.
+/// At the API level, we will refer to `Inertial Frame` as a synonym of
+/// `World`-frame.
+///
+/// Another frame will be defined, the `Backend Frame` which is
+/// different from the `World`-frame by an isometric transform. This frame is
+/// also right-handed 3D inertial Cartesian coordinate system with an
+/// orthonormal basis. It exists and potentially differs from the
+/// `Inertial Frame` because of differing contexts. Typically, the
+/// `Inertial Frame` chosen matches that of the client, e.g., a
+/// simulator that uses Maliput. Meanwhile, the `Backend Frame` typically
+/// matches the underlying data used by a particular backend, e.g., an
+/// OpenDRIVE file. The `Backend Frame` will use `Vector3` for coordinates to
+/// properly differentiate from the `World`-frame type, i.e. `InertialPositions`.
 ///
 /// A `Lane`-frame is a right-handed orthonormal curvilinear coordinate system, with
 /// positions expressed as coordinates @f$(s,r,h)@f$.  Each `Lane` in a `RoadGeometry`
