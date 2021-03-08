@@ -103,8 +103,9 @@ class Lane : public api::Lane {
   // Maps @p lane_pos into the Backend Frame.
   //
   // @note This method implementation @throws maliput::common::assertion_error
-  //       as it should never be called. @see DoToInertialPosition()
-  //       docstring to understand when to override each method accordingly.
+  //       as it should only be called when it is overridden by a derived class.
+  //       @see DoToInertialPosition() docstring to understand when to override
+  //       each method accordingly.
   //
   // @return The mapped @p lane_pos into the Backend Frame.
   virtual math::Vector3 DoToBackendPosition(const api::LanePosition& lane_pos) const;
@@ -112,31 +113,30 @@ class Lane : public api::Lane {
 
   // @{
   // Translates @p inertial_pos with api::RoadGeometry::internal_inertial_frame_translation()
-  // and calls DoToLanePositionFromBackendPosition(). The returned values are
+  // and calls DoToLanePositionBackend(). The returned values are
   // used to build an api::LanePositionResult. Note that `nearest_backend_pos`
   // is converted back to the Inertial Frame before returning the final result.
   //
   // @note When the Inertial and Backend Frames differ, the backend
   //       implementation should (1) not override this method and (2) override
-  //       DoToLanePositionFromBackendPosition().
+  //       DoToLanePositionBackend().
   // @note When the Inertial and Backend Frames do not differ, the backend
   //       implementation should (1) override this method and (2) do not
-  //       override DoToLanePositionFromBackendPosition().
+  //       override DoToLanePositionBackend().
   virtual api::LanePositionResult DoToLanePosition(const api::InertialPosition& inertial_pos) const override;
 
   // Maps @p backend_pos (measured in the Backend Frame) into this Lane Frame.
   //
   // @note This method implementation @throws maliput::common::assertion_error
-  //       as it should never be called. @see DoToLanePosition()
-  //       docstring to understand when to override each method accordingly.
+  //       as it should only be called when it is overridden by a derived class.
+  //       @see DoToLanePosition() docstring to understand when to override each
+  //       method accordingly.
   //
   // @param backend_pos The Backend Frame coordinate to map into this Lane
   //        Frame.
   // @param lane_pos The candidate LanePosition within the Lane' segment-
-  //        bounds which is closest to an Inertial Frame position supplied to
-  //        api::Lane::ToLanePosition() and then converted into the Backend
-  //        Frame (measured by the Cartesian metric in the world frame). It must
-  //        not be nullptr.
+  //        bounds which is closest closest to @p backend_pos. It must not be
+  //        nullptr.
   // @param nearest_backend_pos The position that exactly corresponds to
   //        @p lane_pos. It must not be nullptr.
   // @param distance The Cartesian distance between `nearest_position` and the
@@ -147,8 +147,8 @@ class Lane : public api::Lane {
   //         nullptr.
   //
   // @return The @p lane_pos, @p nearest_backend_pos and @p distance.
-  virtual void DoToLanePositionFromBackendPosition(const math::Vector3& backend_pos, api::LanePosition* lane_pos,
-                                                   math::Vector3* nearest_backend_pos, double* distance) const;
+  virtual void DoToLanePositionBackend(const math::Vector3& backend_pos, api::LanePosition* lane_pos,
+                                       math::Vector3* nearest_backend_pos, double* distance) const;
   // @}
 
   const api::LaneId id_;

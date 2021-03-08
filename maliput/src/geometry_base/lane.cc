@@ -103,13 +103,13 @@ api::LanePositionResult Lane::DoToLanePosition(const api::InertialPosition& iner
   api::LanePosition lane_pos{};
   math::Vector3 nearest_backend_pos{};
   double distance{};
-  DoToLanePositionFromBackendPosition(backend_pos, &lane_pos, &nearest_backend_pos, &distance);
+  DoToLanePositionBackend(backend_pos, &lane_pos, &nearest_backend_pos, &distance);
   return {lane_pos, api::InertialPosition::FromXyz(nearest_backend_pos + inertial_to_backend_frame_translation),
           distance};
 }
 
-void Lane::DoToLanePositionFromBackendPosition(const math::Vector3& backend_pos, api::LanePosition* lane_position,
-                                               math::Vector3* nearest_backend_pos, double* distance) const {
+void Lane::DoToLanePositionBackend(const math::Vector3& backend_pos, api::LanePosition* lane_position,
+                                   math::Vector3* nearest_backend_pos, double* distance) const {
   MALIPUT_THROW_MESSAGE(
       "Unimplemented method. Please check the documentation of "
       "maliput::geometry_base::Lane::DoToLanePosition().");

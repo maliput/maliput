@@ -13,7 +13,9 @@ namespace geometry_base {
 /// _distance_ with `radius`.
 ///
 /// @note Maliput backends could avoid implementing a custom implementation that
-/// knows about the geometry internals by forwarding calls to this function.
+/// knows about the geometry internals by forwarding calls to this function. On
+/// the contrary, backends might decide not to use this function because, for
+/// example, time complexity.
 ///
 /// @param rg The RoadGeometry over all these operations are performed. It
 ///        must not be nullptr.
