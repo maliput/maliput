@@ -161,14 +161,14 @@
 ///
 /// Another frame will be defined, the `Backend Frame` which is
 /// different from the `World`-frame by an isometric transform. This frame is
-/// also right-handed 3D inertial Cartesian coordinate system with an
+/// also a right-handed 3D inertial Cartesian coordinate system with an
 /// orthonormal basis. It exists and potentially differs from the
 /// `Inertial Frame` because of differing contexts. Typically, the
 /// `Inertial Frame` chosen matches that of the client, e.g., a
 /// simulator that uses Maliput. Meanwhile, the `Backend Frame` typically
 /// matches the underlying data used by a particular backend, e.g., an
 /// OpenDRIVE file. The `Backend Frame` will use `Vector3` for coordinates to
-/// properly differentiate from the `World`-frame type, i.e. `InertialPositions`.
+/// properly differentiate from the `World`-frame type, i.e. `InertialPosition`.
 ///
 /// A `Lane`-frame is a right-handed orthonormal curvilinear coordinate system, with
 /// positions expressed as coordinates @f$(s,r,h)@f$.  Each `Lane` in a `RoadGeometry`

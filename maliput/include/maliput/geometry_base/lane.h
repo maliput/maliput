@@ -92,12 +92,10 @@ class Lane : public api::Lane {
   // Forwards the call to DoToBackendPosition(lane_pos) and translates
   // the result to account for api::RoadGeometry::inertial_to_backend_frame_translation().
   //
-  // @note When the Inertial and Backend Frames differ, the backend
-  //       implementation should (1) not override this method and (2) override
-  //       DoToBackendPosition().
-  // @note When the Inertial and Backend Frames do not differ, the backend
-  //       implementation should (1) override this method and (2) do not
-  //       override DoToBackendPosition().
+  // @note Because of performance constraints, backends must decide whether to
+  //       exclusively override DoToInertialPosition() or DoToBackendPosition().
+  //       When overriding DoToInertialPosition(), a better performance is
+  //       expected than the generic transform applied here.
   virtual api::InertialPosition DoToInertialPosition(const api::LanePosition& lane_pos) const override;
 
   // Maps @p lane_pos into the Backend Frame.
@@ -117,12 +115,10 @@ class Lane : public api::Lane {
   // used to build an api::LanePositionResult. Note that `nearest_backend_pos`
   // is converted back to the Inertial Frame before returning the final result.
   //
-  // @note When the Inertial and Backend Frames differ, the backend
-  //       implementation should (1) not override this method and (2) override
-  //       DoToLanePositionBackend().
-  // @note When the Inertial and Backend Frames do not differ, the backend
-  //       implementation should (1) override this method and (2) do not
-  //       override DoToLanePositionBackend().
+  // @note Because of performance constraints, backends must decide whether to
+  //       exclusively override DoToLanePosition() or DoToLanePositionBackend().
+  //       When overriding DoToLanePosition(), a better performance is
+  //       expected than the generic transform applied here.
   virtual api::LanePositionResult DoToLanePosition(const api::InertialPosition& inertial_pos) const override;
 
   // Maps @p backend_pos (measured in the Backend Frame) into this Lane Frame.
