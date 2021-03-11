@@ -4,6 +4,7 @@
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/lane.h"
+#include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/passkey.h"
@@ -86,6 +87,70 @@ class Lane : public api::Lane {
   const api::LaneEndSet* DoGetOngoingBranches(const api::LaneEnd::Which which_end) const override;
 
   std::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
+
+  // @{
+  // Maps @p lane_pos into the Inertial Frame.
+  //
+  // @details Forwards the call to DoToBackendPosition(lane_pos) and translates
+  //          the result to account for api::RoadGeometry::inertial_to_backend_frame_translation().
+  //
+  // @note Because of performance constraints, backends must decide whether to
+  //       exclusively override DoToInertialPosition() or DoToBackendPosition().
+  //       When overriding DoToInertialPosition(), a better performance is
+  //       expected than the generic transform applied here.
+  virtual api::InertialPosition DoToInertialPosition(const api::LanePosition& lane_pos) const override;
+
+  // Maps @p lane_pos into the Backend Frame.
+  //
+  // @note This method implementation @throws maliput::common::assertion_error
+  //       as it should only be called when it is overridden by a derived class.
+  //       @see DoToInertialPosition() docstring to understand when to override
+  //       each method accordingly.
+  //
+  // @return The mapped @p lane_pos into the Backend Frame.
+  virtual math::Vector3 DoToBackendPosition(const api::LanePosition& lane_pos) const;
+  // @}
+
+  // @{
+  // Maps @p inertial_pos (measured in the Inertial Frame) into this Lane Frame.
+  //
+  // @details Translates @p inertial_pos with api::RoadGeometry::internal_inertial_frame_translation()
+  //          and calls DoToLanePositionBackend(). The returned values are
+  //          used to build an api::LanePositionResult. Note that
+  //          `nearest_backend_pos` is converted back to the Inertial Frame
+  //          before returning the final result.
+  //
+  // @note Because of performance constraints, backends must decide whether to
+  //       exclusively override DoToLanePosition() or DoToLanePositionBackend().
+  //       When overriding DoToLanePosition(), a better performance is
+  //       expected than the generic transform applied here.
+  virtual api::LanePositionResult DoToLanePosition(const api::InertialPosition& inertial_pos) const override;
+
+  // Maps @p backend_pos (measured in the Backend Frame) into this Lane Frame.
+  //
+  // @note This method implementation @throws maliput::common::assertion_error
+  //       as it should only be called when it is overridden by a derived class.
+  //       @see DoToLanePosition() docstring to understand when to override each
+  //       method accordingly.
+  //
+  // @param backend_pos The Backend Frame coordinate to map into this Lane
+  //        Frame.
+  // @param lane_pos The candidate LanePosition within the Lane' segment-
+  //        bounds which is closest closest to @p backend_pos. It must not be
+  //        nullptr.
+  // @param nearest_backend_pos The position that exactly corresponds to
+  //        @p lane_pos. It must not be nullptr.
+  // @param distance The Cartesian distance between `nearest_position` and the
+  //        Inertial Frame position supplied to Lane::ToLanePosition() and then
+  //        converted into the Backend Frame. It must not be nullptr.
+  //
+  // @throws When any of @p backend_pos, @p lane_pos, or @p distance is
+  //         nullptr.
+  //
+  // @return The @p lane_pos, @p nearest_backend_pos and @p distance.
+  virtual void DoToLanePositionBackend(const math::Vector3& backend_pos, api::LanePosition* lane_pos,
+                                       math::Vector3* nearest_backend_pos, double* distance) const;
+  // @}
 
   const api::LaneId id_;
   const api::Segment* segment_{};

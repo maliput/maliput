@@ -209,20 +209,26 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, BasicConstruction) {
   const double kValidLinearTolerance = 7.0;
   const double kValidAngularTolerance = 99.0;
   const double kValidScaleLength = 0.5;
+  const math::Vector3 kInertialToBackendFrameTranslation{1., 2., 3.};
+
   // Tolerance/scale-length values must be positive.
-  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), 0., kValidAngularTolerance, kValidScaleLength),
+  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), 0., kValidAngularTolerance, kValidScaleLength,
+                                kInertialToBackendFrameTranslation),
                std::exception);
-  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), kValidLinearTolerance, 0., kValidScaleLength),
+  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), kValidLinearTolerance, 0., kValidScaleLength,
+                                kInertialToBackendFrameTranslation),
                std::exception);
-  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), kValidLinearTolerance, kValidAngularTolerance, 0.),
+  EXPECT_THROW(MockRoadGeometry(api::RoadGeometryId("dut"), kValidLinearTolerance, kValidAngularTolerance, 0.,
+                                kInertialToBackendFrameTranslation),
                std::exception);
 
   const MockRoadGeometry dut(api::RoadGeometryId("dut"), kValidLinearTolerance, kValidAngularTolerance,
-                             kValidScaleLength);
+                             kValidScaleLength, kInertialToBackendFrameTranslation);
   EXPECT_EQ(dut.id(), api::RoadGeometryId("dut"));
   EXPECT_EQ(dut.linear_tolerance(), kValidLinearTolerance);
   EXPECT_EQ(dut.angular_tolerance(), kValidAngularTolerance);
   EXPECT_EQ(dut.scale_length(), kValidScaleLength);
+  EXPECT_EQ(dut.inertial_to_backend_frame_translation(), kInertialToBackendFrameTranslation);
 }
 
 GTEST_TEST(GeometryBaseRoadGeometryTest, AddingBranchPoints) {
@@ -232,7 +238,10 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, AddingBranchPoints) {
   MockBranchPoint* raw_branch_point1 = branch_point1.get();
 
   const double kSomePositiveDouble = 7.0;
-  MockRoadGeometry dut(api::RoadGeometryId("dut"), kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble);
+  const math::Vector3 kInertialToBackendFrameTranslation{0., 0., 0.};
+
+  MockRoadGeometry dut(api::RoadGeometryId("dut"), kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble,
+                       kInertialToBackendFrameTranslation);
 
   // Test the empty dut.
   EXPECT_EQ(dut.num_branch_points(), 0);
@@ -264,7 +273,10 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, AddingJunctions) {
   MockJunction* raw_junction1 = junction1.get();
 
   const double kSomePositiveDouble = 7.0;
-  MockRoadGeometry dut(api::RoadGeometryId("dut"), kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble);
+  const math::Vector3 kInertialToBackendFrameTranslation{0., 0., 0.};
+
+  MockRoadGeometry dut(api::RoadGeometryId("dut"), kSomePositiveDouble, kSomePositiveDouble, kSomePositiveDouble,
+                       kInertialToBackendFrameTranslation);
 
   // Test the empty dut.
   EXPECT_EQ(dut.num_junctions(), 0);
@@ -301,7 +313,9 @@ class GeometryBaseRoadGeometryIndexingTest : public ::testing::Test {
 
   void SetUp() override {
     constexpr double kArbitrary{1.};
-    road_geometry_ = std::make_unique<MockRoadGeometry>(api::RoadGeometryId("dut"), kArbitrary, kArbitrary, kArbitrary);
+    const math::Vector3 kInertialToBackendFrameTranslation{0., 0., 0.};
+    road_geometry_ = std::make_unique<MockRoadGeometry>(api::RoadGeometryId("dut"), kArbitrary, kArbitrary, kArbitrary,
+                                                        kInertialToBackendFrameTranslation);
   }
 
   std::unique_ptr<RoadGeometry> road_geometry_;
@@ -360,7 +374,7 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
 }
 
 GTEST_TEST(GeometryBaseRoadGeometryTest, UnimplementedMethods) {
-  const MockRoadGeometry dut(api::RoadGeometryId("dut"), 1., 1., 1.);
+  const MockRoadGeometry dut(api::RoadGeometryId("dut"), 1., 1., 1., {0, 0, 0});
   // Ensure that the not-actually-implemented methods throw an exception.
   EXPECT_THROW(dut.ToRoadPosition(api::InertialPosition(), std::nullopt), std::exception);
   EXPECT_THROW(dut.FindRoadPositions(api::InertialPosition(), 1.), std::exception);

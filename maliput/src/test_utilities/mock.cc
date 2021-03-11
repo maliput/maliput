@@ -72,6 +72,8 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   double do_linear_tolerance() const override { return 0; }
   double do_angular_tolerance() const override { return 0; }
   double do_scale_length() const override { return 0; }
+  math::Vector3 do_inertial_to_backend_frame_translation() const override { return math::Vector3{0., 0., 0.}; }
+
   MockOneLaneIdIndex mock_id_index_;
 };
 
@@ -533,9 +535,10 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& b
 // Return values when ToLanePosition method is called are hardcoded.
 std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry() {
   constexpr double kArbitrary{1.};
+  const math::Vector3 kZero{0., 0., 0.};
   const LanePositionResult lane_position_result_a{{10., 20., 30.}, {12., 89., 1.}, 0.5};
   const LanePositionResult lane_position_result_b{{40., 50., 60.}, {50., 1., 45.}, 30.};
-  auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("road_geometry"), kArbitrary, kArbitrary);
+  auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("road_geometry"), kArbitrary, kArbitrary, kZero);
   auto junction_a = std::make_unique<MockJunction>(JunctionId("junction_a"));
   auto junction_b = std::make_unique<MockJunction>(JunctionId("junction_b"));
   auto segment_a = std::make_unique<MockSegment>(SegmentId("segment_a"));
@@ -564,7 +567,8 @@ std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry() {
 std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometryContiguityBuildFlags& build_flags) {
   // Creates the road geometry.
   auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"), build_flags.linear_tolerance,
-                                               build_flags.angular_tolerance);
+                                               build_flags.angular_tolerance,
+                                               build_flags.inertial_to_backend_frame_translation);
   // Creates the Junctions.
   auto junction_a = std::make_unique<MockJunction>(JunctionId("mock_a"));
   junction_a->set_road_geometry(rg.get());

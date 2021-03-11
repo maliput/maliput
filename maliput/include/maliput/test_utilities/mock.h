@@ -51,6 +51,7 @@ struct RoadGeometryContiguityBuildFlags {
   bool add_angular_mismatch{false};
   double linear_tolerance{0};
   double angular_tolerance{0};
+  math::Vector3 inertial_to_backend_frame_translation{0., 0., 0.};
 };
 
 /// Holds RoadRulebook contiguity build configuration.
@@ -301,8 +302,12 @@ class MockRoadGeometry : public RoadGeometry {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadGeometry)
   MockRoadGeometry(const RoadGeometryId& id) : id_(id) {}
-  MockRoadGeometry(const RoadGeometryId& id, const double& linear_tolerance, const double& angular_tolerance)
-      : id_(id), linear_tolerance_(linear_tolerance), angular_tolerance_(angular_tolerance) {}
+  MockRoadGeometry(const RoadGeometryId& id, const double& linear_tolerance, const double& angular_tolerance,
+                   const math::Vector3& inertial_to_backend_frame_translation)
+      : id_(id),
+        linear_tolerance_(linear_tolerance),
+        angular_tolerance_(angular_tolerance),
+        inertial_to_backend_frame_translation_(inertial_to_backend_frame_translation) {}
 
   void add_junction(std::unique_ptr<MockJunction> junction) { junctions_.push_back(std::move(junction)); }
   void set_start_bp(std::unique_ptr<MockBranchPoint> start_bp) { start_bp_ = std::move(start_bp); }
@@ -341,11 +346,15 @@ class MockRoadGeometry : public RoadGeometry {
   double do_linear_tolerance() const override { return linear_tolerance_; }
   double do_angular_tolerance() const override { return angular_tolerance_; }
   double do_scale_length() const override { return 0; }
+  math::Vector3 do_inertial_to_backend_frame_translation() const override {
+    return inertial_to_backend_frame_translation_;
+  }
 
   MockIdIndex mock_id_index_;
   RoadGeometryId id_;
   double linear_tolerance_{0};
   double angular_tolerance_{0};
+  math::Vector3 inertial_to_backend_frame_translation_{};
   std::vector<std::unique_ptr<MockJunction>> junctions_;
   std::unique_ptr<MockBranchPoint> start_bp_;
   std::unique_ptr<MockBranchPoint> end_bp_;
