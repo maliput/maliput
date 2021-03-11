@@ -89,8 +89,10 @@ class Lane : public api::Lane {
   std::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
 
   // @{
-  // Forwards the call to DoToBackendPosition(lane_pos) and translates
-  // the result to account for api::RoadGeometry::inertial_to_backend_frame_translation().
+  // Maps @p lane_pos into the Inertial Frame.
+  //
+  // @details Forwards the call to DoToBackendPosition(lane_pos) and translates
+  //          the result to account for api::RoadGeometry::inertial_to_backend_frame_translation().
   //
   // @note Because of performance constraints, backends must decide whether to
   //       exclusively override DoToInertialPosition() or DoToBackendPosition().
@@ -110,10 +112,13 @@ class Lane : public api::Lane {
   // @}
 
   // @{
-  // Translates @p inertial_pos with api::RoadGeometry::internal_inertial_frame_translation()
-  // and calls DoToLanePositionBackend(). The returned values are
-  // used to build an api::LanePositionResult. Note that `nearest_backend_pos`
-  // is converted back to the Inertial Frame before returning the final result.
+  // Maps @p inertial_pos (measured in the Inertial Frame) into this Lane Frame.
+  //
+  // @details Translates @p inertial_pos with api::RoadGeometry::internal_inertial_frame_translation()
+  //          and calls DoToLanePositionBackend(). The returned values are
+  //          used to build an api::LanePositionResult. Note that
+  //          `nearest_backend_pos` is converted back to the Inertial Frame
+  //          before returning the final result.
   //
   // @note Because of performance constraints, backends must decide whether to
   //       exclusively override DoToLanePosition() or DoToLanePositionBackend().
