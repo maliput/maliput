@@ -1,10 +1,8 @@
 name: scan_build
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
+    types: [labeled]
 
 env:
   PACKAGE_NAME: maliput
@@ -14,6 +12,7 @@ env:
 
 jobs:
   static_analysis:
+    if: contains(github.event.pull_request.labels.*.name, 'do-static-analyzer-test')
     name: Static analysis
     runs-on: ubuntu-18.04
     container:
