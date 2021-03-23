@@ -25,7 +25,7 @@ namespace test {
 /// maliput::geometry_base "geometry_base" is that all the
 /// remaining pure virtual methods in @ref
 /// maliput::geometry_base "geometry_base" (i.e., the methods
-/// involving actual lane-frame and world-frame geometry) have been
+/// involving actual lane-frame and `Inertial`-frame geometry) have been
 /// provided with implementations that simply throw `std::exception`.
 /// These "Mock" classes do provide sufficient functionality to
 /// exercise the geometry API's object graph.

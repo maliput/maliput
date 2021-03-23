@@ -117,7 +117,7 @@ class Lane {
 
   /// Returns the rotation which expresses the orientation of the
   /// `Lane`-frame basis at @p lane_pos with respect to the
-  /// world frame basis.
+  /// `Inertial`-frame basis.
   Rotation GetOrientation(const LanePosition& lane_pos) const { return DoGetOrientation(lane_pos); }
 
   /// Computes derivatives of LanePosition given a velocity vector @p velocity.

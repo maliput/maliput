@@ -95,7 +95,7 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
   for (int bpi = 0; bpi < num_branch_points(); ++bpi) {
     const BranchPoint* bp = branch_point(bpi);
     // For each BranchPoint:
-    //  - all branches should map to same world frame (x,y,z);
+    //  - all branches should map to same `Inertial`-frame (x,y,z);
     //  - orientation *into* BranchPoint should be the same for all A-side
     //     branches;
     //  - orientation *into* BranchPoint should be the same for all B-side
@@ -110,7 +110,7 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     }
 
     const LaneEnd ref_end = (bp->GetASide()->size() > 0) ? bp->GetASide()->get(0) : bp->GetBSide()->get(0);
-    // ...test world frame position similarity.
+    // ...test `Inertial`-frame position similarity.
     const InertialPosition ref_geo = LaneEndInertialPosition(ref_end);
     const auto test_inertial_position = [&](const LaneEndSet& ends) {
       for (int bi = 0; bi < ends.size(); ++bi) {

@@ -84,7 +84,8 @@ class Bulb final {
   /// Constructs a Bulb instance.
   ///
   /// @param id The bulb's ID. It must be unique in the context of the BulbGroup
-  /// that contains it. @see UniqueBulbId to uniquely identify a Bulb in the world.
+  /// that contains it. @see UniqueBulbId to uniquely identify a Bulb in the
+  /// `Inertial` space.
   ///
   /// @param position_bulb_group The linear offset of this bulb's frame relative
   /// to the frame of the bulb group that contains it. The origin of this bulb's
@@ -218,7 +219,7 @@ class BulbGroup final {
   ///
   /// @param id The bulb group's ID. It must be unique in the context of the
   /// TrafficLight that contains it. @see UniqueBulbGroupId to uniquely identify
-  /// a BulbGroup in the world.
+  /// a BulbGroup in the `Inertial` space.
   ///
   /// @param position_traffic_light The linear offset of this bulb group's frame
   /// relative to the frame of the traffic light that contains it. The origin of
@@ -360,9 +361,9 @@ class TrafficLight final {
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups_;
 };
 
-/// Uniquely identifies a bulb in the world. This consists of the concatenation
-/// of the bulb's ID, the ID of the bulb group that contains the bulb, and the
-/// the ID of the traffic light that contains the bulb group.
+/// Uniquely identifies a bulb in the `Inertial` space. This consists of the
+/// concatenation of the bulb's ID, the ID of the bulb group that contains the
+/// bulb, and the the ID of the traffic light that contains the bulb group.
 ///
 /// String representation of this ID is:
 /// "`traffic_light_id().string()`-`bulb_group_id.string()`-`bulb_group_id.string()`"
@@ -419,8 +420,8 @@ class UniqueBulbId : public UniqueId {
   Bulb::Id bulb_id_;
 };
 
-/// Uniquely identifies a bulb group in the world. This consists of the
-/// concatenation of the ID of the bulb group, and the ID of the traffic
+/// Uniquely identifies a bulb group in the `Inertial` space. This consists of
+/// the concatenation of the ID of the bulb group, and the ID of the traffic
 /// light that contains the bulb group.
 ///
 /// String representation of this ID is:

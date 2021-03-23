@@ -56,7 +56,7 @@ class UniqueIndexer {
   std::vector<const T*> vector_;
 };
 
-/// A world frame vertex.
+/// An `Inertial`-frame vertex.
 class GeoVertex {
  public:
   /// A hasher operation suitable for std::unordered_map.
@@ -86,7 +86,7 @@ class GeoVertex {
   api::InertialPosition v_;
 };
 
-/// A world frame normal vector.
+/// An `Inertial`-frame normal vector.
 class GeoNormal {
  public:
   /// A hasher operation suitable for std::unordered_map.
@@ -116,7 +116,7 @@ class GeoNormal {
   api::InertialPosition n_;
 };
 
-/// A world frame face:  a sequence of vertices with corresponding normals.
+/// An `Inertial`-frame face:  a sequence of vertices with corresponding normals.
 class GeoFace {
  public:
   GeoFace() {}
@@ -160,7 +160,7 @@ class IndexFace {
   std::vector<Vertex> vertices_;
 };
 
-/// A world frame mesh:  a collection of GeoFaces.
+/// An `Inertial`-frame mesh:  a collection of GeoFaces.
 class GeoMesh {
  public:
   GeoMesh() {}
@@ -196,8 +196,8 @@ class GeoMesh {
   /// name of an MTL-defined material to describe visual properties of the mesh.
   /// @p precision specifies the fixed-point precision (number of digits after
   /// the decimal point) for vertex and normal coordinate values.  @p origin
-  /// specifies a world-frame origin for vertex coordinates (i.e., the emitted
-  /// values for a vertex at `(x,y,z)` will be `(x,y,z) - origin`).
+  /// specifies a `Inertial`-frame origin for vertex coordinates (i.e., the
+  /// emitted values for a vertex at `(x,y,z)` will be `(x,y,z) - origin`).
   ///
   /// If other meshes have already been emitted to stream @p os, then
   /// @p vertex_index_offset and @p normal_index_offset must correspond to the

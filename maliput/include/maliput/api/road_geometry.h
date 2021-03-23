@@ -73,8 +73,8 @@ class RoadGeometry {
   /// If @p hint is provided, its value is used to help determine the result.
   ///
   /// Returns a RoadPositionResult. Its RoadPosition is the point in the
-  /// RoadGeometry's manifold which is, in the world frame, closest to
-  /// @p inertial_position. Its InertialPosition is the world frame equivalent of the
+  /// RoadGeometry's manifold which is, in the `Inertial`-frame, closest to
+  /// @p inertial_position. Its InertialPosition is the `Inertial`-frame equivalent of the
   /// RoadPosition and its distance is the Cartesian distance from
   /// @p inertial_position to the nearest point.
   ///
@@ -82,15 +82,15 @@ class RoadGeometry {
   /// `result.lane->ToInertialPosition(result.pos)` is within `linear_tolerance()`
   /// of the returned InertialPosition.
   ///
-  /// The map from RoadGeometry to the world frame is not onto (as a bounded
+  /// The map from RoadGeometry to the `Inertial`-frame is not onto (as a bounded
   /// RoadGeometry cannot completely cover the unbounded Cartesian universe).
   /// If @p inertial_position does represent a point contained within the volume
   /// of the RoadGeometry, then result distance is guaranteed to be less
   /// than or equal to `linear_tolerance()`.
   ///
-  /// The map from RoadGeometry to world frame is not necessarily one-to-one.
+  /// The map from RoadGeometry to `Inertial`-frame is not necessarily one-to-one.
   /// Different `(s,r,h)` coordinates from different Lanes, potentially from
-  /// different Segments, may map to the same `(x,y,z)` world frame location.
+  /// different Segments, may map to the same `(x,y,z)` `Inertial`-frame location.
   ///
   /// If @p inertial_position is contained within the volumes of multiple Segments,
   /// then ToRoadPosition() will choose a Segment which yields the minimum
