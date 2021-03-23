@@ -48,8 +48,8 @@ struct LaneEnd {
 /// text-logging. It is not intended for serialization.
 std::ostream& operator<<(std::ostream& out, const LaneEnd::Which& which_end);
 
-/// A position in 3-dimensional geographical Cartesian space, i.e., in the world
-/// frame, consisting of three components x, y, and z.
+/// A position in 3-dimensional geographical Cartesian space, i.e., in the
+/// `Inertial`-frame, consisting of three components x, y, and z.
 class InertialPosition {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(InertialPosition)
@@ -176,7 +176,7 @@ class Rotation {
   /// Returns the yaw component of the Rotation (in radians).
   double yaw() const { return rpy().yaw_angle(); }
 
-  /// Returns the rotated `inertial_position` InertialPosition in the World Frame.
+  /// Returns the rotated `inertial_position` InertialPosition in the `Inertial`-frame.
   InertialPosition Apply(const InertialPosition& inertial_position) const;
 
   /// Returns the rotation corresponding to "going the other way instead", i.e.,
@@ -185,8 +185,8 @@ class Rotation {
   Rotation Reverse() const;
 
   /// Let $R_1$ be `this` rotation description, and let `rot` be $R_2$, another
-  /// rotation description in the World Frame. Let $F_W_1$ and $F_W_2$ be the
-  /// versors describing the basis of the World Frame. Then, let $F_R_1$ and
+  /// rotation description in the `Inertial`-frame. Let $F_W_1$ and $F_W_2$ be the
+  /// versors describing the basis of the `Inertial`-frame. Then, let $F_R_1$ and
   /// $F_R_2$ be the rotated $F_W_1$ and $F_W_2$ by $R_1$ and $R_2$ respectively.
   /// This method returns the root square sum of each angle between
   /// versors in $F_R_1$ and $F_R_2$.
@@ -254,7 +254,7 @@ class LanePosition {
 struct LanePositionResult {
   /// The candidate LanePosition within the Lane' segment-bounds which
   /// is closest to a `inertial_position` supplied to Lane::ToLanePosition()
-  /// (measured by the Cartesian metric in the world frame).
+  /// (measured by the Cartesian metric in the `Inertial`-frame).
   LanePosition lane_position;
   /// The position that exactly corresponds to `lane_position`.
   InertialPosition nearest_position;

@@ -86,7 +86,7 @@ class Intersection {
 
   /// Determines whether `inertial_position` is within this Intersection::Region().
   ///
-  /// @param inertial_position A InertialPosition in the World Frame.
+  /// @param inertial_position A InertialPosition in the `Inertial`-frame.
   /// @param road_geometry The RoadGeometry where Intersection::Region() is contained. It must not be nullptr.
   /// @returns True When `inertial_position` is within Intersection::Region(). `inertial_position` is contained if
   /// the distance to the closest LanePosition in Intersection::Region() is less or equal than the linear tolerance of

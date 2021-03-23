@@ -159,7 +159,7 @@ bool IsMeshFaceCoplanarWithPlane(const GeoMesh& mesh, const IndexFace& face, con
 /// (see DoMeshVerticesLieOnPlane()). Said plane, built out of the
 /// first vertex position and normal in the @p face, is returned as
 /// a plane defined by a point @p p and a normal non-zero vector @p n.
-/// @param[in] mesh Is a World Frame mesh.
+/// @param[in] mesh Is a `Inertial`-frame mesh.
 /// @param[in] face Is a sequence of vertices with normals.
 /// @param[in] tolerance Is the tolerance to compute face planarity.
 /// @param[out] n Is a vector that with `p` define a plane that should contain all the face vertices.

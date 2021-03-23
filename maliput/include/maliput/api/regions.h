@@ -144,7 +144,7 @@ class LaneSRoute {
 /// @param road_geometry The RoadGeometry where `lane_range_a` and `lane_range_b` are contained. It must not
 /// be nullptr.
 /// @returns True When `lane_range_a` end pose and `lane_range_b` start pose are within linear and
-/// angular tolerance in the World Frame. Otherwise, it returns false.
+/// angular tolerance in the `Inertial`-frame. Otherwise, it returns false.
 ///
 /// @throws common::assertion_error When `lane_range_a`'s Lane is not found in `road_geometry`.
 /// @throws common::assertion_error When `lane_range_b`'s Lane is not found in `road_geometry`.
@@ -153,7 +153,7 @@ bool IsContiguous(const LaneSRange& lane_range_a, const LaneSRange& lane_range_b
 
 /// Evaluates whether `inertial_position` is within `lane_s_ranges`.
 ///
-/// @param inertial_position A InertialPosition in the World Frame.
+/// @param inertial_position A InertialPosition in the `Inertial`-frame.
 /// @param lane_s_ranges A vector of LaneSRanges that define a region.
 /// @param road_geometry The RoadGeometry where `lane_s_ranges` is contained. It must not be nullptr.
 /// @returns True when `inertial_position` is within `lane_s_ranges`. `inertial_position` is contained if the distance

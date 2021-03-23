@@ -29,7 +29,7 @@ namespace geometry_base {
 /// geometry_base implements all the virtual methods involved in
 /// managing the object graph of the road network.  It does not
 /// implement any of the fundamental geometric methods that define the
-/// immersion of lane-frame into world-frame; that is the job of each
+/// immersion of lane-frame into `Inertial`-frame; that is the job of each
 /// specific backend.
 // TODO(maddog@tri.global) Provide a basic naive implementation of
 //                         RoadGeometry::DoToRoadPosition() which

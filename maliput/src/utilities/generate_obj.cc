@@ -76,15 +76,15 @@ std::string FormatMaterial(const Material& mat, int precision) {
 }
 
 // Compute the maximum step in s-coordinates that can approximate the distance
-// between its ends in world's inertial frame coordinates up to the given
+// between its ends in `Inertial`-frame coordinates up to the given
 // `grid_unit` (taken as an absolute tolerance).
 //
 // Let `step_s` be a step in s-coordinates, `s0` a valid s-coordinate in
 // `lane` and `grid_unit` the minimum step in s-coordinates to take.
 // Starting at the minimum of `grid_unit` and the distance in s-coordinates i.e.
 // arc-length, to the `lane`'s end along the center line, increase `step_s`
-// until the distance between its ends in world's coordinates along the center,
-// left most and right most lines of the `lane`'s segment
+// until the distance between its ends in `Inertial` space coordinates along the
+// center, left most and right most lines of the `lane`'s segment
 // surface is bigger than `grid_unit` or the end of the `lane` is reached.
 double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_unit) {
   MALIPUT_DEMAND(lane != nullptr);
@@ -534,7 +534,7 @@ void DrawArrows(double elevation, double height, const api::LaneEndSet* set, Geo
 // @p height is the vertical size of rendering.  The actual elevation
 // may be raised in order to avoid overlapping other nearby
 // BranchPoints.  @p mesh is the mesh into which the rendering occurs.
-// @p previous_centers is a list of the world-frame positions of the
+// @p previous_centers is a list of the `Inertial`-frame positions of the
 // centers of previously rendered BranchPoints (in order to avoid
 // overlaps with them); this list will be updated with the rendered
 // center of this BranchPoint.
@@ -559,7 +559,7 @@ void RenderBranchPoint(const api::BranchPoint* const branch_point, const double 
   double elevation = base_elevation;
   bool has_conflict = true;
   while (has_conflict) {
-    // Calculate center in world-frame with current elevation.
+    // Calculate center in `Inertial`-frame with current elevation.
     const api::LanePosition center_srh((reference_end.end == api::LaneEnd::kStart) ? 0. : reference_end.lane->length(),
                                        0., elevation);
     const api::Rotation orientation = reference_end.lane->GetOrientation(center_srh);
