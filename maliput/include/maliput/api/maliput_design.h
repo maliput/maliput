@@ -84,13 +84,13 @@
 /// In super-mathy terms:
 ///  * The world containing the road network is approximated by an inertial,
 ///    locally (if not globally) flat, 3-dimensional Cartesian coordinate
-///    system referred to as the *world frame*.
+///    system referred to as the *`Inertial`-frame*.
 ///  * The road surface is a bounded compact orientable 2-dimensional manifold
-///    embedded in the @f$ \mathbb{R}^3 @f$ world frame via a @f$ G^1 @f$
+///    embedded in the @f$ \mathbb{R}^3 @f$ `Inertial`-frame via a @f$ G^1 @f$
 ///    continuous map from @f$ \mathbb{R}^2 \to \mathbb{R}^3 @f$.
 ///  * The road surface is extended via its normals into a bounded compact
 ///    orientable 3-dimensional road volume, also embedded in the
-///    @f$ \mathbb{R}^3 @f$ world frame via a @f$ G^1 @f$ continuous map from
+///    @f$ \mathbb{R}^3 @f$ `Inertial`-frame via a @f$ G^1 @f$ continuous map from
 ///    @f$ \mathbb{R}^3 \to \mathbb{R}^3 @f$.
 ///  * We impose the @f$ G^1 @f$ continuity constraint on all roads to ensure that there
 ///    is a consistent, well-defined orientation everywhere on the road's manifold.
@@ -110,10 +110,10 @@
 /// above and/or below them).  Each `Segment` is a group of one or more
 /// adjacent `Lanes`.  A `Lane` corresponds to a lane of travel on a road,
 /// and defines a specific parameterization of the parent `Segment`'s
-/// volume from a local *lane frame* into the world frame.  `Lanes` are
+/// volume from a local *lane frame* into the `Inertial`-frame.  `Lanes` are
 /// connected at `BranchPoints`, and the graph of `Lanes` and
 /// `BranchPoints` describes the topology of a `RoadGeometry`. `Segments` which map
-/// to intersecting volumes of the world frame (e.g., intersections) are grouped
+/// to intersecting volumes of the `Inertial`-frame (e.g., intersections) are grouped
 /// together into `Junctions`.
 ///
 /// In a sense, there are two complementary object graphs in `maliput`.
@@ -134,20 +134,20 @@
 /// > TODO: Explain the concepts of linear tolerance, angular tolerance, and
 /// > characteristic scale length.
 ///
-/// @subsubsection world_frame_versus_lane_frame `World` Frame versus `Lane` Frame
+/// @subsubsection inertial_frame_versus_lane_frame `Inertial`-frame versus `Lane`-frame
 ///
 /// Two types of coordinate frames are used in this model: the (single)
-/// `World`-frame and the (multiple) `Lane`-frames.  In both, distances
+/// `Inertial`-frame and the (multiple) `Lane`-frames.  In both, distances
 /// are typically measured in units of meters.
 ///
-/// The `World`-frame is any right-handed 3D inertial Cartesian coordinate
+/// The `Inertial`-frame is any right-handed 3D inertial Cartesian coordinate
 /// system, with orthonormal basis @f$(\hat{x},\hat{y},\hat{z})@f$ and
 /// positions expressed as triples @f$(x,y,z)@f$.  This could be a
 /// globally-flat coordinate system, e.g., ECEF ("Earth-centered,
 /// Earth-fixed").  Or, it could be a locally-flat projection of the
 /// Earth's surface, e.g., a UTM ("Universal Transverse Mercator")
 /// projection coupled with elevation.  No specific projection is mandated
-/// by `maliput`. To disambiguate for one or another `World`-frame choice, the
+/// by `maliput`. To disambiguate for one or another `Inertial`-frame choice, the
 /// API uses the preferred `InertialPosition` type which can be interpreted for
 /// one or another frame choice.
 ///
@@ -156,26 +156,23 @@
 /// > plane.  Typically, the "ENU" convention is used: @f$\hat{x}@f$ points *East*
 /// > and @f$\hat{y}@f$ points *North*.
 ///
-/// At the API level, we will refer to `Inertial Frame` as a synonym of
-/// `World`-frame.
-///
-/// Another frame will be defined, the `Backend Frame` which is
-/// different from the `World`-frame by an isometric transform. This frame is
+/// Another frame will be defined, the `Backend`-frame which is
+/// different from the `Inertial`-frame by an isometric transform. This frame is
 /// also a right-handed 3D inertial Cartesian coordinate system with an
 /// orthonormal basis. It exists and potentially differs from the
-/// `Inertial Frame` because of differing contexts. Typically, the
-/// `Inertial Frame` chosen matches that of the client, e.g., a
-/// simulator that uses Maliput. Meanwhile, the `Backend Frame` typically
+/// `Inertial`-frame because of differing contexts. Typically, the
+/// `Inertial`-frame chosen matches that of the client, e.g., a
+/// simulator that uses Maliput. Meanwhile, the `Backend`-frame typically
 /// matches the underlying data used by a particular backend, e.g., an
-/// OpenDRIVE file. The `Backend Frame` will use `Vector3` for coordinates to
-/// properly differentiate from the `World`-frame type, i.e. `InertialPosition`.
+/// OpenDRIVE file. The `Backend`-frame will use `Vector3` for coordinates to
+/// properly differentiate from the `Inertial`-frame type, i.e. `InertialPosition`.
 ///
 /// A `Lane`-frame is a right-handed orthonormal curvilinear coordinate system, with
 /// positions expressed as coordinates @f$(s,r,h)@f$.  Each `Lane` in a `RoadGeometry`
-/// defines its own embedding into the `World`, and thus each `Lane`
+/// defines its own embedding into the `Inertial` space, and thus each `Lane`
 /// has its own `Lane`-frame.
 ///
-/// When embedded into the `World`, @f$s@f$ represents longitudinal distance
+/// When embedded into the `Inertial` space, @f$s@f$ represents longitudinal distance
 /// (path-length) along a central reference curve (the *centerline*) which
 /// defines a given `Lane`.  @f$r@f$ is lateral distance along the road surface,
 /// the path length along a geodesic perpendicular to the centerline.
@@ -211,11 +208,11 @@
 ///    of `Lane` @f$L@f$.
 ///
 /// One can construct a map @f$W: \lbrace(L,s,r,h)\rbrace \to \mathbb{R}^3@f$ from the
-/// road manifold into the `World`, as a union of the per `Lane` maps.
+/// road manifold into the `Inertial` space, as a union of the per `Lane` maps.
 /// This @f$W@f$ is technically an *immersion* and not an *embedding* because
 /// it is not necessarily 1-to-1; as described later on, multiple `Lanes`
 /// in the same `Segment` will double-cover the same region of the
-/// @f$\mathbb{R}^3@f$ world frame.  Also, due to our representation of
+/// @f$\mathbb{R}^3@f$ `Inertial`-frame.  Also, due to our representation of
 /// routing, double-coverage will occur where streets cross to form
 /// intersections, or where highways split or merge.  This needs to be
 /// considered when determining the possible interactions of agents or
@@ -234,7 +231,7 @@
 /// shoulders, etc).
 ///
 /// As discussed above, a `Lane`, identified by @f$L@f$, defines a map @f$W_L@f$
-/// from curvilinear coordinates to the `World`-frame:
+/// from curvilinear coordinates to the `Inertial`-frame:
 ///
 /// @f[
 /// W_L: (s,r,h) \mapsto (x,y,z), \text{ for } s \in [0, s_\text{max}]
@@ -255,7 +252,7 @@
 /// The space of the `Lane` is bounded in @f$s@f$ by @f$s \in [0,
 /// s_\text{max}]@f$.  @f$s_\text{max}@f$ is called the *length* of the `Lane`
 /// and is in fact the path-length of the centerline @f$C_L@f$ (in both the
-/// `Lane`-frame and the `World`-frame).  The @f$s=0@f$ end of a `Lane` is
+/// `Lane`-frame and the `Inertial`-frame).  The @f$s=0@f$ end of a `Lane` is
 /// labeled the *start end*, and the @f$s=s_\text{max}@f$ end is the *finish
 /// end*.  However, a `Lane` is just a stretch of pavement with no
 /// preferred travel direction, and there is no direction of travel
@@ -327,7 +324,7 @@
 /// of the `Lanes` joined at a `BranchPoint` are @f$G^1@f$ continuous.  Together with
 /// the earlier-stated requirement of overall @f$G^1@f$ continuity of the road surface
 /// and the conditions on @f$r@f$ and @f$h@f$ being path-lengths, this implies that:
-///  1. The location of a `BranchPoint` is a well-defined point in the `World`-frame.
+///  1. The location of a `BranchPoint` is a well-defined point in the `Inertial`-frame.
 ///  2. The tangent vectors of the @f$C_L@f$ curves are either parallel or
 ///     antiparallel with each other at the
 ///     `BranchPoint`.  In fact, except for the signs of @f$\hat{s}@f$ and @f$\hat{r}@f$,
@@ -390,7 +387,7 @@
 /// presents a different @f$(s,r,h)@f$ parameterization of that same pavement.
 ///
 /// We would like for the segment-bounds of each `Lane` to map to the
-/// same extent of physical space in the `World`-frame, but that isn't always
+/// same extent of physical space in the `Inertial`-frame, but that isn't always
 /// possible due to the geometric constraints of parallel curves.  However,
 /// we do require that the union of the segment-bounds of all `Lanes`
 /// in a `Segment` is simply-connected.  This means that:
@@ -432,7 +429,7 @@
 /// such as on-ramps, exit ramps, traffic circles, and a road that splits
 /// to go around an impassable monument.
 ///
-/// `Segments` which map to intersecting volumes in the `World`-frame (in
+/// `Segments` which map to intersecting volumes in the `Inertial`-frame (in
 /// terms of the union of the segment-bounds of their `Lanes`) are
 /// grouped together into a `Junction`.  The primary (sole?) purpose of a
 /// `Junction` is to indicate that objects in its component `Segments` may
