@@ -38,6 +38,8 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 /// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
+
 namespace maliput {
 namespace common {
 namespace internal {
@@ -62,7 +64,8 @@ void Throw(const char* condition, const char* func, const char* file, int line);
 
 /// Throws an exception with a message showing at least the condition text,
 /// function name, file, and line.
-#define MALIPUT_THROW_MESSAGE(msg)                                          \
-  do {                                                                      \
-    ::maliput::common::internal::Throw(#msg, __func__, __FILE__, __LINE__); \
+#define MALIPUT_THROW_MESSAGE(msg)                                                           \
+  do {                                                                                       \
+    const std::string error_message(#msg);                                                   \
+    ::maliput::common::internal::Throw(error_message.c_str(), __func__, __FILE__, __LINE__); \
   } while (0)
