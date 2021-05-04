@@ -1,5 +1,4 @@
 find_package(ament_cmake_gtest REQUIRED)
-find_package(ament_cmake_pytest REQUIRED)
 
 set(TEST_PATH ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/TwoLanesRoadGeometry.mtl DESTINATION ${TEST_PATH})
