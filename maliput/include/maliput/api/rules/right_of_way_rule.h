@@ -136,7 +136,7 @@ class RightOfWayRule final {
   RightOfWayRule(const Id& id, const LaneSRoute& zone, ZoneType zone_type, const std::vector<State>& states,
                  const RelatedBulbGroups& related_bulb_groups)
       : id_(id), zone_(zone), zone_type_(zone_type), related_bulb_groups_(related_bulb_groups) {
-    MALIPUT_THROW_UNLESS(states.size() >= 1);
+    MALIPUT_VALIDATE(states.size() >= 1, "RightOfWayRule(" + id_.string() + ") does not have enough states.");
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
@@ -144,8 +144,12 @@ class RightOfWayRule final {
     }
     for (const auto& traffic_light_bulb_group : related_bulb_groups) {
       for (const BulbGroup::Id& bulb_group_id : traffic_light_bulb_group.second) {
-        MALIPUT_THROW_UNLESS(std::count(traffic_light_bulb_group.second.begin(), traffic_light_bulb_group.second.end(),
-                                        bulb_group_id) == 1);
+        MALIPUT_VALIDATE(
+            std::count(traffic_light_bulb_group.second.begin(), traffic_light_bulb_group.second.end(), bulb_group_id) ==
+                1,
+            "Trying to build RightOfWayRule(" + id_.string() +
+                ") with related_bulb_groups that contains a duplicate BulbGroup::Id(" + bulb_group_id.string() +
+                ") at TrafficLight::Id(" + traffic_light_bulb_group.first.string() + ")");
       }
     }
   }
@@ -174,7 +178,8 @@ class RightOfWayRule final {
   ///
   /// @throws maliput::common::assertion_error if `is_static()` is false.
   const State& static_state() const {
-    MALIPUT_THROW_UNLESS(is_static());
+    MALIPUT_VALIDATE(is_static(),
+                     "Calling RightOfWayRule(" + id_.string() + ")::static_state() but the state is not static.");
     return states_.begin()->second;
   }
 
