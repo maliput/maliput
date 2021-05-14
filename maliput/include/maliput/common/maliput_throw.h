@@ -73,9 +73,9 @@ void Throw(const char* condition, const char* func, const char* file, int line);
 /// @def MALIPUT_VALIDATE
 /// Used to validate that a @p pred-icate passed into a function or method is
 /// true; if not, an exception with @p message is thrown.
-#define MALIPUT_VALIDATE(pred, message)                                                  \
-  do {                                                                                   \
-    if (!(pred)) {                                                                       \
+#define MALIPUT_VALIDATE(pred, message)                                                               \
+  do {                                                                                                \
+    if (!(pred)) {                                                                                    \
       ::maliput::common::internal::Throw(std::string(message).c_str(), __func__, __FILE__, __LINE__); \
-    }                                                                                    \
+    }                                                                                                 \
   } while (0)
