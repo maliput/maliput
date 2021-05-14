@@ -136,7 +136,7 @@ class RightOfWayRule final {
   RightOfWayRule(const Id& id, const LaneSRoute& zone, ZoneType zone_type, const std::vector<State>& states,
                  const RelatedBulbGroups& related_bulb_groups)
       : id_(id), zone_(zone), zone_type_(zone_type), related_bulb_groups_(related_bulb_groups) {
-    MALIPUT_VALIDATE(states.size() >= 1, "RightOfWayRule(" + id_.string() + ") does not have enough states.");
+    MALIPUT_VALIDATE(states.size() >= 1, "RightOfWayRule(" + id_.string() + ") must have at least one state.");
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
