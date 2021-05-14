@@ -8,7 +8,6 @@
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/unique_id.h"
 #include "maliput/common/maliput_copyable.h"
-#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace api {
@@ -127,7 +126,7 @@ class Rule {
 
   // Validates that `severity` is a non-negative quantity.
   // @throws maliput::assertion_error When `severity` is negative.
-  void ValidateSeverity(int severity) const { MALIPUT_THROW_UNLESS(severity >= 0); }
+  void ValidateSeverity(int severity) const;
 
  private:
   Id id_;
