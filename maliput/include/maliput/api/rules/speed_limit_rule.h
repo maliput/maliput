@@ -44,9 +44,9 @@ class SpeedLimitRule {
   /// or equal to `max`, otherwise a maliput::common::assertion_error is thrown.
   SpeedLimitRule(const Id& id, const LaneSRange& zone, Severity severity, double min, double max)
       : id_(id), zone_(zone), severity_(severity), min_(min), max_(max) {
-    MALIPUT_THROW_UNLESS(min >= 0.);
-    MALIPUT_THROW_UNLESS(max >= 0.);
-    MALIPUT_THROW_UNLESS(min <= max);
+    MALIPUT_VALIDATE(min >= 0., "SpeedLimitRule(" + id_.string() + ") min is negative.");
+    MALIPUT_VALIDATE(max >= 0., "SpeedLimitRule(" + id_.string() + ") max is negative.");
+    MALIPUT_VALIDATE(min <= max, "SpeedLimitRule(" + id_.string() + ") min is greater than max");
   }
 
   /// Returns the persistent identifier.

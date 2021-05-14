@@ -1,5 +1,7 @@
 #include "maliput/api/rules/rule.h"
 
+#include "maliput/common/maliput_throw.h"
+
 namespace maliput {
 namespace api {
 namespace rules {
@@ -37,22 +39,32 @@ bool Rule::State::operator==(const State& other) const {
 
 void Rule::ValidateRelatedRules(const Rule::RelatedRules& related_rules) const {
   for (const auto& group_id_to_related_rules : related_rules) {
-    MALIPUT_THROW_UNLESS(!group_id_to_related_rules.first.empty());
+    MALIPUT_VALIDATE(!group_id_to_related_rules.first.empty(),
+                     "Rule(" + id_.string() + ") contains an empty key in related_rules");
     for (const Rule::Id& rule_id : group_id_to_related_rules.second) {
-      MALIPUT_THROW_UNLESS(
-          std::count(group_id_to_related_rules.second.begin(), group_id_to_related_rules.second.end(), rule_id) == 1);
+      MALIPUT_VALIDATE(
+          std::count(group_id_to_related_rules.second.begin(), group_id_to_related_rules.second.end(), rule_id) == 1,
+          "Rule(" + id_.string() + ") with related_rules that contains a duplicate Rule::Id(" + rule_id.string() +
+              ") at key <" + group_id_to_related_rules.first + ">");
     }
   }
 }
 
 void Rule::ValidateRelatedUniqueIds(const RelatedUniqueIds& related_unique_ids) const {
   for (const auto& group_id_to_related_unique_ids : related_unique_ids) {
-    MALIPUT_THROW_UNLESS(!group_id_to_related_unique_ids.first.empty());
+    MALIPUT_VALIDATE(!group_id_to_related_unique_ids.first.empty(),
+                     "Rule(" + id_.string() + ") contains an empty key in related_unique_ids");
     for (const UniqueId& unique_id : group_id_to_related_unique_ids.second) {
-      MALIPUT_THROW_UNLESS(std::count(group_id_to_related_unique_ids.second.begin(),
-                                      group_id_to_related_unique_ids.second.end(), unique_id) == 1);
+      MALIPUT_VALIDATE(std::count(group_id_to_related_unique_ids.second.begin(),
+                                  group_id_to_related_unique_ids.second.end(), unique_id) == 1,
+                       "Rule(" + id_.string() + ") with related_unique_ids that contains a duplicate UniqueId(" +
+                           unique_id.string() + ") at key <" + group_id_to_related_unique_ids.first + ">");
     }
   }
+}
+
+void Rule::ValidateSeverity(int severity) const {
+  MALIPUT_VALIDATE(severity >= 0, "Rule(" + id_.string() + ") has a state whose severity is negative.");
 }
 
 }  // namespace rules

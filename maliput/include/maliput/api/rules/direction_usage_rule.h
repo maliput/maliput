@@ -104,7 +104,7 @@ class DirectionUsageRule final {
   /// @throws maliput::common::assertion_error if size of states is not exactly
   ///         1.
   DirectionUsageRule(const Id& id, const LaneSRange& zone, std::vector<State> states) : id_(id), zone_(zone) {
-    MALIPUT_THROW_UNLESS(states.size() == 1);
+    MALIPUT_VALIDATE(states.size() >= 1, "DirectionUsageRule(" + id_.string() + ") must have at least one state.");
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
@@ -131,7 +131,8 @@ class DirectionUsageRule final {
   ///
   /// @throws maliput::common::assertion_error if `is_static()` is false.
   const State& static_state() const {
-    MALIPUT_THROW_UNLESS(is_static());
+    MALIPUT_VALIDATE(is_static(),
+                     "Calling DirectionUsageRule(" + id_.string() + ")::static_state() but the state is not static.");
     return states_.begin()->second;
   }
 
