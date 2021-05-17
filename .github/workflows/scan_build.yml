@@ -42,6 +42,15 @@ jobs:
       run: |
         rosdep update;
         rosdep install  -i -y --rosdistro ${ROS_DISTRO} --skip-keys "pybind11" --from-paths src
+    - name: colcon build up-to
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon build --packages-up-to ${PACKAGE_NAME} \
+          --packages-skip ${PACKAGE_NAME} \
+          --event-handlers=console_direct+ \
+          --cmake-args -DCMAKE_LINKER=${LINKER_PATH}
     - name: scan_build
       shell: bash
       working-directory: ${{ env.ROS_WS }}
@@ -49,5 +58,5 @@ jobs:
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         ./src/${PACKAGE_NAME}/.github/run_scan_build \
             --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
-            --packages-up-to ${PACKAGE_NAME}\
+            --packages-select ${PACKAGE_NAME}\
             --event-handlers=console_direct+;
