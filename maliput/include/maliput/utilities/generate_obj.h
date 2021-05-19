@@ -80,7 +80,7 @@ struct Material {
   math::Vector3 diffuse;   /// Kd
   math::Vector3 ambient;   /// Ka
   math::Vector3 specular;  /// Ks
-  double shinines;         /// Ns
+  double shininess;        /// Ns
   double transparency;     /// 1.0 - d
 
   friend bool operator==(const Material& matA, const Material& matB) { return matA.name == matB.name; }

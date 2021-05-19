@@ -72,7 +72,7 @@ std::string FormatMaterial(const Material& mat, int precision) {
       "illum 2\n"
       "d {:.{}f}\n",
       mat.name, FormatVector3AsRow(mat.ambient), FormatVector3AsRow(mat.diffuse), FormatVector3AsRow(mat.specular),
-      mat.shinines, 1.0 - mat.transparency, precision);
+      mat.shininess, 1.0 - mat.transparency, precision);
 }
 
 // Compute the maximum step in s-coordinates that can approximate the distance
