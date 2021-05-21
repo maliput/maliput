@@ -10,10 +10,6 @@ set_target_properties(multiply_integers_test_plugin
     OUTPUT_NAME maliput_multiply_integers_test_plugin
 )
 
-ament_target_dependencies(multiply_integers_test_plugin
-    "maliput"
-)
-
 target_link_libraries(multiply_integers_test_plugin
   maliput::plugin
 )
@@ -24,10 +20,6 @@ add_library(maliput::sum_integers_test_plugin ALIAS sum_integers_test_plugin)
 set_target_properties(sum_integers_test_plugin
   PROPERTIES
     OUTPUT_NAME maliput_sum_integers_test_plugin
-)
-
-ament_target_dependencies(sum_integers_test_plugin
-    "maliput"
 )
 
 target_link_libraries(sum_integers_test_plugin
@@ -56,10 +48,6 @@ add_library(maliput::lorem_ipsum_test_plugin ALIAS lorem_ipsum_test_plugin)
 set_target_properties(lorem_ipsum_test_plugin
   PROPERTIES
     OUTPUT_NAME maliput_lorem_ipsum_test_plugin
-)
-
-ament_target_dependencies(lorem_ipsum_test_plugin
-    "maliput"
 )
 
 target_link_libraries(lorem_ipsum_test_plugin
