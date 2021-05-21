@@ -1,13 +1,13 @@
 // Copyright 2020 Toyota Research Institute
 #pragma once
 
-#include "maliput/common/maliput_copyable.h"
-#include "maliput/common/maliput_throw.h"
-
 #include <atomic>
 #include <deque>
 #include <future>
 #include <vector>
+
+#include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace utility {

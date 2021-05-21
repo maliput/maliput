@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "fmt/ostream.h"
+#include <fmt/ostream.h>
 
 #include "maliput/api/lane.h"
 #include "maliput/common/maliput_abort.h"
