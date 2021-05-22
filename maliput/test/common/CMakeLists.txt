@@ -1,7 +1,7 @@
 ament_add_gtest(logger_test logger_test.cc)
+ament_add_gtest(passkey_test passkey_test.cc)
 ament_add_gtest(maliput_hash_test maliput_hash_test.cc)
 ament_add_gtest(maliput_never_destroyed_test maliput_never_destroyed_test.cc)
-ament_add_gtest(maliput_passkey_test maliput_passkey_test.cc)
 ament_add_gtest(maliput_throw_test maliput_throw_test.cc)
 
 macro(add_dependencies_to_test target)
@@ -22,9 +22,9 @@ macro(add_dependencies_to_test target)
 endmacro()
 
 add_dependencies_to_test(logger_test)
+add_dependencies_to_test(passkey_test)
 add_dependencies_to_test(maliput_hash_test)
 add_dependencies_to_test(maliput_never_destroyed_test)
-add_dependencies_to_test(maliput_passkey_test)
 add_dependencies_to_test(maliput_throw_test)
 
 # TODO(#335): When a sanitizer is enabled, tests where assert are checked are disabled.
