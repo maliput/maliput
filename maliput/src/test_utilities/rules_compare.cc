@@ -1,9 +1,9 @@
 #include "maliput/test_utilities/rules_compare.h"
 
+#include <algorithm>
+
 #include "maliput/common/maliput_unused.h"
 #include "maliput/test_utilities/regions_test_utilities.h"
-
-#include <algorithm>
 
 namespace maliput {
 namespace api {

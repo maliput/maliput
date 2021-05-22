@@ -10,7 +10,7 @@
 #include <tuple>
 #include <vector>
 
-#include "fmt/ostream.h"
+#include <fmt/ostream.h>
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"

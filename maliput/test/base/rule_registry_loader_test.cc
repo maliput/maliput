@@ -2,9 +2,9 @@
 
 #include <fstream>
 #include <variant>
-#include <fmt/format.h>
-#include "fmt/ostream.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/discrete_value_rule.h"

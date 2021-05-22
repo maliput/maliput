@@ -1,13 +1,13 @@
 #include "maliput/common/logger.h"
-#include "maliput/math/vector.h"
+
+#include <string>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <gtest/gtest.h>
 
-#include <string>
-
 #include "maliput/common/assertion_error.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace common {

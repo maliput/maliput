@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "yaml-cpp/yaml.h"
+#include <yaml-cpp/yaml.h>
 
 #include "maliput/api/lane.h"
 #include "maliput/api/regions.h"

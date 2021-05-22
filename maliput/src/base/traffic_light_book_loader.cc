@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include "yaml-cpp/yaml.h"
+#include <yaml-cpp/yaml.h>
 
 #include "maliput/api/lane_data.h"
 #include "maliput/api/rules/traffic_light_book.h"

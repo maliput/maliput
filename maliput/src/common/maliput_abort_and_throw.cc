@@ -36,15 +36,14 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 /// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "maliput/common/maliput_abort.h"
-#include "maliput/common/maliput_throw.h"
-
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include "maliput/common/assertion_error.h"
+#include "maliput/common/maliput_abort.h"
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace common {

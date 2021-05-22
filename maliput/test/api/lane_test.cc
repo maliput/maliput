@@ -1,5 +1,3 @@
-#include "maliput/api/road_network.h"
-
 #include <exception>
 #include <utility>
 
@@ -7,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/intersection.h"
+#include "maliput/api/road_network.h"
 #include "maliput/geometry_base/road_geometry.h"
 #include "maliput/test_utilities/mock.h"
 #include "maliput/test_utilities/mock_geometry.h"

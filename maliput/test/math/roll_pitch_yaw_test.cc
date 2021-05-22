@@ -1,7 +1,8 @@
 #include "maliput/math/roll_pitch_yaw.h"
-#include "maliput/test_utilities/maliput_math_compare.h"
 
 #include <gtest/gtest.h>
+
+#include "maliput/test_utilities/maliput_math_compare.h"
 
 namespace maliput {
 namespace math {

@@ -1,8 +1,7 @@
-#include "maliput/api/rules/discrete_value_rule.h"
-#include "maliput/api/rules/range_value_rule.h"
-
 #include <gtest/gtest.h>
 
+#include "maliput/api/rules/discrete_value_rule.h"
+#include "maliput/api/rules/range_value_rule.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
 #include "maliput/test_utilities/regions_test_utilities.h"
