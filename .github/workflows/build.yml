@@ -20,12 +20,12 @@ jobs:
             container: ubuntu:20.04
     container:
       image: ${{ matrix.container }}
+    env:
+      ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
     steps:
     - uses: actions/checkout@v2
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
-    - env:
-      ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
     # use setup-ros action to get vcs, rosdep, and colcon
     - uses: ros-tooling/setup-ros@0.1.4
     - name: vcs import
