@@ -633,19 +633,23 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
   {
     // Lane 0 should be as good as any other for segment-bounds.
     GeoMesh segment_mesh;
+    // clang-format off
     CoverLaneWithQuads(&segment_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [](double, double) { return 0.; }, features.off_grid_mesh_generation);
+    // clang-format on
     asphalt_mesh->AddFacesFrom(SimplifyMesh(segment_mesh, features));
   }
 
   if (features.draw_elevation_bounds) {
     GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
+    // clang-format off
     CoverLaneWithQuads(&upper_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).max(); },
                        features.off_grid_mesh_generation);
     CoverLaneWithQuads(&lower_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).min(); },
                        features.off_grid_mesh_generation);
+    // clang-format on
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
   }
@@ -657,9 +661,11 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
     const double grid_unit = PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
+      // clang-format off
       CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /*use_segment_bounds*/,
                          [&features](double, double) { return features.lane_haze_elevation; },
                          features.off_grid_mesh_generation);
+      // clang-format on
       lane_mesh->AddFacesFrom(SimplifyMesh(haze_mesh, features));
     }
     if (features.draw_stripes) {
@@ -757,8 +763,10 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
     case MaterialType::Asphalt:
     case MaterialType::GrayedAsphalt: {
       GeoMesh segment_mesh;
+      // clang-format off
       CoverLaneWithQuads(&segment_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                          [](double, double) { return 0.; }, features.off_grid_mesh_generation);
+      // clang-format on
       mesh.AddFacesFrom(SimplifyMesh(segment_mesh, features));
       break;
     }
@@ -766,9 +774,11 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
     case MaterialType::GrayedLane: {
       if (features.draw_lane_haze) {
         GeoMesh haze_mesh;
+        // clang-format off
         CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                            [&features](double, double) { return features.lane_haze_elevation; },
                            features.off_grid_mesh_generation);
+        // clang-format on
         mesh.AddFacesFrom(SimplifyMesh(haze_mesh, features));
       }
       break;
@@ -792,12 +802,14 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
     case MaterialType::HBounds: {
       if (features.draw_elevation_bounds) {
         GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
+        // clang-format off
         CoverLaneWithQuads(&upper_h_bounds_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                            [&lane](double s, double r) { return lane->elevation_bounds(s, r).max(); },
                            features.off_grid_mesh_generation);
         CoverLaneWithQuads(&lower_h_bounds_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                            [&lane](double s, double r) { return lane->elevation_bounds(s, r).min(); },
                            features.off_grid_mesh_generation);
+        // clang-format on
         mesh.AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
         mesh.AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
       }
