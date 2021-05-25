@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        container: [ubuntu:18.04, ubuntu:20.04]
+        ubuntu: [18.04, 20.04]
         include:
-          - container: ubuntu:18.04
+          - ubuntu: 18.04
             ROS_DISTRO: dashing
-          - container: ubuntu:20.04
+          - ubuntu: 20.04
             ROS_DISTRO: foxy
     container:
-      image: ${{ matrix.container }}
+      image: ubuntu:${{ matrix.ubuntu }}
     env:
       ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
     steps:
