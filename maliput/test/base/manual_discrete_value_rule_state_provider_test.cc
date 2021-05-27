@@ -1,8 +1,7 @@
 #include "maliput/base/manual_discrete_value_rule_state_provider.h"
 
-#include <stdexcept>
-
 #include <map>
+#include <stdexcept>
 
 #include <gtest/gtest.h>
 

@@ -37,7 +37,9 @@
 /// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "maliput/math/roll_pitch_yaw.h"
+
 #include <cmath>
+
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {

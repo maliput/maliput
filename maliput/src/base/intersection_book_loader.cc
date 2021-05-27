@@ -3,7 +3,7 @@
 #include <optional>
 #include <vector>
 
-#include "yaml-cpp/yaml.h"
+#include <yaml-cpp/yaml.h>
 
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"

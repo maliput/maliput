@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "fmt/ostream.h"
+#include <fmt/ostream.h>
 
 #include "maliput/utilities/generate_obj.h"
 

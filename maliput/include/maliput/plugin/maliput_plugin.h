@@ -1,11 +1,11 @@
 // Copyright 2021 Toyota Research Institute
 #pragma once
 
+#include <dlfcn.h>
+
 #include <functional>
 #include <memory>
 #include <string>
-
-#include <dlfcn.h>
 
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"

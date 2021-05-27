@@ -1,5 +1,3 @@
-#include "maliput/utilities/generate_string.h"
-
 #include <memory>
 #include <set>
 #include <string>
@@ -8,6 +6,7 @@
 
 #include "maliput/api/road_geometry.h"
 #include "maliput/test_utilities/mock.h"
+#include "maliput/utilities/generate_string.h"
 
 namespace maliput {
 namespace utility {

@@ -1,6 +1,7 @@
 // Copyright 2021 Toyota Research Institute
 
 #include "maliput/plugin/maliput_plugin_manager.h"
+
 #include "maliput/common/logger.h"
 #include "maliput/utility/file_utils.h"
 

@@ -4,21 +4,30 @@ on: [push, pull_request]
 
 env:
   PACKAGE_NAME: maliput
-  ROS_DISTRO: dashing
   ROS_WS: maliput_ws
 
 jobs:
   compile_and_test:
     name: Compile and test
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ubuntu: [18.04, 20.04]
+        include:
+          - ubuntu: 18.04
+            ROS_DISTRO: dashing
+          - ubuntu: 20.04
+            ROS_DISTRO: foxy
     container:
-      image: ubuntu:18.04
+      image: ubuntu:${{ matrix.ubuntu }}
+    env:
+      ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
     steps:
     - uses: actions/checkout@v2
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
     # use setup-ros action to get vcs, rosdep, and colcon
-    - uses: ros-tooling/setup-ros@0.1.2
+    - uses: ros-tooling/setup-ros@0.1.4
     - name: vcs import
       shell: bash
       working-directory: ${{ env.ROS_WS }}

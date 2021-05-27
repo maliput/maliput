@@ -10,7 +10,7 @@
 #include <tuple>
 #include <vector>
 
-#include "fmt/ostream.h"
+#include <fmt/ostream.h>
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
@@ -46,16 +46,16 @@ const std::string kSidewalk("sidewalk");
 // were taken from the original .mtl description that
 // lives in GenerateObjFile().
 const std::vector<Material> kMaterial{
-    {kBlandAsphalt, {0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10., 0.0},
-    {kLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.8},
-    {kMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.5},
-    {kHBoundsHaze, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.8},
-    {kBranchPointGlow, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10., 0.9},
-    {kGrayedBlandAsphalt, {0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10., 0.9},
-    {kGrayedLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10., 0.9},
-    {kGrayedMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9},
+    {kBlandAsphalt, {0.2, 0.2, 0.2}, {0.1, 0.1, 0.1}, {0.3, 0.3, 0.3}, 10.1, 0.0},
+    {kLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10.1, 0.8},
+    {kMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10.1, 0.5},
+    {kHBoundsHaze, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10.1, 0.8},
+    {kBranchPointGlow, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 10.1, 0.9},
+    {kGrayedBlandAsphalt, {0.1, 0.1, 0.1}, {0.2, 0.2, 0.2}, {0.3, 0.3, 0.3}, 10.1, 0.9},
+    {kGrayedLaneHaze, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, {0.9, 0.9, 0.9}, 10.1, 0.9},
+    {kGrayedMarkerPaint, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10.1, 0.9},
     // TODO(#392): Find an appropriate mesh material configuration.
-    {kSidewalk, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10., 0.9},
+    {kSidewalk, {0.8, 0.8, 0.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 0.5}, 10.1, 0.9},
 };
 
 std::string FormatVector3AsRow(const math::Vector3& vec) {
@@ -633,19 +633,23 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
   {
     // Lane 0 should be as good as any other for segment-bounds.
     GeoMesh segment_mesh;
+    // clang-format off
     CoverLaneWithQuads(&segment_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [](double, double) { return 0.; }, features.off_grid_mesh_generation);
+    // clang-format on
     asphalt_mesh->AddFacesFrom(SimplifyMesh(segment_mesh, features));
   }
 
   if (features.draw_elevation_bounds) {
     GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
+    // clang-format off
     CoverLaneWithQuads(&upper_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).max(); },
                        features.off_grid_mesh_generation);
     CoverLaneWithQuads(&lower_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
                        [&segment](double s, double r) { return segment->lane(0)->elevation_bounds(s, r).min(); },
                        features.off_grid_mesh_generation);
+    // clang-format on
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
     h_bounds_mesh->AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
   }
@@ -657,9 +661,11 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
     const double grid_unit = PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
+      // clang-format off
       CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /*use_segment_bounds*/,
                          [&features](double, double) { return features.lane_haze_elevation; },
                          features.off_grid_mesh_generation);
+      // clang-format on
       lane_mesh->AddFacesFrom(SimplifyMesh(haze_mesh, features));
     }
     if (features.draw_stripes) {
@@ -757,8 +763,10 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
     case MaterialType::Asphalt:
     case MaterialType::GrayedAsphalt: {
       GeoMesh segment_mesh;
+      // clang-format off
       CoverLaneWithQuads(&segment_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                          [](double, double) { return 0.; }, features.off_grid_mesh_generation);
+      // clang-format on
       mesh.AddFacesFrom(SimplifyMesh(segment_mesh, features));
       break;
     }
@@ -766,9 +774,11 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
     case MaterialType::GrayedLane: {
       if (features.draw_lane_haze) {
         GeoMesh haze_mesh;
+        // clang-format off
         CoverLaneWithQuads(&haze_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                            [&features](double, double) { return features.lane_haze_elevation; },
                            features.off_grid_mesh_generation);
+        // clang-format on
         mesh.AddFacesFrom(SimplifyMesh(haze_mesh, features));
       }
       break;
@@ -792,12 +802,14 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
     case MaterialType::HBounds: {
       if (features.draw_elevation_bounds) {
         GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
+        // clang-format off
         CoverLaneWithQuads(&upper_h_bounds_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                            [&lane](double s, double r) { return lane->elevation_bounds(s, r).max(); },
                            features.off_grid_mesh_generation);
         CoverLaneWithQuads(&lower_h_bounds_mesh, lane, base_grid_unit, false /* use_lane_bounds */,
                            [&lane](double s, double r) { return lane->elevation_bounds(s, r).min(); },
                            features.off_grid_mesh_generation);
+        // clang-format on
         mesh.AddFacesFrom(SimplifyMesh(upper_h_bounds_mesh, features));
         mesh.AddFacesFrom(SimplifyMesh(lower_h_bounds_mesh, features));
       }
@@ -854,8 +866,10 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
           : PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
 
   GeoMesh segment_mesh;
+  // clang-format off
   CoverLaneWithQuads(&segment_mesh, segment->lane(0), base_grid_unit, true /* use_segment_bounds */,
                      [](double, double) { return 0.; }, features.off_grid_mesh_generation);
+  // clang-format on
   mesh.AddFacesFrom(SimplifyMesh(segment_mesh, features));
 
   Material material = GetMaterialFromMesh(mesh_material);

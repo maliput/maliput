@@ -1,5 +1,3 @@
-#include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
-
 #include <algorithm>
 #include <vector>
 
@@ -8,6 +6,7 @@
 
 #include "maliput/api/lane.h"
 #include "maliput/common/assertion_error.h"
+#include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 #include "maliput/test_utilities/mock_geometry.h"
 #include "maliput/test_utilities/rules_test_utilities.h"

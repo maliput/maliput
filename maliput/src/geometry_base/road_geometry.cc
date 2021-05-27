@@ -14,8 +14,10 @@ void RoadGeometry::AddJunctionPrivate(std::unique_ptr<Junction> junction) {
   MALIPUT_THROW_UNLESS(junction.get() != nullptr);
   junctions_.emplace_back(std::move(junction));
   Junction* const raw_junction = junctions_.back().get();
+  // clang-format off
   raw_junction->AttachToRoadGeometry({}, this, [this](auto segment) { id_index_.AddSegment(segment); },
                                      [this](auto lane) { id_index_.AddLane(lane); });
+  // clang-format on
   id_index_.AddJunction(raw_junction);
 }
 

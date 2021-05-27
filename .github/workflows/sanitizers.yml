@@ -6,7 +6,7 @@ on:
 
 env:
   PACKAGE_NAME: maliput
-  ROS_DISTRO: dashing
+  ROS_DISTRO: foxy
   ROS_WS: maliput_ws
   UBSAN_OPTIONS: halt_on_error=1
 
@@ -14,9 +14,9 @@ jobs:
   compile_and_test:
     if: contains(github.event.pull_request.labels.*.name, 'do-clang-test')
     name: Compile and test with sanitizer
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     container:
-      image: ubuntu:18.04
+      image: ubuntu:20.04
     strategy:
       matrix:
         sanitizer: [none, asan, ubsan, tsan]
@@ -38,7 +38,7 @@ jobs:
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
     # use setup-ros action to get vcs, rosdep, and colcon
-    - uses: ros-tooling/setup-ros@0.1.2
+    - uses: ros-tooling/setup-ros@0.1.4
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     - name: clang 8 install

@@ -1,4 +1,5 @@
 #include "maliput/api/lane.h"
+
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"

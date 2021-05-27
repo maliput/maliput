@@ -1,5 +1,3 @@
-#include "maliput/utilities/generate_obj.h"
-
 #include <cmath>
 #include <memory>
 
@@ -9,6 +7,7 @@
 #include "maliput/api/road_network.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/mock.h"
+#include "maliput/utilities/generate_obj.h"
 
 namespace maliput {
 namespace utility {

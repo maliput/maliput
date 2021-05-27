@@ -1,5 +1,3 @@
-#include "maliput/utilities/generate_urdf.h"
-
 #include <cmath>
 
 #include <gtest/gtest.h>
@@ -7,6 +5,7 @@
 #include "maliput/api/road_geometry.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/mock.h"
+#include "maliput/utilities/generate_urdf.h"
 
 namespace maliput {
 namespace utility {
