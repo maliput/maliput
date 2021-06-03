@@ -38,7 +38,7 @@ set_target_properties(base
 target_include_directories(base
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(base
   PUBLIC

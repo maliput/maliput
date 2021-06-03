@@ -22,7 +22,7 @@ set_target_properties(geometry_base
 target_include_directories(geometry_base
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(geometry_base
   PUBLIC
