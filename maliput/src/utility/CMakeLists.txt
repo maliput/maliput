@@ -34,4 +34,4 @@ install(
   RUNTIME DESTINATION bin
 )
 
-ament_export_libraries(utilities)
+ament_export_libraries(utility)
