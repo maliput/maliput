@@ -32,7 +32,7 @@ set_target_properties(api
 target_include_directories(api
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(api
   PUBLIC

@@ -20,7 +20,7 @@ target_link_libraries(utility
 target_include_directories(utility
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    $<INSTALL_INTERFACE:include>)
 
 ##############################################################################
 # Export
@@ -34,4 +34,4 @@ install(
   RUNTIME DESTINATION bin
 )
 
-ament_export_libraries(utilities)
+ament_export_libraries(utility)

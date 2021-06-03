@@ -20,7 +20,7 @@ target_link_libraries(plugin
 target_include_directories(plugin
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    $<INSTALL_INTERFACE:include>)
 
 ##############################################################################
 # Export
