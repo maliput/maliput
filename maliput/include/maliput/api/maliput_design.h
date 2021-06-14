@@ -185,6 +185,13 @@
 /// and the curves and twists in the embedding introduce fictitious
 /// forces in equations of motion expressed in these coordinates.
 ///
+/// > TODO: see discussion in https://github.com/ToyotaResearchInstitute/maliput_malidrive/issues/16
+/// > For certain roads whose lateral profile is a straight line, geodetic curves
+/// > would likely be straight lines. However, that's not true for the general
+/// > case and the @f$r@f$ distance is not trivially computed. Most backend
+/// > implementations might choose to approximate the arc length of the geodetic
+/// > curve by a path length of a straight line measured in the `Inertial` space.
+///
 /// > TODO: Replace this gibberish with a proper description of the
 /// > effects of the metric induced by the push forward of @f$W_L@f$.
 /// > We also introduce the notion of /isotropic coordinates/
