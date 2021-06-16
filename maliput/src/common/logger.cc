@@ -41,6 +41,7 @@
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <fmt/printf.h>
 
 #include "maliput/common/maliput_never_destroyed.h"
 
@@ -101,7 +102,7 @@ const std::string Logger::format(const std::vector<std::string>& v) const {
   return call_fmt_format(args);
 }
 
-void Sink::log(const std::string& msg) { fmt::print(msg); }
+void Sink::log(const std::string& msg) { fmt::printf(msg); }
 
 }  // namespace common
 
