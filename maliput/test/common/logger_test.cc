@@ -56,16 +56,17 @@ GTEST_TEST(LoggerTest, SetLogLevel) {
 
 class LoggingMesagesTest : public ::testing::Test {
  protected:
+  static constexpr char const* kMessage1 = " Hello World. {}{}.";
+  static constexpr char const* kMessage2 = "The value of PI is: ";
+  static constexpr char const* kExpectedMessage = "  Hello World. The value of PI is: 3.14159.\n";
+  static constexpr double kPI = 3.14159;
+
   void SetUp() override {
     mock_sink_ptr = mock_sink.get();
     log()->set_sink(std::move(mock_sink));
     set_log_level(logger::kLevelToString.at(logger::level::trace));
   }
 
-  static constexpr char const* kMessage1 = " Hello World. {}{}.";
-  static constexpr char const* kMessage2 = "The value of PI is: ";
-  static constexpr char const* kExpectedMessage = "  Hello World. The value of PI is: 3.14159.\n";
-  static constexpr double kPI = 3.14159;
   std::unique_ptr<MockSink> mock_sink = std::make_unique<MockSink>();
   MockSink* mock_sink_ptr{nullptr};
 };
