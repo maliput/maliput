@@ -1,3 +1,7 @@
+find_package(ament_cmake_gtest REQUIRED)
+
+ament_find_gtest()
+
 ##############################################################################
 # Sources
 ##############################################################################
@@ -29,13 +33,17 @@ target_include_directories(
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
+    ${GTEST_INCLUDE_DIRS}
 )
 
 target_link_libraries(test_utilities
+ PUBLIC
   maliput::api
   maliput::common
   maliput::math
   maliput::geometry_base
+ PRIVATE
+  ${GTEST_LIBRARIES}
 )
 
 install(
