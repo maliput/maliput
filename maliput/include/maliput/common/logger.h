@@ -118,7 +118,7 @@ class SinkBase {
 
   /// Log the message
   /// @param msg Is the message to be logged.
-  virtual void log(const std::string& msg) = 0;
+  virtual void log(const std::string& msg, logger::level lev) = 0;
 
   /// Empty the buffer.
   virtual void flush() = 0;
@@ -131,7 +131,7 @@ class Sink : public SinkBase {
   Sink() = default;
   ~Sink() = default;
 
-  void log(const std::string& msg) override;
+  void log(const std::string& msg, logger::level lev) override;
 
   void flush() override{};
 };
@@ -266,7 +266,7 @@ void Logger::log(logger::level lev, Args&&... args) {
     // Performing type-erasure in the header file.
     msg += format(std::vector<std::string>{Serialize()(std::forward<Args>(args))...});
     msg += "\n";
-    sink_->log(msg);
+    sink_->log(msg, lev);
   }
 }
 

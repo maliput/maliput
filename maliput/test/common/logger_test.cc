@@ -23,7 +23,7 @@ class MockSink : public SinkBase {
   ~MockSink() = default;
 
   const std::string& get_log_message() const { return log_message_; }
-  void log(const std::string& msg) override { log_message_ = msg; }
+  void log(const std::string& msg, logger::level lev) override { log_message_ = msg; }
   void flush() override{};
 
  private:
