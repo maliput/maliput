@@ -32,7 +32,6 @@ target_link_libraries(sum_integers_test_plugin
 
 install(
   TARGETS multiply_integers_test_plugin sum_integers_test_plugin
-  EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION ${TEST_PLUGIN_INSTALL_DIR}
   LIBRARY DESTINATION ${TEST_PLUGIN_INSTALL_DIR}
   RUNTIME DESTINATION ${TEST_PLUGIN_INSTALL_DIR}
@@ -60,7 +59,6 @@ target_link_libraries(lorem_ipsum_test_plugin
 
 install(
   TARGETS  lorem_ipsum_test_plugin
-  EXPORT ${PROJECT_NAME}-targets
   # Intentionally this library is installed in a different location.
   ARCHIVE DESTINATION ${OTHER_TEST_PLUGIN_INSTALL_DIR}
   LIBRARY DESTINATION ${OTHER_TEST_PLUGIN_INSTALL_DIR}
