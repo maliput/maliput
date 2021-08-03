@@ -22,6 +22,43 @@ Derived VectorBase<N, Derived>::Zero() {
 }
 
 template <std::size_t N, typename Derived>
+Derived VectorBase<N, Derived>::FromStr(const std::string& vector_str) {
+  static constexpr char kLeftBrace = '{';
+  static constexpr char kRightBrace = '}';
+  static constexpr char kComma = ',';
+
+  // @{ Checks vector_str format.
+  MALIPUT_THROW_UNLESS(std::count(vector_str.begin(), vector_str.end(), kLeftBrace) == 1);
+  MALIPUT_THROW_UNLESS(std::count(vector_str.begin(), vector_str.end(), kRightBrace) == 1);
+  MALIPUT_THROW_UNLESS(std::count(vector_str.begin(), vector_str.end(), kComma) == N - 1);
+  // @}
+
+  std::array<double, N> ret;
+  if (ret.size() == 1) {
+    // 1-D vector.
+    const std::string value_str = vector_str.substr(1, vector_str.find_first_of(kRightBrace) - 1);
+    ret[0] = std::stod(value_str);
+  } else {
+    std::size_t previous_comma_pos{0};
+    for (size_t i = 0; i < ret.size(); ++i) {
+      // Extracts each number.
+      std::string value_str{};
+      const std::size_t comma_pos = vector_str.find_first_of(kComma, previous_comma_pos + 1);
+      if (i == ret.size() - 1) {
+        // Last value.
+        value_str = vector_str.substr(previous_comma_pos + 1, vector_str.find_first_of(kRightBrace) - 1);
+      } else {
+        value_str = vector_str.substr(previous_comma_pos + 1, comma_pos - 1);
+      }
+
+      ret[i] = std::stod(value_str);
+      previous_comma_pos = comma_pos;
+    }
+  }
+  return Derived{ret};
+}
+
+template <std::size_t N, typename Derived>
 VectorBase<N, Derived>::VectorBase() : values_(std::array<double, N>{}) {
   values_.fill(0);
 }
@@ -56,6 +93,20 @@ void VectorBase<N, Derived>::normalize() {
 template <std::size_t N, typename Derived>
 Derived VectorBase<N, Derived>::normalized() const {
   return Derived(*this / norm());
+}
+
+template <std::size_t N, typename Derived>
+std::string VectorBase<N, Derived>::to_str() const {
+  std::stringstream ss;
+  ss << "{";
+  for (size_t i = 0; i < values_.size(); ++i) {
+    if (i != 0) {
+      ss << ", ";
+    }
+    ss << values_[i];
+  }
+  ss << "}";
+  return ss.str();
 }
 
 template <std::size_t N, typename Derived>
@@ -138,14 +189,7 @@ Derived_ operator*(double scalar, const VectorBase<N_, Derived_>& vector) {
 
 template <std::size_t N_, typename Derived_>
 std::ostream& operator<<(std::ostream& os, const VectorBase<N_, Derived_>& vector) {
-  os << "{";
-  for (size_t i = 0; i < vector.size(); ++i) {
-    if (i != 0) {
-      os << ", ";
-    }
-    os << vector[i];
-  }
-  os << "}";
+  os << vector.to_str();
   return os;
 }
 

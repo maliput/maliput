@@ -31,6 +31,13 @@ class VectorBase {
   /// @return An N-dimensional vector filled with ones.
   static Derived Ones();
 
+  /// Parses @p vector_str that should come in the following format "{A, B, C, ...}"
+  /// (white spaces could or could not be there).
+  /// @throws maliput::common::assertion_error When @p vector_str does not follow
+  ///         the specified format.
+  /// @return An N-dimensional vector filled from @p vector_str.
+  static Derived FromStr(const std::string& vector_str);
+
   /// Constructs a null N-dimensional vector.
   VectorBase();
 
@@ -107,6 +114,9 @@ class VectorBase {
 
   /// Divide operator overload between a VectorBase<N, Derived> vector and a double.
   Derived operator/(double scalar) const;
+
+  /// @return A string serialization of the N-dimensional vector.
+  std::string to_str() const;
 
   /// Product operator overload between a vector and a double.
   template <std::size_t N_, typename Derived_>

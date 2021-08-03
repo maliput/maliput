@@ -76,6 +76,7 @@ GTEST_TEST(VectorTest, PublicMethods) {
     dut.x() = 5.;
     dut.y() = 10.;
     EXPECT_EQ(dut, Vector2(5., 10.));
+    EXPECT_EQ("{5, 10}", dut.to_str());
   }
   {  // 3- dimension vector.
     const Vector3 kDut{2., 3., 6.};
@@ -91,6 +92,7 @@ GTEST_TEST(VectorTest, PublicMethods) {
     dut.y() = 10.;
     dut.z() = 15.;
     EXPECT_EQ(dut, Vector3(5., 10., 15.));
+    EXPECT_EQ("{5, 10, 15}", dut.to_str());
   }
   {  // 4- dimension vector.
     const Vector4 kDut{1., 2., 3., 4.};
@@ -109,6 +111,7 @@ GTEST_TEST(VectorTest, PublicMethods) {
     dut.z() = 15.;
     dut.w() = 20.;
     EXPECT_EQ(dut, Vector4(5., 10., 15., 20.));
+    EXPECT_EQ("{5, 10, 15, 20}", dut.to_str());
   }
 }
 
@@ -259,6 +262,7 @@ GTEST_TEST(VectorTest, StaticMethods) {
     EXPECT_EQ(Vector2::Ones(), Vector2(1., 1.));
     EXPECT_EQ(Vector2::UnitX(), Vector2(1., 0.));
     EXPECT_EQ(Vector2::UnitY(), Vector2(0., 1.));
+    EXPECT_EQ(Vector2(1., 2.), Vector2::FromStr("{1., 2.}"));
   }
   {  // 3- dimension vector.
     EXPECT_EQ(Vector3::Zero(), Vector3(0., 0., 0.));
@@ -266,6 +270,7 @@ GTEST_TEST(VectorTest, StaticMethods) {
     EXPECT_EQ(Vector3::UnitX(), Vector3(1., 0., 0.));
     EXPECT_EQ(Vector3::UnitY(), Vector3(0., 1., 0.));
     EXPECT_EQ(Vector3::UnitZ(), Vector3(0., 0., 1.));
+    EXPECT_EQ(Vector3(1., 2., 3.), Vector3::FromStr("{1., 2., 3.}"));
   }
   {  // 4- dimension vector.
     EXPECT_EQ(Vector4::Zero(), Vector4(0., 0., 0., 0.));
@@ -274,6 +279,19 @@ GTEST_TEST(VectorTest, StaticMethods) {
     EXPECT_EQ(Vector4::UnitY(), Vector4(0., 1., 0., 0.));
     EXPECT_EQ(Vector4::UnitZ(), Vector4(0., 0., 1., 0.));
     EXPECT_EQ(Vector4::UnitW(), Vector4(0., 0., 0., 1.));
+    EXPECT_EQ(Vector4(1., 2., 3., 4.), Vector4::FromStr("{1., 2., 3., 4.}"));
+  }
+}
+
+GTEST_TEST(VectorTest, SerializationRoundTrip) {
+  {  // 2- dimension vector.
+    EXPECT_EQ(Vector2(1., 2.), Vector2::FromStr(Vector2(1., 2.).to_str()));
+  }
+  {  // 3- dimension vector.
+    EXPECT_EQ(Vector3(1., 2., 3.), Vector3::FromStr(Vector3(1., 2., 3.).to_str()));
+  }
+  {  // 4- dimension vector.
+    EXPECT_EQ(Vector4(1., 2., 3., 4.), Vector4::FromStr(Vector4(1., 2., 3., 4.).to_str()));
   }
 }
 
