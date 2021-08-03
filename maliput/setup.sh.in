@@ -52,4 +52,4 @@ add_if_not_in_var() {
   fi
 }
 add_if_not_in_var ASAN_OPTIONS $ASAN_OPTIONS:detect_odr_violation=0
-add_if_not_in_var MALIPUT_PLUGIN_PATH $MALIPUT_PLUGIN_PATH $AMENT_CURRENT_PREFIX/lib/maliput/plugins
+add_if_not_in_var MALIPUT_PLUGIN_PATH $MALIPUT_PLUGIN_PATH $COLCON_PREFIX_PATH/maliput/lib/maliput/plugins
