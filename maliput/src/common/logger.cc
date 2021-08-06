@@ -45,42 +45,80 @@
 
 #include "maliput/common/maliput_never_destroyed.h"
 
+// fmt major version for focal: 6.
+// fmt major version for bionic: 4.
+#if MALIPUT_FMT_VERSION == 6
+#include <fmt/color.h>
+#endif
+
 namespace maliput {
 namespace common {
 
 namespace {
-// Color is from fmt V4. From V6 a color.h must be include and a color enum is created.
-fmt::Color FromLogLevelToColor(const logger::level& lev){
-  switch (lev)
-  {
-  case logger::level::trace:
-    return fmt::Color::WHITE;
-  break;
 
-  case logger::level::debug:
-    return fmt::Color::BLUE;
-  break;
+#if MALIPUT_FMT_VERSION == 4
+fmt::Color FromLogLevelToColor(const logger::level& lev) {
+  switch (lev) {
+    case logger::level::trace:
+      return fmt::Color::WHITE;
+      break;
 
-  case logger::level::info:
-    return fmt::Color::GREEN;
-  break;
+    case logger::level::debug:
+      return fmt::Color::BLUE;
+      break;
 
-  case logger::level::error:
-    return fmt::Color::RED;
-  break;
+    case logger::level::info:
+      return fmt::Color::GREEN;
+      break;
 
-  case logger::level::warn:
-    return fmt::Color::YELLOW;
-  break;
+    case logger::level::error:
+      return fmt::Color::RED;
+      break;
 
-  case logger::level::critical:
-    return fmt::Color::RED;
-  break;
-  
-  default:
-    return fmt::Color::WHITE;
+    case logger::level::warn:
+      return fmt::Color::YELLOW;
+      break;
+
+    case logger::level::critical:
+      return fmt::Color::RED;
+      break;
+
+    default:
+      return fmt::Color::WHITE;
   }
 }
+#elif MALIPUT_FMT_VERSION == 6
+fmt::color FromLogLevelToColor(const logger::level& lev) {
+  switch (lev) {
+    case logger::level::trace:
+      return fmt::color::white;
+      break;
+
+    case logger::level::debug:
+      return fmt::color::blue;
+      break;
+
+    case logger::level::info:
+      return fmt::color::green;
+      break;
+
+    case logger::level::error:
+      return fmt::color::red;
+      break;
+
+    case logger::level::warn:
+      return fmt::color::yellow;
+      break;
+
+    case logger::level::critical:
+      return fmt::color::red;
+      break;
+
+    default:
+      return fmt::color::white;
+  }
+}
+#endif
 
 // Apply fmt::format to a list of arguments defined by an array `v`.
 // @tparam N Is the size of the array.
@@ -134,7 +172,11 @@ const std::string Logger::format(const std::vector<std::string>& v) const {
   return call_fmt_format(args);
 }
 
+#if MALIPUT_FMT_VERSION == 6
+void Sink::log(const std::string& msg, logger::level lev) { fmt::print(fg(FromLogLevelToColor(lev)), msg); }
+#elif MALIPUT_FMT_VERSION == 4
 void Sink::log(const std::string& msg, logger::level lev) { fmt::print_colored(FromLogLevelToColor(lev), msg); }
+#endif
 
 }  // namespace common
 

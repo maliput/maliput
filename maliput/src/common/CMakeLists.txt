@@ -16,6 +16,11 @@ set_target_properties(common
     OUTPUT_NAME maliput_common
 )
 
+target_compile_definitions(common
+  PRIVATE
+    MALIPUT_FMT_VERSION=${fmt_VERSION_MAJOR}
+)
+
 target_include_directories(common
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
