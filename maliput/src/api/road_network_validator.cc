@@ -164,7 +164,7 @@ void CheckPhaseDiscreteValueRuleStates(const RoadNetwork& road_network) {
       const rules::DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id_value.first);
       if (std::find(rule.values().begin(), rule.values().end(), rule_id_value.second) == rule.values().end()) {
         MALIPUT_THROW_MESSAGE("DiscreteValueRuleStates have an unknown DiscreteValue referenced by Rule(id: " +
-                              rule.id().string() + ") in Phase(id: " + phase_id_value.first.string() + ")");
+                              rule.id().string() + ") in Phase(id: " + phase.id().string() + ")");
       }
     }
   };
@@ -201,8 +201,7 @@ void CheckPhasesBulbStates(const RoadNetwork& road_network) {
       if (std::find(bulb->states().begin(), bulb->states().end(), unique_bulb_id_state.second) ==
           bulb->states().end()) {
         MALIPUT_THROW_MESSAGE("BulbStates have an unknown BulbState referenced by UniqueBulbId(id: " +
-                              unique_bulb_id_state.first.string() + ") in Phase(id: " + phase_id_value.first.string() +
-                              ")");
+                              unique_bulb_id_state.first.string() + ") in Phase(id: " + phase.id().string() + ")");
       }
     }
   };
@@ -231,7 +230,7 @@ void CheckRelatedRues(const RoadNetwork& road_network) {
             MALIPUT_THROW_MESSAGE("DiscreteValueRule(id:" + kv.first.string() +
                                   ") has a DiscreteValue with a "
                                   "RelatedRule pointing to id:" +
-                                  related_rule_id +
+                                  related_rule_id.string() +
                                   " and it does not exist in the "
                                   "RoadRulebook.");
           }
@@ -248,7 +247,7 @@ void CheckRelatedRues(const RoadNetwork& road_network) {
             MALIPUT_THROW_MESSAGE("RangeValueRule(id:" + kv.first.string() +
                                   ") has a Range with a related rule "
                                   "pointing to id:" +
-                                  related_rule_id + " and it does not exist in the RoadRulebook.");
+                                  related_rule_id.string() + " and it does not exist in the RoadRulebook.");
           }
         }
       }
