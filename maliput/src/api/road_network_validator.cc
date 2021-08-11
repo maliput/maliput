@@ -201,8 +201,7 @@ void CheckPhasesBulbStates(const RoadNetwork& road_network) {
       if (std::find(bulb->states().begin(), bulb->states().end(), unique_bulb_id_state.second) ==
           bulb->states().end()) {
         MALIPUT_THROW_MESSAGE("BulbStates have an unknown BulbState referenced by UniqueBulbId(id: " +
-                              unique_bulb_id_state.first.string() + ") in Phase(id: " + phase.id().string() +
-                              ")");
+                              unique_bulb_id_state.first.string() + ") in Phase(id: " + phase.id().string() + ")");
       }
     }
   };

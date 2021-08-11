@@ -66,7 +66,7 @@ void Throw(const char* condition, const char* func, const char* file, int line);
 /// function name, file, and line.
 #define MALIPUT_THROW_MESSAGE(msg)                                                           \
   do {                                                                                       \
-    const std::string error_message(msg);                                                   \
+    const std::string error_message(msg);                                                    \
     ::maliput::common::internal::Throw(error_message.c_str(), __func__, __FILE__, __LINE__); \
   } while (0)
 
