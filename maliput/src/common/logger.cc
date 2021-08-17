@@ -155,6 +155,15 @@ std::string Logger::set_level(logger::level log_level) {
   }
 }
 
+bool Logger::set_color(bool color) {
+  const bool ret{color_};
+  if (color_ != color) {
+    set_sink(std::make_unique<common::Sink>(color));
+    color_ = color;
+  }
+  return ret;
+}
+
 void Logger::set_sink(std::unique_ptr<common::SinkBase> sink) {
   MALIPUT_THROW_UNLESS(sink.get() != nullptr);
   sink_ = (std::move(sink));
@@ -164,6 +173,8 @@ std::string set_log_level(const std::string& level) {
   return log()->set_level(common::logger::kStringToLevel.at(level));
 }
 
+bool set_log_color(bool color) { return log()->set_color(color); }
+
 const std::string Logger::format(const std::vector<std::string>& v) const {
   std::array<std::string, kNumberOfArguments> args;
   for (int i = 0; i < static_cast<int>(v.size()) && i < kNumberOfArguments; i++) {
@@ -172,11 +183,21 @@ const std::string Logger::format(const std::vector<std::string>& v) const {
   return call_fmt_format(args);
 }
 
+Sink::Sink(bool color) {
+  if (color) {
+    print_ = [](const std::string& msg, logger::level lev) {
 #if MALIPUT_FMT_VERSION == 6
-void Sink::log(const std::string& msg, logger::level lev) { fmt::print(fg(FromLogLevelToColor(lev)), msg); }
+      fmt::print(fg(FromLogLevelToColor(lev)), msg);
 #elif MALIPUT_FMT_VERSION == 4
-void Sink::log(const std::string& msg, logger::level lev) { fmt::print_colored(FromLogLevelToColor(lev), msg); }
+      fmt::print_colored(FromLogLevelToColor(lev), msg);
 #endif
+    };
+  } else {
+    print_ = [](const std::string& msg, logger::level) { fmt::print(msg); };
+  }
+}
+
+void Sink::log(const std::string& msg, logger::level lev) { print_(msg, lev); }
 
 }  // namespace common
 

@@ -128,12 +128,15 @@ class SinkBase {
 class Sink : public SinkBase {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Sink);
-  Sink() = default;
+  Sink(bool color);
   ~Sink() = default;
 
   void log(const std::string& msg, logger::level lev) override;
 
   void flush() override{};
+
+ private:
+  std::function<void(const std::string&, logger::level)> print_{};
 };
 
 /// A logger class implementation.
@@ -224,7 +227,17 @@ class Logger {
   /// @return The string value of the previous log level. @see logger::kLevelToString.
   std::string set_level(logger::level log_level);
 
+  /// Sets flag to whether print using colors or not.
+  /// @param color True to enable color printing. False otherwise.
+  /// @return Previous value of the color flag.
+  bool set_color(bool color);
+
  private:
+  // Create a string from a list of strings.
+  // @param v Is a list of strings of fmt type. See https://github.com/fmtlib/fmt.
+  // @return A string created from the list `v` using fmt library.
+  const std::string format(const std::vector<std::string>& v) const;
+
   // Send the message to the sink.
   // @param log_level Level of the message.
   // @param args Is an argument list representing objects to be formatted using fmt library. See
@@ -232,16 +245,14 @@ class Logger {
   template <typename... Args>
   void log(logger::level log_level, Args&&... args);
 
+  // Flag to enable color printing.
+  bool color_{false};
+
   // Sink where the messages will be dumped to.
-  std::unique_ptr<common::SinkBase> sink_{std::make_unique<common::Sink>()};
+  std::unique_ptr<common::SinkBase> sink_{std::make_unique<common::Sink>(color_)};
 
   // Minimum level of messages to be log.
   logger::level level_{logger::level::info};
-
-  // Create a string from a list of strings.
-  // @param v Is a list of strings of fmt type. See https://github.com/fmtlib/fmt.
-  // @return A string created from the list `v` using fmt library.
-  const std::string format(const std::vector<std::string>& v) const;
 };
 
 /// Convenient functor for getting a string from a object that has serialization operator defined.
@@ -280,6 +291,13 @@ void Logger::log(logger::level lev, Args&&... args) {
 ///         predefined values.
 /// @relatesalso Logger.
 std::string set_log_level(const std::string& level);
+
+/// Invokes `maliput::log()->set_color(color)`.
+///
+/// @param level True to enable color printing. False otherwise.
+/// @return Previous value of the color flag.
+/// @relatesalso Logger.
+bool set_log_color(bool color);
 
 }  // namespace common
 

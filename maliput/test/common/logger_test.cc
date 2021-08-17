@@ -33,7 +33,7 @@ class MockSink : public SinkBase {
 GTEST_TEST(LoggerTest, GetInstance) { EXPECT_NE(log(), nullptr); }
 
 GTEST_TEST(LoggerTest, SetSink) {
-  std::unique_ptr<SinkBase> dut = std::make_unique<Sink>();
+  std::unique_ptr<SinkBase> dut = std::make_unique<MockSink>();
   SinkBase* dut_ptr = dut.get();
   log()->set_sink(std::move(dut));
   EXPECT_EQ(log()->get_sink(), dut_ptr);
