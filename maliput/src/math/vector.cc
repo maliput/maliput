@@ -2,6 +2,7 @@
 
 #include <complex>
 #include <functional>
+#include <limits>
 #include <numeric>
 
 namespace maliput {
@@ -98,6 +99,7 @@ Derived VectorBase<N, Derived>::normalized() const {
 template <std::size_t N, typename Derived>
 std::string VectorBase<N, Derived>::to_str() const {
   std::stringstream ss;
+  ss.precision(std::numeric_limits<double>::digits10);
   ss << "{";
   for (size_t i = 0; i < values_.size(); ++i) {
     if (i != 0) {
