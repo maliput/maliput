@@ -641,6 +641,7 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
   }
 
   if (features.draw_elevation_bounds) {
+    maliput::log()->trace("Drawing elevation bounds");
     GeoMesh upper_h_bounds_mesh, lower_h_bounds_mesh;
     // clang-format off
     CoverLaneWithQuads(&upper_h_bounds_mesh, segment->lane(0), base_grid_unit, true /*use_segment_bounds*/,
@@ -658,6 +659,7 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
     if (!lane) {
       continue;
     }
+    maliput::log()->trace("Creating meshes for lane id {}", lane->id().string());
     const double grid_unit = PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
@@ -940,6 +942,7 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
 std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* rg,
                                                                       const ObjFeatures& features) {
   MALIPUT_THROW_UNLESS(rg != nullptr);
+  maliput::log()->trace("Building Meshes for RoadGeometry id {}...", rg->id().string());
 
   GeoMesh asphalt_mesh;
   GeoMesh lane_mesh;
@@ -963,12 +966,14 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
     const api::Junction* junction = rg->junction(ji);
     if (!junction) {
       continue;
+      maliput::log()->trace("Visiting junction id {}", junction->id().string());
     }
     for (int si = 0; si < junction->num_segments(); ++si) {
       const api::Segment* segment = junction->segment(si);
       if (!segment) {
         continue;
       }
+      maliput::log()->trace("Rendering segment id {}", segment->id().string());
       // TODO(maddog@tri.global)  Id's need well-defined comparison semantics.
       if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
         RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh, &sidewalk_mesh);
