@@ -119,7 +119,8 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
         if (d > linear_tolerance()) {
           std::stringstream ss;
           ss << "Lane " << le.lane->id().string() << ((le.end == LaneEnd::kStart) ? "[start]" : "[end]")
-             << " position is off by " << d << ".";
+             << " position is off by " << d << " from Lane " << ref_end.lane->id().string()
+             << ((ref_end.end == LaneEnd::kStart) ? "[start]" : "[end]");
           failures.push_back(ss.str());
         }
       }
@@ -127,8 +128,9 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
     test_inertial_position(*(bp->GetASide()));
     test_inertial_position(*(bp->GetBSide()));
     // ...test orientation similarity.
-    const Rotation ref_rot = (bp->GetASide()->size() > 0) ? OrientationOutFromLane(bp->GetASide()->get(0))
-                                                          : OrientationOutFromLane(bp->GetBSide()->get(0)).Reverse();
+    const LaneEnd ref_end_rot = (bp->GetASide()->size() > 0) ? bp->GetASide()->get(0) : bp->GetBSide()->get(0);
+    const Rotation ref_rot = (bp->GetASide()->size() > 0) ? OrientationOutFromLane(ref_end_rot)
+                                                          : OrientationOutFromLane(ref_end_rot).Reverse();
     const auto test_orientation = [&](const LaneEndSet& ends, const Rotation& reference) {
       for (int bi = 0; bi < ends.size(); ++bi) {
         const LaneEnd le = ends.get(bi);
@@ -136,7 +138,8 @@ std::vector<std::string> RoadGeometry::CheckInvariants() const {
         if (d > angular_tolerance()) {
           std::stringstream ss;
           ss << "Lane " << le.lane->id().string() << ((le.end == LaneEnd::kStart) ? "[start]" : "[end]")
-             << " orientation is off by " << d << ".";
+             << " orientation is off by " << d << " from Lane " << ref_end_rot.lane->id().string()
+             << ((ref_end_rot.end == LaneEnd::kStart) ? "[start]" : "[end]");
           failures.push_back(ss.str());
         }
       }
