@@ -21,9 +21,8 @@ enum class CompareType { kAbsolute, kRelative };
  * tolerance, \::testing\::AssertionFailure otherwise.
  */
 template <std::size_t N, typename Derived>
-::testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1,
-                                          const math::VectorBase<N, Derived>& v2, double tolerance = 0.0,
-                                          CompareType compare_type = CompareType::kAbsolute);
+testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, const math::VectorBase<N, Derived>& v2,
+                                        double tolerance = 0.0, CompareType compare_type = CompareType::kAbsolute);
 
 /**
  * Assert that two matrices @p m1 and @p m2 are equal down to a certain @p tolerance.
@@ -36,8 +35,8 @@ template <std::size_t N, typename Derived>
  * tolerance, \::testing\::AssertionFailure otherwise.
  */
 template <std::size_t N>
-::testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2, double tolerance = 0.0,
-                                           CompareType compare_type = CompareType::kAbsolute);
+testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2, double tolerance = 0.0,
+                                         CompareType compare_type = CompareType::kAbsolute);
 
 }  // namespace test
 }  // namespace math

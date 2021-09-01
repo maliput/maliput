@@ -275,7 +275,7 @@
 /// @f]
 ///
 /// defines inclusive min/max bounds which depend only on @f$s@f$.  These are
-/// the @f/segment bounds@f/ for the `Lane`, the valid domain of @f$r@f$, which
+/// the @f$segment bounds@f$ for the `Lane`, the valid domain of @f$r@f$, which
 /// is intended to represent the full lateral extent of the `Segment` including
 /// all adjacent `Lanes`.
 ///
@@ -605,11 +605,11 @@
 ///
 ///  * `SpeedLimitRule` - speed limits
 ///  * `RightOfWayRule` - control of right-of-way / priority on specific routes
-///  > * TODO: `DirectionUsageRule` - direction-of-travel specification
-///  > * TODO: `LaneChangeRule` - adjacent-lane transition restrictions
-///  > * TODO: `OngoingRouteRule` - turning restrictions
-///  > * TODO: `PreferentialUseRule` - lane-based vehicle-type restrictions (e.g.,
-///  >   HOV lanes)
+///  * TODO: `DirectionUsageRule` - direction-of-travel specification
+///  * TODO: `LaneChangeRule` - adjacent-lane transition restrictions
+///  * TODO: `OngoingRouteRule` - turning restrictions
+///  * TODO: `PreferentialUseRule` - lane-based vehicle-type restrictions (e.g.,
+///    HOV lanes)
 ///
 /// @subsubsection common_region_entities Common Region Entities
 ///
@@ -638,11 +638,11 @@
 ///  * severity:
 ///    * *strict* (e.g., in the US, black-on-white posted limit)
 ///    * *advisory* (e.g., in the US, black-on-yellow advisory limit on curves)
-/// > * TODO: applicable vehicle type (for limits applying to specific types):
-/// >   * any
-/// >   * trucks
-/// >   * ...
-/// > * TODO: time-of-day/calendar condition
+///    * TODO: applicable vehicle type (for limits applying to specific types):
+///      * any
+///      * trucks
+///      * ...
+///    * TODO: time-of-day/calendar condition
 ///
 /// @subsubsection right_of_way_rule `RightOfWayRule`: Stopping and Yielding
 ///

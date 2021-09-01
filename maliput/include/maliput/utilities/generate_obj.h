@@ -139,8 +139,8 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 
 /// Builds a complete RoadGeometryMesh based on `features` properties and the RoadGeometry.
 ///
-/// @param road_geometry  the api::RoadGeometry to model.
-/// @param features  parameters for constructing the mesh.
+/// @param rg the api::RoadGeometry to model.
+/// @param features parameters for constructing the mesh.
 /// @return A RoadGeometryMesh with all segment, lane, and branch point meshes
 /// @throws if @p mesh_material is not one of BranchPoint's valid mesh materials
 RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFeatures& features);

@@ -51,13 +51,13 @@ Code that needs custom copy or move functions should not use these macros.
 copy-construction, copy-assignment, move-construction, and move-assignment.
 Invoke this this macro in the public section of the
 class declaration, e.g.:
-<pre>
+@code{cpp}
 class Foo {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Foo)
   // ...
 };
-</pre>
+@endcode
 */
 #define MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Classname) \
   Classname(const Classname&) = delete;              \
@@ -73,13 +73,13 @@ functions could conceivably still be ill-formed, in which case they will
 effectively not be declared or used -- but because the copy constructor exists
 the type will still be MoveConstructible. Invoke this this
 macro in the public section of the class declaration, e.g.:
-<pre>
+@code{cpp}
 class Foo {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Foo)
   // ...
 };
-</pre>
+@endcode
 */
 #define MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Classname)                                \
   Classname(const Classname&) = default;                                                   \
@@ -98,8 +98,8 @@ This is useful when paired with MALIPUT_DEFINE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN_
 to work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57728 whereby the
 declaration and definition must be split.  Once Maliput no longer supports GCC
 versions prior to 6.3, this macro could be removed.
-Invoke this this macro in the public section of the class declaration, e.g.:
-<pre>
+Invoke this macro in the public section of the class declaration, e.g.:
+@code{cpp}
 template <typename T>
 class Foo {
  public:
@@ -107,7 +107,7 @@ class Foo {
   // ...
 };
 MALIPUT_DEFINE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN_T(Foo)
-</pre>
+@endcode
 */
 #define MALIPUT_DECLARE_COPY_AND_MOVE_AND_ASSIGN(Classname)                                \
   Classname(const Classname&);                                                             \

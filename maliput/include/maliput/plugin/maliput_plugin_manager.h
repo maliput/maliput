@@ -19,8 +19,7 @@ class MaliputPluginManager {
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MaliputPluginManager);
 
   /// Constructs a MaliputPluginManager.
-  /// It looks for plugins in the paths that are described in the environment variable called @ref
-  /// kMaliputPluginPathEnv.
+  /// It looks for plugins in the paths that are described in the environment variable called `MALIPUT_PLUGIN_PATH`.
   /// Plugins will not be loaded twice and their uniqueness is determined by their id.
   /// When a duplicate is found, the most recently found plugin prevails.
   MaliputPluginManager();
