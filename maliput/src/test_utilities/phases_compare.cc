@@ -21,8 +21,9 @@ namespace test {
   return c.result();
 }
 
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const DiscreteValueRuleStates& a,
-                                   const DiscreteValueRuleStates& b) {
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& a,
+                                   const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& b) {
   maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.size(), b.size()));

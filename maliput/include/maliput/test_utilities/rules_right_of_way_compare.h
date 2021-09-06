@@ -29,10 +29,10 @@ namespace test {
                                    const rules::RightOfWayRule::State& a, const rules::RightOfWayRule::State& b);
 
 /// Predicate-formatter which tests equality of
-/// RightOfWayRule::RelatedBulbGroups.
+/// RightOfWayRule::RelatedBulbGroups which expands to std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const RightOfWayRule::RelatedBulbGroups& a,
-                                   const RightOfWayRule::RelatedBulbGroups& b);
+                                   const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& a,
+                                   const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& b);
 
 /// Predicate-formatter which tests equality of RightOfWayRule.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::RightOfWayRule& a,
