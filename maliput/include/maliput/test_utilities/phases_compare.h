@@ -19,9 +19,11 @@ namespace test {
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const RuleStates& a,
                                    const RuleStates& b);
 
-/// Predicate-formatter which tests equality of DiscreteValueRuleStates.
-::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const DiscreteValueRuleStates& a,
-                                   const DiscreteValueRuleStates& b);
+/// Predicate-formatter which tests equality of DiscreteValueRuleStates,
+/// which expands to std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>.
+::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
+                                   const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& a,
+                                   const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& b);
 
 /// Predicate-formatter which tests equality of std::optional<BulbStates>.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,

@@ -9,9 +9,8 @@ namespace math {
 namespace test {
 
 template <std::size_t N, typename Derived>
-::testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1,
-                                          const math::VectorBase<N, Derived>& v2, double tolerance,
-                                          CompareType compare_type) {
+testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, const math::VectorBase<N, Derived>& v2,
+                                        double tolerance, CompareType compare_type) {
   for (int i = 0; i < static_cast<int>(N); i++) {
     // First handle the corner cases of positive infinity, negative infinity,
     // and NaN
@@ -66,8 +65,8 @@ template <std::size_t N, typename Derived>
 }
 
 template <std::size_t N>
-::testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2, double tolerance,
-                                           CompareType compare_type) {
+testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2, double tolerance,
+                                         CompareType compare_type) {
   for (int ii = 0; ii < static_cast<int>(N); ii++) {
     for (int jj = 0; jj < static_cast<int>(N); jj++) {
       // First handle the corner cases of positive infinity, negative infinity,
@@ -126,6 +125,7 @@ template <std::size_t N>
   return ::testing::AssertionSuccess() << "m1 =\n" << m1 << "\nis approximately equal to m2 =\n" << m2;
 }
 
+//! @cond Doxygen_Suppress
 // Explicit instanciations
 template ::testing::AssertionResult CompareVectors(const VectorBase<2, Vector2>&, const VectorBase<2, Vector2>&, double,
                                                    CompareType);
@@ -136,6 +136,7 @@ template ::testing::AssertionResult CompareVectors(const VectorBase<4, Vector4>&
 template ::testing::AssertionResult CompareMatrices(const Matrix<2>&, const Matrix<2>&, double, CompareType);
 template ::testing::AssertionResult CompareMatrices(const Matrix<3>&, const Matrix<3>&, double, CompareType);
 template ::testing::AssertionResult CompareMatrices(const Matrix<4>&, const Matrix<4>&, double, CompareType);
+//! @endcond
 
 }  // namespace test
 }  // namespace math

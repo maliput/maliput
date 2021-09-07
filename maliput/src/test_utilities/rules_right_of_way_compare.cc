@@ -71,8 +71,8 @@ namespace test {
 }
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
-                                   const RightOfWayRule::RelatedBulbGroups& a,
-                                   const RightOfWayRule::RelatedBulbGroups& b) {
+                                   const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& a,
+                                   const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& b) {
   maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
 

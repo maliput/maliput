@@ -271,20 +271,20 @@ void Logger::log(logger::level lev, Args&&... args) {
 }
 
 /// Invokes `maliput::log()->set_level(level)`.
+/// See @relates Logger Logger.
 ///
 /// @param level Must be a string from the level enumerations: `trace`, `debug`,
-/// `info`, `warning`, `error`, `critical` or `off`.
+///              `info`, `warning`, `error`, `critical` or `off`.
 /// @return The string value of the previous log level.
 ///
 /// @throw std::out_of_range When `level` is not one of the
 ///         predefined values.
-/// @relatesalso Logger.
 std::string set_log_level(const std::string& level);
 
 }  // namespace common
 
 /// Retrieve an instance of a logger to use for logger.
-/// @relatesalso common::Logger.
+/// See @relates common::Logger Logger.
 common::Logger* log();
 
 }  // namespace maliput
