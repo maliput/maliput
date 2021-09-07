@@ -13,7 +13,7 @@ enum class CompareType { kAbsolute, kRelative };
 /**
  * Assert that two vectors @p v1 and @p v2 are equal down to a certain @p tolerance.
  *
- * Instanciations for comparing Vector2, Vector3 and Vector4 are provided.
+ * Instantiations for comparing Vector2, Vector3 and Vector4 are provided.
  *
  * @param v1 The first vector to compare.
  * @param v2 The second vector to compare.
@@ -29,7 +29,7 @@ testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, 
 /**
  * Assert that two matrices @p m1 and @p m2 are equal down to a certain @p tolerance.
  *
- * Instanciations for comparing Matrix2, Matrix3 and Matrix4 are provided.
+ * Instantiations for comparing Matrix2, Matrix3 and Matrix4 are provided.
  *
  * @param m1 The first matrix to compare.
  * @param m2 The second matrix to compare.
