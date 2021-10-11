@@ -32,10 +32,10 @@
 /// @subsection maliput_plugin_manager MaliputPluginManager
 ///
 /// maliput::plugin::MaliputPluginManager manages the lifecycle of `MaliputPlugin`s.
-/// It will try to load all the available plugins in path and made them available
+/// It will try to load all the available plugins in the path(`MALIPUT_PLUGIN_PATH`) and make them available
 /// via maliput::plugin::MaliputPluginManager::GetPlugin().
 ///
-/// The MaliputPlugin's discovery process consists on retrieve all the MaliputPlugin that are located
+/// The MaliputPlugin's discovery process consists on retrieving all the MaliputPlugins that are located
 /// as the `MALIPUT_PLUGIN_PATH` environment variable points to.
 ///
 /// To extend the discovery process to other locations simply extend the `MALIPUT_PLUGIN_PATH` environment variable.
@@ -46,14 +46,16 @@
 /// @section maliput_available_interfaces Maliput available interfaces
 /// @subsection road_network_loader_plugin RoadNetworkLoader plugin
 ///
-/// maliput::plugin::RoadNetworkLoader is an interface that allows the user to provide a custom
-/// maliput::plugin::RoadNetworkLoader functor. By doing so, a custom implementation of the maliput::api::RoadNetwork
-/// can be dinamically linked to maliput in runtime.
+/// Maliput clients may opt to use the plugin architecture to load at runtime specific backends.
+/// That simplifies the linkage process and reduces the number of compile time dependencies.
+/// See maliput::plugin::RoadNetworkLoader class which offers a unified interface for maliput
+/// users to load a maliput::api::RoadNetwork.
 ///
-/// A `REGISTER_ROAD_NETWORK_LOADER_PLUGIN()` macro is provided to easily register the plugin and add the methods that
-/// are necessary to convert the dynamic library into a maliput::plugin::MaliputPlugin.
+/// Maliput backend implementations must use `REGISTER_ROAD_NETWORK_LOADER_PLUGIN()` macro
+/// to instantiate the necessary entry points of the plugin. Those symbols are required
+/// by the plugin architecture discovery phase. Refer to the following code snippet for a
+/// usage example:
 ///
-/// As an example:
 /// @code{.cpp}
 /// // Implementation of a maliput::plugin::RoadNetworkLoader using a custom maliput backend called `my_custom_backend`.
 /// class RoadNetworkLoader : public maliput::plugin::RoadNetworkLoader {
@@ -67,17 +69,17 @@
 /// REGISTER_ROAD_NETWORK_LOADER_PLUGIN("my_custom_backend", RoadNetworkLoader);
 /// @endcode
 /// As it can be seen:
-///  - maliput::plugin::RoadNetworkLoader class is inherited and the `operator()` is overriden returning an
-///  maliput::api::RoadNetwork implemented using a custom backend.
+///  - `RoadNetworkLoader` class inherits from maliput::plugin::RoadNetworkLoader and the `operator()` calls into the
+///  specific maliput backend load procedure.
 ///  - REGISTER_ROAD_NETWORK_LOADER_PLUGIN() macros is called.
 ///
-/// Note: In order to be able to be loaded by the MaliputPluginManager the `MALIPUT_PLUGIN_PATH`'s paths must contain
-/// the location of the installed library created from above example code.
+/// Note: `MALIPUT_PLUGIN_PATH` must contain the path to the installed plugin shared library
+/// in order to make maliput::plugin::MaliputPluginManager aware of its existence and load it.
 ///
-/// @subsubsection using_custom_road_network_loader Using custom RoadNetworkLoader plugin
+/// @subsubsection using_custom_road_network_loader Using a custom RoadNetworkLoader plugin
 ///
 /// After the creation of the maliput::plugin::MaliputPlugin that implements a maliput::plugin::RoadNetworkLoader and
-/// the correct set-up of the MALIPUT_PLUGIN_PATH discovery path, the use of this plugin is quite straight forward:
+/// the correct set up of the `MALIPUT_PLUGIN_PATH` discovery path, the use of this plugin is quite straightforward:
 ///
 /// @code{.cpp}
 /// const std::string plugin_name{"my_custom_backend"};
@@ -101,8 +103,7 @@
 /// }
 ///
 /// // Obtains a pointer to an instance of the loader class.
-/// maliput::plugin::RoadNetworkLoaderPtr rn_loader_ptr =
-///     maliput_plugin->ExecuteSymbol<maliput::plugin::RoadNetworkLoaderPtr>(
+/// auto rn_loader_ptr = maliput_plugin->ExecuteSymbol<maliput::plugin::RoadNetworkLoaderPtr>(
 ///         maliput::plugin::RoadNetworkLoader::GetEntryPoint());
 ///
 /// // Use smart pointers to gracefully manage heap allocation.
