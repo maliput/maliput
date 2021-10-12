@@ -2,6 +2,7 @@
 
 #include "maliput/plugin/maliput_plugin_manager.h"
 
+#include "maliput/common/filesystem.h"
 #include "maliput/common/logger.h"
 #include "maliput/utility/file_utils.h"
 
@@ -10,13 +11,21 @@ namespace plugin {
 namespace {
 
 // Looks for shared object(.so files) that are located in the paths that `env_var` is pointing to.
+// It logs a warning message if a path isn't a valid directory path.
 // @param env_var Environment variable.
 // @returns A list of shared objects filepaths.
 std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
   const auto paths_from_env = maliput::utility::GetAllPathsFromEnvironment(env_var);
   std::vector<std::string> filepaths{};
-  for (const auto& path : paths_from_env) {
-    const auto filepaths_from_dir = maliput::utility::GetAllFilePathsFromDirectory(path, "so");
+  for (const auto& path_from_env : paths_from_env) {
+    std::cout << "path_from_env: " << path_from_env << std::endl;
+    maliput::common::Path path{path_from_env};
+    if (!path.is_directory()) {
+      maliput::log()->warn("The path '{}' isn't a valid directory for the {} env var, omitting...", path_from_env,
+                           env_var);
+      continue;
+    }
+    const auto filepaths_from_dir = maliput::utility::GetAllFilePathsFromDirectory(path.get_path(), "so");
     filepaths.insert(filepaths.end(), filepaths_from_dir.begin(), filepaths_from_dir.end());
   }
   return filepaths;
