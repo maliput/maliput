@@ -23,6 +23,7 @@ std::vector<std::string> GetAllFilePathsFromDirectory(const std::string& directo
                                                       const std::optional<std::string>& ends_with_suffix);
 
 /// Retrieves a list of paths that live in a environment variable.
+/// When environment variable isn't set the list will be empty.
 /// @param env_var Environemnt variable.
 /// @returns A list of paths extracted from `env_var`.
 std::vector<std::string> GetAllPathsFromEnvironment(const std::string& env_var);

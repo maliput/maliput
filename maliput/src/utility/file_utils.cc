@@ -5,6 +5,8 @@
 // TODO(#379): Remove "experimental" namespace once a newer version of GCC is used(8 or above).
 #include <experimental/filesystem>
 
+#include "maliput/common/logger.h"
+
 namespace maliput {
 namespace utility {
 namespace fs = std::experimental::filesystem;
@@ -34,7 +36,12 @@ std::vector<std::string> GetAllFilePathsFromDirectory(const std::string& directo
 }
 
 std::vector<std::string> GetAllPathsFromEnvironment(const std::string& env_var) {
-  std::istringstream path_stream(std::string(std::getenv(env_var.c_str())));
+  char* env = std::getenv(env_var.c_str());
+  if (env == nullptr) {
+    maliput::log()->warn("Env var '{}' isn't set.", env_var);
+    return {};
+  }
+  std::istringstream path_stream(env);
   const std::string delimeter{":"};
   std::vector<std::string> paths;
   std::string path;
