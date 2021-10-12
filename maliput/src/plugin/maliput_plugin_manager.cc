@@ -17,9 +17,10 @@ namespace {
 std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
   const auto paths_from_env = maliput::utility::GetAllPathsFromEnvironment(env_var);
   std::vector<std::string> filepaths{};
+  maliput::log()->trace("'{}' env var contains {} paths:", env_var, paths_from_env.size());
   for (const auto& path_from_env : paths_from_env) {
-    std::cout << "path_from_env: " << path_from_env << std::endl;
-    maliput::common::Path path{path_from_env};
+    maliput::log()->trace("\t'{}'", path_from_env);
+    const maliput::common::Path path{path_from_env};
     if (!path.is_directory()) {
       maliput::log()->warn("The path '{}' isn't a valid directory for the {} env var, omitting...", path_from_env,
                            env_var);
