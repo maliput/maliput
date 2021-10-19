@@ -31,7 +31,7 @@ class RoadNetworkLoader {
 
   /// Returns a maliput::api::RoadNetwork.
   /// @param properties Dictionary containing the arguments needed for creating the RoadNetwork.
-  virtual std::unique_ptr<const maliput::api::RoadNetwork> operator()(
+  virtual std::unique_ptr<maliput::api::RoadNetwork> operator()(
       const std::map<std::string, std::string>& properties) const = 0;
   virtual ~RoadNetworkLoader() = default;
 };
