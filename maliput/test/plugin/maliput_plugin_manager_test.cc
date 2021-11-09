@@ -5,6 +5,7 @@
 
 #include "maliput/plugin/maliput_plugin_manager.h"
 
+#include <algorithm>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -50,10 +51,16 @@ class MaliputPluginManagerTest : public ::testing::Test {
 };
 
 // Plugins are loaded and checked that their methods are working.
-TEST_F(MaliputPluginManagerTest, ConstructorAndGetPlugin) {
+TEST_F(MaliputPluginManagerTest, ConstructorGetAndListPlugin) {
   MaliputPluginManager dut;
   const PluginFeatures kPlugin1{MaliputPlugin::Id("multiply_integers_test_plugin"), "MultiplyIntegers"};
   const PluginFeatures kPlugin2{MaliputPlugin::Id("sum_integers_test_plugin"), "SumIntegers"};
+
+  const auto plugin_names = dut.ListPlugins();
+  EXPECT_EQ((std::size_t)2, plugin_names.size());
+  EXPECT_NE(plugin_names.end(), std::find(plugin_names.begin(), plugin_names.end(), kPlugin1.id));
+  EXPECT_NE(plugin_names.end(), std::find(plugin_names.begin(), plugin_names.end(), kPlugin2.id));
+
   auto plugin = dut.GetPlugin(kPlugin1.id);
   EXPECT_EQ(kPlugin1.id.string(), plugin->GetId());
   int result{};

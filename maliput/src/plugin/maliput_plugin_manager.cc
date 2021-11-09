@@ -57,5 +57,13 @@ void MaliputPluginManager::AddPlugin(const std::string& path_to_plugin) {
       (is_repeated ? "A new version of Plugin Id: {} was loaded." : "Plugin Id: {} was correctly loaded."), id);
 }
 
+std::vector<MaliputPlugin::Id> MaliputPluginManager::ListPlugins() {
+  std::vector<MaliputPlugin::Id> keys{};
+  for (const auto& plugin : plugins_) {
+    keys.push_back(plugin.first);
+  }
+  return keys;
+}
+
 }  // namespace plugin
 }  // namespace maliput
