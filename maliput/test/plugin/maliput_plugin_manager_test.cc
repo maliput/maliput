@@ -57,7 +57,7 @@ TEST_F(MaliputPluginManagerTest, ConstructorGetAndListPlugin) {
   const PluginFeatures kPlugin2{MaliputPlugin::Id("sum_integers_test_plugin"), "SumIntegers"};
 
   const auto plugin_names = dut.ListPlugins();
-  EXPECT_EQ((std::size_t)2, plugin_names.size());
+  EXPECT_EQ(2, static_cast<int>(plugin_names.size()));
   EXPECT_NE(plugin_names.end(), std::find(plugin_names.begin(), plugin_names.end(), kPlugin1.id));
   EXPECT_NE(plugin_names.end(), std::find(plugin_names.begin(), plugin_names.end(), kPlugin2.id));
 
