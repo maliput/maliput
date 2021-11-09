@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/plugin/maliput_plugin.h"
@@ -32,6 +33,9 @@ class MaliputPluginManager {
   /// Loads a new plugin. If a plugin with the same id was already loaded then it is replaced by the new one.
   /// @param path_to_plugin Path to new the plugin.
   void AddPlugin(const std::string& path_to_plugin);
+
+  /// @returns A vector with the MaliputPlugin::Id of the loaded plugins.
+  std::vector<MaliputPlugin::Id> ListPlugins();
 
  private:
   // Environment variable name that holds the path to look for plugins.
