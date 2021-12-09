@@ -1,6 +1,10 @@
 name: gcc
 
-on: [push, pull_request]
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 env:
   PACKAGE_NAME: maliput
