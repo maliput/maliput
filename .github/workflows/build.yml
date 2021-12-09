@@ -15,8 +15,10 @@ jobs:
         ubuntu: [18.04, 20.04]
         include:
           - ubuntu: 18.04
+            ubuntu_name: bionic
             ROS_DISTRO: dashing
           - ubuntu: 20.04
+            ubuntu_name: focal
             ROS_DISTRO: foxy
     container:
       image: ubuntu:${{ matrix.ubuntu }}
