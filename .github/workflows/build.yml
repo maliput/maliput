@@ -15,8 +15,10 @@ jobs:
         ubuntu: [18.04, 20.04]
         include:
           - ubuntu: 18.04
+            ubuntu_name: bionic
             ROS_DISTRO: dashing
           - ubuntu: 20.04
+            ubuntu_name: focal
             ROS_DISTRO: foxy
     container:
       image: ubuntu:${{ matrix.ubuntu }}
@@ -55,3 +57,23 @@ jobs:
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon test --packages-select ${PACKAGE_NAME} --event-handlers=console_direct+;
         colcon test-result --verbose;
+    # create tarball to push to github artifacts
+    # Note that a file with the name of the bundle is created to pass the value
+    # step to step.
+    - name: Create tarball to store in Github Artifacts.
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      env:
+        BUNDLE_NAME: maliput_underlay
+      run: |
+        echo "Moving install space to ${BUNDLE_NAME}";
+        mv install ${BUNDLE_NAME};
+        CURRENT_BUNDLE_TARBALL_NAME="${BUNDLE_NAME}_$(date +%Y%m%d)_${{ matrix.ubuntu_name }}.tar.gz"
+        echo $CURRENT_BUNDLE_TARBALL_NAME > bundle_file_name
+        echo "bundle_file_name=${CURRENT_BUNDLE_TARBALL_NAME}" >> $GITHUB_ENV
+        echo "Compressing tarball ${CURRENT_BUNDLE_TARBALL_NAME}";
+        tar -czvf ${CURRENT_BUNDLE_TARBALL_NAME} ${BUNDLE_NAME};
+    - uses: actions/upload-artifact@v2
+      with:
+        name: binary_underlay
+        path: ${{ env.ROS_WS }}/${{ env.bundle_file_name }}
