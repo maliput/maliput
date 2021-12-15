@@ -47,7 +47,7 @@ class SRange {
   double size() const { return std::fabs(s1() - s0()); }
 
   /// Returns whether this SRange is in the direction of +s (i.e., s1() > s0()).
-  double WithS() const { return s1() > s0(); }
+  bool WithS() const { return s1() > s0(); }
 
   /// Determines whether this SRange intersects with `s_range`.
   /// `tolerance` will modify this range and `s_range` by increasing the maximum tolerance
