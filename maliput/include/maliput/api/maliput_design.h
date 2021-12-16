@@ -134,7 +134,7 @@
 /// > TODO: Explain the concepts of linear tolerance, angular tolerance, and
 /// > characteristic scale length.
 ///
-/// @subsubsection inertial_frame_versus_lane_frame `Inertial`-frame versus `Lane`-frame
+/// @subsubsection inertial_frame_versus_lane_frame Inertial-frame versus Lane-frame
 ///
 /// Two types of coordinate frames are used in this model: the (single)
 /// `Inertial`-frame and the (multiple) `Lane`-frames.  In both, distances
@@ -230,7 +230,7 @@
 /// > `Lane`-frame of any `Lane`.  We anticipate needing an additional set of
 /// > surface/volume parameterizations in the future to complete the picture.
 ///
-/// @subsubsection lanes_as_lanes Lanes as `Lanes`
+/// @subsubsection lanes_as_lanes Lanes as Lanes
 ///
 /// A `Lane` represents a lane of travel in a road network, expressing a path
 /// along a stretch of asphalt as well as a parameterization of that asphalt
@@ -316,7 +316,7 @@
 /// > into regions that cannot be properly represented by the parameterization
 /// > of a given `Lane`.
 ///
-/// @subsubsection lanes_joined_via_branchpoints Lanes Joined End-to-End via `BranchPoints`
+/// @subsubsection lanes_joined_via_branchpoints Lanes Joined End-to-End via BranchPoints
 ///
 /// `BranchPoints` are the points where `Lanes` are connected end-to-end.
 /// They are so named because they are the branch-points in the decision
@@ -385,7 +385,7 @@
 /// at the *start* end of a `Lane`, it's the negative of the tangent, pointing
 /// in the @f$-s@f$ direction instead of the @f$+s@f$ direction.
 ///
-/// @subsubsection adjacent_lanes_grouped_into_segments Adjacent Lanes Grouped into `Segments`
+/// @subsubsection adjacent_lanes_grouped_into_segments Adjacent Lanes Grouped into Segments
 ///
 /// In real roads, the pavement is often divided into multiple adjacent
 /// lanes of travel; in `maliput`, adjacent `Lanes` are grouped together
@@ -427,7 +427,7 @@
 /// with unique integers, beginning with zero for the rightmost `Lane` and
 /// increasing leftward.
 ///
-/// @subsubsection intersecting_segments_grouped_into_junctions Intersecting `Segments` Grouped into `Junction`
+/// @subsubsection intersecting_segments_grouped_into_junctions Intersecting Segments Grouped into Junction
 ///
 /// It is possible for multiple `Segments` to cover the same pavement.
 /// In fact, that is how intersections are represented, by criss-crossing
@@ -458,7 +458,7 @@
 /// joins those two end-to-end, resulting in three independent `Junction`
 /// that are better localized.
 ///
-/// @subsection abstract_geometry_api_roadgeometry Abstract Geometry API: `RoadGeometry`
+/// @subsection abstract_geometry_api_roadgeometry Abstract Geometry API: RoadGeometry
 ///
 /// > TODO:  Explain semantics of object ID's.  (cross-referencing, tiling,
 /// > debugging, visualization)
@@ -472,7 +472,7 @@
 /// * `RoadPosition`
 /// * ...
 ///
-/// @subsubsection roadgeometry `RoadGeometry`
+/// @subsubsection roadgeometry RoadGeometry
 ///
 /// * accessors for component `Junctions`
 /// * accessors for component `BranchPoints`
@@ -481,15 +481,15 @@
 ///   * `angular_tolerance`
 ///   * `scale_length`
 ///
-/// @subsubsection junction `Junction`
+/// @subsubsection junction Junction
 ///
 /// * accessors for parent `RoadGeometry`, component `Junctions`
 ///
-/// @subsubsection segment `Segment`
+/// @subsubsection segment Segment
 ///
 /// * accessors for parent `Junction`, component `Lanes`
 ///
-/// @subsubsection lane `Lane`
+/// @subsubsection lane Lane
 ///
 /// * nominal @f$r@f$ bounds,
 ///   @f$B_\text{nominal}: (s) \mapsto [r_\text{min}, r_\text{max}]@f$
@@ -507,7 +507,7 @@
 /// * accessors for parent `Segment`, associated `BranchPoints`,
 ///   and left/right `Lanes`, to traverse the object graph.
 ///
-/// @subsubsection branchpoints `BranchPoints`
+/// @subsubsection branchpoints BranchPoints
 ///
 /// * accessors for `Lanes` on each side ("A" versus "B")
 /// * accessor for the set of confluent `Lanes` for a given `Lane`
@@ -517,7 +517,7 @@
 ///
 /// @section rules_and_features_databases Rules and Features Databases
 ///
-/// @subsection rules_of_the_road Rules of the Road: `RoadRulebook`
+/// @subsection rules_of_the_road Rules of the Road: RoadRulebook
 ///
 /// A `RoadRulebook` (see @ref road-rulebook-outline_img "figure" ) expresses the semantic
 /// "rules of the road" for a road network, as rule elements associated to
@@ -626,7 +626,7 @@
 ///  * `LaneIdEnd`: a pair of `LaneId` and an "end" specifier, which describes
 ///    either the start or finish of a specific `Lane`.
 ///
-/// @subsubsection speed_limit_rules `SpeedLimitRule`: Speed Limits
+/// @subsubsection speed_limit_rules SpeedLimitRule: Speed Limits
 ///
 /// A `SpeedLimitRule` describes speed limits on a longitudinal range of a Lane.
 /// It comprises:
@@ -644,7 +644,7 @@
 ///      * ...
 ///    * TODO: time-of-day/calendar condition
 ///
-/// @subsubsection right_of_way_rule `RightOfWayRule`: Stopping and Yielding
+/// @subsubsection right_of_way_rule RightOfWayRule: Stopping and Yielding
 ///
 /// `RightOfWayRule` describes which vehicles have right-of-way (also
 /// known as "priority"). Note that "right of way" does not mean "right
