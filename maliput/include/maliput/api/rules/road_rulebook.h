@@ -61,16 +61,19 @@ class RoadRulebook {
   /// Returns the RightOfWayRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
+  MALIPUT_DEPRECATED("next release", "RightOfWayRule class will be deprecated.")
   RightOfWayRule GetRule(const RightOfWayRule::Id& id) const { return DoGetRule(id); }
 
   /// Returns the SpeedLimitRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
+  MALIPUT_DEPRECATED("next release", "SpeedLimitRule class will be deprecated.")
   SpeedLimitRule GetRule(const SpeedLimitRule::Id& id) const { return DoGetRule(id); }
 
   /// Returns the DirectionUsageRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
+  MALIPUT_DEPRECATED("next release", "DirectionUsageRule class will be deprecated.")
   DirectionUsageRule GetRule(const DirectionUsageRule::Id& id) const { return DoGetRule(id); }
 
   /// Returns the DiscreteValueRule with the specified `id`.

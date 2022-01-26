@@ -7,6 +7,7 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 
 namespace maliput {
 namespace api {
@@ -29,6 +30,7 @@ class PhaseRingBook {
 
   /// Finds and returns the PhaseRing containing the specified
   /// RightOfWayRule. Returns std::nullopt if @p rule_id is unrecognized.
+  MALIPUT_DEPRECATED("next release", "RightOfWayRule class will be deprecated.")
   std::optional<PhaseRing> FindPhaseRing(const RightOfWayRule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
 
   /// Finds and returns the PhaseRing containing the specified

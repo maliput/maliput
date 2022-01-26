@@ -3,6 +3,7 @@
 #include "maliput/api/regions.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -19,7 +20,7 @@ namespace rules {
 /// Each instance mandates a maximum speed limit as well as a minimum
 /// speed limit.  Since neither limit may be less than zero, a minimum
 /// limit of exactly zero is equivalent to having no minimum limit at all.
-class SpeedLimitRule {
+class MALIPUT_DEPRECATED("next release", "Use RangeValueRule instead.") SpeedLimitRule {
  public:
   using Id = TypeSpecificIdentifier<class SpeedLimitRule>;
 

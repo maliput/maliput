@@ -6,6 +6,7 @@
 #include "maliput/api/regions.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
@@ -27,7 +28,7 @@ namespace rules {
 /// semantics.
 ///
 /// Each Lane location can be governed by at most one DirectionUsageRule.
-class DirectionUsageRule final {
+class MALIPUT_DEPRECATED("next release", "Use DiscreteValueRule instead.") DirectionUsageRule final {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DirectionUsageRule);
 

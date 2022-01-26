@@ -9,6 +9,7 @@
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 
 namespace maliput {
 namespace api {
@@ -60,6 +61,7 @@ class Phase final {
   const Id& id() const { return id_; }
 
   /// Returns the phase's RightOfWayRule instances and their states.
+  MALIPUT_DEPRECATED("next release", "RightOfWayRule class will be deprecated.")
   const RuleStates& rule_states() const { return rule_states_; }
 
   /// Returns the phase's DiscreteValueRule instances and their states.
