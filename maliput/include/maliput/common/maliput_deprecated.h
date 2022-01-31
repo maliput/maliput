@@ -41,8 +41,15 @@
 ///
 /// Provides a portable macro for use in generating compile-time warnings for
 /// use of code that is permitted but discouraged. */
-#ifndef MALIPUT_DEPRECATED
+
+#ifdef BUILD_DOCS
+
+#define MALIPUT_DEPRECATED(removal_date, message)
+
+#else  // BUILD_DOCS
+
 #define MALIPUT_DEPRECATED(removal_date, message)                                    \
   [[deprecated("MALIPUT DEPRECATED: " message " The deprecated code will be removed" \
                " on or after " removal_date ".")]]
-#endif
+
+#endif  // BUILD_DOCS
