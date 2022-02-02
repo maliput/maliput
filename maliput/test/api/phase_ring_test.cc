@@ -43,19 +43,25 @@ Phase CreateFullPhase(const Phase::Id& id) {
 
 Phase CreatePhaseWithMissingRuleStates(const Phase::Id& id) {
   const Phase mock_phase = CreateFullPhase(id);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   RuleStates rule_states = mock_phase.rule_states();
+#pragma GCC diagnostic pop
   rule_states.erase(rule_states.begin());
   DiscreteValueRuleStates discrete_value_rule_states = mock_phase.discrete_value_rule_states();
   discrete_value_rule_states.erase(discrete_value_rule_states.begin());
   return Phase(id, rule_states, discrete_value_rule_states, mock_phase.bulb_states());
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 Phase CreatePhaseWithMissingBulbStates(const Phase::Id& id) {
   const Phase mock_phase = CreateFullPhase(id);
   BulbStates bulb_states = *mock_phase.bulb_states();
   bulb_states.erase(bulb_states.begin());
   return Phase(id, mock_phase.rule_states(), mock_phase.discrete_value_rule_states(), bulb_states);
 }
+#pragma GCC diagnostic pop
 
 class PhaseRingTest : public ::testing::Test {
  protected:

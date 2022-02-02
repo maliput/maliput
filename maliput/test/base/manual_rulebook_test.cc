@@ -33,6 +33,8 @@ class ManualRulebookTest : public ::testing::Test {
  protected:
   const LaneSRange kZone{LaneId("a"), {10., 20.}};
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const RightOfWayRule kRightOfWay{
       RightOfWayRule::Id("rowr_id"),
       LaneSRoute({kZone}),
@@ -47,6 +49,7 @@ class ManualRulebookTest : public ::testing::Test {
       kZone,
       {DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"), DirectionUsageRule::State::Type::kWithS,
                                  DirectionUsageRule::State::Severity::kStrict)}};
+#pragma GCC diagnostic pop
 
   const Rule::Id kDiscreteValueRuleId{"dvrt/dvr_id"};
 
@@ -71,6 +74,8 @@ class ManualRulebookTest : public ::testing::Test {
 
 TEST_F(ManualRulebookTest, DefaultConstructor) { ManualRulebook dut; }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 TEST_F(ManualRulebookTest, AddGetRemoveRightOfWay) {
   ManualRulebook dut;
 
@@ -106,6 +111,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveDirectionUsage) {
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kDirectionUsage.id()), maliput::common::assertion_error);
 }
+#pragma GCC diagnostic pop
 
 TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
   ManualRulebook dut;
@@ -161,12 +167,15 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   dut.AddRule(kDiscreteValueRule);
   dut.AddRule(kRangeValueRule);
   dut.RemoveAll();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   EXPECT_THROW(dut.GetRule(kRightOfWay.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kRightOfWay.id()), maliput::common::assertion_error);
   EXPECT_THROW(dut.GetRule(kSpeedLimit.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kSpeedLimit.id()), maliput::common::assertion_error);
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kDirectionUsage.id()), maliput::common::assertion_error);
+#pragma GCC diagnostic pop
   EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()), maliput::common::assertion_error);
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
@@ -178,9 +187,12 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   dut.AddRule(kDirectionUsage);
   dut.AddRule(kDiscreteValueRule);
   dut.AddRule(kRangeValueRule);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kRightOfWay.id()), kRightOfWay));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDirectionUsage.id()), kDirectionUsage));
+#pragma GCC diagnostic pop
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule));
 }

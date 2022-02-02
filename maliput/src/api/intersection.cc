@@ -35,7 +35,11 @@ const std::optional<rules::RuleStates> Intersection::RuleStates() const {
   if (phase_result.has_value()) {
     const rules::Phase::Id phase_id = phase_result->state;
     const rules::Phase& phase = ring_.phases().at(phase_id);
-    return phase.rule_states();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    const auto rule_states = phase.rule_states();
+#pragma GCC diagnostic pop
+    return rule_states;
   }
   return std::nullopt;
 }

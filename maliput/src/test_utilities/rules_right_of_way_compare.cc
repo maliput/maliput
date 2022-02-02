@@ -13,6 +13,8 @@ namespace api {
 namespace rules {
 namespace test {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    rules::RightOfWayRule::ZoneType a, rules::RightOfWayRule::ZoneType b) {
   return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
@@ -130,6 +132,7 @@ namespace test {
   }
   return c.result();
 }
+#pragma GCC diagnostic pop
 
 }  // namespace test
 }  // namespace rules

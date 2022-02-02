@@ -27,6 +27,8 @@ class RoadNetwork {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadNetwork)
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Constructs a RoadNetwork instance. After creation, you are encouraged to
   /// validate it using ValidateRoadNetwork(), which is defined in
   /// maliput/api/road_network_validator.h.
@@ -38,6 +40,7 @@ class RoadNetwork {
               std::unique_ptr<rules::PhaseProvider> phase_provider, std::unique_ptr<rules::RuleRegistry> rule_registry,
               std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
               std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider);
+#pragma GCC diagnostic pop
 
   virtual ~RoadNetwork() = default;
 
@@ -56,11 +59,13 @@ class RoadNetwork {
   IntersectionBook* intersection_book() { return intersection_book_.get(); }
 
   const rules::PhaseRingBook* phase_ring_book() const { return phase_ring_book_.get(); }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   MALIPUT_DEPRECATED("next release", "RightOfWayRule class will be deprecated.")
   rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider() {
     return right_of_way_rule_state_provider_.get();
   }
+#pragma GCC diagnostic pop
 
   rules::PhaseProvider* phase_provider() { return phase_provider_.get(); }
 
@@ -80,7 +85,10 @@ class RoadNetwork {
   std::unique_ptr<const rules::TrafficLightBook> traffic_light_book_;
   std::unique_ptr<IntersectionBook> intersection_book_;
   std::unique_ptr<rules::PhaseRingBook> phase_ring_book_;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   std::unique_ptr<rules::RightOfWayRuleStateProvider> right_of_way_rule_state_provider_;
+#pragma GCC diagnostic pop
   std::unique_ptr<rules::PhaseProvider> phase_provider_;
   std::unique_ptr<rules::RuleRegistry> rule_registry_;
   std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider_;

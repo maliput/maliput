@@ -8,7 +8,8 @@
 
 namespace maliput {
 namespace api {
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
                          std::unique_ptr<const rules::RoadRulebook> rulebook,
                          std::unique_ptr<const rules::TrafficLightBook> traffic_light_book,
@@ -40,6 +41,7 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
   MALIPUT_THROW_UNLESS(discrete_value_rule_state_provider_.get() != nullptr);
   MALIPUT_THROW_UNLESS(range_value_rule_state_provider_.get() != nullptr);
 }
+#pragma GCC diagnostic pop
 
 bool RoadNetwork::Contains(const RoadPosition& road_position) const {
   return road_position.lane->Contains(road_position.pos);

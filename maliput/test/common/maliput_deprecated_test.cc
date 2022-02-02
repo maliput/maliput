@@ -21,13 +21,19 @@ int OldMethod(int arg) { return arg; }
 int NewMethod(int arg) { return arg; }
 
 GTEST_TEST(MaliputDeprecatedTest, ClassTest) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const MyOldClass deprecated;
+#pragma GCC diagnostic pop
   const MyNewClass not_deprecated;
   unused(deprecated, not_deprecated);
 }
 
 GTEST_TEST(MaliputDeprecatedTest, FunctionTest) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const int deprecated = OldMethod(1);
+#pragma GCC diagnostic pop
   const int not_deprecated = NewMethod(1);
   unused(deprecated, not_deprecated);
 }

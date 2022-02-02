@@ -35,8 +35,11 @@ struct ManualPhaseRingBookTest : public ::testing::Test {
         ring_id("ring"),
         ring(ring_id, {phase}) {}
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const RightOfWayRule::Id row_rule_id_a;
   const RightOfWayRule::Id row_rule_id_b;
+#pragma GCC diagnostic pop
   const Rule::Id rule_id_a;
   const Rule::Id rule_id_b;
   const Phase phase;
@@ -98,6 +101,8 @@ TEST_F(ManualPhaseRingBookTest, RingWithOverlappingRule) {
   EXPECT_THROW(dut.AddPhaseRing(ring_with_overlapping_rule), std::logic_error);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 // TODO(agalbachicar)  This test should be removed once RightOfWayRules are.
 TEST_F(ManualPhaseRingBookTest, RightOfWayRuleApiTest) {
   ManualPhaseRingBook dut;
@@ -121,6 +126,7 @@ TEST_F(ManualPhaseRingBookTest, RightOfWayRuleApiTest) {
     EXPECT_EQ(dut.FindPhaseRing(rule_id), std::nullopt);
   }
 }
+#pragma GCC diagnostic pop
 
 // @ }
 

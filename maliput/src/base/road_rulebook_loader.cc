@@ -250,6 +250,8 @@ RightOfWayRule::RelatedBulbGroups BuildRelatedBulbGroups(const YAML::Node& rule_
   return {};
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry, const YAML::Node& rule_node) {
   MALIPUT_THROW_UNLESS(rule_node.IsMap());
   MALIPUT_THROW_UNLESS(rule_node["ID"].IsDefined());
@@ -269,7 +271,10 @@ RightOfWayRule BuildRightOfWayRule(const api::RoadGeometry* road_geometry, const
 Rule::Id GetRuleIdFrom(const Rule::TypeId& rule_type_id, const RightOfWayRule::Id& right_of_way_rule_id) {
   return maliput::api::rules::Rule::Id(rule_type_id.string() + "/" + right_of_way_rule_id.string());
 }
+#pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 DiscreteValueRule BuildVehicleStopInZoneBehaviourDiscreteValueRule(const RightOfWayRule& right_of_way_rule) {
   return DiscreteValueRule(
       GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), right_of_way_rule.id()),
@@ -287,6 +292,7 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
       {RightOfWayRule::State::Type::kStop, "Stop"},
       {RightOfWayRule::State::Type::kStopThenGo, "StopThenGo"},
   };
+#pragma GCC diagnostic pop
 
   Rule::RelatedUniqueIds related_unique_ids{{RelatedUniqueIdsKeys::kBulbGroup, {}}};
   for (const auto& pair_traffic_light_id_vector_bulb_group_id : right_of_way_rule.related_bulb_groups()) {
@@ -317,6 +323,9 @@ DiscreteValueRule BuildRightOfWayTypeDiscreteValueRule(const RightOfWayRule& rig
 
 // DirectionUsageRule loading
 namespace {
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 std::vector<DirectionUsageRule::State> BuildDirectionUsageStates(const YAML::Node& states_node) {
   MALIPUT_THROW_UNLESS(states_node.IsSequence());
   std::vector<DirectionUsageRule::State> states;
@@ -346,6 +355,7 @@ DirectionUsageRule BuildDirectionUsageRule(const api::RoadGeometry* road_geometr
 
   return DirectionUsageRule(rule_id, zone, states);
 }
+#pragma GCC diagnostic pop
 }  // namespace
 
 std::unique_ptr<api::rules::RoadRulebook> BuildFrom(const api::RoadGeometry* road_geometry,
@@ -359,7 +369,10 @@ std::unique_ptr<api::rules::RoadRulebook> BuildFrom(const api::RoadGeometry* roa
   MALIPUT_THROW_UNLESS(right_of_way_rules_node.IsSequence());
   std::unique_ptr<ManualRulebook> rulebook = std::make_unique<ManualRulebook>();
   for (const YAML::Node& right_of_way_rule_node : right_of_way_rules_node) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     const RightOfWayRule right_of_way_rule{BuildRightOfWayRule(road_geometry, right_of_way_rule_node)};
+#pragma GCC diagnostic pop
     const DiscreteValueRule vehicle_stop_in_zone_behaviour_discrete_value_rule{
         BuildVehicleStopInZoneBehaviourDiscreteValueRule(right_of_way_rule)};
     rulebook->AddRule(right_of_way_rule);

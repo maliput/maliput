@@ -69,21 +69,29 @@ using api::rules::TrafficLightBook;
 using api::rules::UniqueBulbGroupId;
 using api::rules::UniqueBulbId;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 // Given @p rulebook that contains all of the rules, and @p rules_node that
 // contains a sequence of rule IDs, return a
 // std::unordered_map<RightOfWayRule::Id, RightOfWayRule> of the rules mentioned
 // in @p rules_node.
 std::unordered_map<RightOfWayRule::Id, RightOfWayRule> GetRules(const RoadRulebook* rulebook,
                                                                 const YAML::Node& rules_node) {
-  MALIPUT_THROW_UNLESS(rules_node.IsSequence());
   std::unordered_map<RightOfWayRule::Id, RightOfWayRule> result;
+#pragma GCC diagnostic pop
+  MALIPUT_THROW_UNLESS(rules_node.IsSequence());
   for (const YAML::Node& rule_node : rules_node) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     const RightOfWayRule::Id rule_id(rule_node.as<std::string>());
     result.emplace(rule_id, rulebook->GetRule(rule_id));
+#pragma GCC diagnostic pop
   }
   return result;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 // The default is determined by searching for states of the following types in
 // the following order: kStop, kStopThenGo, kGo. If more then one state of the
 // same type exists, return any one of them.
@@ -109,7 +117,10 @@ RightOfWayRule::State GetDefaultState(
   }
   MALIPUT_ABORT_MESSAGE("The rule has no states.");
 }
+#pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 // Given a set of rules, determine default states for each rule and return them
 // in a new RuleStates object. See GetDefaultState() for details on how the
 // default state is determined.
@@ -120,6 +131,7 @@ RuleStates CreateDefaultRuleStates(const std::unordered_map<RightOfWayRule::Id, 
   }
   return result;
 }
+#pragma GCC diagnostic pop
 
 // Confirms that every bulb in @p bulbs_node exists within @p bulb_group.
 void ConfirmBulbsExist(const BulbGroup& bulb_group, const YAML::Node& bulbs_node) {
@@ -207,8 +219,11 @@ DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_state
   for (const auto& row_it : rule_states) {
     const Rule::Id rule_id = GetRuleIdFrom(RightOfWayRuleTypeId(), row_it.first);
     const DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     const RightOfWayRule right_of_way_rule = rulebook->GetRule(row_it.first);
     MALIPUT_THROW_UNLESS(right_of_way_rule.states().find(row_it.second) != right_of_way_rule.states().end());
+#pragma GCC diagnostic pop
     MALIPUT_THROW_UNLESS(discrete_value_rule_states
                              .emplace(rule_id, FindDiscreteValueFromRightOfWayRuleState(
                                                    row_it.first, right_of_way_rule.states().at(row_it.second),
@@ -260,7 +275,10 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
   MALIPUT_THROW_UNLESS(phase_ring_node.IsMap());
   MALIPUT_THROW_UNLESS(phase_ring_node["ID"].IsDefined());
   const PhaseRing::Id ring_id(phase_ring_node["ID"].as<std::string>());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const std::unordered_map<RightOfWayRule::Id, RightOfWayRule> rules = GetRules(rulebook, phase_ring_node["Rules"]);
+#pragma GCC diagnostic pop
 
   const YAML::Node& phases_node = phase_ring_node["Phases"];
   MALIPUT_THROW_UNLESS(phases_node.IsDefined());

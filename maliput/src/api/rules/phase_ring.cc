@@ -18,6 +18,8 @@ void VerifyAllPhasesHaveSameCoverage(const PhaseRing::Id& id, const std::vector<
   MALIPUT_VALIDATE(phases.size() >= 1, "PhaseRing(" + id.string() + ") must have at least one phase.");
   const auto& r = phases.at(0);  // The reference phase.
   for (const auto& phase : phases) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     MALIPUT_VALIDATE(phase.rule_states().size() == r.rule_states().size(),
                      "PhaseRing(" + id.string() + "). Phase(" + phase.id().string() + ") and Phase(" + r.id().string() +
                          ") must have the same number of rule_states.");
@@ -25,6 +27,7 @@ void VerifyAllPhasesHaveSameCoverage(const PhaseRing::Id& id, const std::vector<
       MALIPUT_VALIDATE(r.rule_states().count(s.first) == 1, "PhaseRing(" + id.string() + "). Phase(" +
                                                                 phase.id().string() + ") has duplicated rule states.");
     }
+#pragma GCC diagnostic pop
     MALIPUT_VALIDATE(phase.discrete_value_rule_states().size() == r.discrete_value_rule_states().size(),
                      "PhaseRing(" + id.string() + "). Phase(" + phase.id().string() + ") and Phase(" + r.id().string() +
                          ") must have the same number of discrete_value_rule_states.");

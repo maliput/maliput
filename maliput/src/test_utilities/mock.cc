@@ -81,9 +81,12 @@ class MockRoadRulebook : public rules::RoadRulebook {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadRulebook)
   MockRoadRulebook() {}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   void set_right_of_way(const RightOfWayRule& rule) { right_of_way_rule_ = rule; }
   void set_direction_usage(const DirectionUsageRule& rule) { direction_usage_rule_ = rule; }
   void set_speed_limit(const SpeedLimitRule& rule) { speed_limit_rule_ = rule; }
+#pragma GCC diagnostic pop
   void set_discrete_value_rule(const DiscreteValueRule& rule) { discrete_value_rule_ = rule; }
   void set_range_value_rule(const RangeValueRule& rule) { range_value_rule_ = rule; }
 
@@ -108,9 +111,12 @@ class MockRoadRulebook : public rules::RoadRulebook {
     }
     return result;
   }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override { return *right_of_way_rule_; }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override { return *speed_limit_rule_; }
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return *direction_usage_rule_; }
+#pragma GCC diagnostic pop
   DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
     if (discrete_value_rule_.has_value() && discrete_value_rule_->id() == id) {
       return *discrete_value_rule_;
@@ -124,9 +130,12 @@ class MockRoadRulebook : public rules::RoadRulebook {
     throw std::out_of_range("Unknown Id.");
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   std::optional<RightOfWayRule> right_of_way_rule_{};
   std::optional<DirectionUsageRule> direction_usage_rule_{};
   std::optional<SpeedLimitRule> speed_limit_rule_{};
+#pragma GCC diagnostic pop
   std::optional<DiscreteValueRule> discrete_value_rule_{};
   std::optional<RangeValueRule> range_value_rule_{};
 };
@@ -167,11 +176,14 @@ class MockContiguityRoadRulebook final : public rules::RoadRulebook {
     throw std::out_of_range("Unknown Id.");
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const override { throw std::out_of_range("Unknown Id."); }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const override { throw std::out_of_range("Unknown Id."); }
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const override {
     throw std::out_of_range("Unknown Id.");
   }
+#pragma GCC diagnostic pop
 
   std::optional<DiscreteValueRule> discrete_value_rule_{};
   std::optional<RangeValueRule> range_value_rule_{};
@@ -325,6 +337,8 @@ RightOfWayRule::RelatedBulbGroups RelatedBulbGroups() {
       {rules::TrafficLight::Id("TrafficLightId"), {rules::BulbGroup::Id("BulbGroupId")}}};
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 RightOfWayRule CreateRightOfWayRule() { return CreateRightOfWayRule(RightOfWayBuildFlags{}); }
 
 RightOfWayRule CreateRightOfWayRule(const RightOfWayBuildFlags& build_flags) {
@@ -346,6 +360,7 @@ DirectionUsageRule::State CreateDirectionUsageRuleState() {
 DirectionUsageRule CreateDirectionUsageRule() {
   return DirectionUsageRule(DirectionUsageRule::Id("dur_id"), CreateLaneSRange(), {CreateDirectionUsageRuleState()});
 }
+#pragma GCC diagnostic pop
 
 rules::Rule::RelatedRules CreateEmptyRelatedRules() { return {}; }
 
@@ -723,9 +738,12 @@ std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook(const PhaseBuildFlags&
   return phase_ring_book;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 std::unique_ptr<rules::RightOfWayRuleStateProvider> CreateRightOfWayRuleStateProvider() {
   return std::make_unique<MockRightOfWayRuleStateProvider>();
 }
+#pragma GCC diagnostic pop
 
 std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider() { return std::make_unique<MockPhaseProvider>(); }
 

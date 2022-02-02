@@ -13,6 +13,8 @@ namespace test {
 // TODO(maddog@tri.global)  This should be replaced by a generic predicate
 //                          which handles anything with operator==.
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 /// Predicate-formatter which tests equality of SpeedLimitRule::Severity.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    rules::SpeedLimitRule::Severity a, rules::SpeedLimitRule::Severity b);
@@ -20,6 +22,7 @@ namespace test {
 /// Predicate-formatter which tests equality of SpeedLimitRule.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const rules::SpeedLimitRule& a,
                                    const rules::SpeedLimitRule& b);
+#pragma GCC diagnostic pop
 
 }  // namespace test
 }  // namespace rules

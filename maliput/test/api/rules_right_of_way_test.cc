@@ -19,6 +19,8 @@ namespace {
 
 // Tests for RightOfWayRule::State
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 GTEST_TEST(RightOfWayRuleStateTest, Construction) {
   EXPECT_NO_THROW(RightOfWayRule::State(RightOfWayRule::State::Id("some_id"), RightOfWayRule::State::Type::kStop, {}));
   EXPECT_NO_THROW(RightOfWayRule::State(RightOfWayRule::State::Id("some_id"), RightOfWayRule::State::Type::kGo,
@@ -125,6 +127,7 @@ GTEST_TEST(RightOfWayRuleTest, Assignment) {
   dut = source;
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
 }
+#pragma GCC diagnostic pop
 
 }  // namespace
 }  // namespace rules

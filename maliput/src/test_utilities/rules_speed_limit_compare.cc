@@ -11,6 +11,8 @@ namespace api {
 namespace rules {
 namespace test {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 /// Predicate-formatter which tests equality of SpeedLimitRule::Severity.
 // TODO(maddog@tri.global)  This should be replaced by a generic predicate
 //                          which handles anything with operator==.
@@ -31,6 +33,7 @@ namespace test {
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.min(), b.min()));
   return c.result();
 }
+#pragma GCC diagnostic pop
 
 }  // namespace test
 }  // namespace rules

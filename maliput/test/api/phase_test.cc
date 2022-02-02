@@ -18,6 +18,8 @@ namespace {
 
 class PhaseTest : public ::testing::Test {
  protected:
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   PhaseTest()
       : id_("test_id"),
         rule_states_{{RightOfWayRule::Id("northbound-forward"), RightOfWayRule::State::Id("GO")},
@@ -38,9 +40,13 @@ class PhaseTest : public ::testing::Test {
              {{TrafficLight::Id("major-intersection"), BulbGroup::Id("southbound"), Bulb::Id("left-turn-red")},
               BulbState::kOn}}},
         phase_{id_, rule_states_, discrete_value_rule_states_, bulb_states_} {}
+#pragma GCC diagnostic pop
 
   const Phase::Id id_;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const RuleStates rule_states_;
+#pragma GCC diagnostic pop
   const DiscreteValueRuleStates discrete_value_rule_states_;
   const std::optional<BulbStates> bulb_states_;
   const Phase phase_;
@@ -51,7 +57,10 @@ TEST_F(PhaseTest, Accessors) {
        std::vector<std::optional<BulbStates>>{std::nullopt, bulb_states_}) {
     Phase dut(id_, rule_states_, discrete_value_rule_states_, bulb_states);
     EXPECT_EQ(dut.id(), id_);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     EXPECT_EQ(dut.rule_states(), rule_states_);
+#pragma GCC diagnostic pop
     EXPECT_EQ(dut.discrete_value_rule_states(), discrete_value_rule_states_);
     EXPECT_EQ(dut.bulb_states(), bulb_states);
   }

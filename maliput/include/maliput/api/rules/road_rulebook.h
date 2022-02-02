@@ -33,9 +33,12 @@ class RoadRulebook {
   /// Results of a FindRules() query.  Results are organized by type; an
   /// empty map indicates no applicable rules of that type are known.
   struct QueryResults {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     std::map<RightOfWayRule::Id, RightOfWayRule> right_of_way;
     std::map<SpeedLimitRule::Id, SpeedLimitRule> speed_limit;
     std::map<DirectionUsageRule::Id, DirectionUsageRule> direction_usage;
+#pragma GCC diagnostic pop
     std::map<DiscreteValueRule::Id, DiscreteValueRule> discrete_value_rules;
     std::map<RangeValueRule::Id, RangeValueRule> range_value_rules;
   };
@@ -58,6 +61,8 @@ class RoadRulebook {
   /// Returns all the rules in this RoadRulebook.
   QueryResults Rules() const { return DoRules(); }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Returns the RightOfWayRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
@@ -75,6 +80,7 @@ class RoadRulebook {
   /// @throws std::out_of_range if `id` is unknown.
   MALIPUT_DEPRECATED("next release", "DirectionUsageRule class will be deprecated.")
   DirectionUsageRule GetRule(const DirectionUsageRule::Id& id) const { return DoGetRule(id); }
+#pragma GCC diagnostic pop
 
   /// Returns the DiscreteValueRule with the specified `id`.
   ///
@@ -96,9 +102,12 @@ class RoadRulebook {
   //@{
   virtual QueryResults DoFindRules(const std::vector<LaneSRange>& ranges, double tolerance) const = 0;
   virtual QueryResults DoRules() const = 0;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const = 0;
   virtual SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const = 0;
   virtual DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const = 0;
+#pragma GCC diagnostic pop
   virtual DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const = 0;
   virtual RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const = 0;
   //@}

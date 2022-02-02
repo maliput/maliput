@@ -68,7 +68,8 @@ class ManualRulebook::Impl {
     range_value_rules_.clear();
     index_->RemoveAll();
   }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   void AddRule(const api::rules::RightOfWayRule& rule) { AddAnyRule(rule, &right_of_ways_); }
 
   void RemoveRule(const api::rules::RightOfWayRule::Id& id) { RemoveAnyRule(id, &right_of_ways_); }
@@ -80,6 +81,7 @@ class ManualRulebook::Impl {
   void AddRule(const api::rules::DirectionUsageRule& rule) { AddAnyRule(rule, &direction_usage_rules_); }
 
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id) { RemoveAnyRule(id, &direction_usage_rules_); }
+#pragma GCC diagnostic pop
 
   void AddRule(const api::rules::DiscreteValueRule& rule) {
     MALIPUT_THROW_UNLESS(range_value_rules_.find(rule.id()) == range_value_rules_.end());
@@ -153,7 +155,8 @@ class ManualRulebook::Impl {
     result.range_value_rules.insert(range_value_rules_.begin(), range_value_rules_.end());
     return result;
   }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const { return GetAnyRule(id, right_of_ways_); }
 
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const { return GetAnyRule(id, speed_limits_); }
@@ -161,6 +164,7 @@ class ManualRulebook::Impl {
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const {
     return GetAnyRule(id, direction_usage_rules_);
   }
+#pragma GCC diagnostic pop
 
   DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const { return discrete_value_rules_.at(id); }
 
@@ -174,6 +178,8 @@ class ManualRulebook::Impl {
    public:
     void RemoveAll() { map_.clear(); }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     void AddRule(const SpeedLimitRule& rule) { AddRange(IdVariant{rule.id()}, rule.zone()); }
 
     void RemoveRule(const SpeedLimitRule& rule) { RemoveRanges(IdVariant{rule.id()}, rule.zone().lane_id()); }
@@ -193,6 +199,7 @@ class ManualRulebook::Impl {
     void AddRule(const DirectionUsageRule& rule) { AddRange(IdVariant{rule.id()}, rule.zone()); }
 
     void RemoveRule(const DirectionUsageRule& rule) { RemoveRanges(IdVariant{rule.id()}, rule.zone().lane_id()); }
+#pragma GCC diagnostic pop
 
     void AddRule(const DiscreteValueRule& rule) {
       for (const LaneSRange& range : rule.zone().ranges()) {
@@ -280,9 +287,12 @@ class ManualRulebook::Impl {
   }
 
   std::unique_ptr<RangeIndex> index_;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   IdIndex<api::rules::RightOfWayRule> right_of_ways_;
   IdIndex<api::rules::SpeedLimitRule> speed_limits_;
   IdIndex<api::rules::DirectionUsageRule> direction_usage_rules_;
+#pragma GCC diagnostic pop
   std::unordered_map<Rule::Id, DiscreteValueRule> discrete_value_rules_;
   std::unordered_map<Rule::Id, RangeValueRule> range_value_rules_;
 };
@@ -293,6 +303,8 @@ ManualRulebook::~ManualRulebook() = default;
 
 void ManualRulebook::RemoveAll() { impl_->RemoveAll(); }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 void ManualRulebook::AddRule(const api::rules::RightOfWayRule& rule) { impl_->AddRule(rule); }
 
 void ManualRulebook::RemoveRule(const api::rules::RightOfWayRule::Id& id) { impl_->RemoveRule(id); }
@@ -304,6 +316,7 @@ void ManualRulebook::RemoveRule(const api::rules::SpeedLimitRule::Id& id) { impl
 void ManualRulebook::AddRule(const api::rules::DirectionUsageRule& rule) { impl_->AddRule(rule); }
 
 void ManualRulebook::RemoveRule(const api::rules::DirectionUsageRule::Id& id) { impl_->RemoveRule(id); }
+#pragma GCC diagnostic pop
 
 void ManualRulebook::AddRule(const api::rules::DiscreteValueRule& rule) { impl_->AddRule(rule); }
 
@@ -317,11 +330,14 @@ QueryResults ManualRulebook::DoFindRules(const std::vector<LaneSRange>& ranges, 
 
 QueryResults ManualRulebook::DoRules() const { return impl_->DoRules(); }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 RightOfWayRule ManualRulebook::DoGetRule(const RightOfWayRule::Id& id) const { return impl_->DoGetRule(id); }
 
 SpeedLimitRule ManualRulebook::DoGetRule(const SpeedLimitRule::Id& id) const { return impl_->DoGetRule(id); }
 
 DirectionUsageRule ManualRulebook::DoGetRule(const DirectionUsageRule::Id& id) const { return impl_->DoGetRule(id); }
+#pragma GCC diagnostic pop
 
 DiscreteValueRule ManualRulebook::DoGetDiscreteValueRule(const Rule::Id& id) const {
   return impl_->DoGetDiscreteValueRule(id);
