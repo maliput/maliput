@@ -66,19 +66,19 @@ class RoadRulebook {
   /// Returns the RightOfWayRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
-  MALIPUT_DEPRECATED("next release", "RightOfWayRule class will be deprecated.")
+  MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated.", "GetDiscreteValueRule")
   RightOfWayRule GetRule(const RightOfWayRule::Id& id) const { return DoGetRule(id); }
 
   /// Returns the SpeedLimitRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
-  MALIPUT_DEPRECATED("next release", "SpeedLimitRule class will be deprecated.")
+  MALIPUT_DEPRECATED("SpeedLimitRule class will be deprecated.", "GetDiscreteValueRule")
   SpeedLimitRule GetRule(const SpeedLimitRule::Id& id) const { return DoGetRule(id); }
 
   /// Returns the DirectionUsageRule with the specified `id`.
   ///
   /// @throws std::out_of_range if `id` is unknown.
-  MALIPUT_DEPRECATED("next release", "DirectionUsageRule class will be deprecated.")
+  MALIPUT_DEPRECATED("DirectionUsageRule class will be deprecated.", "GetDiscreteValueRule")
   DirectionUsageRule GetRule(const DirectionUsageRule::Id& id) const { return DoGetRule(id); }
 #pragma GCC diagnostic pop
 

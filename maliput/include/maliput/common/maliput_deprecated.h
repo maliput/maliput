@@ -44,12 +44,57 @@
 
 #ifdef BUILD_DOCS
 
-#define MALIPUT_DEPRECATED(removal_date, message)
+#define MALIPUT_DEPRECATED(...)
 
 #else  // BUILD_DOCS
 
-#define MALIPUT_DEPRECATED(removal_date, message)                                    \
-  [[deprecated("MALIPUT DEPRECATED: " message " The deprecated code will be removed" \
-               " on or after " removal_date ".")]]
+/// Auxiliary macro declarations for overloading #MALIPUT_DEPRECATED macro. Please use ONLY #MALIPUT_DEPRECATED().
+/// @{
+#define MALIPUT_DEPRECATED_MSG(message) MALIPUT_DEPRECATED_MSG_REPLACEMENT(message, "None")
+#define MALIPUT_DEPRECATED_MSG_REPLACEMENT(message, replacement) \
+  MALIPUT_DEPRECATED_MSG_REPLACEMENT_DATE(message, replacement, "unkown")
+#define MALIPUT_DEPRECATED_MSG_REPLACEMENT_DATE(message, replacement, removal_date)  \
+  [[deprecated("MALIPUT DEPRECATED: " message ". " replacement " is an alternative." \
+               " Deprecation date is " removal_date ".")]]
+
+#define GET_DEPRECATED_MACRO(_1, _2, _3, DEPRECATED_MACRO_NAME, ...) DEPRECATED_MACRO_NAME
+/// @}
+
+/// Adds "deprecated" attribute to classes, methods, variables, aliases.
+/// _1 : message: Deprecation message.
+/// _2 : replacement: Alternative entity suggested to be used.
+/// _3 : removal_date: Estimated date for removal.
+///
+/// Example of use:
+/// * Method:
+/// @code{cpp}
+/// MALIPUT_DEPRECATED("MyOldMethod will be deprecated")
+/// int MyOldMethod(int x) {
+///   // ...
+/// }
+/// @endcode
+///
+/// * Class:
+/// @code{cpp}
+/// class MALIPUT_DEPRECATED("MyOldClass will be deprecated", "MyNewClass") MyOldClass {
+///   // ...
+/// };
+/// @endcode
+///
+/// * Variable:
+/// @code{cpp}
+/// MALIPUT_DEPRECATED("my_old_var will be deprecated")
+/// static constexpr int my_old_var = 2;
+/// @endcode
+///
+/// * Type Alias:
+/// @code{cpp}
+/// using MyOldAlias MALIPUT_DEPRECATED("MyOldAlias will be deprecated.") = std::map<std::string, double>;
+/// @endcode
+///
+#define MALIPUT_DEPRECATED(...)                                                                                  \
+  GET_DEPRECATED_MACRO(__VA_ARGS__, MALIPUT_DEPRECATED_MSG_REPLACEMENT_DATE, MALIPUT_DEPRECATED_MSG_REPLACEMENT, \
+                       MALIPUT_DEPRECATED_MSG, _UNUSED)                                                          \
+  (__VA_ARGS__)
 
 #endif  // BUILD_DOCS

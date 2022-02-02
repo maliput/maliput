@@ -30,7 +30,7 @@ class PhaseRingBook {
 
   /// Finds and returns the PhaseRing containing the specified
   /// RightOfWayRule. Returns std::nullopt if @p rule_id is unrecognized.
-  MALIPUT_DEPRECATED("next release", "RightOfWayRule class will be deprecated.")
+  MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated.")
   std::optional<PhaseRing> FindPhaseRing(const RightOfWayRule::Id& rule_id) const { return DoFindPhaseRing(rule_id); }
 
   /// Finds and returns the PhaseRing containing the specified

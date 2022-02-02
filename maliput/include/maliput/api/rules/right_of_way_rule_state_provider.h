@@ -12,7 +12,7 @@ namespace api {
 namespace rules {
 
 /// Abstract interface for the provider of the RightOfWayRule.
-class MALIPUT_DEPRECATED("next release", "RigthOfWayRule class will be deprecated.") RightOfWayRuleStateProvider {
+class MALIPUT_DEPRECATED("RigthOfWayRule class will be deprecated.") RightOfWayRuleStateProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RightOfWayRuleStateProvider)
 

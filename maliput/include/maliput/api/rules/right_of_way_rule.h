@@ -43,7 +43,7 @@ namespace rules {
 ///
 /// Rules and BulbGroups are linked via a many-to-many relationship. The
 /// Rule-to-BulbGroups relationship is stored in this class.
-class MALIPUT_DEPRECATED("next release", "Use DiscreteValueRule instead.") RightOfWayRule final {
+class MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated", "DiscreteValueRule") RightOfWayRule final {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RightOfWayRule);
 

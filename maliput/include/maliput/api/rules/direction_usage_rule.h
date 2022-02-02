@@ -28,7 +28,7 @@ namespace rules {
 /// semantics.
 ///
 /// Each Lane location can be governed by at most one DirectionUsageRule.
-class MALIPUT_DEPRECATED("next release", "Use DiscreteValueRule instead.") DirectionUsageRule final {
+class MALIPUT_DEPRECATED("DirectionUsageRule will be deprecated", "DiscreteValueRule") DirectionUsageRule final {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(DirectionUsageRule);
 

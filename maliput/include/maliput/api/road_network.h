@@ -61,7 +61,7 @@ class RoadNetwork {
   const rules::PhaseRingBook* phase_ring_book() const { return phase_ring_book_.get(); }
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  MALIPUT_DEPRECATED("next release", "RightOfWayRule class will be deprecated.")
+  MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated.")
   rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider() {
     return right_of_way_rule_state_provider_.get();
   }

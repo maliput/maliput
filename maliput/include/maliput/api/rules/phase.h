@@ -61,7 +61,7 @@ class Phase final {
   const Id& id() const { return id_; }
 
   /// Returns the phase's RightOfWayRule instances and their states.
-  MALIPUT_DEPRECATED("next release", "RightOfWayRule class will be deprecated.")
+  MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated.")
   const RuleStates& rule_states() const { return rule_states_; }
 
   /// Returns the phase's DiscreteValueRule instances and their states.
