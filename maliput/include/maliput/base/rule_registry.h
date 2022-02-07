@@ -9,7 +9,7 @@
 namespace maliput {
 
 /// Returns a Rule::TypeId whose string representation is
-/// "Direction Usage Rule Type".
+/// "Direction-Usage Rule Type".
 api::rules::Rule::TypeId DirectionUsageRuleTypeId();
 
 /// Returns a direction usage rule type and its possible discrete values.
@@ -55,7 +55,7 @@ api::rules::Rule::TypeId RightOfWayRuleTypeId();
 api::rules::DiscreteValueRuleTypeAndValues BuildRightOfWayRuleType();
 
 /// Returns a Rule::TypeId whose string representation is
-/// "Vehicle Stop In Zone Behavior Rule Type".
+/// "Vehicle-Stop-In-Zone-Behavior Rule Type".
 api::rules::Rule::TypeId VehicleStopInZoneBehaviorRuleTypeId();
 
 /// Returns a vehicle stop in zone behavior rule type and its possible discrete
@@ -84,7 +84,7 @@ api::rules::Rule::TypeId VehicleStopInZoneBehaviorRuleTypeId();
 api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleType();
 
 /// Returns a maliput::api::rules::Rule::TypeId initialized with
-/// "Speed Limit Rule Type".
+/// "Speed-Limit Rule Type".
 api::rules::Rule::TypeId SpeedLimitRuleTypeId();
 
 /// Defines keys used in api::rules::Rule::RelatedRules.
