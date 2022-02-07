@@ -590,8 +590,8 @@
 /// unique configured state, but there is no direct API provisioning of that
 /// information.
 ///
-/// Finally, each rule instance is identified by a unique ID and multiple rule
-/// rules may share the same rule type. The rule ID is backed by `Rule::Id` and
+/// Finally, each rule instance is identified by a unique ID and multiple rules
+/// may share the same rule type. The rule ID is backed by `Rule::Id` and
 /// the rule type ID is backed by `Rule::TypeId`. There rule type itself under
 /// this framework consists of:
 ///  * The rule type ID.
