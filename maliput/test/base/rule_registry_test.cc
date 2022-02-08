@@ -16,7 +16,7 @@ namespace test {
 namespace {
 
 GTEST_TEST(DirectionUsageRuleTypeIdTest, Initialization) {
-  EXPECT_EQ(DirectionUsageRuleTypeId().string(), "Direction Usage Rule Type");
+  EXPECT_EQ(DirectionUsageRuleTypeId().string(), "Direction-Usage Rule Type");
 }
 
 GTEST_TEST(RightOfWayRuleTypeIdTest, Initialization) {
@@ -24,11 +24,11 @@ GTEST_TEST(RightOfWayRuleTypeIdTest, Initialization) {
 }
 
 GTEST_TEST(VehicleStopInZoneBehaviorRuleTypeIdTest, Initialization) {
-  EXPECT_EQ(VehicleStopInZoneBehaviorRuleTypeId().string(), "Vehicle Stop In Zone Behavior Rule Type");
+  EXPECT_EQ(VehicleStopInZoneBehaviorRuleTypeId().string(), "Vehicle-Stop-In-Zone-Behavior Rule Type");
 }
 
 GTEST_TEST(SpeedLimitRuleTypeIdTest, Initialization) {
-  EXPECT_EQ(SpeedLimitRuleTypeId().string(), "Speed Limit Rule Type");
+  EXPECT_EQ(SpeedLimitRuleTypeId().string(), "Speed-Limit Rule Type");
 }
 
 // Holds the information to evaluate the rule type built by `builder` function.

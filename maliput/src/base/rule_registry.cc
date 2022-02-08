@@ -25,7 +25,7 @@ std::vector<api::rules::DiscreteValueRule::DiscreteValue> GenerateEveryCombinati
 
 }  // namespace
 
-api::rules::Rule::TypeId DirectionUsageRuleTypeId() { return api::rules::Rule::TypeId("Direction Usage Rule Type"); }
+api::rules::Rule::TypeId DirectionUsageRuleTypeId() { return api::rules::Rule::TypeId("Direction-Usage Rule Type"); }
 
 api::rules::DiscreteValueRuleTypeAndValues BuildDirectionUsageRuleType() {
   const std::vector<std::string> state_values{"WithS", "AgainstS", "Bidirectional", "BidirectionalTurnOnly",
@@ -44,7 +44,7 @@ api::rules::DiscreteValueRuleTypeAndValues BuildRightOfWayRuleType() {
 }
 
 api::rules::Rule::TypeId VehicleStopInZoneBehaviorRuleTypeId() {
-  return api::rules::Rule::TypeId("Vehicle Stop In Zone Behavior Rule Type");
+  return api::rules::Rule::TypeId("Vehicle-Stop-In-Zone-Behavior Rule Type");
 }
 
 api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleType() {
@@ -56,7 +56,7 @@ api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleTyp
       GenerateEveryCombination({api::rules::Rule::State::kStrict}, state_values));
 }
 
-api::rules::Rule::TypeId SpeedLimitRuleTypeId() { return api::rules::Rule::TypeId{"Speed Limit Rule Type"}; }
+api::rules::Rule::TypeId SpeedLimitRuleTypeId() { return api::rules::Rule::TypeId{"Speed-Limit Rule Type"}; }
 
 const char* RelatedRulesKeys::kYieldGroup{"Yield Group"};
 
