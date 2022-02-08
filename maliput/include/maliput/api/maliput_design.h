@@ -556,6 +556,98 @@
 /// @anchor road-rulebook-outline_img
 /// @image html road-rulebook-outline.svg "`RoadRulebook` outline."
 ///
+/// There are two rule APIs. One that is based on static types which is
+/// deprecated, and the other one which relies on just two C++ distinct types
+/// but allows further customization and extension by API users. In the
+/// following sections, the two APIs are described.
+///
+/// @subsubsection new_rules_types New Rule API description
+///
+/// There are three rule C++ types: `Rule`, `DiscreteValueRule` and
+/// `RangeValueRule`. The parent type, `Rule`, helps to hold the basic
+/// information and semantic relationships with other rules, and other entities
+/// in the world, like light bulbs. `DiscreteValeRule` is a rule type thought
+/// for discrete states, comprising from string based representations to numeric
+/// ones. On the other hand, `RangeValueRule` completes the universe of rule
+/// types by supporting numeric ranges in which certain magnitudes may vary.
+///
+/// Each rule instance may have one or multiple states which are `Rule::State`
+/// and its customized implementations `DiscreteValueRule::DiscreteValue` and
+/// `RangeValueRule::Range`. These states are defined by common attributes like
+/// other related rules (for increased semantics and hierarchies), severity
+/// levels (to moderate the action of agents), related unique IDs (thought for
+/// traffic light bulb identification with the rule state itself) and the value
+/// they hold (either a string representation or a numeric range).
+///
+/// Rule state dynamics, i.e. the change of `DiscreteValueRule::DiscreteValue`
+/// and `RangeValueRule::Range` to another one for each rule is controlled by
+/// state providers. Only interfaces for `DiscreteValueRuleStateProvider` and
+/// `RangeValueRuleStateProvider` are defined, meaning that custom
+/// implementations are delegated to designers so as to control state transition
+/// behaviors in the context of a simulation. These providers include the notion
+/// of time. This is the only place where it appears due to the time agnostic
+/// nature of the vast majority of the API. "Static" rules are those with a
+/// unique configured state, but there is no direct API provisioning of that
+/// information.
+///
+/// Finally, each rule instance is identified by a unique ID and multiple rules
+/// may share the same rule type. The rule ID is backed by `Rule::Id` and
+/// the rule type ID is backed by `Rule::TypeId`. There rule type itself under
+/// this framework consists of:
+///  * The rule type ID.
+///  * All possible rule states (either `DiscreteValueRule::DiscreteValue` or
+///    `RangeValueRule::Range`).
+///
+/// Given that two completely unrelated semantic rule types like the
+/// "Right-Of-Way" and "Direction-Usage" are represented by the same C++ type,
+/// `DiscreteValueRule`. The possible rule states for a "Right-Of-Way" rule type
+/// and "Direction-Usage" rule type are stored in a `RuleRegistry`. The
+/// `RuleRegistry` safely constructs rules with types that are defined at
+/// runtime or previously in a separate location or store. At runtime, agents or
+/// generically speaking API consumers might query the possible rule states for
+/// a given rule type as well as construct rules to load into a `RoadRulebook`
+/// implementation.
+///
+/// @paragraph new_rule_common_types Common rule types and their implementations
+///
+/// The majority of road networks present certain rule types that are common in
+/// terms of their semantic attributes, not necessarily in their relationships
+/// or state phasing. We can identify:
+///
+///  * Speed limits - define speed limits for agents - `RangeValueRule`
+///  * Right of way - control of right-of-way / priority on specific routes -
+///    `DiscreteValueRule`
+///  * Direction usage - define the direction of travel for agents -
+///    `DiscreteValueRule`
+///  * Vehicle stop in zone behavior - define whether agents can stop and for
+///    how long - `DiscreteValueRule`.
+///
+/// These types are already provided with base implementations so consumers can
+/// quickly build up a `RuleRegistry` from them. It is opt-in, which proves to
+/// be flexible enough for most use cases. Backend implementations might define
+/// their own types atop of these ones or just replace them with their own
+/// rule states and types.
+///
+/// @subsubsection common_region_entities Common Region Entities
+///
+/// A few common entities, which identify regions of the road network, occur in
+/// the various rule types:
+///
+///  * `LaneId`: unique ID of a `Lane` in a `RoadGeometry`;
+///  * `SRange`: inclusive longitudinal range @f$[s_0, s_1]@f$ between two
+///    s-coordinates;
+///  * `LaneSRange`: a `LaneId` paired with an `SRange`, describing a longitudinal
+///    range of a specific `Lane`;
+///  * `LaneSRoute`: a sequence of `LaneSRange`'s which describe a contiguous
+///    longitudinal path that may span multiple end-to-end connected `Lane`'s;
+///  * `LaneIdEnd`: a pair of `LaneId` and an "end" specifier, which describes
+///    either the start or finish of a specific `Lane`.
+///
+/// > Note: regions are attributes of new and old rule descriptions. They define
+/// > the applicability space of each rule.
+///
+/// @subsubsection deprecated_rule_api [DEPRECATED] Old rule API
+///
 /// We distinguish two kinds of state:
 ///  * *Static state* comprises the aspects of a simulation which are
 ///    established before the simulation begins and which cannot evolve
@@ -610,21 +702,6 @@
 ///  * TODO: `OngoingRouteRule` - turning restrictions
 ///  * TODO: `PreferentialUseRule` - lane-based vehicle-type restrictions (e.g.,
 ///    HOV lanes)
-///
-/// @subsubsection common_region_entities Common Region Entities
-///
-/// A few common entities, which identify regions of the road network, occur in
-/// the various rule types:
-///
-///  * `LaneId`: unique ID of a `Lane` in a `RoadGeometry`;
-///  * `SRange`: inclusive longitudinal range @f$[s_0, s_1]@f$ between two
-///    s-coordinates;
-///  * `LaneSRange`: a `LaneId` paired with an `SRange`, describing a longitudinal
-///    range of a specific `Lane`;
-///  * `LaneSRoute`: a sequence of `LaneSRange`'s which describe a contiguous
-///    longitudinal path that may span multiple end-to-end connected `Lane`'s;
-///  * `LaneIdEnd`: a pair of `LaneId` and an "end" specifier, which describes
-///    either the start or finish of a specific `Lane`.
 ///
 /// @subsubsection speed_limit_rules SpeedLimitRule: Speed Limits
 ///
