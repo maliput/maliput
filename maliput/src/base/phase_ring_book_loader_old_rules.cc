@@ -1,4 +1,6 @@
+// clang-format off
 #include "maliput/base/phase_ring_book_loader.h"
+// clang-format on
 
 #include <algorithm>
 #include <unordered_map>
