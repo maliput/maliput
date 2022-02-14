@@ -88,9 +88,13 @@ TEST_F(ManualPhaseProviderTest, CurrentAndNextPhases) {
 // Tests that an exception is thrown if the phases within a PhaseRing cover
 // different sets of RightOfWayRules.
 GTEST_TEST(PhaseRingTest, InvalidPhases) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
   const RuleStates rule_states_1{{RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")},
                                  {RightOfWayRule::Id("b"), RightOfWayRule::State::Id("2")}};
   const RuleStates rule_states_2{{RightOfWayRule::Id("a"), RightOfWayRule::State::Id("1")}};
+#pragma GCC diagnostic pop
 
   const DiscreteValueRuleStates discrete_value_rule_states_1{
       {Rule::Id("a"),

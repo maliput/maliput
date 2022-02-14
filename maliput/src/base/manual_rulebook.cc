@@ -15,12 +15,18 @@
 
 namespace {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 using IdVariant = std::variant<maliput::api::rules::RightOfWayRule::Id, maliput::api::rules::SpeedLimitRule::Id,
                                maliput::api::rules::DirectionUsageRule::Id, maliput::api::rules::Rule::Id>;
+#pragma GCC diagnostic pop
 }  // namespace
 
 namespace std {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 template <class HashAlgorithm>
 void hash_append(HashAlgorithm& hasher, const IdVariant& item) noexcept {
   using maliput::common::hash_append;
@@ -37,6 +43,7 @@ void hash_append(HashAlgorithm& hasher, const IdVariant& item) noexcept {
     hash_append(hasher, std::get<maliput::api::rules::Rule::Id>(item));
   }
 }
+#pragma GCC diagnostic pop
 
 }  // namespace std
 namespace maliput {

@@ -5,6 +5,7 @@
 #include "maliput/api/intersection.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 
 namespace maliput {
 namespace api {
@@ -39,12 +40,16 @@ class IntersectionBook {
   /// `id`, nullptr is returned.
   Intersection* FindIntersection(const rules::DiscreteValueRule::Id& id) { return DoGetFindIntersection(id); }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Find the intersection which contains api::rules::RightOfWayRule::Id.
   ///
   /// @param id A rules::RightOfWayRule::Id.
   /// @returns The Intersection that contains `id`. When none of the Intersections have a rules::RightOfWayRule with
   /// `id`, nullptr is returned.
+  MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated")
   Intersection* FindIntersection(const rules::RightOfWayRule::Id& id) { return DoGetFindIntersection(id); }
+#pragma GCC diagnostic pop
 
  protected:
   IntersectionBook() = default;
@@ -58,7 +63,10 @@ class IntersectionBook {
 
   virtual Intersection* DoGetFindIntersection(const rules::DiscreteValueRule::Id& id) = 0;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   virtual Intersection* DoGetFindIntersection(const rules::RightOfWayRule::Id& id) = 0;
+#pragma GCC diagnostic pop
 };
 
 }  // namespace api

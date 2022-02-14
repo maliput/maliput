@@ -22,11 +22,14 @@ class IntersectionTest : public ::testing::Test {
         dummy_phase_2_(api::rules::Phase::Id("phase_2"), rule_states_2_, discrete_value_rule_states_2_, bulb_states_2_),
         dummy_ring_(api::rules::PhaseRing::Id("ring"), {dummy_phase_1_, dummy_phase_2_}) {}
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const api::rules::RightOfWayRule::Id rule_id_a{"rule_id"};
   const api::rules::RuleStates rule_states_1_{
       {api::rules::RightOfWayRule::Id(rule_id_a), api::rules::RightOfWayRule::State::Id("GO")}};
   const api::rules::RuleStates rule_states_2_{
       {api::rules::RightOfWayRule::Id(rule_id_a), api::rules::RightOfWayRule::State::Id("STOP")}};
+#pragma GCC diagnostic pop
 
   const api::rules::DiscreteValueRule::DiscreteValue discrete_value_1{
       api::rules::Rule::State::kStrict, api::rules::Rule::RelatedRules{}, api::rules::Rule::RelatedUniqueIds{}, "Go"};
@@ -79,7 +82,10 @@ TEST_F(IntersectionTest, BasicTest) {
   EXPECT_EQ(dut.ring_id(), dummy_ring_.id());
   EXPECT_EQ(dut.bulb_states().value().at(unique_bulb_id), api::rules::BulbState::kOn);
   EXPECT_EQ(dut.DiscreteValueRuleStates().value().at(rule_id_b), discrete_value_2);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   EXPECT_EQ(dut.RuleStates().value().at(rule_id_a), api::rules::RightOfWayRule::State::Id("STOP"));
+#pragma GCC diagnostic pop
   dut.SetPhase(dummy_phase_1_.id(), dummy_phase_2_.id(), kDurationUntil);
   EXPECT_EQ(dut.bulb_states().value().at(unique_bulb_id), api::rules::BulbState::kOff);
   EXPECT_EQ(dut.DiscreteValueRuleStates().value().at(rule_id_b), discrete_value_1);
@@ -128,6 +134,8 @@ TEST_F(IntersectionTest, IncludesByDiscreteValueRuleId) {
 }
 
 TEST_F(IntersectionTest, IncludesByRightOfWayRuleId) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const api::rules::RightOfWayRule::Id not_included_rule_id{"not_included_rule_id"};
   ManualPhaseProvider phase_provider;
   Intersection dut(kIntersectionId, ranges_a, dummy_ring_, &phase_provider);
@@ -135,6 +143,7 @@ TEST_F(IntersectionTest, IncludesByRightOfWayRuleId) {
 
   EXPECT_TRUE(dut.Includes(rule_id_a));
   EXPECT_FALSE(dut.Includes(not_included_rule_id));
+#pragma GCC diagnostic pop
 }
 
 }  // namespace

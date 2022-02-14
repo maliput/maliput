@@ -9,6 +9,7 @@
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 
 namespace maliput {
 namespace api {
@@ -63,8 +64,12 @@ class Intersection {
   /// Returns the current discrete value rule states within the intersection.
   const std::optional<rules::DiscreteValueRuleStates> DiscreteValueRuleStates() const;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Returns the current RightOfWayRule states within the intersection.
+  MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated", "DiscreteValueRuleStates")
   const std::optional<rules::RuleStates> RuleStates() const;
+#pragma GCC diagnostic pop
 
   /// Determines whether the rules::TrafficLight::Id is within this Intersection.
   ///
@@ -78,11 +83,15 @@ class Intersection {
   /// @returns True When `id` is within this Intersection.
   bool Includes(const rules::DiscreteValueRule::Id& id) const;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Determines whether the rules::RightOfWayRule::Id is within this Intersection.
   ///
   /// @param id A rules::RightOfWayRule::Id.
   /// @returns True When `id` is within this Intersection.
+  MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated")
   bool Includes(const rules::RightOfWayRule::Id& id) const;
+#pragma GCC diagnostic pop
 
   /// Determines whether `inertial_position` is within this Intersection::Region().
   ///

@@ -30,19 +30,19 @@ const std::optional<rules::DiscreteValueRuleStates> Intersection::DiscreteValueR
   return std::nullopt;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 const std::optional<rules::RuleStates> Intersection::RuleStates() const {
   const std::optional<PhaseProvider::Result> phase_result = Phase();
   if (phase_result.has_value()) {
     const rules::Phase::Id phase_id = phase_result->state;
     const rules::Phase& phase = ring_.phases().at(phase_id);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     const auto rule_states = phase.rule_states();
-#pragma GCC diagnostic pop
     return rule_states;
   }
   return std::nullopt;
 }
+#pragma GCC diagnostic pop
 
 bool Intersection::Includes(const api::rules::TrafficLight::Id& id) const {
   const std::optional<api::rules::BulbStates> bulb_states = this->bulb_states();
@@ -63,10 +63,13 @@ bool Intersection::Includes(const api::rules::DiscreteValueRule::Id& id) const {
              : false;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 bool Intersection::Includes(const api::rules::RightOfWayRule::Id& id) const {
   const std::optional<rules::RuleStates> rule_states = RuleStates();
   return rule_states.has_value() ? rule_states.value().find(id) != rule_states.value().end() : false;
 }
+#pragma GCC diagnostic pop
 
 bool Intersection::Includes(const InertialPosition& inertial_position, const RoadGeometry* road_geometry) const {
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);

@@ -11,6 +11,8 @@ namespace api {
 namespace rules {
 namespace test {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 // TODO(maddog@tri.global)  This should be replaced by a generic predicate
 //                          which handles anything with operator==.
 
@@ -27,6 +29,7 @@ namespace test {
 /// Predicate-formatter which tests equality of RightOfWayRule::State.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const rules::RightOfWayRule::State& a, const rules::RightOfWayRule::State& b);
+#pragma GCC diagnostic pop
 
 /// Predicate-formatter which tests equality of
 /// RightOfWayRule::RelatedBulbGroups which expands to std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>.

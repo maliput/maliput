@@ -212,6 +212,8 @@ DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(
   return discrete_value;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_states, const RoadRulebook* rulebook) {
   MALIPUT_THROW_UNLESS(rulebook != nullptr);
 
@@ -232,6 +234,7 @@ DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_state
   }
   return discrete_value_rule_states;
 }
+#pragma GCC diagnostic pop
 
 void VerifyPhaseExists(const std::vector<Phase>& phases, const Phase::Id& phase_id) {
   const auto it =
@@ -291,6 +294,8 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
     // First get a RuleStates object populated with default states of all rules.
     // Then, override the defaults with the states specified in the YAML
     // document.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     RuleStates rule_states = CreateDefaultRuleStates(rules);
     const YAML::Node& rule_states_node = phase_node["RightOfWayRuleStates"];
     MALIPUT_THROW_UNLESS(rule_states_node.IsDefined());
@@ -304,6 +309,7 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
     phases.push_back(Phase(phase_id, rule_states, LoadDiscreteValueRuleStates(rule_states, rulebook),
                            LoadBulbStates(traffic_light_book, phase_node)));
   }
+#pragma GCC diagnostic pop
 
   const auto next_phases = BuildNextPhases(phases, phase_ring_node);
   return PhaseRing(ring_id, phases, next_phases);

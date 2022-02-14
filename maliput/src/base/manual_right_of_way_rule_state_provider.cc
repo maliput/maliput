@@ -5,6 +5,9 @@
 
 namespace maliput {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 using api::rules::RightOfWayRule;
 
 void ManualRightOfWayRuleStateProvider::AddState(const RightOfWayRule::Id& id,
@@ -27,5 +30,7 @@ std::optional<api::rules::RightOfWayRuleStateProvider::RightOfWayResult> ManualR
   }
   return api::rules::RightOfWayRuleStateProvider::RightOfWayResult{it->second, std::nullopt};
 }
+
+#pragma GCC diagnostic pop
 
 }  // namespace maliput

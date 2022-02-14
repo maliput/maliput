@@ -45,7 +45,10 @@ class PhaseRingBook {
 
   virtual std::optional<PhaseRing> DoGetPhaseRing(const PhaseRing::Id& ring_id) const = 0;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   virtual std::optional<PhaseRing> DoFindPhaseRing(const RightOfWayRule::Id& rule_id) const = 0;
+#pragma GCC diagnostic pop
 
   virtual std::optional<PhaseRing> DoFindPhaseRing(const Rule::Id& rule_id) const = 0;
 };

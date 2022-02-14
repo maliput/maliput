@@ -225,15 +225,20 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
                                                        : std::optional<rules::PhaseRing>{};
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   std::optional<rules::PhaseRing> DoFindPhaseRing(const rules::RightOfWayRule::Id&) const override {
     return std::nullopt;
   }
+#pragma GCC diagnostic pop
 
   std::optional<rules::PhaseRing> DoFindPhaseRing(const rules::Rule::Id&) const override { return std::nullopt; }
 
   std::unordered_map<rules::PhaseRing::Id, rules::PhaseRing> phase_rings_;
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRightOfWayRuleStateProvider)
@@ -242,6 +247,7 @@ class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateP
  private:
   std::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id&) const override { return std::nullopt; }
 };
+#pragma GCC diagnostic pop
 
 class MockPhaseProvider final : public rules::PhaseProvider {
  public:
@@ -285,7 +291,10 @@ class MockIntersectionBook final : public IntersectionBook {
 
   api::Intersection* DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) override { return nullptr; };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   api::Intersection* DoGetFindIntersection(const api::rules::RightOfWayRule::Id& id) override { return nullptr; };
+#pragma GCC diagnostic pop
 
   MockIntersection intersection_;
 };
@@ -320,6 +329,8 @@ LaneSRoute CreateLaneSRoute() {
 
 LaneSRange CreateLaneSRange() { return LaneSRange(LaneId("a"), {0., 9.}); }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 RightOfWayRule::State::YieldGroup YieldGroup2() {
   return {RightOfWayRule::Id("other_rule_a"), RightOfWayRule::Id("other_rule_b")};
 }
@@ -337,8 +348,6 @@ RightOfWayRule::RelatedBulbGroups RelatedBulbGroups() {
       {rules::TrafficLight::Id("TrafficLightId"), {rules::BulbGroup::Id("BulbGroupId")}}};
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 RightOfWayRule CreateRightOfWayRule() { return CreateRightOfWayRule(RightOfWayBuildFlags{}); }
 
 RightOfWayRule CreateRightOfWayRule(const RightOfWayBuildFlags& build_flags) {
@@ -465,8 +474,12 @@ Phase CreatePhase(const PhaseBuildFlags& build_flags) {
       build_flags.add_missing_bulb ? rules::Bulb::Id("UnknownBulbId") : rules::Bulb::Id("BulbId"));
   const rules::BulbState bulb_state =
       build_flags.add_missing_bulb_state ? rules::BulbState::kOff : rules::BulbState::kOn;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
   return Phase(Phase::Id("phase_id"), rules::RuleStates{}, rules::DiscreteValueRuleStates{{rule_id, {discrete_value}}},
                rules::BulbStates{{unique_bulb_id, bulb_state}});
+#pragma GCC diagnostic pop
 }
 
 PhaseRing CreatePhaseRing() { return PhaseRing(PhaseRing::Id("mock"), {CreatePhase()}); }

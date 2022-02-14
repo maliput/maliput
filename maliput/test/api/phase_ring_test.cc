@@ -21,6 +21,9 @@ namespace api {
 namespace rules {
 namespace {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 Phase CreateFullPhase(const Phase::Id& id) {
   return Phase{
       id,
@@ -40,6 +43,7 @@ Phase CreateFullPhase(const Phase::Id& id) {
         {{TrafficLight::Id("my_intersection"), BulbGroup::Id("my_bulb_group"), Bulb::Id("rule_b_red")},
          BulbState::kOn}}}};
 }
+#pragma GCC diagnostic pop
 
 Phase CreatePhaseWithMissingRuleStates(const Phase::Id& id) {
   const Phase mock_phase = CreateFullPhase(id);

@@ -20,6 +20,8 @@ namespace {
 
 using api::LaneSRange;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 // Returns an arbitrary Phase.
 // 'id' value is included in the api::rules::Rule::Id and the api::rules::Rule::TrafficLight::Id of the
 // api::rules::Phase only to allow generating different phases. The name does not represent a real usecase.
@@ -42,6 +44,7 @@ api::rules::Phase CreatePhase(const api::rules::Phase::Id& id) {
           api::rules::Bulb::Id("rule_b_red")},
          api::rules::BulbState::kOn}}}};
 }
+#pragma GCC diagnostic pop
 
 GTEST_TEST(IntersectionBook, BasicTest) {
   ManualPhaseProvider phase_provider;
@@ -105,9 +108,12 @@ class IntersectionBookTest : public ::testing::Test {
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdAPhase1{"RightOfWayRuleType/rule_a/phase_id_1"};
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdBPhase2{"RightOfWayRuleType/rule_b/phase_id_2"};
   const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdAPhase3{"RightOfWayRuleType/rule_a/phase_id_3"};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const api::rules::RightOfWayRule::Id kRightOfWayRuleIdAPhase1{"rule_a/phase_id_1"};
   const api::rules::RightOfWayRule::Id kRightOfWayRuleIdBPhase2{"rule_b/phase_id_2"};
   const api::rules::RightOfWayRule::Id kRightOfWayRuleIdAPhase3{"rule_a/phase_id_3"};
+#pragma GCC diagnostic pop
   const double kTolerance = 1e-3;
 
   IntersectionBookTest() {
@@ -162,9 +168,12 @@ TEST_F(IntersectionBookTest, FindIntersectionByDiscreteValueRuleId) {
 }
 
 TEST_F(IntersectionBookTest, FindIntersectionByRightOfWayRuleId) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdAPhase1)->id(), Intersection::Id(kIntersectionIdA));
   EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdBPhase2)->id(), Intersection::Id(kIntersectionIdB));
   EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdAPhase3)->id(), Intersection::Id(kIntersectionIdC));
+#pragma GCC diagnostic pop
 }
 
 }  // namespace

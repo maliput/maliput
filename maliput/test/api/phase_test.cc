@@ -72,7 +72,10 @@ TEST_F(PhaseTest, Copying) {
 }
 
 TEST_F(PhaseTest, Assignment) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   Phase dut(Phase::Id("other_dut_id"), RuleStates(), discrete_value_rule_states_);
+#pragma GCC diagnostic pop
   dut = phase_;
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, phase_));
 }

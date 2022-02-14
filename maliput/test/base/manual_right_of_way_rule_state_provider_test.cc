@@ -14,6 +14,8 @@ using api::rules::RightOfWayRule;
 using api::rules::RightOfWayRuleStateProvider;
 
 GTEST_TEST(ManualRightOfWayRuleStateProviderTest, BasicTest) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   ManualRightOfWayRuleStateProvider dut;
   const RightOfWayRule::Id kRuleId("foo");
   const RightOfWayRule::State::Id kStateId("bar");
@@ -33,6 +35,7 @@ GTEST_TEST(ManualRightOfWayRuleStateProviderTest, BasicTest) {
   dut.SetState(kRuleId, kOtherStateId);
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetState(kRuleId).value(),
                                (RightOfWayRuleStateProvider::RightOfWayResult{kOtherStateId, std::nullopt})));
+#pragma GCC diagnostic pop
 }
 
 }  // namespace

@@ -7,8 +7,12 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 
 namespace maliput {
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 /// Provides the state of api::rules::RightOfWayRule instances based on
 /// the current api::rules::Phase. The states of the rules that govern an
@@ -24,7 +28,9 @@ namespace maliput {
 ///
 /// The rules above will ensure vehicles traveling on Street A do not collide
 /// with vehicles traveling on Street B and vice versa.
-class PhaseBasedRightOfWayRuleStateProvider final : public api::rules::RightOfWayRuleStateProvider {
+class MALIPUT_DEPRECATED("api::rules::RightOfWayRuleStateProvider class will be deprecated.",
+                         "PhaseBasedRightOfWayDiscreteValueRuleStateProvider")
+    PhaseBasedRightOfWayRuleStateProvider final : public api::rules::RightOfWayRuleStateProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseBasedRightOfWayRuleStateProvider)
 
@@ -48,5 +54,6 @@ class PhaseBasedRightOfWayRuleStateProvider final : public api::rules::RightOfWa
   const api::rules::PhaseRingBook* phase_ring_book_{};
   const api::rules::PhaseProvider* phase_provider_{};
 };
+#pragma GCC diagnostic pop
 
 }  // namespace maliput

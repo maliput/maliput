@@ -15,9 +15,12 @@ namespace api {
 namespace rules {
 namespace test {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 /// Predicate-formatter which tests equality of RuleStates.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const RuleStates& a,
                                    const RuleStates& b);
+#pragma GCC diagnostic pop
 
 /// Predicate-formatter which tests equality of DiscreteValueRuleStates,
 /// which expands to std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>.

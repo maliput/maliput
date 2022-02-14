@@ -50,7 +50,10 @@ GTEST_TEST(PhaseBasedRightOfWayRuleStateProviderTest, BasicTest) {
   ManualPhaseProvider phase_provider;
   phase_provider.AddPhaseRing(ring_id, phase_id_1);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   PhaseBasedRightOfWayRuleStateProvider dut(&phase_ring_book, &phase_provider);
+#pragma GCC diagnostic pop
 
   EXPECT_EQ(&dut.phase_ring_book(), &phase_ring_book);
   EXPECT_EQ(&dut.phase_provider(), &phase_provider);
