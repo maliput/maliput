@@ -57,7 +57,7 @@
   [[deprecated("MALIPUT DEPRECATED: " message ". " replacement " is an alternative." \
                " Deprecation date is " removal_date ".")]]
 
-#define GET_DEPRECATED_MACRO(_1, _2, _3, DEPRECATED_MACRO_NAME, ...) DEPRECATED_MACRO_NAME
+#define MALIPUT_GET_DEPRECATED_MACRO(_1, _2, _3, DEPRECATED_MACRO_NAME, ...) DEPRECATED_MACRO_NAME
 /// @}
 
 /// Adds "deprecated" attribute to classes, methods, variables, aliases.
@@ -92,9 +92,9 @@
 /// using MyOldAlias MALIPUT_DEPRECATED("MyOldAlias will be deprecated.") = std::map<std::string, double>;
 /// @endcode
 ///
-#define MALIPUT_DEPRECATED(...)                                                                                  \
-  GET_DEPRECATED_MACRO(__VA_ARGS__, MALIPUT_DEPRECATED_MSG_REPLACEMENT_DATE, MALIPUT_DEPRECATED_MSG_REPLACEMENT, \
-                       MALIPUT_DEPRECATED_MSG, _UNUSED)                                                          \
+#define MALIPUT_DEPRECATED(...)                                                                     \
+  MALIPUT_GET_DEPRECATED_MACRO(__VA_ARGS__, MALIPUT_DEPRECATED_MSG_REPLACEMENT_DATE,                \
+                               MALIPUT_DEPRECATED_MSG_REPLACEMENT, MALIPUT_DEPRECATED_MSG, _UNUSED) \
   (__VA_ARGS__)
 
 #endif  // BUILD_DOCS
