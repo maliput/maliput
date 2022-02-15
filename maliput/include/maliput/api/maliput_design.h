@@ -556,6 +556,111 @@
 /// @anchor road-rulebook-outline_img
 /// @image html road-rulebook-outline.svg "`RoadRulebook` outline."
 ///
+/// There are two rule APIs. One that is based on static types which is
+/// deprecated, and the other one which relies on just two C++ distinct types
+/// but allows further customization and extension by API users. In the
+/// following sections, the two APIs are described.
+///
+/// @subsubsection new_rules_types New Rule API description
+///
+/// There are three rule C++ types: `Rule`, `DiscreteValueRule` and
+/// `RangeValueRule`. The parent type, `Rule`, helps to hold the basic
+/// information and semantic relationships with other rules, and other entities
+/// in the world, like light bulbs. `DiscreteValeRule` is a rule type thought
+/// for discrete states, comprising from string based representations to numeric
+/// ones. On the other hand, `RangeValueRule` completes the universe of rule
+/// types by supporting numeric ranges in which certain magnitudes may vary.
+///
+/// Each rule instance may have one or multiple states which are `Rule::State`
+/// and its customized implementations `DiscreteValueRule::DiscreteValue` and
+/// `RangeValueRule::Range`. These states are defined by common attributes like
+/// other related rules (for increased semantics and hierarchies), severity
+/// levels (to moderate the action of agents), related unique IDs (thought for
+/// traffic light bulb identification with the rule state itself) and the value
+/// they hold (either a string representation or a numeric range).
+///
+/// Rule state dynamics, i.e. the change of `DiscreteValueRule::DiscreteValue`
+/// and `RangeValueRule::Range` to another one for each rule is controlled by
+/// state providers. Only interfaces for `DiscreteValueRuleStateProvider` and
+/// `RangeValueRuleStateProvider` are defined, meaning that custom
+/// implementations are delegated to designers so as to control state transition
+/// behaviors in the context of a simulation. These providers include the notion
+/// of time. This is the only place where it appears due to the time agnostic
+/// nature of the vast majority of the API. "Static" rules are those with a
+/// unique configured state, but there is no direct API provisioning of that
+/// information.
+///
+/// Finally, each rule instance is identified by a unique ID and multiple rules
+/// may share the same rule type. The rule ID is backed by `Rule::Id` and
+/// the rule type ID is backed by `Rule::TypeId`. There rule type itself under
+/// this framework consists of:
+///  * The rule type ID.
+///  * All possible rule states (either `DiscreteValueRule::DiscreteValue` or
+///    `RangeValueRule::Range`).
+///
+/// Given that two completely unrelated semantic rule types like the
+/// "Right-Of-Way" and "Direction-Usage" are represented by the same C++ type,
+/// `DiscreteValueRule`. The possible rule states for a "Right-Of-Way" rule type
+/// and "Direction-Usage" rule type are stored in a `RuleRegistry`. The
+/// `RuleRegistry` safely constructs rules with types that are defined at
+/// runtime or previously in a separate location or store. At runtime, agents or
+/// generically speaking API consumers might query the possible rule states for
+/// a given rule type as well as construct rules to load into a `RoadRulebook`
+/// implementation.
+///
+/// @paragraph new_rule_common_types Common rule types and their implementations
+///
+/// The majority of road networks present certain rule types that are common in
+/// terms of their semantic attributes, not necessarily in their relationships
+/// or state phasing. We can identify:
+///
+///  * Speed limits - define speed limits for agents - `RangeValueRule`
+///  * Right of way - control of right-of-way / priority on specific routes -
+///    `DiscreteValueRule`
+///  * Direction usage - define the direction of travel for agents -
+///    `DiscreteValueRule`
+///  * Vehicle stop in zone behavior - define whether agents can stop and for
+///    how long - `DiscreteValueRule`.
+///
+/// These types are already provided with base implementations so consumers can
+/// quickly build up a `RuleRegistry` from them. It is opt-in, which proves to
+/// be flexible enough for most use cases. Backend implementations might define
+/// their own types atop of these ones or just replace them with their own
+/// rule states and types.
+///
+/// @subsubsection common_region_entities Common Region Entities
+///
+/// A few common entities, which identify regions of the road network, occur in
+/// the various rule types:
+///
+///  * `LaneId`: unique ID of a `Lane` in a `RoadGeometry`;
+///  * `SRange`: inclusive longitudinal range @f$[s_0, s_1]@f$ between two
+///    s-coordinates;
+///  * `LaneSRange`: a `LaneId` paired with an `SRange`, describing a longitudinal
+///    range of a specific `Lane`;
+///  * `LaneSRoute`: a sequence of `LaneSRange`'s which describe a contiguous
+///    longitudinal path that may span multiple end-to-end connected `Lane`'s;
+///  * `LaneIdEnd`: a pair of `LaneId` and an "end" specifier, which describes
+///    either the start or finish of a specific `Lane`.
+///
+/// > Note: regions are attributes of new and old rule descriptions. They define
+/// > the applicability space of each rule.
+///
+/// @subsubsection roadrulebook_queries Queries to the `RoadRulebook`
+///
+/// The `RoadRulebook` API allows to query the collection of rules by:
+///  * No restriction: can retrieve all rules.
+///  * Rule ID: which are guaranteed to be unique at rule construction.
+///  * By region: whether rule's applicability in the `RoadGeometry` intersects
+///    the query region.
+///
+/// These queries are convenient because of the properties the rules themselves
+/// have and what is interesting to a simulated agent. One important aspect of
+/// the rules are their state dynamics which are handled in a different book
+/// though.
+///
+/// @subsubsection deprecated_rule_api [DEPRECATED] Old rule API
+///
 /// We distinguish two kinds of state:
 ///  * *Static state* comprises the aspects of a simulation which are
 ///    established before the simulation begins and which cannot evolve
@@ -610,21 +715,6 @@
 ///  * TODO: `OngoingRouteRule` - turning restrictions
 ///  * TODO: `PreferentialUseRule` - lane-based vehicle-type restrictions (e.g.,
 ///    HOV lanes)
-///
-/// @subsubsection common_region_entities Common Region Entities
-///
-/// A few common entities, which identify regions of the road network, occur in
-/// the various rule types:
-///
-///  * `LaneId`: unique ID of a `Lane` in a `RoadGeometry`;
-///  * `SRange`: inclusive longitudinal range @f$[s_0, s_1]@f$ between two
-///    s-coordinates;
-///  * `LaneSRange`: a `LaneId` paired with an `SRange`, describing a longitudinal
-///    range of a specific `Lane`;
-///  * `LaneSRoute`: a sequence of `LaneSRange`'s which describe a contiguous
-///    longitudinal path that may span multiple end-to-end connected `Lane`'s;
-///  * `LaneIdEnd`: a pair of `LaneId` and an "end" specifier, which describes
-///    either the start or finish of a specific `Lane`.
 ///
 /// @subsubsection speed_limit_rules SpeedLimitRule: Speed Limits
 ///
@@ -974,6 +1064,83 @@
 ///    * time-of-day/calendar condition?
 ///    * *Should this should be merged with `DirectionUsageRule`, because
 ///      lane usage/direction might be specified per vehicle type?*
+///
+/// @subsection phase_dynamics `Phase` dynamics: how to handle the rule state changes
+///
+/// As explained before, rule state dynamics are complex enough to be modeled
+/// within the very same `Rule` type. Also, the `RoadRulebook` falls short to
+/// provide query support for the state transition of the Rules it can fetch.
+/// `maliput` models the sequencing of rule states and traffic lights' bulbs
+/// as a ring of `Phases`. Each `Phase` holds a dictionary of rule IDs to
+/// rule states (`DiscreteValues`) and related bulb IDs (`UniqueBulbIds`) to the
+/// bulb state (`BulbState`).
+///
+/// `Phases` have an implicit rule co-location constraint. Sequencing of
+/// `Phases` that do not share the same region are designer's responsibility.
+/// The API does not provide any further enhanced semantics to deal with such
+/// case. However, the ordered sequence of co-located `Phases` is captured by a
+/// `PhaseRing`. `Phases` are stored in `PhaseRings` which cannot be empty. They
+/// may have only one `Phase` though, meaning that it is self connected or it
+/// never ends.
+///
+/// > NOTE: Intra-`Phase` relationship between `Rule::Id` and `UniqueBulbId` can
+/// > be discovered by the actual `DiscreteValue`'s related unique IDs by the
+/// > agent.
+///
+/// The `PhaseRing` acts as a container of all the related `Phases` in a
+/// sequence. A designer might query them by the `Phase::Id` or the next
+/// `Phases`, but no strict order should be expected. Instead, `PhaseProvider`
+/// offers an interface to obtain the current and next `Phase::Ids` for a
+/// `PhaseRing`. Custom time based or event driven behaviors could be
+/// implemented for this interface. Similarly to the rules, there are convenient
+/// "manual" implementations to exercise the interfaces in integration examples.
+///
+/// @subsection traffic_lights `TafficLight` modelling and databases
+///
+/// Traffic lights physically come in various shapes and configurations. With a
+/// set of bulbs (from now on `BulbGroups` and `Bulbs`) that are semantically
+/// related and serve many road lanes simultaneously. We are not able to capture
+/// all variations of configurations, but the API proposes a generic enough
+/// abstraction that comprises most of the use cases that involve the physical
+/// properties of the `TrafficLights`, their `BulbGroups` and each `Bulb` in
+/// them.
+///
+/// `Bulbs` can be round or arrows, have an orientation and position relative to
+/// the parent `BulbGroup` and a specific color. At certain moment, they can be
+/// on, off or blinking. Each `Bulb` occupies a volume defined with a bounding
+/// box.
+///
+/// A collection of `Bulbs` compose a `BulbGroup`. Each `BulbGroup` has a pose
+/// relative to the `TrafficLight` they are part of.
+///
+/// Finally, a `TrafficLight` is composed of a set of `BulbGroups`. It is set in
+/// a pose (position and orientation) in the Inertial Frame. Once it is built,
+/// both its `BulbGroups` and `Bulbs` are uniquely identified by composing the
+/// parent (`TrafficLight::Id`), child (`BulbGroup::Id`) and grandchild
+/// (`Bulb::Id`) IDs. Those compound IDs are represented by `UniqueBulbId` and
+/// `UniqueBulbGroupId` types.
+///
+/// `TrafficLights` can be obtained via `TrafficLightBook`, another interface to
+/// which offers queries by `TrafficLight::Id` and to retrieve all
+/// `TrafficLights`.
+///
+/// @subsection intersections_aggregation `Intersections` to aggregate multiple related entities
+///
+/// The inherent complexity of the rule dynamics require multiple interfaces and
+/// and concrete implementations to be setup in favor of describing the traffic
+/// dynamics and adapt to multiple scenarios. In favor of reducing the
+/// complexity of the queries, the `Intersection` aggregates multiple disperse
+/// IDs and related entities that would require many queries to different books
+/// and state providers.
+///
+/// To obtain the `Intersection` the agent is immerse, it can use the
+/// `IntersectionBook` which provides multiple query semantics to retrieve the
+/// right one:
+/// - by `Intersection::Id`
+/// - by `TrafficLight::Id`
+/// - by `DiscreteValueRule::Id`
+/// - all `Intersections`
+/// - (DEPRECATED) by `RightOfWayRule::Id`
 ///
 /// > TODO Furniture and Physical Features
 /// Furniture and Physical Features

@@ -1,4 +1,6 @@
+// clang-format off
 #include "maliput/base/phase_ring_book_loader.h"
+// clang-format on
 
 #include <algorithm>
 #include <unordered_map>
@@ -10,6 +12,7 @@
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/base/manual_phase_ring_book.h"
@@ -59,8 +62,10 @@ using api::rules::DiscreteValueRuleStates;
 using api::rules::Phase;
 using api::rules::PhaseRing;
 using api::rules::PhaseRingBook;
+using api::rules::RightOfWayRule;
 using api::rules::RoadRulebook;
 using api::rules::Rule;
+using api::rules::RuleStates;
 using api::rules::TrafficLight;
 using api::rules::TrafficLightBook;
 using api::rules::UniqueBulbGroupId;
@@ -68,24 +73,31 @@ using api::rules::UniqueBulbId;
 
 // Given @p rulebook that contains all of the rules, and @p rules_node that
 // contains a sequence of rule IDs, return a
-// std::unordered_map<Rule::Id, DiscreteValueRule> of the rules mentioned
+// std::unordered_map<RightOfWayRule::Id, RightOfWayRule> of the rules mentioned
 // in @p rules_node.
-std::unordered_map<Rule::Id, DiscreteValueRule> GetRightOfWayTypeRules(const RoadRulebook* rulebook,
-                                                                       const YAML::Node& rules_node) {
+std::unordered_map<RightOfWayRule::Id, RightOfWayRule> GetRules(const RoadRulebook* rulebook,
+                                                                const YAML::Node& rules_node) {
   MALIPUT_THROW_UNLESS(rules_node.IsSequence());
-  std::unordered_map<Rule::Id, DiscreteValueRule> result;
+  std::unordered_map<RightOfWayRule::Id, RightOfWayRule> result;
   for (const YAML::Node& rule_node : rules_node) {
-    const Rule::Id rule_id(rule_node.as<std::string>());
-    result.emplace(rule_id, rulebook->GetDiscreteValueRule(rule_id));
+    const RightOfWayRule::Id rule_id(rule_node.as<std::string>());
+    result.emplace(rule_id, rulebook->GetRule(rule_id));
   }
   return result;
 }
 
-DiscreteValueRule::DiscreteValue GetDefaultState(const std::vector<DiscreteValueRule::DiscreteValue>& values) {
-  for (const auto& keyword : {"Stop", "StopThenGo", "Go"}) {
-    auto it = std::find_if(values.begin(), values.end(), [&keyword](const auto& v) { return v.value == keyword; });
-    if (it != values.end()) {
-      return *it;
+// The default is determined by searching for states of the following types in
+// the following order: kStop, kStopThenGo, kGo. If more then one state of the
+// same type exists, return any one of them.
+RightOfWayRule::State GetDefaultState(
+    const std::unordered_map<RightOfWayRule::State::Id, RightOfWayRule::State>& states) {
+  for (const auto row_rule_state : {RightOfWayRule::State::Type::kStop, RightOfWayRule::State::Type::kStopThenGo,
+                                    RightOfWayRule::State::Type::kGo}) {
+    const auto it = std::find_if(states.begin(), states.end(), [&row_rule_state](const auto& id_state) {
+      return id_state.second.type() == row_rule_state;
+    });
+    if (it != states.end()) {
+      return it->second;
     }
   }
   MALIPUT_ABORT_MESSAGE("The rule has no states.");
@@ -94,10 +106,10 @@ DiscreteValueRule::DiscreteValue GetDefaultState(const std::vector<DiscreteValue
 // Given a set of rules, determine default states for each rule and return them
 // in a new RuleStates object. See GetDefaultState() for details on how the
 // default state is determined.
-DiscreteValueRuleStates CreateDefaultRuleStates(const std::unordered_map<Rule::Id, DiscreteValueRule> rules) {
-  DiscreteValueRuleStates result;
+RuleStates CreateDefaultRuleStates(const std::unordered_map<RightOfWayRule::Id, RightOfWayRule> rules) {
+  RuleStates result;
   for (const auto& rule : rules) {
-    result.emplace(rule.first, GetDefaultState(rule.second.values()));
+    result.emplace(rule.first, GetDefaultState(rule.second.states()).id());
   }
   return result;
 }
@@ -132,17 +144,68 @@ std::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_b
         MALIPUT_THROW_UNLESS(bulbs_node.IsMap());
         ConfirmBulbsExist(*bulb_group, bulbs_node);
         for (const Bulb* bulb : bulb_group->bulbs()) {
-          BulbState bulb_state = bulb->GetDefaultState();
           const YAML::Node& bulb_state_node = bulbs_node[bulb->id().string()];
-          if (bulb_state_node.IsDefined()) {
-            bulb_state = bulb_state_node.as<BulbState>();
-          }
-          (*result)[bulb->unique_id()] = bulb_state;
+          (*result)[bulb->unique_id()] =
+              bulb_state_node.IsDefined() ? bulb_state_node.as<BulbState>() : bulb->GetDefaultState();
         }
       }
     }
   }
   return result;
+}
+
+Rule::Id GetRuleIdFrom(const Rule::TypeId& rule_type_id, const RightOfWayRule::Id& right_of_way_rule_id) {
+  return Rule::Id(rule_type_id.string() + "/" + right_of_way_rule_id.string());
+}
+
+DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(
+    const RightOfWayRule::Id& row_id, const RightOfWayRule::State& row_state,
+    const RightOfWayRule::RelatedBulbGroups& related_bulb_groups, const DiscreteValueRule& rule) {
+  const std::unordered_map<RightOfWayRule::State::Type, std::string> kRightOfWayStateToString{
+      {RightOfWayRule::State::Type::kGo, "Go"},
+      {RightOfWayRule::State::Type::kStop, "Stop"},
+      {RightOfWayRule::State::Type::kStopThenGo, "StopThenGo"},
+  };
+  // Constructs a DiscreteValueRule::DiscreteValue from `row_state`.
+  api::rules::Rule::RelatedRules related_rules;
+  related_rules.emplace(VehicleStopInZoneBehaviorRuleTypeId().string(),
+                        std::vector<Rule::Id>{GetRuleIdFrom(VehicleStopInZoneBehaviorRuleTypeId(), row_id)});
+  std::vector<Rule::Id> yield_group;
+  for (const auto& yield_id : row_state.yield_to()) {
+    yield_group.push_back(GetRuleIdFrom(RightOfWayRuleTypeId(), yield_id));
+  }
+  related_rules.emplace(RelatedRulesKeys::kYieldGroup, yield_group);
+
+  Rule::RelatedUniqueIds related_unique_ids{{RelatedUniqueIdsKeys::kBulbGroup, {}}};
+  for (const auto& pair_traffic_light_id_vector_bulb_group_id : related_bulb_groups) {
+    for (const auto& bulb_group_id : pair_traffic_light_id_vector_bulb_group_id.second) {
+      related_unique_ids.at(RelatedUniqueIdsKeys::kBulbGroup)
+          .push_back(UniqueBulbGroupId{pair_traffic_light_id_vector_bulb_group_id.first, bulb_group_id});
+    }
+  }
+
+  const DiscreteValueRule::DiscreteValue discrete_value{Rule::State::kStrict, related_rules, related_unique_ids,
+                                                        kRightOfWayStateToString.at(row_state.type())};
+  MALIPUT_THROW_UNLESS(std::find(rule.values().begin(), rule.values().end(), discrete_value) != rule.values().end());
+  return discrete_value;
+}
+
+DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_states, const RoadRulebook* rulebook) {
+  MALIPUT_THROW_UNLESS(rulebook != nullptr);
+
+  DiscreteValueRuleStates discrete_value_rule_states;
+  for (const auto& row_it : rule_states) {
+    const Rule::Id rule_id = GetRuleIdFrom(RightOfWayRuleTypeId(), row_it.first);
+    const DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id);
+    const RightOfWayRule right_of_way_rule = rulebook->GetRule(row_it.first);
+    MALIPUT_THROW_UNLESS(right_of_way_rule.states().find(row_it.second) != right_of_way_rule.states().end());
+    MALIPUT_THROW_UNLESS(discrete_value_rule_states
+                             .emplace(rule_id, FindDiscreteValueFromRightOfWayRuleState(
+                                                   row_it.first, right_of_way_rule.states().at(row_it.second),
+                                                   right_of_way_rule.related_bulb_groups(), rule))
+                             .second);
+  }
+  return discrete_value_rule_states;
 }
 
 void VerifyPhaseExists(const std::vector<Phase>& phases, const Phase::Id& phase_id) {
@@ -187,15 +250,7 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
   MALIPUT_THROW_UNLESS(phase_ring_node.IsMap());
   MALIPUT_THROW_UNLESS(phase_ring_node["ID"].IsDefined());
   const PhaseRing::Id ring_id(phase_ring_node["ID"].as<std::string>());
-
-  const std::unordered_map<Rule::Id, DiscreteValueRule> discrete_rules =
-      GetRightOfWayTypeRules(rulebook, phase_ring_node["Rules"]);
-  MALIPUT_THROW_UNLESS(!discrete_rules.empty());
-  // First get default states of all rules.
-  // Then, override the defaults with the states specified in the YAML
-  // document.
-  DiscreteValueRuleStates discrete_rule_states = CreateDefaultRuleStates(discrete_rules);
-  MALIPUT_THROW_UNLESS(!discrete_rule_states.empty());
+  const std::unordered_map<RightOfWayRule::Id, RightOfWayRule> rules = GetRules(rulebook, phase_ring_node["Rules"]);
 
   const YAML::Node& phases_node = phase_ring_node["Phases"];
   MALIPUT_THROW_UNLESS(phases_node.IsDefined());
@@ -205,21 +260,21 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
     MALIPUT_THROW_UNLESS(phase_node.IsMap());
     MALIPUT_THROW_UNLESS(phase_node["ID"].IsDefined());
     const Phase::Id phase_id(phase_node["ID"].as<std::string>());
+    // First get a RuleStates object populated with default states of all rules.
+    // Then, override the defaults with the states specified in the YAML
+    // document.
+    RuleStates rule_states = CreateDefaultRuleStates(rules);
     const YAML::Node& rule_states_node = phase_node["RightOfWayRuleStates"];
     MALIPUT_THROW_UNLESS(rule_states_node.IsDefined());
     MALIPUT_THROW_UNLESS(rule_states_node.IsMap());
     for (const auto& rule_state_it : rule_states_node) {
-      Rule::Id rule_id(rule_state_it.first.as<std::string>());
-      std::string value(rule_state_it.second.as<std::string>());
-      MALIPUT_THROW_UNLESS(discrete_rules.find(rule_id) != discrete_rules.end());
-      const auto discrete_value_itr = std::find_if(
-          discrete_rules.at(rule_id).values().begin(), discrete_rules.at(rule_id).values().end(),
-          [&value](const DiscreteValueRule::DiscreteValue& discrete_value) { return discrete_value.value == value; });
-      MALIPUT_THROW_UNLESS(discrete_value_itr != discrete_rules.at(rule_id).values().end());
-      MALIPUT_THROW_UNLESS(discrete_rule_states.find(rule_id) != discrete_rule_states.end());
-      discrete_rule_states.at(rule_id) = *discrete_value_itr;
+      RightOfWayRule::Id rule_id(rule_state_it.first.as<std::string>());
+      RightOfWayRule::State::Id state_id(rule_state_it.second.as<std::string>());
+      MALIPUT_THROW_UNLESS(rule_states.find(rule_id) != rule_states.end());
+      rule_states.at(rule_id) = state_id;
     }
-    phases.push_back(Phase(phase_id, {}, discrete_rule_states, LoadBulbStates(traffic_light_book, phase_node)));
+    phases.push_back(Phase(phase_id, rule_states, LoadDiscreteValueRuleStates(rule_states, rulebook),
+                           LoadBulbStates(traffic_light_book, phase_node)));
   }
 
   const auto next_phases = BuildNextPhases(phases, phase_ring_node);
@@ -242,15 +297,15 @@ std::unique_ptr<api::rules::PhaseRingBook> BuildFrom(const RoadRulebook* ruleboo
 
 }  // namespace
 
-std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBook(const RoadRulebook* rulebook,
-                                                             const TrafficLightBook* traffic_light_book,
-                                                             const std::string& input) {
+std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBookOldRules(const RoadRulebook* rulebook,
+                                                                     const TrafficLightBook* traffic_light_book,
+                                                                     const std::string& input) {
   return BuildFrom(rulebook, traffic_light_book, YAML::Load(input));
 }
 
-std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBookFromFile(const RoadRulebook* rulebook,
-                                                                     const TrafficLightBook* traffic_light_book,
-                                                                     const std::string& filename) {
+std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBookFromFileOldRules(const RoadRulebook* rulebook,
+                                                                             const TrafficLightBook* traffic_light_book,
+                                                                             const std::string& filename) {
   return BuildFrom(rulebook, traffic_light_book, YAML::LoadFile(filename));
 }
 
