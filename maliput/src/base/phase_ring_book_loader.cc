@@ -82,22 +82,10 @@ std::unordered_map<Rule::Id, DiscreteValueRule> GetRightOfWayTypeRules(const Roa
 }
 
 DiscreteValueRule::DiscreteValue GetDefaultState(const std::vector<DiscreteValueRule::DiscreteValue>& values) {
-  // Search for rules of value "Stop". Return if one is found.
-  for (const auto& value : values) {
-    if (value.value == "Stop") {
-      return value;
-    }
-  }
-  // Search for rules of value "StopThenGo". Return if one is found.
-  for (const auto& value : values) {
-    if (value.value == "StopThenGo") {
-      return value;
-    }
-  }
-  // Search for rules of value "Go". Return if one is found.
-  for (const auto& value : values) {
-    if (value.value == "Go") {
-      return value;
+  for (const auto& keyword : {"Stop", "StopThenGo", "Go"}) {
+    auto it = std::find_if(values.begin(), values.end(), [&keyword](const auto& v) { return v.value == keyword; });
+    if (it != values.end()) {
+      return *it;
     }
   }
   MALIPUT_ABORT_MESSAGE("The rule has no states.");

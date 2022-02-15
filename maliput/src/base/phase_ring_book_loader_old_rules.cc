@@ -91,22 +91,13 @@ std::unordered_map<RightOfWayRule::Id, RightOfWayRule> GetRules(const RoadRulebo
 // same type exists, return any one of them.
 RightOfWayRule::State GetDefaultState(
     const std::unordered_map<RightOfWayRule::State::Id, RightOfWayRule::State>& states) {
-  // Search for rules of type kStop. Return if one is found.
-  for (const auto& state : states) {
-    if (state.second.type() == RightOfWayRule::State::Type::kStop) {
-      return state.second;
-    }
-  }
-  // Search for rules of type kStopThenGo. Return if one is found.
-  for (const auto& state : states) {
-    if (state.second.type() == RightOfWayRule::State::Type::kStopThenGo) {
-      return state.second;
-    }
-  }
-  // Search for rules of type kGo. Return if one is found.
-  for (const auto& state : states) {
-    if (state.second.type() == RightOfWayRule::State::Type::kGo) {
-      return state.second;
+  for (const auto row_rule_state : {RightOfWayRule::State::Type::kStop, RightOfWayRule::State::Type::kStopThenGo,
+                                    RightOfWayRule::State::Type::kGo}) {
+    const auto it = std::find_if(states.begin(), states.end(), [&row_rule_state](const auto& id_state) {
+      return id_state.second.type() == row_rule_state;
+    });
+    if (it != states.end()) {
+      return it->second;
     }
   }
   MALIPUT_ABORT_MESSAGE("The rule has no states.");
@@ -153,12 +144,9 @@ std::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_b
         MALIPUT_THROW_UNLESS(bulbs_node.IsMap());
         ConfirmBulbsExist(*bulb_group, bulbs_node);
         for (const Bulb* bulb : bulb_group->bulbs()) {
-          BulbState bulb_state = bulb->GetDefaultState();
           const YAML::Node& bulb_state_node = bulbs_node[bulb->id().string()];
-          if (bulb_state_node.IsDefined()) {
-            bulb_state = bulb_state_node.as<BulbState>();
-          }
-          (*result)[bulb->unique_id()] = bulb_state;
+          (*result)[bulb->unique_id()] =
+              bulb_state_node.IsDefined() ? bulb_state_node.as<BulbState>() : bulb->GetDefaultState();
         }
       }
     }
