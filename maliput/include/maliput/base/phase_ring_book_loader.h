@@ -10,13 +10,13 @@
 namespace maliput {
 
 /// Instantiates and returns an api::rules::PhaseRingBook instance based on the
-/// specified @p rulebook, and @p input document. Based on old rule API.
+/// specified @p rulebook, and @p input YAML string. Based on old rule API.
 ///
 /// @param rulebook Contains the rules.
 ///
 /// @param traffic_light_book Contains the traffic lights.
 ///
-/// @param input The YAML PhaseRings document.
+/// @param input The YAML string which describes the PhaseRings.
 ///
 /// @return The newly created api::rules::PhaseRingBook instance.
 std::unique_ptr<api::rules::PhaseRingBook> LoadPhaseRingBookOldRules(
