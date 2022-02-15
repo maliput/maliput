@@ -646,6 +646,19 @@
 /// > Note: regions are attributes of new and old rule descriptions. They define
 /// > the applicability space of each rule.
 ///
+/// @subsubsection roadrulebook_queries Queries to the `RoadRulebook`
+///
+/// The `RoadRulebook` API allows to query the collection of rules by:
+///  * No restriction: can retrieve all rules.
+///  * Rule ID: which are guaranteed to be unique at rule construction.
+///  * By region: whether rule's applicability in the `RoadGeometry` intersects
+///    the query region.
+///
+/// These queries are convenient because of the properties the rules themselves
+/// have and what is interesting to a simulated agent. One important aspect of
+/// the rules are their state dynamics which are handled in a different book
+/// though.
+///
 /// @subsubsection deprecated_rule_api [DEPRECATED] Old rule API
 ///
 /// We distinguish two kinds of state:
@@ -1051,6 +1064,83 @@
 ///    * time-of-day/calendar condition?
 ///    * *Should this should be merged with `DirectionUsageRule`, because
 ///      lane usage/direction might be specified per vehicle type?*
+///
+/// @subsection phase_dynamics `Phase` dynamics: how to handle the rule state changes
+///
+/// As explained before, rule state dynamics are complex enough to be modeled
+/// within the very same `Rule` type. Also, the `RoadRulebook` falls short to
+/// provide query support for the state transition of the Rules it can fetch.
+/// `maliput` models the sequencing of rule states and traffic lights' bulbs
+/// as a ring of `Phases`. Each `Phase` holds a dictionary of rule IDs to
+/// rule states (`DiscreteValues`) and related bulb IDs (`UniqueBulbIds`) to the
+/// bulb state (`BulbState`).
+///
+/// `Phases` have an implicit rule co-location constraint. Sequencing of
+/// `Phases` that do not share the same region are designer's responsibility.
+/// The API does not provide any further enhanced semantics to deal with such
+/// case. However, the ordered sequence of co-located `Phases` is captured by a
+/// `PhaseRing`. `Phases` are stored in `PhaseRings` which cannot be empty. They
+/// may have only one `Phase` though, meaning that it is self connected or it
+/// never ends.
+///
+/// > NOTE: Intra-`Phase` relationship between `Rule::Id` and `UniqueBulbId` can
+/// > be discovered by the actual `DiscreteValue`'s related unique IDs by the
+/// > agent.
+///
+/// The `PhaseRing` acts as a container of all the related `Phases` in a
+/// sequence. A designer might query them by the `Phase::Id` or the next
+/// `Phases`, but no strict order should be expected. Instead, `PhaseProvider`
+/// offers an interface to obtain the current and next `Phase::Ids` for a
+/// `PhaseRing`. Custom time based or event driven behaviors could be
+/// implemented for this interface. Similarly to the rules, there are convenient
+/// "manual" implementations to exercise the interfaces in integration examples.
+///
+/// @subsection traffic_lights `TafficLight` modelling and databases
+///
+/// Traffic lights physically come in various shapes and configurations. With a
+/// set of bulbs (from now on `BulbGroups` and `Bulbs`) that are semantically
+/// related and serve many road lanes simultaneously. We are not able to capture
+/// all variations of configurations, but the API proposes a generic enough
+/// abstraction that comprises most of the use cases that involve the physical
+/// properties of the `TrafficLights`, their `BulbGroups` and each `Bulb` in
+/// them.
+///
+/// `Bulbs` can be round or arrows, have an orientation and position relative to
+/// the parent `BulbGroup` and a specific color. At certain moment, they can be
+/// on, off or blinking. Each `Bulb` occupies a volume defined with a bounding
+/// box.
+///
+/// A collection of `Bulbs` compose a `BulbGroup`. Each `BulbGroup` has a pose
+/// relative to the `TrafficLight` they are part of.
+///
+/// Finally, a `TrafficLight` is composed of a set of `BulbGroups`. It is set in
+/// a pose (position and orientation) in the Inertial Frame. Once it is built,
+/// both its `BulbGroups` and `Bulbs` are uniquely identified by composing the
+/// parent (`TrafficLight::Id`), child (`BulbGroup::Id`) and grandchild
+/// (`Bulb::Id`) IDs. Those compound IDs are represented by `UniqueBulbId` and
+/// `UniqueBulbGroupId` types.
+///
+/// `TrafficLights` can be obtained via `TrafficLightBook`, another interface to
+/// which offers queries by `TrafficLight::Id` and to retrieve all
+/// `TrafficLights`.
+///
+/// @subsection intersections_aggregation `Intersections` to aggregate multiple related entities
+///
+/// The inherent complexity of the rule dynamics require multiple interfaces and
+/// and concrete implementations to be setup in favor of describing the traffic
+/// dynamics and adapt to multiple scenarios. In favor of reducing the
+/// complexity of the queries, the `Intersection` aggregates multiple disperse
+/// IDs and related entities that would require many queries to different books
+/// and state providers.
+///
+/// To obtain the `Intersection` the agent is immerse, it can use the
+/// `IntersectionBook` which provides multiple query semantics to retrieve the
+/// right one:
+/// - by `Intersection::Id`
+/// - by `TrafficLight::Id`
+/// - by `DiscreteValueRule::Id`
+/// - all `Intersections`
+/// - (DEPRECATED) by `RightOfWayRule::Id`
 ///
 /// > TODO Furniture and Physical Features
 /// Furniture and Physical Features
