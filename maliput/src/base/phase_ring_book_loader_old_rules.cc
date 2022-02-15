@@ -71,6 +71,9 @@ using api::rules::TrafficLightBook;
 using api::rules::UniqueBulbGroupId;
 using api::rules::UniqueBulbId;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 // Given @p rulebook that contains all of the rules, and @p rules_node that
 // contains a sequence of rule IDs, return a
 // std::unordered_map<RightOfWayRule::Id, RightOfWayRule> of the rules mentioned
@@ -114,6 +117,8 @@ RuleStates CreateDefaultRuleStates(const std::unordered_map<RightOfWayRule::Id, 
   return result;
 }
 
+#pragma GCC diagnostic pop
+
 // Confirms that every bulb in @p bulbs_node exists within @p bulb_group.
 void ConfirmBulbsExist(const BulbGroup& bulb_group, const YAML::Node& bulbs_node) {
   for (const auto& bulb_group_pair : bulbs_node) {
@@ -153,6 +158,9 @@ std::optional<BulbStates> LoadBulbStates(const TrafficLightBook* traffic_light_b
   }
   return result;
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 Rule::Id GetRuleIdFrom(const Rule::TypeId& rule_type_id, const RightOfWayRule::Id& right_of_way_rule_id) {
   return Rule::Id(rule_type_id.string() + "/" + right_of_way_rule_id.string());
@@ -208,6 +216,8 @@ DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_state
   return discrete_value_rule_states;
 }
 
+#pragma GCC diagnostic pop
+
 void VerifyPhaseExists(const std::vector<Phase>& phases, const Phase::Id& phase_id) {
   const auto it =
       std::find_if(phases.begin(), phases.end(), [&](const Phase& p) -> bool { return p.id() == phase_id; });
@@ -250,6 +260,8 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
   MALIPUT_THROW_UNLESS(phase_ring_node.IsMap());
   MALIPUT_THROW_UNLESS(phase_ring_node["ID"].IsDefined());
   const PhaseRing::Id ring_id(phase_ring_node["ID"].as<std::string>());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const std::unordered_map<RightOfWayRule::Id, RightOfWayRule> rules = GetRules(rulebook, phase_ring_node["Rules"]);
 
   const YAML::Node& phases_node = phase_ring_node["Phases"];
@@ -277,6 +289,7 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
                            LoadBulbStates(traffic_light_book, phase_node)));
   }
 
+#pragma GCC diagnostic pop
   const auto next_phases = BuildNextPhases(phases, phase_ring_node);
   return PhaseRing(ring_id, phases, next_phases);
 }
