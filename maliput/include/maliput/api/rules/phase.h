@@ -9,14 +9,19 @@
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 /// A mapping from a RightOfWayRule::Id to a RightOfWayRule::State::Id. Just an
 /// alias for user convenience.
-using RuleStates = std::unordered_map<RightOfWayRule::Id, RightOfWayRule::State::Id>;
+using RuleStates MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated.") =
+    std::unordered_map<RightOfWayRule::Id, RightOfWayRule::State::Id>;
+#pragma GCC diagnostic pop
 
 /// A mapping from a UniqueBulbId to a BulbState. Just an alias for user
 /// convenience.
@@ -36,6 +41,8 @@ class Phase final {
   /// Unique identifier for a Phase.
   using Id = TypeSpecificIdentifier<Phase>;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Constructs a Phase.
   ///
   /// @param id the unique ID of the phase (in the RightOfWayRulePhaseRing)
@@ -55,12 +62,17 @@ class Phase final {
   /// type to the other happens.
   Phase(const Id& id, const RuleStates& rule_states, const DiscreteValueRuleStates& discrete_value_rule_states,
         std::optional<BulbStates> bulb_states = std::nullopt);
+#pragma GCC diagnostic pop
 
   /// Returns the phase's identifier.
   const Id& id() const { return id_; }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Returns the phase's RightOfWayRule instances and their states.
+  MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated.")
   const RuleStates& rule_states() const { return rule_states_; }
+#pragma GCC diagnostic pop
 
   /// Returns the phase's DiscreteValueRule instances and their states.
   const DiscreteValueRuleStates& discrete_value_rule_states() const { return discrete_value_rule_states_; }
@@ -70,7 +82,10 @@ class Phase final {
 
  private:
   Id id_;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   RuleStates rule_states_;
+#pragma GCC diagnostic pop
   DiscreteValueRuleStates discrete_value_rule_states_;
   std::optional<BulbStates> bulb_states_;
 };

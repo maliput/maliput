@@ -18,6 +18,8 @@ namespace {
 
 const LaneSRange kZone(LaneId("the_lane"), SRange(13., 15.));
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 GTEST_TEST(SpeedLimitRuleTest, Construction) {
   EXPECT_NO_THROW(SpeedLimitRule(SpeedLimitRule::Id("some_id"), kZone, SpeedLimitRule::Severity::kStrict, 33., 77.));
   EXPECT_NO_THROW(SpeedLimitRule(SpeedLimitRule::Id("some_id"), kZone, SpeedLimitRule::Severity::kStrict, 0., 77.));
@@ -61,6 +63,7 @@ GTEST_TEST(SpeedLimitRuleTest, Assignment) {
   dut = source;
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
 }
+#pragma GCC diagnostic pop
 
 }  // namespace
 }  // namespace rules

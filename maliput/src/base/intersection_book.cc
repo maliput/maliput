@@ -99,6 +99,8 @@ api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::Dis
   return nullptr;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::RightOfWayRule::Id& id) {
   for (const auto& intersection : GetIntersections()) {
     if (intersection->Includes(id)) {
@@ -107,5 +109,6 @@ api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::Rig
   }
   return nullptr;
 }
+#pragma GCC diagnostic pop
 
 }  // namespace maliput

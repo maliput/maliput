@@ -54,7 +54,8 @@ class PhaseBasedBehaviorTest : public ::testing::Test {
   };
 
   const LaneSRange kZone{LaneId{"a"}, {10., 20.}};
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const RightOfWayRule::Id row_rule_id_a{"rule a"};
   const RightOfWayRule::Id row_rule_id_b{"rule b"};
   const RightOfWayRule::State::Id row_state_id_go{"GO"};
@@ -75,6 +76,7 @@ class PhaseBasedBehaviorTest : public ::testing::Test {
        RightOfWayRule::State{row_state_id_stop, RightOfWayRule::State::Type::kStop, {}}},
       {} /* related_bulb_groups */
   };
+#pragma GCC diagnostic pop
 
   const Rule::Id rule_id_a{"Right-Of-Way/rule a"};
   const Rule::Id rule_id_b{"Right-Of-Way/rule b"};

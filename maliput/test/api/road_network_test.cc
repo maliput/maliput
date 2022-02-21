@@ -40,7 +40,10 @@ class RoadNetworkTest : public ::testing::Test {
     intersection_book_ = test::CreateIntersectionBook();
     traffic_light_book_ = test::CreateTrafficLightBook();
     phase_ring_book_ = test::CreatePhaseRingBook();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     right_of_way_rule_state_provider_ = test::CreateRightOfWayRuleStateProvider();
+#pragma GCC diagnostic pop
     phase_provider_ = test::CreatePhaseProvider();
     rule_registry_ = test::CreateRuleRegistry();
     discrete_value_rule_state_provider_ = test::CreateDiscreteValueRuleStateProvider();
@@ -63,7 +66,10 @@ class RoadNetworkTest : public ::testing::Test {
   std::unique_ptr<TrafficLightBook> traffic_light_book_;
   std::unique_ptr<IntersectionBook> intersection_book_;
   std::unique_ptr<PhaseRingBook> phase_ring_book_;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   std::unique_ptr<RightOfWayRuleStateProvider> right_of_way_rule_state_provider_;
+#pragma GCC diagnostic pop
   std::unique_ptr<PhaseProvider> phase_provider_;
   std::unique_ptr<RuleRegistry> rule_registry_;
   std::unique_ptr<DiscreteValueRuleStateProvider> discrete_value_rule_state_provider_;
@@ -74,7 +80,10 @@ class RoadNetworkTest : public ::testing::Test {
   TrafficLightBook* traffic_light_book_ptr_{};
   IntersectionBook* intersection_book_ptr_{};
   PhaseRingBook* phase_ring_book_ptr_{};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   RightOfWayRuleStateProvider* right_of_way_rule_state_provider_ptr_{};
+#pragma GCC diagnostic pop
   PhaseProvider* phase_provider_ptr_{};
   RuleRegistry* rule_registry_ptr_{};
   DiscreteValueRuleStateProvider* discrete_value_rule_state_provider_ptr_{};
@@ -147,7 +156,10 @@ TEST_F(RoadNetworkTest, InstantiateAndUseAccessors) {
   EXPECT_EQ(dut.traffic_light_book(), traffic_light_book_ptr_);
   EXPECT_EQ(dut.intersection_book(), intersection_book_ptr_);
   EXPECT_EQ(dut.phase_ring_book(), phase_ring_book_ptr_);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   EXPECT_EQ(dut.right_of_way_rule_state_provider(), right_of_way_rule_state_provider_ptr_);
+#pragma GCC diagnostic pop
   EXPECT_EQ(dut.phase_provider(), phase_provider_ptr_);
   EXPECT_EQ(dut.rule_registry(), rule_registry_ptr_);
   EXPECT_EQ(dut.discrete_value_rule_state_provider(), discrete_value_rule_state_provider_ptr_);
@@ -164,10 +176,13 @@ TEST_F(RoadNetworkTest, TestMemberMethodAccess) {
   EXPECT_NE(intersection, nullptr);
   intersection->SetPhase(rules::Phase::Id("Mock"));
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   dut.rulebook()->GetRule(rules::RightOfWayRule::Id("Mock"));
-  dut.traffic_light_book()->GetTrafficLight(rules::TrafficLight::Id("Mock"));
-  dut.phase_ring_book()->GetPhaseRing(rules::PhaseRing::Id("Mock"));
   dut.right_of_way_rule_state_provider()->GetState(rules::RightOfWayRule::Id("Mock"));
+#pragma GCC diagnostic pop
+  dut.phase_ring_book()->GetPhaseRing(rules::PhaseRing::Id("Mock"));
+  dut.traffic_light_book()->GetTrafficLight(rules::TrafficLight::Id("Mock"));
   dut.phase_provider()->GetPhase(rules::PhaseRing::Id("Mock"));
   dut.rule_registry()->GetPossibleStatesOfRuleType(rules::Rule::TypeId("Mock"));
   dut.discrete_value_rule_state_provider()->GetState(rules::Rule::Id("Mock"));

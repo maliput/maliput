@@ -16,6 +16,8 @@ namespace test {
 //                               which handles anything with operator==.
 // Issue #10950 tracks this improvement.
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 /// Predicate-formatter which tests equality of DirectionUsageRule::State::Type.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    DirectionUsageRule::State::Type a, DirectionUsageRule::State::Type b);
@@ -38,6 +40,7 @@ namespace test {
 /// Predicate-formatter which tests equality of DirectionUsageRule.
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const DirectionUsageRule& a,
                                    const DirectionUsageRule& b);
+#pragma GCC diagnostic pop
 
 }  // namespace test
 }  // namespace rules

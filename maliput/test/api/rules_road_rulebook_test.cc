@@ -22,6 +22,8 @@ namespace {
 class MockRulebook final : public RoadRulebook {
  public:
   const LaneSRange kZone{LaneId("some_lane"), {10., 20.}};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const RightOfWayRule kRightOfWay{
       RightOfWayRule::Id("rowr_id"),
       LaneSRoute({kZone}),
@@ -34,6 +36,7 @@ class MockRulebook final : public RoadRulebook {
       kZone,
       {DirectionUsageRule::State(DirectionUsageRule::State::Id("dur_state"), DirectionUsageRule::State::Type::kWithS,
                                  DirectionUsageRule::State::Severity::kPreferred)}};
+#pragma GCC diagnostic pop
   const RangeValueRule kRangeValueRule{
       Rule::Id("rvrt/rvr_id"), Rule::TypeId("rvrt"), LaneSRoute({kZone}), {api::test::CreateRange()}};
   const DiscreteValueRule kDiscreteValueRule{
@@ -66,7 +69,8 @@ class MockRulebook final : public RoadRulebook {
                         {{kDiscreteValueRule.id(), kDiscreteValueRule}},
                         {{kRangeValueRule.id(), kRangeValueRule}}};
   }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   virtual RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const override {
     if (id != kRightOfWay.id()) {
       throw std::out_of_range("");
@@ -87,6 +91,7 @@ class MockRulebook final : public RoadRulebook {
     }
     return kDirectionUsage;
   }
+#pragma GCC diagnostic pop
 
   DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
     if (id != kDiscreteValueRule.id()) {
@@ -132,6 +137,8 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   EXPECT_EQ(static_cast<int>(nonempty.discrete_value_rules.size()), 1);
   EXPECT_EQ(static_cast<int>(nonempty.range_value_rules.size()), 1);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   EXPECT_EQ(dut.GetRule(dut.kRightOfWay.id()).id(), dut.kRightOfWay.id());
   EXPECT_THROW(dut.GetRule(RightOfWayRule::Id("xxx")), std::out_of_range);
 
@@ -140,6 +147,7 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
 
   EXPECT_EQ(dut.GetRule(dut.kDirectionUsage.id()).id(), dut.kDirectionUsage.id());
   EXPECT_THROW(dut.GetRule(DirectionUsageRule::Id("xxx")), std::out_of_range);
+#pragma GCC diagnostic pop
 
   EXPECT_EQ(dut.GetDiscreteValueRule(dut.kDiscreteValueRule.id()).id(), dut.kDiscreteValueRule.id());
   EXPECT_THROW(dut.GetDiscreteValueRule(Rule::Id("xxx")), std::out_of_range);

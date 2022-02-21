@@ -81,9 +81,12 @@ class MockRoadRulebook : public rules::RoadRulebook {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadRulebook)
   MockRoadRulebook() {}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   void set_right_of_way(const RightOfWayRule& rule) { right_of_way_rule_ = rule; }
   void set_direction_usage(const DirectionUsageRule& rule) { direction_usage_rule_ = rule; }
   void set_speed_limit(const SpeedLimitRule& rule) { speed_limit_rule_ = rule; }
+#pragma GCC diagnostic pop
   void set_discrete_value_rule(const DiscreteValueRule& rule) { discrete_value_rule_ = rule; }
   void set_range_value_rule(const RangeValueRule& rule) { range_value_rule_ = rule; }
 
@@ -108,9 +111,12 @@ class MockRoadRulebook : public rules::RoadRulebook {
     }
     return result;
   }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   RightOfWayRule DoGetRule(const RightOfWayRule::Id&) const override { return *right_of_way_rule_; }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override { return *speed_limit_rule_; }
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return *direction_usage_rule_; }
+#pragma GCC diagnostic pop
   DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
     if (discrete_value_rule_.has_value() && discrete_value_rule_->id() == id) {
       return *discrete_value_rule_;
@@ -124,9 +130,12 @@ class MockRoadRulebook : public rules::RoadRulebook {
     throw std::out_of_range("Unknown Id.");
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   std::optional<RightOfWayRule> right_of_way_rule_{};
   std::optional<DirectionUsageRule> direction_usage_rule_{};
   std::optional<SpeedLimitRule> speed_limit_rule_{};
+#pragma GCC diagnostic pop
   std::optional<DiscreteValueRule> discrete_value_rule_{};
   std::optional<RangeValueRule> range_value_rule_{};
 };
@@ -167,11 +176,14 @@ class MockContiguityRoadRulebook final : public rules::RoadRulebook {
     throw std::out_of_range("Unknown Id.");
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   RightOfWayRule DoGetRule(const RightOfWayRule::Id& id) const override { throw std::out_of_range("Unknown Id."); }
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const override { throw std::out_of_range("Unknown Id."); }
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const override {
     throw std::out_of_range("Unknown Id.");
   }
+#pragma GCC diagnostic pop
 
   std::optional<DiscreteValueRule> discrete_value_rule_{};
   std::optional<RangeValueRule> range_value_rule_{};
@@ -213,15 +225,20 @@ class MockPhaseRingBook final : public rules::PhaseRingBook {
                                                        : std::optional<rules::PhaseRing>{};
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   std::optional<rules::PhaseRing> DoFindPhaseRing(const rules::RightOfWayRule::Id&) const override {
     return std::nullopt;
   }
+#pragma GCC diagnostic pop
 
   std::optional<rules::PhaseRing> DoFindPhaseRing(const rules::Rule::Id&) const override { return std::nullopt; }
 
   std::unordered_map<rules::PhaseRing::Id, rules::PhaseRing> phase_rings_;
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRightOfWayRuleStateProvider)
@@ -230,6 +247,7 @@ class MockRightOfWayRuleStateProvider final : public rules::RightOfWayRuleStateP
  private:
   std::optional<RightOfWayResult> DoGetState(const RightOfWayRule::Id&) const override { return std::nullopt; }
 };
+#pragma GCC diagnostic pop
 
 class MockPhaseProvider final : public rules::PhaseProvider {
  public:
@@ -273,7 +291,10 @@ class MockIntersectionBook final : public IntersectionBook {
 
   api::Intersection* DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) override { return nullptr; };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   api::Intersection* DoGetFindIntersection(const api::rules::RightOfWayRule::Id& id) override { return nullptr; };
+#pragma GCC diagnostic pop
 
   MockIntersection intersection_;
 };
@@ -308,6 +329,8 @@ LaneSRoute CreateLaneSRoute() {
 
 LaneSRange CreateLaneSRange() { return LaneSRange(LaneId("a"), {0., 9.}); }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 RightOfWayRule::State::YieldGroup YieldGroup2() {
   return {RightOfWayRule::Id("other_rule_a"), RightOfWayRule::Id("other_rule_b")};
 }
@@ -346,6 +369,7 @@ DirectionUsageRule::State CreateDirectionUsageRuleState() {
 DirectionUsageRule CreateDirectionUsageRule() {
   return DirectionUsageRule(DirectionUsageRule::Id("dur_id"), CreateLaneSRange(), {CreateDirectionUsageRuleState()});
 }
+#pragma GCC diagnostic pop
 
 rules::Rule::RelatedRules CreateEmptyRelatedRules() { return {}; }
 
@@ -450,8 +474,12 @@ Phase CreatePhase(const PhaseBuildFlags& build_flags) {
       build_flags.add_missing_bulb ? rules::Bulb::Id("UnknownBulbId") : rules::Bulb::Id("BulbId"));
   const rules::BulbState bulb_state =
       build_flags.add_missing_bulb_state ? rules::BulbState::kOff : rules::BulbState::kOn;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
   return Phase(Phase::Id("phase_id"), rules::RuleStates{}, rules::DiscreteValueRuleStates{{rule_id, {discrete_value}}},
                rules::BulbStates{{unique_bulb_id, bulb_state}});
+#pragma GCC diagnostic pop
 }
 
 PhaseRing CreatePhaseRing() { return PhaseRing(PhaseRing::Id("mock"), {CreatePhase()}); }
@@ -723,9 +751,12 @@ std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook(const PhaseBuildFlags&
   return phase_ring_book;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 std::unique_ptr<rules::RightOfWayRuleStateProvider> CreateRightOfWayRuleStateProvider() {
   return std::make_unique<MockRightOfWayRuleStateProvider>();
 }
+#pragma GCC diagnostic pop
 
 std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider() { return std::make_unique<MockPhaseProvider>(); }
 

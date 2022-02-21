@@ -27,9 +27,12 @@ namespace {
 // TODO(liang.fok) Eliminate duplicate regions within the returned vector.
 std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook, const Phase& phase) {
   std::vector<LaneSRange> result;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   for (const auto& rule_state : phase.rule_states()) {
     const RightOfWayRule::Id rule_id = rule_state.first;
     const RightOfWayRule rule = road_rulebook.GetRule(rule_id);
+#pragma GCC diagnostic pop
     for (const auto& range : rule.zone().ranges()) {
       result.push_back(range);
     }

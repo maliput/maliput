@@ -21,23 +21,32 @@ PhaseBasedRightOfWayRuleStateProvider::PhaseBasedRightOfWayRuleStateProvider(con
 
 std::optional<RightOfWayRuleStateProvider::RightOfWayResult> PhaseBasedRightOfWayRuleStateProvider::DoGetState(
     const RightOfWayRule::Id& rule_id) const {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   std::optional<PhaseRing> ring = phase_ring_book_->FindPhaseRing(rule_id);
+#pragma GCC diagnostic pop
   if (ring.has_value()) {
     const std::optional<PhaseProvider::Result> phase_result = phase_provider_->GetPhase(ring->id());
     if (phase_result.has_value()) {
       const Phase::Id phase_id = phase_result->state;
       const Phase& phase = ring->phases().at(phase_id);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
       const RightOfWayRule::State::Id state_id = phase.rule_states().at(rule_id);
       std::optional<RightOfWayResult::Next> next = std::nullopt;
+#pragma GCC diagnostic pop
       if (phase_result->next.has_value()) {
         const Phase::Id next_phase_id = phase_result->next->state;
         const Phase& next_phase = ring->phases().at(next_phase_id);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         const RightOfWayRule::State::Id next_state_id = next_phase.rule_states().at(rule_id);
         next = RightOfWayResult::Next{next_state_id, phase_result->next->duration_until};
       }
       return RightOfWayResult{state_id, next};
     }
   }
+#pragma GCC diagnostic pop
   return std::nullopt;
 }
 

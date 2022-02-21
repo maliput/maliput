@@ -27,8 +27,11 @@ class ManualPhaseRingBook::Impl {
       throw std::logic_error("Attempted to add multiple PhaseRing instances with ID " + ring.id().string());
     }
     const Phase& phase = ring.phases().begin()->second;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     for (const auto& element : phase.rule_states()) {
       auto r = right_of_way_rule_book_.emplace(element.first, ring.id());
+#pragma GCC diagnostic pop
       if (!r.second) {
         throw std::logic_error("RightOfWayRule with ID " + element.first.string() +
                                " is part of more than one PhaseRing.");
@@ -49,9 +52,12 @@ class ManualPhaseRingBook::Impl {
     }
     MALIPUT_THROW_UNLESS(ring_book_.erase(ring_id) == 1);
     const Phase& phase = ring->phases().begin()->second;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     for (const auto& element : phase.rule_states()) {
       MALIPUT_THROW_UNLESS(right_of_way_rule_book_.erase(element.first) == 1);
     }
+#pragma GCC diagnostic pop
     for (const auto& element : phase.discrete_value_rule_states()) {
       MALIPUT_THROW_UNLESS(rule_book_.erase(element.first) == 1);
     }

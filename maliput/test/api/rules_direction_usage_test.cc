@@ -18,6 +18,8 @@ namespace api {
 namespace rules {
 namespace {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 using Severity = DirectionUsageRule::State::Severity;
 using Type = DirectionUsageRule::State::Type;
 
@@ -88,6 +90,7 @@ TEST_F(DirectionUsageTest, StateTypeMapperTest) {
     EXPECT_EQ(static_cast<int>(dut.count(type)), 1);
   }
 }
+#pragma GCC diagnostic pop
 
 }  // namespace
 }  // namespace rules

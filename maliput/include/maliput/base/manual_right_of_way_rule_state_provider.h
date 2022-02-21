@@ -5,11 +5,16 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 
 namespace maliput {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 /// A trivial implementation of an api::rules::RightOfWayRuleStateProvider.
-class ManualRightOfWayRuleStateProvider final : public api::rules::RightOfWayRuleStateProvider {
+class MALIPUT_DEPRECATED("api::rules::RightOfWayRuleStateProvider class will be deprecated.",
+                         "ManualDiscreteValueRuleStateProvider") ManualRightOfWayRuleStateProvider final
+    : public api::rules::RightOfWayRuleStateProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ManualRightOfWayRuleStateProvider)
 
@@ -38,5 +43,6 @@ class ManualRightOfWayRuleStateProvider final : public api::rules::RightOfWayRul
 
   std::unordered_map<api::rules::RightOfWayRule::Id, api::rules::RightOfWayRule::State::Id> states_;
 };
+#pragma GCC diagnostic pop
 
 }  // namespace maliput

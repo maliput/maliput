@@ -5,13 +5,14 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/state_provider_result.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_deprecated.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 
 /// Abstract interface for the provider of the RightOfWayRule.
-class RightOfWayRuleStateProvider {
+class MALIPUT_DEPRECATED("RigthOfWayRule class will be deprecated.") RightOfWayRuleStateProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RightOfWayRuleStateProvider)
 

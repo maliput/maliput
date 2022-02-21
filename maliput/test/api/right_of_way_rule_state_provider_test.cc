@@ -12,6 +12,8 @@ namespace api {
 namespace rules {
 namespace {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 class RightOfWayRuleStateProviderTest : public ::testing::Test {
  protected:
   const RightOfWayRule::Id kExistingId{"aye"};
@@ -49,6 +51,7 @@ TEST_F(RightOfWayRuleStateProviderTest, ExerciseInterface) {
 
   EXPECT_FALSE(dut.GetState(kNonExistingId).has_value());
 }
+#pragma GCC diagnostic pop
 
 }  // namespace
 }  // namespace rules

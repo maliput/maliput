@@ -38,7 +38,10 @@ class IntersectionBook : public api::IntersectionBook {
 
   api::Intersection* DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) override;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   api::Intersection* DoGetFindIntersection(const api::rules::RightOfWayRule::Id& id) override;
+#pragma GCC diagnostic pop
 
   class Impl;
   std::unique_ptr<Impl> impl_;

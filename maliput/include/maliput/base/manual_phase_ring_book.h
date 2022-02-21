@@ -42,7 +42,10 @@ class ManualPhaseRingBook : public api::rules::PhaseRingBook {
 
   std::optional<api::rules::PhaseRing> DoGetPhaseRing(const api::rules::PhaseRing::Id& ring_id) const override;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   std::optional<api::rules::PhaseRing> DoFindPhaseRing(const api::rules::RightOfWayRule::Id& rule_id) const override;
+#pragma GCC diagnostic pop
 
   std::optional<api::rules::PhaseRing> DoFindPhaseRing(const api::rules::Rule::Id& rule_id) const override;
 

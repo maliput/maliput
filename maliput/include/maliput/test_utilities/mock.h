@@ -366,6 +366,8 @@ LaneSRoute CreateLaneSRoute();
 /// Returns a LaneSRange containing an arbitrary range.
 LaneSRange CreateLaneSRange();
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 /// Returns a rules::RightOfWayRule::State::YieldGroup of size two.
 rules::RightOfWayRule::State::YieldGroup YieldGroup2();
 
@@ -399,6 +401,7 @@ rules::DirectionUsageRule::State CreateDirectionUsageRuleState();
 
 /// Returns a rules::DirectionUsageRule containing an arbitrary state.
 rules::DirectionUsageRule CreateDirectionUsageRule();
+#pragma GCC diagnostic pop
 
 /// Returns an empty rules::Rule::RelatedRules.
 rules::Rule::RelatedRules CreateEmptyRelatedRules();
@@ -557,8 +560,11 @@ std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook();
 /// Returns an arbitrary rules::PhaseRingBook based on `build_flags`.
 std::unique_ptr<rules::PhaseRingBook> CreatePhaseRingBook(const PhaseBuildFlags& build_flags);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 /// Returns an arbitrary rules::RightOfWayRuleStateProvider.
 std::unique_ptr<rules::RightOfWayRuleStateProvider> CreateRightOfWayRuleStateProvider();
+#pragma GCC diagnostic pop
 
 /// Returns an arbitrary rules::PhaseProvider.
 std::unique_ptr<rules::PhaseProvider> CreatePhaseProvider();

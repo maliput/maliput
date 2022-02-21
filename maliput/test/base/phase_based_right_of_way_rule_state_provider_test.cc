@@ -11,15 +11,21 @@ namespace {
 using maliput::api::rules::DiscreteValueRule;
 using maliput::api::rules::Phase;
 using maliput::api::rules::PhaseRing;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::RightOfWayRuleStateProvider;
+#pragma GCC diagnostic pop
 using maliput::api::rules::Rule;
 
 GTEST_TEST(PhaseBasedRightOfWayRuleStateProviderTest, BasicTest) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const RightOfWayRule::Id row_rule_id_a("rule a");
   const RightOfWayRule::Id row_rule_id_b("rule b");
   const RightOfWayRule::State::Id row_state_id_go("GO");
   const RightOfWayRule::State::Id row_state_id_stop("STOP");
+#pragma GCC diagnostic pop
 
   const Rule::Id rule_id_a("Right-Of-Way/rule a");
   const Rule::Id rule_id_b("Right-Of-Way/rule b");
@@ -44,11 +50,16 @@ GTEST_TEST(PhaseBasedRightOfWayRuleStateProviderTest, BasicTest) {
   ManualPhaseProvider phase_provider;
   phase_provider.AddPhaseRing(ring_id, phase_id_1);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   PhaseBasedRightOfWayRuleStateProvider dut(&phase_ring_book, &phase_provider);
+#pragma GCC diagnostic pop
 
   EXPECT_EQ(&dut.phase_ring_book(), &phase_ring_book);
   EXPECT_EQ(&dut.phase_provider(), &phase_provider);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   struct ExpectedState {
     const RightOfWayRule::Id rule;
     const RightOfWayRuleStateProvider::RightOfWayResult result;
@@ -82,6 +93,7 @@ GTEST_TEST(PhaseBasedRightOfWayRuleStateProviderTest, BasicTest) {
                                                       {row_rule_id_b, {row_state_id_go}}};
   compare_expected(phase_2_test_cases);
   EXPECT_FALSE(dut.GetState(RightOfWayRule::Id("unknown rule")).has_value());
+#pragma GCC diagnostic pop
 }
 
 }  // namespace

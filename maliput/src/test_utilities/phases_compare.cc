@@ -10,6 +10,8 @@ namespace api {
 namespace rules {
 namespace test {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const RuleStates& a,
                                    const RuleStates& b) {
   maliput::common::unused(a_expression, b_expression);
@@ -20,6 +22,7 @@ namespace test {
   }
   return c.result();
 }
+#pragma GCC diagnostic pop
 
 ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression,
                                    const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& a,
@@ -51,7 +54,10 @@ namespace test {
   maliput::common::unused(a_expression, b_expression);
   AssertionResultCollector c;
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.id(), b.id()));
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.rule_states(), b.rule_states()));
+#pragma GCC diagnostic pop
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.discrete_value_rule_states(), b.discrete_value_rule_states()));
   MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.bulb_states(), b.bulb_states()));
   return c.result();

@@ -35,6 +35,22 @@ ament_environment_hooks(
 )
 
 ##############################################################################
+# Docs
+##############################################################################
+
+if(BUILD_DOCS)
+  message(STATUS "Doxygen generation - Enabled")
+  find_package(ament_cmake_doxygen REQUIRED)
+    ament_doxygen_generate(doxygen_maliput
+      CONFIG_OVERLAY doc/Doxyfile.overlay.in
+      TEST_ON_WARNS
+    )
+  add_definitions(-DBUILD_DOCS)
+else()
+  message(STATUS "Doxygen generation - Disabled")
+endif()
+
+##############################################################################
 # Sources
 ##############################################################################
 add_subdirectory(include)
@@ -49,22 +65,6 @@ if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(test)
   ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
-endif()
-
-##############################################################################
-# Docs
-##############################################################################
-
-if(NOT DEFINED BUILD_DOCS)
-  set(BUILD_DOCS 1)
-endif()
-
-if(BUILD_DOCS)
-  find_package(ament_cmake_doxygen REQUIRED)
-  ament_doxygen_generate(doxygen_maliput
-    CONFIG_OVERLAY doc/Doxyfile.overlay.in
-    TEST_ON_WARNS
-  )
 endif()
 
 ##############################################################################

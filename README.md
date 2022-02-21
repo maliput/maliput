@@ -29,3 +29,8 @@ source ./bringup
    ```sh
    colcon build --cmake-args -DWITH_PYTHON_VERSION=3 --packages-up-to maliput
    ```
+
+  **Note**: To build documentation a `-BUILD_DOCS` cmake flag is required:
+  ```sh
+  colcon build --packages-select maliput --cmake-args " -DBUILD_DOCS=On"
+  ```

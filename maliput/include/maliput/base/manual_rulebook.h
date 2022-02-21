@@ -28,6 +28,8 @@ class ManualRulebook : public api::rules::RoadRulebook {
   /// Removes all rules.
   void RemoveAll();
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Adds a new RightOfWayRule.
   ///
   /// @throws maliput::common::assertion_error if a rule with the same ID
@@ -60,6 +62,7 @@ class ManualRulebook : public api::rules::RoadRulebook {
   ///
   /// @throws maliput::common::assertion_error if no such rule exists.
   void RemoveRule(const api::rules::DirectionUsageRule::Id& id);
+#pragma GCC diagnostic pop
 
   /// Adds a new DiscreteValueRule.
   ///
@@ -82,9 +85,12 @@ class ManualRulebook : public api::rules::RoadRulebook {
   api::rules::RoadRulebook::QueryResults DoFindRules(const std::vector<api::LaneSRange>& ranges,
                                                      double tolerance) const override;
   api::rules::RoadRulebook::QueryResults DoRules() const override;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   api::rules::RightOfWayRule DoGetRule(const api::rules::RightOfWayRule::Id& id) const override;
   api::rules::SpeedLimitRule DoGetRule(const api::rules::SpeedLimitRule::Id& id) const override;
   api::rules::DirectionUsageRule DoGetRule(const api::rules::DirectionUsageRule::Id& id) const override;
+#pragma GCC diagnostic pop
   api::rules::DiscreteValueRule DoGetDiscreteValueRule(const api::rules::Rule::Id& id) const override;
   api::rules::RangeValueRule DoGetRangeValueRule(const api::rules::Rule::Id& id) const override;
 
