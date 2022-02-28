@@ -324,6 +324,11 @@ class MockRangeValueRuleStateProvider : public rules::RangeValueRuleStateProvide
   std::optional<rules::RangeValueRuleStateProvider::StateResult> DoGetState(const Rule::Id&) const override {
     return std::nullopt;
   }
+  std::optional<rules::RangeValueRuleStateProvider::StateResult> DoGetState(const api::RoadPosition& road_position,
+                                                                            const api::rules::Rule::TypeId& rule_type,
+                                                                            double tolerance) const override {
+    return std::nullopt;
+  }
 };
 
 }  // namespace

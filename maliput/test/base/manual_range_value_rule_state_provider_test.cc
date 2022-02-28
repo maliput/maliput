@@ -15,6 +15,11 @@ namespace maliput {
 namespace test {
 namespace {
 
+using api::LaneId;
+using api::LanePosition;
+using api::LaneSRange;
+using api::LaneSRoute;
+using api::RoadPosition;
 using api::rules::RangeValueRule;
 using api::rules::RangeValueRuleStateProvider;
 using api::rules::RoadRulebook;
@@ -23,7 +28,10 @@ using api::rules::Rule;
 class ManualRangeValueRuleStateProviderTest : public ::testing::Test {
  protected:
   const Rule::Id kRuleId{"rvrt/rvr_id"};
+  const Rule::TypeId kRuleType{"rvrt"};
   const Rule::Id kUnknownRuleId{"rvrt/unknown_id"};
+  const LaneId kLaneId{"a"};
+  const LaneSRange kLaneSRange{kLaneId, {0., 9.}};
   const RangeValueRule::Range kRangeA{api::test::CreateRange()};
   const RangeValueRule::Range kInvalidRange{
       RangeValueRule::Range{Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
@@ -62,6 +70,28 @@ TEST_F(ManualRangeValueRuleStateProviderTest, SetStateTest) {
   // Sets a valid state, next state and duration until.
   EXPECT_NO_THROW(dut.SetState(kRuleId, kRangeA, {kRangeA}, {kDurationUntil}));
   const std::optional<RangeValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
+  EXPECT_TRUE(result.has_value());
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kRangeA));
+  EXPECT_TRUE(result->next.has_value());
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, kRangeA));
+  EXPECT_TRUE(result->next->duration_until.has_value());
+  EXPECT_EQ(result->next->duration_until.value(), kDurationUntil);
+}
+
+TEST_F(ManualRangeValueRuleStateProviderTest, GetStateByRoadPositionAndRuleType) {
+  ManualRangeValueRuleStateProvider dut(road_rulebook_.get());
+  const api::test::MockLane lane{kLaneId};
+  const RoadPosition road_position{
+      &lane, LanePosition{(kLaneSRange.s_range().s0() + kLaneSRange.s_range().s1()) / 2., 0., 0.}};
+  const double tolerance{1e-3};
+  // Sets a valid state, next state and duration until.
+  EXPECT_NO_THROW(dut.SetState(kRuleId, kRangeA, {kRangeA}, {kDurationUntil}));
+  EXPECT_FALSE(dut.GetState(road_position, Rule::TypeId{"UnkownRuleType"}, tolerance).has_value());
+  EXPECT_FALSE(dut.GetState({&lane, LanePosition{1000., 0., 0.}} /* Off zone */, kRuleType, tolerance).has_value());
+  EXPECT_THROW(dut.GetState(road_position, kRuleType, -1. /* Negative tolerance */).has_value(),
+               maliput::common::assertion_error);
+  const std::optional<RangeValueRuleStateProvider::StateResult> result =
+      dut.GetState(road_position, kRuleType, tolerance);
   EXPECT_TRUE(result.has_value());
   EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kRangeA));
   EXPECT_TRUE(result->next.has_value());
