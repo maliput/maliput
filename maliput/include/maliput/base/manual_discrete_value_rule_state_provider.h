@@ -3,6 +3,7 @@
 #include <optional>
 #include <unordered_map>
 
+#include "maliput/api/lane_data.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/discrete_value_rule_state_provider.h"
 #include "maliput/api/rules/road_rulebook.h"
@@ -69,6 +70,13 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   // function.
   virtual std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const override;
+
+  // This function has been marked as virtual because other providers might
+  // benefit from injecting their own getter and then forwarding calls to this
+  // function.
+  virtual std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
+      const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type,
+      double tolerance) const override;
 
  private:
   // @throws common::assertion_error When @p state is unrecognized in

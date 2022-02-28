@@ -308,6 +308,11 @@ class MockDiscreteValueRuleStateProvider : public rules::DiscreteValueRuleStateP
   std::optional<rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(const Rule::Id&) const override {
     return std::nullopt;
   }
+  std::optional<rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
+      const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type,
+      double tolerance) const override {
+    return std::nullopt;
+  }
 };
 
 class MockRangeValueRuleStateProvider : public rules::RangeValueRuleStateProvider {
