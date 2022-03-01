@@ -64,12 +64,18 @@ class ManualRangeValueRuleStateProvider : public api::rules::RangeValueRuleState
                 const std::optional<double>& duration_until);
 
  private:
-  std::optional<api::rules::RangeValueRuleStateProvider::StateResult> DoGetState(
-      const api::rules::Rule::Id& id) const override final;
+  // This function has been marked as virtual because other providers might
+  // benefit from injecting their own getter and then forwarding calls to this
+  // function.
+  virtual std::optional<api::rules::RangeValueRuleStateProvider::StateResult> DoGetState(
+      const api::rules::Rule::Id& id) const override;
 
-  std::optional<api::rules::RangeValueRuleStateProvider::StateResult> DoGetState(
+  // This function has been marked as virtual because other providers might
+  // benefit from injecting their own getter and then forwarding calls to this
+  // function.
+  virtual std::optional<api::rules::RangeValueRuleStateProvider::StateResult> DoGetState(
       const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type,
-      double tolerance) const override final;
+      double tolerance) const override;
 
   // @throws common::assertion_error When @p state is unrecognized in
   //         @p range_value_rule's ranges.
