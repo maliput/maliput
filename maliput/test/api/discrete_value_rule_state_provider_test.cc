@@ -16,7 +16,10 @@ namespace {
 // Mock class to evaluate DiscreteValueRuleStateProvider interface.
 class MockDiscreteValueRuleStateProvider : public DiscreteValueRuleStateProvider {
  public:
+  static const double kTolerance;
   static const Rule::Id kRuleId;
+  static const Rule::TypeId kRuleType;
+  static const RoadPosition kRoadPosition;
   static DiscreteValueRule::DiscreteValue MakeCurrentDiscreteValue();
   static DiscreteValueRule::DiscreteValue MakeNextDiscreteValue();
 
@@ -28,9 +31,22 @@ class MockDiscreteValueRuleStateProvider : public DiscreteValueRuleStateProvider
     }
     return {};
   }
+  std::optional<StateResult> DoGetState(const RoadPosition& road_position, const Rule::TypeId& rule_type,
+                                        double tolerance) const override {
+    if (road_position.lane == kRoadPosition.lane && road_position.pos.srh() == kRoadPosition.pos.srh() &&
+        rule_type == kRuleType && tolerance == kTolerance) {
+      return StateResult{MakeCurrentDiscreteValue(),
+                         StateResult::Next{MakeNextDiscreteValue(), 123.456 /* duration */}};
+    }
+    return {};
+  }
 };
 
+const double MockDiscreteValueRuleStateProvider::kTolerance{1e-3};
 const Rule::Id MockDiscreteValueRuleStateProvider::kRuleId{"RuleId"};
+// Using nullptr lane for the sake of the test.
+const RoadPosition MockDiscreteValueRuleStateProvider::kRoadPosition{nullptr, LanePosition{0., 0., 0.}};
+const Rule::TypeId MockDiscreteValueRuleStateProvider::kRuleType{"My-Rule-Type"};
 
 DiscreteValueRule::DiscreteValue MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue() {
   return DiscreteValueRule::DiscreteValue{Rule::State::kStrict, maliput::api::test::CreateEmptyRelatedRules(),
@@ -42,7 +58,7 @@ DiscreteValueRule::DiscreteValue MockDiscreteValueRuleStateProvider::MakeNextDis
                                           maliput::api::test::CreateEmptyRelatedUniqueIds(), "next_state"};
 }
 
-GTEST_TEST(DiscreteValueRuleStateProviderTest, ExerciseInterface) {
+GTEST_TEST(DiscreteValueRuleStateProviderTest, GetStateById) {
   const MockDiscreteValueRuleStateProvider dut;
   const std::optional<DiscreteValueRuleStateProvider::StateResult> result =
       dut.GetState(MockDiscreteValueRuleStateProvider::kRuleId);
@@ -55,6 +71,31 @@ GTEST_TEST(DiscreteValueRuleStateProviderTest, ExerciseInterface) {
   EXPECT_EQ(result->next->duration_until.value(), 123.456);
 
   EXPECT_FALSE(dut.GetState(Rule::Id("UnregisteredRule")).has_value());
+}
+
+GTEST_TEST(DiscreteValueRuleStateProviderTest, GetStateByRoadPositionAndType) {
+  const MockDiscreteValueRuleStateProvider dut;
+  const std::optional<DiscreteValueRuleStateProvider::StateResult> result =
+      dut.GetState(MockDiscreteValueRuleStateProvider::kRoadPosition, MockDiscreteValueRuleStateProvider::kRuleType,
+                   MockDiscreteValueRuleStateProvider::kTolerance);
+
+  EXPECT_TRUE(result.has_value());
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue()));
+  EXPECT_TRUE(result->next.has_value());
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue()));
+  EXPECT_TRUE(result->next->duration_until.has_value());
+  EXPECT_EQ(result->next->duration_until.value(), 123.456);
+
+  EXPECT_FALSE(dut.GetState(RoadPosition{nullptr, LanePosition{100., 0., 0.}},
+                            MockDiscreteValueRuleStateProvider::kRuleType,
+                            MockDiscreteValueRuleStateProvider::kTolerance)
+                   .has_value());
+  EXPECT_FALSE(dut.GetState(MockDiscreteValueRuleStateProvider::kRoadPosition, Rule::TypeId("Unkown Rule Type"),
+                            MockDiscreteValueRuleStateProvider::kTolerance)
+                   .has_value());
+  EXPECT_FALSE(dut.GetState(MockDiscreteValueRuleStateProvider::kRoadPosition,
+                            MockDiscreteValueRuleStateProvider::kRuleType, 800)
+                   .has_value());
 }
 
 }  // namespace

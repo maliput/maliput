@@ -93,6 +93,7 @@ GTEST_TEST(SRangeTest, WithS) {
 
 GTEST_TEST(SRangeTest, Intersects) {
   const SRange s_range(3., 10.);
+  EXPECT_TRUE(s_range.Intersects(SRange{5., 5.}, kLinearTolerance));
   EXPECT_TRUE(s_range.Intersects(SRange{2., 5.}, kLinearTolerance));
   EXPECT_TRUE(s_range.Intersects(SRange{8., 13.}, kLinearTolerance));
   EXPECT_TRUE(s_range.Intersects(SRange{11., 9.}, kLinearTolerance));
@@ -169,6 +170,7 @@ GTEST_TEST(LaneSRangeTest, Assignment) {
 
 GTEST_TEST(LaneSRangeTest, Intersects) {
   const LaneSRange lane_s_range_a(kLaneId1, SRange(20., 30.));
+  EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{kLaneId1, SRange(25., 25.)}, kLinearTolerance));
   EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{kLaneId1, SRange(25., 35.)}, kLinearTolerance));
   EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{kLaneId1, SRange(70., 10.)}, kLinearTolerance));
   EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{kLaneId1, SRange(15., 25.)}, kLinearTolerance));
@@ -210,6 +212,7 @@ TEST_F(LaneSRouteTest, Assignment) {
 }
 
 TEST_F(LaneSRouteTest, Intersects) {
+  EXPECT_TRUE(LaneSRoute(source_).Intersects(LaneSRoute{{{kLaneId1, SRange(5., 5.)}}}, kLinearTolerance));
   EXPECT_TRUE(LaneSRoute(source_).Intersects(LaneSRoute{{{kLaneId1, SRange(5., 35.)}, {kLaneId2, SRange(32., 1.)}}},
                                              kLinearTolerance));
   EXPECT_TRUE(LaneSRoute(source_).Intersects(LaneSRoute{{{kLaneId3, SRange(100., 102.)}, {kLaneId2, SRange(25., 30.)}}},
