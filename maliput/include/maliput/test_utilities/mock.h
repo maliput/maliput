@@ -456,6 +456,8 @@ rules::PhaseRing CreatePhaseRing(const PhaseBuildFlags& build_flags);
 rules::RangeValueRule CreateRangeValueRuleForContiguityTest();
 
 /// Returns an arbitrary RoadNetwork.
+///
+/// It calls all the Create*() functions in this header file to populate the RoadNetwork.
 std::unique_ptr<RoadNetwork> CreateRoadNetwork();
 
 /// Returns an arbitrary RoadGeometry.
