@@ -5,6 +5,7 @@
 #include "maliput/api/intersection_book.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/road_geometry.h"
+#include "maliput/api/road_network.h"
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/discrete_value_rule_state_provider.h"
@@ -453,6 +454,11 @@ rules::PhaseRing CreatePhaseRing(const PhaseBuildFlags& build_flags);
 
 /// Returns a rules::RangeValueRule containing an arbitrary state.
 rules::RangeValueRule CreateRangeValueRuleForContiguityTest();
+
+/// Returns an arbitrary RoadNetwork.
+///
+/// It calls all the Create*() functions in this header file to populate the RoadNetwork.
+std::unique_ptr<RoadNetwork> CreateRoadNetwork();
 
 /// Returns an arbitrary RoadGeometry.
 std::unique_ptr<RoadGeometry> CreateRoadGeometry();

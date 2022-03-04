@@ -508,6 +508,14 @@ std::unique_ptr<RoadGeometry> CreateMultipleLanesRoadGeometry(const std::vector<
   return std::move(rg);
 }
 
+std::unique_ptr<RoadNetwork> CreateRoadNetwork() {
+  return std::make_unique<RoadNetwork>(
+      std::move(CreateRoadGeometry()), std::move(CreateRoadRulebook()), std::move(CreateTrafficLightBook()),
+      std::move(CreateIntersectionBook()), std::move(CreatePhaseRingBook()),
+      std::move(CreateRightOfWayRuleStateProvider()), std::move(CreatePhaseProvider()), std::move(CreateRuleRegistry()),
+      std::move(CreateDiscreteValueRuleStateProvider()), std::move(CreateRangeValueRuleStateProvider()));
+}
+
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
   return std::make_unique<MockRoadGeometry>(RoadGeometryId("mock"));
 }
