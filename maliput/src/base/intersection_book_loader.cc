@@ -6,26 +6,30 @@
 #include <yaml-cpp/yaml.h>
 
 #include "maliput/api/regions.h"
+#include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/rule.h"
 #include "maliput/base/intersection.h"
 #include "maliput/base/intersection_book.h"
 #include "maliput/common/maliput_throw.h"
 
 using maliput::api::LaneSRange;
 using maliput::api::LaneSRoute;
+using maliput::api::rules::DiscreteValueRule;
 using maliput::api::rules::Phase;
 using maliput::api::rules::PhaseRing;
 using maliput::api::rules::PhaseRingBook;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::RoadRulebook;
+using maliput::api::rules::Rule;
 
 namespace maliput {
 namespace {
 
 // TODO(liang.fok) Eliminate duplicate regions within the returned vector.
-std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook, const Phase& phase) {
+std::vector<LaneSRange> GetRegionOldRules(const RoadRulebook& road_rulebook, const Phase& phase) {
   std::vector<LaneSRange> result;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -33,6 +37,18 @@ std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook, const Phase
     const RightOfWayRule::Id rule_id = rule_state.first;
     const RightOfWayRule rule = road_rulebook.GetRule(rule_id);
 #pragma GCC diagnostic pop
+    for (const auto& range : rule.zone().ranges()) {
+      result.push_back(range);
+    }
+  }
+  return result;
+}
+
+std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook, const Phase& phase) {
+  std::vector<LaneSRange> result;
+  for (const auto& rule_state : phase.discrete_value_rule_states()) {
+    const Rule::Id rule_id = rule_state.first;
+    const DiscreteValueRule rule = road_rulebook.GetDiscreteValueRule(rule_id);
     for (const auto& range : rule.zone().ranges()) {
       result.push_back(range);
     }
@@ -73,7 +89,9 @@ std::unique_ptr<api::Intersection> BuildIntersection(const YAML::Node& intersect
   // The following arbitrarily uses the first phase within the PhaseRing. This
   // is acceptable since a PhaseRing guarantees that all Phases within it share
   // the same domain.
-  const std::vector<LaneSRange> region = GetRegion(road_rulebook, ring->phases().begin()->second);
+  // TODO(#108): Remove GetRegionOldRules usage once old rules are deprecated.
+  std::vector<LaneSRange> region = GetRegion(road_rulebook, ring->phases().begin()->second);
+  region = region.empty() ? GetRegionOldRules(road_rulebook, ring->phases().begin()->second) : region;
   return std::make_unique<Intersection>(id, region, ring.value(), phase_provider);
 }
 
