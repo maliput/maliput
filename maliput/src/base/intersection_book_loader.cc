@@ -29,7 +29,7 @@ namespace maliput {
 namespace {
 
 // TODO(liang.fok) Eliminate duplicate regions within the returned vector.
-std::vector<LaneSRange> GetRegionOldRules(const RoadRulebook& road_rulebook, const Phase& phase) {
+std::vector<LaneSRange> GetRegionOfOldRules(const RoadRulebook& road_rulebook, const Phase& phase) {
   std::vector<LaneSRange> result;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -89,9 +89,9 @@ std::unique_ptr<api::Intersection> BuildIntersection(const YAML::Node& intersect
   // The following arbitrarily uses the first phase within the PhaseRing. This
   // is acceptable since a PhaseRing guarantees that all Phases within it share
   // the same domain.
-  // TODO(#108): Remove GetRegionOldRules usage once old rules are deprecated.
+  // TODO(#108): Remove GetRegionOfOldRules usage once old rules are deprecated.
   std::vector<LaneSRange> region = GetRegion(road_rulebook, ring->phases().begin()->second);
-  region = region.empty() ? GetRegionOldRules(road_rulebook, ring->phases().begin()->second) : region;
+  region = region.empty() ? GetRegionOfOldRules(road_rulebook, ring->phases().begin()->second) : region;
   return std::make_unique<Intersection>(id, region, ring.value(), phase_provider);
 }
 
