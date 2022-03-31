@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <optional>
 #include <unordered_map>
 
@@ -78,6 +79,12 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
       const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type,
       double tolerance) const override;
 
+  // Get the DiscreteValueRules of `rule_type` type that apply to a given `road_position` under certain `tolerance`.
+  std::map<api::rules::DiscreteValueRule::Id, api::rules::DiscreteValueRule> GetFilteredDiscreteValeuRules(
+      const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type, double tolerance) const;
+
+  const api::rules::RoadRulebook* rulebook_{nullptr};
+
  private:
   // @throws common::assertion_error When @p state is unrecognized in
   //         @p discrete_value_rule's values.
@@ -85,7 +92,6 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
                          const api::rules::DiscreteValueRule::DiscreteValue& state) const;
 
   std::unordered_map<api::rules::Rule::Id, api::rules::DiscreteValueRuleStateProvider::StateResult> states_;
-  const api::rules::RoadRulebook* rulebook_{nullptr};
 };
 
 }  // namespace maliput
