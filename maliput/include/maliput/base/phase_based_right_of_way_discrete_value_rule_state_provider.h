@@ -55,15 +55,19 @@ class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public ManualDi
   const api::rules::PhaseProvider& phase_provider() const { return *phase_provider_; }
 
  private:
-  // Gets the state for Right-Of-Way rules as the class docstring explain. When
+  // Gets the state for Right-Of-Way rules as the class docstring explains. When
   // nothing can be told about the rule based on the phase,
   // ManualDiscreteValueRuleStateProvider::DoGetState() is called.
   std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::rules::Rule::Id& id) const final;
 
-  // Gets the state for a `rule_type` rule at `road_position` under certain `tolerance`, as the class docstring explain.
-  // When nothing can be told about the rule based on the phase,
-  // ManualDiscreteValueRuleStateProvider::DoGetState() is called.
+  // Gets the state for a `rule_type` rule at `road_position` under certain `tolerance`, as the class docstring
+  // explains.
+  // Some considerations:
+  //  - When nothing can be told about the rule based on the phase, ManualDiscreteValueRuleStateProvider::DoGetState()
+  //  is called.
+  //  - When per `road_position` and `rule_type` more than one rule is applicable, the state of the first applicable
+  //  rule is returned. In this case an appropriate warning is logged as it is an unusual usecase.
   std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type, double tolerance) const final;
 

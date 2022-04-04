@@ -54,7 +54,7 @@ std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> ManualDis
 
 std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> ManualDiscreteValueRuleStateProvider::DoGetState(
     const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type, double tolerance) const {
-  const auto filtered_discrete_value_rules = GetFilteredDiscreteValeuRules(road_position, rule_type, tolerance);
+  const auto filtered_discrete_value_rules = GetFilteredDiscreteValueRules(road_position, rule_type, tolerance);
   if (filtered_discrete_value_rules.size() > 1) {
     maliput::log()->warn(
         "For rule_type: {} and road_position: [LaneId: {}, LanePos: {}] there are more than one possible rules: ",
@@ -75,7 +75,7 @@ std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> ManualDis
 }
 
 std::map<api::rules::DiscreteValueRule::Id, api::rules::DiscreteValueRule>
-ManualDiscreteValueRuleStateProvider::GetFilteredDiscreteValeuRules(const api::RoadPosition& road_position,
+ManualDiscreteValueRuleStateProvider::GetFilteredDiscreteValueRules(const api::RoadPosition& road_position,
                                                                     const api::rules::Rule::TypeId& rule_type,
                                                                     double tolerance) const {
   MALIPUT_THROW_UNLESS(tolerance >= 0.);

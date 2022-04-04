@@ -79,8 +79,8 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
       const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type,
       double tolerance) const override;
 
-  // Get the DiscreteValueRules of `rule_type` type that apply to a given `road_position` under certain `tolerance`.
-  std::map<api::rules::DiscreteValueRule::Id, api::rules::DiscreteValueRule> GetFilteredDiscreteValeuRules(
+  // Gets the DiscreteValueRules of `rule_type` type that apply to a given `road_position` under certain `tolerance`.
+  std::map<api::rules::DiscreteValueRule::Id, api::rules::DiscreteValueRule> GetFilteredDiscreteValueRules(
       const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type, double tolerance) const;
 
   const api::rules::RoadRulebook* rulebook_{nullptr};

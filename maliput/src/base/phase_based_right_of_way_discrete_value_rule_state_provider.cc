@@ -52,7 +52,7 @@ std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult>
 PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const api::RoadPosition& road_position,
                                                                const api::rules::Rule::TypeId& rule_type,
                                                                double tolerance) const {
-  const auto filtered_discrete_value_rules = GetFilteredDiscreteValeuRules(road_position, rule_type, tolerance);
+  const auto filtered_discrete_value_rules = GetFilteredDiscreteValueRules(road_position, rule_type, tolerance);
   if (filtered_discrete_value_rules.empty()) {
     // Returns empty state result if no rule is found.
     return {};
