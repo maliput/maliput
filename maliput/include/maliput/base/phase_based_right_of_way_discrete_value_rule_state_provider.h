@@ -67,7 +67,7 @@ class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public ManualDi
   //  - When nothing can be told about the rule based on the phase, ManualDiscreteValueRuleStateProvider::DoGetState()
   //  is called.
   //  - When per `road_position` and `rule_type` more than one rule is applicable, the state of the first applicable
-  //  rule is returned. In this case an appropriate warning is logged as it is an unusual usecase.
+  //  rule is returned. In this case an appropriate warning is logged as it is an unusual case.
   std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> DoGetState(
       const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type, double tolerance) const final;
 
