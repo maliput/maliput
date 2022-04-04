@@ -3,6 +3,8 @@
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
+#include "maliput/base/rule_filter.h"
+#include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
 
 namespace maliput {
@@ -44,6 +46,29 @@ PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const Rule::Id& r
     }
   }
   return ManualDiscreteValueRuleStateProvider::DoGetState(rule_id);
+}
+
+std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult>
+PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const api::RoadPosition& road_position,
+                                                               const api::rules::Rule::TypeId& rule_type,
+                                                               double tolerance) const {
+  const auto filtered_discrete_value_rules = GetFilteredDiscreteValueRules(road_position, rule_type, tolerance);
+  if (filtered_discrete_value_rules.empty()) {
+    // Returns empty state result if no rule is found.
+    return {};
+  }
+  if (filtered_discrete_value_rules.size() > 1) {
+    maliput::log()->warn(
+        "For rule_type: {} and road_position: [LaneId: {}, LanePos: {}] there are more than one possible rules: ",
+        rule_type.string(), road_position.lane->id(), road_position.pos.srh().to_str());
+    for (const auto& rule : filtered_discrete_value_rules) {
+      maliput::log()->warn("\tRule id: {} matches with rule_type: {} and road_position: [LaneId: {}, LanePos: {}]",
+                           rule.first.string(), rule_type.string(), road_position.lane->id(),
+                           road_position.pos.srh().to_str());
+    }
+  }
+  // Once we have the rule id we can leverage DoGetState(const Rule::Id& rule_id) method.
+  return DoGetState(filtered_discrete_value_rules.begin()->first);
 }
 
 }  // namespace maliput

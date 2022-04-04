@@ -54,6 +54,30 @@ std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> ManualDis
 
 std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> ManualDiscreteValueRuleStateProvider::DoGetState(
     const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type, double tolerance) const {
+  const auto filtered_discrete_value_rules = GetFilteredDiscreteValueRules(road_position, rule_type, tolerance);
+  if (filtered_discrete_value_rules.size() > 1) {
+    maliput::log()->warn(
+        "For rule_type: {} and road_position: [LaneId: {}, LanePos: {}] there are more than one possible rules: ",
+        rule_type.string(), road_position.lane->id(), road_position.pos.srh().to_str());
+    for (const auto& rule : filtered_discrete_value_rules) {
+      maliput::log()->warn("\tRule id: {} matches with rule_type: {} and road_position: [LaneId: {}, LanePos: {}]",
+                           rule.first.string(), rule_type.string(), road_position.lane->id(),
+                           road_position.pos.srh().to_str());
+    }
+  }
+  std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> current_state{std::nullopt};
+  if (!filtered_discrete_value_rules.empty()) {
+    const auto state = states_.find(filtered_discrete_value_rules.begin()->first);
+    MALIPUT_THROW_UNLESS(state != states_.end());
+    current_state = std::make_optional<>(state->second);
+  }
+  return current_state;
+}
+
+std::map<api::rules::DiscreteValueRule::Id, api::rules::DiscreteValueRule>
+ManualDiscreteValueRuleStateProvider::GetFilteredDiscreteValueRules(const api::RoadPosition& road_position,
+                                                                    const api::rules::Rule::TypeId& rule_type,
+                                                                    double tolerance) const {
   MALIPUT_THROW_UNLESS(tolerance >= 0.);
   const auto query_result_rules = rulebook_->Rules();
   const DiscreteValueRuleFilter rule_type_filter = [&rule_type](const api::rules::DiscreteValueRule& rule) {
@@ -65,23 +89,7 @@ std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> ManualDis
     return rule.zone().Intersects(api::LaneSRoute({lane_s_range}), tolerance);
   };
   const auto filtered_rules = FilterRules(query_result_rules, {rule_type_filter, zone_filter}, {});
-  if (filtered_rules.discrete_value_rules.size() > 1) {
-    maliput::log()->warn(
-        "For rule_type: {} and road_position: [LaneId: {}, LanePos: {}] there are more than one possible rules: ",
-        rule_type.string(), road_position.lane->id(), road_position.pos.srh().to_str());
-    for (const auto& rule : filtered_rules.discrete_value_rules) {
-      maliput::log()->warn("\tRule id: {} matches with rule_type: {} and road_position: [LaneId: {}, LanePos: {}]",
-                           rule.first.string(), rule_type.string(), road_position.lane->id(),
-                           road_position.pos.srh().to_str());
-    }
-  }
-  std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> current_state{std::nullopt};
-  if (!filtered_rules.discrete_value_rules.empty()) {
-    const auto state = states_.find(filtered_rules.discrete_value_rules.begin()->first);
-    MALIPUT_THROW_UNLESS(state != states_.end());
-    current_state = std::make_optional<>(state->second);
-  }
-  return current_state;
+  return filtered_rules.discrete_value_rules;
 }
 
 }  // namespace maliput

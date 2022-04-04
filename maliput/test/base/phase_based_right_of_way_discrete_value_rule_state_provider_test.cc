@@ -11,6 +11,7 @@
 #include "maliput/base/manual_phase_provider.h"
 #include "maliput/base/manual_phase_ring_book.h"
 #include "maliput/base/manual_rulebook.h"
+#include "maliput/base/rule_registry.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
 #include "maliput/test_utilities/rules_compare.h"
@@ -19,9 +20,12 @@
 namespace maliput {
 namespace {
 
+using maliput::api::Lane;
 using maliput::api::LaneId;
+using maliput::api::LanePosition;
 using maliput::api::LaneSRange;
 using maliput::api::LaneSRoute;
+using maliput::api::RoadPosition;
 using maliput::api::rules::DiscreteValueRule;
 using maliput::api::rules::DiscreteValueRuleStateProvider;
 using maliput::api::rules::Phase;
@@ -48,12 +52,21 @@ GTEST_TEST(PhaseBasedRightOfWayDiscreteValueRuleStateProviderTest, ConstructorCo
 // Evaluates the phase based behavior of the state provider.
 class PhaseBasedBehaviorTest : public ::testing::Test {
  protected:
-  struct ExpectedState {
+  struct ExpectedStateByRule {
     const Rule::Id rule;
     const DiscreteValueRuleStateProvider::StateResult result;
   };
 
-  const LaneSRange kZone{LaneId{"a"}, {10., 20.}};
+  struct ExpectedStateByRoadPosition {
+    const maliput::api::RoadPosition road_position;
+    const Rule::TypeId rule_type;
+    const DiscreteValueRuleStateProvider::StateResult result;
+  };
+
+  const LaneId kLaneIdA{"a"};
+  const LaneId kLaneIdB{"b"};
+  const LaneSRange kZoneA{kLaneIdA, {0., 9.}};
+  const LaneSRange kZoneB{kLaneIdB, {0., 9.}};
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const RightOfWayRule::Id row_rule_id_a{"rule a"};
@@ -62,7 +75,7 @@ class PhaseBasedBehaviorTest : public ::testing::Test {
   const RightOfWayRule::State::Id row_state_id_stop{"STOP"};
   const RightOfWayRule right_of_way_rule_a{
       row_rule_id_a,
-      LaneSRoute({kZone}),
+      LaneSRoute({kZoneA}),
       RightOfWayRule::ZoneType::kStopExcluded,
       {RightOfWayRule::State{row_state_id_go, RightOfWayRule::State::Type::kGo, {}},
        RightOfWayRule::State{row_state_id_stop, RightOfWayRule::State::Type::kStop, {}}},
@@ -70,24 +83,24 @@ class PhaseBasedBehaviorTest : public ::testing::Test {
   };
   const RightOfWayRule right_of_way_rule_b{
       row_rule_id_b,
-      LaneSRoute({kZone}),
+      LaneSRoute({kZoneB}),
       RightOfWayRule::ZoneType::kStopExcluded,
       {RightOfWayRule::State{row_state_id_go, RightOfWayRule::State::Type::kGo, {}},
        RightOfWayRule::State{row_state_id_stop, RightOfWayRule::State::Type::kStop, {}}},
       {} /* related_bulb_groups */
   };
 #pragma GCC diagnostic pop
-
-  const Rule::Id rule_id_a{"Right-Of-Way/rule a"};
-  const Rule::Id rule_id_b{"Right-Of-Way/rule b"};
+  const Rule::TypeId kRuleType{maliput::RightOfWayRuleTypeId()};
+  const Rule::Id rule_id_a{kRuleType.string() + "/rule a"};
+  const Rule::Id rule_id_b{kRuleType.string() + "/rule b"};
   const DiscreteValueRule::DiscreteValue state_go{Rule::State::kStrict, Rule::RelatedRules{}, Rule::RelatedUniqueIds{},
                                                   "Go"};
   const DiscreteValueRule::DiscreteValue state_stop{Rule::State::kStrict, Rule::RelatedRules{},
                                                     Rule::RelatedUniqueIds{}, "Stop"};
   const DiscreteValueRule right_of_way_discrete_value_rule_a{
-      rule_id_a, Rule::TypeId("Right-Of-Way"), LaneSRoute({kZone}), {state_go, state_stop}};
+      rule_id_a, kRuleType, LaneSRoute({kZoneA}), {state_go, state_stop}};
   const DiscreteValueRule right_of_way_discrete_value_rule_b{
-      rule_id_b, Rule::TypeId("Right-Of-Way"), LaneSRoute({kZone}), {state_go, state_stop}};
+      rule_id_b, kRuleType, LaneSRoute({kZoneB}), {state_go, state_stop}};
 
   const Phase::Id phase_id_1{"phase1"};
   const Phase phase1{phase_id_1,
@@ -100,6 +113,7 @@ class PhaseBasedBehaviorTest : public ::testing::Test {
 
   const PhaseRing::Id ring_id{"ring"};
   const PhaseRing ring{ring_id, {phase1, phase2}};
+  const double kTolerance{1e-3};
 
   void SetUp() override {
     rulebook_.AddRule(right_of_way_rule_a);
@@ -112,22 +126,38 @@ class PhaseBasedBehaviorTest : public ::testing::Test {
     phase_provider_.AddPhaseRing(ring_id, phase_id_1);
   }
 
-  void CompareExpectedTestCases(const DiscreteValueRuleStateProvider& dut,
-                                const std::vector<ExpectedState>& test_cases) const {
+  void CompareExpectedTestCasesByRule(const DiscreteValueRuleStateProvider& dut,
+                                      const std::vector<ExpectedStateByRule> test_cases) const {
     for (const auto& test : test_cases) {
       const std::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(test.rule);
       EXPECT_TRUE(result.has_value());
-      EXPECT_EQ(result->state, test.result.state);
-      if (test.result.next) {
-        EXPECT_EQ(result->next->state, test.result.next->state);
-        if (test.result.next->duration_until) {
-          EXPECT_EQ(*result->next->duration_until, *test.result.next->duration_until);
-        } else {
-          EXPECT_EQ(result->next->duration_until, std::nullopt);
-        }
+      CompareDiscreteValueRuleStateProviderResult(test.result, *result);
+    }
+  }
+
+  void CompareExpectedTestCasesByRoadPosition(const DiscreteValueRuleStateProvider& dut,
+                                              const std::vector<ExpectedStateByRoadPosition> test_cases) const {
+    for (const auto& test : test_cases) {
+      const std::optional<DiscreteValueRuleStateProvider::StateResult> result =
+          dut.GetState(test.road_position, test.rule_type, kTolerance);
+      EXPECT_TRUE(result.has_value());
+      CompareDiscreteValueRuleStateProviderResult(test.result, *result);
+    }
+  }
+
+  void CompareDiscreteValueRuleStateProviderResult(
+      const DiscreteValueRuleStateProvider::StateResult& expected_result,
+      const DiscreteValueRuleStateProvider::StateResult& actual_result) const {
+    EXPECT_EQ(expected_result.state, actual_result.state);
+    if (expected_result.next) {
+      EXPECT_EQ(expected_result.next->state, actual_result.next->state);
+      if (expected_result.next->duration_until) {
+        EXPECT_EQ(*expected_result.next->duration_until, *actual_result.next->duration_until);
       } else {
-        EXPECT_EQ(result->next, std::nullopt);
+        EXPECT_EQ(expected_result.next->duration_until, std::nullopt);
       }
+    } else {
+      EXPECT_EQ(expected_result.next, std::nullopt);
     }
   }
 
@@ -144,13 +174,40 @@ TEST_F(PhaseBasedBehaviorTest, PhaseBasedBehavior) {
 
   // TODO(liang.fok) Add tests for "next state" in returned results once #9993
   // is resolved.
-  const std::vector<ExpectedState> phase_1_test_cases{{rule_id_a, {state_go, std::nullopt}},
-                                                      {rule_id_b, {state_stop, std::nullopt}}};
-  CompareExpectedTestCases(dut, phase_1_test_cases);
+  const std::vector<ExpectedStateByRule> phase_1_test_cases{{rule_id_a, {state_go, std::nullopt}},
+                                                            {rule_id_b, {state_stop, std::nullopt}}};
+  CompareExpectedTestCasesByRule(dut, phase_1_test_cases);
   phase_provider_.SetPhase(ring_id, phase_id_2);
-  const std::vector<ExpectedState> phase_2_test_cases{{rule_id_a, {state_stop}}, {rule_id_b, {state_go}}};
-  CompareExpectedTestCases(dut, phase_2_test_cases);
+  const std::vector<ExpectedStateByRule> phase_2_test_cases{{rule_id_a, {state_stop}}, {rule_id_b, {state_go}}};
+  CompareExpectedTestCasesByRule(dut, phase_2_test_cases);
   EXPECT_FALSE(dut.GetState(Rule::Id("unknown rule")).has_value());
+}
+
+TEST_F(PhaseBasedBehaviorTest, GetStateByRoadPositionBehavior) {
+  PhaseBasedRightOfWayDiscreteValueRuleStateProvider dut(&rulebook_, &phase_ring_book_, &phase_provider_);
+  EXPECT_EQ(&dut.phase_ring_book(), &phase_ring_book_);
+  EXPECT_EQ(&dut.phase_provider(), &phase_provider_);
+
+  const api::test::MockLane lane_a{kLaneIdA};
+  const api::test::MockLane lane_b{kLaneIdB};
+  const RoadPosition road_position_a{&lane_a,
+                                     LanePosition{(kZoneA.s_range().s0() + kZoneA.s_range().s1()) / 2., 0., 0.}};
+  const RoadPosition road_position_b{&lane_b,
+                                     LanePosition{(kZoneB.s_range().s0() + kZoneB.s_range().s1()) / 2., 0., 0.}};
+  const std::vector<ExpectedStateByRoadPosition> phase_1_test_cases{
+      {road_position_a, kRuleType, {state_go, std::nullopt}},
+      {road_position_b, kRuleType, {state_stop, std::nullopt}},
+  };
+  CompareExpectedTestCasesByRoadPosition(dut, phase_1_test_cases);
+  phase_provider_.SetPhase(ring_id, phase_id_2);
+  const std::vector<ExpectedStateByRoadPosition> phase_2_test_cases{
+      {road_position_a, kRuleType, {state_stop, std::nullopt}},
+      {road_position_b, kRuleType, {state_go, std::nullopt}},
+  };
+  CompareExpectedTestCasesByRoadPosition(dut, phase_2_test_cases);
+  EXPECT_FALSE(dut.GetState({&lane_a, LanePosition{1000., 0., 0.}} /* Off zone */, kRuleType, kTolerance).has_value());
+  EXPECT_THROW(dut.GetState(road_position_a, kRuleType, -1. /* Negative tolerance */).has_value(),
+               maliput::common::assertion_error);
 }
 
 // Evaluates the manual behavior of the state provider.
