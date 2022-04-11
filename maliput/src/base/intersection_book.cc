@@ -45,18 +45,19 @@ class IntersectionBook::Impl {
     return it->second.get();
   }
 
-  Intersection* DoGetFindIntersection(const api::InertialPosition& inertial_pose, const api::RoadGeometry* road_geometry) {
-  //TODO add maliputpy binding layer
-  // TODO add to maliput implementations (maliput_malidrive maliput_multilane, maliput_dragway?, test others too)
-  // TODO add_road_network_* method
-  // auto road_geometry = road_network_->road_geometry()
-  for (const auto& intersection : DoGetIntersections()) {
-    if (intersection->Includes(inertial_pose, road_geometry)) {
-      return intersection;
+  Intersection* DoGetFindIntersection(const api::InertialPosition& inertial_pose,
+                                      const api::RoadGeometry* road_geometry) {
+    // TODO add maliputpy binding layer
+    // TODO add to maliput implementations (maliput_malidrive maliput_multilane, maliput_dragway?, test others too)
+    // TODO add_road_network_* method
+    // auto road_geometry = road_network_->road_geometry()
+    for (const auto& intersection : DoGetIntersections()) {
+      if (intersection->Includes(inertial_pose, road_geometry)) {
+        return intersection;
+      }
     }
+    return nullptr;
   }
-  return nullptr;
-}
 
  private:
   std::unordered_map<Intersection::Id, std::unique_ptr<Intersection>> book_;
@@ -112,8 +113,9 @@ api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::Dis
   return nullptr;
 }
 
-Intersection* IntersectionBook::DoGetFindIntersection(const api::InertialPosition& inertial_pose, const api::RoadGeometry* road_geometry) { 
-    return impl_->DoGetFindIntersection(inertial_pose, road_geometry);
+Intersection* IntersectionBook::DoGetFindIntersection(const api::InertialPosition& inertial_pose,
+                                                      const api::RoadGeometry* road_geometry) {
+  return impl_->DoGetFindIntersection(inertial_pose, road_geometry);
 }
 
 #pragma GCC diagnostic push
