@@ -45,7 +45,9 @@ class IntersectionBook {
   /// @param inertial_pose A position in inertial space (TODO TERMINOLOGY space?)
   /// @returns The Intersection that contains `inertial_pose`. When none of the Intersections have overlap with
   /// `inertial_pose`, nullptr is returned.
-  Intersection* FindIntersection(const InertialPosition& inertial_pose, const api::RoadGeometry* road_geometry) { return DoGetFindIntersection(inertial_pose, road_geometry); }
+  Intersection* FindIntersection(const InertialPosition& inertial_pose, const api::RoadGeometry* road_geometry) {
+    return DoGetFindIntersection(inertial_pose, road_geometry);
+  }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -70,7 +72,8 @@ class IntersectionBook {
 
   virtual Intersection* DoGetFindIntersection(const rules::DiscreteValueRule::Id& id) = 0;
 
-  virtual Intersection* DoGetFindIntersection(const InertialPosition& inertial_pose, const api::RoadGeometry* road_geometry) = 0;
+  virtual Intersection* DoGetFindIntersection(const InertialPosition& inertial_pose,
+                                              const api::RoadGeometry* road_geometry) = 0;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"

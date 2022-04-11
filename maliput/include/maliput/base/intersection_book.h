@@ -39,7 +39,8 @@ class IntersectionBook : public api::IntersectionBook {
   api::Intersection* DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) override;
 
   // api::Intersection* DoGetFindIntersection(const api::InertialPosition& inetial_pose) override;
-  api::Intersection* DoGetFindIntersection(const api::InertialPosition& inetial_pose, const api::RoadGeometry* road_geometry) override;
+  api::Intersection* DoGetFindIntersection(const api::InertialPosition& inetial_pose,
+                                           const api::RoadGeometry* road_geometry) override;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
