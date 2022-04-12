@@ -12,10 +12,10 @@ namespace maliput {
 void ManualDiscreteValueRuleStateProvider::ValidateRuleState(
     const api::rules::DiscreteValueRule& discrete_value_rule,
     const api::rules::DiscreteValueRule::DiscreteValue& state) const {
-  if (std::find(discrete_value_rule.values().begin(), discrete_value_rule.values().end(), state) ==
-      discrete_value_rule.values().end()) {
+  if (std::find(discrete_value_rule.states().begin(), discrete_value_rule.states().end(), state) ==
+      discrete_value_rule.states().end()) {
     MALIPUT_THROW_MESSAGE("DiscreteValue is not in DiscreteValueRule " + discrete_value_rule.id().string() +
-                          "'s' values().");
+                          "'s' states().");
   }
 }
 

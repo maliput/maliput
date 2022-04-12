@@ -162,7 +162,7 @@ void CheckPhaseDiscreteValueRuleStates(const RoadNetwork& road_network) {
   auto evaluate_phase = [rulebook = road_network.rulebook()](const rules::Phase& phase) {
     for (const auto& rule_id_value : phase.discrete_value_rule_states()) {
       const rules::DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id_value.first);
-      if (std::find(rule.values().begin(), rule.values().end(), rule_id_value.second) == rule.values().end()) {
+      if (std::find(rule.states().begin(), rule.states().end(), rule_id_value.second) == rule.states().end()) {
         MALIPUT_THROW_MESSAGE("DiscreteValueRuleStates have an unknown DiscreteValue referenced by Rule(id: " +
                               rule.id().string() + ") in Phase(id: " + phase.id().string() + ")");
       }
@@ -223,7 +223,7 @@ void CheckRelatedRues(const RoadNetwork& road_network) {
   const rules::RoadRulebook::QueryResults rules = road_network.rulebook()->Rules();
 
   for (const auto& kv : rules.discrete_value_rules) {
-    for (const auto& value : kv.second.values()) {
+    for (const auto& value : kv.second.states()) {
       for (const auto& group_related_rule_ids : value.related_rules) {
         for (const auto& related_rule_id : group_related_rule_ids.second) {
           if (!IsRuleIdIn(related_rule_id, rules.discrete_value_rules, rules.range_value_rules)) {
@@ -240,7 +240,7 @@ void CheckRelatedRues(const RoadNetwork& road_network) {
   }
 
   for (const auto& kv : rules.range_value_rules) {
-    for (const auto& range : kv.second.ranges()) {
+    for (const auto& range : kv.second.states()) {
       for (const auto& group_related_rule_ids : range.related_rules) {
         for (const auto& related_rule_id : group_related_rule_ids.second) {
           if (!IsRuleIdIn(related_rule_id, rules.discrete_value_rules, rules.range_value_rules)) {

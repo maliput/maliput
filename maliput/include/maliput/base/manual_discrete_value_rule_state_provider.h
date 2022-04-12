@@ -46,9 +46,9 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   /// @param id DiscreteValueRule's ID. It must be recognized by the `rulebook`
   ///        specified at time of construction.
   /// @param state The state of the rule. It must be one in
-  ///        DiscreteValueRule::values().
+  ///        DiscreteValueRule::states().
   /// @param next_state The optional next state of the rule. It must be one in
-  ///        DiscreteValueRule::values().
+  ///        DiscreteValueRule::states().
   /// @param duration_until If known, the estimated time until the transition to
   ///        the next state, relative to when this method is called. When
   ///        provided, it must be positive and @p next_state must not be nullopt.
@@ -56,9 +56,9 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   /// @throws std::out_of_range When @p id is unrecognized by the `rulebook`
   ///         specified at time of construction.
   /// @throws common::assertion_error When @p state does not match any state
-  ///         in DiscreteValueRule::values().
+  ///         in DiscreteValueRule::states().
   /// @throws common::assertion_error When @p next_state does not match any
-  ///         state in DiscreteValueRule::values().
+  ///         state in DiscreteValueRule::states().
   /// @throws common::assertion_error When @p duration_until is not positive or
   ///         it is provided when @p next_state is nullopt.
   void SetState(const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& state,

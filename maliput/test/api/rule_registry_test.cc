@@ -234,14 +234,14 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
   EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(range_value_rule.zone(), kZone));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.ranges(), {kRangeA}));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.states(), {kRangeA}));
 
   // Builds and evaluates a RangeValueRule of the same type but with non-empty RelatedRules.
   range_value_rule = dut.BuildRangeValueRule(kRangeRuleId, kRangeValueRuleType, kZone, {kRangeB});
   EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
   EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(range_value_rule.zone(), kZone));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.ranges(), {kRangeB}));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.states(), {kRangeB}));
 
   // Unregistered type.
   EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {kRangeA}),
@@ -261,7 +261,7 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   EXPECT_EQ(discrete_value_rule.id(), kDiscreteValueRuleId);
   EXPECT_EQ(discrete_value_rule.type_id(), kDiscreteValueRuleType);
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(discrete_value_rule.zone(), kZone));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(discrete_value_rule.values(), kExpectedDiscreteValues));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(discrete_value_rule.states(), kExpectedDiscreteValues));
 
   // Unregistered type.
   EXPECT_THROW(dut.BuildDiscreteValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, kExpectedDiscreteValues),

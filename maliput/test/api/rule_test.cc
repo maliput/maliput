@@ -142,7 +142,7 @@ TEST_F(RuleTest, RangeValueRuleAccessors) {
   EXPECT_EQ(dut.id(), kId);
   EXPECT_EQ(dut.type_id(), kTypeId);
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), kZone));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.ranges(), kRanges));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states(), kRanges));
 }
 
 // Evaluates the equal and not equal operator overloads for
@@ -346,7 +346,7 @@ TEST_F(RuleTest, DiscreteValueRuleAccessors) {
   EXPECT_EQ(dut.id(), kId);
   EXPECT_EQ(dut.type_id(), kTypeId);
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), kZone));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.values(), kDiscreteValues));
+  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states(), kDiscreteValues));
 }
 
 // Evaluates the equal and not equal operator overloads for

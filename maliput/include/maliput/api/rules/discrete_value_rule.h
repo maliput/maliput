@@ -60,10 +60,10 @@ class DiscreteValueRule : public Rule {
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                     const std::vector<DiscreteValue>& values);
 
-  const std::vector<DiscreteValue>& values() const { return values_; }
+  const std::vector<DiscreteValue>& states() const { return states_; }
 
  private:
-  std::vector<DiscreteValue> values_;
+  std::vector<DiscreteValue> states_;
 };
 
 }  // namespace rules

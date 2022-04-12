@@ -97,7 +97,7 @@ DiscreteValueRule::DiscreteValue GetDefaultState(const std::vector<DiscreteValue
 DiscreteValueRuleStates CreateDefaultRuleStates(const std::unordered_map<Rule::Id, DiscreteValueRule> rules) {
   DiscreteValueRuleStates result;
   for (const auto& rule : rules) {
-    result.emplace(rule.first, GetDefaultState(rule.second.values()));
+    result.emplace(rule.first, GetDefaultState(rule.second.states()));
   }
   return result;
 }
@@ -213,9 +213,9 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
       std::string value(rule_state_it.second.as<std::string>());
       MALIPUT_THROW_UNLESS(discrete_rules.find(rule_id) != discrete_rules.end());
       const auto discrete_value_itr = std::find_if(
-          discrete_rules.at(rule_id).values().begin(), discrete_rules.at(rule_id).values().end(),
+          discrete_rules.at(rule_id).states().begin(), discrete_rules.at(rule_id).states().end(),
           [&value](const DiscreteValueRule::DiscreteValue& discrete_value) { return discrete_value.value == value; });
-      MALIPUT_THROW_UNLESS(discrete_value_itr != discrete_rules.at(rule_id).values().end());
+      MALIPUT_THROW_UNLESS(discrete_value_itr != discrete_rules.at(rule_id).states().end());
       MALIPUT_THROW_UNLESS(discrete_rule_states.find(rule_id) != discrete_rule_states.end());
       discrete_rule_states.at(rule_id) = *discrete_value_itr;
     }

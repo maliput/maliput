@@ -214,8 +214,8 @@ class PhaseRingBookLoaderFromFileTest : public ::testing::Test {
       StraightRoadNetworkHelpers::CreateEastFacingTrafficLight()};
 
   const DiscreteValueRuleStates expected_discrete_value_rule_states_all_go_phase{
-      {kEastWestDiscreteRule.id(), kEastWestDiscreteRule.values()[0]},
-      {kWestEastDiscreteRule.id(), kWestEastDiscreteRule.values()[0]}};
+      {kEastWestDiscreteRule.id(), kEastWestDiscreteRule.states()[0]},
+      {kWestEastDiscreteRule.id(), kWestEastDiscreteRule.states()[0]}};
 
   const BulbStates expected_bulb_states_all_go_phase{
       // West facing bulbs.
@@ -229,8 +229,8 @@ class PhaseRingBookLoaderFromFileTest : public ::testing::Test {
   };
 
   const DiscreteValueRuleStates expected_discrete_value_rule_states_all_stop_phase{
-      {kEastWestDiscreteRule.id(), kEastWestDiscreteRule.values()[1]},
-      {kWestEastDiscreteRule.id(), kWestEastDiscreteRule.values()[1]}};
+      {kEastWestDiscreteRule.id(), kEastWestDiscreteRule.states()[1]},
+      {kWestEastDiscreteRule.id(), kWestEastDiscreteRule.states()[1]}};
 
   const BulbStates expected_bulb_states_all_stop_phase{
       // West facing bulbs.
