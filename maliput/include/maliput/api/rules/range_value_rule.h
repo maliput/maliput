@@ -76,10 +76,10 @@ class RangeValueRule : public Rule {
   RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                  const std::vector<Range>& ranges);
 
-  const std::vector<Range>& ranges() const { return ranges_; }
+  const std::vector<Range>& states() const { return states_; }
 
  private:
-  std::vector<Range> ranges_;
+  std::vector<Range> states_;
 };
 
 }  // namespace rules

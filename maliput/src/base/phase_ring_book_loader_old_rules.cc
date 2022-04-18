@@ -194,7 +194,7 @@ DiscreteValueRule::DiscreteValue FindDiscreteValueFromRightOfWayRuleState(
 
   const DiscreteValueRule::DiscreteValue discrete_value{Rule::State::kStrict, related_rules, related_unique_ids,
                                                         kRightOfWayStateToString.at(row_state.type())};
-  MALIPUT_THROW_UNLESS(std::find(rule.values().begin(), rule.values().end(), discrete_value) != rule.values().end());
+  MALIPUT_THROW_UNLESS(std::find(rule.states().begin(), rule.states().end(), discrete_value) != rule.states().end());
   return discrete_value;
 }
 

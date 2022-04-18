@@ -11,9 +11,9 @@ namespace maliput {
 
 void ManualRangeValueRuleStateProvider::ValidateRuleState(const api::rules::RangeValueRule& range_value_rule,
                                                           const api::rules::RangeValueRule::Range& state) const {
-  if (std::find(range_value_rule.ranges().begin(), range_value_rule.ranges().end(), state) ==
-      range_value_rule.ranges().end()) {
-    MALIPUT_THROW_MESSAGE("Range is not in RangeValueRule " + range_value_rule.id().string() + "'s' ranges().");
+  if (std::find(range_value_rule.states().begin(), range_value_rule.states().end(), state) ==
+      range_value_rule.states().end()) {
+    MALIPUT_THROW_MESSAGE("Range is not in RangeValueRule " + range_value_rule.id().string() + "'s' states().");
   }
 }
 

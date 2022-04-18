@@ -10,15 +10,15 @@ namespace rules {
 
 RangeValueRule::RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                                const std::vector<Range>& ranges)
-    : Rule(id, type_id, zone), ranges_(ranges) {
-  MALIPUT_VALIDATE(!ranges_.empty(), "RangeValueRule(" + id.string() + ") has no RangeValueRule::Ranges.");
-  for (const Range& range : ranges_) {
+    : Rule(id, type_id, zone), states_(ranges) {
+  MALIPUT_VALIDATE(!states_.empty(), "RangeValueRule(" + id.string() + ") has no RangeValueRule::Ranges.");
+  for (const Range& range : states_) {
     ValidateRelatedRules(range.related_rules);
     ValidateRelatedUniqueIds(range.related_unique_ids);
     ValidateSeverity(range.severity);
     MALIPUT_VALIDATE(range.min <= range.max,
                      "RangeValueRule(" + id.string() + ") has a RangeValueRule::Ranges whose min > max.");
-    MALIPUT_VALIDATE(std::count(ranges_.begin(), ranges_.end(), range) == 1,
+    MALIPUT_VALIDATE(std::count(states_.begin(), states_.end(), range) == 1,
                      "RangeValueRule(" + id.string() + ") has duplicated RangeValueRule::Ranges.");
   }
 }
