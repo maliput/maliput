@@ -32,11 +32,11 @@ namespace maliput {
 /// one. At build time, it is expected that the loader calls
 /// ManualDiscreteValueRuleStateProvider::SetState() for those non Right-Of-Way
 /// rules that are part of the RoadRulebook.
-class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public ManualDiscreteValueRuleStateProvider {
+class PhasedDiscreteRuleStateProvider final : public ManualDiscreteValueRuleStateProvider {
  public:
-  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseBasedRightOfWayDiscreteValueRuleStateProvider)
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhasedDiscreteRuleStateProvider)
 
-  /// Constructs a PhaseBasedRightOfWayDiscreteValueRuleStateProvider.
+  /// Constructs a PhasedDiscreteRuleStateProvider.
   ///
   /// All pointer parameters are aliased; they must not be nullptr and their
   /// lifespans must exceed that of this instance.
@@ -44,11 +44,11 @@ class PhaseBasedRightOfWayDiscreteValueRuleStateProvider final : public ManualDi
   /// @throws common::assertion_error When `rulebook` is nullptr.
   /// @throws common::assertion_error When `phase_ring_book` is nullptr.
   /// @throws common::assertion_error When `phase_provider` is nullptr.
-  PhaseBasedRightOfWayDiscreteValueRuleStateProvider(const api::rules::RoadRulebook* rulebook,
+  PhasedDiscreteRuleStateProvider(const api::rules::RoadRulebook* rulebook,
                                                      const api::rules::PhaseRingBook* phase_ring_book,
                                                      const api::rules::PhaseProvider* phase_provider);
 
-  ~PhaseBasedRightOfWayDiscreteValueRuleStateProvider() final = default;
+  ~PhasedDiscreteRuleStateProvider() final = default;
 
   const api::rules::PhaseRingBook& phase_ring_book() const { return *phase_ring_book_; }
 
