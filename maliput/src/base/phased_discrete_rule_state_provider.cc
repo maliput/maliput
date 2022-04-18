@@ -1,4 +1,4 @@
-#include "maliput/base/phase_discrete_rule_state_provider.h"
+#include "maliput/base/phased_discrete_rule_state_provider.h"
 
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
