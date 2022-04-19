@@ -45,8 +45,8 @@ class PhasedDiscreteRuleStateProvider final : public ManualDiscreteValueRuleStat
   /// @throws common::assertion_error When `phase_ring_book` is nullptr.
   /// @throws common::assertion_error When `phase_provider` is nullptr.
   PhasedDiscreteRuleStateProvider(const api::rules::RoadRulebook* rulebook,
-                                                     const api::rules::PhaseRingBook* phase_ring_book,
-                                                     const api::rules::PhaseProvider* phase_provider);
+                                  const api::rules::PhaseRingBook* phase_ring_book,
+                                  const api::rules::PhaseProvider* phase_provider);
 
   ~PhasedDiscreteRuleStateProvider() final = default;
 

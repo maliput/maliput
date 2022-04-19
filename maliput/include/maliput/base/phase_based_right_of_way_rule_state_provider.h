@@ -29,8 +29,8 @@ namespace maliput {
 /// The rules above will ensure vehicles traveling on Street A do not collide
 /// with vehicles traveling on Street B and vice versa.
 class MALIPUT_DEPRECATED("api::rules::RightOfWayRuleStateProvider class will be deprecated.",
-                         "PhasedDiscreteRuleStateProvider")
-    PhaseBasedRightOfWayRuleStateProvider final : public api::rules::RightOfWayRuleStateProvider {
+                         "PhasedDiscreteRuleStateProvider") PhaseBasedRightOfWayRuleStateProvider final
+    : public api::rules::RightOfWayRuleStateProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhaseBasedRightOfWayRuleStateProvider)
 

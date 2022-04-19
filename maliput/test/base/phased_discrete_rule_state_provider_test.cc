@@ -35,17 +35,15 @@ using maliput::api::rules::RoadRulebook;
 using maliput::api::rules::Rule;
 
 // Evaluates constructor constraints.
-GTEST_TEST(PhaseBasedRightOfWayDiscreteValueRuleStateProviderTest, ConstructorConstraints) {
+GTEST_TEST(PhasedDiscreteRuleStateProviderTest, ConstructorConstraints) {
   const ManualRulebook rulebook;
   const ManualPhaseRingBook phase_ring_book;
   const ManualPhaseProvider phase_provider;
 
   EXPECT_THROW(PhasedDiscreteRuleStateProvider(nullptr, &phase_ring_book, &phase_provider),
                maliput::common::assertion_error);
-  EXPECT_THROW(PhasedDiscreteRuleStateProvider(&rulebook, nullptr, &phase_provider),
-               maliput::common::assertion_error);
-  EXPECT_THROW(PhasedDiscreteRuleStateProvider(&rulebook, &phase_ring_book, nullptr),
-               maliput::common::assertion_error);
+  EXPECT_THROW(PhasedDiscreteRuleStateProvider(&rulebook, nullptr, &phase_provider), maliput::common::assertion_error);
+  EXPECT_THROW(PhasedDiscreteRuleStateProvider(&rulebook, &phase_ring_book, nullptr), maliput::common::assertion_error);
   EXPECT_NO_THROW(PhasedDiscreteRuleStateProvider(&rulebook, &phase_ring_book, &phase_provider));
 }
 
