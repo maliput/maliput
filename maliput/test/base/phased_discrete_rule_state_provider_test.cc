@@ -1,4 +1,4 @@
-#include "maliput/base/phase_based_right_of_way_discrete_value_rule_state_provider.h"
+#include "maliput/base/phased_discrete_rule_state_provider.h"
 
 #include <memory>
 
@@ -35,18 +35,16 @@ using maliput::api::rules::RoadRulebook;
 using maliput::api::rules::Rule;
 
 // Evaluates constructor constraints.
-GTEST_TEST(PhaseBasedRightOfWayDiscreteValueRuleStateProviderTest, ConstructorConstraints) {
+GTEST_TEST(PhasedDiscreteRuleStateProviderTest, ConstructorConstraints) {
   const ManualRulebook rulebook;
   const ManualPhaseRingBook phase_ring_book;
   const ManualPhaseProvider phase_provider;
 
-  EXPECT_THROW(PhaseBasedRightOfWayDiscreteValueRuleStateProvider(nullptr, &phase_ring_book, &phase_provider),
+  EXPECT_THROW(PhasedDiscreteRuleStateProvider(nullptr, &phase_ring_book, &phase_provider),
                maliput::common::assertion_error);
-  EXPECT_THROW(PhaseBasedRightOfWayDiscreteValueRuleStateProvider(&rulebook, nullptr, &phase_provider),
-               maliput::common::assertion_error);
-  EXPECT_THROW(PhaseBasedRightOfWayDiscreteValueRuleStateProvider(&rulebook, &phase_ring_book, nullptr),
-               maliput::common::assertion_error);
-  EXPECT_NO_THROW(PhaseBasedRightOfWayDiscreteValueRuleStateProvider(&rulebook, &phase_ring_book, &phase_provider));
+  EXPECT_THROW(PhasedDiscreteRuleStateProvider(&rulebook, nullptr, &phase_provider), maliput::common::assertion_error);
+  EXPECT_THROW(PhasedDiscreteRuleStateProvider(&rulebook, &phase_ring_book, nullptr), maliput::common::assertion_error);
+  EXPECT_NO_THROW(PhasedDiscreteRuleStateProvider(&rulebook, &phase_ring_book, &phase_provider));
 }
 
 // Evaluates the phase based behavior of the state provider.
@@ -167,7 +165,7 @@ class PhaseBasedBehaviorTest : public ::testing::Test {
 };
 
 TEST_F(PhaseBasedBehaviorTest, PhaseBasedBehavior) {
-  PhaseBasedRightOfWayDiscreteValueRuleStateProvider dut(&rulebook_, &phase_ring_book_, &phase_provider_);
+  PhasedDiscreteRuleStateProvider dut(&rulebook_, &phase_ring_book_, &phase_provider_);
 
   EXPECT_EQ(&dut.phase_ring_book(), &phase_ring_book_);
   EXPECT_EQ(&dut.phase_provider(), &phase_provider_);
@@ -184,7 +182,7 @@ TEST_F(PhaseBasedBehaviorTest, PhaseBasedBehavior) {
 }
 
 TEST_F(PhaseBasedBehaviorTest, GetStateByRoadPositionBehavior) {
-  PhaseBasedRightOfWayDiscreteValueRuleStateProvider dut(&rulebook_, &phase_ring_book_, &phase_provider_);
+  PhasedDiscreteRuleStateProvider dut(&rulebook_, &phase_ring_book_, &phase_provider_);
   EXPECT_EQ(&dut.phase_ring_book(), &phase_ring_book_);
   EXPECT_EQ(&dut.phase_provider(), &phase_provider_);
 
@@ -237,7 +235,7 @@ class ManualBasedBehaviorTest : public ::testing::Test {
 };
 
 TEST_F(ManualBasedBehaviorTest, SetStateTest) {
-  PhaseBasedRightOfWayDiscreteValueRuleStateProvider dut(road_rulebook_.get(), &phase_ring_book_, &phase_provider_);
+  PhasedDiscreteRuleStateProvider dut(road_rulebook_.get(), &phase_ring_book_, &phase_provider_);
 
   // Tries to set the state to an unknown Rule::Id in `rulebook_`.
   EXPECT_THROW(dut.SetState(kUnknownRuleId, kStateA, {}, {}), std::out_of_range);

@@ -1,4 +1,4 @@
-#include "maliput/base/phase_based_right_of_way_discrete_value_rule_state_provider.h"
+#include "maliput/base/phased_discrete_rule_state_provider.h"
 
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
@@ -17,8 +17,9 @@ using api::rules::PhaseRing;
 using api::rules::PhaseRingBook;
 using api::rules::Rule;
 
-PhaseBasedRightOfWayDiscreteValueRuleStateProvider::PhaseBasedRightOfWayDiscreteValueRuleStateProvider(
-    const api::rules::RoadRulebook* rulebook, const PhaseRingBook* phase_ring_book, const PhaseProvider* phase_provider)
+PhasedDiscreteRuleStateProvider::PhasedDiscreteRuleStateProvider(const api::rules::RoadRulebook* rulebook,
+                                                                 const PhaseRingBook* phase_ring_book,
+                                                                 const PhaseProvider* phase_provider)
     : ManualDiscreteValueRuleStateProvider(rulebook),
       phase_ring_book_(phase_ring_book),
       phase_provider_(phase_provider) {
@@ -26,8 +27,8 @@ PhaseBasedRightOfWayDiscreteValueRuleStateProvider::PhaseBasedRightOfWayDiscrete
   MALIPUT_THROW_UNLESS(phase_provider_ != nullptr);
 }
 
-std::optional<DiscreteValueRuleStateProvider::StateResult>
-PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const Rule::Id& rule_id) const {
+std::optional<DiscreteValueRuleStateProvider::StateResult> PhasedDiscreteRuleStateProvider::DoGetState(
+    const Rule::Id& rule_id) const {
   std::optional<PhaseRing> ring = phase_ring_book_->FindPhaseRing(rule_id);
   if (ring.has_value()) {
     const std::optional<PhaseProvider::Result> phase_result = phase_provider_->GetPhase(ring->id());
@@ -48,10 +49,8 @@ PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const Rule::Id& r
   return ManualDiscreteValueRuleStateProvider::DoGetState(rule_id);
 }
 
-std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult>
-PhaseBasedRightOfWayDiscreteValueRuleStateProvider::DoGetState(const api::RoadPosition& road_position,
-                                                               const api::rules::Rule::TypeId& rule_type,
-                                                               double tolerance) const {
+std::optional<api::rules::DiscreteValueRuleStateProvider::StateResult> PhasedDiscreteRuleStateProvider::DoGetState(
+    const api::RoadPosition& road_position, const api::rules::Rule::TypeId& rule_type, double tolerance) const {
   const auto filtered_discrete_value_rules = GetFilteredDiscreteValueRules(road_position, rule_type, tolerance);
   if (filtered_discrete_value_rules.empty()) {
     // Returns empty state result if no rule is found.
