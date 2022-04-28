@@ -1,5 +1,5 @@
 // Copyright 2020 Toyota Research Institute
-#include "maliput/utilities/thread_pool.h"
+#include "maliput/utility/thread_pool.h"
 
 #include <algorithm>
 #include <atomic>

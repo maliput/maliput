@@ -6,7 +6,7 @@
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/road_network.h"
 #include "maliput/api/segment.h"
-#include "maliput/utilities/mesh.h"
+#include "maliput/utility/mesh.h"
 
 namespace maliput {
 namespace utility {

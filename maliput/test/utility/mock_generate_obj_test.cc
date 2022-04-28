@@ -7,7 +7,7 @@
 #include "maliput/api/road_network.h"
 #include "maliput/common/filesystem.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/utilities/generate_obj.h"
+#include "maliput/utility/generate_obj.h"
 
 namespace maliput {
 namespace utility {
@@ -43,7 +43,7 @@ class MockGenerateObjTest : public ::testing::Test {
 };
 
 // OBJ and MTL files generated from the GeneratedObjFile method are compared with the following files
-// located in the test path of maliput::utilities' tests:
+// located in the test path of maliput::utility' tests:
 //  - TwoLanesRoadGeometry.mtl
 //  - TwoLanesRoadGeometry.obj
 TEST_F(MockGenerateObjTest, TwoLanesRoadGeometry) {
@@ -80,7 +80,7 @@ TEST_F(MockGenerateObjTest, TwoLanesRoadGeometry) {
 }
 
 // OBJ and MTL files generated from the GeneratedObjFile method are compared with the following files
-// located in the test path of maliput::utilities' tests:
+// located in the test path of maliput::utility' tests:
 //  - TwoLanesRoadGeometry.mtl
 //  - TwoLanesRoadGeometry.obj
 // Tests are run with an api::RoadNetwork instead of a api::RoadGeometry.

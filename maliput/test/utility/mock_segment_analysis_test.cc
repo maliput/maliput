@@ -6,7 +6,7 @@
 
 #include "maliput/api/segment.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/utilities/segment_analysis.h"
+#include "maliput/utility/segment_analysis.h"
 
 namespace maliput {
 namespace utility {
