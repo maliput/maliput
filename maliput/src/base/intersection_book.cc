@@ -16,7 +16,10 @@ class IntersectionBook::Impl {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
 
-  Impl() = default;
+  Impl(const api::RoadGeometry* road_geometry) : road_geometry_(road_geometry) {
+    MALIPUT_THROW_UNLESS(road_geometry_ != nullptr);
+  }
+
   ~Impl() = default;
 
   void AddIntersection(std::unique_ptr<Intersection> intersection) {
@@ -45,14 +48,9 @@ class IntersectionBook::Impl {
     return it->second.get();
   }
 
-  Intersection* DoGetFindIntersection(const api::InertialPosition& inertial_pose,
-                                      const api::RoadGeometry* road_geometry) {
-    // TODO add maliputpy binding layer
-    // TODO add to maliput implementations (maliput_malidrive maliput_multilane, maliput_dragway?, test others too)
-    // TODO add_road_network_* method
-    // auto road_geometry = road_network_->road_geometry()
+  Intersection* DoGetFindIntersection(const api::InertialPosition& inertial_pos) {
     for (const auto& intersection : DoGetIntersections()) {
-      if (intersection->Includes(inertial_pose, road_geometry)) {
+      if (intersection->Includes(inertial_pos, road_geometry_)) {
         return intersection;
       }
     }
@@ -60,10 +58,12 @@ class IntersectionBook::Impl {
   }
 
  private:
+  const api::RoadGeometry* road_geometry_{};
   std::unordered_map<Intersection::Id, std::unique_ptr<Intersection>> book_;
 };
 
-IntersectionBook::IntersectionBook() : impl_(std::make_unique<Impl>()) {}
+IntersectionBook::IntersectionBook(const api::RoadGeometry* road_geometry)
+    : impl_(std::make_unique<Impl>(road_geometry)) {}
 
 IntersectionBook::~IntersectionBook() = default;
 
@@ -113,9 +113,8 @@ api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::Dis
   return nullptr;
 }
 
-Intersection* IntersectionBook::DoGetFindIntersection(const api::InertialPosition& inertial_pose,
-                                                      const api::RoadGeometry* road_geometry) {
-  return impl_->DoGetFindIntersection(inertial_pose, road_geometry);
+Intersection* IntersectionBook::DoGetFindIntersection(const api::InertialPosition& inertial_pos) {
+  return impl_->DoGetFindIntersection(inertial_pos);
 }
 
 #pragma GCC diagnostic push

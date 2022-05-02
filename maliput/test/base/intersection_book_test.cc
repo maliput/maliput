@@ -14,6 +14,7 @@
 #include "maliput/api/rules/rule.h"
 #include "maliput/base/intersection.h"
 #include "maliput/base/manual_phase_provider.h"
+#include "maliput/test_utilities/mock.h"
 
 namespace maliput {
 namespace {
@@ -47,6 +48,7 @@ api::rules::Phase CreatePhase(const api::rules::Phase::Id& id) {
 #pragma GCC diagnostic pop
 
 GTEST_TEST(IntersectionBook, BasicTest) {
+  auto road_geometry = api::test::CreateRoadGeometry();
   ManualPhaseProvider phase_provider;
   const api::rules::PhaseRing phase_ring(api::rules::PhaseRing::Id("phase_ring_id"),
                                          {CreatePhase(api::rules::Phase::Id("phase_id"))}, std::nullopt);
@@ -54,7 +56,8 @@ GTEST_TEST(IntersectionBook, BasicTest) {
   const std::vector<api::LaneSRange> region;
   auto intersection = std::make_unique<Intersection>(id, region, phase_ring, &phase_provider);
   const Intersection* intersection_ptr = intersection.get();
-  IntersectionBook dut;
+
+  IntersectionBook dut(road_geometry.get());
   EXPECT_THROW(dut.AddIntersection(nullptr), std::exception);
   dut.AddIntersection(std::move(intersection));
   EXPECT_EQ(dut.GetIntersection(Intersection::Id("unknown")), nullptr);
@@ -116,32 +119,37 @@ class IntersectionBookTest : public ::testing::Test {
 #pragma GCC diagnostic pop
   const double kTolerance = 1e-3;
 
-  IntersectionBookTest() {
+  void SetUp() override {
+    road_geometry_ = api::test::CreateRoadGeometry();
+    intersection_book_ = std::make_unique<IntersectionBook>(road_geometry_.get());
+    ASSERT_NE(nullptr, intersection_book_.get());
+
     phase_provider_.AddPhaseRing(kPhaseRing1.id(), kPhase1.id());
     phase_provider_.AddPhaseRing(kPhaseRing2.id(), kPhase2.id());
     phase_provider_.AddPhaseRing(kPhaseRing3.id(), kPhase3.id());
     auto intersection_a = std::make_unique<Intersection>(kIntersectionIdA, region_a, kPhaseRing1, &phase_provider_);
     auto intersection_b = std::make_unique<Intersection>(kIntersectionIdB, region_b, kPhaseRing2, &phase_provider_);
     auto intersection_c = std::make_unique<Intersection>(kIntersectionIdC, region_c, kPhaseRing3, &phase_provider_);
-    intersection_book_.AddIntersection(std::move(intersection_a));
-    intersection_book_.AddIntersection(std::move(intersection_b));
-    intersection_book_.AddIntersection(std::move(intersection_c));
+    intersection_book_->AddIntersection(std::move(intersection_a));
+    intersection_book_->AddIntersection(std::move(intersection_b));
+    intersection_book_->AddIntersection(std::move(intersection_c));
   }
 
   ManualPhaseProvider phase_provider_;
-  IntersectionBook intersection_book_;
+  std::unique_ptr<api::RoadGeometry> road_geometry_{};
+  std::unique_ptr<IntersectionBook> intersection_book_{};
 };
 
 TEST_F(IntersectionBookTest, FindIntersections) {
-  EXPECT_EQ(static_cast<int>(intersection_book_.FindIntersections({}, kTolerance).size()), 0);
+  EXPECT_EQ(static_cast<int>(intersection_book_->FindIntersections({}, kTolerance).size()), 0);
   {
-    const std::vector<maliput::api::Intersection*> dut{intersection_book_.FindIntersections(region_a, kTolerance)};
+    const std::vector<maliput::api::Intersection*> dut{intersection_book_->FindIntersections(region_a, kTolerance)};
     EXPECT_EQ(static_cast<int>(dut.size()), 2);
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdA));
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdC));
   }
   {
-    const std::vector<maliput::api::Intersection*> dut(intersection_book_.FindIntersections(region_c, kTolerance));
+    const std::vector<maliput::api::Intersection*> dut(intersection_book_->FindIntersections(region_c, kTolerance));
     EXPECT_EQ(static_cast<int>(dut.size()), 3);
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdA));
     EXPECT_TRUE(HasIntersectionId(dut, kIntersectionIdB));
@@ -149,32 +157,37 @@ TEST_F(IntersectionBookTest, FindIntersections) {
   }
   {
     const std::vector<maliput::api::Intersection*> dut(
-        intersection_book_.FindIntersections({LaneSRange{api::LaneId{"lane_c_1"}, api::SRange{0., 10.}}}, kTolerance));
+        intersection_book_->FindIntersections({LaneSRange{api::LaneId{"lane_c_1"}, api::SRange{0., 10.}}}, kTolerance));
     EXPECT_EQ(static_cast<int>(dut.size()), 1);
     EXPECT_EQ(dut[0]->id(), kIntersectionIdC);
   }
 }
 
 TEST_F(IntersectionBookTest, FindIntersectionByTrafficLightId) {
-  EXPECT_EQ(intersection_book_.FindIntersection(kTrafficLightIdAPhase1)->id(), kIntersectionIdA);
-  EXPECT_EQ(intersection_book_.FindIntersection(kTrafficLightIdBPhase2)->id(), kIntersectionIdB);
-  EXPECT_EQ(intersection_book_.FindIntersection(kTrafficLightIdAPhase3)->id(), kIntersectionIdC);
+  EXPECT_EQ(intersection_book_->FindIntersection(kTrafficLightIdAPhase1)->id(), kIntersectionIdA);
+  EXPECT_EQ(intersection_book_->FindIntersection(kTrafficLightIdBPhase2)->id(), kIntersectionIdB);
+  EXPECT_EQ(intersection_book_->FindIntersection(kTrafficLightIdAPhase3)->id(), kIntersectionIdC);
 }
 
 TEST_F(IntersectionBookTest, FindIntersectionByDiscreteValueRuleId) {
-  EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdAPhase1)->id(), Intersection::Id(kIntersectionIdA));
-  EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdBPhase2)->id(), Intersection::Id(kIntersectionIdB));
-  EXPECT_EQ(intersection_book_.FindIntersection(kDiscreteValueRuleIdAPhase3)->id(), Intersection::Id(kIntersectionIdC));
+  EXPECT_EQ(intersection_book_->FindIntersection(kDiscreteValueRuleIdAPhase1)->id(),
+            Intersection::Id(kIntersectionIdA));
+  EXPECT_EQ(intersection_book_->FindIntersection(kDiscreteValueRuleIdBPhase2)->id(),
+            Intersection::Id(kIntersectionIdB));
+  EXPECT_EQ(intersection_book_->FindIntersection(kDiscreteValueRuleIdAPhase3)->id(),
+            Intersection::Id(kIntersectionIdC));
 }
 
 TEST_F(IntersectionBookTest, FindIntersectionByRightOfWayRuleId) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdAPhase1)->id(), Intersection::Id(kIntersectionIdA));
-  EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdBPhase2)->id(), Intersection::Id(kIntersectionIdB));
-  EXPECT_EQ(intersection_book_.FindIntersection(kRightOfWayRuleIdAPhase3)->id(), Intersection::Id(kIntersectionIdC));
+  EXPECT_EQ(intersection_book_->FindIntersection(kRightOfWayRuleIdAPhase1)->id(), Intersection::Id(kIntersectionIdA));
+  EXPECT_EQ(intersection_book_->FindIntersection(kRightOfWayRuleIdBPhase2)->id(), Intersection::Id(kIntersectionIdB));
+  EXPECT_EQ(intersection_book_->FindIntersection(kRightOfWayRuleIdAPhase3)->id(), Intersection::Id(kIntersectionIdC));
 #pragma GCC diagnostic pop
 }
+
+// TODO(#479): must test api::IntersectionBook::FindIntersection(const api::InertialPosition& inertial_pose)
 
 }  // namespace
 }  // namespace maliput

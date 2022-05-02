@@ -97,10 +97,11 @@ std::unique_ptr<api::Intersection> BuildIntersection(const YAML::Node& intersect
 
 std::unique_ptr<api::IntersectionBook> BuildFrom(const YAML::Node& root_node, const RoadRulebook& road_rulebook,
                                                  const PhaseRingBook& phase_ring_book,
+                                                 const api::RoadGeometry* road_geometry,
                                                  ManualPhaseProvider* phase_provider) {
   MALIPUT_THROW_UNLESS(root_node.IsMap());
   const YAML::Node& intersections_node = root_node["Intersections"];
-  auto result = std::make_unique<IntersectionBook>();
+  auto result = std::make_unique<IntersectionBook>(road_geometry);
   if (!intersections_node.IsDefined()) {
     return result;
   }
@@ -115,15 +116,17 @@ std::unique_ptr<api::IntersectionBook> BuildFrom(const YAML::Node& root_node, co
 
 std::unique_ptr<api::IntersectionBook> LoadIntersectionBook(const std::string& input, const RoadRulebook& road_rulebook,
                                                             const PhaseRingBook& phase_ring_book,
+                                                            const api::RoadGeometry* road_geometry,
                                                             ManualPhaseProvider* phase_provider) {
-  return BuildFrom(YAML::Load(input), road_rulebook, phase_ring_book, phase_provider);
+  return BuildFrom(YAML::Load(input), road_rulebook, phase_ring_book, road_geometry, phase_provider);
 }
 
 std::unique_ptr<api::IntersectionBook> LoadIntersectionBookFromFile(const std::string& filename,
                                                                     const RoadRulebook& road_rulebook,
                                                                     const PhaseRingBook& phase_ring_book,
+                                                                    const api::RoadGeometry* road_geometry,
                                                                     ManualPhaseProvider* phase_provider) {
-  return BuildFrom(YAML::LoadFile(filename), road_rulebook, phase_ring_book, phase_provider);
+  return BuildFrom(YAML::LoadFile(filename), road_rulebook, phase_ring_book, road_geometry, phase_provider);
 }
 
 }  // namespace maliput

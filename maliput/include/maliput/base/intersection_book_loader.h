@@ -4,6 +4,7 @@
 #include <string>
 
 #include "maliput/api/intersection_book.h"
+#include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/base/manual_phase_provider.h"
@@ -23,6 +24,7 @@ namespace maliput {
 std::unique_ptr<api::IntersectionBook> LoadIntersectionBook(const std::string& input,
                                                             const api::rules::RoadRulebook& road_rulebook,
                                                             const api::rules::PhaseRingBook& phase_ring_book,
+                                                            const api::RoadGeometry* road_geometry,
                                                             ManualPhaseProvider* phase_provider);
 
 /// Instantiates and returns an api::IntersectionBook instance based on the
@@ -38,6 +40,7 @@ std::unique_ptr<api::IntersectionBook> LoadIntersectionBook(const std::string& i
 std::unique_ptr<api::IntersectionBook> LoadIntersectionBookFromFile(const std::string& filename,
                                                                     const api::rules::RoadRulebook& road_rulebook,
                                                                     const api::rules::PhaseRingBook& phase_ring_book,
+                                                                    const api::RoadGeometry* road_geometry,
                                                                     ManualPhaseProvider* phase_provider);
 
 }  // namespace maliput
