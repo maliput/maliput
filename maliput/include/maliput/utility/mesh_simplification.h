@@ -11,7 +11,7 @@
 
 #include "maliput/common/maliput_hash.h"
 #include "maliput/math/vector.h"
-#include "maliput/utilities/mesh.h"
+#include "maliput/utility/mesh.h"
 
 namespace maliput {
 namespace utility {

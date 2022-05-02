@@ -1,10 +1,10 @@
-#include "maliput/utilities/generate_urdf.h"
+#include "maliput/utility/generate_urdf.h"
 
 #include <fstream>
 
 #include <fmt/ostream.h>
 
-#include "maliput/utilities/generate_obj.h"
+#include "maliput/utility/generate_obj.h"
 
 namespace maliput {
 namespace utility {

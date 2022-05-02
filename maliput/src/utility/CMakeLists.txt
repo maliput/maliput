@@ -4,6 +4,12 @@
 
 set(SOURCES
   file_utils.cc
+  generate_obj.cc
+  generate_string.cc
+  generate_urdf.cc
+  mesh_simplification.cc
+  segment_analysis.cc
+  thread_pool.cc
 )
 add_library(utility ${SOURCES})
 
@@ -14,7 +20,13 @@ set_target_properties(utility
     OUTPUT_NAME maliput_utility
 )
 target_link_libraries(utility
-  stdc++fs
+  PRIVATE
+    fmt::fmt
+  PUBLIC
+    stdc++fs
+    maliput::api
+    maliput::common
+    maliput::math
 )
 
 target_include_directories(utility

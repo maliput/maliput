@@ -3,7 +3,7 @@
 #include <string>
 
 #include "maliput/api/road_geometry.h"
-#include "maliput/utilities/generate_obj.h"
+#include "maliput/utility/generate_obj.h"
 
 namespace maliput {
 namespace utility {
