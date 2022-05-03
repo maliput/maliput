@@ -49,9 +49,10 @@ class IntersectionBook::Impl {
   }
 
   Intersection* DoGetFindIntersection(const api::InertialPosition& inertial_pos) {
-    auto intersection = std::find_if(DoGetIntersections().begin(), DoGetIntersections().end(), [this, &inertial_pos](api::Intersection* intersection) {
-      return intersection->Includes(inertial_pos, this->road_geometry_);
-    })
+    auto intersection = std::find_if(DoGetIntersections().begin(), DoGetIntersections().end(),
+                                     [this, &inertial_pos](api::Intersection* intersection) {
+                                       return intersection->Includes(inertial_pos, this->road_geometry_);
+                                     });
     return intersection != DoGetIntersections().end() ? *intersection : nullptr;
   }
 
