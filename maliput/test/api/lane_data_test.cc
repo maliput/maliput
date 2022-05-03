@@ -191,8 +191,8 @@ GTEST_TEST(RoadPosition, ToInertialPositionTest) {
   RoadPosition dut1(test_lane_ptr, pos_1);
   RoadPosition dut2(test_lane_ptr, pos_2);
 
-  EXPECT_EQ(dut1.ToInertialPosition(), end_ip);
-  EXPECT_EQ(dut2.ToInertialPosition(), start_ip);
+  EXPECT_EQ(dut1.ToInertialPosition(), start_ip);
+  EXPECT_EQ(dut2.ToInertialPosition(), end_ip);
 }
 
 // An arbitrary very small number (that passes the tests).
