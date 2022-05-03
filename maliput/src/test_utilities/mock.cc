@@ -291,6 +291,8 @@ class MockIntersectionBook final : public IntersectionBook {
 
   api::Intersection* DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) override { return nullptr; };
 
+  api::Intersection* DoGetFindIntersection(const api::InertialPosition& inertial_pose) override { return nullptr; };
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   api::Intersection* DoGetFindIntersection(const api::rules::RightOfWayRule::Id& id) override { return nullptr; };

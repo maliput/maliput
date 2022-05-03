@@ -4,6 +4,7 @@
 
 #include "maliput/api/intersection.h"
 #include "maliput/api/intersection_book.h"
+#include "maliput/api/road_geometry.h"
 #include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
@@ -13,7 +14,12 @@ class IntersectionBook : public api::IntersectionBook {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(IntersectionBook);
 
-  IntersectionBook();
+  /// Constructs an IntersectionBook
+  ///
+  /// @param road_geometry The api::RoadGeometry used when computing GetFindIntersection(inertial_pose)
+  /// @pre road_geometry must not be null.
+  /// @throws maliput::common::assertion_error when preconditions are unmet.
+  explicit IntersectionBook(const api::RoadGeometry* road_geometry);
 
   ~IntersectionBook() override;
 
@@ -37,6 +43,8 @@ class IntersectionBook : public api::IntersectionBook {
   api::Intersection* DoGetFindIntersection(const api::rules::TrafficLight::Id& id) override;
 
   api::Intersection* DoGetFindIntersection(const api::rules::DiscreteValueRule::Id& id) override;
+
+  api::Intersection* DoGetFindIntersection(const api::InertialPosition& inertial_pos) override;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"

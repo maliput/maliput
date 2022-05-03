@@ -16,7 +16,10 @@ class IntersectionBook::Impl {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
 
-  Impl() = default;
+  Impl(const api::RoadGeometry* road_geometry) : road_geometry_(road_geometry) {
+    MALIPUT_THROW_UNLESS(road_geometry_ != nullptr);
+  }
+
   ~Impl() = default;
 
   void AddIntersection(std::unique_ptr<Intersection> intersection) {
@@ -45,11 +48,21 @@ class IntersectionBook::Impl {
     return it->second.get();
   }
 
+  Intersection* DoGetFindIntersection(const api::InertialPosition& inertial_pos) {
+    auto intersection = std::find_if(DoGetIntersections().begin(), DoGetIntersections().end(),
+                                     [this, &inertial_pos](api::Intersection* intersection) {
+                                       return intersection->Includes(inertial_pos, this->road_geometry_);
+                                     });
+    return intersection != DoGetIntersections().end() ? *intersection : nullptr;
+  }
+
  private:
+  const api::RoadGeometry* road_geometry_{};
   std::unordered_map<Intersection::Id, std::unique_ptr<Intersection>> book_;
 };
 
-IntersectionBook::IntersectionBook() : impl_(std::make_unique<Impl>()) {}
+IntersectionBook::IntersectionBook(const api::RoadGeometry* road_geometry)
+    : impl_(std::make_unique<Impl>(road_geometry)) {}
 
 IntersectionBook::~IntersectionBook() = default;
 
@@ -97,6 +110,10 @@ api::Intersection* IntersectionBook::DoGetFindIntersection(const api::rules::Dis
     }
   }
   return nullptr;
+}
+
+Intersection* IntersectionBook::DoGetFindIntersection(const api::InertialPosition& inertial_pos) {
+  return impl_->DoGetFindIntersection(inertial_pos);
 }
 
 #pragma GCC diagnostic push

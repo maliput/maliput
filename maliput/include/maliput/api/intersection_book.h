@@ -40,6 +40,13 @@ class IntersectionBook {
   /// `id`, nullptr is returned.
   Intersection* FindIntersection(const rules::DiscreteValueRule::Id& id) { return DoGetFindIntersection(id); }
 
+  /// Find the intersection which contains api::rules::DiscreteValueRule::Id.
+  ///
+  /// @param inertial_pos A position in Inertial-Frame.
+  /// @returns The Intersection that contains `inertial_pose`. When none of the Intersections have overlap with
+  /// `inertial_pose`, nullptr is returned.
+  Intersection* FindIntersection(const InertialPosition& inertial_pos) { return DoGetFindIntersection(inertial_pos); }
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   /// Find the intersection which contains api::rules::RightOfWayRule::Id.
@@ -62,6 +69,8 @@ class IntersectionBook {
   virtual Intersection* DoGetFindIntersection(const rules::TrafficLight::Id& id) = 0;
 
   virtual Intersection* DoGetFindIntersection(const rules::DiscreteValueRule::Id& id) = 0;
+
+  virtual Intersection* DoGetFindIntersection(const InertialPosition& inertial_pos) = 0;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
