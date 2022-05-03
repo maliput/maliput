@@ -177,25 +177,22 @@ GTEST_TEST(InertialPosition, DistanceTest) {
   EXPECT_NEAR(dut.Distance({66.0, 90.0, -25.0}), 55.452682532047085, kLinearTolerance);
 }
 
+// Tests RoadPosition::ToInertialPosition method.
 GTEST_TEST(RoadPosition, ToInertialPositionTest) {
-  // Check if indirection of the methods works and returns and InertialPosition
-  const LanePosition _pos1(0.0, kX1, kX2);
-  const LanePosition _pos2(1.0, kX1, kX2);
-  math::Quaternion twist_quat_ = math::Quaternion(M_PI * 2. / 3., math::Vector3(1.0, 1.0, 1.0));
-  Rotation _rot = Rotation::FromQuat(twist_quat_);
+  const LanePosition pos_1(0.0, kX1, kX2);
+  const LanePosition pos_2(1.0, kX1, kX2);
 
-  maliput::api::test::MockLane test_lane1{maliput::api::LaneId{"mock1"}};
-  maliput::api::test::MockLane* test_lane_ptr1 = &test_lane1;
+  InertialPosition start_ip(1, 0, 0);
+  InertialPosition end_ip(2, 0, 0);
 
-  maliput::api::test::MockLane test_lane2{maliput::api::LaneId{"mock2"}, InertialPosition(2, 0, 0), _rot,
-                                          InertialPosition(1, 0, 0), _rot};
-  maliput::api::test::MockLane* test_lane_ptr2 = &test_lane2;
+  maliput::api::test::MockLane test_lane{maliput::api::LaneId{"mock"}, start_ip, {}, end_ip, {}};
+  maliput::api::test::MockLane* test_lane_ptr = &test_lane;
 
-  RoadPosition dut1(test_lane_ptr1, _pos1);
-  RoadPosition dut2(test_lane_ptr2, _pos1);
+  RoadPosition dut1(test_lane_ptr, pos_1);
+  RoadPosition dut2(test_lane_ptr, pos_2);
 
-  EXPECT_EQ(dut1.ToInertialPosition(), InertialPosition(0, 0, 0));
-  EXPECT_EQ(dut2.ToInertialPosition(), InertialPosition(2, 0, 0));
+  EXPECT_EQ(dut1.ToInertialPosition(), end_ip);
+  EXPECT_EQ(dut2.ToInertialPosition(), start_ip);
 }
 
 // An arbitrary very small number (that passes the tests).

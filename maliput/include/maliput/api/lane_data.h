@@ -297,10 +297,10 @@ struct RoadPosition {
   /// Fully parameterized constructor.
   RoadPosition(const Lane* _lane, const LanePosition& _pos) : lane(_lane), pos(_pos) {}
 
-  // Methods
+  /// Indirection to #api::Lane::ToInertialPosition() method.
+  /// @returns The InertialPosition that corresponds to `lane` and `pos`.
   InertialPosition ToInertialPosition() const;
 
-  // Variables
   const Lane* lane{};
   LanePosition pos;
 };
