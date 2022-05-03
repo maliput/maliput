@@ -8,6 +8,7 @@
 #include "maliput/math/vector.h"
 #include "maliput/test_utilities/maliput_math_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
+#include "maliput/test_utilities/mock.h"
 
 namespace maliput {
 namespace api {
@@ -174,6 +175,27 @@ GTEST_TEST(InertialPosition, DistanceTest) {
   const double kLinearTolerance = 1e-15;
   const InertialPosition dut(25., 85., 12.);
   EXPECT_NEAR(dut.Distance({66.0, 90.0, -25.0}), 55.452682532047085, kLinearTolerance);
+}
+
+GTEST_TEST(RoadPosition, ToInertialPositionTest) {
+  // Check if indirection of the methods works and returns and InertialPosition
+  const LanePosition _pos1(0.0, kX1, kX2);
+  const LanePosition _pos2(1.0, kX1, kX2);
+  math::Quaternion twist_quat_ = math::Quaternion(M_PI * 2. / 3., math::Vector3(1.0, 1.0, 1.0));
+  Rotation _rot = Rotation::FromQuat(twist_quat_);
+
+  maliput::api::test::MockLane test_lane1{maliput::api::LaneId{"mock1"}};
+  maliput::api::test::MockLane* test_lane_ptr1 = &test_lane1;
+
+  maliput::api::test::MockLane test_lane2{maliput::api::LaneId{"mock2"}, InertialPosition(2, 0, 0), _rot,
+                                          InertialPosition(1, 0, 0), _rot};
+  maliput::api::test::MockLane* test_lane_ptr2 = &test_lane2;
+
+  RoadPosition dut1(test_lane_ptr1, _pos1);
+  RoadPosition dut2(test_lane_ptr2, _pos1);
+
+  EXPECT_EQ(dut1.ToInertialPosition(), InertialPosition(0, 0, 0));
+  EXPECT_EQ(dut2.ToInertialPosition(), InertialPosition(2, 0, 0));
 }
 
 // An arbitrary very small number (that passes the tests).

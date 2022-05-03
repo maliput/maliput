@@ -297,6 +297,10 @@ struct RoadPosition {
   /// Fully parameterized constructor.
   RoadPosition(const Lane* _lane, const LanePosition& _pos) : lane(_lane), pos(_pos) {}
 
+  // Methods
+  InertialPosition ToInertialPosition() const;
+
+  // Variables
   const Lane* lane{};
   LanePosition pos;
 };
