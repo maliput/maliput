@@ -35,7 +35,10 @@ InertialPosition Rotation::Apply(const InertialPosition& inertial_position) cons
   return InertialPosition::FromXyz(quaternion_ * inertial_position.xyz());
 }
 
-InertialPosition RoadPosition::ToInertialPosition() const { return lane->ToInertialPosition(pos); };
+InertialPosition RoadPosition::ToInertialPosition() const {
+  MALIPUT_THROW_UNLESS(lane != nullptr);
+  return lane->ToInertialPosition(pos);
+};
 
 math::Matrix3 Rotation::matrix() const { return quaternion_.ToRotationMatrix(); }
 

@@ -182,17 +182,18 @@ GTEST_TEST(RoadPosition, ToInertialPositionTest) {
   const LanePosition pos_1(0.0, kX1, kX2);
   const LanePosition pos_2(1.0, kX1, kX2);
 
-  InertialPosition start_ip(1, 0, 0);
-  InertialPosition end_ip(2, 0, 0);
+  const InertialPosition start_ip(1, 0, 0);
+  const InertialPosition end_ip(2, 0, 0);
 
-  maliput::api::test::MockLane test_lane{maliput::api::LaneId{"mock"}, start_ip, {}, end_ip, {}};
-  maliput::api::test::MockLane* test_lane_ptr = &test_lane;
+  const maliput::api::test::MockLane lane{maliput::api::LaneId{"mock"}, start_ip, {}, end_ip, {}};
 
-  RoadPosition dut1(test_lane_ptr, pos_1);
-  RoadPosition dut2(test_lane_ptr, pos_2);
+  RoadPosition dut(&lane, pos_1);
 
-  EXPECT_EQ(dut1.ToInertialPosition(), start_ip);
-  EXPECT_EQ(dut2.ToInertialPosition(), end_ip);
+  EXPECT_EQ(start_ip, dut.ToInertialPosition());
+
+  dut.pos = pos_2;
+
+  EXPECT_EQ(end_ip, dut.ToInertialPosition());
 }
 
 // An arbitrary very small number (that passes the tests).

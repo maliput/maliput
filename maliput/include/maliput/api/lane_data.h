@@ -299,6 +299,7 @@ struct RoadPosition {
 
   /// Indirection to #api::Lane::ToInertialPosition() method.
   /// @returns The InertialPosition that corresponds to `lane` and `pos`.
+  /// @throws When member `lane` is nullptr.
   InertialPosition ToInertialPosition() const;
 
   const Lane* lane{};
