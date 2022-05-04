@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "maliput/api/lane.h"
+
 namespace maliput {
 namespace api {
 
@@ -32,6 +34,11 @@ double InertialPosition::Distance(const InertialPosition& inertial_position) con
 InertialPosition Rotation::Apply(const InertialPosition& inertial_position) const {
   return InertialPosition::FromXyz(quaternion_ * inertial_position.xyz());
 }
+
+InertialPosition RoadPosition::ToInertialPosition() const {
+  MALIPUT_THROW_UNLESS(lane != nullptr);
+  return lane->ToInertialPosition(pos);
+};
 
 math::Matrix3 Rotation::matrix() const { return quaternion_.ToRotationMatrix(); }
 

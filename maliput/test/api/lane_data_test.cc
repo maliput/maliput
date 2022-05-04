@@ -8,6 +8,7 @@
 #include "maliput/math/vector.h"
 #include "maliput/test_utilities/maliput_math_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
+#include "maliput/test_utilities/mock.h"
 
 namespace maliput {
 namespace api {
@@ -174,6 +175,25 @@ GTEST_TEST(InertialPosition, DistanceTest) {
   const double kLinearTolerance = 1e-15;
   const InertialPosition dut(25., 85., 12.);
   EXPECT_NEAR(dut.Distance({66.0, 90.0, -25.0}), 55.452682532047085, kLinearTolerance);
+}
+
+// Tests RoadPosition::ToInertialPosition method.
+GTEST_TEST(RoadPosition, ToInertialPositionTest) {
+  const LanePosition pos_1(0.0, kX1, kX2);
+  const LanePosition pos_2(1.0, kX1, kX2);
+
+  const InertialPosition start_ip(1, 0, 0);
+  const InertialPosition end_ip(2, 0, 0);
+
+  const maliput::api::test::MockLane lane{maliput::api::LaneId{"mock"}, start_ip, {}, end_ip, {}};
+
+  RoadPosition dut(&lane, pos_1);
+
+  EXPECT_EQ(start_ip, dut.ToInertialPosition());
+
+  dut.pos = pos_2;
+
+  EXPECT_EQ(end_ip, dut.ToInertialPosition());
 }
 
 // An arbitrary very small number (that passes the tests).

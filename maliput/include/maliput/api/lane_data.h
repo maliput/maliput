@@ -297,6 +297,11 @@ struct RoadPosition {
   /// Fully parameterized constructor.
   RoadPosition(const Lane* _lane, const LanePosition& _pos) : lane(_lane), pos(_pos) {}
 
+  /// Indirection to #api::Lane::ToInertialPosition() method.
+  /// @returns The InertialPosition that corresponds to `lane` and `pos`.
+  /// @throws When member `lane` is nullptr.
+  InertialPosition ToInertialPosition() const;
+
   const Lane* lane{};
   LanePosition pos;
 };
