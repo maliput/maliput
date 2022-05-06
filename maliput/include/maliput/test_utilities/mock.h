@@ -492,7 +492,17 @@ std::unique_ptr<RoadGeometry> CreateMockContiguousRoadGeometry(const RoadGeometr
 std::unique_ptr<RoadGeometry> CreateOneLaneRoadGeometry();
 
 /// Returns an arbitrary two-lane RoadGeometry.
+///
+/// Forwards the call to CreateTwoLanesRoadGeometry(const LanePositionResult&, const LanePositionResult&)
+/// and provides two hardcoded LanePositionResults:
+/// - "lane_a": {{10., 20., 30.}, {12., 89., 1.}, 0.5}
+/// - "lane_b": {{40., 50., 60.}, {50., 1., 45.}, 30.}
 std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry();
+
+/// Returns an arbitrary two-lane RoadGeometry and each lane will return @p lane_a_pos_result and
+/// @p lane_b_pos_result when calling Lane::ToLanePosition() with any InertialPosition.
+std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry(const LanePositionResult& lane_a_pos_result,
+                                                         const LanePositionResult& lane_b_pos_result);
 
 /// Returns an aribtrary lane with @p id .
 std::unique_ptr<Lane> CreateLane(const LaneId& id);
