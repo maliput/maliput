@@ -238,7 +238,7 @@ class IntersectionBookWithTwoLaneRoadGeometryTest : public ::testing::Test {
 // Verifies that the returned intersection is A, because the distance of the nearest position is less than
 // linear_tolerance (set to 1 meter in the mock instantiation).
 TEST_F(IntersectionBookWithTwoLaneRoadGeometryTest, FindIntersectionByInertialPosition) {
-  ASSERT_EQ(Intersection::Id(kIntersectionIdA), dut_->FindIntersection(kLaneAPositionResult.nearest_position)->id());
+  ASSERT_EQ(kIntersectionIdA, dut_->FindIntersection(kLaneAPositionResult.nearest_position)->id());
 }
 
 }  // namespace
