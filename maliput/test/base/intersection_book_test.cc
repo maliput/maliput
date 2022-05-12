@@ -187,7 +187,59 @@ TEST_F(IntersectionBookTest, FindIntersectionByRightOfWayRuleId) {
 #pragma GCC diagnostic pop
 }
 
-// TODO(#479): must test api::IntersectionBook::FindIntersection(const api::InertialPosition& inertial_pose)
+class IntersectionBookWithTwoLaneRoadGeometryTest : public ::testing::Test {
+ public:
+  const api::rules::Phase kPhase1 = CreatePhase(api::rules::Phase::Id("phase_id_1"));
+  const api::rules::Phase kPhase2 = CreatePhase(api::rules::Phase::Id("phase_id_2"));
+  const api::rules::PhaseRing kPhaseRing1{api::rules::PhaseRing::Id("phase_ring_id_1"), {kPhase1}, std::nullopt};
+  const api::rules::PhaseRing kPhaseRing2{api::rules::PhaseRing::Id("phase_ring_id_2"), {kPhase2}, std::nullopt};
+  const Intersection::Id kIntersectionIdA{"intersection_a"};
+  const std::vector<api::LaneSRange> region_a{{
+      LaneSRange{api::LaneId{"lane_a"}, api::SRange{0., 100.}},
+  }};
+  const Intersection::Id kIntersectionIdB{"intersection_b"};
+  const std::vector<api::LaneSRange> region_b{{
+      LaneSRange{api::LaneId{"lane_b"}, api::SRange{0., 100.}},
+  }};
+  // TrafficLight::Id constants includes phase_id in its name to match with CreatePhase() function.
+  // The name does not represent a real usecase.
+  const api::rules::TrafficLight::Id kTrafficLightIdAPhase1{"traffic_light_a/phase_id_1"};
+  const api::rules::TrafficLight::Id kTrafficLightIdBPhase2{"traffic_light_b/phase_id_2"};
+  const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdAPhase1{"RightOfWayRuleType/rule_a/phase_id_1"};
+  const api::rules::DiscreteValueRule::Id kDiscreteValueRuleIdBPhase2{"RightOfWayRuleType/rule_b/phase_id_2"};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  const api::rules::RightOfWayRule::Id kRightOfWayRuleIdAPhase1{"rule_a/phase_id_1"};
+  const api::rules::RightOfWayRule::Id kRightOfWayRuleIdBPhase2{"rule_b/phase_id_2"};
+#pragma GCC diagnostic pop
+  const double kTolerance = 1e-3;
+
+  const api::LanePositionResult kLaneAPositionResult{{10., 20., 30.}, {1., 2., 3.}, 0.};
+  const api::LanePositionResult kLaneBPositionResult{{40., 50., 60.}, {4., 5., 6.}, 10.};
+
+  void SetUp() override {
+    road_geometry_ = api::test::CreateTwoLanesRoadGeometry(kLaneAPositionResult, kLaneBPositionResult);
+    dut_ = std::make_unique<IntersectionBook>(road_geometry_.get());
+    ASSERT_NE(nullptr, dut_.get());
+
+    phase_provider_.AddPhaseRing(kPhaseRing1.id(), kPhase1.id());
+    phase_provider_.AddPhaseRing(kPhaseRing2.id(), kPhase2.id());
+    auto intersection_a = std::make_unique<Intersection>(kIntersectionIdA, region_a, kPhaseRing1, &phase_provider_);
+    auto intersection_b = std::make_unique<Intersection>(kIntersectionIdB, region_b, kPhaseRing2, &phase_provider_);
+    dut_->AddIntersection(std::move(intersection_a));
+    dut_->AddIntersection(std::move(intersection_b));
+  }
+
+  ManualPhaseProvider phase_provider_;
+  std::unique_ptr<api::RoadGeometry> road_geometry_{};
+  std::unique_ptr<IntersectionBook> dut_{};
+};
+
+// Verifies that the returned intersection is A, because the distance of the nearest position is less than
+// linear_tolerance (set to 1 meter in the mock instantiation).
+TEST_F(IntersectionBookWithTwoLaneRoadGeometryTest, FindIntersectionByInertialPosition) {
+  ASSERT_EQ(kIntersectionIdA, dut_->FindIntersection(kLaneAPositionResult.nearest_position)->id());
+}
 
 }  // namespace
 }  // namespace maliput

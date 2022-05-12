@@ -579,20 +579,25 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& b
   return std::move(rg);
 }
 
-// Creates a RoadGeometry with two Junctions. Each Junction will have a Segment and a Lane.
-// Return values when ToLanePosition method is called are hardcoded.
+// @{ Creates a RoadGeometry with two Junctions. Each Junction will have a Segment and a Lane.
+//    Return values when ToLanePosition method is called are hardcoded or passed via arguments.
 std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry() {
+  const LanePositionResult lane_a_pos_result{{10., 20., 30.}, {12., 89., 1.}, 0.5};
+  const LanePositionResult lane_b_pos_result{{40., 50., 60.}, {50., 1., 45.}, 30.};
+  return CreateTwoLanesRoadGeometry(lane_a_pos_result, lane_b_pos_result);
+}
+
+std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry(const LanePositionResult& lane_a_pos_result,
+                                                         const LanePositionResult& lane_b_pos_result) {
   constexpr double kArbitrary{1.};
   const math::Vector3 kZero{0., 0., 0.};
-  const LanePositionResult lane_position_result_a{{10., 20., 30.}, {12., 89., 1.}, 0.5};
-  const LanePositionResult lane_position_result_b{{40., 50., 60.}, {50., 1., 45.}, 30.};
   auto rg = std::make_unique<MockRoadGeometry>(RoadGeometryId("road_geometry"), kArbitrary, kArbitrary, kZero);
   auto junction_a = std::make_unique<MockJunction>(JunctionId("junction_a"));
   auto junction_b = std::make_unique<MockJunction>(JunctionId("junction_b"));
   auto segment_a = std::make_unique<MockSegment>(SegmentId("segment_a"));
   auto segment_b = std::make_unique<MockSegment>(SegmentId("segment_b"));
-  auto lane_a = std::make_unique<MockLane>(LaneId("lane_a"), lane_position_result_a);
-  auto lane_b = std::make_unique<MockLane>(LaneId("lane_b"), lane_position_result_b);
+  auto lane_a = std::make_unique<MockLane>(LaneId("lane_a"), lane_a_pos_result);
+  auto lane_b = std::make_unique<MockLane>(LaneId("lane_b"), lane_b_pos_result);
   junction_a->set_road_geometry(rg.get());
   junction_b->set_road_geometry(rg.get());
   segment_a->set_junction(junction_a.get());
@@ -609,6 +614,7 @@ std::unique_ptr<RoadGeometry> CreateTwoLanesRoadGeometry() {
   rg->add_junction(std::move(junction_b));
   return std::move(rg);
 }
+// @}
 
 // Creates a RoadGeometry with two Junctions. Each Junction will have a Segment and a Lane.
 // Lanes' geometry will be created in accordance to `build_flags`.
