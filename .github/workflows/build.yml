@@ -8,26 +8,15 @@ on:
 
 env:
   PACKAGE_NAME: maliput
+  ROS_DISTRO: foxy
   ROS_WS: maliput_ws
 
 jobs:
   compile_and_test:
     name: Compile and test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ubuntu: [18.04, 20.04]
-        include:
-          - ubuntu: 18.04
-            ubuntu_name: bionic
-            ROS_DISTRO: dashing
-          - ubuntu: 20.04
-            ubuntu_name: focal
-            ROS_DISTRO: foxy
     container:
-      image: ubuntu:${{ matrix.ubuntu }}
-    env:
-      ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
+      image: ubuntu:20.04
     steps:
     - uses: actions/checkout@v2
       with:
@@ -46,7 +35,7 @@ jobs:
       working-directory: ${{ env.ROS_WS }}
       run: |
         rosdep update --include-eol-distros;
-        rosdep install  -i -y --rosdistro ${ROS_DISTRO} --skip-keys "pybind11" --from-paths src
+        rosdep install  -i -y --rosdistro ${ROS_DISTRO} --from-paths src
     - name: colcon build
       shell: bash
       working-directory: ${{ env.ROS_WS }}
