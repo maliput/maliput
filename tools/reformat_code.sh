@@ -45,7 +45,7 @@ export PATH=$PATH:/home/$USER/.local/bin
 declare -i CLANGFORMATFAILED=0
 
 pushd $REPO_DIR
-ament_clang_format --config=./../.clang-format --reformat || CLANGFORMATFAILED=1
+ament_clang_format --config=./.clang-format --reformat || CLANGFORMATFAILED=1
 popd
 
 if [ "$CLANGFORMATFAILED" -ne "0" ]; then
