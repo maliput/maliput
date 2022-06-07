@@ -48,4 +48,4 @@ jobs:
       if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
       with:
         name: binary_underlay
-        path: ${{ steps.action_ros_ci_with_docs.outputs.ros-workspace-directory-name }}/${{ env.bundle_file_name }}
+        path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/${{ env.bundle_file_name }}
