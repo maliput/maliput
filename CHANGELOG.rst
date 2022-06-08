@@ -2,8 +2,8 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2022-06-08)
+------------------
 * moving maliput to the root (`#506 <https://github.com/maliput/maliput/issues/506>`_)
 * Contributors: Tully Foote
 
