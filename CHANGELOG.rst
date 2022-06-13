@@ -2,6 +2,12 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixes include folder installation. (`#508 <https://github.com/maliput/maliput/issues/508>`_)
+* Uses ros-action-ci in build.yaml workflow. (`#505 <https://github.com/maliput/maliput/issues/505>`_)
+* Contributors: Franco Cipollone
+
 1.0.3 (2022-06-08)
 ------------------
 * moving maliput to the root (`#506 <https://github.com/maliput/maliput/issues/506>`_)
