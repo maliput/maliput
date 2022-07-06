@@ -1,5 +1,5 @@
 
-[![GCC](https://github.com/ToyotaResearchInstitute/maliput/actions/workflows/build.yml/badge.svg)](https://github.com/ToyotaResearchInstitute/maliput/actions/workflows/build.yml)
+[![GCC](https://github.com/maliput/maliput/actions/workflows/build.yml/badge.svg)](https://github.com/maliput/maliput/actions/workflows/build.yml)
 
 # Maliput
 
@@ -7,7 +7,7 @@ Road network runtime interface.
 
 ## Build
 
-1. Setup a development workspace as described [here](https://github.com/ToyotaResearchInstitute/maliput_documentation/blob/main/docs/installation_quickstart.rst).
+1. Setup a development workspace as described [here](https://maliput.readthedocs.io/en/latest/developer_setup.html).
 
 2. Bring up your development workspace:
 
