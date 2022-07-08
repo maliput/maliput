@@ -3,9 +3,24 @@
 
 # Maliput
 
+## Description
+
 A C++ runtime API describing a Road Network model for use in agent and traffic simulations. It guarantees a continuous description of the road geometry and supports dynamic environments with varying rules states.
 
-Please visit https://maliput.readthedocs.org for more information.
+For a full overview of Maliput capabilities please visit https://maliput.readthedocs.io/en/latest/maliput_overview.html.
+
+## API Documentation
+
+Refer to [Maliput's Online API Documentation](https://maliput.readthedocs.io/en/latest/html/deps/maliput/html/annotated.html).
+
+## Examples
+
+[Getting Started](https://maliput.readthedocs.io/en/latest/getting_started.html) page is a good place for starting to see the maliput's capabilities.
+
+There are a couple of packages where the maliput's api is excercised.
+ - [maliput_integration](https://github.com/maliput/maliput_integration): Concentrates applications created for maliput. See [maliput_integration's tutorials](https://maliput.readthedocs.io/en/latest/html/deps/maliput_integration/html/integration_tutorials.html).
+ - [delphyne_demos](https://github.com/maliput/delphyne_demos): Contains demos based on delphyne, which is an agent simulation framework that uses `maliput` as road network model. See [delphyne_demos](https://github.com/maliput/delphyne_demos).
+
 
 ## Installation
 
@@ -15,12 +30,7 @@ Ubuntu Focal Fossa 20.04 LTS.
 
 ### Binary Installation on Ubuntu
 
-See [Installation page](https://maliput.readthedocs.io/en/latest/installation.html#binary-installation-on-ubuntu) for adding the ROS2 repositories to your source list.
-
-Install maliput package:
-```sh
-sudo apt install ros-foxy-maliput
-```
+See [Installation Docs](https://maliput.readthedocs.io/en/latest/installation.html#binary-installation-on-ubuntu).
 
 ### Source Installation on Ubuntu
 
@@ -62,6 +72,8 @@ sudo apt install python3-rosdep python3-colcon-common-extensions
     colcon build --packages-select maliput --cmake-args " -DBUILD_DOCS=On"
     ```
 
+For further info refer to [Source Installation on Ubuntu](https://maliput.readthedocs.io/en/latest/installation.html#source-installation-on-ubuntu)
+
 #### For development
 
 It is recommended to follow the guidelines for setting up a development workspace as described [here](https://maliput.readthedocs.io/en/latest/developer_setup.html).
@@ -72,4 +84,4 @@ Please see [CONTRIBUTING](https://maliput.readthedocs.io/en/latest/contributing.
 
 ## License
 
-This library is licensed under BSD 3-Clause. See also the [LICENSE](https://github.com/maliput/maliput/blob/main/LICENSE) file.
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/maliput/maliput/blob/main/LICENSE)
