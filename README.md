@@ -15,11 +15,11 @@ Refer to [Maliput's Online API Documentation](https://maliput.readthedocs.io/en/
 
 ## Examples
 
-[Getting Started](https://maliput.readthedocs.io/en/latest/getting_started.html) page is a good place for starting to see the maliput's capabilities.
+[Getting Started](https://maliput.readthedocs.io/en/latest/getting_started.html) page is a good place for starting to see the Maliput's capabilities.
 
-There are a couple of packages where the maliput's api is excercised.
+There are a couple of packages where the Maliput's API is exercised.
  - [maliput_integration](https://github.com/maliput/maliput_integration): Concentrates applications created for maliput. See [maliput_integration's tutorials](https://maliput.readthedocs.io/en/latest/html/deps/maliput_integration/html/integration_tutorials.html).
- - [delphyne_demos](https://github.com/maliput/delphyne_demos): Contains demos based on delphyne, which is an agent simulation framework that uses `maliput` as road network model. See [delphyne_demos](https://github.com/maliput/delphyne_demos).
+ - [delphyne_demos](https://github.com/maliput/delphyne_demos): Contains demos based on delphyne, which is an agent simulation framework that uses `maliput` as the road network model. See [delphyne_demos](https://github.com/maliput/delphyne_demos).
 
 
 ## Installation
