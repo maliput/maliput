@@ -2,7 +2,7 @@
 # Sources
 ##############################################################################
 
-add_library(plugin maliput_plugin.cc maliput_plugin_manager.cc)
+add_library(plugin create_road_network.cc maliput_plugin.cc maliput_plugin_manager.cc)
 add_library(maliput::plugin ALIAS plugin)
 
 set_target_properties(plugin

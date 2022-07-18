@@ -64,3 +64,31 @@ install(
   LIBRARY DESTINATION ${OTHER_TEST_PLUGIN_INSTALL_DIR}
   RUNTIME DESTINATION ${OTHER_TEST_PLUGIN_INSTALL_DIR}
 )
+
+##############################################################################
+# Sources
+##############################################################################
+
+add_library(road_network_loader_test_plugin road_network_loader_test_plugin.cc)
+add_library(maliput::road_network_loader_test_plugin ALIAS road_network_loader_test_plugin)
+
+set_target_properties(road_network_loader_test_plugin
+  PROPERTIES
+    OUTPUT_NAME maliput_road_network_loader_test_plugin
+)
+
+target_link_libraries(road_network_loader_test_plugin
+  maliput::api
+  maliput::plugin
+)
+
+##############################################################################
+# Export
+##############################################################################
+
+install(
+  TARGETS  road_network_loader_test_plugin
+  ARCHIVE DESTINATION ${TEST_PLUGIN_INSTALL_DIR}
+  LIBRARY DESTINATION ${TEST_PLUGIN_INSTALL_DIR}
+  RUNTIME DESTINATION ${TEST_PLUGIN_INSTALL_DIR}
+)

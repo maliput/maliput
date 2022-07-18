@@ -145,6 +145,19 @@
 ///
 /// @endcode
 ///
+/// For convenience, maliput offers a helper method for loading a maliput::api::RoadNetwork from a plugin, which is a
+/// shortcut to the above code snippet.
+///
+/// @code{.cpp}
+/// const std::string road_network_loader_plugin_id{"my_custom_backend"};
+/// const std::map<std::string, std::string> loader_parameters{/* Parameters for the backend's builder if necessary */}
+///
+/// // Create maliput::api::RoadNetwork instance.
+/// std::unique_ptr<maliput::api::RoadNetwork> road_network =
+/// maliput::plugin::CreateRoadNetwork(road_network_loader_plugin_id, loader_parameters);
+///
+/// @endcode
+///
 /// @section related_references Related References
 ///
 /// - `maliput` backends that already have implemented their maliput::plugin::RoadNetworkLoader plugin:

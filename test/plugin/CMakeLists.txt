@@ -1,3 +1,4 @@
+ament_add_gtest(create_road_network_test create_road_network_test.cc)
 ament_add_gtest(maliput_plugin_test maliput_plugin_test.cc)
 ament_add_gtest(maliput_plugin_manager_test maliput_plugin_manager_test.cc)
 
@@ -21,6 +22,7 @@ macro(add_dependencies_to_test target)
       )
 
       target_link_libraries(${target}
+          maliput::api
           maliput::plugin
       )
 
@@ -39,6 +41,7 @@ macro(add_dependencies_to_test target)
     endif()
 endmacro()
 
+add_dependencies_to_test(create_road_network_test)
 add_dependencies_to_test(maliput_plugin_test)
 add_dependencies_to_test(maliput_plugin_manager_test)
 
