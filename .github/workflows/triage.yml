@@ -1,0 +1,17 @@
+name: Triage - Core Development
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  add-ticket-to-project:
+    uses: maliput/.github/.github/workflows/triage.yml@main
+    with:
+      number_of_project: "1"
+    secrets:
+      github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
