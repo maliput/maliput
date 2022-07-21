@@ -1,4 +1,4 @@
-name: Triage - Core Development
+name: Triage
 
 on:
   issues:
@@ -10,6 +10,7 @@ on:
 
 jobs:
   add-ticket-to-project:
+    name: Core Development project
     uses: maliput/.github/.github/workflows/triage.yml@main
     with:
       number_of_project: "1"
