@@ -84,22 +84,32 @@ TEST_F(MaliputPluginManagerTest, ConstructorGetAndListPlugin) {
   MaliputPluginManager dut;
   const PluginFeatures kPlugin1{MaliputPlugin::Id("multiply_integers_test_plugin"), "MultiplyIntegers"};
   const PluginFeatures kPlugin2{MaliputPlugin::Id("sum_integers_test_plugin"), "SumIntegers"};
+  const PluginFeatures kPlugin3{MaliputPlugin::Id("road_network_loader_test_plugin"), "GetMaliputPluginId"};
 
   const auto plugin_names = dut.ListPlugins();
-  EXPECT_EQ(2, static_cast<int>(plugin_names.size()));
+  EXPECT_EQ(3, static_cast<int>(plugin_names.size()));
   EXPECT_NE(plugin_names.end(), std::find(plugin_names.begin(), plugin_names.end(), kPlugin1.id));
   EXPECT_NE(plugin_names.end(), std::find(plugin_names.begin(), plugin_names.end(), kPlugin2.id));
 
+  // multiply_integers_test_plugin plugin.
   auto plugin = dut.GetPlugin(kPlugin1.id);
   EXPECT_EQ(kPlugin1.id.string(), plugin->GetId());
   int result{};
   ASSERT_NO_THROW(result = plugin->ExecuteSymbol<int>(kPlugin1.custom_method, 5, 10));
   EXPECT_EQ(50, result);
 
+  // sum_integers_test_plugin plugin.
   plugin = dut.GetPlugin(kPlugin2.id);
   EXPECT_EQ(kPlugin2.id.string(), plugin->GetId());
   ASSERT_NO_THROW(result = plugin->ExecuteSymbol<int>(kPlugin2.custom_method, 5, 10));
   EXPECT_EQ(15, result);
+
+  // road_network_loader_test_plugin plugin.
+  char* str_result{};
+  plugin = dut.GetPlugin(kPlugin3.id);
+  EXPECT_EQ(kPlugin3.id.string(), plugin->GetId());
+  ASSERT_NO_THROW(str_result = plugin->ExecuteSymbol<char*>(kPlugin3.custom_method));
+  EXPECT_EQ(kPlugin3.id.string(), str_result);
 }
 
 // A plugin with the same ID is added in order to verify that a replacement is
