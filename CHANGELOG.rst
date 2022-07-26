@@ -2,6 +2,16 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Provides convenient method for loading a RN via plugins. (`#512 <https://github.com/maliput/maliput/issues/512>`_)
+* Adds triage workflow. (`#513 <https://github.com/maliput/maliput/issues/513>`_)
+* Improves README. (`#511 <https://github.com/maliput/maliput/issues/511>`_)
+* Update README.md with new github.com/maliput URLs (`#510 <https://github.com/maliput/maliput/issues/510>`_)
+  Needed due to the transition to the "maliput" organization.
+  Also refer developers to new documentation website.
+* Contributors: Chien-Liang Fok, Franco Cipollone
+
 1.0.4 (2022-06-13)
 ------------------
 * Fixes include folder installation. (`#508 <https://github.com/maliput/maliput/issues/508>`_)
