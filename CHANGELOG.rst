@@ -2,8 +2,8 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.5 (2022-07-26)
+------------------
 * Provides convenient method for loading a RN via plugins. (`#512 <https://github.com/maliput/maliput/issues/512>`_)
 * Adds triage workflow. (`#513 <https://github.com/maliput/maliput/issues/513>`_)
 * Improves README. (`#511 <https://github.com/maliput/maliput/issues/511>`_)
