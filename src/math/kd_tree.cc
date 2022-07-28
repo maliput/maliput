@@ -80,6 +80,15 @@ double KDTree<Coordinate, Dimension>::SquaredDistance(const Coordinate& point_a,
 }
 
 template <typename Coordinate, std::size_t Dimension>
+KDTree<Coordinate, Dimension>::NodeCmp::NodeCmp(std::size_t index) : index_(index) {
+  MALIPUT_VALIDATE(index < Dimension, "Index can not be greater than number of dimensions minus one.");
+}
+
+template <typename Coordinate, std::size_t Dimension>
+bool KDTree<Coordinate, Dimension>::NodeCmp::operator()(const Node& n1, const Node& n2) const { return n1.get(index_) < n2.get(index_); }
+
+
+template <typename Coordinate, std::size_t Dimension>
 typename KDTree<Coordinate, Dimension>::Node* KDTree<Coordinate, Dimension>::MakeTree(std::size_t begin,
                                                                                       std::size_t end,
                                                                                       std::size_t index) {

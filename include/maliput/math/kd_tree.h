@@ -127,11 +127,9 @@ class KDTree {
 
   // Functor for comparing points according to the given dimension being evaluated at that point.
   struct NodeCmp {
-    NodeCmp(std::size_t index) : index_(index) {
-      MALIPUT_VALIDATE(index < Dimension, "Index can not be greater than number of dimensions minus one.");
-    }
+    NodeCmp(std::size_t index);
     // Compares two nodes according to the given dimension being evaluated at that point.
-    bool operator()(const Node& n1, const Node& n2) const { return n1.get(index_) < n2.get(index_); }
+    bool operator()(const Node& n1, const Node& n2) const;
     std::size_t index_;
   };
 
