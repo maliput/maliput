@@ -29,12 +29,10 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cmath>
+#include <limits>
 #include <vector>
 
 #include "maliput/common/maliput_copyable.h"
-#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace math {
@@ -61,23 +59,13 @@ class KDTree {
   /// @tparam Iterator type of the iterator.
   /// @throws maliput::common::assertion_error When the range is empty.
   template <typename Iterator>
-  KDTree(Iterator begin, Iterator end) : nodes_(begin, end) {
-    // TODO: verifies that there is at least one point.
-    MALIPUT_VALIDATE(!nodes_.empty(), "Empty range");
-    root_ = MakeTree(0, nodes_.size(), 0);
-  }
+  KDTree(Iterator begin, Iterator end);
 
   /// Constructs a KDTree taking a vector of points.
   ///
   /// @param points Vector of points
   /// @throws maliput::common::assertion_error When the range is empty.
-  KDTree(const std::vector<Coordinate>& points) {
-    MALIPUT_VALIDATE(!points.empty(), "Empty range");
-    for (const auto& point : points) {
-      nodes_.push_back(point);
-    }
-    root_ = MakeTree(0, nodes_.size(), 0);
-  }
+  KDTree(const std::vector<Coordinate>& points);
 
   /// Returns the number of nodes visited by the last call
   /// to nearest().
@@ -85,34 +73,20 @@ class KDTree {
 
   /// Returns the distance between the input point and return value
   /// from the last call to nearest().
-  double Distance() const { return std::sqrt(best_dist_); }
+  double Distance() const;
 
   /// Finds the nearest point in the tree to the given point. (Nearest Neighbour (NN))
   /// It is not valid to call this function if the tree is empty.
   /// @param point a point
   /// @return the nearest point in the tree to the given point
-  const Coordinate& Nearest(const Coordinate& point) const {
-    MALIPUT_VALIDATE(root_ != nullptr, "Tree is empty.");
-    best_ = nullptr;
-    visited_ = 0;
-    best_dist_ = 0;
-    Nearest(root_, point, 0);
-    return best_->get_point();
-  }
+  const Coordinate& Nearest(const Coordinate& point) const;
 
  private:
   // Obtains squared distance between two points.
   // @param point_a First point.
   // @param point_b Second point.
   // @returns The squared distance between the two points.
-  static double SquaredDistance(const Coordinate& point_a, const Coordinate& point_b) {
-    double dist = 0;
-    for (std::size_t i = 0; i < Dimension; ++i) {
-      const double d = point_a[i] - point_b[i];
-      dist += d * d;
-    }
-    return dist;
-  }
+  static double SquaredDistance(const Coordinate& point_a, const Coordinate& point_b);
 
   // A node in the kd-tree.
   // The node is in essence a point of the data structure that divides the upper parent node into two sub-trees, left
@@ -131,10 +105,7 @@ class KDTree {
     // @returns The value of the node in the @p index dimension.
     //
     // @throws maliput::common::assertion_error when @p index is greater than Dimension.
-    double get(std::size_t index) const {
-      MALIPUT_VALIDATE(index < Dimension, "Index can not be greater than number of dimensions minus one.");
-      return point_[index];
-    }
+    double get(std::size_t index) const;
 
     // @returns The squared distance between the node and @p other point.
     double Distance(const Coordinate& other) const { return SquaredDistance(point_, other); }
@@ -168,46 +139,12 @@ class KDTree {
   // @param begin Is the start of range.
   // @param end Is the end of range.
   // @param index Is the dimension being evaluated.
-  Node* MakeTree(std::size_t begin, std::size_t end, std::size_t index) {
-    // If range is empty, no tree is needed to be built.
-    if (end <= begin) return nullptr;
-    const std::size_t n = begin + (end - begin) / 2;
-    auto i = nodes_.begin();
-    // Sorting the element in the middle of the range(median).
-    // Smaller and greater values will be located to the left and right of the range correspondingly, according to
-    // NodeCmp functor. However, those values aren't sorted.
-    std::nth_element(i + begin, i + n, i + end, NodeCmp(index));
-    // Obtaining the index to be used for sorting in the next call to MakeTree.
-    index = (index + 1) % Dimension;
-    nodes_[n].set_left(MakeTree(begin, n, index));
-    nodes_[n].set_right(MakeTree(n + 1, end, index));
-    return &nodes_[n];
-  }
+  Node* MakeTree(std::size_t begin, std::size_t end, std::size_t index);
 
   // Obtains the nearest point in the @p node to the given @p point.
   // The @p index under evaluation is provided as this method is called recursively.
   // Updates the #visited, #best_, and #best_dist_ variables.
-  void Nearest(const Node* node, const Coordinate& point, std::size_t index) const {
-    if (node == nullptr) return;
-    ++visited_;
-    // Get the distance between the point and the current node and update best result if necessary.
-    const double node_point_distance = node->Distance(point);
-    if (best_ == nullptr || node_point_distance < best_dist_) {
-      best_dist_ = node_point_distance;
-      best_ = const_cast<Node*>(node);
-    }
-    // If the distance is less than numeric limit, return
-    if (best_dist_ < std::numeric_limits<double>::min()) return;
-    // Evaluate if moving to right or left node.
-    const double dx = node->get(index) - point[index];
-    // Compute index value for the next MakeTree call.
-    index = (index + 1) % Dimension;
-    Nearest(dx > 0 ? node->get_left() : node->get_right(), point, index);
-    // When going up in the tree, evaluate if the other's node's quadrant is any closer than the current best.
-    if (dx * dx >= best_dist_) return;
-    // If the discarded quadrant is closer, evaluate its points.
-    Nearest(dx > 0 ? node->get_right() : node->get_left(), point, index);
-  }
+  void Nearest(const Node* node, const Coordinate& point, std::size_t index) const;
 
   // TODO(francocipollone): Add these NN-related variables to a struct.
   //
