@@ -85,8 +85,9 @@ KDTree<Coordinate, Dimension>::NodeCmp::NodeCmp(std::size_t index) : index_(inde
 }
 
 template <typename Coordinate, std::size_t Dimension>
-bool KDTree<Coordinate, Dimension>::NodeCmp::operator()(const Node& n1, const Node& n2) const { return n1.get(index_) < n2.get(index_); }
-
+bool KDTree<Coordinate, Dimension>::NodeCmp::operator()(const Node& n1, const Node& n2) const {
+  return n1.get(index_) < n2.get(index_);
+}
 
 template <typename Coordinate, std::size_t Dimension>
 typename KDTree<Coordinate, Dimension>::Node* KDTree<Coordinate, Dimension>::MakeTree(std::size_t begin,

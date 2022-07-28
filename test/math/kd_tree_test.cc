@@ -32,6 +32,7 @@
 
 #include "maliput/common/assertion_error.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
 namespace math {
