@@ -8,7 +8,6 @@ set(MATH_SOURCES
   roll_pitch_yaw.cc
   saturate.cc
   vector.cc
-  kd_tree.cc
 )
 
 add_library(math ${MATH_SOURCES})
