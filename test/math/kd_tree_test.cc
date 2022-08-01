@@ -49,13 +49,12 @@ TEST_F(KDTreeTest, Constructor) {
 }
 
 TEST_F(KDTreeTest, NNSearch) {
-  std::vector<maliput::math::Vector3> points{{6, 5, 2}, {1, 8, 9}, {7, 1, 1}, {7, 8, 7}, {7, 3, 6},
-                                             {2, 1, 4}, {1, 4, 1}, {8, 7, 3}, {6, 2, 8}, {2, 8, 6},
-                                             {9, 1, 4}, {2, 8, 3}, {8, 1, 4}, {9, 4, 1}, {7, 2, 9}};
+  const std::vector<maliput::math::Vector3> points{{6, 5, 2}, {1, 8, 9}, {7, 1, 1}, {7, 8, 7}, {7, 3, 6},
+                                                   {2, 1, 4}, {1, 4, 1}, {8, 7, 3}, {6, 2, 8}, {2, 8, 6},
+                                                   {9, 1, 4}, {2, 8, 3}, {8, 1, 4}, {9, 4, 1}, {7, 2, 9}};
   const KDTree<maliput::math::Vector3, 3> dut{points.begin(), points.end()};
   const maliput::math::Vector3 point{3., 3., 3.};
   const maliput::math::Vector3 expected_point{2., 1., 4.};
-  const double expected_distance{(point - expected_point).norm()};
 
   // TODO(): Modify API to return a NNSearchResult struct with the point, distance, and visited nodes.
   const auto nearest_point = dut.Nearest(point);
@@ -63,10 +62,6 @@ TEST_F(KDTreeTest, NNSearch) {
   EXPECT_DOUBLE_EQ(expected_point.x(), nearest_point.x());
   EXPECT_DOUBLE_EQ(expected_point.y(), nearest_point.y());
   EXPECT_DOUBLE_EQ(expected_point.z(), nearest_point.z());
-  // Tests distance being returned.
-  EXPECT_DOUBLE_EQ(expected_distance, dut.Distance());
-  // Tests that visited nodes are less than brute force.
-  EXPECT_LT(dut.Visited(), points.size());
 }
 
 }  // namespace
