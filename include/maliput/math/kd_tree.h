@@ -60,8 +60,9 @@ namespace details {
 // @param end Is the end of range.
 // @param index Is the dimension being evaluated.
 // @param nodes Is a list of non-connected nodes to be configured.
-template<std::size_t Dimension, typename Node, typename NodeCmp>
+template <std::size_t Dimension, typename Node, typename NodeCmp>
 Node* MakeKdTree(std::size_t begin, std::size_t end, std::size_t index, std::deque<Node>& nodes) {
+  static_assert(Dimension > 0, "Dimension must be greater than 0.");
   // If range is empty, no tree is needed to be built.
   if (end <= begin) return nullptr;
   const std::size_t node_index = begin + (end - begin) / 2;
@@ -82,6 +83,8 @@ Node* MakeKdTree(std::size_t begin, std::size_t end, std::size_t index, std::deq
 /// @tparam Dimension The dimension of the points.
 template <typename Coordinate, std::size_t Dimension>
 struct SquaredDistance {
+  static_assert(Dimension > 0, "Dimension must be greater than 0.");
+
   /// Obtains squared distance between two coordinates.
   /// @param lhs First point.
   /// @param rhs Second point.
@@ -101,6 +104,7 @@ struct SquaredDistance {
 template <std::size_t Dimension>
 struct NodeCmp {
   NodeCmp(std::size_t index) : index_(index) {
+    static_assert(Dimension > 0, "Dimension must be greater than 0.");
     MALIPUT_VALIDATE(index < Dimension, "Index can not be greater than number of dimensions minus one.");
   }
   /// Compares two nodes according to the given dimension being evaluated at that point.
@@ -108,13 +112,15 @@ struct NodeCmp {
   ///         It must provide a method get_coordinate() for getting the underlying point.
   /// @param lhs First node.
   /// @param rhs Second node.
-  template<typename Node>
-  bool operator()(const Node& lhs, const Node& rhs) const { return lhs.get_coordinate()[index_] < rhs.get_coordinate()[index_]; }
+  template <typename Node>
+  bool operator()(const Node& lhs, const Node& rhs) const {
+    return lhs.get_coordinate()[index_] < rhs.get_coordinate()[index_];
+  }
 
   const std::size_t index_{};
 };
 
-} // namespace details
+}  // namespace details
 
 /// KDTree provides a space-partitioning data structure for organizing points in a k-dimensional space.
 /// The tree is built from a set of points, where each point is a vector of length k.
@@ -125,12 +131,17 @@ struct NodeCmp {
 /// @tparam Coordinate Data type being used, must have:
 /// - operator[] for accessing the value in each dimension.
 /// @tparam Dimension Dimension of the KD-tree.
-/// @tparam Distance A functor used for getting the distance between two coordinates. By default, details::SquaredDistance is used.
-/// @tparam NodeCmp A functor used for comparing two nodes at certain index/dimension. By default, details::NodeCmp is used.
-template <typename Coordinate, std::size_t Dimension, typename Distance = details::SquaredDistance<Coordinate, Dimension>, typename NodeCmp = details::NodeCmp<Dimension>>
+/// @tparam Distance A functor used for getting the distance between two coordinates. By default,
+/// details::SquaredDistance is used.
+/// @tparam NodeCmp A functor used for comparing two nodes at certain index/dimension. By default, details::NodeCmp is
+/// used.
+template <typename Coordinate, std::size_t Dimension,
+          typename Distance = details::SquaredDistance<Coordinate, Dimension>,
+          typename NodeCmp = details::NodeCmp<Dimension>>
 class KDTree {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(KDTree)
+  static_assert(Dimension > 0, "Dimension must be greater than 0.");
 
   /// Constructs a KDTree taking a pair of iterators. Adds each
   /// point in the range [begin, end) to the tree.
@@ -141,7 +152,6 @@ class KDTree {
   /// @throws maliput::common::assertion_error When the range is empty.
   template <typename Iterator>
   KDTree(Iterator begin, Iterator end) : nodes_(begin, end) {
-    static_assert(Dimension > 0, "Dimension must be greater than 0.");
     MALIPUT_VALIDATE(!nodes_.empty(), "Empty range");
     root_ = details::MakeKdTree<Dimension, Node, NodeCmp>(0, nodes_.size(), 0, nodes_);
   }
@@ -151,7 +161,6 @@ class KDTree {
   /// @param points Vector of points
   /// @throws maliput::common::assertion_error When the range is empty.
   KDTree(const std::vector<Coordinate>& points) {
-    static_assert(Dimension > 0, "Dimension must be greater than 0.");
     MALIPUT_VALIDATE(!points.empty(), "Empty range");
     std::transform(points.begin(), points.end(), std::back_inserter(nodes_),
                    [](const Coordinate& point) { return point; });
