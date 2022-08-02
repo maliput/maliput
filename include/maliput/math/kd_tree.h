@@ -59,7 +59,8 @@ namespace details {
 // @param begin Is the start of range.
 // @param end Is the end of range.
 // @param index Is the dimension being evaluated.
-// @param nodes Is a list of non-connected nodes to be configured.
+// @param nodes Is a list of non-connected nodes to be sorted and configured.
+// @returns A pointer to the root node of the tree.
 template <std::size_t Dimension, typename Node, typename NodeCmp>
 Node* MakeKdTree(std::size_t begin, std::size_t end, std::size_t index, std::deque<Node>& nodes) {
   static_assert(Dimension > 0, "Dimension must be greater than 0.");
