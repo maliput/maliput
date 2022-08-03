@@ -170,7 +170,7 @@ class KDTreeTest : public ::testing::Test {};
 TEST_F(KDTreeTest, Constructor) {
   const std::vector<Vector3> points{};
   ASSERT_THROW((KDTree<Vector3, 3>(points.begin(), points.end())), maliput::common::assertion_error);
-  ASSERT_NO_THROW((KDTree<Vector3, 3>(std::vector<Vector3>{{3, 6, 2}})));
+  ASSERT_NO_THROW((KDTree<Vector3, 3>((std::deque<Vector3>{{3, 6, 2}}))));
 }
 
 // Evaluates KDTree::Nearest method.

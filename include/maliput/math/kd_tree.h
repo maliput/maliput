@@ -33,6 +33,7 @@
 #include <cmath>
 #include <deque>
 #include <limits>
+#include <utility>
 
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
@@ -160,12 +161,14 @@ class KDTree {
   /// Constructs a KDTree taking a vector of points.
   ///
   /// @param points Vector of points
+  /// @tparam Collection type of the collection.
   /// @throws maliput::common::assertion_error When the range is empty.
-  KDTree(const std::vector<Coordinate>& points) {
+  template <typename Collection>
+  KDTree(Collection&& points) {
     MALIPUT_VALIDATE(!points.empty(), "Empty range");
-    std::transform(points.begin(), points.end(), std::back_inserter(nodes_),
-                   [](const Coordinate& point) { return point; });
-    root_ = details::MakeKdTree<Dimension, Node, NodeCmp>(0, nodes_.size(), 0, nodes_);
+    for (auto&& point : points) {
+      nodes_.emplace_back(std::forward<Coordinate>(point));
+    }
   }
 
   /// Finds the nearest point in the tree to the given point. (Nearest Neighbour (NN))
