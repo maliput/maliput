@@ -7,7 +7,8 @@ set(MATH_SOURCES
   quaternion.cc
   roll_pitch_yaw.cc
   saturate.cc
-  vector.cc)
+  vector.cc
+)
 
 add_library(math ${MATH_SOURCES})
 
