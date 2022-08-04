@@ -34,6 +34,7 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/segment.h"
+#include "maliput/geometry_base/kd_tree_reorganization.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -62,6 +63,48 @@ void RoadGeometry::AddBranchPointPrivate(std::unique_ptr<BranchPoint> branch_poi
 const api::Junction* RoadGeometry::do_junction(int index) const { return junctions_.at(index).get(); }
 
 const api::BranchPoint* RoadGeometry::do_branch_point(int index) const { return branch_points_.at(index).get(); }
+
+void RoadGeometry::SpacialReorganization(const SpacialReorganization::Type& type) {
+  // Sample the surface using Lane::ToInertialPosition.
+  const auto lanes = this->ById().GetLanes();
+
+  std::deque<maliput::geometry_base::MaliputPoint> points;
+  for (const auto& lane : lanes) {
+    const auto lane_length = lane.second->length();
+    for (double s = 0; s <= lane_length; s += 0.1) {
+      const auto lane_bounds = lane.second->lane_bounds(s);
+      for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += 0.1) {
+        const auto inertial_pos = lane.second->ToInertialPosition({s, r, 0. /* h */}).xyz();
+        const maliput::geometry_base::MaliputPoint point{inertial_pos.x(), inertial_pos.y(), inertial_pos.z(),
+                                                         lane.first};
+        points.push_back(point);
+      }
+    }
+  }
+  switch (type) {
+    case SpacialReorganization::Type::kKDTree:
+      spacial_reorganization_ = std::make_unique<maliput::geometry_base::KDTreeReorganization>(std::move(points));
+      break;
+    default:
+      MALIPUT_THROW_MESSAGE("Unsupported spacial reorganization type");
+      break;
+  }
+}
+
+api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::InertialPosition& inertial_position,
+                                                       const std::optional<api::RoadPosition>& hint) const {
+  MALIPUT_THROW_UNLESS(spacial_reorganization_ != nullptr);
+  if (hint.has_value()) {
+    MALIPUT_THROW_UNLESS(hint->lane != nullptr);
+    const maliput::api::LanePositionResult lane_pos = hint->lane->ToLanePosition(inertial_position);
+    return {{hint->lane, lane_pos.lane_position}, lane_pos.nearest_position, lane_pos.distance};
+  }
+  const auto lane_id = spacial_reorganization_->ClosestLane(inertial_position.xyz());
+  const auto lane = this->ById().GetLane(lane_id);
+  const auto lane_position_result = lane->ToLanePosition(inertial_position);
+  return {
+      {lane, lane_position_result.lane_position}, lane_position_result.nearest_position, lane_position_result.distance};
+}
 
 }  // namespace geometry_base
 }  // namespace maliput

@@ -42,6 +42,7 @@
 #include "maliput/common/maliput_throw.h"
 #include "maliput/geometry_base/branch_point.h"
 #include "maliput/geometry_base/junction.h"
+#include "maliput/geometry_base/spacial_reorganization.h"
 #include "maliput/math/vector.h"
 
 namespace maliput {
@@ -131,7 +132,13 @@ class RoadGeometry : public api::RoadGeometry {
 
   ~RoadGeometry() override = default;
 
+  void SpacialReorganization(const SpacialReorganization::Type& type);
+
  private:
+  virtual api::RoadPositionResult DoToRoadPosition(
+      const api::InertialPosition& inertial_position,
+      const std::optional<api::RoadPosition>& hint = std::nullopt) const override;
+
   // The non-template implementation of AddJunction<T>()
   void AddJunctionPrivate(std::unique_ptr<Junction> junction);
 
@@ -168,6 +175,7 @@ class RoadGeometry : public api::RoadGeometry {
   std::vector<std::unique_ptr<Junction>> junctions_;
   std::vector<std::unique_ptr<BranchPoint>> branch_points_;
   api::BasicIdIndex id_index_;
+  std::unique_ptr<maliput::geometry_base::SpacialReorganization> spacial_reorganization_;
 };
 
 }  // namespace geometry_base

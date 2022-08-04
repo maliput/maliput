@@ -6,6 +6,7 @@ set(SOURCES
     brute_force_find_road_positions_strategy.cc
     filter_positions.cc
     junction.cc
+    kd_tree_reorganization.cc
     lane.cc
     road_geometry.cc
     segment.cc)
