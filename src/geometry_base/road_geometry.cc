@@ -75,7 +75,7 @@ void RoadGeometry::SpacialReorganization(const SpacialReorganization::Type& type
       const auto lane_bounds = lane.second->lane_bounds(s);
       for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += 0.1) {
         const auto inertial_pos = lane.second->ToInertialPosition({s, r, 0. /* h */}).xyz();
-        const maliput::geometry_base::MaliputPoint point{inertial_pos.x(), inertial_pos.y(), inertial_pos.z(),
+        const maliput::geometry_base::MaliputPoint point{{inertial_pos.x(), inertial_pos.y(), inertial_pos.z()},
                                                          lane.first};
         points.push_back(point);
       }
