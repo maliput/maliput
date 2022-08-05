@@ -3,8 +3,10 @@
 ##############################################################################
 
 set(MATH_SOURCES
+  bounding_box.cc
   matrix.cc
   quaternion.cc
+  overlapping_type.cc
   roll_pitch_yaw.cc
   saturate.cc
   vector.cc
