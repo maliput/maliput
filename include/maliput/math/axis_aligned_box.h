@@ -54,7 +54,7 @@ class AxisAlignedBox : public BoundingRegion<Vector3> {
   /// Get the minimum corner of the bounding box.
   const Vector3& min_corner() const { return min_corner_; }
   /// Get the maximum corner of the bounding box.
-  const Vector3& max_corner() const { return min_corner_; }
+  const Vector3& max_corner() const { return max_corner_; }
 
   /// @returns The vertices of the bounding box in the Inertial-frame.
   std::vector<Vector3> get_vertices() const;

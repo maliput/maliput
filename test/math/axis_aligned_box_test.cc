@@ -234,6 +234,12 @@ class AxisAlignedBoxTest : public ::testing::TestWithParam<AxisAlignedBoxCase> {
   const AxisAlignedBoxCase case_ = GetParam();
 };
 
+TEST_P(AxisAlignedBoxTest, Getters) {
+  const AxisAlignedBox dut{case_.min_corner, case_.max_corner, kTolerance};
+  EXPECT_EQ(case_.min_corner, dut.min_corner());
+  EXPECT_EQ(case_.max_corner, dut.max_corner());
+}
+
 TEST_P(AxisAlignedBoxTest, ContainsPosition) {
   const AxisAlignedBox dut{case_.min_corner, case_.max_corner, kTolerance};
 
