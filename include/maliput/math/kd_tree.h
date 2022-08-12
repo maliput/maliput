@@ -44,7 +44,6 @@
 
 namespace maliput {
 namespace math {
-
 namespace details {
 
 /// Represents a node in a kd-tree data structure.
