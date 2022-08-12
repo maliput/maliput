@@ -47,25 +47,75 @@ namespace math {
 
 namespace details {
 
-// Makes a balanced kd-tree from a range of points already loaded in a collection.
-// This method is called recursively for building the subtrees.
-//
-// The @p nodes will be configured via their API for representing a kd-tree.
-//
-// @tparam Dimension Dimensions of the tree.
-// @tparam Node A node in a tree. It must have the following methods:
-//   - get_coordinate(): For getting the underlying point.
-//   - set_left(Node*): For setting the left sub-node.
-//   - set_right(Node*): For setting the right sub-node.
-// @tparam NodeCmp A functor for comparing two nodes at certain index/dimension:
-//   - NodeCmp::NodeCmp(int index) Constructor.
-//   - NodeCmp::operator()(Node* a, Node* b) Comparison operator.
-//
-// @param begin Is the start of range.
-// @param end Is the end of range.
-// @param index Is the dimension being evaluated.
-// @param nodes Is a list of non-connected nodes to be sorted and configured.
-// @returns A pointer to the root node of the tree.
+/// Represents a node in a kd-tree data structure.
+/// The node is in essence a point of the data structure that divides the upper parent node into two sub-trees, left
+/// and right.
+/// @tparam Coordinate The type of the coordinate.
+/// @tparam Region The type of the region. For example for 3D space, the region could be maliput::math::AxisAlignedBox.
+template <typename Coordinate, typename Region>
+class Node {
+  public:
+  /// Constructs a Node.
+  /// @param point The point that the node represents.
+  Node(const Coordinate& point) : point_(point) {}
+
+  /// Returns the point that the node represents.
+  const Coordinate& get_coordinate() const { return point_; }
+
+  /// Sets @p left as the left sub-node.
+  void set_left(Node* left) { left_ = left; }
+  /// Sets @p right as the right sub-node.
+  void set_right(Node* right) { right_ = right; }
+  /// Sets @p parent as the parent of the node.
+  void set_parent(Node* parent) { parent_ = parent; }
+  /// Sets @p region as the region of the node.
+  void set_region(std::unique_ptr<Region> region) { region_ = std::move(region); }
+  /// Stores the dimension being evaluated for the kd-tree algorithm.
+  void set_index(std::size_t index) { index_ = index; }
+
+  /// @returns The left sub-node.
+  Node* get_left() { return left_; }
+  /// @returns The right sub-node.
+  Node* get_right() { return right_; }
+  /// @returns The left sub-node.
+  Node const* get_left() const { return left_; }
+  /// @returns The right sub-node.
+  Node const* get_right() const { return right_; }
+  /// @returns The parent of the node.
+  const Node* get_parent() const { return parent_; }
+  /// @returns The region of the node.
+  const Region& get_region() const { return *region_; }
+  /// @returns The dimension being evaluated for the kd-tree algorithm.
+  std::size_t get_index() const { return index_; }
+
+  private:
+  Coordinate point_;
+  std::size_t index_{0};
+  Node* parent_{nullptr};
+  Node* left_{nullptr};
+  Node* right_{nullptr};
+  std::unique_ptr<Region> region_;
+};
+
+/// Makes a balanced kd-tree from a range of points already loaded in a collection.
+/// This method is called recursively for building the subtrees.
+///
+/// The @p nodes will be configured via their API for representing a kd-tree.
+///
+/// @tparam Dimension Dimensions of the tree.
+/// @tparam Node A node in a tree. It must have the following methods:
+///   - get_coordinate(): For getting the underlying point.
+///   - set_left(Node*): For setting the left sub-node.
+///   - set_right(Node*): For setting the right sub-node.
+/// @tparam NodeCmp A functor for comparing two nodes at certain index/dimension:
+///   - NodeCmp::NodeCmp(int index) Constructor.
+///   - NodeCmp::operator()(Node* a, Node* b) Comparison operator.
+///
+/// @param begin Is the start of range.
+/// @param end Is the end of range.
+/// @param index Is the dimension being evaluated.
+/// @param nodes Is a list of non-connected nodes to be sorted and configured.
+/// @returns A pointer to the root node of the tree.
 template <std::size_t Dimension, typename Node, typename NodeCmp>
 Node* MakeKdTree(std::size_t begin, std::size_t end, std::size_t index, std::deque<Node>& nodes) {
   static_assert(Dimension > 0, "Dimension must be greater than 0.");
@@ -90,15 +140,28 @@ Node* MakeKdTree(std::size_t begin, std::size_t end, std::size_t index, std::deq
   return &nodes[node_index];
 }
 
-// The region corresponding to the left child of a node v at even depth can be computed
-// from region(v) as follows :
-// region(lc(v)) = region(v)T AND l(v)^left
-// where l(v) is the splitting line stored at v, and l(v)^left
-// is the half plane to the left of and including l(v).
+/// Computes the regions corresponding to each node in a tree and stores them in the nodes.
+///
+/// The region corresponding to the left child(`lc`) of a node `v` at even depth can be computed
+/// as follows:
+///
+///     region(lc(v)) = region(v) ∩ sp(v)^left
+///
+/// where `sp(v)` is the splitting plane stored at `v`, and `sp(v)^left`
+/// is the half-space to the left of and including `sp(v)`.
+/// For the right child the computation is analogous.
+/// @tparam Node A node in a tree. It must have the following methods:
+///         - get_coordinate(): For getting the underlying point.
+///         - get_parent(): For getting the parent of the node.
+///         - get_left(): For getting the left sub-node.
+///         - get_right(): For getting the right sub-node.
+/// @param left True if the node is the left child of its parent.
+/// @param node The node to compute the region for.
 template <typename Node>
 void Initialize3dRegions(bool left, Node* node) {
+  MALIPUT_THROW_UNLESS(node != nullptr);
   MALIPUT_THROW_UNLESS(node->get_parent() != nullptr);
-  const auto parent_region = dynamic_cast<const AxisAlignedBox&>(node->get_parent()->get_region());
+  const auto parent_region = node->get_parent()->get_region();
   Vector3 min_corner{-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()};
   Vector3 max_corner{std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   const int index = node->get_parent()->get_index();
@@ -168,14 +231,17 @@ struct NodeCmp {
 ///
 /// Inspired on https://rosettacode.org/wiki/K-d_tree.
 ///
+/// @tparam CRTP Derived class. It follows the curiously recurring template pattern.
 /// @tparam Coordinate Data type being used, must have:
 /// - operator[] for accessing the value in each dimension.
 /// @tparam Dimension Dimension of the KD-tree.
+/// @tparam Region The type of the region.
 /// @tparam Distance A functor used for getting the distance between two coordinates. By default,
 /// details::SquaredDistance is used.
 /// @tparam NodeCmp A functor used for comparing two nodes at certain index/dimension. By default, details::NodeCmp is
 /// used.
 template <typename CRTP, typename Coordinate, std::size_t Dimension,
+          typename Region = BoundingRegion<Coordinate>,
           typename Distance = details::SquaredDistance<Coordinate, Dimension>,
           typename NodeCmp = details::NodeCmp<Dimension>>
 class KDTreeBase {
@@ -236,48 +302,7 @@ class KDTreeBase {
   }
 
  protected:
-  // A node in the kd-tree.
-  // The node is in essence a point of the data structure that divides the upper parent node into two sub-trees, left
-  // and right.
-  class Node {
-   public:
-    // Constructs a Node.
-    // @param point The point that the node represents.
-    Node(const Coordinate& point) : point_(point) {}
-
-    // Returns the point that the node represents.
-    const Coordinate& get_coordinate() const { return point_; }
-
-    // Sets @p left as the left sub-node.
-    void set_left(Node* left) { left_ = left; }
-    // Sets @p right as the right sub-node.
-    void set_right(Node* right) { right_ = right; }
-    // Sets @p region as the region of the node.
-    void set_region(std::unique_ptr<BoundingRegion<Coordinate>> region) { region_ = std::move(region); }
-    void set_parent(Node* parent) { parent_ = parent; }
-    void set_index(std::size_t index) { index_ = index; }
-    // @returns The left sub-node.
-    Node* get_left() { return left_; }
-    // @returns The right sub-node.
-    Node* get_right() { return right_; }
-    // @returns The left sub-node.
-    Node const* get_left() const { return left_; }
-    // @returns The right sub-node.
-    Node const* get_right() const { return right_; }
-    const Node* get_parent() const { return parent_; }
-
-    // @returns The region of the node.
-    const BoundingRegion<Coordinate>& get_region() const { return *region_; }
-    std::size_t get_index() const { return index_; }
-
-   private:
-    Coordinate point_;
-    std::size_t index_{0};
-    Node* parent_{nullptr};
-    Node* left_{nullptr};
-    Node* right_{nullptr};
-    std::unique_ptr<BoundingRegion<Coordinate>> region_;
-  };
+  using Node = details::Node<Coordinate, Region>;
 
   // Functor for comparing points according to the given dimension being evaluated at that point.
 
@@ -319,15 +344,18 @@ class KDTreeBase {
   std::deque<Node> nodes_;
 };
 
+/// N-Dimension KDTree.
+/// See KDTreeBase for details.
 template <typename Coordinate, ::std::size_t Dimension,
+          typename Region = BoundingRegion<Coordinate>,
           typename Distance = details::SquaredDistance<Coordinate, Dimension>,
           typename NodeCmp = details::NodeCmp<Dimension>>
 class KDTree
-    : public KDTreeBase<KDTree<Coordinate, Dimension, Distance, NodeCmp>, Coordinate, Dimension, Distance, NodeCmp> {
+    : public KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension, Region, Distance, NodeCmp> {
  public:
   template <typename Iterator>
   KDTree(Iterator begin, Iterator end)
-      : KDTreeBase<KDTree<Coordinate, Dimension, Distance, NodeCmp>, Coordinate, Dimension, Distance, NodeCmp>(begin,
+      : KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension, Region, Distance, NodeCmp>(begin,
                                                                                                                end) {}
 
   /// Constructs a KDTreeBase taking a vector of points.
@@ -337,17 +365,38 @@ class KDTree
   /// @throws maliput::common::assertion_error When the range is empty.
   template <typename Collection>
   KDTree(Collection&& points)
-      : KDTreeBase<KDTree<Coordinate, Dimension, Distance, NodeCmp>, Coordinate, Dimension, Distance, NodeCmp>(points) {
+      : KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension, Region, Distance, NodeCmp>(points) {
   }
 };
 
+/// 3-Dimensional KDTree.
+/// In addition it provides a RangeSearch method for range queries in the 3D-space.
+///  - For using the RangeSearch query some extra initialization is needed.
+///    - InitializeRegions(): Regions should be initialized before starting to use the RangeSearch query.
+///                           This isn't automatically done by the constructor because it is expensive. (Adds ~20% time to construction time)
+/// @code {.cpp}
+///  KDTree<Vector3> tree{points};
+///  tree.InitializeRegions(); // Initialize regions for the RangeSearch query.
+///  tree.RangeSearch(region_1);
+///  tree.RangeSearch(region_2);
+///  ...
+///  tree.Nearest(point_1); // NearestNeighbour (NN).
+/// @endcode
+
+/// @tparam Coordinate Data type being used, must have:
+/// - operator[] for accessing the value in each dimension.
+/// @tparam Dimension Dimension of the KD-tree.
+/// @tparam Distance A functor used for getting the distance between two coordinates. By default,
+/// details::SquaredDistance is used.
+/// @tparam NodeCmp A functor used for comparing two nodes at certain index/dimension. By default, details::NodeCmp is
+/// used.
 template <typename Coordinate, typename Distance = details::SquaredDistance<Coordinate, 3>,
           typename NodeCmp = details::NodeCmp<3>>
-class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, Distance, NodeCmp> {
+class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp> {
  public:
   template <typename Iterator>
   KDTree3D(Iterator begin, Iterator end)
-      : KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, Distance, NodeCmp>(begin, end) {}
+      : KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp>(begin, end) {}
 
   /// Constructs a KDTreeBase taking a vector of points.
   ///
@@ -356,14 +405,22 @@ class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coor
   /// @throws maliput::common::assertion_error When the range is empty.
   template <typename Collection>
   KDTree3D(Collection&& points)
-      : KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, Distance, NodeCmp>(points) {}
+      : KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp>(points) {}
 
+  /// Range search in the 3D-space.
+  /// @param region The region to be searched Coordinates on.
+  /// @returns A vector of Coordinates located in the @p region.
+  /// @pre InitializeRegions() must be called before using this method.
+  /// For further info on Range Search algorithm see http://www.cs.utah.edu/~lifeifei/cis5930/kdtree.pdf
   std::deque<const Coordinate*> RangeSearch(const AxisAlignedBox& region) const {
     std::deque<const Coordinate*> result;
     RangeSearch(this->root_, region, result);
     return result;
   }
 
+  /// Initializes the regions of the nodes.
+  /// This initialization must be run before calling the RangeSearch method.
+  /// See RangeSearch method.
   void InitializeRegions() {
     this->root_->set_region(std::make_unique<AxisAlignedBox>(
       Vector3{-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()},
@@ -374,20 +431,12 @@ class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coor
   }
 
  private:
-  using KdTreeBaseNode = typename KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, Distance, NodeCmp>::Node;
+  using KdTreeBaseNode = typename KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp>::Node;
 
-
-    // 1: if v is a leaf
-    // 2: then Report the stored at v if it lies in R
-    // 3: else if region(lv(c)) is fully contained in R
-    // 4:   then REPORTSUBTREE(lc(v))
-    // 5: else if region(lc(v)) intersects R
-    // 6:   then SEARCHKDTREE(lc(v),R)
-
-    // 7: if region(rv(c)) is fully contained in R
-    // 8:   then REPORTSUBTREE(rc(v))
-    // 9: else if region(lc(v)) intersects R
-    // 10:  then SEARCHKDTREE(lc(v),R)
+  // Performs a range search query recursively.
+  // @param node The node to be searched.
+  // @param region The search region.
+  // @param result The result of the search.
   void RangeSearch(KdTreeBaseNode* node, const AxisAlignedBox& region, std::deque<const Coordinate*>& result) const {
     if(!initialized_regions) {
       maliput::log()->error("Regions weren't initialized. For using KDTree3D::RangeSearch method, you need to call KDTree3D::InitializeRegions() first.");
@@ -396,9 +445,8 @@ class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coor
     if (node == nullptr) return;
     // If the node is a leaf, check if its coordinate is in the region.
     if (node->get_left() == nullptr && node->get_right() == nullptr) {
-      const auto coordinate = node->get_coordinate();
-      if (region.Contains(coordinate)) {
-        std::cout << coordinate << std::endl;
+      const auto& coordinate = node->get_coordinate();
+      if (region.Contains({coordinate[0], coordinate[1], coordinate[2]})) {
         result.push_back(&coordinate);
       }
       return;
@@ -406,12 +454,16 @@ class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coor
     // If the region is fully contained in the node, report the node and its children.
     const AxisAlignedBox node_region = dynamic_cast<const AxisAlignedBox&>(node->get_region());
     const auto overlapping_type = region.Overlaps(node_region);
+
     if(overlapping_type == OverlappingType::kContained) {
-      std::cout << "This region is contained in the search region  " << node_region << std::endl;
-      ReportPoints(node, result);
+      ReportPointsInSubTree(node, result);
       return;
     }
     if(overlapping_type == OverlappingType::kIntersected) {
+      const auto& coordinate = node->get_coordinate();
+      if (region.Contains({coordinate[0], coordinate[1], coordinate[2]})) {
+        result.push_back(&coordinate);
+      }
       RangeSearch(node->get_left(), region, result);
       RangeSearch(node->get_right(), region, result);
       return;
@@ -421,18 +473,17 @@ class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coor
     }
   }
 
-  void ReportPoints(KdTreeBaseNode* node, std::deque<const Coordinate*>& result) const {
-    // TODO: Each node could have a list of points located in the region so we don't have to iterate all the nodes for getting the nodes that are contained.
+  // Reports the points in the subtree rooted at @p node.
+  // @param node The node to be searched.
+  // @param result The result of the search.
+  void ReportPointsInSubTree(KdTreeBaseNode* node, std::deque<const Coordinate*>& result) const {
+    // TODO(francocipollone): Each node could have a list of references to points located within the region so we don't
+    //                        have to iterate all the nodes for getting the nodes that are contained.
     if (node == nullptr) return;
-    if (node->get_left() == nullptr && node->get_right() == nullptr) {
-      result.push_back(&(node->get_coordinate()));
-      std::cout << "Reported: "<<  node->get_coordinate()<< std::endl;
-      return;
-    }
-    ReportPoints(node->get_left(), result);
-    ReportPoints(node->get_right(), result);
+    result.push_back(&(node->get_coordinate()));
+    ReportPointsInSubTree(node->get_left(), result);
+    ReportPointsInSubTree(node->get_right(), result);
   }
-
   bool initialized_regions = false;
 };
 
