@@ -32,12 +32,12 @@
 #include <algorithm>
 #include <cmath>
 #include <deque>
-#include <memory>
 #include <limits>
+#include <memory>
 #include <utility>
 
-#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/logger.h"
+#include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/math/axis_aligned_box.h"
 #include "maliput/math/overlapping_type.h"
@@ -54,7 +54,7 @@ namespace details {
 /// @tparam Region The type of the region. For example for 3D space, the region could be maliput::math::AxisAlignedBox.
 template <typename Coordinate, typename Region>
 class Node {
-  public:
+ public:
   /// Constructs a Node.
   /// @param point The point that the node represents.
   Node(const Coordinate& point) : point_(point) {}
@@ -88,7 +88,7 @@ class Node {
   /// @returns The dimension being evaluated for the kd-tree algorithm.
   std::size_t get_index() const { return index_; }
 
-  private:
+ private:
   Coordinate point_;
   std::size_t index_{0};
   Node* parent_{nullptr};
@@ -133,8 +133,8 @@ Node* MakeKdTree(std::size_t begin, std::size_t end, std::size_t index, std::deq
   index = (index + 1) % Dimension;
   Node* left = MakeKdTree<Dimension, Node, NodeCmp>(begin, node_index, index, nodes);
   Node* right = MakeKdTree<Dimension, Node, NodeCmp>(node_index + 1, end, index, nodes);
-  if(left != nullptr) left->set_parent(&nodes[node_index]);
-  if(right != nullptr) right->set_parent(&nodes[node_index]);
+  if (left != nullptr) left->set_parent(&nodes[node_index]);
+  if (right != nullptr) right->set_parent(&nodes[node_index]);
   nodes[node_index].set_left(left);
   nodes[node_index].set_right(right);
   return &nodes[node_index];
@@ -162,10 +162,12 @@ void Initialize3dRegions(bool left, Node* node) {
   MALIPUT_THROW_UNLESS(node != nullptr);
   MALIPUT_THROW_UNLESS(node->get_parent() != nullptr);
   const auto parent_region = node->get_parent()->get_region();
-  Vector3 min_corner{-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()};
-  Vector3 max_corner{std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
+  Vector3 min_corner{-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(),
+                     -std::numeric_limits<double>::infinity()};
+  Vector3 max_corner{std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(),
+                     std::numeric_limits<double>::infinity()};
   const int index = node->get_parent()->get_index();
-  if(left){
+  if (left) {
     max_corner[index] = node->get_parent()->get_coordinate()[index];
   } else {
     min_corner[index] = node->get_parent()->get_coordinate()[index];
@@ -175,10 +177,8 @@ void Initialize3dRegions(bool left, Node* node) {
   MALIPUT_THROW_UNLESS(region.has_value());
   node->set_region(std::make_unique<AxisAlignedBox>(region.value()));
 
-  if(node->get_left() != nullptr)
-    Initialize3dRegions(true, node->get_left());
-  if(node->get_right() != nullptr)
-    Initialize3dRegions(false, node->get_right());
+  if (node->get_left() != nullptr) Initialize3dRegions(true, node->get_left());
+  if (node->get_right() != nullptr) Initialize3dRegions(false, node->get_right());
 }
 
 /// Calculates the squared distance between two points.
@@ -240,8 +240,7 @@ struct NodeCmp {
 /// details::SquaredDistance is used.
 /// @tparam NodeCmp A functor used for comparing two nodes at certain index/dimension. By default, details::NodeCmp is
 /// used.
-template <typename CRTP, typename Coordinate, std::size_t Dimension,
-          typename Region = BoundingRegion<Coordinate>,
+template <typename CRTP, typename Coordinate, std::size_t Dimension, typename Region = BoundingRegion<Coordinate>,
           typename Distance = details::SquaredDistance<Coordinate, Dimension>,
           typename NodeCmp = details::NodeCmp<Dimension>>
 class KDTreeBase {
@@ -346,17 +345,16 @@ class KDTreeBase {
 
 /// N-Dimension KDTree.
 /// See KDTreeBase for details.
-template <typename Coordinate, ::std::size_t Dimension,
-          typename Region = BoundingRegion<Coordinate>,
+template <typename Coordinate, ::std::size_t Dimension, typename Region = BoundingRegion<Coordinate>,
           typename Distance = details::SquaredDistance<Coordinate, Dimension>,
           typename NodeCmp = details::NodeCmp<Dimension>>
-class KDTree
-    : public KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension, Region, Distance, NodeCmp> {
+class KDTree : public KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension,
+                                 Region, Distance, NodeCmp> {
  public:
   template <typename Iterator>
   KDTree(Iterator begin, Iterator end)
-      : KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension, Region, Distance, NodeCmp>(begin,
-                                                                                                               end) {}
+      : KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension, Region, Distance,
+                   NodeCmp>(begin, end) {}
 
   /// Constructs a KDTreeBase taking a vector of points.
   ///
@@ -365,15 +363,16 @@ class KDTree
   /// @throws maliput::common::assertion_error When the range is empty.
   template <typename Collection>
   KDTree(Collection&& points)
-      : KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension, Region, Distance, NodeCmp>(points) {
-  }
+      : KDTreeBase<KDTree<Coordinate, Dimension, Region, Distance, NodeCmp>, Coordinate, Dimension, Region, Distance,
+                   NodeCmp>(points) {}
 };
 
 /// 3-Dimensional KDTree.
 /// In addition it provides a RangeSearch method for range queries in the 3D-space.
 ///  - For using the RangeSearch query some extra initialization is needed.
 ///    - InitializeRegions(): Regions should be initialized before starting to use the RangeSearch query.
-///                           This isn't automatically done by the constructor because it is expensive. (Adds ~20% time to construction time)
+///                           This isn't automatically done by the constructor because it is expensive. (Adds ~20% time
+///                           to construction time)
 /// @code {.cpp}
 ///  KDTree<Vector3> tree{points};
 ///  tree.InitializeRegions(); // Initialize regions for the RangeSearch query.
@@ -392,11 +391,13 @@ class KDTree
 /// used.
 template <typename Coordinate, typename Distance = details::SquaredDistance<Coordinate, 3>,
           typename NodeCmp = details::NodeCmp<3>>
-class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp> {
+class KDTree3D
+    : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp> {
  public:
   template <typename Iterator>
   KDTree3D(Iterator begin, Iterator end)
-      : KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp>(begin, end) {}
+      : KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp>(begin,
+                                                                                                              end) {}
 
   /// Constructs a KDTreeBase taking a vector of points.
   ///
@@ -423,23 +424,28 @@ class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coor
   /// See RangeSearch method.
   void InitializeRegions() {
     this->root_->set_region(std::make_unique<AxisAlignedBox>(
-      Vector3{-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()},
-      Vector3{std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()}));
-    if(this->root_->get_left() != nullptr)details::Initialize3dRegions(true, this->root_->get_left());
-    if(this->root_->get_right() != nullptr)details::Initialize3dRegions(false, this->root_->get_right());
+        Vector3{-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(),
+                -std::numeric_limits<double>::infinity()},
+        Vector3{std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(),
+                std::numeric_limits<double>::infinity()}));
+    if (this->root_->get_left() != nullptr) details::Initialize3dRegions(true, this->root_->get_left());
+    if (this->root_->get_right() != nullptr) details::Initialize3dRegions(false, this->root_->get_right());
     initialized_regions = true;
   }
 
  private:
-  using KdTreeBaseNode = typename KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox, Distance, NodeCmp>::Node;
+  using KdTreeBaseNode = typename KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coordinate, 3, AxisAlignedBox,
+                                             Distance, NodeCmp>::Node;
 
   // Performs a range search query recursively.
   // @param node The node to be searched.
   // @param region The search region.
   // @param result The result of the search.
   void RangeSearch(KdTreeBaseNode* node, const AxisAlignedBox& region, std::deque<const Coordinate*>& result) const {
-    if(!initialized_regions) {
-      maliput::log()->error("Regions weren't initialized. For using KDTree3D::RangeSearch method, you need to call KDTree3D::InitializeRegions() first.");
+    if (!initialized_regions) {
+      maliput::log()->error(
+          "Regions weren't initialized. For using KDTree3D::RangeSearch method, you need to call "
+          "KDTree3D::InitializeRegions() first.");
       return;
     }
     if (node == nullptr) return;
@@ -455,11 +461,11 @@ class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coor
     const AxisAlignedBox node_region = dynamic_cast<const AxisAlignedBox&>(node->get_region());
     const auto overlapping_type = region.Overlaps(node_region);
 
-    if(overlapping_type == OverlappingType::kContained) {
+    if (overlapping_type == OverlappingType::kContained) {
       ReportPointsInSubTree(node, result);
       return;
     }
-    if(overlapping_type == OverlappingType::kIntersected) {
+    if (overlapping_type == OverlappingType::kIntersected) {
       const auto& coordinate = node->get_coordinate();
       if (region.Contains({coordinate[0], coordinate[1], coordinate[2]})) {
         result.push_back(&coordinate);
@@ -468,7 +474,7 @@ class KDTree3D : public KDTreeBase<KDTree3D<Coordinate, Distance, NodeCmp>, Coor
       RangeSearch(node->get_right(), region, result);
       return;
     }
-    if(overlapping_type == OverlappingType::kDisjointed) {
+    if (overlapping_type == OverlappingType::kDisjointed) {
       return;
     }
   }

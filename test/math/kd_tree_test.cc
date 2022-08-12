@@ -77,8 +77,7 @@ TEST_F(NodeTest, Test) {
 }
 
 // Tests maliput::math::details::NodeCmp functor.
-class NodeCmpTest : public ::testing::Test {
-};
+class NodeCmpTest : public ::testing::Test {};
 
 // Tests NodeCmp functor.
 TEST_F(NodeCmpTest, Test) {
@@ -108,7 +107,7 @@ class InitializeRegionsTest : public ::testing::Test {
  public:
   static constexpr double inf = std::numeric_limits<double>::infinity();
 
-  void SetUp () override {
+  void SetUp() override {
     nodes.emplace_back(Vector3{6, 5, 2});
     nodes.emplace_back(Vector3{1, 8, 9});
     nodes.emplace_back(Vector3{7, 1, 1});
@@ -125,7 +124,8 @@ class InitializeRegionsTest : public ::testing::Test {
     nodes.emplace_back(Vector3{9, 4, 1});
     nodes.emplace_back(Vector3{7, 2, 9});
 
-    root = details::MakeKdTree<3, details::Node<Vector3, AxisAlignedBox>, details::NodeCmp<3>>(0, nodes.size(), 0, nodes);
+    root =
+        details::MakeKdTree<3, details::Node<Vector3, AxisAlignedBox>, details::NodeCmp<3>>(0, nodes.size(), 0, nodes);
   }
   // Coordinate nodes for each depth level in the kdtree.
   const std::vector<Vector3> first_level{{7, 2, 9}};
@@ -156,11 +156,9 @@ class InitializeRegionsTest : public ::testing::Test {
 };
 
 TEST_F(InitializeRegionsTest, Test) {
-  root->set_region(std::make_unique<AxisAlignedBox>(
-    Vector3{{-inf, -inf, -inf}},
-    Vector3{{inf, inf, inf}}));
-  if(root->get_left() != nullptr)details::Initialize3dRegions(true, root->get_left());
-  if(root->get_right() != nullptr)details::Initialize3dRegions(false, root->get_right());
+  root->set_region(std::make_unique<AxisAlignedBox>(Vector3{{-inf, -inf, -inf}}, Vector3{{inf, inf, inf}}));
+  if (root->get_left() != nullptr) details::Initialize3dRegions(true, root->get_left());
+  if (root->get_right() != nullptr) details::Initialize3dRegions(false, root->get_right());
 
   // Obtain the nodes.
   const auto second_level_node_1 = root->get_left();
@@ -301,11 +299,11 @@ TEST_F(KDTreeTest, NNSearch) {
 // Evaluates KDTree::Nearest method.
 TEST_F(KDTreeTest, RangeSearch) {
   dut.InitializeRegions();
-  AxisAlignedBox search_region{ {1., 1., 1.}, {9., 9., 9.} };
+  AxisAlignedBox search_region{{1., 1., 1.}, {9., 9., 9.}};
   const auto contained_points = dut.RangeSearch(search_region);
   EXPECT_EQ(contained_points.size(), points.size());
   for (const auto& expected_point : points) {
-    std::find_if(contained_points.begin(), contained_points.end(), [&expected_point]( const Vector3* p) {
+    std::find_if(contained_points.begin(), contained_points.end(), [&expected_point](const Vector3* p) {
       return expected_point[0] == (*p)[0] && expected_point[1] == (*p)[1] && expected_point[2] == (*p)[2];
     });
   }
@@ -320,9 +318,8 @@ class UniquePoint : public Vector3 {
   UniquePoint(double x, double y, double z, unsigned int id = 0) : Vector3(x, y, z), id_(id) {}
   unsigned int id() const { return id_; }
 
-  bool operator==(const UniquePoint& other) const {
-    return id_ == other.id_ && Vector3::operator==(other);
-  }
+  bool operator==(const UniquePoint& other) const { return id_ == other.id_ && Vector3::operator==(other); }
+
  private:
   unsigned int id_{};
 };
@@ -367,13 +364,13 @@ class KDTreeExtendedTest : public ::testing::Test {
   // Performs a brute-force-based range query on @p search_region out of the @p points.
   template <typename T>
   static std::deque<T> BruteForceRangeSearch(const AxisAlignedBox& search_region, const std::deque<T>& points) {
-      std::deque<T> res;
-      for (auto& p : points) {
-        Vector3 p_in_vector_3{p.x(), p.y(), p.z()};
-        if (search_region.Contains(p_in_vector_3)) {
-          res.push_back(p);
-        }
+    std::deque<T> res;
+    for (auto& p : points) {
+      Vector3 p_in_vector_3{p.x(), p.y(), p.z()};
+      if (search_region.Contains(p_in_vector_3)) {
+        res.push_back(p);
       }
+    }
     return res;
   }
 };
@@ -393,18 +390,17 @@ TEST_F(KDTreeExtendedTest, RandomData) {
   EXPECT_DOUBLE_EQ(expected_point.z(), nearest.z());
 
   dut.InitializeRegions();
-  const AxisAlignedBox evaluation_range{ {-250., -250., -250.}, {250., 250., 250.} };
+  const AxisAlignedBox evaluation_range{{-250., -250., -250.}, {250., 250., 250.}};
   const auto expected_range_search = BruteForceRangeSearch(evaluation_range, points);
 
   auto range_search = dut.RangeSearch(evaluation_range);
   ASSERT_EQ(expected_range_search.size(), range_search.size());
-  for(const auto& expected_value : expected_range_search) {
-    const auto it = std::find_if(range_search.begin(), range_search.end(), [&expected_value](const auto& value) {
-      return value->id() == expected_value.id();
-    });
+  for (const auto& expected_value : expected_range_search) {
+    const auto it = std::find_if(range_search.begin(), range_search.end(),
+                                 [&expected_value](const auto& value) { return value->id() == expected_value.id(); });
     EXPECT_TRUE(it != range_search.end());
   }
-  for(const auto& value : range_search) {
+  for (const auto& value : range_search) {
     const Vector3 coord{(*value)[0], (*value)[1], (*value)[2]};
     EXPECT_TRUE(evaluation_range.Contains(coord)) << "Coordinate isn't within the search region: " << coord;
   }
