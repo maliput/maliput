@@ -458,8 +458,7 @@ class KDTree3D
       return;
     }
     // If the region is fully contained in the node, report the node and its children.
-    const AxisAlignedBox node_region = dynamic_cast<const AxisAlignedBox&>(node->get_region());
-    const auto overlapping_type = region.Overlaps(node_region);
+    const auto overlapping_type = region.Overlaps(node->get_region());
 
     if (overlapping_type == OverlappingType::kContained) {
       ReportPointsInSubTree(node, result);
