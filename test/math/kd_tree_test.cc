@@ -58,22 +58,23 @@ TEST_F(NodeTest, Test) {
   const Vector3 left_coord{1., 2., 3.};
   const Vector3 right_coord{4., 5., 6.};
   const Vector3 parent_coord{7., 8., 9.};
+  const AxisAlignedBox expected_region{Vector3{1., 2., 3.}, Vector3{10., 11., 11.}};
   details::Node<Vector3, AxisAlignedBox> left{left_coord};
   details::Node<Vector3, AxisAlignedBox> right{right_coord};
   details::Node<Vector3, AxisAlignedBox> parent{parent_coord};
-  EXPECT_EQ(left.get_coordinate(), left_coord);
   parent.set_index(14.);
-  EXPECT_EQ(parent.get_index(), 14.);
-  left.set_parent(&parent);
-  EXPECT_EQ(left.get_parent(), &parent);
   parent.set_left(&left);
-  EXPECT_EQ(parent.get_left(), &left);
   parent.set_right(&right);
+  parent.set_region(std::make_unique<AxisAlignedBox>(expected_region));
+  left.set_parent(&parent);
+  EXPECT_EQ(left.get_coordinate(), left_coord);
+  EXPECT_EQ(left.get_parent(), &parent);
+  EXPECT_EQ(parent.get_index(), 14.);
+  EXPECT_EQ(parent.get_parent(), nullptr);
+  EXPECT_EQ(parent.get_left(), &left);
   EXPECT_EQ(parent.get_right(), &right);
-  const AxisAlignedBox box{Vector3{1., 2., 3.}, Vector3{10., 11., 11.}};
-  parent.set_region(std::make_unique<AxisAlignedBox>(Vector3{1., 2., 3.}, Vector3{10., 11., 12.}));
-  EXPECT_EQ(parent.get_region().max_corner(), Vector3(10., 11., 12.));
-  EXPECT_EQ(parent.get_region().min_corner(), Vector3(1., 2., 3.));
+  EXPECT_EQ(parent.get_region().max_corner(), expected_region.max_corner());
+  EXPECT_EQ(parent.get_region().min_corner(), expected_region.min_corner());
 }
 
 // Tests maliput::math::details::NodeCmp functor.
@@ -105,27 +106,27 @@ TEST_F(NodeCmpTest, Test) {
 // The values for each level of the tree(deep) are verified by hand.
 class InitializeRegionsTest : public ::testing::Test {
  public:
-  static constexpr double inf = std::numeric_limits<double>::infinity();
+  static constexpr double kInfinite = std::numeric_limits<double>::infinity();
 
   void SetUp() override {
-    nodes.emplace_back(Vector3{6, 5, 2});
-    nodes.emplace_back(Vector3{1, 8, 9});
-    nodes.emplace_back(Vector3{7, 1, 1});
-    nodes.emplace_back(Vector3{7, 8, 7});
-    nodes.emplace_back(Vector3{7, 3, 6});
-    nodes.emplace_back(Vector3{2, 1, 4});
-    nodes.emplace_back(Vector3{1, 4, 1});
-    nodes.emplace_back(Vector3{8, 7, 3});
-    nodes.emplace_back(Vector3{6, 2, 8});
-    nodes.emplace_back(Vector3{2, 8, 6});
-    nodes.emplace_back(Vector3{9, 1, 4});
-    nodes.emplace_back(Vector3{2, 8, 3});
-    nodes.emplace_back(Vector3{8, 1, 4});
-    nodes.emplace_back(Vector3{9, 4, 1});
-    nodes.emplace_back(Vector3{7, 2, 9});
+    nodes_.emplace_back(Vector3{6, 5, 2});
+    nodes_.emplace_back(Vector3{1, 8, 9});
+    nodes_.emplace_back(Vector3{7, 1, 1});
+    nodes_.emplace_back(Vector3{7, 8, 7});
+    nodes_.emplace_back(Vector3{7, 3, 6});
+    nodes_.emplace_back(Vector3{2, 1, 4});
+    nodes_.emplace_back(Vector3{1, 4, 1});
+    nodes_.emplace_back(Vector3{8, 7, 3});
+    nodes_.emplace_back(Vector3{6, 2, 8});
+    nodes_.emplace_back(Vector3{2, 8, 6});
+    nodes_.emplace_back(Vector3{9, 1, 4});
+    nodes_.emplace_back(Vector3{2, 8, 3});
+    nodes_.emplace_back(Vector3{8, 1, 4});
+    nodes_.emplace_back(Vector3{9, 4, 1});
+    nodes_.emplace_back(Vector3{7, 2, 9});
 
-    root =
-        details::MakeKdTree<3, details::Node<Vector3, AxisAlignedBox>, details::NodeCmp<3>>(0, nodes.size(), 0, nodes);
+    root_ = details::MakeKdTree<3, details::Node<Vector3, AxisAlignedBox>, details::NodeCmp<3>>(0, nodes_.size(), 0,
+                                                                                                nodes_);
   }
   // Coordinate nodes for each depth level in the kdtree.
   const std::vector<Vector3> first_level{{7, 2, 9}};
@@ -135,34 +136,35 @@ class InitializeRegionsTest : public ::testing::Test {
                                           {7, 1, 1}, {8, 1, 4}, {9, 4, 1}, {7, 8, 7}};
 
   // Regions for each level of the kdtree.
-  const AxisAlignedBox first_level_region{{-inf, -inf, -inf}, {inf, inf, inf}};
-  const AxisAlignedBox second_level_region_1{{-inf, -inf, -inf}, {7, inf, inf}};
-  const AxisAlignedBox second_level_region_2{{7, -inf, -inf}, {inf, inf, inf}};
-  const AxisAlignedBox third_level_region_1{{-inf, -inf, -inf}, {7, 5, inf}};
-  const AxisAlignedBox third_level_region_2{{-inf, 5, -inf}, {7, inf, inf}};
-  const AxisAlignedBox third_level_region_3{{7, -inf, -inf}, {inf, 3, inf}};
-  const AxisAlignedBox third_level_region_4{{7, 3, -inf}, {inf, inf, inf}};
-  const AxisAlignedBox fourth_level_region_1{{-inf, -inf, -inf}, {7, 5, 4}};
-  const AxisAlignedBox fourth_level_region_2{{-inf, -inf, 4}, {7, 5, inf}};
-  const AxisAlignedBox fourth_level_region_3{{-inf, 5, -inf}, {7, inf, 6}};
-  const AxisAlignedBox fourth_level_region_4{{-inf, 5, 6}, {7, inf, inf}};
-  const AxisAlignedBox fourth_level_region_5{{7, -inf, -inf}, {inf, 3, 4}};
-  const AxisAlignedBox fourth_level_region_6{{7, -inf, 4}, {inf, 3, inf}};
-  const AxisAlignedBox fourth_level_region_7{{7, 3, -inf}, {inf, inf, 3}};
-  const AxisAlignedBox fourth_level_region_8{{7, 3, 3}, {inf, inf, inf}};
+  const AxisAlignedBox first_level_region{{-kInfinite, -kInfinite, -kInfinite}, {kInfinite, kInfinite, kInfinite}};
+  const AxisAlignedBox second_level_region_1{{-kInfinite, -kInfinite, -kInfinite}, {7, kInfinite, kInfinite}};
+  const AxisAlignedBox second_level_region_2{{7, -kInfinite, -kInfinite}, {kInfinite, kInfinite, kInfinite}};
+  const AxisAlignedBox third_level_region_1{{-kInfinite, -kInfinite, -kInfinite}, {7, 5, kInfinite}};
+  const AxisAlignedBox third_level_region_2{{-kInfinite, 5, -kInfinite}, {7, kInfinite, kInfinite}};
+  const AxisAlignedBox third_level_region_3{{7, -kInfinite, -kInfinite}, {kInfinite, 3, kInfinite}};
+  const AxisAlignedBox third_level_region_4{{7, 3, -kInfinite}, {kInfinite, kInfinite, kInfinite}};
+  const AxisAlignedBox fourth_level_region_1{{-kInfinite, -kInfinite, -kInfinite}, {7, 5, 4}};
+  const AxisAlignedBox fourth_level_region_2{{-kInfinite, -kInfinite, 4}, {7, 5, kInfinite}};
+  const AxisAlignedBox fourth_level_region_3{{-kInfinite, 5, -kInfinite}, {7, kInfinite, 6}};
+  const AxisAlignedBox fourth_level_region_4{{-kInfinite, 5, 6}, {7, kInfinite, kInfinite}};
+  const AxisAlignedBox fourth_level_region_5{{7, -kInfinite, -kInfinite}, {kInfinite, 3, 4}};
+  const AxisAlignedBox fourth_level_region_6{{7, -kInfinite, 4}, {kInfinite, 3, kInfinite}};
+  const AxisAlignedBox fourth_level_region_7{{7, 3, -kInfinite}, {kInfinite, kInfinite, 3}};
+  const AxisAlignedBox fourth_level_region_8{{7, 3, 3}, {kInfinite, kInfinite, kInfinite}};
 
-  std::deque<details::Node<Vector3, AxisAlignedBox>> nodes;
-  details::Node<Vector3, AxisAlignedBox>* root{nullptr};
+  std::deque<details::Node<Vector3, AxisAlignedBox>> nodes_;
+  details::Node<Vector3, AxisAlignedBox>* root_{nullptr};
 };
 
 TEST_F(InitializeRegionsTest, Test) {
-  root->set_region(std::make_unique<AxisAlignedBox>(Vector3{{-inf, -inf, -inf}}, Vector3{{inf, inf, inf}}));
-  if (root->get_left() != nullptr) details::Initialize3dRegions(true, root->get_left());
-  if (root->get_right() != nullptr) details::Initialize3dRegions(false, root->get_right());
+  root_->set_region(std::make_unique<AxisAlignedBox>(Vector3{{-kInfinite, -kInfinite, -kInfinite}},
+                                                     Vector3{{kInfinite, kInfinite, kInfinite}}));
+  if (root_->get_left() != nullptr) details::Initialize3dRegions(true, root_->get_left());
+  if (root_->get_right() != nullptr) details::Initialize3dRegions(false, root_->get_right());
 
   // Obtain the nodes.
-  const auto second_level_node_1 = root->get_left();
-  const auto second_level_node_2 = root->get_right();
+  const auto second_level_node_1 = root_->get_left();
+  const auto second_level_node_2 = root_->get_right();
   const auto third_level_node_1 = second_level_node_1->get_left();
   const auto third_level_node_2 = second_level_node_1->get_right();
   const auto third_level_node_3 = second_level_node_2->get_left();
@@ -225,10 +227,10 @@ class MakeKDTreeTest : public InitializeRegionsTest {
 // Verifies that the KD tree is constructed correctly.
 TEST_F(MakeKDTreeTest, MakeKDTree) {
   // First level.
-  ExpectToFind(root->get_coordinate(), first_level);
+  ExpectToFind(root_->get_coordinate(), first_level);
   // Second level.
-  const auto second_level_1 = root->get_left();
-  const auto second_level_2 = root->get_right();
+  const auto second_level_1 = root_->get_left();
+  const auto second_level_2 = root_->get_right();
   ExpectToFind(second_level_1->get_coordinate(), second_level);
   ExpectToFind(second_level_2->get_coordinate(), second_level);
   // Third level.
@@ -296,16 +298,14 @@ TEST_F(KDTreeTest, NNSearch) {
   EXPECT_DOUBLE_EQ(expected_point.z(), nearest_point_with_tol.z());
 }
 
-// Evaluates KDTree::Nearest method.
-TEST_F(KDTreeTest, RangeSearch) {
-  dut.InitializeRegions();
+// Evaluates KDTree3D::RangeSearch method.
+TEST_F(KDTreeTest, RangeSearchReturnsAllPointsWithEnclosingRegion) {
   AxisAlignedBox search_region{{1., 1., 1.}, {9., 9., 9.}};
   const auto contained_points = dut.RangeSearch(search_region);
   EXPECT_EQ(contained_points.size(), points.size());
   for (const auto& expected_point : points) {
-    std::find_if(contained_points.begin(), contained_points.end(), [&expected_point](const Vector3* p) {
-      return expected_point[0] == (*p)[0] && expected_point[1] == (*p)[1] && expected_point[2] == (*p)[2];
-    });
+    std::find_if(contained_points.begin(), contained_points.end(),
+                 [&expected_point](const Vector3* p) { return *p == expected_point; });
   }
 }
 
@@ -335,8 +335,7 @@ class KDTreeExtendedTest : public ::testing::Test {
   // Returns a vector of @p number_of_points UniquePoints obtained randomly, with a uniform distribution, within a range
   // delimited by @p range_min and @p range_max
   static std::deque<UniquePoint> GetRandomPoints(int number_of_points, double range_min, double range_max) {
-    std::random_device rd;                                               // obtain a random number from hardware
-    std::mt19937 gen(rd());                                              // seed the generator
+    std::mt19937 gen(127);                                               // seed the generator
     std::uniform_real_distribution<double> distr(range_min, range_max);  // define the range
 
     std::deque<UniquePoint> points;
@@ -389,7 +388,6 @@ TEST_F(KDTreeExtendedTest, RandomData) {
   EXPECT_DOUBLE_EQ(expected_point.y(), nearest.y());
   EXPECT_DOUBLE_EQ(expected_point.z(), nearest.z());
 
-  dut.InitializeRegions();
   const AxisAlignedBox evaluation_range{{-250., -250., -250.}, {250., 250., 250.}};
   const auto expected_range_search = BruteForceRangeSearch(evaluation_range, points);
 
