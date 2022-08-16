@@ -163,20 +163,21 @@ TEST_F(InitializeRegionsTest, Test) {
   if (root_->get_right() != nullptr) details::Initialize3dRegions(false, root_->get_right());
 
   // Obtain the nodes.
-  const auto second_level_node_1 = root_->get_left();
-  const auto second_level_node_2 = root_->get_right();
-  const auto third_level_node_1 = second_level_node_1->get_left();
-  const auto third_level_node_2 = second_level_node_1->get_right();
-  const auto third_level_node_3 = second_level_node_2->get_left();
-  const auto third_level_node_4 = second_level_node_2->get_right();
-  const auto fourth_level_node_1 = third_level_node_1->get_left();
-  const auto fourth_level_node_2 = third_level_node_1->get_right();
-  const auto fourth_level_node_3 = third_level_node_2->get_left();
-  const auto fourth_level_node_4 = third_level_node_2->get_right();
-  const auto fourth_level_node_5 = third_level_node_3->get_left();
-  const auto fourth_level_node_6 = third_level_node_3->get_right();
-  const auto fourth_level_node_7 = third_level_node_4->get_left();
-  const auto fourth_level_node_8 = third_level_node_4->get_right();
+  // Note that the nodes_ variable got reordered after calling MakeKdTree method.
+  const details::Node<Vector3, AxisAlignedBox>* second_level_node_1 = &nodes_[3];   // root_->get_left();
+  const details::Node<Vector3, AxisAlignedBox>* second_level_node_2 = &nodes_[11];  // root_->get_right();
+  const details::Node<Vector3, AxisAlignedBox>* third_level_node_1 = &nodes_[1];    // second_level_node_1->get_left();
+  const details::Node<Vector3, AxisAlignedBox>* third_level_node_2 = &nodes_[5];    // second_level_node_1->get_right();
+  const details::Node<Vector3, AxisAlignedBox>* third_level_node_3 = &nodes_[9];    // second_level_node_2->get_left();
+  const details::Node<Vector3, AxisAlignedBox>* third_level_node_4 = &nodes_[13];   // second_level_node_2->get_right();
+  const details::Node<Vector3, AxisAlignedBox>* fourth_level_node_1 = &nodes_[0];   // third_level_node_1->get_left();
+  const details::Node<Vector3, AxisAlignedBox>* fourth_level_node_2 = &nodes_[2];   // third_level_node_1->get_right();
+  const details::Node<Vector3, AxisAlignedBox>* fourth_level_node_3 = &nodes_[4];   // third_level_node_2->get_left();
+  const details::Node<Vector3, AxisAlignedBox>* fourth_level_node_4 = &nodes_[6];   // third_level_node_2->get_right();
+  const details::Node<Vector3, AxisAlignedBox>* fourth_level_node_5 = &nodes_[8];   // third_level_node_3->get_left();
+  const details::Node<Vector3, AxisAlignedBox>* fourth_level_node_6 = &nodes_[10];  // third_level_node_3->get_right();
+  const details::Node<Vector3, AxisAlignedBox>* fourth_level_node_7 = &nodes_[12];  // third_level_node_4->get_left();
+  const details::Node<Vector3, AxisAlignedBox>* fourth_level_node_8 = &nodes_[14];  // third_level_node_4->get_right();
 
   // Verify the regions.
   // second level
