@@ -31,6 +31,7 @@
 
 #include <memory>
 
+#include "maliput/api/road_geometry.h"
 #include "maliput/geometry_base/spacial_reorganization.h"
 
 namespace maliput {
@@ -53,13 +54,13 @@ class MaliputPoint : public maliput::math::Vector3 {
 
 class KDTreeReorganization : public SpacialReorganization {
  public:
-  KDTreeReorganization(std::deque<MaliputPoint>&& points);
+  KDTreeReorganization(const api::RoadGeometry* rg, std::deque<MaliputPoint>&& points);
 
   ~KDTreeReorganization();
 
  private:
   maliput::api::LaneId do_closest_lane(const maliput::math::Vector3& point) const override;
-  std::vector<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point,
+  std::set<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point,
                                                      double distance) const override;
 
   class Impl;

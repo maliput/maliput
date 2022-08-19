@@ -83,7 +83,7 @@ void RoadGeometry::SpacialReorganization(const SpacialReorganization::Type& type
   }
   switch (type) {
     case SpacialReorganization::Type::kKDTree:
-      spacial_reorganization_ = std::make_unique<maliput::geometry_base::KDTreeReorganization>(std::move(points));
+      spacial_reorganization_ = std::make_unique<maliput::geometry_base::KDTreeReorganization>(std::move(points), this);
       break;
     default:
       MALIPUT_THROW_MESSAGE("Unsupported spacial reorganization type");
@@ -104,6 +104,22 @@ api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::InertialPositi
   const auto lane_position_result = lane->ToLanePosition(inertial_position);
   return {
       {lane, lane_position_result.lane_position}, lane_position_result.nearest_position, lane_position_result.distance};
+}
+
+std::vector<api::RoadPositionResult> RoadGeometry::DoFindRoadPositions(const api::InertialPosition& inertial_position,
+                                                                      double radius) const {
+  MALIPUT_THROW_UNLESS(spacial_reorganization_ != nullptr);
+  const auto lane_ids = spacial_reorganization_->ClosestLanes(inertial_position.xyz(), radius);
+  std::vector<api::RoadPositionResult> road_positions;
+  for (const auto &current_lane: lane_ids) {
+    const auto lane = this->ById().GetLane(current_lane);
+    const auto lane_position = lane->ToLanePosition(inertial_position);
+    if(lane_position.distance <= radius) {
+      api::RoadPositionResult road_position{{lane, lane_position.lane_position}, lane_position.nearest_position, lane_position.distance};
+      road_positions.push_back(road_position);
+    }
+  }
+  return road_positions;
 }
 
 }  // namespace geometry_base

@@ -46,7 +46,7 @@ class SpacialReorganization {
 
   maliput::api::LaneId ClosestLane(const maliput::math::Vector3& point) const { return do_closest_lane(point); }
 
-  std::vector<maliput::api::LaneId> ClosestLanes(const maliput::math::Vector3& point, double distance) const {
+  std::set<maliput::api::LaneId> ClosestLanes(const maliput::math::Vector3& point, double distance) const {
     return do_closest_lanes(point, distance);
   }
 
@@ -55,7 +55,7 @@ class SpacialReorganization {
 
  private:
   virtual maliput::api::LaneId do_closest_lane(const maliput::math::Vector3& point) const = 0;
-  virtual std::vector<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point,
+  virtual std::set<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point,
                                                              double distance) const = 0;
 };
 
