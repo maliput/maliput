@@ -60,8 +60,7 @@ class KDTreeReorganization : public SpacialReorganization {
 
  private:
   maliput::api::LaneId do_closest_lane(const maliput::math::Vector3& point) const override;
-  std::set<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point,
-                                                     double distance) const override;
+  std::set<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point, double distance) const override;
 
   class Impl;
   std::unique_ptr<Impl> pimpl_;

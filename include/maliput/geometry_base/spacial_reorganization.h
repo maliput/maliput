@@ -56,7 +56,7 @@ class SpacialReorganization {
  private:
   virtual maliput::api::LaneId do_closest_lane(const maliput::math::Vector3& point) const = 0;
   virtual std::set<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point,
-                                                             double distance) const = 0;
+                                                          double distance) const = 0;
 };
 
 }  // namespace geometry_base

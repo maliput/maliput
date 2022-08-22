@@ -27,9 +27,10 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include "maliput/geometry_base/kd_tree_reorganization.h"
+
 #include <cstdlib>
 
-#include "maliput/geometry_base/kd_tree_reorganization.h"
 #include "maliput/math/kd_tree.h"
 
 namespace maliput {
@@ -57,21 +58,22 @@ maliput::api::LaneId KDTreeReorganization::do_closest_lane(const maliput::math::
   const api::InertialPosition& inertial_position{point.x(), point.y(), point.z()};
   const auto maliput_point = pimpl_->kd_tree_->Nearest(point);
   double radius = std::sqrt(pow(point.x() - maliput_point.x(), 2) + pow(point.y() - maliput_point.y(), 2) +
-                                  pow(point.z() - maliput_point.z(), 2));
+                            pow(point.z() - maliput_point.z(), 2));
   const auto lane_ids = do_closest_lanes(point, radius);
 
   auto lane_id_result = maliput_point.lane_id();
   auto lane_position_result = pimpl_->rg_->ById().GetLane(lane_id_result)->ToLanePosition(inertial_position);
   double min_distance = lane_position_result.distance;
 
-  for (const auto &current_lane: lane_ids) {
-    const auto current_lane_position = pimpl_->rg_->ById().GetLane(maliput_point.lane_id())->ToLanePosition(inertial_position);
-    if(current_lane_position.distance < min_distance) {
+  for (const auto& current_lane : lane_ids) {
+    const auto current_lane_position =
+        pimpl_->rg_->ById().GetLane(maliput_point.lane_id())->ToLanePosition(inertial_position);
+    if (current_lane_position.distance < min_distance) {
       min_distance = current_lane_position.distance;
       lane_position_result = current_lane_position;
       lane_id_result = current_lane;
     } else if (current_lane_position.distance == min_distance) {
-      if (std::abs(current_lane_position.lane_position.r()) < std::abs(lane_position_result.lane_position.r())){
+      if (std::abs(current_lane_position.lane_position.r()) < std::abs(lane_position_result.lane_position.r())) {
         min_distance = current_lane_position.distance;
         lane_position_result = current_lane_position;
         lane_id_result = current_lane;
@@ -82,14 +84,14 @@ maliput::api::LaneId KDTreeReorganization::do_closest_lane(const maliput::math::
 }
 
 std::set<maliput::api::LaneId> KDTreeReorganization::do_closest_lanes(const maliput::math::Vector3& point,
-                                                                         double distance) const {
-  const maliput::math::Vector3 min_corner{point.x()-distance, point.y()-distance, point.z()-distance};
-  const maliput::math::Vector3 max_corner{point.x()+distance, point.y()+distance, point.z()+distance};
+                                                                      double distance) const {
+  const maliput::math::Vector3 min_corner{point.x() - distance, point.y() - distance, point.z() - distance};
+  const maliput::math::Vector3 max_corner{point.x() + distance, point.y() + distance, point.z() + distance};
   const math::AxisAlignedBox& search_region{min_corner, max_corner};
   const auto maliput_points = pimpl_->kd_tree_->RangeSearch(search_region);
   std::set<maliput::api::LaneId> maliput_lanes;
-  for (int i = 0; i < maliput_points.size(); i++) {
-      maliput_lanes.insert(maliput_points[i]->lane_id());
+  for (const auto& current_point : maliput_points) {
+    maliput_lanes.insert(current_point->lane_id());
   }
   return maliput_lanes;
 }
