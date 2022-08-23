@@ -58,26 +58,37 @@ maliput::api::LaneId KDTreeReorganization::do_closest_lane(const maliput::math::
   const api::InertialPosition& inertial_position{point.x(), point.y(), point.z()};
   const auto maliput_point = pimpl_->kd_tree_->Nearest(point);
   double radius = std::sqrt(pow(point.x() - maliput_point.x(), 2) + pow(point.y() - maliput_point.y(), 2) +
-                            pow(point.z() - maliput_point.z(), 2));
+                            pow(point.z() - maliput_point.z(), 2)) +
+                  0.02;
   const auto lane_ids = do_closest_lanes(point, radius);
 
   auto lane_id_result = maliput_point.lane_id();
   auto lane_position_result = pimpl_->rg_->ById().GetLane(lane_id_result)->ToLanePosition(inertial_position);
   double min_distance = lane_position_result.distance;
+  const static double KLineraTolerance{1e-12};  // [m]
 
   for (const auto& current_lane : lane_ids) {
     const auto current_lane_position =
         pimpl_->rg_->ById().GetLane(maliput_point.lane_id())->ToLanePosition(inertial_position);
-    if (current_lane_position.distance < min_distance) {
+    if (current_lane_position.distance - min_distance > KLineraTolerance) {
       min_distance = current_lane_position.distance;
       lane_position_result = current_lane_position;
       lane_id_result = current_lane;
-    } else if (current_lane_position.distance == min_distance) {
-      if (std::abs(current_lane_position.lane_position.r()) < std::abs(lane_position_result.lane_position.r())) {
-        min_distance = current_lane_position.distance;
-        lane_position_result = current_lane_position;
-        lane_id_result = current_lane;
-      }
+      continue;
+    }
+    if (current_lane_position.distance - min_distance <= -KLineraTolerance) {
+      continue;
+    }
+    if (std::abs(current_lane_position.lane_position.r()) - std::abs(lane_position_result.lane_position.r()) <
+        -KLineraTolerance) {
+      min_distance = current_lane_position.distance;
+      lane_position_result = current_lane_position;
+      lane_id_result = current_lane;
+      continue;
+    }
+    if (std::abs(current_lane_position.lane_position.r()) - std::abs(lane_position_result.lane_position.r()) >
+        KLineraTolerance) {
+      continue;
     }
   }
   return lane_id_result;
