@@ -129,12 +129,25 @@ class Lane {
   InertialPosition ToInertialPosition(const LanePosition& lane_pos) const { return DoToInertialPosition(lane_pos); }
 
   /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
+  /// The LanePosition is expected to be contained within the lane's boundaries.
+  /// @see ToSegmentPosition method.
   ///
   /// This method guarantees that its result satisfies the condition that
   /// `ToInertialPosition(result.lane_position)` is within `linear_tolerance()`
   ///  of `result.nearest_position`.
   LanePositionResult ToLanePosition(const InertialPosition& inertial_pos) const {
     return DoToLanePosition(inertial_pos);
+  }
+
+  /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
+  /// The LanePosition is expected to be contained within the segment's boundaries.
+  /// @see ToLanePosition method.
+  ///
+  /// This method guarantees that its result satisfies the condition that
+  /// `ToInertialPosition(result.lane_position)` is within `linear_tolerance()`
+  ///  of `result.nearest_position`.
+  LanePositionResult ToSegmentPosition(const InertialPosition& inertial_pos) const {
+    return DoToSegmentPosition(inertial_pos);
   }
 
   // TODO(maddog@tri.global) Method to convert LanePosition to that of
@@ -213,6 +226,8 @@ class Lane {
   virtual InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const = 0;
 
   virtual LanePositionResult DoToLanePosition(const InertialPosition& inertial_pos) const = 0;
+
+  virtual LanePositionResult DoToSegmentPosition(const InertialPosition& inertial_pos) const = 0;
 
   virtual Rotation DoGetOrientation(const LanePosition& lane_pos) const = 0;
 

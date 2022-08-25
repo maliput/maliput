@@ -125,16 +125,15 @@ math::Vector3 Lane::DoToBackendPosition(const api::LanePosition& lane_pos) const
 }
 
 api::LanePositionResult Lane::DoToLanePosition(const api::InertialPosition& inertial_pos) const {
-  const math::Vector3 inertial_to_backend_frame_translation =
-      segment()->junction()->road_geometry()->inertial_to_backend_frame_translation();
-  const math::Vector3 backend_pos = inertial_pos.xyz() - inertial_to_backend_frame_translation;
+  using namespace std::placeholders;
+  return UseInertialToBackendTranslationFor(inertial_pos,
+                                            std::bind(&Lane::DoToLanePositionBackend, this, _1, _2, _3, _4));
+}
 
-  api::LanePosition lane_pos{};
-  math::Vector3 nearest_backend_pos{};
-  double distance{};
-  DoToLanePositionBackend(backend_pos, &lane_pos, &nearest_backend_pos, &distance);
-  return {lane_pos, api::InertialPosition::FromXyz(nearest_backend_pos + inertial_to_backend_frame_translation),
-          distance};
+api::LanePositionResult Lane::DoToSegmentPosition(const api::InertialPosition& inertial_pos) const {
+  using namespace std::placeholders;
+  return UseInertialToBackendTranslationFor(inertial_pos,
+                                            std::bind(&Lane::DoToSegmentPositionBackend, this, _1, _2, _3, _4));
 }
 
 void Lane::DoToLanePositionBackend(const math::Vector3& backend_pos, api::LanePosition* lane_position,
@@ -142,6 +141,28 @@ void Lane::DoToLanePositionBackend(const math::Vector3& backend_pos, api::LanePo
   MALIPUT_THROW_MESSAGE(
       "Unimplemented method. Please check the documentation of "
       "maliput::geometry_base::Lane::DoToLanePosition().");
+}
+
+void Lane::DoToSegmentPositionBackend(const math::Vector3& backend_pos, api::LanePosition* lane_position,
+                                      math::Vector3* nearest_backend_pos, double* distance) const {
+  MALIPUT_THROW_MESSAGE(
+      "Unimplemented method. Please check the documentation of "
+      "maliput::geometry_base::Lane::DoToSegmentPosition().");
+}
+
+api::LanePositionResult Lane::UseInertialToBackendTranslationFor(
+    const api::InertialPosition& inertial_pos,
+    std::function<void(const math::Vector3&, api::LanePosition*, math::Vector3*, double*)> inertial_to_lane) const {
+  const math::Vector3 inertial_to_backend_frame_translation =
+      segment()->junction()->road_geometry()->inertial_to_backend_frame_translation();
+  const math::Vector3 backend_pos = inertial_pos.xyz() - inertial_to_backend_frame_translation;
+
+  api::LanePosition lane_pos{};
+  math::Vector3 nearest_backend_pos{};
+  double distance{};
+  inertial_to_lane(backend_pos, &lane_pos, &nearest_backend_pos, &distance);
+  return {lane_pos, api::InertialPosition::FromXyz(nearest_backend_pos + inertial_to_backend_frame_translation),
+          distance};
 }
 
 }  // namespace geometry_base
