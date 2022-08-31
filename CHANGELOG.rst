@@ -2,6 +2,14 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.6 (2022-08-16)
+------------------
+* Implements KDTree::RangeSearch method. (`#520 <https://github.com/maliput/maliput/issues/520>`_)
+* Adds AxisAlignedBox. (`#519 <https://github.com/maliput/maliput/issues/519>`_)
+* Brings BoundingRegion's related stuff from maliput_object. (`#518 <https://github.com/maliput/maliput/issues/518>`_)
+* Adds KDTree to maliput::math. (`#515 <https://github.com/maliput/maliput/issues/515>`_)
+* Contributors: Franco Cipollone
+
 1.0.5 (2022-07-26)
 ------------------
 * Provides convenient method for loading a RN via plugins. (`#512 <https://github.com/maliput/maliput/issues/512>`_)
