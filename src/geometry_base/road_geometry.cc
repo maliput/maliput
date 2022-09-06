@@ -39,20 +39,6 @@
 namespace maliput {
 namespace geometry_base {
 
-template <typename StrategyT>
-RoadGeometry::RoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length,
-              const math::Vector3& inertial_to_backend_frame_translation)
-    : id_(id),
-      linear_tolerance_(linear_tolerance),
-      angular_tolerance_(angular_tolerance),
-      scale_length_(scale_length),
-      inertial_to_backend_frame_translation_(inertial_to_backend_frame_translation),
-      strategy_(std::make_unique<StrategyT>(this)) {
-  MALIPUT_THROW_UNLESS(linear_tolerance_ > 0.);
-  MALIPUT_THROW_UNLESS(angular_tolerance_ > 0.);
-  MALIPUT_THROW_UNLESS(scale_length_ > 0.);
-}
-
 void RoadGeometry::AddJunctionPrivate(std::unique_ptr<Junction> junction) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(junction.get() != nullptr);

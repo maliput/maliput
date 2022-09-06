@@ -41,7 +41,7 @@ namespace geometry_base {
 class BruteForceStrategy: public StrategyBase {
  public:
   BruteForceStrategy(const api::RoadGeometry* rg):StrategyBase(rg){};
-  ~BruteForceStrategy();
+  ~BruteForceStrategy() override = default;
 
   void Init(){};
 
