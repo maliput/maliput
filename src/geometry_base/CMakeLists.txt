@@ -7,7 +7,7 @@ set(SOURCES
     brute_force_strategy.cc
     filter_positions.cc
     junction.cc
-    kd_tree_reorganization.cc
+    kd_tree_strategy.cc
     lane.cc
     road_geometry.cc
     segment.cc)

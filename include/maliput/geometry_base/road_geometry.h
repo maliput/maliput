@@ -43,7 +43,7 @@
 #include "maliput/geometry_base/branch_point.h"
 #include "maliput/geometry_base/brute_force_strategy.h"
 #include "maliput/geometry_base/junction.h"
-#include "maliput/geometry_base/spacial_reorganization.h"
+#include "maliput/geometry_base/kd_tree_strategy.h"
 #include "maliput/geometry_base/strategy_base.h"
 #include "maliput/math/vector.h"
 
@@ -84,7 +84,7 @@ class RoadGeometry : public api::RoadGeometry {
   ///
   /// @throws maliput::common::assertion_error if either `linear_tolerance` or
   ///         `angular_tolerance` or `scale_length` is non-positive.
-  template <typename StrategyT = BruteForceStrategy>
+  template <typename StrategyT = KDTreeStrategy>
   RoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length,
                const math::Vector3& inertial_to_backend_frame_translation)
       : id_(id),
@@ -136,7 +136,7 @@ class RoadGeometry : public api::RoadGeometry {
 
   ~RoadGeometry() override = default;
 
-  void SpacialReorganization(const SpacialReorganization::Type& type);
+  // void SpacialReorganization(const SpacialReorganization::Type& type);
 
  private:
   virtual api::RoadPositionResult DoToRoadPosition(
@@ -182,7 +182,6 @@ class RoadGeometry : public api::RoadGeometry {
   std::vector<std::unique_ptr<Junction>> junctions_;
   std::vector<std::unique_ptr<BranchPoint>> branch_points_;
   api::BasicIdIndex id_index_;
-  std::unique_ptr<maliput::geometry_base::SpacialReorganization> spacial_reorganization_;
   std::unique_ptr<StrategyBase> strategy_;
 };
 

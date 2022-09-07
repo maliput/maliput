@@ -29,20 +29,37 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <deque>
+#include <memory>
+#include <optional>
+#include <vector>
 
-#include "maliput/api/lane.h"
+#include "maliput/geometry_base/strategy_base.h"
+#include "maliput/math/kd_tree.h"
 
 namespace maliput {
 namespace geometry_base {
 
-class SpacialReorganization {
+class MaliputPoint : public maliput::math::Vector3 {
  public:
-  enum class Type {
-    kKDTree,
-  };
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(MaliputPoint)
+  MaliputPoint() = default;
+  MaliputPoint(const Vector3& xyz) : Vector3(xyz) {}
+  MaliputPoint(const Vector3& xyz, const maliput::api::LaneId& lane_id) : Vector3(xyz), lane_id_(lane_id) {}
 
-  virtual ~SpacialReorganization() = default;
+  ~MaliputPoint() = default;
+
+  maliput::api::LaneId lane_id() const { return lane_id_; };
+
+ private:
+  maliput::api::LaneId lane_id_{"none"};
+};
+
+class KDTreeStrategy : public StrategyBase {
+ public:
+  KDTreeStrategy(const api::RoadGeometry* rg) : StrategyBase(rg){};
+  ~KDTreeStrategy() override = default;
+
+  void Init() override;
 
   maliput::api::LaneId ClosestLane(const maliput::math::Vector3& point) const { return do_closest_lane(point); }
 
@@ -50,13 +67,20 @@ class SpacialReorganization {
     return do_closest_lanes(point, distance);
   }
 
- protected:
-  SpacialReorganization() = default;
+  static constexpr double kStrictLinearTolerance{1e-12};  // [m]
 
  private:
-  virtual maliput::api::LaneId do_closest_lane(const maliput::math::Vector3& point) const = 0;
-  virtual std::set<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point,
-                                                          double distance) const = 0;
+  api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,
+                                           const std::optional<api::RoadPosition>& hint) const override;
+
+  std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
+                                                           double radius) const override;
+
+  maliput::api::LaneId do_closest_lane(const maliput::math::Vector3& point) const;
+
+  std::set<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point, double distance) const;
+
+  std::unique_ptr<maliput::math::KDTree3D<MaliputPoint>> kd_tree_;
 };
 
 }  // namespace geometry_base

@@ -43,7 +43,7 @@ class BruteForceStrategy : public StrategyBase {
   BruteForceStrategy(const api::RoadGeometry* rg) : StrategyBase(rg){};
   ~BruteForceStrategy() override = default;
 
-  void Init(){};
+  void Init() override{};
 
   static constexpr double kStrictLinearTolerance{1e-12};  // [m]
 
