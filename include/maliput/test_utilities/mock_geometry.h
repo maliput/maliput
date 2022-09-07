@@ -39,7 +39,6 @@
 #include "maliput/geometry_base/lane.h"
 #include "maliput/geometry_base/road_geometry.h"
 #include "maliput/geometry_base/segment.h"
-
 #include "maliput/math/vector.h"
 
 namespace maliput {

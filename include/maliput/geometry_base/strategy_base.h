@@ -46,21 +46,25 @@ class StrategyBase {
   virtual void Init() = 0;
 
   api::RoadPositionResult ToRoadPosition(const api::InertialPosition& inertial_position,
-                                                 const std::optional<api::RoadPosition>& hint)
-                                                 {return DoToRoadPosition(inertial_position, hint);}
+                                         const std::optional<api::RoadPosition>& hint) {
+    return DoToRoadPosition(inertial_position, hint);
+  }
 
   std::vector<api::RoadPositionResult> FindRoadPositions(const api::InertialPosition& inertial_position,
-                                            double radius){return DoFindRoadPositions(inertial_position, radius);}
-protected:
-  StrategyBase(const api::RoadGeometry* rg): rg_(rg){};
+                                                         double radius) {
+    return DoFindRoadPositions(inertial_position, radius);
+  }
+
+ protected:
+  StrategyBase(const api::RoadGeometry* rg) : rg_(rg){};
   const api::RoadGeometry* rg_;
 
-private:
+ private:
   virtual api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,
-                                                 const std::optional<api::RoadPosition>& hint) const = 0;
+                                                   const std::optional<api::RoadPosition>& hint) const = 0;
 
   virtual std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
-                                                                 double radius) const = 0;
+                                                                   double radius) const = 0;
 };
 
 }  // namespace geometry_base

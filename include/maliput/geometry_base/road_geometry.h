@@ -43,8 +43,8 @@
 #include "maliput/geometry_base/branch_point.h"
 #include "maliput/geometry_base/brute_force_strategy.h"
 #include "maliput/geometry_base/junction.h"
-#include "maliput/geometry_base/strategy_base.h"
 #include "maliput/geometry_base/spacial_reorganization.h"
+#include "maliput/geometry_base/strategy_base.h"
 #include "maliput/math/vector.h"
 
 namespace maliput {
@@ -86,7 +86,7 @@ class RoadGeometry : public api::RoadGeometry {
   ///         `angular_tolerance` or `scale_length` is non-positive.
   template <typename StrategyT = BruteForceStrategy>
   RoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length,
-                const math::Vector3& inertial_to_backend_frame_translation)
+               const math::Vector3& inertial_to_backend_frame_translation)
       : id_(id),
         linear_tolerance_(linear_tolerance),
         angular_tolerance_(angular_tolerance),

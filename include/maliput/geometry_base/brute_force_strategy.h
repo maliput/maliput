@@ -38,22 +38,21 @@
 namespace maliput {
 namespace geometry_base {
 
-class BruteForceStrategy: public StrategyBase {
+class BruteForceStrategy : public StrategyBase {
  public:
-  BruteForceStrategy(const api::RoadGeometry* rg):StrategyBase(rg){};
+  BruteForceStrategy(const api::RoadGeometry* rg) : StrategyBase(rg){};
   ~BruteForceStrategy() override = default;
 
   void Init(){};
 
-  static constexpr double kStrictLinearTolerance{1e-12}; // [m]
+  static constexpr double kStrictLinearTolerance{1e-12};  // [m]
 
  private:
   api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,
-                                                 const std::optional<api::RoadPosition>& hint) const override;
+                                           const std::optional<api::RoadPosition>& hint) const override;
 
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
-                                                                 double radius) const override;
-
+                                                           double radius) const override;
 };
 
 }  // namespace geometry_base
