@@ -56,10 +56,8 @@ class MaliputPoint : public maliput::math::Vector3 {
 
 class KDTreeStrategy : public StrategyBase {
  public:
-  KDTreeStrategy(const api::RoadGeometry* rg) : StrategyBase(rg){};
+  KDTreeStrategy(const api::RoadGeometry* rg);
   ~KDTreeStrategy() override = default;
-
-  void Init() override;
 
   maliput::api::LaneId ClosestLane(const maliput::math::Vector3& point) const { return do_closest_lane(point); }
 

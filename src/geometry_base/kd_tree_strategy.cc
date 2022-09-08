@@ -37,6 +37,24 @@
 namespace maliput {
 namespace geometry_base {
 
+KDTreeStrategy::KDTreeStrategy(const api::RoadGeometry* rg) : StrategyBase(rg) {
+  const auto lanes = rg_->ById().GetLanes();
+  std::deque<maliput::geometry_base::MaliputPoint> points;
+  for (const auto& lane : lanes) {
+    const auto lane_length = lane.second->length();
+    for (double s = 0; s <= lane_length; s += 0.1) {
+      const auto lane_bounds = lane.second->lane_bounds(s);
+      for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += 0.1) {
+        const auto inertial_pos = lane.second->ToInertialPosition({s, r, 0. /* h */}).xyz();
+        const maliput::geometry_base::MaliputPoint point{{inertial_pos.x(), inertial_pos.y(), inertial_pos.z()},
+                                                         lane.first};
+        points.push_back(point);
+      }
+    }
+  }
+  kd_tree_ = (std::make_unique<math::KDTree3D<MaliputPoint>>(std::move(points)));
+};
+
 api::RoadPositionResult KDTreeStrategy::DoToRoadPosition(const api::InertialPosition& inertial_position,
                                                          const std::optional<api::RoadPosition>& hint) const {
   if (hint.has_value()) {
@@ -65,25 +83,6 @@ std::vector<api::RoadPositionResult> KDTreeStrategy::DoFindRoadPositions(const a
     }
   }
   return road_positions;
-}
-
-void KDTreeStrategy::Init() {
-  const auto lanes = rg_->ById().GetLanes();
-
-  std::deque<maliput::geometry_base::MaliputPoint> points;
-  for (const auto& lane : lanes) {
-    const auto lane_length = lane.second->length();
-    for (double s = 0; s <= lane_length; s += 0.1) {
-      const auto lane_bounds = lane.second->lane_bounds(s);
-      for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += 0.1) {
-        const auto inertial_pos = lane.second->ToInertialPosition({s, r, 0. /* h */}).xyz();
-        const maliput::geometry_base::MaliputPoint point{{inertial_pos.x(), inertial_pos.y(), inertial_pos.z()},
-                                                         lane.first};
-        points.push_back(point);
-      }
-    }
-  }
-  kd_tree_ = (std::make_unique<math::KDTree3D<MaliputPoint>>(std::move(points)));
 }
 
 maliput::api::LaneId KDTreeStrategy::do_closest_lane(const maliput::math::Vector3& point) const {

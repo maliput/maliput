@@ -84,15 +84,13 @@ class RoadGeometry : public api::RoadGeometry {
   ///
   /// @throws maliput::common::assertion_error if either `linear_tolerance` or
   ///         `angular_tolerance` or `scale_length` is non-positive.
-  template <typename StrategyT = KDTreeStrategy>
   RoadGeometry(const api::RoadGeometryId& id, double linear_tolerance, double angular_tolerance, double scale_length,
                const math::Vector3& inertial_to_backend_frame_translation)
       : id_(id),
         linear_tolerance_(linear_tolerance),
         angular_tolerance_(angular_tolerance),
         scale_length_(scale_length),
-        inertial_to_backend_frame_translation_(inertial_to_backend_frame_translation),
-        strategy_(std::make_unique<StrategyT>(this)) {
+        inertial_to_backend_frame_translation_(inertial_to_backend_frame_translation) {
     MALIPUT_THROW_UNLESS(linear_tolerance_ > 0.);
     MALIPUT_THROW_UNLESS(angular_tolerance_ > 0.);
     MALIPUT_THROW_UNLESS(scale_length_ > 0.);
@@ -132,6 +130,11 @@ class RoadGeometry : public api::RoadGeometry {
     T* const raw_pointer = branch_point.get();
     AddBranchPointPrivate(std::move(branch_point));
     return raw_pointer;
+  }
+
+  template <class StrategyT = BruteForceStrategy>
+  void InitializeStrategy() {
+    strategy_ = std::make_unique<StrategyT>(this);
   }
 
   ~RoadGeometry() override = default;

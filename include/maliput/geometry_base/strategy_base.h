@@ -43,8 +43,6 @@ class StrategyBase {
  public:
   virtual ~StrategyBase() = default;
 
-  virtual void Init() = 0;
-
   api::RoadPositionResult ToRoadPosition(const api::InertialPosition& inertial_position,
                                          const std::optional<api::RoadPosition>& hint) {
     return DoToRoadPosition(inertial_position, hint);
