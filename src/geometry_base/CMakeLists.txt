@@ -10,7 +10,8 @@ set(SOURCES
     kd_tree_strategy.cc
     lane.cc
     road_geometry.cc
-    segment.cc)
+    segment.cc
+    strategy_base.cc)
 
 add_library(geometry_base ${SOURCES})
 

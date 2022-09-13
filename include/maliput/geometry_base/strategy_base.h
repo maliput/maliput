@@ -39,23 +39,30 @@
 namespace maliput {
 namespace geometry_base {
 
+/// Provides a base interface for defining strategies that will affect the behavior
+/// of the queries RoadGeomoetry::ToRoadPosition and RoadGeomoetry::FindRoadPositions.
+/// See RoadGeometry::InitializeStrategy().
 class StrategyBase {
  public:
   virtual ~StrategyBase() = default;
 
   api::RoadPositionResult ToRoadPosition(const api::InertialPosition& inertial_position,
-                                         const std::optional<api::RoadPosition>& hint) {
+                                         const std::optional<api::RoadPosition>& hint) const {
     return DoToRoadPosition(inertial_position, hint);
   }
 
   std::vector<api::RoadPositionResult> FindRoadPositions(const api::InertialPosition& inertial_position,
-                                                         double radius) {
+                                                         double radius) const {
     return DoFindRoadPositions(inertial_position, radius);
   }
 
+  bool IsNewRoadPositionResultCloser(const maliput::api::RoadPositionResult& new_road_position_result,
+                                     const maliput::api::RoadPositionResult& road_position_result) const;
+
+  const api::RoadGeometry* GetRoadGeometry() const { return rg_; }
+
  protected:
-  StrategyBase(const api::RoadGeometry* rg) : rg_(rg){};
-  const api::RoadGeometry* rg_;
+  StrategyBase(const api::RoadGeometry* rg) : rg_(rg) { MALIPUT_THROW_UNLESS(rg_ != nullptr); }
 
  private:
   virtual api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,
@@ -63,6 +70,8 @@ class StrategyBase {
 
   virtual std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                                    double radius) const = 0;
+
+  const api::RoadGeometry* rg_{};
 };
 
 }  // namespace geometry_base

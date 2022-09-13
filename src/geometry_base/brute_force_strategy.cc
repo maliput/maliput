@@ -41,52 +41,6 @@
 
 namespace maliput {
 namespace geometry_base {
-bool IsNewRoadPositionResultCloser(const maliput::api::RoadPositionResult& new_road_position_result,
-                                   const maliput::api::RoadPositionResult& road_position_result) {
-  const double delta = new_road_position_result.distance - road_position_result.distance;
-  const bool different_segment = road_position_result.road_position.lane->segment()->id() !=
-                                 new_road_position_result.road_position.lane->segment()->id();
-
-  // When lanes belong to the same segment is expected that the distance value is almost equal so we can't use the
-  // distance as main condition. When lanes don't belong to the same segment we can use the distance as main
-  // condition.
-  if (different_segment) {
-    if (delta < -BruteForceStrategy::kStrictLinearTolerance) {
-      return true;
-    }
-    if (delta >= BruteForceStrategy::kStrictLinearTolerance) {
-      return false;
-    }
-  }
-
-  auto is_within_lane_bounds = [](double r, const maliput::api::RBounds& lane_bounds) {
-    return r >= lane_bounds.min() && r < lane_bounds.max();
-  };
-  // They are almost equal so it is worth checking the `r` coordinate and the
-  // lane bounds.
-  // When both r-coordinates fall within lane bounds or outside, the position
-  // with the minimum absolute r-coordinate prevails.
-  // When the new r-coordinate is within lane bounds, and the previous position
-  // does not fall within lane bounds, the new result prevails.
-  const maliput::api::RBounds new_lane_bounds =
-      new_road_position_result.road_position.lane->lane_bounds(new_road_position_result.road_position.pos.s());
-  const maliput::api::RBounds current_lane_bounds =
-      road_position_result.road_position.lane->lane_bounds(road_position_result.road_position.pos.s());
-  const bool is_new_within_lane_bounds =
-      is_within_lane_bounds(new_road_position_result.road_position.pos.r(), new_lane_bounds);
-  const bool is_current_within_lane_bounds =
-      is_within_lane_bounds(road_position_result.road_position.pos.r(), current_lane_bounds);
-  if ((is_new_within_lane_bounds && is_current_within_lane_bounds) ||
-      (!is_new_within_lane_bounds && !is_current_within_lane_bounds)) {
-    if (std::abs(new_road_position_result.road_position.pos.r()) <
-        std::abs(road_position_result.road_position.pos.r())) {
-      return true;
-    }
-  } else if (is_new_within_lane_bounds && !is_current_within_lane_bounds) {
-    return true;
-  }
-  return false;
-}
 
 maliput::api::RoadPositionResult BruteForceStrategy::DoToRoadPosition(
     const maliput::api::InertialPosition& inertial_pos, const std::optional<maliput::api::RoadPosition>& hint) const {
@@ -104,7 +58,8 @@ maliput::api::RoadPositionResult BruteForceStrategy::DoToRoadPosition(
     // Filter the candidates within a linear tolerance of distance.
     const std::vector<maliput::api::RoadPositionResult> near_road_positions_results =
         maliput::geometry_base::FilterRoadPositionResults(
-            road_position_results, [tol = rg_->linear_tolerance()](const maliput::api::RoadPositionResult& result) {
+            road_position_results,
+            [tol = GetRoadGeometry()->linear_tolerance()](const maliput::api::RoadPositionResult& result) {
               return result.distance <= tol;
             });
 
@@ -123,13 +78,14 @@ maliput::api::RoadPositionResult BruteForceStrategy::DoToRoadPosition(
 
 std::vector<maliput::api::RoadPositionResult> BruteForceStrategy::DoFindRoadPositions(
     const maliput::api::InertialPosition& inertial_position, double radius) const {
-  MALIPUT_THROW_UNLESS(rg_ != nullptr);
+  const api::RoadGeometry* rg = GetRoadGeometry();
+  MALIPUT_THROW_UNLESS(rg != nullptr);
   MALIPUT_THROW_UNLESS(radius >= 0.);
 
   std::vector<maliput::api::RoadPositionResult> road_position_results;
 
-  for (int i = 0; i < rg_->num_junctions(); ++i) {
-    const maliput::api::Junction* junction = rg_->junction(i);
+  for (int i = 0; i < rg->num_junctions(); ++i) {
+    const maliput::api::Junction* junction = rg->junction(i);
     MALIPUT_THROW_UNLESS(junction != nullptr);
     for (int j = 0; j < junction->num_segments(); ++j) {
       const maliput::api::Segment* segment = junction->segment(j);

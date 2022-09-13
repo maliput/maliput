@@ -132,14 +132,12 @@ class RoadGeometry : public api::RoadGeometry {
     return raw_pointer;
   }
 
-  template <class StrategyT = BruteForceStrategy>
+  template <class StrategyT = KDTreeStrategy>
   void InitializeStrategy() {
     strategy_ = std::make_unique<StrategyT>(this);
   }
 
   ~RoadGeometry() override = default;
-
-  // void SpacialReorganization(const SpacialReorganization::Type& type);
 
  private:
   virtual api::RoadPositionResult DoToRoadPosition(

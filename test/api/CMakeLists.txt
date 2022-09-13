@@ -32,7 +32,6 @@ macro(add_dependencies_to_test target)
       target_link_libraries(${target}
           maliput::api
           maliput::common
-          maliput::geometry_base
           maliput::math
           maliput::test_utilities
       )

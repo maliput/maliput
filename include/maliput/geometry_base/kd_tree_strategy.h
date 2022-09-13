@@ -39,44 +39,43 @@
 namespace maliput {
 namespace geometry_base {
 
-class MaliputPoint : public maliput::math::Vector3 {
- public:
-  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(MaliputPoint)
-  MaliputPoint() = default;
-  MaliputPoint(const Vector3& xyz) : Vector3(xyz) {}
-  MaliputPoint(const Vector3& xyz, const maliput::api::LaneId& lane_id) : Vector3(xyz), lane_id_(lane_id) {}
-
-  ~MaliputPoint() = default;
-
-  maliput::api::LaneId lane_id() const { return lane_id_; };
-
- private:
-  maliput::api::LaneId lane_id_{"none"};
-};
+/// Implements StrategyBase by reorganizing the lane space into a kd-tree for
+/// achieving significantly more performant queries than BruteForceStrategy.
+/// The kd-tree is built in construction time by sampling the lanes,
+/// therefore the RoadGeometry should be filled with lanes before
+/// the instantiation.
 
 class KDTreeStrategy : public StrategyBase {
  public:
-  KDTreeStrategy(const api::RoadGeometry* rg);
+  explicit KDTreeStrategy(const api::RoadGeometry* rg);
   ~KDTreeStrategy() override = default;
 
-  maliput::api::LaneId ClosestLane(const maliput::math::Vector3& point) const { return do_closest_lane(point); }
-
-  std::set<maliput::api::LaneId> ClosestLanes(const maliput::math::Vector3& point, double distance) const {
-    return do_closest_lanes(point, distance);
-  }
-
-  static constexpr double kStrictLinearTolerance{1e-12};  // [m]
-
  private:
+  class MaliputPoint : public maliput::math::Vector3 {
+   public:
+    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(MaliputPoint)
+    MaliputPoint() = default;
+    MaliputPoint(const Vector3& xyz) : Vector3(xyz) {}
+    MaliputPoint(const Vector3& xyz, const maliput::api::LaneId& lane_id)
+        : Vector3(xyz), lane_id_(std::make_optional(lane_id)) {}
+
+    ~MaliputPoint() = default;
+
+    std::optional<maliput::api::LaneId> lane_id() const { return lane_id_; };
+
+   private:
+    std::optional<maliput::api::LaneId> lane_id_;
+  };
+
   api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,
                                            const std::optional<api::RoadPosition>& hint) const override;
 
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                            double radius) const override;
 
-  maliput::api::LaneId do_closest_lane(const maliput::math::Vector3& point) const;
+  maliput::api::RoadPositionResult ClosestLane(const maliput::math::Vector3& point) const;
 
-  std::set<maliput::api::LaneId> do_closest_lanes(const maliput::math::Vector3& point, double distance) const;
+  std::set<maliput::api::LaneId> ClosestLanes(const maliput::math::Vector3& point, double distance) const;
 
   std::unique_ptr<maliput::math::KDTree3D<MaliputPoint>> kd_tree_;
 };
