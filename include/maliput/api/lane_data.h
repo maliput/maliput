@@ -281,14 +281,15 @@ class LanePosition {
 
 /// Included in the return result of Lane::ToLanePosition().
 struct LanePositionResult {
-  /// The candidate LanePosition within the Lane' segment-bounds which
-  /// is closest to a `inertial_position` supplied to Lane::ToLanePosition()
+  /// The candidate LanePosition within the Lane' lane-bounds or segment-bounds
+  /// depending if ToLanePosition or ToSegmentPosition respectively, was called.
+  /// The LanePosition is closest to a `inertial_position` supplied to Lane::ToLanePosition()
   /// (measured by the Cartesian metric in the `Inertial`-frame).
   LanePosition lane_position;
   /// The position that exactly corresponds to `lane_position`.
   InertialPosition nearest_position;
   /// The Cartesian distance between `nearest_position` and the
-  /// `inertial_position` supplied to Lane::ToLanePosition().
+  /// `inertial_position` supplied to Lane::ToLanePosition() / Lane::ToSegmentPosition.
   double distance{};
 };
 

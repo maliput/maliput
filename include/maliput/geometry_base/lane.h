@@ -141,7 +141,7 @@ class Lane : public api::Lane {
   // @}
 
   // @{
-  // Maps @p inertial_pos (measured in the Inertial Frame) into this Lane Frame.
+  // Maps @p inertial_pos (measured in the Inertial Frame) into this Lane Frame withing lane boundaries.
   //
   // @details Translates @p inertial_pos with api::RoadGeometry::internal_inertial_frame_translation()
   //          and calls DoToLanePositionBackend(). The returned values are
@@ -155,7 +155,21 @@ class Lane : public api::Lane {
   //       expected than the generic transform applied here.
   virtual api::LanePositionResult DoToLanePosition(const api::InertialPosition& inertial_pos) const override;
 
-  // Maps @p backend_pos (measured in the Backend Frame) into this Lane Frame.
+  // Maps @p inertial_pos (measured in the Inertial Frame) into this Lane Frame within segment boundaries.
+  //
+  // @details Translates @p inertial_pos with api::RoadGeometry::internal_inertial_frame_translation()
+  //          and calls DoToSegmentPositionBackend(). The returned values are
+  //          used to build an api::LanePositionResult. Note that
+  //          `nearest_backend_pos` is converted back to the Inertial Frame
+  //          before returning the final result.
+  //
+  // @note Because of performance constraints, backends must decide whether to
+  //       exclusively override DoToSegmentPosition() or DoToSegmentPositionBackend().
+  //       When overriding DoToSegmentPosition(), a better performance is
+  //       expected than the generic transform applied here.
+  virtual api::LanePositionResult DoToSegmentPosition(const api::InertialPosition& inertial_pos) const override;
+
+  // Maps @p backend_pos (measured in the Backend Frame) into this Lane Frame within lane boundaries.
   //
   // @note This method implementation @throws maliput::common::assertion_error
   //       as it should only be called when it is overridden by a derived class.
@@ -179,7 +193,39 @@ class Lane : public api::Lane {
   // @return The @p lane_pos, @p nearest_backend_pos and @p distance.
   virtual void DoToLanePositionBackend(const math::Vector3& backend_pos, api::LanePosition* lane_pos,
                                        math::Vector3* nearest_backend_pos, double* distance) const;
+
+  // Maps @p backend_pos (measured in the Backend Frame) into this Lane Frame within segment boundaries.
+  //
+  // @note This method implementation @throws maliput::common::assertion_error
+  //       as it should only be called when it is overridden by a derived class.
+  //       @see DoToLanePosition() docstring to understand when to override each
+  //       method accordingly.
+  //
+  // @param backend_pos The Backend Frame coordinate to map into this Lane
+  //        Frame.
+  // @param lane_pos The candidate LanePosition within the Lane' segment-
+  //        bounds which is closest closest to @p backend_pos. It must not be
+  //        nullptr.
+  // @param nearest_backend_pos The position that exactly corresponds to
+  //        @p lane_pos. It must not be nullptr.
+  // @param distance The Cartesian distance between `nearest_position` and the
+  //        Inertial Frame position supplied to Lane::ToLanePosition() and then
+  //        converted into the Backend Frame. It must not be nullptr.
+  //
+  // @throws When any of @p backend_pos, @p lane_pos, or @p distance is
+  //         nullptr.
+  //
+  // @return The @p lane_pos, @p nearest_backend_pos and @p distance.
+  virtual void DoToSegmentPositionBackend(const math::Vector3& backend_pos, api::LanePosition* lane_pos,
+                                          math::Vector3* nearest_backend_pos, double* distance) const;
   // @}
+
+  // Applies the inertial to backend translation to any function in charge of converting from Inertial Frame position to
+  // Lane Frame position.
+  // @p inertial_to_lane is expected to be a reference to DoToSegmentPosition or DoToLanePosition methods.
+  api::LanePositionResult UseInertialToBackendTranslationFor(
+      const api::InertialPosition& inertial_pos,
+      std::function<void(const math::Vector3&, api::LanePosition*, math::Vector3*, double*)> inertial_to_lane) const;
 
   const api::LaneId id_;
   const api::Segment* segment_{};
