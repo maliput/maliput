@@ -2,8 +2,8 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.7 (2022-09-14)
+------------------
 * Modifies ToLanePosition and adds ToSegmentPosition. (`#521 <https://github.com/maliput/maliput/issues/521>`_)
 * Contributors: Franco Cipollone
 
