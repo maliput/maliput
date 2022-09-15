@@ -275,7 +275,7 @@ class KDTreeBase {
   /// It is not valid to call this function if the tree is empty.
   /// @param point a point.
   /// @return the nearest point in the tree to the given point
-  const Coordinate& nearest_point(const Coordinate& point) const {
+  const Coordinate& Nearest(const Coordinate& point) const {
     return Nearest(point, std::numeric_limits<double>::min());
   }
 

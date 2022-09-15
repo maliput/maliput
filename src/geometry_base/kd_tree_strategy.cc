@@ -38,14 +38,15 @@
 namespace maliput {
 namespace geometry_base {
 
-KDTreeStrategy::KDTreeStrategy(const api::RoadGeometry* rg) : StrategyBase(rg) {
+KDTreeStrategy::KDTreeStrategy(const api::RoadGeometry* rg, const double sampling_step)
+    : StrategyBase(rg), sampling_step_(sampling_step) {
   const auto lanes = GetRoadGeometry()->ById().GetLanes();
   std::deque<MaliputPoint> points;
   for (const auto& lane : lanes) {
     const auto lane_length = lane.second->length();
     for (double s = 0; s <= lane_length; s += 0.1) {
       const auto lane_bounds = lane.second->lane_bounds(s);
-      for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += 0.1) {
+      for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += sampling_step_) {
         const auto inertial_pos = lane.second->ToInertialPosition({s, r, 0. /* h */}).xyz();
         const MaliputPoint point{{inertial_pos.x(), inertial_pos.y(), inertial_pos.z()}, lane.first};
         points.push_back(point);
@@ -86,8 +87,8 @@ api::RoadPositionResult KDTreeStrategy::ClosestLane(const math::Vector3& point) 
   // Given that this method should actually obtain the lanes within a tolerance radius. Afterwards, the lane
   // could be obtained using the point being closer to the centerline.
   const api::InertialPosition& inertial_position{point.x(), point.y(), point.z()};
-  const MaliputPoint maliput_point = kd_tree_->nearest_point(point);
-  const double radius = (point - maliput_point).norm() + 0.2;
+  const MaliputPoint maliput_point = kd_tree_->Nearest(point);
+  const double radius = (point - maliput_point).norm() + 2 * sampling_step_;
   const std::set<api::LaneId> lane_ids = ClosestLanes(point, radius);
   const api::RoadGeometry* rg = GetRoadGeometry();
 

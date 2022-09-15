@@ -132,9 +132,12 @@ class RoadGeometry : public api::RoadGeometry {
     return raw_pointer;
   }
 
-  template <class StrategyT = KDTreeStrategy>
-  void InitializeStrategy() {
-    strategy_ = std::make_unique<StrategyT>(this);
+  template <class StrategyT = KDTreeStrategy, class... Args>
+  void InitializeStrategy(Args&&... args) {
+    static_assert(std::is_base_of<StrategyBase, StrategyT>::value,
+                  "StrategyT is not derived from geometry_base::StrategyBase");
+    // strategy_ = std::unique_ptr<StrategyT>(new StrategyT(std::forward<Args>(args)...));
+    strategy_ = std::make_unique<StrategyT>(this, std::forward<Args>(args)...);
   }
 
   ~RoadGeometry() override = default;

@@ -47,21 +47,22 @@ namespace geometry_base {
 
 class KDTreeStrategy : public StrategyBase {
  public:
-  explicit KDTreeStrategy(const api::RoadGeometry* rg);
+  KDTreeStrategy(const api::RoadGeometry* rg, const double sampling_step);
   ~KDTreeStrategy() override = default;
 
  private:
   class MaliputPoint : public maliput::math::Vector3 {
    public:
     MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(MaliputPoint)
-    MaliputPoint() = default;
     MaliputPoint(const Vector3& xyz) : Vector3(xyz) {}
     MaliputPoint(const Vector3& xyz, const maliput::api::LaneId& lane_id)
         : Vector3(xyz), lane_id_(std::make_optional(lane_id)) {}
 
     ~MaliputPoint() = default;
 
-    std::optional<maliput::api::LaneId> lane_id() const { return lane_id_; };
+    std::optional<maliput::api::LaneId> lane_id() const { return lane_id_; }
+
+    void set_lane_id(maliput::api::LaneId id) { lane_id_.value() = id; }
 
    private:
     std::optional<maliput::api::LaneId> lane_id_;
@@ -78,6 +79,8 @@ class KDTreeStrategy : public StrategyBase {
   std::set<maliput::api::LaneId> ClosestLanes(const maliput::math::Vector3& point, double distance) const;
 
   std::unique_ptr<maliput::math::KDTree3D<MaliputPoint>> kd_tree_;
+
+  const double sampling_step_;
 };
 
 }  // namespace geometry_base
