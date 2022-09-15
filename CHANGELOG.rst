@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.7 (2022-09-14)
+------------------
+* Modifies ToLanePosition and adds ToSegmentPosition. (`#521 <https://github.com/maliput/maliput/issues/521>`_)
+* Contributors: Franco Cipollone
+
 1.0.6 (2022-08-16)
 ------------------
 * Implements KDTree::RangeSearch method. (`#520 <https://github.com/maliput/maliput/issues/520>`_)
