@@ -59,7 +59,7 @@ maliput::api::RoadPositionResult BruteForceStrategy::DoToRoadPosition(
     const std::vector<maliput::api::RoadPositionResult> near_road_positions_results =
         maliput::geometry_base::FilterRoadPositionResults(
             road_position_results,
-            [tol = GetRoadGeometry()->linear_tolerance()](const maliput::api::RoadPositionResult& result) {
+            [tol = get_road_geometry()->linear_tolerance()](const maliput::api::RoadPositionResult& result) {
               return result.distance <= tol;
             });
 
@@ -78,7 +78,7 @@ maliput::api::RoadPositionResult BruteForceStrategy::DoToRoadPosition(
 
 std::vector<maliput::api::RoadPositionResult> BruteForceStrategy::DoFindRoadPositions(
     const maliput::api::InertialPosition& inertial_position, double radius) const {
-  const api::RoadGeometry* rg = GetRoadGeometry();
+  const api::RoadGeometry* rg = get_road_geometry();
   MALIPUT_THROW_UNLESS(rg != nullptr);
   MALIPUT_THROW_UNLESS(radius >= 0.);
 

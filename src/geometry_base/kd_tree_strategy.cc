@@ -40,7 +40,7 @@ namespace geometry_base {
 
 KDTreeStrategy::KDTreeStrategy(const api::RoadGeometry* rg, const double sampling_step)
     : StrategyBase(rg), sampling_step_(sampling_step) {
-  const auto lanes = GetRoadGeometry()->ById().GetLanes();
+  const auto lanes = get_road_geometry()->ById().GetLanes();
   std::deque<MaliputPoint> points;
   for (const auto& lane : lanes) {
     const auto lane_length = lane.second->length();
@@ -48,8 +48,7 @@ KDTreeStrategy::KDTreeStrategy(const api::RoadGeometry* rg, const double samplin
       const auto lane_bounds = lane.second->lane_bounds(s);
       for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += sampling_step_) {
         const auto inertial_pos = lane.second->ToInertialPosition({s, r, 0. /* h */}).xyz();
-        const MaliputPoint point{{inertial_pos.x(), inertial_pos.y(), inertial_pos.z()}, lane.first};
-        points.push_back(point);
+        points.push_back(MaliputPoint{{inertial_pos.x(), inertial_pos.y(), inertial_pos.z()}, lane.first});
       }
     }
   }
@@ -63,14 +62,14 @@ api::RoadPositionResult KDTreeStrategy::DoToRoadPosition(const api::InertialPosi
     const api::LanePositionResult lane_pos = hint->lane->ToLanePosition(inertial_position);
     return {{hint->lane, lane_pos.lane_position}, lane_pos.nearest_position, lane_pos.distance};
   }
-  return this->ClosestLane(inertial_position.xyz());
+  return this->ClosestLane(inertial_position);
 }
 
 std::vector<api::RoadPositionResult> KDTreeStrategy::DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                                          double radius) const {
   const auto lane_ids = this->ClosestLanes(inertial_position.xyz(), radius);
   std::vector<api::RoadPositionResult> road_positions;
-  const api::RoadGeometry* rg = GetRoadGeometry();
+  const api::RoadGeometry* rg = get_road_geometry();
   for (const auto& current_lane : lane_ids) {
     const auto lane = rg->ById().GetLane(current_lane);
     const auto lane_position = lane->ToLanePosition(inertial_position);
@@ -83,24 +82,23 @@ std::vector<api::RoadPositionResult> KDTreeStrategy::DoFindRoadPositions(const a
   return road_positions;
 }
 
-api::RoadPositionResult KDTreeStrategy::ClosestLane(const math::Vector3& point) const {
+api::RoadPositionResult KDTreeStrategy::ClosestLane(const api::InertialPosition& point) const {
   // Given that this method should actually obtain the lanes within a tolerance radius. Afterwards, the lane
   // could be obtained using the point being closer to the centerline.
-  const api::InertialPosition& inertial_position{point.x(), point.y(), point.z()};
-  const MaliputPoint maliput_point = kd_tree_->Nearest(point);
-  const double radius = (point - maliput_point).norm() + 2 * sampling_step_;
-  const std::set<api::LaneId> lane_ids = ClosestLanes(point, radius);
-  const api::RoadGeometry* rg = GetRoadGeometry();
+  const MaliputPoint maliput_point = kd_tree_->nearest_point(point.xyz());
+  const double radius = (point.xyz() - maliput_point).norm() + 2. * sampling_step_;
+  const std::set<api::LaneId> lane_ids = ClosestLanes(point.xyz(), radius);
+  const api::RoadGeometry* rg = get_road_geometry();
 
   const api::Lane* lane_result = rg->ById().GetLane(maliput_point.lane_id().value());
-  api::LanePositionResult lane_position_result = lane_result->ToLanePosition(inertial_position);
+  api::LanePositionResult lane_position_result = lane_result->ToLanePosition(point);
   api::RoadPositionResult road_position_result{{lane_result, lane_position_result.lane_position},
                                                lane_position_result.nearest_position,
                                                lane_position_result.distance};
 
   for (const auto& current_lane_id : lane_ids) {
     const api::Lane* current_lane = rg->ById().GetLane(current_lane_id);
-    const api::LanePositionResult current_lane_position = current_lane->ToLanePosition(inertial_position);
+    const api::LanePositionResult current_lane_position = current_lane->ToLanePosition(point);
     const api::RoadPositionResult current_road_position{{current_lane, current_lane_position.lane_position},
                                                         current_lane_position.nearest_position,
                                                         current_lane_position.distance};

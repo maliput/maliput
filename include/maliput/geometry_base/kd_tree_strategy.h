@@ -39,21 +39,18 @@
 namespace maliput {
 namespace geometry_base {
 
-/// Implements StrategyBase by reorganizing the lane space into a kd-tree for
+/// Implements StrategyBase by reorganizing the maliput::api::Lane space into a kd-tree for
 /// achieving significantly more performant queries than BruteForceStrategy.
-/// The kd-tree is built in construction time by sampling the lanes,
-/// therefore the RoadGeometry should be filled with lanes before
-/// the instantiation.
-
-class KDTreeStrategy : public StrategyBase {
+/// The kd-tree is built in construction time by sampling the lanes, therefore
+/// the RoadGeometry should be entirely built before this class instantiation.
+class KDTreeStrategy final : public StrategyBase {
  public:
-  KDTreeStrategy(const api::RoadGeometry* rg, const double sampling_step);
+  KDTreeStrategy(const api::RoadGeometry* rg, double sampling_step);
   ~KDTreeStrategy() override = default;
 
  private:
   class MaliputPoint : public maliput::math::Vector3 {
    public:
-    MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(MaliputPoint)
     MaliputPoint(const Vector3& xyz) : Vector3(xyz) {}
     MaliputPoint(const Vector3& xyz, const maliput::api::LaneId& lane_id)
         : Vector3(xyz), lane_id_(std::make_optional(lane_id)) {}
@@ -61,8 +58,6 @@ class KDTreeStrategy : public StrategyBase {
     ~MaliputPoint() = default;
 
     std::optional<maliput::api::LaneId> lane_id() const { return lane_id_; }
-
-    void set_lane_id(maliput::api::LaneId id) { lane_id_.value() = id; }
 
    private:
     std::optional<maliput::api::LaneId> lane_id_;
@@ -74,7 +69,7 @@ class KDTreeStrategy : public StrategyBase {
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                            double radius) const override;
 
-  maliput::api::RoadPositionResult ClosestLane(const maliput::math::Vector3& point) const;
+  maliput::api::RoadPositionResult ClosestLane(const api::InertialPosition& point) const;
 
   std::set<maliput::api::LaneId> ClosestLanes(const maliput::math::Vector3& point, double distance) const;
 

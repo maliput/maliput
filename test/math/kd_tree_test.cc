@@ -284,15 +284,15 @@ TEST_F(KDTreeTest, NNSearch) {
   const Vector3 point{3., 3., 3.};
   const Vector3 expected_point{2., 1., 4.};
 
-  // Use Nearest() without tolerance selection.
-  const auto nearest_point = dut.Nearest(point);
+  // Use nearest_point() without tolerance selection.
+  const auto nearest_point = dut.nearest_point(point);
   // Tests point being returned.
   EXPECT_DOUBLE_EQ(expected_point.x(), nearest_point.x());
   EXPECT_DOUBLE_EQ(expected_point.y(), nearest_point.y());
   EXPECT_DOUBLE_EQ(expected_point.z(), nearest_point.z());
 
-  // Use Nearest() without tolerance selection.
-  const auto nearest_point_with_tol = dut.Nearest(point, kTolerance);
+  // Use nearest_point() without tolerance selection.
+  const auto nearest_point_with_tol = dut.nearest_point(point, kTolerance);
   // Tests point being returned.
   EXPECT_DOUBLE_EQ(expected_point.x(), nearest_point_with_tol.x());
   EXPECT_DOUBLE_EQ(expected_point.y(), nearest_point_with_tol.y());
@@ -383,7 +383,7 @@ TEST_F(KDTreeExtendedTest, RandomData) {
   const UniquePoint evaluation_point{50., 50., 50., 0 /* id is unused here */};
   const UniquePoint expected_point = BruteForceNNSearch<>(evaluation_point, points);
 
-  auto nearest = dut.Nearest(evaluation_point);
+  auto nearest = dut.nearest_point(evaluation_point);
   EXPECT_EQ(expected_point.id(), nearest.id());
   EXPECT_DOUBLE_EQ(expected_point.x(), nearest.x());
   EXPECT_DOUBLE_EQ(expected_point.y(), nearest.y());

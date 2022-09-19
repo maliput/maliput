@@ -38,12 +38,12 @@
 namespace maliput {
 namespace geometry_base {
 
-/// Implements StrategyBase using a brute force algorithm for resolving the ToRoadPosition and FindRoadPositions.
-/// It iterates along the entire road geometry using extensive use of the maliput::api::Lane::ToLanePosition method.
-
-class BruteForceStrategy : public StrategyBase {
+/// Implements StrategyBase using a brute force algorithm for resolving the maliput::api::RoadGeometry::ToRoadPosition()
+/// and maliput::api::RoadGeometry::FindRoadPositions() methods.
+/// It iterates along the entire RoadGeometry calling maliput::api::Lane::ToLanePosition() to find the optimum result.
+class BruteForceStrategy final : public StrategyBase {
  public:
-  BruteForceStrategy(const api::RoadGeometry* rg) : StrategyBase(rg){};
+  explicit BruteForceStrategy(const api::RoadGeometry* rg) : StrategyBase(rg){};
   ~BruteForceStrategy() override = default;
 
  private:

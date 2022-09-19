@@ -40,52 +40,8 @@ namespace maliput {
 namespace geometry_base {
 
 /// Method that verifies which road position result is closer to the inertial point.
-inline bool IsNewRoadPositionResultCloser(const maliput::api::RoadPositionResult& new_road_position_result,
-                                          const maliput::api::RoadPositionResult& road_position_result) {
-  const double delta = new_road_position_result.distance - road_position_result.distance;
-  const bool different_segment = road_position_result.road_position.lane->segment()->id() !=
-                                 new_road_position_result.road_position.lane->segment()->id();
-
-  // When lanes belong to the same segment is expected that the distance value is almost equal so we can't use the
-  // distance as main condition. When lanes don't belong to the same segment we can use the distance as main
-  // condition.
-  if (different_segment) {
-    if (delta < -1e-12) {
-      return true;
-    }
-    if (delta >= 1e-12) {
-      return false;
-    }
-  }
-
-  auto is_within_lane_bounds = [](double r, const maliput::api::RBounds& lane_bounds) {
-    return r >= lane_bounds.min() && r < lane_bounds.max();
-  };
-  // They are almost equal so it is worth checking the `r` coordinate and the
-  // lane bounds.
-  // When both r-coordinates fall within lane bounds or outside, the position
-  // with the minimum absolute r-coordinate prevails.
-  // When the new r-coordinate is within lane bounds, and the previous position
-  // does not fall within lane bounds, the new result prevails.
-  const maliput::api::RBounds new_lane_bounds =
-      new_road_position_result.road_position.lane->lane_bounds(new_road_position_result.road_position.pos.s());
-  const maliput::api::RBounds current_lane_bounds =
-      road_position_result.road_position.lane->lane_bounds(road_position_result.road_position.pos.s());
-  const bool is_new_within_lane_bounds =
-      is_within_lane_bounds(new_road_position_result.road_position.pos.r(), new_lane_bounds);
-  const bool is_current_within_lane_bounds =
-      is_within_lane_bounds(road_position_result.road_position.pos.r(), current_lane_bounds);
-  if ((is_new_within_lane_bounds && is_current_within_lane_bounds) ||
-      (!is_new_within_lane_bounds && !is_current_within_lane_bounds)) {
-    if (std::abs(new_road_position_result.road_position.pos.r()) <
-        std::abs(road_position_result.road_position.pos.r())) {
-      return true;
-    }
-  } else if (is_new_within_lane_bounds && !is_current_within_lane_bounds) {
-    return true;
-  }
-  return false;
-}
+bool IsNewRoadPositionResultCloser(const maliput::api::RoadPositionResult& new_road_position_result,
+                                   const maliput::api::RoadPositionResult& road_position_result);
 
 /// Provides a base interface for defining strategies that will affect the behavior
 /// of the queries RoadGeomoetry::ToRoadPosition and RoadGeomoetry::FindRoadPositions.
@@ -104,10 +60,10 @@ class StrategyBase {
     return DoFindRoadPositions(inertial_position, radius);
   }
 
-  const api::RoadGeometry* GetRoadGeometry() const { return rg_; }
-
  protected:
   StrategyBase(const api::RoadGeometry* rg) : rg_(rg) { MALIPUT_THROW_UNLESS(rg_ != nullptr); }
+
+  const api::RoadGeometry* get_road_geometry() const { return rg_; }
 
  private:
   virtual api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,
