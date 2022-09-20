@@ -51,7 +51,7 @@ class KDTreeStrategy final : public StrategyBase {
  private:
   class MaliputPoint : public maliput::math::Vector3 {
    public:
-    MaliputPoint(const Vector3& xyz) : Vector3(xyz) {}
+    explicit MaliputPoint(const Vector3& xyz) : Vector3(xyz) {}
     MaliputPoint(const Vector3& xyz, const maliput::api::LaneId& lane_id)
         : Vector3(xyz), lane_id_(std::make_optional(lane_id)) {}
 
@@ -71,7 +71,7 @@ class KDTreeStrategy final : public StrategyBase {
 
   maliput::api::RoadPositionResult ClosestLane(const api::InertialPosition& point) const;
 
-  std::set<maliput::api::LaneId> ClosestLanes(const maliput::math::Vector3& point, double distance) const;
+  std::set<maliput::api::LaneId> ClosestLanes(const api::InertialPosition& point, double distance) const;
 
   std::unique_ptr<maliput::math::KDTree3D<MaliputPoint>> kd_tree_;
 

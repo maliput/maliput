@@ -39,7 +39,12 @@
 namespace maliput {
 namespace geometry_base {
 
-/// Method that verifies which road position result is closer to the inertial point.
+/// Compares two maliput::api::RoadPositionResults and determines whether @p new_road_position_result
+/// is closer to @p road_position_result.
+/// @see maliput::api::RoadPosition::ToRoadPosition() for a clear definition of how the comparison must be performed.
+/// @param  new_road_position_result A maliput::api::RoadPositionResult to compare.
+/// @param  road_position_result The reference maliput::api::RoadPositionResult to compare.
+/// @return true When @p new_road_position_result is closer than @p road_position_result.
 bool IsNewRoadPositionResultCloser(const maliput::api::RoadPositionResult& new_road_position_result,
                                    const maliput::api::RoadPositionResult& road_position_result);
 
