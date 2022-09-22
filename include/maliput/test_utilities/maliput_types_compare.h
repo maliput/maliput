@@ -37,16 +37,12 @@ namespace maliput {
 namespace api {
 namespace test {
 
-/// Asserts equality within @p tolerance of the maliput::api::LanePositionResult @p lpr_a and @p lpr_B.
+/// Compares equality within @p tolerance deviation of the maliput::api::LanePositionResult @p lpr_a and @p lpr_B.
 /// @param lpr_a The first LanePositionResult to compare.
 /// @param lpr_b The second LanePositionResult to compare.
 /// @param tolerance The tolerance to use for the comparison.
-#define IsLanePositionResultClose(lpr_a, lpr_b, tolerance)                                           \
-  do {                                                                                               \
-    EXPECT_TRUE(IsLanePositionClose(lpr_a.lane_position, lpr_b.lane_position, tolerance));           \
-    EXPECT_TRUE(IsInertialPositionClose(lpr_a.nearest_position, lpr_b.nearest_position, tolerance)); \
-    EXPECT_NEAR(lpr_a.distance, lpr_b.distance, tolerance);                                          \
-  } while (0);
+::testing::AssertionResult IsLanePositionResultClose(const LanePositionResult& lpr_a, const LanePositionResult& lpr_b,
+                                                     double tolerance);
 
 /// Compares equality within @p tolerance deviation of two InertialPosition objects.
 /// @param pos1 A InertialPosition object to compare.

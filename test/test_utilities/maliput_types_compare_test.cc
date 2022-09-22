@@ -97,7 +97,19 @@ TEST(IsLanePositionResultCloseTest, Test) {
   const double distance{10.};
   const LanePositionResult test_value{lane_pos, inertial_pos, distance};
   const LanePositionResult close_value{lane_pos, inertial_pos, distance};
-  IsLanePositionResultClose(test_value, close_value, kTolerance);
+  EXPECT_EQ(testing::AssertionSuccess(), IsLanePositionResultClose(test_value, close_value, kTolerance));
+
+  // Non close per lane position.
+  const LanePositionResult non_lane_pos_close{{10., 10., 10.}, inertial_pos, distance};
+  EXPECT_EQ(testing::AssertionFailure(), IsLanePositionResultClose(test_value, non_lane_pos_close, kTolerance));
+
+  // Non close per nearest position.
+  const LanePositionResult non_inertial_pos_close{lane_pos, {10., 10., 10.}, distance};
+  EXPECT_EQ(testing::AssertionFailure(), IsLanePositionResultClose(test_value, non_inertial_pos_close, kTolerance));
+
+  // Non close per distance.
+  const LanePositionResult non_distance_close{lane_pos, inertial_pos, 85.};
+  EXPECT_EQ(testing::AssertionFailure(), IsLanePositionResultClose(test_value, non_distance_close, kTolerance));
 }
 
 }  // namespace

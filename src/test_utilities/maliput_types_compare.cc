@@ -194,6 +194,25 @@ namespace test {
                                        << ", tolerance = " << tolerance;
 }
 
+::testing::AssertionResult IsLanePositionResultClose(const LanePositionResult& lpr_a, const LanePositionResult& lpr_b,
+                                                     double tolerance) {
+  ::testing::AssertionResult lane_position_result =
+      IsLanePositionClose(lpr_a.lane_position, lpr_b.lane_position, tolerance);
+  if (!lane_position_result) return lane_position_result;
+
+  ::testing::AssertionResult nearest_position_result =
+      IsInertialPositionClose(lpr_a.nearest_position, lpr_b.nearest_position, tolerance);
+  if (!nearest_position_result) return nearest_position_result;
+
+  const double delta = std::abs(lpr_a.distance - lpr_b.distance);
+  if (delta > tolerance) {
+    return ::testing::AssertionFailure() << "LanePositionResult are different at distance. lpr_a.distance: "
+                                         << lpr_a.distance << " vs. lpr_b.distance: " << lpr_b.distance
+                                         << ", diff = " << delta << ", tolerance = " << tolerance << "\n";
+  }
+  return ::testing::AssertionSuccess();
+}
+
 }  // namespace test
 }  // namespace api
 }  // namespace maliput
