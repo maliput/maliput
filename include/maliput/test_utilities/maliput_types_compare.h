@@ -97,6 +97,13 @@ namespace test {
 /// within the @p tolerance deviation.
 ::testing::AssertionResult IsHBoundsClose(const HBounds& hbounds1, const HBounds& hbounds2, double tolerance);
 
+/// Compares equality of two LaneEnd objects.
+/// @param lane_end1 A LaneEnd object to compare.
+/// @param lane_end1 A LaneEnd object to compare.
+/// @return ::testing::AssertionFailure() When LaneEnd objects are different.
+/// @return ::testing::AssertionSuccess() When LaneEnd objects are equal.
+::testing::AssertionResult IsLaneEndEqual(const LaneEnd& lane_end1, const LaneEnd& lane_end2);
+
 }  // namespace test
 }  // namespace api
 }  // namespace maliput
