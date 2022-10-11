@@ -99,7 +99,7 @@ namespace test {
 
 /// Compares equality of two LaneEnd objects.
 /// @param lane_end1 A LaneEnd object to compare.
-/// @param lane_end1 A LaneEnd object to compare.
+/// @param lane_end2 A LaneEnd object to compare.
 /// @return ::testing::AssertionFailure() When LaneEnd objects are different.
 /// @return ::testing::AssertionSuccess() When LaneEnd objects are equal.
 ::testing::AssertionResult IsLaneEndEqual(const LaneEnd& lane_end1, const LaneEnd& lane_end2);
