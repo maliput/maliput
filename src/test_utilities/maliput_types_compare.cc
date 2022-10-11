@@ -213,6 +213,22 @@ namespace test {
   return ::testing::AssertionSuccess();
 }
 
+::testing::AssertionResult IsLaneEndEqual(const LaneEnd& lane_end1, const LaneEnd& lane_end2) {
+  auto which_to_string = [](const LaneEnd::Which end) {
+    return end == LaneEnd::Which::kStart ? std::string("kStart") : std::string("kFinish");
+  };
+  if (lane_end1.lane != lane_end2.lane) {
+    return ::testing::AssertionFailure() << "lane_end1.lane is different from lane_end2.lane. lane_end1.lane: "
+                                         << lane_end1.lane << " vs. lane_end2.lane: " << lane_end2.lane << "\n";
+  }
+  if (lane_end1.end != lane_end2.end) {
+    return ::testing::AssertionFailure() << "lane_end1.end is different from lane_end2.end. lane_end1.end: "
+                                         << which_to_string(lane_end1.end)
+                                         << " vs. lane_end2.end: " << which_to_string(lane_end2.end) << "\n";
+  }
+  return ::testing::AssertionSuccess();
+}
+
 }  // namespace test
 }  // namespace api
 }  // namespace maliput

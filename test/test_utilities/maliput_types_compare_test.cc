@@ -112,6 +112,16 @@ TEST(IsLanePositionResultCloseTest, Test) {
   EXPECT_EQ(testing::AssertionFailure(), IsLanePositionResultClose(test_value, non_distance_close, kTolerance));
 }
 
+TEST(IsLaneEndEqualTest, Test) {
+  const LaneEnd lane_end1(reinterpret_cast<const Lane*>(0xDeadBeef), maliput::api::LaneEnd::Which::kStart);
+  const LaneEnd lane_end2(reinterpret_cast<const Lane*>(0xDeadD00d), maliput::api::LaneEnd::Which::kStart);
+  const LaneEnd lane_end3(reinterpret_cast<const Lane*>(0xDeadBeef), maliput::api::LaneEnd::Which::kFinish);
+
+  EXPECT_EQ(testing::AssertionSuccess(), IsLaneEndEqual(lane_end1, lane_end1));
+  EXPECT_EQ(testing::AssertionFailure(), IsLaneEndEqual(lane_end1, lane_end2));
+  EXPECT_EQ(testing::AssertionFailure(), IsLaneEndEqual(lane_end1, lane_end3));
+}
+
 }  // namespace
 }  // namespace test
 }  // namespace api
