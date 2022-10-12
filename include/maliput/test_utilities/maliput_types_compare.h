@@ -44,6 +44,13 @@ namespace test {
 ::testing::AssertionResult IsLanePositionResultClose(const LanePositionResult& lpr_a, const LanePositionResult& lpr_b,
                                                      double tolerance);
 
+/// Compares equality within @p tolerance deviation of the maliput::api::RoadPositionResult @p rpr_a and @p rpr_B.
+/// @param rpr_a The first RoadPositionResult to compare.
+/// @param rpr_b The second RoadPositionResult to compare.
+/// @param tolerance The tolerance to use for the comparison.
+testing::AssertionResult IsRoadPositionResultClose(const maliput::api::RoadPositionResult& rpr_a,
+                                                   const maliput::api::RoadPositionResult& rpr_b, double tolerance);
+
 /// Compares equality within @p tolerance deviation of two InertialPosition objects.
 /// @param pos1 A InertialPosition object to compare.
 /// @param pos2 A InertialPosition object to compare.

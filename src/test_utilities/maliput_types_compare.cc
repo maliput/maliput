@@ -213,6 +213,17 @@ namespace test {
   return ::testing::AssertionSuccess();
 }
 
+testing::AssertionResult IsRoadPositionResultClose(const maliput::api::RoadPositionResult& rpr_a,
+                                                   const maliput::api::RoadPositionResult& rpr_b, double tolerance) {
+  if (rpr_a.road_position.lane != rpr_b.road_position.lane) {
+    return testing::AssertionFailure()
+           << "RoadPositionResult are different at road_position.lane: rpr_a.road_position.lane: "
+           << rpr_a.road_position.lane << " vs. rpr_b.road_position.lane: " << rpr_b.road_position.lane;
+  }
+  return IsLanePositionResultClose({rpr_a.road_position.pos, rpr_a.nearest_position, rpr_a.distance},
+                                   {rpr_b.road_position.pos, rpr_b.nearest_position, rpr_b.distance}, tolerance);
+}
+
 ::testing::AssertionResult IsLaneEndEqual(const LaneEnd& lane_end1, const LaneEnd& lane_end2) {
   auto which_to_string = [](const LaneEnd::Which end) {
     return end == LaneEnd::Which::kStart ? std::string("kStart") : std::string("kFinish");
