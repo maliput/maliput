@@ -112,6 +112,43 @@ TEST(IsLanePositionResultCloseTest, Test) {
   EXPECT_EQ(testing::AssertionFailure(), IsLanePositionResultClose(test_value, non_distance_close, kTolerance));
 }
 
+TEST(IsRoadPositionResultCloseTest, Test) {
+  const InertialPosition inertial_pos{0., 10., 10.};
+  const LanePosition lane_pos{0., 10., 10.};
+  const RoadPosition road_pos{reinterpret_cast<const Lane*>(0xDeadBeef), lane_pos};
+  const double distance{10.};
+  const RoadPositionResult test_value{road_pos, inertial_pos, distance};
+  const RoadPositionResult close_value{road_pos, inertial_pos, distance};
+  EXPECT_EQ(testing::AssertionSuccess(), IsRoadPositionResultClose(test_value, close_value, kTolerance));
+
+  // Non close per non lane matching.
+  const RoadPositionResult non_lane_matching{
+      {reinterpret_cast<const Lane*>(0xDeadD00d), lane_pos}, inertial_pos, distance};
+  EXPECT_EQ(testing::AssertionFailure(), IsRoadPositionResultClose(test_value, non_lane_matching, kTolerance));
+
+  // Non close per lane position.
+  const RoadPositionResult non_lane_pos_close{{road_pos.lane, {10., 10., 10.}}, inertial_pos, distance};
+  EXPECT_EQ(testing::AssertionFailure(), IsRoadPositionResultClose(test_value, non_lane_pos_close, kTolerance));
+
+  // Non close per nearest position.
+  const RoadPositionResult non_inertial_pos_close{road_pos, {10., 10., 10.}, distance};
+  EXPECT_EQ(testing::AssertionFailure(), IsRoadPositionResultClose(test_value, non_inertial_pos_close, kTolerance));
+
+  // Non close per distance.
+  const RoadPositionResult non_distance_close{road_pos, inertial_pos, 85.};
+  EXPECT_EQ(testing::AssertionFailure(), IsRoadPositionResultClose(test_value, non_distance_close, kTolerance));
+}
+
+TEST(IsLaneEndEqualTest, Test) {
+  const LaneEnd lane_end1(reinterpret_cast<const Lane*>(0xDeadBeef), maliput::api::LaneEnd::Which::kStart);
+  const LaneEnd lane_end2(reinterpret_cast<const Lane*>(0xDeadD00d), maliput::api::LaneEnd::Which::kStart);
+  const LaneEnd lane_end3(reinterpret_cast<const Lane*>(0xDeadBeef), maliput::api::LaneEnd::Which::kFinish);
+
+  EXPECT_EQ(testing::AssertionSuccess(), IsLaneEndEqual(lane_end1, lane_end1));
+  EXPECT_EQ(testing::AssertionFailure(), IsLaneEndEqual(lane_end1, lane_end2));
+  EXPECT_EQ(testing::AssertionFailure(), IsLaneEndEqual(lane_end1, lane_end3));
+}
+
 }  // namespace
 }  // namespace test
 }  // namespace api

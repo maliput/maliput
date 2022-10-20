@@ -44,6 +44,13 @@ namespace test {
 ::testing::AssertionResult IsLanePositionResultClose(const LanePositionResult& lpr_a, const LanePositionResult& lpr_b,
                                                      double tolerance);
 
+/// Compares equality within @p tolerance deviation of the maliput::api::RoadPositionResult @p rpr_a and @p rpr_B.
+/// @param rpr_a The first RoadPositionResult to compare.
+/// @param rpr_b The second RoadPositionResult to compare.
+/// @param tolerance The tolerance to use for the comparison.
+testing::AssertionResult IsRoadPositionResultClose(const maliput::api::RoadPositionResult& rpr_a,
+                                                   const maliput::api::RoadPositionResult& rpr_b, double tolerance);
+
 /// Compares equality within @p tolerance deviation of two InertialPosition objects.
 /// @param pos1 A InertialPosition object to compare.
 /// @param pos2 A InertialPosition object to compare.
@@ -96,6 +103,13 @@ namespace test {
 /// @return ::testing::AssertionSuccess() When HBounds objects are equal or
 /// within the @p tolerance deviation.
 ::testing::AssertionResult IsHBoundsClose(const HBounds& hbounds1, const HBounds& hbounds2, double tolerance);
+
+/// Compares equality of two LaneEnd objects.
+/// @param lane_end1 A LaneEnd object to compare.
+/// @param lane_end2 A LaneEnd object to compare.
+/// @return ::testing::AssertionFailure() When LaneEnd objects are different.
+/// @return ::testing::AssertionSuccess() When LaneEnd objects are equal.
+::testing::AssertionResult IsLaneEndEqual(const LaneEnd& lane_end1, const LaneEnd& lane_end2);
 
 }  // namespace test
 }  // namespace api
