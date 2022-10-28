@@ -1,6 +1,9 @@
 cc_library(
     name = "api",
-    srcs = glob(["src/api/*.cc"]),
+    srcs = glob([
+        "src/api/*.cc",
+        "src/api/rules/*.cc",
+    ]),
     hdrs = glob([
         "include/maliput/api/*.h",
         "include/maliput/api/rules/*.h",
@@ -66,6 +69,7 @@ cc_library(
         "include/maliput/api/*.h",
         "include/maliput/math/*.h",
     ]),
+    linkopts = ["-ldl"],
     strip_include_prefix = "include",
     deps = [
         "@//:api",
@@ -109,6 +113,7 @@ cc_library(
     name = "utility",
     srcs = glob(["src/utility/*.cc"]),
     hdrs = glob(["include/maliput/utility/*.h"]),
+    linkopts = ["-lstdc++fs"],
     strip_include_prefix = "include",
     deps = [
         "@//:api",
@@ -119,24 +124,124 @@ cc_library(
 
 #### test #####
 cc_test(
-    name = "maliput_test",
-    size = "small",
+    name = "api_test",
+    size = "enormous",
+    timeout = "long",
+    srcs = glob(["test/api/*.cc"]),
+    deps = [
+        "@//:api",
+        "@//:common",
+        "@//:math",
+        "@//:test_utilities",
+        "@//:utility",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "base_test",
+    size = "enormous",
+    timeout = "long",
     srcs = glob([
-        "test/api/*.cc",
         "test/base/*.cc",
-        "test/common/*.cc",
-        "test/geometry_base/*.cc",
-        "test/math/*.cc",
-        "test/plugin/*.cc",
-        "test/utility/*.cc",
     ]),
     deps = [
         "@//:api",
         "@//:base",
+        "@//:test_utilities",
+        "@com_google_googletest//:gtest_main",
+        "@fmt",
+    ],
+)
+
+cc_test(
+    name = "common_test",
+    size = "enormous",
+    timeout = "long",
+    srcs = glob([
+        "test/common/*.cc",
+    ]),
+    deps = [
+        "@//:common",
+        "@//:test_utilities",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "geometry_base_test",
+    size = "enormous",
+    timeout = "long",
+    srcs = glob([
+        "test/geometry_base/*.cc",
+    ]),
+    deps = [
+        "@//:api",
+        "@//:test_utilities",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "math_test",
+    size = "enormous",
+    timeout = "long",
+    srcs = glob([
+        "test/math/*.cc",
+    ]),
+    deps = [
         "@//:common",
         "@//:math",
+        "@//:test_utilities",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "plugin_test",
+    size = "enormous",
+    timeout = "long",
+    srcs = glob([
+        "test/api/*.cc",
+        "test/plugin/*.cc",
+    ]),
+    local_defines = [
+        "TEST_MALIPUT_PLUGIN_LIBDIR=\\\"/tmp/maliput/test/plugins/\\\"",
+        "OTHER_TEST_MALIPUT_PLUGIN_LIBDIR=\\\"/tmp/maliput/test/other_plugins/\\\"",
+    ],
+    deps = [
+        "@//:api",
         "@//:plugin",
-        "@//:routing",
+        "@//:test_utilities",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "test_utilities_test",
+    size = "enormous",
+    timeout = "long",
+    srcs = glob([
+        "test/test_utilities/*.cc",
+    ]),
+    deps = [
+        "@//:api",
+        "@//:common",
+        "@//:test_utilities",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "utlity_test",
+    size = "enormous",
+    timeout = "long",
+    srcs = glob([
+        "test/utility/*.cc",
+    ]),
+    deps = [
+        "@//:api",
+        "@//:common",
         "@//:test_utilities",
         "@//:utility",
         "@com_google_googletest//:gtest_main",
