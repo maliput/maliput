@@ -19,7 +19,7 @@ cc_library(
         "include/maliput/base/*.h",
     ]),
     strip_include_prefix = "include",
-    deps = ["@yaml-cpp//:yaml-cpp", "@//:common", '@//:math', '@//:api']
+    deps = ["@yaml-cpp//:yaml-cpp", "@//:common", "@//:math", "@//:api"],
 )
 
 cc_library(
