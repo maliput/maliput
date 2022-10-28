@@ -97,7 +97,7 @@ cc_library(
 
 #### test #####
 cc_test(
-    name = "maliput_tes",
+    name = "maliput_test",
     size = "small",
     srcs = glob([
         "test/api/*.cc",
