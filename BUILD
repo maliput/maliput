@@ -4,7 +4,6 @@ cc_library(
     hdrs = glob([
         "include/maliput/api/*.h",
         "include/maliput/api/rules/*.h",
-
         "include/maliput/base/*.h",
         "include/maliput/common/*.h",
         "include/maliput/math/*.h",
@@ -19,7 +18,12 @@ cc_library(
         "include/maliput/base/*.h",
     ]),
     strip_include_prefix = "include",
-    deps = ["@yaml-cpp//:yaml-cpp", "@//:common", "@//:math", "@//:api"],
+    deps = [
+        "@//:api",
+        "@//:common",
+        "@//:math",
+        "@yaml-cpp//:yaml-cpp",
+    ],
 )
 
 cc_library(
@@ -27,8 +31,7 @@ cc_library(
     srcs = glob(["src/common/*.cc"]),
     hdrs = glob(["include/maliput/common/*.h"]),
     strip_include_prefix = "include",
-    deps = ["@fmt//:fmt"],
-
+    deps = ["@fmt"],
 )
 
 cc_library(
@@ -38,7 +41,11 @@ cc_library(
         "include/maliput/geometry_base/*.h",
     ]),
     strip_include_prefix = "include",
-    deps = ['@//:common', '@//:math', '@//:api']
+    deps = [
+        "@//:api",
+        "@//:common",
+        "@//:math",
+    ],
 )
 
 cc_library(
@@ -48,7 +55,7 @@ cc_library(
         "include/maliput/math/*.h",
     ]),
     strip_include_prefix = "include",
-    deps = ['@//:common']
+    deps = ["@//:common"],
 )
 
 cc_library(
@@ -60,7 +67,12 @@ cc_library(
         "include/maliput/math/*.h",
     ]),
     strip_include_prefix = "include",
-    deps = ['@//:api', '@//:common', '@//:math', '@//:utility']
+    deps = [
+        "@//:api",
+        "@//:common",
+        "@//:math",
+        "@//:utility",
+    ],
 )
 
 cc_library(
@@ -70,7 +82,11 @@ cc_library(
         "include/maliput/routing/*.h",
     ]),
     strip_include_prefix = "include",
-    deps = ['@//:math', '@//:common', '@//:api']
+    deps = [
+        "@//:api",
+        "@//:common",
+        "@//:math",
+    ],
 )
 
 cc_library(
@@ -81,10 +97,12 @@ cc_library(
     ]),
     strip_include_prefix = "include",
     deps = [
+        "@//:api",
+        "@//:common",
+        "@//:geometry_base",
+        "@//:math",
         "@com_google_googletest//:gtest",
-        '@//:geometry_base',
-        "@//:api", "@//:common", "@//:math",
-    ]
+    ],
 )
 
 cc_library(
@@ -92,7 +110,11 @@ cc_library(
     srcs = glob(["src/utility/*.cc"]),
     hdrs = glob(["include/maliput/utility/*.h"]),
     strip_include_prefix = "include",
-    deps = ['@//:api', '@//:common', '@//:math']
+    deps = [
+        "@//:api",
+        "@//:common",
+        "@//:math",
+    ],
 )
 
 #### test #####
@@ -109,14 +131,14 @@ cc_test(
         "test/utility/*.cc",
     ]),
     deps = [
-        "@com_google_googletest//:gtest_main",
-        "@//:test_utilities",
-        "@//:common",
-        "@//:math",
         "@//:api",
         "@//:base",
-        "@//:utility",
+        "@//:common",
+        "@//:math",
         "@//:plugin",
-        "@//:routing"
+        "@//:routing",
+        "@//:test_utilities",
+        "@//:utility",
+        "@com_google_googletest//:gtest_main",
     ],
 )
