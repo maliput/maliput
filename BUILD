@@ -202,7 +202,6 @@ cc_test(
     size = "enormous",
     timeout = "long",
     srcs = glob([
-        "test/api/*.cc",
         "test/plugin/*.cc",
     ]),
     local_defines = [
