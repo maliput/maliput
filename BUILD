@@ -27,6 +27,7 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 cc_library(
     name = "api",
     srcs = glob([
@@ -154,7 +155,7 @@ cc_library(
 #### test #####
 cc_test(
     name = "api_test",
-    size = "enormous",
+    size = "large",
     timeout = "long",
     srcs = glob(["test/api/*.cc"]),
     deps = [
@@ -169,7 +170,7 @@ cc_test(
 
 cc_test(
     name = "base_test",
-    size = "enormous",
+    size = "large",
     timeout = "long",
     srcs = glob([
         "test/base/*.cc",
@@ -185,8 +186,8 @@ cc_test(
 
 cc_test(
     name = "common_test",
-    size = "enormous",
-    timeout = "long",
+    size = "small",
+    timeout = "short",
     srcs = glob([
         "test/common/*.cc",
     ]),
@@ -199,8 +200,8 @@ cc_test(
 
 cc_test(
     name = "geometry_base_test",
-    size = "enormous",
-    timeout = "long",
+    size = "small",
+    timeout = "short",
     srcs = glob([
         "test/geometry_base/*.cc",
     ]),
@@ -213,8 +214,8 @@ cc_test(
 
 cc_test(
     name = "math_test",
-    size = "enormous",
-    timeout = "long",
+    size = "large",
+    timeout = "moderate",
     srcs = glob([
         "test/math/*.cc",
     ]),
@@ -228,8 +229,8 @@ cc_test(
 
 cc_test(
     name = "plugin_test",
-    size = "enormous",
-    timeout = "long",
+    size = "large",
+    timeout = "moderate",
     srcs = glob([
         "test/plugin/*.cc",
     ]),
@@ -247,8 +248,8 @@ cc_test(
 
 cc_test(
     name = "test_utilities_test",
-    size = "enormous",
-    timeout = "long",
+    size = "small",
+    timeout = "short",
     srcs = glob([
         "test/test_utilities/*.cc",
     ]),
@@ -261,9 +262,9 @@ cc_test(
 )
 
 cc_test(
-    name = "utlity_test",
-    size = "enormous",
-    timeout = "long",
+    name = "utility_test",
+    size = "large",
+    timeout = "moderate",
     srcs = glob([
         "test/utility/*.cc",
     ]),
