@@ -57,7 +57,8 @@ cc_library(
         "@//:api",
         "@//:common",
         "@//:math",
-        "@yaml-cpp//:yaml-cpp",
+        "@yaml-cpp",
+        "@fmt"
     ],
 )
 

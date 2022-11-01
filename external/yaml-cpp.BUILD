@@ -6,7 +6,12 @@ cc_library(
         "include/yaml-cpp/node/detail/*.h",
         "include/yaml-cpp/contrib/*.h",
     ]),
-    defines = ["FMT_HEADER_ONLY"],
-    includes = ["include"],
+    srcs = glob([
+        "src/*.cpp",
+        "src/*.h",
+        "src/contrib/*.cpp",
+        "src/contrib/*.h",
+    ]),
     visibility = ["//visibility:public"],
+    strip_include_prefix = "include",
 )
