@@ -49,6 +49,18 @@ GTEST_TEST(MaliputThrowMessageTest, ExpectThrowWithMessageTest) {
   EXPECT_THROW({ MALIPUT_THROW_MESSAGE("Exception description"); }, assertion_error);
 }
 
+// Evaluates whether or not MALIPUT_VALIDATE() throws.
+GTEST_TEST(MaliputValidateTest, Test) {
+  EXPECT_THROW({ MALIPUT_VALIDATE(false, "Exception description"); }, assertion_error);
+  EXPECT_NO_THROW({ MALIPUT_VALIDATE(true, "Exception description"); });
+}
+
+// Evaluates whether or not MALIPUT_IS_IN_RANGE() throws.
+GTEST_TEST(MaliputIsInRangeTest, Test) {
+  EXPECT_THROW({ MALIPUT_IS_IN_RANGE(5., 1., 4.); }, assertion_error);
+  EXPECT_NO_THROW({ MALIPUT_IS_IN_RANGE(5., 1., 10.); });
+}
+
 }  // namespace
 }  // namespace test
 }  // namespace common
