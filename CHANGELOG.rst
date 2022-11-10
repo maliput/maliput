@@ -2,8 +2,8 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.8 (2022-11-10)
+------------------
 * Brings range validator from maliput_malidrive. (`#529 <https://github.com/maliput/maliput/issues/529>`_)
 * Update triage.yml (`#526 <https://github.com/maliput/maliput/issues/526>`_)
 * Adds convenient test utility method. (`#525 <https://github.com/maliput/maliput/issues/525>`_)
