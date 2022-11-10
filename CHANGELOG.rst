@@ -2,6 +2,15 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Brings range validator from maliput_malidrive. (`#529 <https://github.com/maliput/maliput/issues/529>`_)
+* Update triage.yml (`#526 <https://github.com/maliput/maliput/issues/526>`_)
+* Adds convenient test utility method. (`#525 <https://github.com/maliput/maliput/issues/525>`_)
+* Adds a test function for LaneEnds. (`#524 <https://github.com/maliput/maliput/issues/524>`_)
+* Adds IsLanePositionResultClose macro. (`#522 <https://github.com/maliput/maliput/issues/522>`_)
+* Contributors: Agustin Alba Chicar, Franco Cipollone
+
 1.0.7 (2022-09-14)
 ------------------
 * Modifies ToLanePosition and adds ToSegmentPosition. (`#521 <https://github.com/maliput/maliput/issues/521>`_)
