@@ -84,7 +84,7 @@ void MaliputPluginManager::AddPlugin(const std::string& path_to_plugin) {
       (is_repeated ? "A new version of Plugin Id: {} was loaded." : "Plugin Id: {} was correctly loaded."), id);
 }
 
-std::unordered_map<MaliputPlugin::Id, MaliputPluginType> MaliputPluginManager::ListPlugins() {
+std::unordered_map<MaliputPlugin::Id, MaliputPluginType> MaliputPluginManager::ListPlugins() const {
   std::unordered_map<MaliputPlugin::Id, MaliputPluginType> id_type{};
   for (const auto& plugin : plugins_) {
     id_type.emplace(plugin.first, plugin.second->GetType());
