@@ -35,7 +35,7 @@
 namespace maliput {
 namespace plugin {
 
-std::unique_ptr<maliput::plugin::RoadNetworkLoader> CreateRoadNetworkLoader(const std::string& road_network_loader_id) {
+std::unique_ptr<maliput::plugin::RoadNetworkLoader> MakeRoadNetworkLoader(const std::string& road_network_loader_id) {
   // 'manager' is static for two main reasons:
   // 1 - The manager should keep loaded the correspondent plugin until the program is finished.
   // 2 - There is no need to reload the libraries every time this function is called.
@@ -60,7 +60,7 @@ std::unique_ptr<maliput::plugin::RoadNetworkLoader> CreateRoadNetworkLoader(cons
 std::unique_ptr<maliput::api::RoadNetwork> CreateRoadNetwork(const std::string& road_network_loader_id,
                                                              const std::map<std::string, std::string>& properties) {
   std::unique_ptr<maliput::plugin::RoadNetworkLoader> road_network_loader =
-      CreateRoadNetworkLoader(road_network_loader_id);
+      MakeRoadNetworkLoader(road_network_loader_id);
   // Generates the maliput::api::RoadNetwork.
   return (*road_network_loader)(properties);
 }

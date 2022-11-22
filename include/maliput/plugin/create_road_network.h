@@ -55,7 +55,7 @@ std::unique_ptr<maliput::api::RoadNetwork> CreateRoadNetwork(const std::string& 
 ///
 /// @throws maliput::common::assertion_error When `road_network_loader_id` is not found.
 /// @throws maliput::common::assertion_error When the plugin isn't a RoadNetworkLoader plugin type.
-std::unique_ptr<maliput::plugin::RoadNetworkLoader> CreateRoadNetworkLoader(const std::string& road_network_loader_id);
+std::unique_ptr<maliput::plugin::RoadNetworkLoader> MakeRoadNetworkLoader(const std::string& road_network_loader_id);
 
 }  // namespace plugin
 }  // namespace maliput

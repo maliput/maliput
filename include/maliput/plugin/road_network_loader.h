@@ -27,6 +27,7 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include <map>
 #include <string>
 
 #include "maliput/api/road_network.h"
@@ -66,9 +67,7 @@ class RoadNetworkLoader {
 
   /// Returns a map of the default properties that are required for creating the RoadNetwork.
   /// It is expected to be overriden by the derived class if such properties are wanted to be provided.
-  virtual std::map<std::string, std::string> GetDefaultParameters() const {
-    return std::map<std::string, std::string>();
-  }
+  virtual std::map<std::string, std::string> GetDefaultParameters() const { return {}; }
 };
 
 }  // namespace plugin
