@@ -46,6 +46,7 @@
 namespace maliput {
 namespace {
 
+using api::rules::BulbStates;
 using api::rules::DiscreteValueRule;
 using api::rules::DiscreteValueRuleStates;
 using api::rules::Phase;
@@ -166,50 +167,52 @@ class DefaultPopulatedManualPhaseProviderTest : public testing::Test {
   const Phase::Id kPhaseId4{"phase_4"};
   const Phase::Id kPhaseId5{"phase_5"};
   const Phase::Id kPhaseId6{"phase_6"};
+  const RuleStates kEmptyRuleStates{};
+  const BulbStates kEmptyBulbStates{};
   const Phase phase_1_{kPhaseId1,
-                       {} /* rule_states */,
+                       kEmptyRuleStates,
                        {
                            {Rule::Id{"rule_a"}, CreateDiscreteValue("rule_a_value_1")},
                            {Rule::Id{"rule_b"}, CreateDiscreteValue("rule_b_value_1")},
                        } /* discrete_value_rule_states */,
-                       std::nullopt /* bulb_states */};
+                       kEmptyBulbStates};
 
   const Phase phase_2_{kPhaseId2,
-                       {} /* rule_states */,
+                       kEmptyRuleStates,
                        {
                            {Rule::Id{"rule_a"}, CreateDiscreteValue("rule_a_value_2")},
                            {Rule::Id{"rule_b"}, CreateDiscreteValue("rule_b_value_2")},
                        } /* discrete_value_rule_states */,
-                       std::nullopt /* bulb_states */};
+                       kEmptyBulbStates};
   const Phase phase_3_{kPhaseId3,
-                       {} /* rule_states */,
+                       kEmptyRuleStates,
                        {
                            {Rule::Id{"rule_a"}, CreateDiscreteValue("rule_a_value_3")},
                            {Rule::Id{"rule_b"}, CreateDiscreteValue("rule_b_value_3")},
                        } /* discrete_value_rule_states */,
-                       std::nullopt /* bulb_states */};
+                       kEmptyBulbStates};
   const Phase phase_4_{kPhaseId4,
-                       {} /* rule_states */,
+                       kEmptyRuleStates,
                        {
                            {Rule::Id{"rule_c"}, CreateDiscreteValue("rule_c_value_1")},
                            {Rule::Id{"rule_d"}, CreateDiscreteValue("rule_d_value_1")},
                        } /* discrete_value_rule_states */,
-                       std::nullopt /* bulb_states */};
+                       kEmptyBulbStates};
 
   const Phase phase_5_{kPhaseId5,
-                       {} /* rule_states */,
+                       kEmptyRuleStates,
                        {
                            {Rule::Id{"rule_c"}, CreateDiscreteValue("rule_c_value_2")},
                            {Rule::Id{"rule_d"}, CreateDiscreteValue("rule_d_value_2")},
                        } /* discrete_value_rule_states */,
-                       std::nullopt /* bulb_states */};
+                       kEmptyBulbStates};
   const Phase phase_6_{kPhaseId6,
-                       {} /* rule_states */,
+                       kEmptyRuleStates,
                        {
                            {Rule::Id{"rule_c"}, CreateDiscreteValue("rule_c_value_3")},
                            {Rule::Id{"rule_d"}, CreateDiscreteValue("rule_d_value_3")},
                        } /* discrete_value_rule_states */,
-                       std::nullopt /* bulb_states */};
+                       kEmptyBulbStates};
   const PhaseRing::Id phase_ring_id_1_{"phase_ring_1"};
   const PhaseRing::Id phase_ring_id_2_{"phase_ring_2"};
   const PhaseRing phase_ring_with_next_{phase_ring_id_1_,
@@ -234,7 +237,7 @@ TEST_F(DefaultPopulatedManualPhaseProviderTest, Test) {
   // As the phases aren't added in order, we need to check if the gotten phase is actually part of the ring.
   ASSERT_TRUE(phase_ring_with_next_.GetPhase(phase_from_ring_1->state).has_value());
   ASSERT_TRUE(phase_from_ring_1->next.has_value());
-  // Once that we get the phase we could check the next phase.
+  // Once we get the phase we could check the next phase.
   if (phase_from_ring_1->state == kPhaseId1) {
     EXPECT_EQ(kPhaseId3, phase_from_ring_1->next->state);
   } else if (phase_from_ring_1->state == kPhaseId2) {
