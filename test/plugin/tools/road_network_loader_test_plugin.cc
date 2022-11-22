@@ -51,6 +51,10 @@ class MyRoadNetworkLoader : public maliput::plugin::RoadNetworkLoader {
     // For the purpose of this test, we return a nullptr RoadNetwork.
     return nullptr;
   }
+
+  std::map<std::string, std::string> GetDefaultParameters() const override {
+    return {{"configuration_1", "value_1"}, {"configuration_2", "value_2"}};
+  }
 };
 
 }  // namespace
