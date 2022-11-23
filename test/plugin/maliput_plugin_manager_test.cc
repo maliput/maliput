@@ -55,6 +55,7 @@ class MaliputPluginManagerTest : public ::testing::Test {
   struct PluginFeatures {
     MaliputPlugin::Id id{"none"};
     std::string custom_method{};
+    MaliputPluginType type{MaliputPluginType::kRoadNetworkLoader};
   };
 
   // Creates a back of the current environment variable value to be restored in the tear down process.
@@ -88,8 +89,16 @@ TEST_F(MaliputPluginManagerTest, ConstructorGetAndListPlugin) {
 
   const auto plugin_names = dut.ListPlugins();
   EXPECT_EQ(3, static_cast<int>(plugin_names.size()));
-  EXPECT_NE(plugin_names.end(), std::find(plugin_names.begin(), plugin_names.end(), kPlugin1.id));
-  EXPECT_NE(plugin_names.end(), std::find(plugin_names.begin(), plugin_names.end(), kPlugin2.id));
+
+  auto it = plugin_names.find(kPlugin1.id);
+  ASSERT_NE(plugin_names.end(), it);
+  EXPECT_EQ(kPlugin1.type, it->second);
+  it = plugin_names.find(kPlugin2.id);
+  ASSERT_NE(plugin_names.end(), it);
+  EXPECT_EQ(kPlugin2.type, it->second);
+  it = plugin_names.find(kPlugin3.id);
+  ASSERT_NE(plugin_names.end(), it);
+  EXPECT_EQ(kPlugin3.type, it->second);
 
   // multiply_integers_test_plugin plugin.
   auto plugin = dut.GetPlugin(kPlugin1.id);
