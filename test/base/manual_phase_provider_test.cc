@@ -167,7 +167,10 @@ class DefaultPopulatedManualPhaseProviderTest : public testing::Test {
   const Phase::Id kPhaseId4{"phase_4"};
   const Phase::Id kPhaseId5{"phase_5"};
   const Phase::Id kPhaseId6{"phase_6"};
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const RuleStates kEmptyRuleStates{};
+  #pragma GCC diagnostic pop
   const BulbStates kEmptyBulbStates{};
   const Phase phase_1_{kPhaseId1,
                        kEmptyRuleStates,
