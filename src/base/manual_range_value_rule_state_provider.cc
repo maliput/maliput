@@ -37,6 +37,31 @@
 #include "maliput/common/logger.h"
 
 namespace maliput {
+namespace {
+
+// Sets to `state_provider` the first range in each
+// RangeValueRule::states() in `range_value_rules` as the default state.
+// @throws maliput::common::assertion_error When `state_provider` is
+//         nullptr.
+void PopulateRangeValueRuleStates(
+    const std::map<maliput::api::rules::Rule::Id, maliput::api::rules::RangeValueRule>& range_value_rules,
+    maliput::ManualRangeValueRuleStateProvider* state_provider) {
+  MALIPUT_THROW_UNLESS(state_provider != nullptr);
+  for (const auto& rule_id_rule : range_value_rules) {
+    state_provider->SetState(rule_id_rule.first, rule_id_rule.second.states().front(), std::nullopt, std::nullopt);
+  }
+}
+
+}  // namespace
+
+std::unique_ptr<ManualRangeValueRuleStateProvider>
+ManualRangeValueRuleStateProvider::GetDefaultManualRangeValueRuleStateProvider(
+    const maliput::api::rules::RoadRulebook* rulebook) {
+  auto state_provider = std::make_unique<maliput::ManualRangeValueRuleStateProvider>(rulebook);
+  const maliput::api::rules::RoadRulebook::QueryResults all_rules = rulebook->Rules();
+  PopulateRangeValueRuleStates(all_rules.range_value_rules, state_provider.get());
+  return state_provider;
+}
 
 void ManualRangeValueRuleStateProvider::ValidateRuleState(const api::rules::RangeValueRule& range_value_rule,
                                                           const api::rules::RangeValueRule::Range& state) const {

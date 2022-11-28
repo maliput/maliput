@@ -65,6 +65,17 @@ class PhasedDiscreteRuleStateProvider final : public ManualDiscreteValueRuleStat
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(PhasedDiscreteRuleStateProvider)
 
+  /// Constructs a PhasedDiscreteRuleStateProvider with the default states populated to be used when rules are not parte
+  /// of a phase.
+  ///
+  /// @param rulebook The RoadRulebook to use.
+  /// @param phase_ring_book The PhaseRingBook to use.
+  /// @param phase_provider The PhaseProvider to use.
+  /// @throws maliput::common::assertion_error When phase_ring_book is nullptr.
+  static std::unique_ptr<PhasedDiscreteRuleStateProvider> GetDefaultPhasedDiscreteRuleStateProvider(
+      const maliput::api::rules::RoadRulebook* rulebook, const maliput::api::rules::PhaseRingBook* phase_ring_book,
+      const maliput::api::rules::PhaseProvider* phase_provider);
+
   /// Constructs a PhasedDiscreteRuleStateProvider.
   ///
   /// All pointer parameters are aliased; they must not be nullptr and their

@@ -48,6 +48,12 @@ class ManualRangeValueRuleStateProvider : public api::rules::RangeValueRuleState
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ManualRangeValueRuleStateProvider)
 
+  /// Constructs a ManualRangeValueRuleStateProvider with the default states populated.
+  ///
+  /// @param rulebook The RoadRulebook to use.
+  static std::unique_ptr<ManualRangeValueRuleStateProvider> GetDefaultManualRangeValueRuleStateProvider(
+      const maliput::api::rules::RoadRulebook* rulebook);
+
   /// Constructs a ManualRangeValueRuleStateProvider.
   ///
   /// @param rulebook A rulebook pointer to validate Rule::Id and their states.
