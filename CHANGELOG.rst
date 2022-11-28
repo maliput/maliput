@@ -2,8 +2,8 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.9 (2022-11-28)
+------------------
 * Provides default populated discrete and range value rule state providers. (`#533 <https://github.com/maliput/maliput/issues/533>`_)
 * Adds a default populated ManualPhaseProvider. (`#530 <https://github.com/maliput/maliput/issues/530>`_)
 * Maliput Plugin: Adds interface for providing default parameters from the backends (`#532 <https://github.com/maliput/maliput/issues/532>`_)
