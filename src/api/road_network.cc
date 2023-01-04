@@ -49,12 +49,30 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
                          std::unique_ptr<rules::RuleRegistry> rule_registry,
                          std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
                          std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider)
+    : RoadNetwork(std::move(road_geometry), std::move(rulebook), std::move(traffic_light_book),
+                  std::move(intersection_book), std::move(phase_ring_book), std::move(phase_provider),
+                  std::move(rule_registry), std::move(discrete_value_rule_state_provider),
+                  std::move(range_value_rule_state_provider)) {
+  right_of_way_rule_state_provider_ = std::move(right_of_way_rule_state_provider);
+  MALIPUT_THROW_UNLESS(right_of_way_rule_state_provider_.get() != nullptr);
+}
+
+#pragma GCC diagnostic pop
+
+RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
+                         std::unique_ptr<const rules::RoadRulebook> rulebook,
+                         std::unique_ptr<const rules::TrafficLightBook> traffic_light_book,
+                         std::unique_ptr<IntersectionBook> intersection_book,
+                         std::unique_ptr<rules::PhaseRingBook> phase_ring_book,
+                         std::unique_ptr<rules::PhaseProvider> phase_provider,
+                         std::unique_ptr<rules::RuleRegistry> rule_registry,
+                         std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
+                         std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider)
     : road_geometry_(std::move(road_geometry)),
       rulebook_(std::move(rulebook)),
       traffic_light_book_(std::move(traffic_light_book)),
       intersection_book_(std::move(intersection_book)),
       phase_ring_book_(std::move(phase_ring_book)),
-      right_of_way_rule_state_provider_(std::move(right_of_way_rule_state_provider)),
       phase_provider_(std::move(phase_provider)),
       rule_registry_(std::move(rule_registry)),
       discrete_value_rule_state_provider_(std::move(discrete_value_rule_state_provider)),
@@ -64,13 +82,11 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
   MALIPUT_THROW_UNLESS(traffic_light_book_.get() != nullptr);
   MALIPUT_THROW_UNLESS(intersection_book_.get() != nullptr);
   MALIPUT_THROW_UNLESS(phase_ring_book_.get() != nullptr);
-  MALIPUT_THROW_UNLESS(right_of_way_rule_state_provider_.get() != nullptr);
   MALIPUT_THROW_UNLESS(phase_provider_.get() != nullptr);
   MALIPUT_THROW_UNLESS(rule_registry_.get() != nullptr);
   MALIPUT_THROW_UNLESS(discrete_value_rule_state_provider_.get() != nullptr);
   MALIPUT_THROW_UNLESS(range_value_rule_state_provider_.get() != nullptr);
 }
-#pragma GCC diagnostic pop
 
 bool RoadNetwork::Contains(const RoadPosition& road_position) const {
   return road_position.lane->Contains(road_position.pos);
