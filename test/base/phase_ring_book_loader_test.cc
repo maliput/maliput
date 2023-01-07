@@ -180,6 +180,37 @@ class StraightRoadNetworkHelpers {
         maliput::RightOfWayRuleTypeId().string() + "/0_0_1", maliput::RightOfWayRuleTypeId().string() + "/0_1_2");
   }
 
+  // Returns a YAML description based on the proposed RoadNetwork sample without RightOfWayRuleStates.
+  static std::string PhaseRingBookYamlDescriptionWithoutRightOfWayRuleStates() {
+    return fmt::format(
+        R"R(PhaseRings:
+- ID: StraightRoadCrossingPath
+  Rules: [{0}, {1}]
+  Phases:
+  - ID: AllGo
+    RightOfWayRuleStates: {2}
+    TrafficLightStates:
+      WestFacing:
+          WestFacingBulbs: {{RedBulb: Off, YellowBulb: Off, GreenBulb: On}}
+      EastFacing:
+          EastFacingBulbs: {{RedBulb: Off, YellowBulb: Off, GreenBulb: On}}
+  - ID: AllStop
+    TrafficLightStates:
+      WestFacing:
+          WestFacingBulbs: {{RedBulb: On, YellowBulb: Off, GreenBulb: Off}}
+      EastFacing:
+          EastFacingBulbs: {{RedBulb: On, YellowBulb: Off, GreenBulb: Off}}
+  PhaseTransitionGraph:
+    AllGo:
+    - ID: AllStop
+      duration_until: 45
+    AllStop:
+    - ID: AllGo
+)R",
+        maliput::RightOfWayRuleTypeId().string() + "/0_0_1", maliput::RightOfWayRuleTypeId().string() + "/0_1_2",
+        "{}" /* Empty map */);
+  }
+
  private:
   // Creates a 3-Round-Bulb BulbGroup of id `bulb_group_id`.
   static std::unique_ptr<BulbGroup> CreateBulbGroup(const std::string bulb_group_id) {
@@ -212,7 +243,7 @@ class StraightRoadNetworkHelpers {
 // The PhaseRingBook is populated using a YAML description:
 //  - YAML description: See See StraightRoadNetworkHelpers::PhaseRingBookYamlDescription()
 class PhaseRingBookLoaderFromFileTest : public ::testing::Test {
- protected:
+ public:
   static void GenerateYamlFileFromString(const std::string& string_to_yaml, const std::string& filepath) {
     std::ofstream os(filepath);
     os << string_to_yaml;
@@ -322,6 +353,35 @@ TEST_F(PhaseRingBookLoaderFromFileTest, PhaseRingBookTest) {
   ASSERT_EQ(1, static_cast<int>(next_phases_from_all_stop.size()));
   EXPECT_EQ(kAllGoPhaseId, next_phases_from_all_stop[0].id);
   EXPECT_EQ(std::nullopt, next_phases_from_all_stop[0].duration_until);
+}
+
+// PhaseRingBook contains information for both rules and traffic lights.
+// When no rules are provided, the PhaseRingBook still have information about the phases that can be used.
+class PhaseRingBookTestWithNoRuleBook : public PhaseRingBookLoaderFromFileTest {
+ public:
+  void SetUp() override {
+    directory_.set_as_temp();
+    directory_.append("PhaseRingBookLoaderTest");
+    ASSERT_TRUE(common::Filesystem::create_directory(directory_));
+
+    phase_ring_book_string_ = StraightRoadNetworkHelpers::PhaseRingBookYamlDescriptionWithoutRightOfWayRuleStates();
+    filepath_ = directory_.get_path() + "/phase_ring_book_test.yaml";
+    GenerateYamlFileFromString(phase_ring_book_string_, filepath_);
+  }
+
+  void TearDown() override {
+    if (!filepath_.empty()) {
+      EXPECT_TRUE(common::Filesystem::remove_file(common::Path(filepath_)));
+    }
+    ASSERT_TRUE(common::Filesystem::remove_directory(directory_));
+  }
+};
+
+TEST_F(PhaseRingBookTestWithNoRuleBook, PhaseRingBookTestWithNoRules) {
+  const auto rulebook = std::make_unique<maliput::ManualRulebook>();
+  const auto traffic_light_book = StraightRoadNetworkHelpers::CreateTrafficLightBook();
+  std::unique_ptr<maliput::api::rules::PhaseRingBook> dut;
+  ASSERT_NO_THROW(dut = maliput::LoadPhaseRingBookFromFile(rulebook.get(), traffic_light_book.get(), filepath_));
 }
 
 }  // namespace

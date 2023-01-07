@@ -103,6 +103,9 @@ std::unordered_map<Rule::Id, DiscreteValueRule> GetRightOfWayTypeRules(const Roa
                                                                        const YAML::Node& rules_node) {
   MALIPUT_THROW_UNLESS(rules_node.IsSequence());
   std::unordered_map<Rule::Id, DiscreteValueRule> result;
+  if (rulebook->Rules().discrete_value_rules.empty()) {
+    return result;
+  }
   for (const YAML::Node& rule_node : rules_node) {
     const Rule::Id rule_id(rule_node.as<std::string>());
     result.emplace(rule_id, rulebook->GetDiscreteValueRule(rule_id));
@@ -219,12 +222,10 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
 
   const std::unordered_map<Rule::Id, DiscreteValueRule> discrete_rules =
       GetRightOfWayTypeRules(rulebook, phase_ring_node["Rules"]);
-  MALIPUT_THROW_UNLESS(!discrete_rules.empty());
   // First get default states of all rules.
   // Then, override the defaults with the states specified in the YAML
   // document.
   DiscreteValueRuleStates discrete_rule_states = CreateDefaultRuleStates(discrete_rules);
-  MALIPUT_THROW_UNLESS(!discrete_rule_states.empty());
 
   const YAML::Node& phases_node = phase_ring_node["Phases"];
   MALIPUT_THROW_UNLESS(phases_node.IsDefined());
@@ -235,8 +236,22 @@ PhaseRing BuildPhaseRing(const RoadRulebook* rulebook, const TrafficLightBook* t
     MALIPUT_THROW_UNLESS(phase_node["ID"].IsDefined());
     const Phase::Id phase_id(phase_node["ID"].as<std::string>());
     const YAML::Node& rule_states_node = phase_node["RightOfWayRuleStates"];
-    MALIPUT_THROW_UNLESS(rule_states_node.IsDefined());
-    MALIPUT_THROW_UNLESS(rule_states_node.IsMap());
+    // RightOfWayRuleStates might not be added in the yaml.
+    if (rule_states_node.IsDefined()) {
+      if (rule_states_node.IsMap()) {
+        if (rule_states_node.size() > 0 && discrete_rule_states.empty()) {
+          // If:
+          // 1. Is defined
+          // 2. Is a map
+          // 3. There are rules defined in the RightOfWayRuleStates
+          // Then the discrete value rules described in the RuleBook can't be empty.
+          MALIPUT_THROW_MESSAGE("There are no rules defined in the RuleBook to be used in the PhaseRingBook.");
+        }
+      } else {
+        // If it is defined it must be a map.
+        MALIPUT_THROW_MESSAGE("RightOfWayRuleStates field in the PhaseRingBook must be a map.");
+      }
+    }
     for (const auto& rule_state_it : rule_states_node) {
       Rule::Id rule_id(rule_state_it.first.as<std::string>());
       std::string value(rule_state_it.second.as<std::string>());
