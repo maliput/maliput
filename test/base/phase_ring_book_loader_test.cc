@@ -381,7 +381,6 @@ TEST_F(PhaseRingBookTestWithNoRuleBook, PhaseRingBookTestWithNoRules) {
   const auto rulebook = std::make_unique<maliput::ManualRulebook>();
   const auto traffic_light_book = StraightRoadNetworkHelpers::CreateTrafficLightBook();
   std::unique_ptr<maliput::api::rules::PhaseRingBook> dut;
-  maliput::LoadPhaseRingBookFromFile(rulebook.get(), traffic_light_book.get(), filepath_);
   ASSERT_NO_THROW(dut = maliput::LoadPhaseRingBookFromFile(rulebook.get(), traffic_light_book.get(), filepath_));
 }
 
