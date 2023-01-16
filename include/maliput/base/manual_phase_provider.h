@@ -35,6 +35,7 @@
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_provider.h"
 #include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/phase_ring_book.h"
 #include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
@@ -44,6 +45,14 @@ namespace maliput {
 class ManualPhaseProvider : public api::rules::PhaseProvider {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ManualPhaseProvider);
+
+  /// Constructs a ManualPhaseProvider populated from a given PhaseRingBook.
+  /// @details The initial phase for each ring is the arbitrarily chosen.
+  ///
+  /// @param phase_ring_book The PhaseRingBook to use.
+  /// @throws maliput::common::assertion_error When phase_ring_book is nullptr.
+  static std::unique_ptr<ManualPhaseProvider> GetDefaultPopulatedManualPhaseProvider(
+      const maliput::api::rules::PhaseRingBook* phase_ring_book);
 
   ManualPhaseProvider();
 

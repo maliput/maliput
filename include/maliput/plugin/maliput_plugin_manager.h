@@ -63,7 +63,7 @@ class MaliputPluginManager {
   void AddPlugin(const std::string& path_to_plugin);
 
   /// @returns A vector with the MaliputPlugin::Id of the loaded plugins.
-  std::vector<MaliputPlugin::Id> ListPlugins();
+  std::unordered_map<MaliputPlugin::Id, MaliputPluginType> ListPlugins() const;
 
  private:
   // Environment variable name that holds the path to look for plugins.

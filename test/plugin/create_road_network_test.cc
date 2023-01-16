@@ -44,7 +44,7 @@ namespace maliput {
 namespace plugin {
 namespace {
 
-class CreateRoadNetworkTest : public ::testing::Test {
+class MakeRoadNetworkLoaderTest : public ::testing::Test {
  public:
   // Creates a back up of the current environment variable value to be restored in the tear down process.
   // Adds a temporary path where the test plugins are already install.
@@ -64,10 +64,26 @@ class CreateRoadNetworkTest : public ::testing::Test {
   std::string back_up_env_;
 };
 
-TEST_F(CreateRoadNetworkTest, Throws) {
+TEST_F(MakeRoadNetworkLoaderTest, Throws) {
   // No matching plugin id.
-  EXPECT_THROW(CreateRoadNetwork("wrong_id", {}), maliput::common::assertion_error);
+  EXPECT_THROW(MakeRoadNetworkLoader("wrong_id"), maliput::common::assertion_error);
 }
+
+TEST_F(MakeRoadNetworkLoaderTest, MakeRoadNetworkLoader) {
+  std::unique_ptr<maliput::plugin::RoadNetworkLoader> dut;
+  ASSERT_NO_THROW(dut = MakeRoadNetworkLoader(kTestMaliputPlugin));
+  EXPECT_NE(dut, nullptr);
+}
+
+TEST_F(MakeRoadNetworkLoaderTest, DefaultParameters) {
+  const std::map<std::string, std::string> kDefaultParameters{{"configuration_1", "value_1"},
+                                                              {"configuration_2", "value_2"}};
+  std::unique_ptr<maliput::plugin::RoadNetworkLoader> dut = MakeRoadNetworkLoader(kTestMaliputPlugin);
+  ASSERT_NE(dut, nullptr);
+  EXPECT_EQ(kDefaultParameters, dut->GetDefaultParameters());
+}
+
+class CreateRoadNetworkTest : public MakeRoadNetworkLoaderTest {};
 
 TEST_F(CreateRoadNetworkTest, CreateRoadNetwork) { ASSERT_NO_THROW(CreateRoadNetwork(kTestMaliputPlugin, {})); }
 

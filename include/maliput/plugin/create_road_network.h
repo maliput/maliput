@@ -33,6 +33,7 @@
 #include <string>
 
 #include "maliput/api/road_network.h"
+#include "maliput/plugin/road_network_loader.h"
 
 namespace maliput {
 namespace plugin {
@@ -47,6 +48,14 @@ namespace plugin {
 /// @throws maliput::common::assertion_error When the `maliput::api::RoadNetwork` can't be loaded.
 std::unique_ptr<maliput::api::RoadNetwork> CreateRoadNetwork(const std::string& road_network_loader_id,
                                                              const std::map<std::string, std::string>& properties);
+
+/// Creates a maliput::plugin::RoadNetworkLoader using the specified plugin id.
+/// @param road_network_loader_id RoadNetworkLoader plugin id to be used.
+/// @returns A maliput::plugin::RoadNetworkLoader.
+///
+/// @throws maliput::common::assertion_error When `road_network_loader_id` is not found.
+/// @throws maliput::common::assertion_error When the plugin isn't a RoadNetworkLoader plugin type.
+std::unique_ptr<maliput::plugin::RoadNetworkLoader> MakeRoadNetworkLoader(const std::string& road_network_loader_id);
 
 }  // namespace plugin
 }  // namespace maliput

@@ -108,3 +108,12 @@ void Throw(const char* condition, const char* func, const char* file, int line);
       ::maliput::common::internal::Throw(std::string(message).c_str(), __func__, __FILE__, __LINE__); \
     }                                                                                                 \
   } while (0)
+
+/// @def MALIPUT_IS_IN_RANGE
+/// Throws if `value` is within [`min_value`; `max_value`]. It forwards the call
+/// to MALIPUT_VALIDATE() with a customized string stating the error.
+#define MALIPUT_IS_IN_RANGE(value, min_value, max_value)                                                           \
+  do {                                                                                                             \
+    MALIPUT_VALIDATE(value >= min_value, std::to_string(value) + " is less than " + std::to_string(min_value));    \
+    MALIPUT_VALIDATE(value <= max_value, std::to_string(value) + " is greater than " + std::to_string(max_value)); \
+  } while (0)

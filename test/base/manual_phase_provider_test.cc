@@ -40,10 +40,13 @@
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule.h"
+#include "maliput/base/manual_phase_ring_book.h"
+#include "maliput/test_utilities/mock.h"
 
 namespace maliput {
 namespace {
 
+using api::rules::BulbStates;
 using api::rules::DiscreteValueRule;
 using api::rules::DiscreteValueRuleStates;
 using api::rules::Phase;
@@ -138,6 +141,122 @@ GTEST_TEST(PhaseRingTest, InvalidPhases) {
   Phase phase_2(Phase::Id("baz"), rule_states_2, discrete_value_rule_states_2);
   const std::vector<Phase> phases{phase_1, phase_2};
   EXPECT_THROW(PhaseRing(PhaseRing::Id("foo"), phases), std::exception);
+}
+
+// Tests the ManualPhaseProvider::GetDefaultPopulatedManualPhaseProvider method.
+// For this, two phase_rings are added to the phase ring book:
+// 1 - Containing 3 phases with next phases information.
+// 2 - Containing 3 phases without next phases information.
+class DefaultPopulatedManualPhaseProviderTest : public testing::Test {
+ public:
+  static DiscreteValueRule::DiscreteValue CreateDiscreteValue(const std::string& value) {
+    return {Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
+            value};
+  }
+  static constexpr double kDurationUntil = 10.0;
+
+ protected:
+  void SetUp() override {
+    phase_ring_book_.AddPhaseRing(phase_ring_with_next_);
+    phase_ring_book_.AddPhaseRing(phase_ring_without_next_);
+  }
+
+  const Phase::Id kPhaseId1{"phase_1"};
+  const Phase::Id kPhaseId2{"phase_2"};
+  const Phase::Id kPhaseId3{"phase_3"};
+  const Phase::Id kPhaseId4{"phase_4"};
+  const Phase::Id kPhaseId5{"phase_5"};
+  const Phase::Id kPhaseId6{"phase_6"};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  const RuleStates kEmptyRuleStates{};
+#pragma GCC diagnostic pop
+  const BulbStates kEmptyBulbStates{};
+  const Phase phase_1_{kPhaseId1,
+                       kEmptyRuleStates,
+                       {
+                           {Rule::Id{"rule_a"}, CreateDiscreteValue("rule_a_value_1")},
+                           {Rule::Id{"rule_b"}, CreateDiscreteValue("rule_b_value_1")},
+                       } /* discrete_value_rule_states */,
+                       kEmptyBulbStates};
+
+  const Phase phase_2_{kPhaseId2,
+                       kEmptyRuleStates,
+                       {
+                           {Rule::Id{"rule_a"}, CreateDiscreteValue("rule_a_value_2")},
+                           {Rule::Id{"rule_b"}, CreateDiscreteValue("rule_b_value_2")},
+                       } /* discrete_value_rule_states */,
+                       kEmptyBulbStates};
+  const Phase phase_3_{kPhaseId3,
+                       kEmptyRuleStates,
+                       {
+                           {Rule::Id{"rule_a"}, CreateDiscreteValue("rule_a_value_3")},
+                           {Rule::Id{"rule_b"}, CreateDiscreteValue("rule_b_value_3")},
+                       } /* discrete_value_rule_states */,
+                       kEmptyBulbStates};
+  const Phase phase_4_{kPhaseId4,
+                       kEmptyRuleStates,
+                       {
+                           {Rule::Id{"rule_c"}, CreateDiscreteValue("rule_c_value_1")},
+                           {Rule::Id{"rule_d"}, CreateDiscreteValue("rule_d_value_1")},
+                       } /* discrete_value_rule_states */,
+                       kEmptyBulbStates};
+
+  const Phase phase_5_{kPhaseId5,
+                       kEmptyRuleStates,
+                       {
+                           {Rule::Id{"rule_c"}, CreateDiscreteValue("rule_c_value_2")},
+                           {Rule::Id{"rule_d"}, CreateDiscreteValue("rule_d_value_2")},
+                       } /* discrete_value_rule_states */,
+                       kEmptyBulbStates};
+  const Phase phase_6_{kPhaseId6,
+                       kEmptyRuleStates,
+                       {
+                           {Rule::Id{"rule_c"}, CreateDiscreteValue("rule_c_value_3")},
+                           {Rule::Id{"rule_d"}, CreateDiscreteValue("rule_d_value_3")},
+                       } /* discrete_value_rule_states */,
+                       kEmptyBulbStates};
+  const PhaseRing::Id phase_ring_id_1_{"phase_ring_1"};
+  const PhaseRing::Id phase_ring_id_2_{"phase_ring_2"};
+  const PhaseRing phase_ring_with_next_{phase_ring_id_1_,
+                                        {phase_1_, phase_2_, phase_3_},
+                                        {{
+                                            {phase_1_.id(), {{phase_2_.id(), {kDurationUntil}}}},
+                                            {phase_2_.id(), {{phase_3_.id(), {kDurationUntil}}}},
+                                            {phase_3_.id(), {{phase_1_.id(), {kDurationUntil}}}},
+                                        }}};
+  const PhaseRing phase_ring_without_next_{phase_ring_id_2_, {phase_4_, phase_5_, phase_6_}};
+
+  ManualPhaseRingBook phase_ring_book_{};
+};
+
+TEST_F(DefaultPopulatedManualPhaseProviderTest, Test) {
+  const std::unique_ptr<ManualPhaseProvider> dut{
+      ManualPhaseProvider::GetDefaultPopulatedManualPhaseProvider(&phase_ring_book_)};
+
+  // Phase ring book 1.
+  const std::optional<PhaseProvider::Result> phase_from_ring_1 = dut->GetPhase(phase_ring_id_1_);
+  ASSERT_TRUE(phase_from_ring_1.has_value());
+  // As the phases aren't added in order, we need to check if the gotten phase is actually part of the ring.
+  ASSERT_TRUE(phase_ring_with_next_.GetPhase(phase_from_ring_1->state).has_value());
+  ASSERT_TRUE(phase_from_ring_1->next.has_value());
+  // Once we get the phase we could check the next phase.
+  if (phase_from_ring_1->state == kPhaseId1) {
+    EXPECT_EQ(kPhaseId3, phase_from_ring_1->next->state);
+  } else if (phase_from_ring_1->state == kPhaseId2) {
+    EXPECT_EQ(kPhaseId3, phase_from_ring_1->next->state);
+  } else if (phase_from_ring_1->state == kPhaseId3) {
+    EXPECT_EQ(kPhaseId1, phase_from_ring_1->next->state);
+  } else {
+    FAIL();
+  }
+  EXPECT_EQ(phase_from_ring_1->next->duration_until, kDurationUntil);
+
+  // Phase ring book 2.
+  const std::optional<PhaseProvider::Result> phase_from_ring_2 = dut->GetPhase(phase_ring_id_2_);
+  ASSERT_TRUE(phase_from_ring_2.has_value());
+  ASSERT_TRUE(phase_ring_without_next_.GetPhase(phase_from_ring_2->state).has_value());
+  ASSERT_FALSE(phase_from_ring_2->next.has_value());
 }
 
 }  // namespace

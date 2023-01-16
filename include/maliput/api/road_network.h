@@ -61,6 +61,7 @@ class RoadNetwork {
   /// Constructs a RoadNetwork instance. After creation, you are encouraged to
   /// validate it using ValidateRoadNetwork(), which is defined in
   /// maliput/api/road_network_validator.h.
+  /// TODO(#108): Remove this constructor once old rule api is removed.
   RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry, std::unique_ptr<const rules::RoadRulebook> rulebook,
               std::unique_ptr<const rules::TrafficLightBook> traffic_light_book,
               std::unique_ptr<IntersectionBook> intersection_book,
@@ -70,6 +71,17 @@ class RoadNetwork {
               std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
               std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider);
 #pragma GCC diagnostic pop
+
+  /// Constructs a RoadNetwork instance. After creation, you are encouraged to
+  /// validate it using ValidateRoadNetwork(), which is defined in
+  /// maliput/api/road_network_validator.h.
+  RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry, std::unique_ptr<const rules::RoadRulebook> rulebook,
+              std::unique_ptr<const rules::TrafficLightBook> traffic_light_book,
+              std::unique_ptr<IntersectionBook> intersection_book,
+              std::unique_ptr<rules::PhaseRingBook> phase_ring_book,
+              std::unique_ptr<rules::PhaseProvider> phase_provider, std::unique_ptr<rules::RuleRegistry> rule_registry,
+              std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
+              std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider);
 
   virtual ~RoadNetwork() = default;
 

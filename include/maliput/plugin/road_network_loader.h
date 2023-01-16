@@ -27,13 +27,14 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include <map>
 #include <string>
 
 #include "maliput/api/road_network.h"
 #include "maliput/plugin/maliput_plugin_type.h"
 
 /// @def REGISTER_ROAD_NETWORK_LOADER_PLUGIN(PluginName, RoadNetworkLoaderClass)
-/// Macro for automating the creation of the correspondant functions for the correct
+/// Macro for automating the creation of the correspondent functions for the correct
 /// implementation of a RoadNetworkLoader plugin.
 ///
 /// @param PluginName Is the name of the plugin and must be unique among all the plugins.
@@ -57,11 +58,16 @@ class RoadNetworkLoader {
   /// @returns The entry point method name for getting an instance of the class.
   static std::string GetEntryPoint() { return "MakeRoadNetworkLoader"; }
 
+  virtual ~RoadNetworkLoader() = default;
+
   /// Returns a maliput::api::RoadNetwork.
   /// @param properties Dictionary containing the arguments needed for creating the RoadNetwork.
   virtual std::unique_ptr<maliput::api::RoadNetwork> operator()(
       const std::map<std::string, std::string>& properties) const = 0;
-  virtual ~RoadNetworkLoader() = default;
+
+  /// Returns a map of the default properties that are required for creating the RoadNetwork.
+  /// It is expected to be overriden by the derived class if such properties are wanted to be provided.
+  virtual std::map<std::string, std::string> GetDefaultParameters() const { return {}; }
 };
 
 }  // namespace plugin
