@@ -119,7 +119,7 @@ std::deque<const api::Lane*> KDTreeStrategy::ClosestLanes(const api::InertialPos
   const math::AxisAlignedBox search_region{min_corner, max_corner};
   const std::deque<const MaliputPoint*> maliput_points = kd_tree_->RangeSearch(search_region);
   std::deque<const api::Lane*> maliput_lanes(maliput_points.size());
-  std::transform(maliput_points.begin(), maliput_points.end(), std::back_inserter(maliput_lanes),
+  std::transform(maliput_points.begin(), maliput_points.end(), maliput_lanes.begin(),
                  [](const MaliputPoint* point) { return point->get_lane().value(); });
   return maliput_lanes;
 }

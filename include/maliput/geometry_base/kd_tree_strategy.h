@@ -60,7 +60,9 @@ class KDTreeStrategy final : public StrategyBase {
     /// Creates a MaliputPoint from a Vector3 and a lane_id.
     /// @param xyz The Vector3 to be wrapped.
     /// @param lane The lane the point belongs to.
-    MaliputPoint(const Vector3& xyz, const api::Lane* lane) : Vector3(xyz), lane_(std::make_optional(lane)) {}
+    MaliputPoint(const Vector3& xyz, const api::Lane* lane) : Vector3(xyz), lane_(std::make_optional(lane)) {
+      MALIPUT_THROW_UNLESS(lane != nullptr);
+    }
 
     ~MaliputPoint() = default;
 
