@@ -59,18 +59,17 @@ class KDTreeStrategy final : public StrategyBase {
 
     /// Creates a MaliputPoint from a Vector3 and a lane_id.
     /// @param xyz The Vector3 to be wrapped.
-    /// @param lane_id The lane_id of the point.
-    MaliputPoint(const Vector3& xyz, const api::LaneId& lane_id)
-        : Vector3(xyz), lane_id_(std::make_optional(lane_id)) {}
+    /// @param lane The lane the point belongs to.
+    MaliputPoint(const Vector3& xyz, const api::Lane* lane) : Vector3(xyz), lane_(std::make_optional(lane)) {}
 
     ~MaliputPoint() = default;
 
-    /// Returns the lane_id of the point
-    /// @return The lane_id of the point if any, std::nullopt otherwise.
-    std::optional<api::LaneId> lane_id() const { return lane_id_; }
+    /// Returns the lane.
+    /// @return The lane if any, std::nullopt otherwise.
+    std::optional<const api::Lane*> get_lane() const { return lane_; }
 
    private:
-    std::optional<api::LaneId> lane_id_;
+    std::optional<const api::Lane*> lane_;
   };
 
   // Documentation inherited.
@@ -88,7 +87,7 @@ class KDTreeStrategy final : public StrategyBase {
 
   // Obtains the closest lanes in the road geometry to a given point within a region around the point.
   // The region is an axis-aligned box with the point as center and the distance as half of the box's edge length.
-  std::set<api::LaneId> ClosestLanes(const api::InertialPosition& point, double half_edge_length) const;
+  std::deque<const api::Lane*> ClosestLanes(const api::InertialPosition& point, double half_edge_length) const;
 
   std::unique_ptr<math::KDTree3D<MaliputPoint>> kd_tree_;
 
