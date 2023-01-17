@@ -74,22 +74,24 @@ std::vector<api::RoadPositionResult> KDTreeStrategy::DoFindRoadPositions(const a
     const auto lane = rg->ById().GetLane(current_lane);
     const auto lane_position = lane->ToLanePosition(inertial_position);
     if (lane_position.distance <= radius) {
-      api::RoadPositionResult road_position{
-          {lane, lane_position.lane_position}, lane_position.nearest_position, lane_position.distance};
-      road_positions.push_back(road_position);
+      road_positions.push_back(
+          {{lane, lane_position.lane_position}, lane_position.nearest_position, lane_position.distance});
     }
   }
   return road_positions;
 }
 
 api::RoadPositionResult KDTreeStrategy::ClosestLane(const api::InertialPosition& point) const {
-  // Given that this method should actually obtain the lanes within a tolerance radius. Afterwards, the lane
-  // could be obtained using the point being closer to the centerline.
+  // Obtains the closest point in the kd-tree to the given point.
   const MaliputPoint maliput_point = kd_tree_->nearest_point(MaliputPoint{point.xyz()});
-  const double radius = (point.xyz() - maliput_point).norm() + 2. * sampling_step_;
-  const std::set<api::LaneId> lane_ids = ClosestLanes(point, radius);
+  // As the kd-tree is built with a sampling step, the closest point may not be the closest lane.
+  // Therefore, we search for the closest lane in a axis-aligned box whose half edge length is the distance between the
+  // nearest point and the given point plus twice the sampling_step_.
+  const double half_edge_length = (point.xyz() - maliput_point).norm() + 2. * sampling_step_;
+  const std::set<api::LaneId> lane_ids = ClosestLanes(point, half_edge_length);
   const api::RoadGeometry* rg = get_road_geometry();
 
+  // Once we have the lanes in the region, we search for the closest lane relying on the lane's ToLanePosition method.
   const api::Lane* lane_result = rg->ById().GetLane(maliput_point.lane_id().value());
   api::LanePositionResult lane_position_result = lane_result->ToLanePosition(point);
   api::RoadPositionResult road_position_result{{lane_result, lane_position_result.lane_position},
@@ -110,15 +112,14 @@ api::RoadPositionResult KDTreeStrategy::ClosestLane(const api::InertialPosition&
   return road_position_result;
 }
 
-std::set<api::LaneId> KDTreeStrategy::ClosestLanes(const api::InertialPosition& point, double distance) const {
-  const math::Vector3 min_corner{point.x() - distance, point.y() - distance, point.z() - distance};
-  const math::Vector3 max_corner{point.x() + distance, point.y() + distance, point.z() + distance};
+std::set<api::LaneId> KDTreeStrategy::ClosestLanes(const api::InertialPosition& point, double half_edge_length) const {
+  const math::Vector3 min_corner{point.x() - half_edge_length, point.y() - half_edge_length,
+                                 point.z() - half_edge_length};
+  const math::Vector3 max_corner{point.x() + half_edge_length, point.y() + half_edge_length,
+                                 point.z() + half_edge_length};
   const math::AxisAlignedBox search_region{min_corner, max_corner};
-  std::deque<const MaliputPoint*> maliput_points = kd_tree_->RangeSearch(search_region);
+  const std::deque<const MaliputPoint*> maliput_points = kd_tree_->RangeSearch(search_region);
   std::set<api::LaneId> maliput_lanes;
-  /*std::transform(maliput_points.begin(), maliput_points.end(),
-                   maliput_lanes.begin(),
-                   [](auto point) {return point->lane_id().value();});*/
   for (const auto& current_point : maliput_points) {
     maliput_lanes.insert(current_point->lane_id().value());
   }

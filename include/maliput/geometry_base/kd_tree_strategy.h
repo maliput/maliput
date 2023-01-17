@@ -49,31 +49,48 @@ class KDTreeStrategy final : public StrategyBase {
   ~KDTreeStrategy() override = default;
 
  private:
+  /// A wrapper around maliput::math::Vector3 that also stores the lane_id
+  /// Convenient for the KDTree3D population.
   class MaliputPoint : public maliput::math::Vector3 {
    public:
+    /// Creates a MaliputPoint from a Vector3.
+    /// @param xyz The Vector3 to be wrapped.
     explicit MaliputPoint(const Vector3& xyz) : Vector3(xyz) {}
-    MaliputPoint(const Vector3& xyz, const maliput::api::LaneId& lane_id)
+
+    /// Creates a MaliputPoint from a Vector3 and a lane_id.
+    /// @param xyz The Vector3 to be wrapped.
+    /// @param lane_id The lane_id of the point.
+    MaliputPoint(const Vector3& xyz, const api::LaneId& lane_id)
         : Vector3(xyz), lane_id_(std::make_optional(lane_id)) {}
 
     ~MaliputPoint() = default;
 
-    std::optional<maliput::api::LaneId> lane_id() const { return lane_id_; }
+    /// Returns the lane_id of the point
+    /// @return The lane_id of the point if any, std::nullopt otherwise.
+    std::optional<api::LaneId> lane_id() const { return lane_id_; }
 
    private:
-    std::optional<maliput::api::LaneId> lane_id_;
+    std::optional<api::LaneId> lane_id_;
   };
 
+  // Documentation inherited.
   api::RoadPositionResult DoToRoadPosition(const api::InertialPosition& inertial_position,
                                            const std::optional<api::RoadPosition>& hint) const override;
 
+  // Documentation inherited.
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                            double radius) const override;
 
-  maliput::api::RoadPositionResult ClosestLane(const api::InertialPosition& point) const;
+  // Obtains the closest lane in the road geometry to a given point.
+  // @param point The point to be used as reference.
+  // @return The closest lane to the point.
+  api::RoadPositionResult ClosestLane(const api::InertialPosition& inertial_position) const;
 
-  std::set<maliput::api::LaneId> ClosestLanes(const api::InertialPosition& point, double distance) const;
+  // Obtains the closest lanes in the road geometry to a given point within a region around the point.
+  // The region is an axis-aligned box with the point as center and the distance as half of the box's edge length.
+  std::set<api::LaneId> ClosestLanes(const api::InertialPosition& point, double half_edge_length) const;
 
-  std::unique_ptr<maliput::math::KDTree3D<MaliputPoint>> kd_tree_;
+  std::unique_ptr<math::KDTree3D<MaliputPoint>> kd_tree_;
 
   const double sampling_step_;
 };

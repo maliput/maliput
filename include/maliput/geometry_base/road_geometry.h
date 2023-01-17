@@ -50,7 +50,6 @@
 namespace maliput {
 namespace geometry_base {
 
-///
 /// geometry_base provides basic implementations for a subset of the
 /// interfaces of maliput's geometry API (api::RoadGeometry, etc) that
 /// can be shared by most "leaf" backends.  It is suitable for use as
@@ -63,12 +62,34 @@ namespace geometry_base {
 /// implement any of the fundamental geometric methods that define the
 /// immersion of lane-frame into `Inertial`-frame; that is the job of each
 /// specific backend.
-// TODO(maddog@tri.global) Provide a basic naive implementation of
-//                         RoadGeometry::DoToRoadPosition() which
-//                         only requires generic calls to
-//                         Lane::ToLanePosition().
 
 /// geometry_base's implementation of api::RoadGeometry.
+///
+/// A base implementation for the DoToRoadPosition and DoToFindRoadPosition virtual methods are offered.
+/// These methods could be initialize with two different strategies for performing their tasks:
+/// 1. BruteForceStrategy: This strategy performs a brute force search for the nearest lane on the road network.
+///                        It performs repetitive queries on the maliput::api::Lane::ToLanePosition method.
+/// 2. KdTreeStrategy: This strategy performs a search for the nearest lane on the road network using a KdTree.
+///                    In order to achieve this, the kdtree space needs to initialized, which is done by calling
+///                    InitializeStrategy() method, after all the lanes have been added to the road geometry.
+///
+/// The InitializeStrategy() method allows you to indicate which strategy you want to use for the search and it is
+/// mandatory to call it before using the DoToRoadPosition and DoToFindRoadPosition methods.
+///
+/// @code {.cpp}
+/// // create road geometry.
+/// RoadGeometry road_geometry("road_geometry", 0.1, 0.1, 1.0, math::Vector3(0., 0., 0.));
+/// // Add lanes to the road geometry.
+/// road_geometry.AddJunction(...);
+/// // ...
+/// // Add branchpoints to the road geometry.
+/// road_geometry.AddBranchPoint(...);
+/// // ...
+/// // Initialize the strategy.
+/// road_geometry->InitializeStrategy<maliput::geometry_base::KDTreeStrategy>(0.25 /* sampling step */);
+/// // or road_geometry->InitializeStrategy<maliput::geometry_base::BruteForceStrategy>();
+/// @endcode
+///
 class RoadGeometry : public api::RoadGeometry {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadGeometry);
