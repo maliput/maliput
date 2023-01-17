@@ -75,6 +75,7 @@ namespace geometry_base {
 ///
 /// The InitializeStrategy() method allows you to indicate which strategy you want to use for the search and it is
 /// mandatory to call it before using the DoToRoadPosition and DoToFindRoadPosition methods.
+/// By default the BruteForceStrategy is used.
 ///
 /// @code {.cpp}
 /// // create road geometry.
@@ -206,7 +207,7 @@ class RoadGeometry : public api::RoadGeometry {
   std::vector<std::unique_ptr<Junction>> junctions_;
   std::vector<std::unique_ptr<BranchPoint>> branch_points_;
   api::BasicIdIndex id_index_;
-  std::unique_ptr<StrategyBase> strategy_;
+  std::unique_ptr<StrategyBase> strategy_{std::make_unique<BruteForceStrategy>(this)};
 };
 
 }  // namespace geometry_base
