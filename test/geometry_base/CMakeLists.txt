@@ -14,6 +14,7 @@ macro(add_dependencies_to_test target)
 
       target_link_libraries(${target}
           maliput::api
+          maliput::geometry_base
           maliput::test_utilities
       )
 

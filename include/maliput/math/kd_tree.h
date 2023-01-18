@@ -275,8 +275,8 @@ class KDTreeBase {
   /// It is not valid to call this function if the tree is empty.
   /// @param point a point.
   /// @return the nearest point in the tree to the given point
-  const Coordinate& Nearest(const Coordinate& point) const {
-    return Nearest(point, std::numeric_limits<double>::min());
+  const Coordinate& nearest_point(const Coordinate& point) const {
+    return nearest_point(point, std::numeric_limits<double>::min());
   }
 
   /// Finds the nearest point in the tree to the given point. (Nearest Neighbour (NN))
@@ -286,12 +286,12 @@ class KDTreeBase {
   /// @return the nearest point in the tree to the given point
   /// @throws maliput::common::assertion_error When tree is empty.
   /// @throws maliput::common::assertion_error When tolerance is negative.
-  const Coordinate& Nearest(const Coordinate& point, double tolerance) const {
+  const Coordinate& nearest_point(const Coordinate& point, double tolerance) const {
     MALIPUT_VALIDATE(root_ != nullptr, "Tree is empty.");
     MALIPUT_VALIDATE(tolerance > 0, "Tolerance is negative.");
     Node* best = nullptr;
     double best_dist = std::numeric_limits<double>::infinity();
-    Nearest(root_, point, 0, tolerance, best, &best_dist);
+    nearest_point(root_, point, 0, tolerance, best, &best_dist);
     return best->get_coordinate();
   }
 
@@ -306,8 +306,8 @@ class KDTreeBase {
   // @param index Dimension under evaluation as this method is called recursively.
   // @param nearest_neighbour_node The nearest neighbour node so far.
   // @param nearest_neighbour_distance The closest distance to the nearest neighbour so far.
-  void Nearest(const Node* node, const Coordinate& point, std::size_t index, double tolerance,
-               Node*& nearest_neighbour_node, double* nearest_neighbour_distance) const {
+  void nearest_point(const Node* node, const Coordinate& point, std::size_t index, double tolerance,
+                     Node*& nearest_neighbour_node, double* nearest_neighbour_distance) const {
     MALIPUT_VALIDATE(index < Dimension, "Index can not be greater than number of dimensions minus one.");
     MALIPUT_THROW_UNLESS(nearest_neighbour_distance != nullptr);
     if (node == nullptr) return;
@@ -323,13 +323,13 @@ class KDTreeBase {
     const double dx = node->get_coordinate()[index] - point[index];
     // Compute index value for the next MakeTree call.
     index = (index + 1) % Dimension;
-    Nearest(dx > 0 ? node->get_left() : node->get_right(), point, index, tolerance, nearest_neighbour_node,
-            nearest_neighbour_distance);
+    nearest_point(dx > 0 ? node->get_left() : node->get_right(), point, index, tolerance, nearest_neighbour_node,
+                  nearest_neighbour_distance);
     // When going up in the tree, evaluate if the other's node's quadrant is any closer than the current best.
     if (dx * dx >= *nearest_neighbour_distance) return;
     // If the discarded quadrant is closer, evaluate its points.
-    Nearest(dx > 0 ? node->get_right() : node->get_left(), point, index, tolerance, nearest_neighbour_node,
-            nearest_neighbour_distance);
+    nearest_point(dx > 0 ? node->get_right() : node->get_left(), point, index, tolerance, nearest_neighbour_node,
+                  nearest_neighbour_distance);
   }
 
   // Root node of the tree.
@@ -371,7 +371,7 @@ class KDTree : public details::KDTreeBase<KDTree<Coordinate, Dimension, Region, 
 ///  tree.RangeSearch(region_1);
 ///  tree.RangeSearch(region_2);
 ///  ...
-///  tree.Nearest(point_1); // NearestNeighbour (NN).
+///  tree.nearest_point(point_1); // NearestNeighbour (NN).
 /// @endcode
 
 /// @tparam Coordinate Data type being used, must have:

@@ -34,6 +34,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/geometry_base/branch_point.h"
+#include "maliput/geometry_base/brute_force_strategy.h"
 #include "maliput/geometry_base/junction.h"
 #include "maliput/geometry_base/lane.h"
 #include "maliput/geometry_base/road_geometry.h"

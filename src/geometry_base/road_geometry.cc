@@ -63,5 +63,23 @@ const api::Junction* RoadGeometry::do_junction(int index) const { return junctio
 
 const api::BranchPoint* RoadGeometry::do_branch_point(int index) const { return branch_points_.at(index).get(); }
 
+api::RoadPositionResult RoadGeometry::DoToRoadPosition(const api::InertialPosition& inertial_position,
+                                                       const std::optional<api::RoadPosition>& hint) const {
+  MALIPUT_VALIDATE(
+      strategy_ != nullptr,
+      "RoadGeometry::DoToRoadPosition() called with no strategy set. Call "
+      "maliput::geometry_base::RoadGeometry::InitializeStrategy() after road geometry is fully constructed.");
+  return strategy_->ToRoadPosition(inertial_position, hint);
+}
+
+std::vector<api::RoadPositionResult> RoadGeometry::DoFindRoadPositions(const api::InertialPosition& inertial_position,
+                                                                       double radius) const {
+  MALIPUT_VALIDATE(
+      strategy_ != nullptr,
+      "RoadGeometry::DoFindRoadPositions() called with no strategy set. Call "
+      "maliput::geometry_base::RoadGeometry::InitializeStrategy() after road geometry is fully constructed.");
+  return strategy_->FindRoadPositions(inertial_position, radius);
+}
+
 }  // namespace geometry_base
 }  // namespace maliput

@@ -4,11 +4,14 @@
 set(SOURCES
     branch_point.cc
     brute_force_find_road_positions_strategy.cc
+    brute_force_strategy.cc
     filter_positions.cc
     junction.cc
+    kd_tree_strategy.cc
     lane.cc
     road_geometry.cc
-    segment.cc)
+    segment.cc
+    strategy_base.cc)
 
 add_library(geometry_base ${SOURCES})
 
