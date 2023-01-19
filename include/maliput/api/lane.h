@@ -64,13 +64,13 @@ class Lane {
   virtual ~Lane() = default;
 
   /// Returns the persistent identifier.
-  LaneId id() const { return do_id(); }
+  LaneId id() const;
 
   /// Returns the Segment to which this Lane belongs.
-  const Segment* segment() const { return do_segment(); }
+  const Segment* segment() const;
 
   /// Returns the index of this Lane within the Segment which owns it.
-  int index() const { return do_index(); }
+  int index() const;
 
   /// Returns a pointer to the adjacent Lane to the left of this Lane.
   ///
@@ -78,7 +78,7 @@ class Lane {
   /// e.g., "to the left along the +s direction".
   ///
   /// @returns nullptr iff parent Segment has no Lane to the left.
-  const Lane* to_left() const { return do_to_left(); }
+  const Lane* to_left() const;
 
   /// Returns a pointer to the adjacent Lane to the right of this Lane.
   ///
@@ -86,13 +86,13 @@ class Lane {
   /// e.g., "to the right along the +s direction".
   ///
   /// @returns nullptr iff parent Segment has no Lane to the right.
-  const Lane* to_right() const { return do_to_right(); }
+  const Lane* to_right() const;
 
   /// Returns the arc-length of the Lane along its reference curve.
   ///
   /// The value of length() is also the maximum s-coordinate for this Lane;
   /// i.e., the domain of s is [0, length()].
-  double length() const { return do_length(); }
+  double length() const;
 
   /// Returns the nominal lateral (r) bounds for the lane as a function of s.
   ///
@@ -100,7 +100,7 @@ class Lane {
   /// "staying in the lane".
   ///
   /// @see segment_bounds(double s) that defines the whole surface.
-  RBounds lane_bounds(double s) const { return do_lane_bounds(s); }
+  RBounds lane_bounds(double s) const;
 
   /// Returns the lateral segment (r) bounds of the lane as a function of s.
   ///
@@ -110,7 +110,7 @@ class Lane {
   ///
   /// @see lane_bounds(double s) that defines what's considered to be "staying
   /// in the lane".
-  RBounds segment_bounds(double s) const { return do_segment_bounds(s); }
+  RBounds segment_bounds(double s) const;
 
   /// Returns the elevation (`h`) bounds of the lane as a function of `(s, r)`.
   ///
@@ -119,14 +119,14 @@ class Lane {
   ///
   /// `s` is within [0, `length()`] of this Lane and `r` is within
   /// `lane_bounds(s)`.
-  HBounds elevation_bounds(double s, double r) const { return do_elevation_bounds(s, r); }
+  HBounds elevation_bounds(double s, double r) const;
 
   /// Returns the InertialPosition corresponding to the given LanePosition.
   ///
   /// @pre The s component of @p lane_pos must be in domain [0, Lane::length()].
   /// @pre The r component of @p lane_pos must be in domain [Rmin, Rmax]
   ///      derived from Lane::segment_bounds().
-  InertialPosition ToInertialPosition(const LanePosition& lane_pos) const { return DoToInertialPosition(lane_pos); }
+  InertialPosition ToInertialPosition(const LanePosition& lane_pos) const;
 
   /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
   /// The LanePosition is expected to be contained within the lane's boundaries.
@@ -135,9 +135,7 @@ class Lane {
   /// This method guarantees that its result satisfies the condition that
   /// `ToInertialPosition(result.lane_position)` is within `linear_tolerance()`
   ///  of `result.nearest_position`.
-  LanePositionResult ToLanePosition(const InertialPosition& inertial_pos) const {
-    return DoToLanePosition(inertial_pos);
-  }
+  LanePositionResult ToLanePosition(const InertialPosition& inertial_pos) const;
 
   /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
   /// The LanePosition is expected to be contained within the segment's boundaries.
@@ -146,9 +144,7 @@ class Lane {
   /// This method guarantees that its result satisfies the condition that
   /// `ToInertialPosition(result.lane_position)` is within `linear_tolerance()`
   ///  of `result.nearest_position`.
-  LanePositionResult ToSegmentPosition(const InertialPosition& inertial_pos) const {
-    return DoToSegmentPosition(inertial_pos);
-  }
+  LanePositionResult ToSegmentPosition(const InertialPosition& inertial_pos) const;
 
   // TODO(maddog@tri.global) Method to convert LanePosition to that of
   //                         another Lane.  (Should assert that both
@@ -160,39 +156,33 @@ class Lane {
   /// Returns the rotation which expresses the orientation of the
   /// `Lane`-frame basis at @p lane_pos with respect to the
   /// `Inertial`-frame basis.
-  Rotation GetOrientation(const LanePosition& lane_pos) const { return DoGetOrientation(lane_pos); }
+  Rotation GetOrientation(const LanePosition& lane_pos) const;
 
   /// Computes derivatives of LanePosition given a velocity vector @p velocity.
   /// @p velocity is a isometric velocity vector oriented in the `Lane`-frame
   /// at @p position.
   ///
   /// @returns `Lane`-frame derivatives packed into a LanePosition struct.
-  LanePosition EvalMotionDerivatives(const LanePosition& position, const IsoLaneVelocity& velocity) const {
-    return DoEvalMotionDerivatives(position, velocity);
-  }
+  LanePosition EvalMotionDerivatives(const LanePosition& position, const IsoLaneVelocity& velocity) const;
 
   // TODO(maddog@tri.global)  Design/implement this.
   // void EvalSurfaceDerivatives(...) const { return do_(); }
 
   /// Returns the lane's BranchPoint for the end specified by @p which_end.
-  const BranchPoint* GetBranchPoint(const LaneEnd::Which which_end) const { return DoGetBranchPoint(which_end); }
+  const BranchPoint* GetBranchPoint(const LaneEnd::Which which_end) const;
 
   /// Returns the set of LaneEnd's which connect with this lane on the
   /// same side of the BranchPoint at @p which_end.  At a minimum,
   /// this set will include this Lane.
-  const LaneEndSet* GetConfluentBranches(const LaneEnd::Which which_end) const {
-    return DoGetConfluentBranches(which_end);
-  }
+  const LaneEndSet* GetConfluentBranches(const LaneEnd::Which which_end) const;
 
   /// Returns the set of LaneEnd's which continue onward from this lane at the
   /// BranchPoint at @p which_end.
-  const LaneEndSet* GetOngoingBranches(const LaneEnd::Which which_end) const { return DoGetOngoingBranches(which_end); }
+  const LaneEndSet* GetOngoingBranches(const LaneEnd::Which which_end) const;
 
   /// Returns the default ongoing LaneEnd connected at @p which_end,
   /// or std::nullopt if no default branch has been established at @p which_end.
-  std::optional<LaneEnd> GetDefaultBranch(const LaneEnd::Which which_end) const {
-    return DoGetDefaultBranch(which_end);
-  }
+  std::optional<LaneEnd> GetDefaultBranch(const LaneEnd::Which which_end) const;
 
   /// Returns if this lane contains @p lane_position.
   bool Contains(const LanePosition& lane_position) const;
