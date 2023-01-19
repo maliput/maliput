@@ -48,6 +48,18 @@ else()
 endif()
 
 ##############################################################################
+# Profiling
+##############################################################################
+
+if(MALIPUT_PROFILER_ENABLE)
+  message(STATUS "Maliput Profiler - Enabled")
+  find_package(ignition-common3 REQUIRED COMPONENTS profiler)
+  add_definitions(-DMALIPUT_PROFILER_ENABLE)
+  else()
+  message(STATUS "Maliput Profiler - Disabled")
+endif()
+
+##############################################################################
 # Sources
 ##############################################################################
 add_subdirectory(src)
