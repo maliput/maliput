@@ -26,6 +26,13 @@ target_link_libraries(routing
     maliput::common
 )
 
+if(MALIPUT_PROFILER_ENABLE)
+  target_link_libraries(routing
+    PRIVATE
+      ignition-common3::profiler
+  )
+endif()
+
 ##############################################################################
 # Export
 ##############################################################################
