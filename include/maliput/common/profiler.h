@@ -55,6 +55,9 @@
 #define MALIPUT_PROFILE_L(name, line) IGN_PROFILE_L(name, line)
 /// \brief Scoped profiling sample. Sample will stop at end of scope.
 #define MALIPUT_PROFILE(name) IGN_PROFILE(name)
+/// \brief Scoped profiling sample as MALIPUT_PROFILE.
+///        The function name is used as the sample name.
+#define MALIPUT_PROFILE_FUNC() IGN_PROFILE(__FUNCTION__)
 
 /// \brief Macro to determine if profiler is enabled and has an implementation.
 #define MALIPUT_PROFILER_VALID IGN_PROFILER_VALID
