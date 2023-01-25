@@ -69,7 +69,7 @@ std::optional<double> DetermineEdgeS(const api::Lane* lane, const api::Lane* nex
 
 std::vector<api::LaneSRoute> DeriveLaneSRoutes(const api::RoadPosition& start, const api::RoadPosition& end,
                                                double max_length_m) {
-  MALIPUT_PROFILE("maliput::routing::DeriveLaneSRoutes");
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_DEMAND(start.lane != nullptr);
   MALIPUT_DEMAND(end.lane != nullptr);
   const double start_s = start.pos.s();

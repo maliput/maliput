@@ -45,98 +45,98 @@ bool IsWithinRange(double x, double min, double max, double tolerance) {
 }  // namespace
 
 LaneId Lane::id() const {
-  MALIPUT_PROFILE("maliput::api::Lane::id");
+  MALIPUT_PROFILE_FUNC();
   return do_id();
 }
 
 const Segment* Lane::segment() const {
-  MALIPUT_PROFILE("maliput::api::Lane::segment");
+  MALIPUT_PROFILE_FUNC();
   return do_segment();
 }
 
 int Lane::index() const {
-  MALIPUT_PROFILE("maliput::api::Lane::index");
+  MALIPUT_PROFILE_FUNC();
   return do_index();
 }
 
 const Lane* Lane::to_left() const {
-  MALIPUT_PROFILE("maliput::api::Lane::to_left");
+  MALIPUT_PROFILE_FUNC();
   return do_to_left();
 }
 
 const Lane* Lane::to_right() const {
-  MALIPUT_PROFILE("maliput::api::Lane::to_right");
+  MALIPUT_PROFILE_FUNC();
   return do_to_right();
 }
 
 double Lane::length() const {
-  MALIPUT_PROFILE("maliput::api::Lane::length");
+  MALIPUT_PROFILE_FUNC();
   return do_length();
 }
 
 RBounds Lane::lane_bounds(double s) const {
-  MALIPUT_PROFILE("maliput::api::Lane::lane_bounds");
+  MALIPUT_PROFILE_FUNC();
 
   return do_lane_bounds(s);
 }
 
 RBounds Lane::segment_bounds(double s) const {
-  MALIPUT_PROFILE("maliput::api::Lane::segment_bounds");
+  MALIPUT_PROFILE_FUNC();
   return do_segment_bounds(s);
 }
 
 HBounds Lane::elevation_bounds(double s, double r) const {
-  MALIPUT_PROFILE("maliput::api::Lane::elevation_bounds");
+  MALIPUT_PROFILE_FUNC();
   return do_elevation_bounds(s, r);
 }
 
 InertialPosition Lane::ToInertialPosition(const LanePosition& lane_pos) const {
-  MALIPUT_PROFILE("maliput::api::Lane::ToInertialPosition");
+  MALIPUT_PROFILE_FUNC();
   return DoToInertialPosition(lane_pos);
 }
 
 LanePositionResult Lane::ToLanePosition(const InertialPosition& inertial_pos) const {
-  MALIPUT_PROFILE("maliput::api::Lane::ToLanePosition");
+  MALIPUT_PROFILE_FUNC();
   return DoToLanePosition(inertial_pos);
 }
 
 LanePositionResult Lane::ToSegmentPosition(const InertialPosition& inertial_pos) const {
-  MALIPUT_PROFILE("maliput::api::Lane::ToSegmentPosition");
+  MALIPUT_PROFILE_FUNC();
   return DoToSegmentPosition(inertial_pos);
 }
 
 Rotation Lane::GetOrientation(const LanePosition& lane_pos) const {
-  MALIPUT_PROFILE("maliput::api::Lane::GetOrientation");
+  MALIPUT_PROFILE_FUNC();
   return DoGetOrientation(lane_pos);
 }
 
 LanePosition Lane::EvalMotionDerivatives(const LanePosition& position, const IsoLaneVelocity& velocity) const {
-  MALIPUT_PROFILE("maliput::api::Lane::EvalMotionDerivatives");
+  MALIPUT_PROFILE_FUNC();
   return DoEvalMotionDerivatives(position, velocity);
 }
 
 const BranchPoint* Lane::GetBranchPoint(const LaneEnd::Which which_end) const {
-  MALIPUT_PROFILE("maliput::api::Lane::GetBranchPoint");
+  MALIPUT_PROFILE_FUNC();
   return DoGetBranchPoint(which_end);
 }
 
 const LaneEndSet* Lane::GetConfluentBranches(const LaneEnd::Which which_end) const {
-  MALIPUT_PROFILE("maliput::api::Lane::GetConfluentBranches");
+  MALIPUT_PROFILE_FUNC();
   return DoGetConfluentBranches(which_end);
 }
 
 const LaneEndSet* Lane::GetOngoingBranches(const LaneEnd::Which which_end) const {
-  MALIPUT_PROFILE("maliput::api::Lane::GetOngoingBranches");
+  MALIPUT_PROFILE_FUNC();
   return DoGetOngoingBranches(which_end);
 }
 
 std::optional<LaneEnd> Lane::GetDefaultBranch(const LaneEnd::Which which_end) const {
-  MALIPUT_PROFILE("maliput::api::Lane::GetDefaultBranch");
+  MALIPUT_PROFILE_FUNC();
   return DoGetDefaultBranch(which_end);
 }
 
 bool Lane::Contains(const LanePosition& lane_position) const {
-  MALIPUT_PROFILE("maliput::api::Lane::Contains");
+  MALIPUT_PROFILE_FUNC();
   const double s = lane_position.s();
   const double r = lane_position.r();
   const double h = lane_position.h();

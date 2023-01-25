@@ -72,30 +72,30 @@ Rotation OrientationOutFromLane(const LaneEnd& lane_end) {
 
 RoadPositionResult RoadGeometry::ToRoadPosition(const InertialPosition& inertial_position,
                                                 const std::optional<RoadPosition>& hint) const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::ToRoadPosition");
+  MALIPUT_PROFILE_FUNC();
   return DoToRoadPosition(inertial_position, hint);
 }
 
 std::vector<RoadPositionResult> RoadGeometry::FindRoadPositions(const InertialPosition& inertial_position,
                                                                 double radius) const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::FindRoadPositions");
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_THROW_UNLESS(radius >= 0.);
   return DoFindRoadPositions(inertial_position, radius);
 }
 
 std::vector<InertialPosition> RoadGeometry::SampleAheadWaypoints(const LaneSRoute& lane_s_route,
                                                                  double path_length_sampling_rate) const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::SampleAheadWaypoints");
+  MALIPUT_PROFILE_FUNC();
   return DoSampleAheadWaypoints(lane_s_route, path_length_sampling_rate);
 }
 
 math::Vector3 RoadGeometry::inertial_to_backend_frame_translation() const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::inertial_to_backend_frame_translation");
+  MALIPUT_PROFILE_FUNC();
   return do_inertial_to_backend_frame_translation();
 }
 
 std::vector<std::string> RoadGeometry::CheckInvariants() const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::CheckInvariants");
+  MALIPUT_PROFILE_FUNC();
   std::vector<std::string> failures;
 
   // Verify correctness of back-pointers/indexing in object hierarchy.
@@ -246,28 +246,28 @@ std::vector<InertialPosition> RoadGeometry::DoSampleAheadWaypoints(const LaneSRo
 }
 
 const Lane* RoadGeometry::IdIndex::GetLane(const LaneId& id) const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::IdIndex::GetLane");
+  MALIPUT_PROFILE_FUNC();
   return DoGetLane(id);
 }
 
 const std::unordered_map<LaneId, const Lane*>& RoadGeometry::IdIndex::GetLanes() const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::IdIndex::GetLanes");
+  MALIPUT_PROFILE_FUNC();
   return DoGetLanes();
 }
 
 const Segment* RoadGeometry::IdIndex::GetSegment(const SegmentId& id) const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::IdIndex::GetSegment");
+  MALIPUT_PROFILE_FUNC();
 
   return DoGetSegment(id);
 }
 
 const Junction* RoadGeometry::IdIndex::GetJunction(const JunctionId& id) const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::IdIndex::GetJunction");
+  MALIPUT_PROFILE_FUNC();
   return DoGetJunction(id);
 }
 
 const BranchPoint* RoadGeometry::IdIndex::GetBranchPoint(const BranchPointId& id) const {
-  MALIPUT_PROFILE("maliput::api::RoadGeometry::IdIndex::GetBranchPoint");
+  MALIPUT_PROFILE_FUNC();
   return DoGetBranchPoint(id);
 }
 

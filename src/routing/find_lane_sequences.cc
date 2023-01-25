@@ -84,7 +84,7 @@ std::vector<std::vector<const Lane*>> FindLaneSequencesHelper(const Lane* start,
 }  // namespace
 
 std::vector<std::vector<const Lane*>> FindLaneSequences(const Lane* start, const Lane* end, double max_length_m) {
-  MALIPUT_PROFILE("maliput::routing::FindLaneSequences");
+  MALIPUT_PROFILE_FUNC();
   if (start->id() == end->id()) {
     return {{start}};
   }
