@@ -92,7 +92,7 @@ For having the profiler enabled when using `maliput`, it is mandatory to install
 1. Install prerequisites. `ign-common3` is not installed via `rosdep` as the profiler is only run on demand:
 
     ```
-    sudo apt install libignition-common3-dev
+    sudo apt install libignition-common3-profiler-dev
     ```
 
 2. Build `maliput` package using `MALIPUT_PROFILER_ENABLE` cmake argument:
