@@ -83,7 +83,7 @@ It is recommended to follow the guidelines for setting up a development workspac
 `maliput` is able to run a profiler for evaluating performance.
 It is implemented via `ign-common3`'s `profiler` component.
 
-In order to avoid any performance drop, this is disabled by default and the binaries aren't distributed with the profiler set up.
+In order to avoid any performance drop and to keep maliput dependency chain clean, this is disabled by default and the binaries aren't distributed with the profiler enabled.
 
 For having the profiler enabled when using `maliput`, it is mandatory to install `maliput` from source.
 
