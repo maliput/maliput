@@ -56,8 +56,11 @@
 /// \brief Scoped profiling sample. Sample will stop at end of scope.
 #define MALIPUT_PROFILE(name) IGN_PROFILE(name)
 /// \brief Scoped profiling sample as MALIPUT_PROFILE.
-///        The function name is used as the sample name.
+///        __FUNCTION__ is used as the sample name.
 #define MALIPUT_PROFILE_FUNC() IGN_PROFILE(__FUNCTION__)
+/// \brief Scoped profiling sample as MALIPUT_PROFILE.
+///        __PRETTY_FUNCTION__ is used as the sample name.
+#define MALIPUT_PROFILE_PRETTY_FUNC() IGN_PROFILE(__PRETTY_FUNCTION__)
 
 /// \brief Macro to determine if profiler is enabled and has an implementation.
 #define MALIPUT_PROFILER_VALID IGN_PROFILER_VALID
@@ -69,6 +72,8 @@
 #define MALIPUT_PROFILE_END() ((void)0)
 #define MALIPUT_PROFILE_L(name, line) ((void)name)
 #define MALIPUT_PROFILE(name) ((void)name)
+#define MALIPUT_PROFILE_FUNC() ((void)0)
+#define MALIPUT_PROFILE_PRETTY_FUNC() ((void)0)
 #define MALIPUT_PROFILER_VALID MALIPUT_PROFILER_ENABLE
 
 #endif  // MALIPUT_PROFILER_ENABLE
