@@ -144,6 +144,13 @@ TEST_F(LoggingMesagesTest, CriticalLog) {
   EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_message);
 }
 
+TEST_F(LoggingMesagesTest, OffLevelLog) {
+  log()->set_level(logger::level::off);
+  const std::string expected_empty_message{};
+  log()->critical(kMessage1, kMessage2, kPI);
+  EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_empty_message);
+}
+
 }  // namespace
 }  // namespace test
 }  // namespace common

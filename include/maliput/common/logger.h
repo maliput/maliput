@@ -77,13 +77,13 @@ namespace logger {
 
 /// Logging levels.
 enum level {
-  off = 0,
-  trace,
+  trace = 0,
   debug,
   info,
   warn,
   error,
   critical,
+  off,
   unchanged,
 };
 
