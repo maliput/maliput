@@ -138,9 +138,7 @@ class RoadGeometry {
   //                          might expect an updated RoadPosition which is
   //                          nearby (e.g., on the same Lane).
   RoadPositionResult ToRoadPosition(const InertialPosition& inertial_position,
-                                    const std::optional<RoadPosition>& hint = std::nullopt) const {
-    return DoToRoadPosition(inertial_position, hint);
-  }
+                                    const std::optional<RoadPosition>& hint = std::nullopt) const;
 
   /// Obtains all RoadPositions within @p radius of @p inertial_position. Only Lanes
   /// whose segment regions include points that are within @p radius of
@@ -163,10 +161,7 @@ class RoadGeometry {
   /// Note that derivative implementations may choose to violate the above
   /// semantics for performance reasons. See docstrings of derivative
   /// implementations for details.
-  std::vector<RoadPositionResult> FindRoadPositions(const InertialPosition& inertial_position, double radius) const {
-    MALIPUT_THROW_UNLESS(radius >= 0.);
-    return DoFindRoadPositions(inertial_position, radius);
-  }
+  std::vector<RoadPositionResult> FindRoadPositions(const InertialPosition& inertial_position, double radius) const;
 
   /// Returns the tolerance guaranteed for linear measurements (positions).
   double linear_tolerance() const { return do_linear_tolerance(); }
@@ -202,9 +197,7 @@ class RoadGeometry {
   /// @throws maliput::assertion_error When any LaneSRange in `lane_s_route.ranges()` refers to
   ///                an unknown Lane.
   std::vector<InertialPosition> SampleAheadWaypoints(const LaneSRoute& lane_s_route,
-                                                     double path_length_sampling_rate) const {
-    return DoSampleAheadWaypoints(lane_s_route, path_length_sampling_rate);
-  }
+                                                     double path_length_sampling_rate) const;
 
   /// The Backend Frame is an inertial frame similar to the Inertial Frame that
   /// differ one from another by an isometric transformation. This method
@@ -214,7 +207,7 @@ class RoadGeometry {
   /// maliput_design.h.
   ///
   /// @return maliput's Inertial Frame to Backend Frame translation vector.
-  math::Vector3 inertial_to_backend_frame_translation() const { return do_inertial_to_backend_frame_translation(); }
+  math::Vector3 inertial_to_backend_frame_translation() const;
 
   // TODO(#400): Add RollPitchYaw inertial_to_backend_frame_rotation() const.
 
@@ -266,22 +259,22 @@ class RoadGeometry::IdIndex {
   virtual ~IdIndex() = default;
 
   /// Returns the Lane identified by @p id, or `nullptr` if @p id is unknown.
-  const Lane* GetLane(const LaneId& id) const { return DoGetLane(id); }
+  const Lane* GetLane(const LaneId& id) const;
 
   // Returns all of the Lane instances.
-  const std::unordered_map<LaneId, const Lane*>& GetLanes() const { return DoGetLanes(); }
+  const std::unordered_map<LaneId, const Lane*>& GetLanes() const;
 
   /// Returns the Segment identified by @p id, or `nullptr` if @p id is
   /// unknown.
-  const Segment* GetSegment(const SegmentId& id) const { return DoGetSegment(id); }
+  const Segment* GetSegment(const SegmentId& id) const;
 
   /// Returns the Junction identified by @p id, or `nullptr` if @p id is
   /// unknown.
-  const Junction* GetJunction(const JunctionId& id) const { return DoGetJunction(id); }
+  const Junction* GetJunction(const JunctionId& id) const;
 
   /// Returns the BranchPoint identified by @p id, or `nullptr` if @p id is
   /// unknown.
-  const BranchPoint* GetBranchPoint(const BranchPointId& id) const { return DoGetBranchPoint(id); }
+  const BranchPoint* GetBranchPoint(const BranchPointId& id) const;
 
  protected:
   IdIndex() = default;

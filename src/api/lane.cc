@@ -32,15 +32,111 @@
 #include "maliput/api/junction.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/common/profiler.h"
 
 namespace maliput {
 namespace api {
+namespace {
 
 bool IsWithinRange(double x, double min, double max, double tolerance) {
   return ((min - tolerance) <= x) && (x <= (max + tolerance));
 }
 
+}  // namespace
+
+LaneId Lane::id() const {
+  MALIPUT_PROFILE_FUNC();
+  return do_id();
+}
+
+const Segment* Lane::segment() const {
+  MALIPUT_PROFILE_FUNC();
+  return do_segment();
+}
+
+int Lane::index() const {
+  MALIPUT_PROFILE_FUNC();
+  return do_index();
+}
+
+const Lane* Lane::to_left() const {
+  MALIPUT_PROFILE_FUNC();
+  return do_to_left();
+}
+
+const Lane* Lane::to_right() const {
+  MALIPUT_PROFILE_FUNC();
+  return do_to_right();
+}
+
+double Lane::length() const {
+  MALIPUT_PROFILE_FUNC();
+  return do_length();
+}
+
+RBounds Lane::lane_bounds(double s) const {
+  MALIPUT_PROFILE_FUNC();
+
+  return do_lane_bounds(s);
+}
+
+RBounds Lane::segment_bounds(double s) const {
+  MALIPUT_PROFILE_FUNC();
+  return do_segment_bounds(s);
+}
+
+HBounds Lane::elevation_bounds(double s, double r) const {
+  MALIPUT_PROFILE_FUNC();
+  return do_elevation_bounds(s, r);
+}
+
+InertialPosition Lane::ToInertialPosition(const LanePosition& lane_pos) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoToInertialPosition(lane_pos);
+}
+
+LanePositionResult Lane::ToLanePosition(const InertialPosition& inertial_pos) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoToLanePosition(inertial_pos);
+}
+
+LanePositionResult Lane::ToSegmentPosition(const InertialPosition& inertial_pos) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoToSegmentPosition(inertial_pos);
+}
+
+Rotation Lane::GetOrientation(const LanePosition& lane_pos) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetOrientation(lane_pos);
+}
+
+LanePosition Lane::EvalMotionDerivatives(const LanePosition& position, const IsoLaneVelocity& velocity) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoEvalMotionDerivatives(position, velocity);
+}
+
+const BranchPoint* Lane::GetBranchPoint(const LaneEnd::Which which_end) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetBranchPoint(which_end);
+}
+
+const LaneEndSet* Lane::GetConfluentBranches(const LaneEnd::Which which_end) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetConfluentBranches(which_end);
+}
+
+const LaneEndSet* Lane::GetOngoingBranches(const LaneEnd::Which which_end) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetOngoingBranches(which_end);
+}
+
+std::optional<LaneEnd> Lane::GetDefaultBranch(const LaneEnd::Which which_end) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetDefaultBranch(which_end);
+}
+
 bool Lane::Contains(const LanePosition& lane_position) const {
+  MALIPUT_PROFILE_FUNC();
   const double s = lane_position.s();
   const double r = lane_position.r();
   const double h = lane_position.h();

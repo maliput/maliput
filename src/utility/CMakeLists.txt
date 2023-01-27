@@ -29,6 +29,13 @@ target_link_libraries(utility
     maliput::math
 )
 
+if(MALIPUT_PROFILER_ENABLE)
+  target_link_libraries(utility
+    PRIVATE
+      ignition-common3::profiler
+  )
+endif()
+
 target_include_directories(utility
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

@@ -48,6 +48,7 @@
 #include "maliput/api/segment.h"
 #include "maliput/common/logger.h"
 #include "maliput/common/maliput_abort.h"
+#include "maliput/common/profiler.h"
 #include "maliput/math/vector.h"
 #include "maliput/utility/mesh.h"
 #include "maliput/utility/mesh_simplification.h"
@@ -116,6 +117,7 @@ std::string FormatMaterial(const Material& mat, int precision) {
 // center, left most and right most lines of the `lane`'s segment
 // surface is bigger than `grid_unit` or the end of the `lane` is reached.
 double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_unit) {
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_DEMAND(lane != nullptr);
 
   const double length = lane->length();
@@ -174,6 +176,7 @@ double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_
 // vertices.
 void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_segment_bounds,
                                const std::function<double(double, double)>& elevation) {
+  MALIPUT_PROFILE_FUNC();
   const double s_max = lane->length();
   for (double s0 = 0, s1; s0 < s_max; s0 = s1) {
     const double step_increment = ComputeSampleStep(lane, s0, grid_unit);
@@ -202,6 +205,7 @@ void GenerateOptimizedRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid
 
 void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_segment_bounds,
                              const std::function<double(double, double)>& elevation) {
+  MALIPUT_PROFILE_FUNC();
   const double linear_tolerance = lane->segment()->junction()->road_geometry()->linear_tolerance();
   const double s_max = lane->length();
   for (double s0 = 0, s1; s0 < s_max; s0 = s1) {
@@ -278,6 +282,7 @@ void GeneratePreciseRoadMesh(GeoMesh* mesh, const api::Lane* lane, double grid_u
 //        the corresponding elevation `h`, to yield a quad vertex `(s, r, h)`.
 void CoverLaneWithQuads(GeoMesh* mesh, const api::Lane* lane, double grid_unit, bool use_segment_bounds,
                         const std::function<double(double, double)>& elevation, bool optimize_generation) {
+  MALIPUT_PROFILE_FUNC();
   if (optimize_generation) {
     GenerateOptimizedRoadMesh(mesh, lane, grid_unit, use_segment_bounds, elevation);
   } else {
@@ -340,6 +345,7 @@ void StripeLaneBounds(GeoMesh* mesh, const api::Lane* lane, double grid_unit, do
 // @param h_offset  h value of each vertex (height above road surface)
 void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit, double s_offset, double s_size,
                    double h_offset) {
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_DEMAND(s_offset >= 0.);
   MALIPUT_DEMAND((s_offset + s_size) <= lane->length());
   const double kRelativeWidth = 0.8;
@@ -436,6 +442,7 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit, doubl
 // @param grid_unit  size of each quad (length of edge in s and r dimensions)
 // @param h_offset  h value of each vertex (height above road surface)
 void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit, double h_offset) {
+  MALIPUT_PROFILE_FUNC();
   // To avoid crossing boundaries (and tripping assertions) due to
   // numeric precision issues, we will nudge the arrows inward from
   // the ends of the lanes by the RoadGeometry's linear_tolerance().
@@ -469,6 +476,7 @@ void MarkLaneEnds(GeoMesh* mesh, const api::Lane* lane, double grid_unit, double
 // Note that @p max_size would be the maximum possible grid unit every time it
 // it is bigger than @p linear_tolerance.
 double PickGridUnit(const api::Lane* lane, double max_size, double min_resolution, double linear_tolerance) {
+  MALIPUT_PROFILE_FUNC();
   double result = max_size;
 
   const api::RBounds rb0 = lane->lane_bounds(0.);
@@ -498,6 +506,7 @@ double PickGridUnit(const api::Lane* lane, double max_size, double min_resolutio
 // @param as_diamond  whether a diamond shape is desired or not
 // @param mesh        the mesh to store the created shapes in
 void DrawBranch(double elevation, double height, const api::LaneEnd& lane_end, bool as_diamond, GeoMesh* mesh) {
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_THROW_UNLESS(mesh != nullptr && elevation >= 0 && height >= 0);
 
   static const double kWidthFactor = 0.1;
@@ -550,6 +559,7 @@ void DrawBranch(double elevation, double height, const api::LaneEnd& lane_end, b
 //                    for
 // @param mesh        the mesh to store the created shapes in
 void DrawArrows(double elevation, double height, const api::LaneEndSet* set, GeoMesh* mesh) {
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_THROW_UNLESS(set != nullptr && mesh != nullptr);
 
   for (int i = 0; i < set->size(); ++i) {
@@ -569,6 +579,7 @@ void DrawArrows(double elevation, double height, const api::LaneEndSet* set, Geo
 // center of this BranchPoint.
 void RenderBranchPoint(const api::BranchPoint* const branch_point, const double base_elevation, const double height,
                        GeoMesh* mesh, std::vector<api::InertialPosition>* previous_centers) {
+  MALIPUT_PROFILE_FUNC();
   if ((branch_point->GetASide()->size() == 0) && (branch_point->GetBSide()->size() == 0)) {
     // No branches?  Odd, but, oh, well... nothing to do here.
     return;
@@ -624,6 +635,7 @@ void RenderBranchPoint(const api::BranchPoint* const branch_point, const double 
 }
 
 GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
+  MALIPUT_PROFILE_FUNC();
   if (features.simplify_mesh_threshold == 0.) {
     return mesh;  // Passes given mesh unmodified.
   }
@@ -647,6 +659,7 @@ GeoMesh SimplifyMesh(const GeoMesh& mesh, const ObjFeatures& features) {
 // TODO(#392): Receive the RoadRulebook pointer to modify the mesh creation accordingly.
 void RenderSegment(const api::Segment* segment, const ObjFeatures& features, GeoMesh* asphalt_mesh, GeoMesh* lane_mesh,
                    GeoMesh* marker_mesh, GeoMesh* h_bounds_mesh, GeoMesh* sidewalk_mesh) {
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_THROW_UNLESS(segment != nullptr);
   MALIPUT_THROW_UNLESS(segment->junction() != nullptr);
   MALIPUT_THROW_UNLESS(segment->junction()->road_geometry() != nullptr);
@@ -777,6 +790,7 @@ Material GetMaterialFromMesh(const MaterialType mesh_material) {
 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::LaneId& lane_id, const MaterialType& mesh_material) {
+  MALIPUT_PROFILE("BuildMesh: For lanes");
   MALIPUT_DEMAND(rg != nullptr);
   MALIPUT_THROW_UNLESS(mesh_material != MaterialType::BranchPointGlow);
 
@@ -864,6 +878,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::BranchPointId& branch_point_id,
                                              const MaterialType& mesh_material) {
+  MALIPUT_PROFILE("BuildMesh: For BranchPoints");
   MALIPUT_DEMAND(rg != nullptr);
   MALIPUT_THROW_UNLESS(mesh_material == MaterialType::BranchPointGlow);
 
@@ -884,6 +899,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 
 std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const ObjFeatures& features,
                                              const api::SegmentId& segment_id, const MaterialType& mesh_material) {
+  MALIPUT_PROFILE("BuildMesh: For Segments");
   MALIPUT_DEMAND(rg != nullptr);
   MALIPUT_THROW_UNLESS(mesh_material == MaterialType::Asphalt || mesh_material == MaterialType::GrayedAsphalt);
 
@@ -909,6 +925,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
 }
 
 RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFeatures& features) {
+  MALIPUT_PROFILE_FUNC();
   RoadGeometryMesh meshes;
 
   GeoMesh asphalt_mesh;
@@ -970,6 +987,7 @@ RoadGeometryMesh BuildRoadGeometryMesh(const api::RoadGeometry* rg, const ObjFea
 
 std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api::RoadGeometry* rg,
                                                                       const ObjFeatures& features) {
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_THROW_UNLESS(rg != nullptr);
   maliput::log()->trace("Building Meshes for RoadGeometry id {}...", rg->id().string());
 
@@ -1046,6 +1064,7 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
 
 void GenerateObjFile(const api::RoadGeometry* rg, const std::string& dirpath, const std::string& fileroot,
                      const ObjFeatures& features) {
+  MALIPUT_PROFILE_FUNC();
   MALIPUT_THROW_UNLESS(rg != nullptr);
 
   std::map<std::string, std::pair<mesh::GeoMesh, Material>> meshes = BuildMeshes(rg, features);

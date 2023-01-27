@@ -5,6 +5,7 @@ ament_add_gtest(maliput_hash_test maliput_hash_test.cc)
 ament_add_gtest(maliput_never_destroyed_test maliput_never_destroyed_test.cc)
 ament_add_gtest(maliput_throw_test maliput_throw_test.cc)
 ament_add_gtest(range_validator_test range_validator_test.cc)
+ament_add_gtest(profiler_test profiler_test.cc)
 
 macro(add_dependencies_to_test target)
     if (TARGET ${target})
@@ -30,6 +31,13 @@ add_dependencies_to_test(maliput_hash_test)
 add_dependencies_to_test(maliput_never_destroyed_test)
 add_dependencies_to_test(maliput_throw_test)
 add_dependencies_to_test(range_validator_test)
+add_dependencies_to_test(profiler_test)
+
+if(MALIPUT_PROFILER_ENABLE)
+  target_link_libraries(profiler_test
+      ignition-common3::profiler
+  )
+endif()
 
 # TODO(#335): When a sanitizer is enabled, tests where assert are checked are disabled.
 if (NOT ${SANITIZERS})

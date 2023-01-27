@@ -78,6 +78,35 @@ For further info refer to [Source Installation on Ubuntu](https://maliput.readth
 
 It is recommended to follow the guidelines for setting up a development workspace as described [here](https://maliput.readthedocs.io/en/latest/developer_setup.html).
 
+## Profiling maliput
+
+`maliput` is able to run a profiler for evaluating performance.
+It is implemented via `ign-common3`'s `profiler` component.
+
+In order to avoid any performance drop and to keep maliput dependency chain clean, this is disabled by default and the binaries aren't distributed with the profiler enabled.
+
+For having the profiler enabled when using `maliput`, it is mandatory to install `maliput` from source.
+
+### Steps
+
+1. Install prerequisites. `ign-common3` is not installed via `rosdep` as the profiler is only run on demand:
+
+    ```
+    sudo apt install libignition-common3-profiler-dev
+    ```
+
+2. Build `maliput` package using `MALIPUT_PROFILER_ENABLE` cmake argument:
+Continue the [Source-Installation-on-Ubuntu](#Source-Installation-on-Ubuntu) instructions. The only difference is:
+    ```
+    colcon build --packages-select maliput --cmake-args " -DMALIPUT_PROFILER_ENABLE=On"
+    ```
+
+3. Run an application with your preferred `maliput` backend. In another terminal, open the visualizer for the profiler:
+    ```
+    ign_remotery_vis
+    ```
+    _Note: As it opens a browser using `xdg-open`, it is recommended to have installed `xdg-utils` and a browser: (e.g: `sudo apt install -y xdg-utils firefox`)_.
+
 ## Contributing
 
 Please see [CONTRIBUTING](https://maliput.readthedocs.io/en/latest/contributing.html) page.
