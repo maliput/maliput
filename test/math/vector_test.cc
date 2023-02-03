@@ -40,11 +40,13 @@ GTEST_TEST(VectorTest, Constructors) {
     EXPECT_EQ(Vector<2>({0., 0.}), Vector<2>());
     EXPECT_EQ(Vector<2>({5., 98.}), Vector<2>({5., 98.}));
     EXPECT_EQ(Vector<2>({1., 2.}), Vector<2>(std::array<double, 2>{1., 2.}));
+    EXPECT_EQ(static_cast<std::size_t>(2), Vector<2>::kDimension);
   }
   {  // 2- dimension vector.
     EXPECT_EQ(Vector2(0., 0.), Vector2());
     EXPECT_EQ(Vector2(5., 98.), Vector2({5., 98.}));
     EXPECT_EQ(Vector2(1., 2.), Vector2(std::array<double, 2>{1., 2.}));
+    EXPECT_EQ(static_cast<std::size_t>(2), Vector2::kDimension);
     {
       const Vector2 kExpected{3., 4.};
       const Vector2 kDut = kExpected;
@@ -60,6 +62,7 @@ GTEST_TEST(VectorTest, Constructors) {
     EXPECT_EQ(Vector3(0., 0., 0.), Vector3());
     EXPECT_EQ(Vector3(5., 98., -35.), Vector3({5., 98., -35.}));
     EXPECT_EQ(Vector3(1., 2., 3.), Vector3(std::array<double, 3>{1., 2., 3.}));
+    EXPECT_EQ(static_cast<std::size_t>(3), Vector3::kDimension);
     {
       const Vector3 kExpected{3., 4., 1.};
       const Vector3 kDut = kExpected;
@@ -75,6 +78,7 @@ GTEST_TEST(VectorTest, Constructors) {
     EXPECT_EQ(Vector4(0., 0., 0., 0.), Vector4());
     EXPECT_EQ(Vector4(5., 98., -35., 56.), Vector4({5., 98., -35., 56.}));
     EXPECT_EQ(Vector4(1., 2., 3., 4.), Vector4(std::array<double, 4>{1., 2., 3., 4.}));
+    EXPECT_EQ(static_cast<std::size_t>(4), Vector4::kDimension);
     {
       const Vector4 kExpected{3., 4., 1., 10.};
       const Vector4 kDut = kExpected;
