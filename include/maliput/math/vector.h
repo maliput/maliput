@@ -54,6 +54,9 @@ template <std::size_t N, typename Derived>
 class VectorBase {
   // TODO(francocipollone): Move VectorBase to a VectorBase.h header.
  public:
+  /// The dimension of the vector.
+  static constexpr std::size_t kDimension{N};
+
   /// @return An N-dimensional vector filled with zeros.
   static Derived Zero();
 
@@ -165,7 +168,7 @@ class VectorBase {
 
 /// A N-dimensional vector.
 /// @tparam N Is the dimension of the vector.
-template <size_t N>
+template <std::size_t N>
 class Vector : public VectorBase<N, Vector<N>> {
  public:
   /// Constructs a null N-dimensional vector.
