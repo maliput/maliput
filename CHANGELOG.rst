@@ -2,8 +2,8 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.0 (2023-02-08)
+------------------
 * Adds dimension static const to vector class. (`#541 <https://github.com/maliput/maliput/issues/541>`_)
 * Fixes logger-level-0ff behavior. (`#540 <https://github.com/maliput/maliput/issues/540>`_)
 * Adds maliput profiler (`#538 <https://github.com/maliput/maliput/issues/538>`_)
