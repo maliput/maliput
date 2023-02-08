@@ -2,6 +2,16 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adds dimension static const to vector class. (`#541 <https://github.com/maliput/maliput/issues/541>`_)
+* Fixes logger-level-0ff behavior. (`#540 <https://github.com/maliput/maliput/issues/540>`_)
+* Adds maliput profiler (`#538 <https://github.com/maliput/maliput/issues/538>`_)
+* Provides a default ToRoadPosition/FindRoadPosition implementations using kdtree data structure (`#517 <https://github.com/maliput/maliput/issues/517>`_)
+* PhaseRingBookLoader supporting empty rules for the phases. (`#536 <https://github.com/maliput/maliput/issues/536>`_)
+* Provides new-rule-api compatible RoadNetwork's constructor. (`#535 <https://github.com/maliput/maliput/issues/535>`_)
+* Contributors: Franco Cipollone
+
 1.0.9 (2022-11-28)
 ------------------
 * Provides default populated discrete and range value rule state providers. (`#533 <https://github.com/maliput/maliput/issues/533>`_)
