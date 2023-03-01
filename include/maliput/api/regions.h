@@ -118,6 +118,10 @@ class LaneSRange {
   /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
   bool Intersects(const LaneSRange& lane_s_range, double tolerance) const;
 
+  /// Returns a std::optional<LaneSRange> bearing the intersected LaneSRange that results overlapping
+  /// this LaneSRange with `lane_s_range`. When there is no common area, std::nullopt is returned.
+  std::optional<LaneSRange> GetIntersection(const LaneSRange& lane_s_range, double tolerance) const;
+
  private:
   LaneId lane_id_;
   SRange s_range_;

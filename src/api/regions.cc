@@ -108,6 +108,15 @@ bool LaneSRange::Intersects(const LaneSRange& lane_s_range, const double toleran
   return lane_id_ == lane_s_range.lane_id() ? s_range_.Intersects(lane_s_range.s_range(), tolerance) : false;
 }
 
+std::optional<LaneSRange> LaneSRange::GetIntersection(const LaneSRange& lane_s_range, double tolerance) const {
+  if (Intersects(lane_s_range, tolerance)) {
+    const auto intersection = s_range_.GetIntersection(lane_s_range.s_range(), tolerance);
+    MALIPUT_THROW_UNLESS(intersection.has_value());
+    return std::optional<LaneSRange>{LaneSRange(lane_id_, intersection.value())};
+  }
+  return std::nullopt;
+}
+
 bool LaneSRoute::Intersects(const LaneSRoute& lane_s_route, double tolerance) const {
   for (const auto& s_range : ranges()) {
     const auto lane_s_range_it =

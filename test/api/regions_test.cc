@@ -207,6 +207,24 @@ GTEST_TEST(LaneSRangeTest, Intersects) {
   EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{kLaneId3, SRange(70., 10.)}, kLinearTolerance));
 }
 
+GTEST_TEST(LaneSRangeTest, GetIntersection) {
+  const LaneSRange lane_s_range_a(kLaneId1, SRange(20., 30.));
+
+  // Different lane id. No intersection is expected
+  auto dut = lane_s_range_a.GetIntersection(LaneSRange{kLaneId2, SRange(25., 35.)}, kLinearTolerance);
+  EXPECT_FALSE(dut.has_value());
+
+  // Intersection is expected.
+  LaneSRange expected_intersection{kLaneId1, SRange(25., 30.)};
+  dut = lane_s_range_a.GetIntersection(LaneSRange{kLaneId1, SRange(25., 35.)}, kLinearTolerance);
+  ASSERT_TRUE(dut.has_value());
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.value(), expected_intersection));
+
+  // Same lane id, different range. No intersection is expected.
+  dut = lane_s_range_a.GetIntersection(LaneSRange{kLaneId1, SRange(35., 40.)}, kLinearTolerance);
+  EXPECT_FALSE(dut.has_value());
+}
+
 class LaneSRouteTest : public ::testing::Test {
  protected:
   void SetUp() override {
