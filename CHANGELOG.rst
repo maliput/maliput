@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Provides LaneSRange::GetIntersection method. (`#542 <https://github.com/maliput/maliput/issues/542>`_)
+* Contributors: Franco Cipollone
+
 1.1.0 (2023-02-08)
 ------------------
 * Adds dimension static const to vector class. (`#541 <https://github.com/maliput/maliput/issues/541>`_)
