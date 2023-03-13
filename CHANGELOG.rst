@@ -2,8 +2,8 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.1 (2023-03-13)
+------------------
 * Provides LaneSRange::GetIntersection method. (`#542 <https://github.com/maliput/maliput/issues/542>`_)
 * Contributors: Franco Cipollone
 
