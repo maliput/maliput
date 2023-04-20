@@ -79,7 +79,7 @@ class Route final {
   }
 
   /// @return The number of RoutePhases.
-  int Size() const { route_phases_.size(); }
+  int Size() const { static_cast<int>(route_phases_.size()); }
 
   /// Indexes the RoutePhases.
   ///
