@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2023, Woven Planet. All rights reserved.
+// Copyright (c) 2023, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -81,7 +81,11 @@ class Router {
   const maliput::api::RoadNetwork* road_network() const { return road_network_; }
 
  protected:
-  /// Implementations 
+  // Implementations should call this constructor to set the @p road_network.
+  //
+  // @param road_network The maliput::api::RoadNetwork pointer. It must not be
+  // nullptr. The lifetime of this pointer must exceed that of this object.
+  // @throws maliput::common::assertion_error When @p road_network is nullptr.
   explicit Router(const maliput::api::RoadNetwork* road_network) : road_network_(road_network) {
     MALIPUT_THROW_UNLESS(road_network_ != nullptr);
   }

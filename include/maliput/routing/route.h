@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2023, Woven Planet. All rights reserved.
+// Copyright (c) 2023, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,6 @@
 #include <vector>
 
 #include "maliput/api/lane_data.h"
-#include "maliput/api/regions.h"
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
@@ -43,19 +42,19 @@ namespace routing {
 
 /// Describes the sequence of paths to go from one RoadPosition to another.
 /// It is sequenced by RoutePhases which contain default and adjacent
-/// maliput::api::LaneSRanges which conduce the agent from the start to the end
-/// road position.
+/// maliput::api::LaneSRanges which an agent can use to travel from the start to
+/// the end road position.
 ///
 /// Agents are expected to use the Router to obtain a Route. Once in the Route,
-/// they can iterate through the RoutePhases or find by a specific INERTIAL or
-/// LANE Frame coordinate the RoutePhase and start driving from there towards
-/// the end goal.
+/// they can iterate through the RoutePhases or find a specific RoutePhase via
+/// an INERTIAL or LANE Frame coordinage the RoutePhase and start driving from
+/// there towards the end goal.
 ///
 /// The first RoutePhase start road position identifies the beginning of the
 /// Route. The last RoutePhase end road position identifies the ending of the
-/// Route. RoutePhases in the sequence are connected end to end by the same
-/// INERTIAL-Frame coordinate whose the corresponding LANE-Frame coordinate
-/// depends on which maliput::api::LaneSRange they contain.
+/// Route. The sequence of RoutePhases form a continuous route where the end of
+/// one RoutePhase exactly matches the begining of the next RoutePhase in the
+/// sequence.
 class Route final {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Route);
@@ -63,27 +62,29 @@ class Route final {
 
   /// Constructs a Route.
   ///
-  /// @param route_phases The sequence of RoutePhases. It must not be nullptr.
+  /// @param route_phases The sequence of RoutePhases. It must not be empty.
   /// RoutePhases must be connected end to end.
   /// @param road_network The maliput::api::RoadNetwork pointer. It must not be
-  /// nullptr.
+  /// nullptr. The lifetime of this pointer must exceed that of this object.
   /// @throws maliput::common::assertion_error When @p route_phases is empty.
   /// @throws maliput::common::assertion_error When @p route_phases contains
-  /// RoutePhases that are not connected end to end.
-  /// @throws maliput::common::assertion_error When @p road_networ is nullptr.
-  Route(const std::vector<RoutePhases>& route_phases, const maliput::api::RoadNetwork* road_network) :
+  /// RoutePhases that are not connected end to end, or contain locations not in
+  /// @p road_network.
+  /// @throws maliput::common::assertion_error When @p road_network is nullptr.
+  Route(const std::vector<RoutePhase>& route_phases, const maliput::api::RoadNetwork* road_network) :
       route_phases_(route_phases), road_network_(road_network) {
     MALIPUT_THROW_UNLESS(!route_phases_.empty());
     MALIPUT_THROW_UNLESS(road_network_ != nullptr);
     /// TODO(#453): Validate end to end connection of the RoutePhases.
+    /// TODO(#453): Validate RoutePhases are in the RoadNetwork.
   }
 
   /// @return The number of RoutePhases.
-  int Size() const { static_cast<int>(route_phases_.size()); }
+  int Size() const { return static_cast<int>(route_phases_.size()); }
 
   /// Indexes the RoutePhases.
   ///
-  /// @param index The index of the RoutePhase. It must be not be negative and
+  /// @param index The index of the RoutePhase. It must be non-negative and
   /// less than `size()`.
   /// @return The RoutePhase at @p index.
   /// @throws std::out_of_range When @p index is negative or >= `size()`.
@@ -94,7 +95,7 @@ class Route final {
     return route_phases_.front().StartRoadPosition();
   }
 
-  /// @return The ebd maliput::api::RoadPosition of this Route.
+  /// @return The end maliput::api::RoadPosition of this Route.
   const maliput::api::RoadPosition& EndRoadPosition() const {
     return route_phases_.back().EndRoadPosition();
   }
@@ -104,17 +105,21 @@ class Route final {
   /// @param inertial_position An INERTIAL-Frame position.
   /// @return An optional with the RoutePhase which contains @p inertial_position.
   std::optional<RoutePhase> FindRoutePhaseBy(
-      const maliput::api::InertialPosition& inertial_position) const;
+      const maliput::api::InertialPosition& inertial_position) const {
+    MALIPUT_THROW_MESSAGE("Unimplemented");
+  }
 
   /// Finds the RoutePhase where @p road_position falls into.
   ///
   /// @param road_position A LANE-Frame position.
   /// @return An optional with the RoutePhase which contains @p road_position.
   std::optional<RoutePhase> FindRoutePhaseBy(
-      const maliput::api::RoadPosition& road_position) const;
+      const maliput::api::RoadPosition& road_position) const {
+    MALIPUT_THROW_MESSAGE("Unimplemented");
+  }
 
  private:
-  std::vector<RoutePhases> route_phases_;
+  std::vector<RoutePhase> route_phases_{};
   const maliput::api::RoadNetwork* road_network_{};
 };
 
