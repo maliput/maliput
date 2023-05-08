@@ -34,6 +34,7 @@
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/routing/lane_s_relation.h"
 #include "maliput/routing/route_phase.h"
 #include "maliput/routing/route_position_result.h"
 
@@ -134,6 +135,16 @@ class Route final {
   /// @throws maliput::common::assertion_error When @p road_position is not
   /// valid.
   RoutePositionResult FindRoutePositionBy(const maliput::api::RoadPosition& road_position) const {
+    MALIPUT_THROW_MESSAGE("Unimplemented");
+  }
+
+  /// Finds the relationship between @p lane_s_range_a and @p lane_s_range_b.
+  ///
+  /// @param lane_s_range_a A maliput::api::LaneSRange.
+  /// @param lane_s_range_b A maliput::api::LaneSRange.
+  /// @return The LaneSRangeRelation between @p lane_s_range_a and @p lane_s_range_b.
+  LaneSRangeRelation LaneSRangeRelationFor(const maliput::api::LaneSRange& lane_s_range_a,
+                                           const maliput::api::LaneSRange& lane_s_range_b) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
