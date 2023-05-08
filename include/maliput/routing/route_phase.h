@@ -28,7 +28,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <optional>
 #include <vector>
 
 #include "maliput/api/lane_data.h"
@@ -36,6 +35,7 @@
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/routing/route_position_result.h"
 
 namespace maliput {
 namespace routing {
@@ -54,10 +54,6 @@ namespace routing {
 ///
 /// (To be discussed): we can attach the start and / or end road_positions to
 /// the default_lane_s_range as a precondition.
-///
-/// (To be discussed) As a proxy for agents, the RoadNetwork pointer is provided
-/// to execute convenient queries for the agent, such as retrieving the rules
-/// that apply to specific corridors of this RoutePhase.
 ///
 /// Agents can localize themselves within a RoutePhase by using FindLaneSRangeBy()
 /// methods. This is useful when they are initially placing themselves on a path
@@ -120,48 +116,48 @@ class RoutePhase final {
   /// @return The default maliput::api::LaneSRange.
   const maliput::api::LaneSRange& DefaultLaneSRange() const { return default_lane_s_range_; }
 
-  /// @return The maliput::api::rules::RoadRulebook::QueryResults for the
-  /// default maliput::api::LaneSRange.
-  maliput::api::rules::RoadRulebook::QueryResults RulesForDefaultLaneSRange() const {
-    return road_network_->rulebook()->FindRules({default_lane_s_range_},
-                                                road_network_->road_geometry()->linear_tolerance());
-  }
-
   /// @return A vector of maliput::api::LaneSRanges with the adjacent
   /// maliput::api::LaneSRanges.
   std::vector<maliput::api::LaneSRange> AdjacentLaneSRanges() const { return adjacent_lane_s_ranges_; }
 
-  /// Finds the rules for @p lane_s_range.
+  /// Finds the RoutePhasePositionResult where @p inertial_position best fits.
   ///
-  /// The @p lane_s_range must intersect one of the default or adjacent
-  /// maliput::api::LaneSRanges.
-  /// (To be discussed): we probably want it to be included rather than intersected.
-  ///
-  /// @param lane_s_range The maliput::api::LaneSRange to consider.
-  /// @return The rules that apply to that @p lane_s_range.
-  /// @throws maliput::common::assertion_error When @p lane_s_range does not
-  /// intersect any of the default or adjacent maliput::api::LaneSRanges.
-  maliput::api::rules::RoadRulebook::QueryResults RulesForLaneSRange(
-      const maliput::api::LaneSRange& lane_s_range) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
-
-  /// Finds the maliput::api::LaneSRange where @p inertial_position falls into.
+  /// The fitting of the @p inertial_position into the complete Route will use
+  /// the same set of rules maliput::api::RoadGeometry::ToRoadPosition() uses to
+  /// find a matching maliput::api::RoadPositionResult within the maliput::api::RoadGeometry.
+  /// When the @p inertial_position does not fall into the volume defined by the
+  /// set of maliput:api::LaneSRanges each RoutePhase has, the returned
+  /// RoutePhase will be the one that minimizes the Euclidean distance to the
+  /// Route.
+  /// The mapping is done right on `r=0, h=0` over the maliput::api::Lanes, i.e.
+  /// at the centerline. This means that the returned `distance` and INERTIAL-
+  /// Frame position are evaluated there as well.
   ///
   /// @param inertial_position An INERTIAL-Frame position.
-  /// @return An optional with the maliput::api::LaneSRange when the RoutePhase
-  /// contains a LaneSRange which holds @p inertial_position.
-  std::optional<maliput::api::LaneSRange> FindLaneSRangeBy(
-      const maliput::api::InertialPosition& inertial_position) const {
+  /// @return A RoutePhasePositionResult.
+  RoutePhasePositionResult FindRoutePhasePositionBy(const maliput::api::InertialPosition& inertial_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
-  /// Finds the maliput::api::LaneSRange where @p road_position falls into.
+  /// Finds the RoutePhasePositionResult where @p road_position best fits.
   ///
-  /// @param road_position A LANE-Frame position.
-  /// @return An optional with the maliput::api::LaneSRange when the RoutePhase
-  /// contains a LaneSRange which holds @p road_position.
-  std::optional<maliput::api::LaneSRange> FindLaneSRangeBy(const maliput::api::RoadPosition& road_position) const {
+  /// The fitting of the @p road_position into the complete Route will use
+  /// the same set of rules maliput::api::RoadGeometry::ToRoadPosition() uses to
+  /// find a matching maliput::api::RoadPositionResult within the maliput::api::RoadGeometry.
+  /// When the @p road_position does not fall into the volume defined by the
+  /// set of maliput:api::LaneSRanges each RoutePhase has, the returned
+  /// RoutePhase will be the one that minimizes the Euclidean distance to the
+  /// Route.
+  /// The mapping is done right on `r=0, h=0` over the maliput::api::Lanes, i.e.
+  /// at the centerline. This means that the returned `distance` and INERTIAL-
+  /// Frame position are evaluated there as well.
+  ///
+  /// @param road_position A road position expressed into the LANE-Frame
+  /// position. It must be valid.
+  /// @return A RoutePhasePositionResult.
+  /// @throws maliput::common::assertion_error When @p road_position is not
+  /// valid.
+  RoutePhasePositionResult FindRoutePhasePositionBy(const maliput::api::RoadPosition& road_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 

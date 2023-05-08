@@ -28,7 +28,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <optional>
 #include <vector>
 
 #include "maliput/api/lane_data.h"
@@ -36,6 +35,7 @@
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/routing/route_phase.h"
+#include "maliput/routing/route_position_result.h"
 
 namespace maliput {
 namespace routing {
@@ -47,8 +47,8 @@ namespace routing {
 ///
 /// Agents are expected to use the Router to obtain a Route. Once in the Route,
 /// they can iterate through the RoutePhases or find a specific RoutePhase via
-/// an INERTIAL or LANE Frame coordinage the RoutePhase and start driving from
-/// there towards the end goal.
+/// an INERTIAL or LANE Frame coordinate and start driving from there towards
+/// the end goal.
 ///
 /// The first RoutePhase start road position identifies the beginning of the
 /// Route. The last RoutePhase end road position identifies the ending of the
@@ -96,19 +96,44 @@ class Route final {
   /// @return The end maliput::api::RoadPosition of this Route.
   const maliput::api::RoadPosition& EndRoadPosition() const { return route_phases_.back().EndRoadPosition(); }
 
-  /// Finds the RoutePhase where @p inertial_position falls into.
+  /// Finds the RoutePositionResult which @p inertial_position best fits.
+  ///
+  /// The fitting of the @p inertial_position into the complete Route will use
+  /// the same set of rules maliput::api::RoadGeometry::ToRoadPosition() uses to
+  /// find a matching maliput::api::RoadPositionResult within the maliput::api::RoadGeometry.
+  /// When the @p inertial_position does not fall into the volume defined by the
+  /// set of maliput:api::LaneSRanges each RoutePhase has, the returned
+  /// RoutePhase will be the one that minimizes the Euclidean distance to the
+  /// Route.
+  /// The mapping is done right on `r=0, h=0` over the maliput::api::Lanes, i.e.
+  /// at the centerline. This means that the returned `distance` and INERTIAL-
+  /// Frame are evaluated there as well.
   ///
   /// @param inertial_position An INERTIAL-Frame position.
-  /// @return An optional with the RoutePhase which contains @p inertial_position.
-  std::optional<RoutePhase> FindRoutePhaseBy(const maliput::api::InertialPosition& inertial_position) const {
+  /// @return A RoutePositionResult.
+  RoutePositionResult FindRoutePositionBy(const maliput::api::InertialPosition& inertial_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
-  /// Finds the RoutePhase where @p road_position falls into.
+  /// Finds the RoutePositionResult which @p road_position best fits.
   ///
-  /// @param road_position A LANE-Frame position.
-  /// @return An optional with the RoutePhase which contains @p road_position.
-  std::optional<RoutePhase> FindRoutePhaseBy(const maliput::api::RoadPosition& road_position) const {
+  /// The fitting of the @p road_position into the complete Route will use
+  /// the same set of rules maliput::api::RoadGeometry::ToRoadPosition() uses to
+  /// find a matching maliput::api::RoadPositionResult within the maliput::api::RoadGeometry.
+  /// When the @p road_position does not fall into the volume defined by the
+  /// set of maliput:api::LaneSRanges each RoutePhase has, the returned
+  /// RoutePhase will be the one that minimizes the Euclidean distance to the
+  /// Route.
+  /// The mapping is done right on `r=0, h=0` over the maliput::api::Lanes, i.e.
+  /// at the centerline. This means that the returned `distance` and INERTIAL-
+  /// Frame are evaluated there as well.
+  ///
+  /// @param road_position A road position expressed into the LANE-Frame
+  /// position. It must be valid.
+  /// @return A RoutePositionResult.
+  /// @throws maliput::common::assertion_error When @p road_position is not
+  /// valid.
+  RoutePositionResult FindRoutePositionBy(const maliput::api::RoadPosition& road_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
