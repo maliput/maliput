@@ -48,7 +48,7 @@ namespace routing {
 /// Implementations of this class may integrate different policies to compute
 /// Routes, such as length, maximum speed, driving allowance, etc. One or many
 /// implementations can be created per agent type with different customizations
-/// might yield different routes upon the same maliput::api::RoadGeometry and 
+/// might yield different routes upon the same maliput::api::RoadGeometry and
 /// set of arguments of your query. This is correct and expected behavior as the
 /// particular implementation details must rule the decisions that build a
 /// Route.
@@ -70,10 +70,9 @@ class Router {
   /// @throws maliput::common::assertion_error When @p start_road_position is not valid.
   /// @throws maliput::common::assertion_error When @p end_road_position is not valid.
   /// @throws maliput::common::assertion_error When @p routing_constraints is not valid.
-  std::optional<Route> ComputeRoute(
-      const maliput::api::RoadPosition& start_road_position,
-      const maliput::api::RoadPosition& end_road_position,
-      const RoutingConstraints& routing_constraints) const {
+  std::optional<Route> ComputeRoute(const maliput::api::RoadPosition& start_road_position,
+                                    const maliput::api::RoadPosition& end_road_position,
+                                    const RoutingConstraints& routing_constraints) const {
     return DoComputeRoute(start_road_position, end_road_position, routing_constraints);
   }
 
@@ -91,10 +90,9 @@ class Router {
   }
 
  private:
-  virtual std::optional<Route> DoComputeRoute(
-      const maliput::api::RoadPosition& start_road_position,
-      const maliput::api::RoadPosition& end_road_position,
-      const RoutingConstraints& routing_constraints) const = 0;
+  virtual std::optional<Route> DoComputeRoute(const maliput::api::RoadPosition& start_road_position,
+                                              const maliput::api::RoadPosition& end_road_position,
+                                              const RoutingConstraints& routing_constraints) const = 0;
 
   const maliput::api::RoadNetwork* road_network_{};
 };

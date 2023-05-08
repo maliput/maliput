@@ -48,7 +48,7 @@ struct RoutingConstraints {
 
 /// Validates the constraints of each parameter of @p routing_constraints.
 /// @param routing_constraints A RoutingConstraints to validate.
-/// @throw maliput::common::assertion_error When one of the preconditions of @p routing_constraints are violated.  
+/// @throw maliput::common::assertion_error When one of the preconditions of @p routing_constraints are violated.
 void ValidateRoutingConstraints(const RoutingConstraints& routing_constraints);
 
 }  // namespace routing

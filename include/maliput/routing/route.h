@@ -71,8 +71,8 @@ class Route final {
   /// RoutePhases that are not connected end to end, or contain locations not in
   /// @p road_network.
   /// @throws maliput::common::assertion_error When @p road_network is nullptr.
-  Route(const std::vector<RoutePhase>& route_phases, const maliput::api::RoadNetwork* road_network) :
-      route_phases_(route_phases), road_network_(road_network) {
+  Route(const std::vector<RoutePhase>& route_phases, const maliput::api::RoadNetwork* road_network)
+      : route_phases_(route_phases), road_network_(road_network) {
     MALIPUT_THROW_UNLESS(!route_phases_.empty());
     MALIPUT_THROW_UNLESS(road_network_ != nullptr);
     /// TODO(#453): Validate end to end connection of the RoutePhases.
@@ -91,21 +91,16 @@ class Route final {
   const RoutePhase& Get(int index) const { return route_phases_.at(index); }
 
   /// @return The start maliput::api::RoadPosition of this Route.
-  const maliput::api::RoadPosition& StartRoadPosition() const {
-    return route_phases_.front().StartRoadPosition();
-  }
+  const maliput::api::RoadPosition& StartRoadPosition() const { return route_phases_.front().StartRoadPosition(); }
 
   /// @return The end maliput::api::RoadPosition of this Route.
-  const maliput::api::RoadPosition& EndRoadPosition() const {
-    return route_phases_.back().EndRoadPosition();
-  }
+  const maliput::api::RoadPosition& EndRoadPosition() const { return route_phases_.back().EndRoadPosition(); }
 
   /// Finds the RoutePhase where @p inertial_position falls into.
   ///
   /// @param inertial_position An INERTIAL-Frame position.
   /// @return An optional with the RoutePhase which contains @p inertial_position.
-  std::optional<RoutePhase> FindRoutePhaseBy(
-      const maliput::api::InertialPosition& inertial_position) const {
+  std::optional<RoutePhase> FindRoutePhaseBy(const maliput::api::InertialPosition& inertial_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
@@ -113,8 +108,7 @@ class Route final {
   ///
   /// @param road_position A LANE-Frame position.
   /// @return An optional with the RoutePhase which contains @p road_position.
-  std::optional<RoutePhase> FindRoutePhaseBy(
-      const maliput::api::RoadPosition& road_position) const {
+  std::optional<RoutePhase> FindRoutePhaseBy(const maliput::api::RoadPosition& road_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 

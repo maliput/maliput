@@ -87,16 +87,14 @@ class RoutePhase final {
   /// @throws maliput::common::assertion_error When @p lane_s_range_tolerance is
   /// negative.
   /// @throws maliput::common::assertion_error When @p road_network is nullptr.
-  RoutePhase(
-      int index,
-      double lane_s_range_tolerance,
-      const maliput::api::RoadPosition& start_road_position,
-      const maliput::api::RoadPosition& end_road_position,
-      const maliput::api::LaneSRange& default_lane_s_range,
-      const std::vector<maliput::api::LaneSRange>& adjancent_lane_s_ranges,
-      const maliput::api::RoadNetwork* road_network) :
-        index_(index), lane_s_range_tolerance_(lane_s_range_tolerance),
-        default_lane_s_range_(default_lane_s_range), adjacent_lane_s_ranges_(adjancent_lane_s_ranges),
+  RoutePhase(int index, double lane_s_range_tolerance, const maliput::api::RoadPosition& start_road_position,
+             const maliput::api::RoadPosition& end_road_position, const maliput::api::LaneSRange& default_lane_s_range,
+             const std::vector<maliput::api::LaneSRange>& adjancent_lane_s_ranges,
+             const maliput::api::RoadNetwork* road_network)
+      : index_(index),
+        lane_s_range_tolerance_(lane_s_range_tolerance),
+        default_lane_s_range_(default_lane_s_range),
+        adjacent_lane_s_ranges_(adjancent_lane_s_ranges),
         road_network_(road_network) {
     MALIPUT_THROW_UNLESS(index_ >= 0);
     MALIPUT_THROW_UNLESS(lane_s_range_tolerance >= 0.);
@@ -125,8 +123,8 @@ class RoutePhase final {
   /// @return The maliput::api::rules::RoadRulebook::QueryResults for the
   /// default maliput::api::LaneSRange.
   maliput::api::rules::RoadRulebook::QueryResults RulesForDefaultLaneSRange() const {
-    return road_network_->rulebook()->FindRules(
-        {default_lane_s_range_}, road_network_->road_geometry()->linear_tolerance());
+    return road_network_->rulebook()->FindRules({default_lane_s_range_},
+                                                road_network_->road_geometry()->linear_tolerance());
   }
 
   /// @return A vector of maliput::api::LaneSRanges with the adjacent
@@ -163,8 +161,7 @@ class RoutePhase final {
   /// @param road_position A LANE-Frame position.
   /// @return An optional with the maliput::api::LaneSRange when the RoutePhase
   /// contains a LaneSRange which holds @p road_position.
-  std::optional<maliput::api::LaneSRange> FindLaneSRangeBy(
-      const maliput::api::RoadPosition& road_position) const {
+  std::optional<maliput::api::LaneSRange> FindLaneSRangeBy(const maliput::api::RoadPosition& road_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
