@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -34,13 +34,13 @@
 #include <optional>
 #include <string>
 
-#include <maliput/api/type_specific_identifier.h>
-#include <maliput/common/maliput_copyable.h>
-#include <maliput/math/bounding_region.h>
+#include "maliput/api/type_specific_identifier.h"
+#include "maliput/common/maliput_copyable.h"
+#include "maliput/math/bounding_region.h"
 
 namespace maliput {
-namespace object {
 namespace api {
+namespace object {
 
 /// Represents an object in a given @p Coordinate system.
 template <typename Coordinate>
@@ -80,6 +80,6 @@ class Object {
   const std::unique_ptr<maliput::math::BoundingRegion<Coordinate>> region_;
 };
 
-}  // namespace api
 }  // namespace object
+}  // namespace api
 }  // namespace maliput

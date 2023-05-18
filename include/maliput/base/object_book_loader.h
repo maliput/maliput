@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -32,11 +32,10 @@
 #include <memory>
 #include <string>
 
-#include <maliput/math/vector.h>
+#include "maliput/api/object/object_book.h"
+#include "maliput/math/vector.h"
 
-#include "maliput_object/api/object_book.h"
-
-/// @file loader.h
+/// @file object_book_loader.h
 /// @page maliput_object_yaml_spec Maliput Object YAML specification
 /// @author Agustin Alba Chicar
 /// @author Franco Cipollone
@@ -46,9 +45,9 @@
 /// @section maliput_object_yaml YAML format specification for objects
 ///
 /// The maliput::object API provides two functions to load a concrete
-/// maliput::object::api::ObjectBook implementation from a YAML description:
-/// - @ref maliput::object::loader::LoadFile() for YAML files.
-/// - @ref maliput::object::loader::Load() for string serialized YAML descriptions.
+/// maliput::api::object::ObjectBook implementation from a YAML description:
+/// - @ref maliput::LoadObjectBookFromFile() for YAML files.
+/// - @ref maliput::LoadObjectBook() for string serialized YAML descriptions.
 ///
 /// The only supported type of coordinate is maliput::math::Vector3 , meaning
 /// that concrete @ref maliput::math::BoundingRegion "BoundingRegions"
@@ -79,7 +78,7 @@
 /// <h4>`maliput_objects`</h4>
 ///
 /// `maliput_object` is a dictionary of objects. Every first level key
-/// identifies a new @ref maliput::object::api::Object :
+/// identifies a new @ref maliput::api::object::Object :
 ///
 /// @code{.yml}
 ///
@@ -137,25 +136,22 @@
 /// - `user_defined_prop_1` and `user_defined_prop_n` are examples of keys.
 /// - `my_value_1` and `my_value_n` are examples of values.
 namespace maliput {
-namespace object {
-namespace loader {
 
 /// Loads the @p input string as a `maliput_object` YAML document.
 /// See @ref loader.h documentation for further details.
 ///
 /// @param input A YAML document as a string that must contain a node as described in @ref loader.h
 /// @throws maliput::common::assertion_error When @p input fails to be parsed.
-/// @return A maliput::object::api::ObjectBook<maliput::math::Vector3> representing the @p input.
-std::unique_ptr<maliput::object::api::ObjectBook<maliput::math::Vector3>> Load(const std::string& input);
+/// @return A maliput::api::object::ObjectBook<maliput::math::Vector3> representing the @p input.
+std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> LoadObjectBook(const std::string& input);
 
 /// Loads the @p filename file as a `maliput_object` YAML document.
 /// See @ref loader.h documentation for further details.
 ///
 /// @param filename The path to the YAML document.
 /// @throws maliput::common::assertion_error When @p input fails to be parsed.
-/// @return A maliput::object::api::ObjectBook<maliput::math::Vector3> representing the contents of @p filename.
-std::unique_ptr<maliput::object::api::ObjectBook<maliput::math::Vector3>> LoadFile(const std::string& filename);
+/// @return A maliput::api::object::ObjectBook<maliput::math::Vector3> representing the contents of @p filename.
+std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> LoadObjectBookFromFile(
+    const std::string& filename);
 
-}  // namespace loader
-}  // namespace object
 }  // namespace maliput

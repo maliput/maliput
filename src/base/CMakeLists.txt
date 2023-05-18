@@ -7,11 +7,13 @@ set(BASE_SOURCES
   intersection_book.cc
   intersection_book_loader.cc
   manual_discrete_value_rule_state_provider.cc
+  manual_object_book.cc
   manual_phase_provider.cc
   manual_range_value_rule_state_provider.cc
   manual_right_of_way_rule_state_provider.cc
   manual_phase_ring_book.cc
   manual_rulebook.cc
+  object_book_loader.cc
   phased_discrete_rule_state_provider.cc
   phase_based_right_of_way_rule_state_provider.cc
   phase_ring_book_loader.cc

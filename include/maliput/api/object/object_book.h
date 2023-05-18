@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -34,18 +34,17 @@
 #include <optional>
 #include <unordered_map>
 
-#include <maliput/common/maliput_copyable.h>
-#include <maliput/math/bounding_region.h>
-#include <maliput/math/overlapping_type.h>
-
-#include "maliput_object/api/object.h"
+#include "maliput/api/object/object.h"
+#include "maliput/common/maliput_copyable.h"
+#include "maliput/math/bounding_region.h"
+#include "maliput/math/overlapping_type.h"
 
 namespace maliput {
-namespace object {
 namespace api {
+namespace object {
 
 /// Book for Objects in a given @p Coordinate system.
-/// TODO(#14): ObjectBook should be capable of holding all Objects regardless of the Coordinate that
+/// TODO(): ObjectBook should be capable of holding all Objects regardless of the Coordinate that
 ///            determines their spatial characteristics. When finding by regions it should be able of filtering by
 ///            coordinate type.
 template <typename Coordinate>
@@ -91,6 +90,6 @@ class ObjectBook {
       const maliput::math::OverlappingType& overlapping_type) const = 0;
 };
 
-}  // namespace api
 }  // namespace object
+}  // namespace api
 }  // namespace maliput

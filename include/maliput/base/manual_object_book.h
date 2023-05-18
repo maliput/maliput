@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -34,19 +34,17 @@
 #include <optional>
 #include <unordered_map>
 
-#include <maliput/common/maliput_copyable.h>
-#include <maliput/math/bounding_region.h>
-#include <maliput/math/overlapping_type.h>
-
-#include "maliput_object/api/object.h"
-#include "maliput_object/api/object_book.h"
+#include "maliput/api/object/object.h"
+#include "maliput/api/object/object_book.h"
+#include "maliput/common/maliput_copyable.h"
+#include "maliput/math/bounding_region.h"
+#include "maliput/math/overlapping_type.h"
 
 namespace maliput {
-namespace object {
 
 /// Implements api::ObjectBook for loading objects manually.
 template <typename Coordinate>
-class ManualObjectBook : public api::ObjectBook<Coordinate> {
+class ManualObjectBook : public api::object::ObjectBook<Coordinate> {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(ManualObjectBook)
   ManualObjectBook() = default;
@@ -54,24 +52,25 @@ class ManualObjectBook : public api::ObjectBook<Coordinate> {
 
   /// Adds an object to the book.
   /// @param object The object to be added.
-  void AddObject(std::unique_ptr<api::Object<Coordinate>> object);
+  void AddObject(std::unique_ptr<api::object::Object<Coordinate>> object);
 
   /// Removes an object from the book.
   /// @param object The object to be removed.
-  void RemoveObject(const typename api::Object<Coordinate>::Id& object);
+  void RemoveObject(const typename api::object::Object<Coordinate>::Id& object);
 
  private:
-  virtual std::unordered_map<typename api::Object<Coordinate>::Id, api::Object<Coordinate>*> do_objects()
-      const override;
-  virtual api::Object<Coordinate>* DoFindById(const typename api::Object<Coordinate>::Id& object_id) const override;
-  virtual std::vector<api::Object<Coordinate>*> DoFindByPredicate(
-      std::function<bool(const api::Object<Coordinate>*)> predicate) const override;
-  virtual std::vector<api::Object<Coordinate>*> DoFindOverlappingIn(
+  virtual std::unordered_map<typename api::object::Object<Coordinate>::Id, api::object::Object<Coordinate>*>
+  do_objects() const override;
+  virtual api::object::Object<Coordinate>* DoFindById(
+      const typename api::object::Object<Coordinate>::Id& object_id) const override;
+  virtual std::vector<api::object::Object<Coordinate>*> DoFindByPredicate(
+      std::function<bool(const api::object::Object<Coordinate>*)> predicate) const override;
+  virtual std::vector<api::object::Object<Coordinate>*> DoFindOverlappingIn(
       const maliput::math::BoundingRegion<Coordinate>& region,
       const maliput::math::OverlappingType& overlapping_type) const override;
 
-  std::unordered_map<typename api::Object<Coordinate>::Id, std::unique_ptr<api::Object<Coordinate>>> objects_;
+  std::unordered_map<typename api::object::Object<Coordinate>::Id, std::unique_ptr<api::object::Object<Coordinate>>>
+      objects_;
 };
 
-}  // namespace object
 }  // namespace maliput

@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,18 +27,18 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput_object/loader/loader.h"
+#include "maliput/base/object_book_loader.h"
 
 #include <map>
 #include <string>
 #include <utility>
 
-#include <maliput/common/maliput_throw.h>
-#include <maliput/math/bounding_box.h>
 #include <yaml-cpp/yaml.h>
 
-#include "maliput_object/api/object.h"
-#include "maliput_object/base/manual_object_book.h"
+#include "maliput/api/object/object.h"
+#include "maliput/base/manual_object_book.h"
+#include "maliput/common/maliput_throw.h"
+#include "maliput/math/bounding_box.h"
 
 namespace YAML {
 
@@ -114,17 +114,17 @@ std::map<std::string, std::string> ParseProperties(const YAML::Node& node) {
   return properties;
 }
 
-std::unique_ptr<api::Object<maliput::math::Vector3>> ParseObject(const std::string& id, const YAML::Node& node,
-                                                                 double tolerance) {
+std::unique_ptr<api::object::Object<maliput::math::Vector3>> ParseObject(const std::string& id, const YAML::Node& node,
+                                                                         double tolerance) {
   MALIPUT_THROW_UNLESS(node["bounding_region"].IsDefined());
   MALIPUT_THROW_UNLESS(node["properties"].IsDefined());
   std::unique_ptr<maliput::math::BoundingBox> bounding_box = ParseBoundingBox(node["bounding_region"], tolerance);
   const std::map<std::string, std::string> properties = ParseProperties(node["properties"]);
-  return std::make_unique<api::Object<maliput::math::Vector3>>(api::Object<maliput::math::Vector3>::Id(id), properties,
-                                                               std::move(bounding_box));
+  return std::make_unique<api::object::Object<maliput::math::Vector3>>(
+      api::object::Object<maliput::math::Vector3>::Id(id), properties, std::move(bounding_box));
 }
 
-std::unique_ptr<maliput::object::api::ObjectBook<maliput::math::Vector3>> BuildFrom(const YAML::Node& node) {
+std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> BuildFrom(const YAML::Node& node) {
   MALIPUT_THROW_UNLESS(node.IsMap());
   const YAML::Node& objects_node = node["maliput_objects"];
   MALIPUT_THROW_UNLESS(objects_node.IsDefined());
@@ -138,11 +138,11 @@ std::unique_ptr<maliput::object::api::ObjectBook<maliput::math::Vector3>> BuildF
 
 }  // namespace
 
-std::unique_ptr<maliput::object::api::ObjectBook<maliput::math::Vector3>> Load(const std::string& input) {
+std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> Load(const std::string& input) {
   return BuildFrom(YAML::Load(input));
 }
 
-std::unique_ptr<maliput::object::api::ObjectBook<maliput::math::Vector3>> LoadFile(const std::string& filename) {
+std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> LoadFile(const std::string& filename) {
   return BuildFrom(YAML::LoadFile(filename));
 }
 
