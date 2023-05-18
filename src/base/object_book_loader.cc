@@ -83,8 +83,6 @@ struct convert<maliput::math::RollPitchYaw> {
 }  // namespace YAML
 
 namespace maliput {
-namespace object {
-namespace loader {
 namespace {
 // TODO(#15): Decide to pass it as a construction argument or read it from the input file.
 constexpr const double kTolerance{1e-3};
@@ -138,14 +136,13 @@ std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> BuildF
 
 }  // namespace
 
-std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> Load(const std::string& input) {
+std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> LoadObjectBook(const std::string& input) {
   return BuildFrom(YAML::Load(input));
 }
 
-std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> LoadFile(const std::string& filename) {
+std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> LoadObjectBookFromFile(
+    const std::string& filename) {
   return BuildFrom(YAML::LoadFile(filename));
 }
 
-}  // namespace loader
-}  // namespace object
 }  // namespace maliput

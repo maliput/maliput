@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput_object/api/object_book.h"
+#include "maliput/api/object/object_book.h"
 
 #include <map>
 #include <memory>
@@ -37,33 +37,35 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <maliput/math/bounding_region.h>
-#include <maliput/math/vector.h>
-#include <maliput/test_utilities/mock_math.h>
 
-#include "maliput_object/api/object.h"
-#include "maliput_object/test_utilities/mock.h"
+#include "maliput/api/object/object.h"
+#include "maliput/math/bounding_region.h"
+#include "maliput/math/vector.h"
+#include "maliput/test_utilities/mock_math.h"
+#include "maliput/test_utilities/mock_object.h"
 
 namespace maliput {
-namespace object {
 namespace api {
+namespace object {
 namespace test {
 namespace {
 
 using maliput::math::Vector3;
 
 TEST(ObjectBookTest, API) {
-  test_utilities::MockObjectBook<Vector3> dut;
-  const api::Object<Vector3>::Id kId{"id"};
+  test::MockObjectBook<Vector3> dut;
+  const api::object::Object<Vector3>::Id kId{"id"};
   const maliput::math::test::MockBoundingRegion kBoundingRegion{};
   const maliput::math::OverlappingType kOverlappingType{maliput::math::OverlappingType::kContained |
                                                         maliput::math::OverlappingType::kIntersected};
-  const std::unordered_map<api::Object<Vector3>::Id, api::Object<Vector3>*> kExpectedObjects{};
-  std::unique_ptr<api::Object<Vector3>> kExpectedObjectById = std::make_unique<api::Object<Vector3>>(
+  const std::unordered_map<api::object::Object<Vector3>::Id, api::object::Object<Vector3>*> kExpectedObjects{};
+  std::unique_ptr<api::object::Object<Vector3>> kExpectedObjectById = std::make_unique<api::object::Object<Vector3>>(
       kId, std::map<std::string, std::string>{}, std::make_unique<maliput::math::test::MockBoundingRegion>());
-  const std::vector<api::Object<Vector3>*> kExpectedObjectsByPredicate{kExpectedObjectById.get()};
-  const std::vector<api::Object<Vector3>*> kExpectedObjectsByOverlapping{kExpectedObjectsByPredicate};
-  const std::function<bool(const api::Object<Vector3>*)> kPredicate = [](const api::Object<Vector3>*) { return true; };
+  const std::vector<api::object::Object<Vector3>*> kExpectedObjectsByPredicate{kExpectedObjectById.get()};
+  const std::vector<api::object::Object<Vector3>*> kExpectedObjectsByOverlapping{kExpectedObjectsByPredicate};
+  const std::function<bool(const api::object::Object<Vector3>*)> kPredicate = [](const api::object::Object<Vector3>*) {
+    return true;
+  };
   EXPECT_CALL(dut, do_objects()).Times(1).WillOnce(::testing::Return(kExpectedObjects));
   EXPECT_CALL(dut, DoFindById(kId)).Times(1).WillOnce(::testing::Return(kExpectedObjectById.get()));
   EXPECT_CALL(dut, DoFindByPredicate(::testing::_)).Times(1).WillOnce(::testing::Return(kExpectedObjectsByPredicate));
@@ -78,6 +80,6 @@ TEST(ObjectBookTest, API) {
 
 }  // namespace
 }  // namespace test
-}  // namespace api
 }  // namespace object
+}  // namespace api
 }  // namespace maliput

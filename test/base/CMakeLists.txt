@@ -1,12 +1,14 @@
 ament_add_gtest(base_rule_registry_test rule_registry_test.cc)
 ament_add_gtest(intersection_test intersection_test.cc)
 ament_add_gtest(intersection_book_test intersection_book_test.cc)
+ament_add_gmock(manual_object_book_test manual_object_book_test.cc)
 ament_add_gtest(manual_phase_provider_test manual_phase_provider_test.cc)
 ament_add_gtest(manual_discrete_value_rule_state_provider_test manual_discrete_value_rule_state_provider_test.cc)
 ament_add_gtest(manual_range_value_rule_state_provider_test manual_range_value_rule_state_provider_test.cc)
 ament_add_gtest(manual_right_of_way_rule_state_provider_test manual_right_of_way_rule_state_provider_test)
 ament_add_gtest(manual_phase_ring_book_test manual_phase_ring_book_test.cc)
 ament_add_gtest(manual_rulebook_test manual_rulebook_test.cc)
+ament_add_gtest(object_book_loader_test object_book_loader_test.cc)
 ament_add_gtest(phased_discrete_rule_state_provider_test phased_discrete_rule_state_provider_test.cc)
 ament_add_gtest(phase_based_right_of_way_rule_state_provider_test phase_based_right_of_way_rule_state_provider_test.cc)
 ament_add_gtest(phase_ring_book_loader_test phase_ring_book_loader_test.cc)
@@ -28,6 +30,8 @@ macro(add_dependencies_to_test target)
       target_link_libraries(${target}
           maliput::api
           maliput::base
+          maliput::math
+          maliput::test_utilities
           fmt::fmt
           test_utilities
       )
@@ -38,12 +42,14 @@ endmacro()
 add_dependencies_to_test(base_rule_registry_test)
 add_dependencies_to_test(intersection_test)
 add_dependencies_to_test(intersection_book_test)
-add_dependencies_to_test(manual_phase_provider_test)
 add_dependencies_to_test(manual_discrete_value_rule_state_provider_test)
+add_dependencies_to_test(manual_object_book_test)
+add_dependencies_to_test(manual_phase_provider_test)
+add_dependencies_to_test(manual_phase_ring_book_test)
 add_dependencies_to_test(manual_range_value_rule_state_provider_test)
 add_dependencies_to_test(manual_right_of_way_rule_state_provider_test)
-add_dependencies_to_test(manual_phase_ring_book_test)
 add_dependencies_to_test(manual_rulebook_test)
+add_dependencies_to_test(object_book_loader_test)
 add_dependencies_to_test(phased_discrete_rule_state_provider_test)
 add_dependencies_to_test(phase_based_right_of_way_rule_state_provider_test)
 add_dependencies_to_test(phase_ring_book_loader_test)

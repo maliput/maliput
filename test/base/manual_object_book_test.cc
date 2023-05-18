@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput_object/base/manual_object_book.h"
+#include "maliput/base/manual_object_book.h"
 
 #include <map>
 #include <memory>
@@ -37,15 +37,14 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <maliput/math/bounding_region.h>
-#include <maliput/math/vector.h>
-#include <maliput/test_utilities/mock_math.h>
 
-#include "maliput_object/api/object.h"
-#include "maliput_object/api/object_book.h"
+#include "maliput/api/object/object.h"
+#include "maliput/api/object/object_book.h"
+#include "maliput/math/bounding_region.h"
+#include "maliput/math/vector.h"
+#include "maliput/test_utilities/mock_math.h"
 
 namespace maliput {
-namespace object {
 namespace test {
 namespace {
 
@@ -59,25 +58,25 @@ class ManualObjectBookTest : public ::testing::Test {
     dut_.AddObject(std::move(kObjectB));
     EXPECT_EQ(2, static_cast<int>(dut_.objects().size()));
   }
-  const api::Object<Vector3>::Id kIdA{"id_a"};
-  const api::Object<Vector3>::Id kIdB{"id_b"};
+  const api::object::Object<Vector3>::Id kIdA{"id_a"};
+  const api::object::Object<Vector3>::Id kIdB{"id_b"};
   const std::string kPropertyA{"PropertyA"};
   const std::string kPropertyB{"PropertyB"};
   // Object A.
   std::unique_ptr<maliput::math::test::MockBoundingRegion> kRegionA =
       std::make_unique<maliput::math::test::MockBoundingRegion>();
   const maliput::math::test::MockBoundingRegion* kRegionAPtr{kRegionA.get()};
-  std::unique_ptr<api::Object<Vector3>> kObjectA = std::make_unique<api::Object<Vector3>>(
+  std::unique_ptr<api::object::Object<Vector3>> kObjectA = std::make_unique<api::object::Object<Vector3>>(
       kIdA, std::map<std::string, std::string>{{kPropertyA, "DescriptionA"}}, std::move(kRegionA));
-  const api::Object<Vector3>* kObjectAPtr{kObjectA.get()};
+  const api::object::Object<Vector3>* kObjectAPtr{kObjectA.get()};
 
   // Object B.
   std::unique_ptr<maliput::math::test::MockBoundingRegion> kRegionB =
       std::make_unique<maliput::math::test::MockBoundingRegion>();
   const maliput::math::test::MockBoundingRegion* kRegionBPtr{kRegionB.get()};
-  std::unique_ptr<api::Object<Vector3>> kObjectB = std::make_unique<api::Object<Vector3>>(
+  std::unique_ptr<api::object::Object<Vector3>> kObjectB = std::make_unique<api::object::Object<Vector3>>(
       kIdB, std::map<std::string, std::string>{{kPropertyB, "DescriptionB"}}, std::move(kRegionB));
-  const api::Object<Vector3>* kObjectBPtr{kObjectB.get()};
+  const api::object::Object<Vector3>* kObjectBPtr{kObjectB.get()};
 
   ManualObjectBook<Vector3> dut_;
 };
@@ -87,7 +86,7 @@ TEST_F(ManualObjectBookTest, ManualObjectBook) {
   ASSERT_EQ(kObjectAPtr->id(), dut_.FindById(kIdA)->id());
   // Find by predicate.
   const auto objects_by_predicate = dut_.FindByPredicate(
-      [this](const api::Object<Vector3>* object) { return object->get_property(kPropertyB).has_value(); });
+      [this](const api::object::Object<Vector3>* object) { return object->get_property(kPropertyB).has_value(); });
   ASSERT_EQ(1, static_cast<int>(objects_by_predicate.size()));
   EXPECT_EQ(kObjectBPtr->id(), objects_by_predicate.front()->id());
 
@@ -108,5 +107,4 @@ TEST_F(ManualObjectBookTest, ManualObjectBook) {
 
 }  // namespace
 }  // namespace test
-}  // namespace object
 }  // namespace maliput

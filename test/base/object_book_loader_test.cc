@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput_object/loader/loader.h"
+#include "maliput/base/object_book_loader.h"
 
 #include <fstream>
 #include <stdexcept>
@@ -37,31 +37,29 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <gtest/gtest.h>
-#include <maliput/common/assertion_error.h>
-#include <maliput/math/bounding_box.h>
-#include <maliput/math/bounding_region.h>
-#include <maliput/math/matrix.h>
-#include <maliput/math/roll_pitch_yaw.h>
-#include <maliput/math/vector.h>
 
+#include "maliput/api/object/object.h"
+#include "maliput/api/object/object_book.h"
+#include "maliput/common/assertion_error.h"
 #include "maliput/common/filesystem.h"
-#include "maliput_object/api/object.h"
-#include "maliput_object/api/object_book.h"
+#include "maliput/math/bounding_box.h"
+#include "maliput/math/bounding_region.h"
+#include "maliput/math/matrix.h"
+#include "maliput/math/roll_pitch_yaw.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
-namespace object {
-namespace loader {
 namespace test {
 namespace {
 
+using maliput::api::object::Object;
 using maliput::math::BoundingBox;
 using maliput::math::BoundingRegion;
-using maliput::object::api::Object;
 
 // @{ Asserts that no file or no string with YAML content throws.
-TEST(LoadTest, EmptyString) { ASSERT_THROW(Load(""), std::runtime_error); }
+TEST(LoadTest, EmptyString) { ASSERT_THROW(LoadObjectBook(""), std::runtime_error); }
 
-TEST(LoadFileTest, EmptyString) { ASSERT_THROW(LoadFile(""), std::runtime_error); }
+TEST(LoadFileTest, EmptyString) { ASSERT_THROW(LoadObjectBookFromFile(""), std::runtime_error); }
 // @}
 
 // Test structure to verify schema errors.
@@ -208,7 +206,7 @@ maliput_objects:
 class SchemaParserCheckTest : public ::testing::TestWithParam<SchemaParserTestCase> {};
 
 TEST_P(SchemaParserCheckTest, AssertsThatItThrowsWhenSchemaIsIncorrect) {
-  ASSERT_THROW(Load(GetParam().yaml_under_test), maliput::common::assertion_error);
+  ASSERT_THROW(LoadObjectBook(GetParam().yaml_under_test), maliput::common::assertion_error);
 }
 
 INSTANTIATE_TEST_CASE_P(SchemaParserCheckTestGroup, SchemaParserCheckTest,
@@ -247,7 +245,7 @@ maliput_objects:
         kObjectId, kX, kY, kZ, kRoll, kPitch, kYaw, kLength, kDepth, kHeight, kKey, kValue);
   }
 
-  static void TestObjectBook(const api::ObjectBook<maliput::math::Vector3>* object_book) {
+  static void TestObjectBook(const api::object::ObjectBook<maliput::math::Vector3>* object_book) {
     ASSERT_NE(nullptr, object_book);
     ASSERT_EQ(1u, object_book->objects().size());
 
@@ -284,7 +282,8 @@ maliput_objects:
 };
 
 TEST(LoadFromStringTest, OneValidObject) {
-  std::unique_ptr<api::ObjectBook<maliput::math::Vector3>> object_book = Load(ObjectTestFeatures::GenerateYamlString());
+  std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> object_book =
+      LoadObjectBook(ObjectTestFeatures::GenerateYamlString());
   ObjectTestFeatures::TestObjectBook(object_book.get());
 }
 
@@ -317,12 +316,11 @@ class LoadFromFileTest : public ::testing::Test {
 };
 
 TEST_F(LoadFromFileTest, EvaluateLoadFromFile) {
-  std::unique_ptr<api::ObjectBook<maliput::math::Vector3>> object_book = LoadFile(filepath_);
+  std::unique_ptr<maliput::api::object::ObjectBook<maliput::math::Vector3>> object_book =
+      LoadObjectBookFromFile(filepath_);
   ObjectTestFeatures::TestObjectBook(object_book.get());
 }
 
 }  // namespace
 }  // namespace test
-}  // namespace loader
-}  // namespace object
 }  // namespace maliput

@@ -1,7 +1,7 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven Planet.
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,20 +27,21 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput_object/api/object.h"
+#include "maliput/api/object/object.h"
 
 #include <memory>
 #include <optional>
 #include <string>
 
 #include <gtest/gtest.h>
-#include <maliput/math/bounding_region.h>
-#include <maliput/math/vector.h>
-#include <maliput/test_utilities/mock_math.h>
+
+#include "maliput/math/bounding_region.h"
+#include "maliput/math/vector.h"
+#include "maliput/test_utilities/mock_math.h"
 
 namespace maliput {
-namespace object {
 namespace api {
+namespace object {
 namespace test {
 namespace {
 
@@ -60,7 +61,7 @@ class ObjectTest : public ::testing::Test {
 TEST_F(ObjectTest, Constructor) { EXPECT_NO_THROW(Object<Vector3>(kId, {}, std::move(region_))); }
 
 TEST_F(ObjectTest, API) {
-  const api::Object<Vector3> dut{kId, kExpectedProperties, std::move(region_)};
+  const api::object::Object<Vector3> dut{kId, kExpectedProperties, std::move(region_)};
   ASSERT_EQ(kId, dut.id());
 
   EXPECT_CALL(*region_ptr_, DoOverlaps(::testing::_)).Times(1).WillOnce(::testing::Return(kExpectedOverlapping));
@@ -77,6 +78,6 @@ TEST_F(ObjectTest, API) {
 
 }  // namespace
 }  // namespace test
-}  // namespace api
 }  // namespace object
+}  // namespace api
 }  // namespace maliput

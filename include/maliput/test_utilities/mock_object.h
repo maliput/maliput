@@ -33,47 +33,35 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <maliput/api/lane.h>
-#include <maliput/api/road_network.h>
-#include <maliput/math/bounding_region.h>
-#include <maliput/math/overlapping_type.h>
-#include <maliput/math/vector.h>
 
-#include "maliput_object/api/object.h"
-#include "maliput_object/api/object_book.h"
-#include "maliput_object/api/object_query.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/object/object.h"
+#include "maliput/api/object/object_book.h"
+#include "maliput/api/road_network.h"
+#include "maliput/math/bounding_region.h"
+#include "maliput/math/overlapping_type.h"
+#include "maliput/math/vector.h"
 
 namespace maliput {
+namespace api {
 namespace object {
-namespace test_utilities {
+namespace test {
 
 template <typename Coordinate>
-class MockObjectBook : public api::ObjectBook<Coordinate> {
+class MockObjectBook : public ObjectBook<Coordinate> {
  public:
   MockObjectBook() = default;
-  MOCK_METHOD((std::unordered_map<typename api::Object<Coordinate>::Id, api::Object<Coordinate>*>), do_objects, (),
+  MOCK_METHOD((std::unordered_map<typename Object<Coordinate>::Id, Object<Coordinate>*>), do_objects, (),
               (const, override));
-  MOCK_METHOD((api::Object<Coordinate>*), DoFindById, (const typename api::Object<Coordinate>::Id&), (const, override));
-  MOCK_METHOD((std::vector<api::Object<Coordinate>*>), DoFindByPredicate,
-              (std::function<bool(const api::Object<Coordinate>*)>), (const, override));
-  MOCK_METHOD((std::vector<api::Object<Coordinate>*>), DoFindOverlappingIn,
+  MOCK_METHOD((Object<Coordinate>*), DoFindById, (const typename Object<Coordinate>::Id&), (const, override));
+  MOCK_METHOD((std::vector<Object<Coordinate>*>), DoFindByPredicate, (std::function<bool(const Object<Coordinate>*)>),
+              (const, override));
+  MOCK_METHOD((std::vector<Object<Coordinate>*>), DoFindOverlappingIn,
               (const maliput::math::BoundingRegion<Coordinate>&, const maliput::math::OverlappingType&),
               (const, override));
 };
 
-class MockObjectQuery : public api::ObjectQuery {
- public:
-  MOCK_METHOD((std::vector<const maliput::api::Lane*>), DoFindOverlappingLanesIn,
-              (const api::Object<maliput::math::Vector3>*), (const, override));
-  MOCK_METHOD((std::vector<const maliput::api::Lane*>), DoFindOverlappingLanesIn,
-              (const api::Object<maliput::math::Vector3>*, const maliput::math::OverlappingType&), (const, override));
-  MOCK_METHOD((std::optional<const maliput::api::LaneSRoute>), DoRoute,
-              (const api::Object<maliput::math::Vector3>*, const api::Object<maliput::math::Vector3>*),
-              (const, override));
-  MOCK_METHOD((const api::ObjectBook<maliput::math::Vector3>*), do_object_book, (), (const, override));
-  MOCK_METHOD((const maliput::api::RoadNetwork*), do_road_network, (), (const, override));
-};
-
-}  // namespace test_utilities
+}  // namespace test
 }  // namespace object
+}  // namespace api
 }  // namespace maliput
