@@ -29,26 +29,21 @@
 #pragma once
 
 #include <optional>
-#include <string>
-#include <unordered_map>
 
 namespace maliput {
 namespace routing {
 
-/// Holds the constraints that can be applied to the Router when computing a
-/// Route.
+/// Holds the constraints that can be applied to the Router when computing a Route.
 struct RoutingConstraints {
-  /// Allows maliput::api::Lane switchs within a RoutePhase when computing the
-  /// Route.
+  /// Allows api::Lane switches within a RoutePhase when computing the Route.
   bool allow_lane_switch{true};
-  /// Defines the maximum cost cost of a RoutePhase. When set, it must be
-  /// positive.
+  /// Defines the maximum cost of a RoutePhase. When set, it must be positive.
   std::optional<double> max_routing_phase_cost{};
 };
 
 /// Validates the constraints of each parameter of @p routing_constraints.
 /// @param routing_constraints A RoutingConstraints to validate.
-/// @throw maliput::common::assertion_error When one of the preconditions of @p routing_constraints are violated.
+/// @throw common::assertion_error When one of the preconditions of @p routing_constraints are violated.
 void ValidateRoutingConstraints(const RoutingConstraints& routing_constraints);
 
 }  // namespace routing

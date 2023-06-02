@@ -32,7 +32,7 @@ namespace maliput {
 namespace routing {
 
 /// Defines the possible relationships the routing API can interpret between
-/// two maliput::api::LaneSRanges within a Route.
+/// two api::LaneSRanges within a Route.
 /// Relations described in this enum must be mutually exclusive. The following
 /// ASCII art helps to understand the relative relations described below.
 ///
@@ -46,36 +46,36 @@ namespace routing {
 /// </pre>
 ///
 /// In the diagram above:
-/// - `x` indicates the beginning or the end of a maliput::api::LaneSRange.
-/// - `>` indicates the direction of travel of the maliput::api::LaneSRange.
-/// - The letters name the maliput::api::LaneSRanges in the Route.
+/// - `x` indicates the beginning or the end of a api::LaneSRange.
+/// - `>` indicates the direction of travel of the api::LaneSRange.
+/// - The letters name the api::LaneSRanges in the Route.
 ///
 /// Thus,
-/// - `A` is LaneSRangeRelation::kAdjacentToTheLeft of `B`.
-/// - `B` is LaneSRangeRelation::kAdjacentToTheRight of `A`.
-/// - `A` is LaneSRangeRelation::kToTheLeft of `D`.
-/// - `D` is LaneSRangeRelation::kToRightLeft of `A`.
+/// - `A` is LaneSRangeRelation::kAdjacentLeft of `B`.
+/// - `B` is LaneSRangeRelation::kAdjacentRight of `A`.
+/// - `A` is LaneSRangeRelation::kLeft of `D`.
+/// - `D` is LaneSRangeRelation::kRight of `A`.
 /// - `F` is LaneSRangeRelation::kSucceedingStraight of `C`.
-/// - `E` and `F` are LaneSRangeRelation::kSucceedingToTheLeft of `D`.
-/// - `F` and `G` are LaneSRangeRelation::kSucceedingToTheRight of `B`.
+/// - `E` and `F` are LaneSRangeRelation::kSucceedingLeft of `D`.
+/// - `F` and `G` are LaneSRangeRelation::kSucceedingRight of `B`.
 /// - `E` is LaneSRangeRelation::kPreceedingStraight of `H`.
-/// - `E` is LaneSRangeRelation::kPreceedingToTheLeft of `I`.
-/// - `F` and `G` are LaneSRangeRelation::kPreceedingToTheRight of `H`.
+/// - `E` is LaneSRangeRelation::kPreceedingLeft of `I`.
+/// - `F` and `G` are LaneSRangeRelation::kPreceedingRight of `H`.
 /// - `A` is LaneSRangeRelation::kUnrelated to `H`.
 ///
-/// LaneSRangeRelation::kUnknown represents the case when any of the ranges is
-/// not found in the Route.
+/// LaneSRangeRelation::kUnknown represents the case when any of the
+/// api::LaneSRanges is not found in the Route.
 enum class LaneSRangeRelation {
-  kAdjacentToTheLeft,
-  kAdjacentToTheRight,
-  kToTheLeft,
-  kToRightLeft,
+  kAdjacentLeft,
+  kAdjacentRight,
+  kLeft,
+  kRight,
   kSucceedingStraight,
-  kSucceedingToTheLeft,
-  kSucceedingToTheRight,
+  kSucceedingLeft,
+  kSucceedingRight,
   kPreceedingStraight,
-  kPreceedingToTheLeft,
-  kPreceedingToTheRight,
+  kPreceedingLeft,
+  kPreceedingRight,
   kUnrelated,
   kUnknown,
 };

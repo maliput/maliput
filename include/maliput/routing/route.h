@@ -34,16 +34,16 @@
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
-#include "maliput/routing/lane_s_relation.h"
+#include "maliput/routing/lane_s_range_relation.h"
 #include "maliput/routing/route_phase.h"
 #include "maliput/routing/route_position_result.h"
 
 namespace maliput {
 namespace routing {
 
-/// Describes the sequence of paths to go from one RoadPosition to another.
+/// Describes the sequence of paths that go from one RoadPosition to another.
 /// It is sequenced by RoutePhases which contain default and adjacent
-/// maliput::api::LaneSRanges which an agent can use to travel from the start to
+/// api::LaneSRanges which an agent can use to travel from the start to
 /// the end road position.
 ///
 /// Agents are expected to use the Router to obtain a Route. Once in the Route,
@@ -54,7 +54,7 @@ namespace routing {
 /// The first RoutePhase start road position identifies the beginning of the
 /// Route. The last RoutePhase end road position identifies the ending of the
 /// Route. The sequence of RoutePhases form a continuous route where the end of
-/// one RoutePhase exactly matches the begining of the next RoutePhase in the
+/// one RoutePhase exactly matches the beginning of the next RoutePhase in the
 /// sequence.
 class Route final {
  public:
@@ -65,23 +65,21 @@ class Route final {
   ///
   /// @param route_phases The sequence of RoutePhases. It must not be empty.
   /// RoutePhases must be connected end to end.
-  /// @param road_network The maliput::api::RoadNetwork pointer. It must not be
+  /// @param road_network The api::RoadNetwork pointer. It must not be
   /// nullptr. The lifetime of this pointer must exceed that of this object.
-  /// @throws maliput::common::assertion_error When @p route_phases is empty.
-  /// @throws maliput::common::assertion_error When @p route_phases contains
-  /// RoutePhases that are not connected end to end, or contain locations not in
-  /// @p road_network.
-  /// @throws maliput::common::assertion_error When @p road_network is nullptr.
-  Route(const std::vector<RoutePhase>& route_phases, const maliput::api::RoadNetwork* road_network)
+  /// @throws common::assertion_error When @p route_phases is empty.
+  /// @throws common::assertion_error When @p route_phases is not connected end
+  /// to end.
+  /// @throws common::assertion_error When @p road_network is nullptr.
+  Route(const std::vector<RoutePhase>& route_phases, const api::RoadNetwork* road_network)
       : route_phases_(route_phases), road_network_(road_network) {
     MALIPUT_THROW_UNLESS(!route_phases_.empty());
     MALIPUT_THROW_UNLESS(road_network_ != nullptr);
     /// TODO(#453): Validate end to end connection of the RoutePhases.
-    /// TODO(#453): Validate RoutePhases are in the RoadNetwork.
   }
 
   /// @return The number of RoutePhases.
-  int Size() const { return static_cast<int>(route_phases_.size()); }
+  int size() const { return static_cast<int>(route_phases_.size()); }
 
   /// Indexes the RoutePhases.
   ///
@@ -91,66 +89,71 @@ class Route final {
   /// @throws std::out_of_range When @p index is negative or >= `size()`.
   const RoutePhase& Get(int index) const { return route_phases_.at(index); }
 
-  /// @return The start maliput::api::RoadPosition of this Route.
-  const maliput::api::RoadPosition& StartRoadPosition() const { return route_phases_.front().StartRoadPosition(); }
+  /// @return The start of this Route.
+  const api::RoadPosition& start_road_position() const {
+    return route_phases_.front().start_road_position();
+  }
 
-  /// @return The end maliput::api::RoadPosition of this Route.
-  const maliput::api::RoadPosition& EndRoadPosition() const { return route_phases_.back().EndRoadPosition(); }
+  /// @return The end of this Route.
+  const api::RoadPosition& end_road_position() const {
+    return route_phases_.back().end_road_position();
+  }
 
   /// Finds the RoutePositionResult which @p inertial_position best fits.
   ///
   /// The fitting of the @p inertial_position into the complete Route will use
-  /// the same set of rules maliput::api::RoadGeometry::ToRoadPosition() uses to
-  /// find a matching maliput::api::RoadPositionResult within the maliput::api::RoadGeometry.
+  /// the same set of rules api::RoadGeometry::ToRoadPosition() uses to
+  /// find a matching api::RoadPositionResult within the api::RoadGeometry.
   /// When the @p inertial_position does not fall into the volume defined by the
-  /// set of maliput:api::LaneSRanges each RoutePhase has, the returned
+  /// set of api::LaneSRanges each RoutePhase has, the returned
   /// RoutePhase will be the one that minimizes the Euclidean distance to the
   /// Route.
-  /// The mapping is done right on `r=0, h=0` over the maliput::api::Lanes, i.e.
+  /// The mapping is done right on `r=0, h=0` over the api::Lanes, i.e.
   /// at the centerline. This means that the returned `distance` and INERTIAL-
   /// Frame are evaluated there as well.
   ///
-  /// @param inertial_position An INERTIAL-Frame position.
+  /// @param inertial_position The INERTIAL-Frame position.
   /// @return A RoutePositionResult.
-  RoutePositionResult FindRoutePositionBy(const maliput::api::InertialPosition& inertial_position) const {
+  RoutePositionResult FindRoutePositionBy(const api::InertialPosition& inertial_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
   /// Finds the RoutePositionResult which @p road_position best fits.
   ///
   /// The fitting of the @p road_position into the complete Route will use
-  /// the same set of rules maliput::api::RoadGeometry::ToRoadPosition() uses to
-  /// find a matching maliput::api::RoadPositionResult within the maliput::api::RoadGeometry.
+  /// the same set of rules api::RoadGeometry::ToRoadPosition() uses to
+  /// find a matching api::RoadPositionResult within the api::RoadGeometry.
   /// When the @p road_position does not fall into the volume defined by the
-  /// set of maliput:api::LaneSRanges each RoutePhase has, the returned
+  /// set of api::LaneSRanges each RoutePhase has, the returned
   /// RoutePhase will be the one that minimizes the Euclidean distance to the
   /// Route.
-  /// The mapping is done right on `r=0, h=0` over the maliput::api::Lanes, i.e.
+  /// The mapping is done right on `r=0, h=0` over the api::Lanes, i.e.
   /// at the centerline. This means that the returned `distance` and INERTIAL-
   /// Frame are evaluated there as well.
   ///
-  /// @param road_position A road position expressed into the LANE-Frame
-  /// position. It must be valid.
+  /// @param road_position The road position. It must be valid.
   /// @return A RoutePositionResult.
-  /// @throws maliput::common::assertion_error When @p road_position is not
+  /// @throws common::assertion_error When @p road_position is not
   /// valid.
-  RoutePositionResult FindRoutePositionBy(const maliput::api::RoadPosition& road_position) const {
+  RoutePositionResult FindRoutePositionBy(const api::RoadPosition& road_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
-  /// Finds the relationship between @p lane_s_range_a and @p lane_s_range_b.
+  /// Finds the relation between @p lane_s_range_b with respect to
+  /// @p lane_s_range_a.
   ///
-  /// @param lane_s_range_a A maliput::api::LaneSRange.
-  /// @param lane_s_range_b A maliput::api::LaneSRange.
-  /// @return The LaneSRangeRelation between @p lane_s_range_a and @p lane_s_range_b.
-  LaneSRangeRelation LaneSRangeRelationFor(const maliput::api::LaneSRange& lane_s_range_a,
-                                           const maliput::api::LaneSRange& lane_s_range_b) const {
+  /// @param lane_s_range_a An api::LaneSRange.
+  /// @param lane_s_range_b An api::LaneSRange.
+  /// @return The LaneSRangeRelation between @p lane_s_range_b with respect to
+  /// @p lane_s_range_a.
+  LaneSRangeRelation LaneSRangeRelationFor(const api::LaneSRange& lane_s_range_a,
+                                           const api::LaneSRange& lane_s_range_b) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
  private:
-  std::vector<RoutePhase> route_phases_{};
-  const maliput::api::RoadNetwork* road_network_{};
+  std::vector<RoutePhase> route_phases_;
+  const api::RoadNetwork* road_network_{};
 };
 
 }  // namespace routing
