@@ -40,14 +40,22 @@
 namespace maliput {
 namespace routing {
 
-/// Manages a phase in a complete Route, towards its completion of a Route.
+/// Manages a phase in a Route, towards the its end.
 ///
-/// It is composed of a default api::LaneSRange which is the corridor
-/// the agent traversing the Route should follow. Alternative parallel adjacent
-/// api.:LaneSRanges might be taken when provided.
+/// It is composed of a set of api::LaneSRanges. All these api::LaneSRanges
+/// are adjacent one to the other and present different alternative path
+/// segments towards the end of the Route. This is a convinient entity to reduce
+/// the result space of all the api::LaneSRange permutations that yield valid
+/// paths within the Route.
 ///
-/// When the start and end api::RoadPositions belong to different
-/// api::Lanes, a switch of api::Lanes is required.
+/// All the initial api::RoadPositions consitute the set of start positions of
+/// this phase. All the end api::RoadPositions constitute the set of end
+/// positions of this phase. Certain api::RoadPositions in the start and end
+/// sets may not have connectivity at the api::BranchPoint level, but the
+/// api::LaneSRanges are included because they offer alternative volume for
+/// agents to maneuver in. At least one api::RoadPosition in both the start and
+/// end sets must be equal or overlapping in the INERTIAL-Frame another
+/// api::RoadPosition in the preceeding and succeeding RoutePhase respectively.
 ///
 /// Agents can localize themselves within a RoutePhase by using FindLaneSRangeBy()
 /// methods. This is useful when they are initially placing themselves on a path
@@ -62,55 +70,57 @@ class RoutePhase final {
   /// @param index The index at the parent Route. It must be non-negative.
   /// @param lane_s_range_tolerance Tolerance to compare api::LaneSRanges.
   /// It must be non-negative.
-  /// @param start_road_position The start api::RoadPosition of this
-  /// RoutePhase. `start_road_position.lane` must not be nullptr and it must be
-  /// in @p lane_s_ranges.
-  /// @param end_road_position The end api::RoadPosition of this
-  /// RoutePhase. `end_road_position.lane` must not be nullptr and it must be
-  /// in @p lane_s_ranges.
+  /// @param start_positions The start api::RoadPositions of this
+  /// RoutePhase. Each api::RoadPosition must be valid and it must be in
+  /// @p lane_s_ranges. There must be at least one api::RoadPosition.
+  /// @param end_position The end api::RoadPositions of this
+  /// RoutePhase. Each api::RoadPosition must be valid and it must be in
+  /// @p lane_s_ranges. There must be at least one api::RoadPosition.
   /// @param lane_s_ranges List of api::LaneSRanges. It must not be empty, all
-  /// elements must exist in @p road_network and should be consecutive adjacent.
-  /// @param default_lane_s_range_index The index of the default api::LaneSRange
-  /// in @p lane_s_ranges. It must be a valid index.
+  /// elements must exist in @p road_network and should be consecutively
+  /// adjacent.
   /// @param road_network The pointer to the api::RoadNetwork. It must
   /// not be nullptr. The lifetime of this pointer must exceed that of this
   /// object.
   /// @throws common::assertion_error When @p index is negative.
   /// @throws common::assertion_error When @p lane_s_range_tolerance is
   /// negative.
-  /// @throws common::assertion_error When @p start_road_position.lane is
-  /// nullptr.
-  /// @throws common::assertion_error When @p end_road_position.lane is
-  /// nullptr.
+  /// @throws common::assertion_error When any @p start_positions is
+  /// invalid.
+  /// @throws common::assertion_error When @p start_positions is empty.
+  /// @throws common::assertion_error When any @p start_positions are not
+  /// positions in @p lane_s_ranges.
+  /// @throws common::assertion_error When any @p end_positions is
+  /// invalid.
+  /// @throws common::assertion_error When @p end_positions is empty.
+  /// @throws common::assertion_error When any @p end_positions are not
+  /// positions in @p lane_s_ranges.
   /// @throws common::assertion_error When @p lane_s_ranges is empty.
   /// @throws common::assertion_error When @p lane_s_ranges contains
   /// non-adjacent consecutive api::LaneSRanges.
   /// @throws common::assertion_error When @p lane_s_ranges contains
-  /// api::LaneSRanges that do not exist in @p road_network.   
-  /// @throws common::assertion_error When @p default_lane_s_range_index is not
-  /// a valid index of @p lane_s_ranges.
+  /// api::LaneSRanges that do not exist in @p road_network.
   /// @throws common::assertion_error When @p road_network is nullptr.
-  RoutePhase(int index,
-             double lane_s_range_tolerance,
-             const api::RoadPosition& start_road_position,
-             const api::RoadPosition& end_road_position,
-             const std::vector<api::LaneSRange>& lane_s_ranges,
-             int default_lane_s_range_index,
+  RoutePhase(int index, double lane_s_range_tolerance, const std::vector<api::RoadPosition>& start_positions,
+             const std::vector<api::RoadPosition>& end_positions, const std::vector<api::LaneSRange>& lane_s_ranges,
              const api::RoadNetwork* road_network)
       : index_(index),
         lane_s_range_tolerance_(lane_s_range_tolerance),
+        start_positions_(start_positions),
+        end_positions_(end_positions),
         lane_s_ranges_(lane_s_ranges),
-        default_lane_s_range_index_(default_lane_s_range_index),
         road_network_(road_network) {
     MALIPUT_THROW_UNLESS(index_ >= 0);
-    MALIPUT_THROW_UNLESS(lane_s_range_tolerance >= 0.);    
-    MALIPUT_THROW_UNLESS(start_road_position_.lane != nullptr);
-    MALIPUT_THROW_UNLESS(end_road_position_.lane != nullptr);
+    MALIPUT_THROW_UNLESS(lane_s_range_tolerance >= 0.);
+    MALIPUT_THROW_UNLESS(!start_positions_.empty());
+    MALIPUT_THROW_UNLESS(std::any_of(start_positions_.begin(), start_positions_.end(),
+                                     [](const auto& pos) { return pos.lane == nullptr; }));
+    MALIPUT_THROW_UNLESS(!end_positions_.empty());
+    MALIPUT_THROW_UNLESS(
+        std::any_of(end_positions_.begin(), end_positions_.end(), [](const auto& pos) { return pos.lane == nullptr; }));
     MALIPUT_THROW_UNLESS(!lane_s_ranges_.empty());
-    MALIPUT_THROW_UNLESS(default_lane_s_range_index_ >= 0 && default_lane_s_range_index_ < static_cast<int>(lane_s_ranges_.size()));
     MALIPUT_THROW_UNLESS(road_network_ != nullptr);
-    // TODO(#543): Validate that start_road_position_.lane->id() and position, or end_road_position_.lane->id() and position
-    // are in the default api::LaneSRange of lane_s_ranges_.
+    // TODO(#543): Validate that for start_positions_ and end_positions_ the api::RoadPositions are in lane_s_ranges_.
     // TODO(#543): Validate that lane_s_ranges_ are effectively adjacent one to another.
     // TODO(#543): Validate api::LaneSRanges are in the RoadNetwork.
   }
@@ -118,25 +128,14 @@ class RoutePhase final {
   /// @return The index of this RoutePhase.
   int index() const { return index_; }
 
-  /// @return The start api::RoadPosition of this RoutePhase.
-  const api::RoadPosition& start_road_position() const {
-    return start_road_position_;
-  }
+  /// @return The start api::RoadPositions of this RoutePhase.
+  const std::vector<api::RoadPosition>& start_positions() const { return start_positions_; }
 
-  /// @return The end api::RoadPosition of this RoutePhase.
-  const api::RoadPosition& end_road_position() const {
-    return end_road_position_;
-  }
-
-  /// @return The default api::LaneSRange.
-  const api::LaneSRange& default_lane_s_range() const {
-    return lane_s_ranges_.at(default_lane_s_range_index_);
-  }
+  /// @return The end api::RoadPositions of this RoutePhase.
+  const std::vector<api::RoadPosition>& end_positions() const { return end_positions_; }
 
   /// @return The vector of api::LaneSRanges.
-  const std::vector<api::LaneSRange>& lane_s_ranges() const {
-    return lane_s_ranges_;
-  }
+  const std::vector<api::LaneSRange>& lane_s_ranges() const { return lane_s_ranges_; }
 
   /// Finds the RoutePositionResult where @p inertial_position best fits.
   ///
@@ -181,10 +180,9 @@ class RoutePhase final {
  private:
   int index_{};
   double lane_s_range_tolerance_{};
-  api::RoadPosition start_road_position_;
-  api::RoadPosition end_road_position_;
+  std::vector<api::RoadPosition> start_positions_;
+  std::vector<api::RoadPosition> end_positions_;
   std::vector<api::LaneSRange> lane_s_ranges_;
-  int default_lane_s_range_index_{};
   const api::RoadNetwork* road_network_{};
 };
 

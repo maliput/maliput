@@ -69,8 +69,7 @@ class Router {
   /// @throws common::assertion_error When @p start is not valid.
   /// @throws common::assertion_error When @p end is not valid.
   /// @throws common::assertion_error When @p routing_constraints is not valid.
-  std::optional<Route> ComputeRoute(const api::RoadPosition& start,
-                                    const api::RoadPosition& end,
+  std::optional<Route> ComputeRoute(const api::RoadPosition& start, const api::RoadPosition& end,
                                     const RoutingConstraints& routing_constraints) const {
     return DoComputeRoute(start, end, routing_constraints);
   }
@@ -79,8 +78,7 @@ class Router {
   Router() = default;
 
  private:
-  virtual std::optional<Route> DoComputeRoute(const api::RoadPosition& start,
-                                              const api::RoadPosition& end,
+  virtual std::optional<Route> DoComputeRoute(const api::RoadPosition& start, const api::RoadPosition& end,
                                               const RoutingConstraints& routing_constraints) const = 0;
 };
 
