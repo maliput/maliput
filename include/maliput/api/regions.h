@@ -161,7 +161,7 @@ class LaneSRoute {
   bool Intersects(const LaneSRoute& lane_s_route, double tolerance) const;
 
   // TODO(maddog@tri.global)  Implement a "CheckInvariants()" method which
-  //                          ensures adjancency (with respect to a specified
+  //                          ensures adjacency (with respect to a specified
   //                          RoadGeometry).
 
  private:
