@@ -4,7 +4,9 @@
 
 set(ROUTING_SOURCES
   derive_lane_s_routes.cc
-  find_lane_sequences.cc)
+  find_lane_sequences.cc
+  routing_constraints.cc
+)
 
 add_library(routing ${ROUTING_SOURCES})
 
