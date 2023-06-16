@@ -45,23 +45,33 @@ namespace routing {
 /// another.
 ///
 /// It hosts a subset of the api::RoadGeometry that represents a valid routing
-/// graph for agent navigation. The graph is represented by a sequence of
-/// RoutePhases. These entities allow agents to reduce the path search space
-/// by constraining the lookup towards the end api::RoadPosition.
+/// graph for agent navigation. For scalability, the route is divided into a
+/// sequence of RoutePhases. These entities allow agents to reduce the path
+/// search space by constraining the lookup towards the end goal.
 ///
 /// Agents are expected to use the Router to obtain a Route. Once in the Route,
 /// they can iterate through the RoutePhases or find a specific RoutePhase via
 /// an INERTIAL or LANE Frame coordinate and start driving from there towards
 /// the end goal.
 ///
-/// The first RoutePhase start road position identifies the beginning of the
-/// Route. The last RoutePhase end road position identifies the ending of the
+/// The first RoutePhase's first start position identifies the beginning of the
+/// Route. The last RoutePhase's first end position identifies the ending of the
 /// Route. The sequence of RoutePhases form a continuous route where the end of
 /// one RoutePhase exactly matches the beginning of the next RoutePhase in the
 /// sequence.
 ///
-/// A valid representation of this routing request for this geometry (starting
-/// `s` and ending at `e`):
+/// Let:
+/// - `s` indicates the start of the Route.
+/// - `e` indicates the end of the Route.
+/// - `x` indicates the start of end of an api::LaneSRange.
+/// - `*` indicates the start of end of RoutingPhase.
+/// - `-` indicates the path of an api::LaneSRange.
+/// - `_` indicates the path of an api::LaneSRange within a RoutingPhase.
+/// - `S0`, `S1`, ...: are api::Segments.
+/// - `L0`, `L1`, ...: are api::Lanes.
+///
+/// Consider the following road geometry and routing request:
+///
 /// <pre>
 ///        S1       S2       S3      S4
 ///                                       e    L0
@@ -78,7 +88,9 @@ namespace routing {
 /// S0 s   L0
 /// </pre>
 ///
-/// And yields the following route:
+///
+/// A valid Route could be:
+///
 /// <pre>
 ///        S1       S2       S3      S4
 ///                                       e    L0
@@ -95,21 +107,11 @@ namespace routing {
 /// S0 s   L0
 /// </pre>
 ///
-/// Where:
-/// - `s` indicates the start of the Route.
-/// - `e` indicates the end of the Route.
-/// - `x` indicates the start of end of an api::LaneSRange.
-/// - `*` indicates the start of end of RoutingPhase.
-/// - `-` indicates the path of an api::LaneSRange.
-/// - `_` indicates the path of an api::LaneSRange within a RoutingPhase.
-/// - `S0`, `S1`, ...: are api::Segments.
-/// - `L0`, `L1`, ...: are api::Lanes.
-///
 /// Depending on where queried, different api::LaneSRoutes are returned, for
 /// example, if queried from `s`, the returned sequence will be:
-/// {S0:L0, S2:L2, S2:L1, S2:L0, S3:L0, S4:L0}
+/// {S0:L0, S2:L2, S2:L1, S2:L0, S3:L0, S3:L1, S3:L2, S4:L0, S4:L1}
 ///
-/// And if queried at any point in S3:L2: {S3:L2, S3:L1, S3:L0, S4:L0}.
+/// And if queried at any point in S3:L2: {S3:L2, S3:L1, S3:L0, S4:L0, S4:L1}.
 class Route final {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Route);
@@ -143,10 +145,12 @@ class Route final {
   /// @throws std::out_of_range When @p index is negative or >= `size()`.
   const RoutePhase& Get(int index) const { return route_phases_.at(index); }
 
-  /// @return The start of this Route.
+  /// Returns the start of this Route. This is a convenience method for
+  /// Get(0).start_positions().front().
   const api::RoadPosition& start_route_position() const { return route_phases_.front().start_positions().front(); }
 
-  /// @return The end of this Route.
+  /// Returns the end of this Route. This is a convenience method for
+  /// Get(size() - 1).end_positions().front().
   const api::RoadPosition& end_route_position() const { return route_phases_.back().end_positions().front(); }
 
   /// Finds the RoutePositionResult which @p inertial_position best fits.
@@ -201,7 +205,7 @@ class Route final {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
-  /// Computes an api::LaneSRoute from @p start_position towards
+  /// Computes an api::LaneSRoute that connects @p start_position with
   /// end_route_position().
   ///
   /// The resulting api::LaneSRoute aims for reducing the number of lane

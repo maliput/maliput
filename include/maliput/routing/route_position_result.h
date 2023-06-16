@@ -33,19 +33,25 @@
 namespace maliput {
 namespace routing {
 
-/// Maps a position in the LANE and INERTIAL Frames within a Route.
-struct RoutePositionResult {
-  /// The index of the RoutePhase in the Route.
-  int route_phase_index{};
+/// The result of a position query on a Phase.
+struct PhasePositionResult {
   /// The index of the api::LaneSRange within the RoutePhase.
   int lane_s_range_index{};
-  /// The LANE-Frame position within the `lane_s_range`.
+  /// The LANE-Frame position within the LaneSRange referenced by `lane_s_range_index`.
   api::LanePosition lane_position;
   /// The INERTIAL-Frame position of `lane_position`.
   api::InertialPosition inertial_position;
   /// The Euclidean distance between the point used for querying and
   /// `inertial_position`.
   double distance{};
+};
+
+/// The result of a position query on a Route.
+struct RoutePositionResult {
+  /// The index of the RoutePhase in the Route.
+  int route_phase_index{};
+  /// The position within the Phase.
+  PhasePositionResult phase_position_result;
 };
 
 }  // namespace routing

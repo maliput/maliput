@@ -47,7 +47,7 @@ namespace routing {
 ///
 /// In the diagram above:
 /// - `x` indicates the beginning or the end of a api::LaneSRange.
-/// - `>` indicates the direction of travel of the api::LaneSRange.
+/// - `>` indicates the direction of travel of the route.
 /// - The letters name the api::LaneSRanges in the Route.
 ///
 /// Thus,
@@ -79,6 +79,33 @@ enum class LaneSRangeRelation {
   kUnrelated,
   kUnknown,
 };
+
+/// @return A convenient dictionary that maps LaneSRangeRelation to a const char *.
+inline std::map<LaneSRangeRelation, const char*> LaneSRangeRelationMapper() {
+  return {
+      {LaneSRangeRelation::kAdjacentLeft, "kAdjacentLeft"},
+      {LaneSRangeRelation::kAdjacentRight, "kAdjacentRight"},
+      {LaneSRangeRelation::kLeft, "kLeft"},
+      {LaneSRangeRelation::kRight, "kRight"},
+      {LaneSRangeRelation::kSucceedingStraight, "kSucceedingStraight"},
+      {LaneSRangeRelation::kSucceedingLeft, "kSucceedingLeft"},
+      {LaneSRangeRelation::kSucceedingRight, "kSucceedingRight"},
+      {LaneSRangeRelation::kPreceedingStraight, "kPreceedingStraight"},
+      {LaneSRangeRelation::kPreceedingLeft, "kPreceedingLeft"},
+      {LaneSRangeRelation::kPreceedingRight, "kPreceedingRight"},
+      {LaneSRangeRelation::kUnrelated, "kUnrelated"},
+      {LaneSRangeRelation::kUnknown, "kUnknown"},
+  };
+}
+
+/// Convenient overload to serialize as string a LaneSRangeRelation.
+/// @param os A mutable reference to a std::ostream.
+/// @param relation The LaneSRangeRelation to serialize.
+/// @return @p os with @p relation serialized.
+inline std::ostream& operator<<(std::ostream& os, const LaneSRangeRelation& relation) {
+  os << LaneSRangeRelationMapper().at(relation);
+  return os;
+}
 
 }  // namespace routing
 }  // namespace maliput

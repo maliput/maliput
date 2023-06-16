@@ -40,15 +40,14 @@
 namespace maliput {
 namespace routing {
 
-/// Manages a phase in a Route, towards the its end.
+/// Manages a phase in a Route, towards its end.
 ///
 /// It is composed of a set of api::LaneSRanges. All these api::LaneSRanges
-/// are adjacent one to the other and present different alternative path
-/// segments towards the end of the Route. This is a convinient entity to reduce
-/// the result space of all the api::LaneSRange permutations that yield valid
-/// paths within the Route.
+/// are adjacent and present different alternative path segments towards the end
+/// of the Route. This is a convenient entity to reduce the result space of all
+/// the api::LaneSRange permutations that yield valid paths within the Route.
 ///
-/// All the initial api::RoadPositions consitute the set of start positions of
+/// All the initial api::RoadPositions constitute the set of start positions of
 /// this phase. All the end api::RoadPositions constitute the set of end
 /// positions of this phase. Certain api::RoadPositions in the start and end
 /// sets may not have connectivity at the api::BranchPoint level, but the
@@ -57,7 +56,7 @@ namespace routing {
 /// end sets must be equal or overlapping in the INERTIAL-Frame another
 /// api::RoadPosition in the preceeding and succeeding RoutePhase respectively.
 ///
-/// Agents can localize themselves within a RoutePhase by using FindLaneSRangeBy()
+/// Agents can localize themselves within a RoutePhase by using FindLaneSRange()
 /// methods. This is useful when they are initially placing themselves on a path
 /// or for iterative querying.
 class RoutePhase final {
@@ -137,7 +136,7 @@ class RoutePhase final {
   /// @return The vector of api::LaneSRanges.
   const std::vector<api::LaneSRange>& lane_s_ranges() const { return lane_s_ranges_; }
 
-  /// Finds the RoutePositionResult where @p inertial_position best fits.
+  /// Finds the PhasePositionResult where @p inertial_position best fits.
   ///
   /// The fitting of the @p inertial_position into the complete Route will use
   /// the same set of rules api::RoadGeometry::ToRoadPosition() uses to
@@ -151,12 +150,12 @@ class RoutePhase final {
   /// Frame position are evaluated there as well.
   ///
   /// @param inertial_position The INERTIAL-Frame position.
-  /// @return A RoutePositionResult.
-  RoutePositionResult FindRoutePhasePositionBy(const api::InertialPosition& inertial_position) const {
+  /// @return A PhasePositionResult.
+  PhasePositionResult FindPhasePosition(const api::InertialPosition& inertial_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 
-  /// Finds the RoutePositionResult where @p road_position best fits.
+  /// Finds the PhasePositionResult where @p road_position best fits.
   ///
   /// The fitting of the @p road_position into the complete Route will use
   /// the same set of rules api::RoadGeometry::ToRoadPosition() uses to
@@ -170,10 +169,10 @@ class RoutePhase final {
   /// Frame position are evaluated there as well.
   ///
   /// @param road_position The road position. It must be valid.
-  /// @return A RoutePositionResult.
+  /// @return A PhasePositionResult.
   /// @throws common::assertion_error When @p road_position is not
   /// valid.
-  RoutePositionResult FindRoutePhasePositionBy(const api::RoadPosition& road_position) const {
+  PhasePositionResult FindPhasePosition(const api::RoadPosition& road_position) const {
     MALIPUT_THROW_MESSAGE("Unimplemented");
   }
 

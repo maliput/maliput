@@ -41,13 +41,12 @@
 namespace maliput {
 namespace routing {
 
-/// Computes Routes that join one point with another in the
-/// api::RoadGeometry.
+/// Computes Routes within an api::RoadNetwork.
 ///
 /// Implementations of this class may integrate different policies to compute
 /// Routes, such as length, maximum speed, driving allowance, etc. One or many
 /// implementations can be created per agent type with different customizations
-/// might yield different routes upon the same api::RoadGeometry and
+/// might yield different routes upon the same api::RoadNetwork and
 /// set of arguments of your query. This is correct and expected behavior as the
 /// particular implementation details must rule the decisions that build a
 /// Route.
@@ -55,13 +54,13 @@ class Router {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Router);
 
-  /// Computes the Route that joins @p start_road_position to
-  /// @p end_road_position under @p routing_constraints.
+  /// Computes the Route that joins @p start to @p end under
+  /// @p routing_constraints.
   ///
-  /// @param start The start point in the api::RoadGeometry.
-  /// It must be a valid api::RoadPosition within the api::RoadGeometry.
-  /// @param end The end point in the api::RoadGeometry.
-  /// It must be a valid api::RoadPosition within the api::RoadGeometry.
+  /// @param start The start point in the api::RoadNetwork.
+  /// It must be a valid api::RoadPosition within the api::RoadNetwork.
+  /// @param end The end point in the api::RoadNetwork.
+  /// It must be a valid api::RoadPosition within the api::RoadNetwork.
   /// @param routing_constraints The set of constraints that apply to the routing
   /// algorithm when computing the Route. It must be valid. @see ValidateRoutingConstraints().
   /// @return An optional with a Route that joins @p start with @p end under
