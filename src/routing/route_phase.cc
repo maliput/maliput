@@ -42,21 +42,6 @@ namespace {
 // @return true When @p value is within @p min and @p max.
 inline bool is_in_range(double min, double max, double value) { return value >= min && value <= max; }
 
-// @return true When @p position is in any of @p lane_s_ranges with @p tolerance in the LANE-Frame s coordinate.
-bool ValidatePositionIsInLaneSRanges(const maliput::api::RoadPosition& position,
-                                     const std::vector<api::LaneSRange>& lane_s_ranges, double tolerance) {
-  return std::any_of(lane_s_ranges.begin(), lane_s_ranges.end(), [position, tolerance](const auto& lane_s_range) {
-    if (position.lane->id() != lane_s_range.lane_id()) {
-      return false;
-    }
-    const double min_s_range =
-        (lane_s_range.s_range().WithS() ? lane_s_range.s_range().s0() : lane_s_range.s_range().s1()) - tolerance;
-    const double max_s_range =
-        (lane_s_range.s_range().WithS() ? lane_s_range.s_range().s1() : lane_s_range.s_range().s0()) + tolerance;
-    return is_in_range(min_s_range, max_s_range, position.pos.s());
-  });
-}
-
 // @return true When @p lane_s_range is a valid range in @p road_geometry with @p tolerance in the LANE-Frame s
 // coordinate.
 bool ValidateLaneSRangeIsInRoadNetwork(const api::LaneSRange& lane_s_range, const api::RoadGeometry* road_geometry,
@@ -81,6 +66,24 @@ bool ValidateLaneSRangesAreAdjancent(const api::LaneSRange& lane_s_range_a, cons
 }
 
 }  // namespace
+
+bool ValidatePositionIsInLaneSRanges(const maliput::api::RoadPosition& position,
+                                     const std::vector<api::LaneSRange>& lane_s_ranges, double tolerance) {
+  MALIPUT_THROW_UNLESS(position.lane != nullptr);
+  MALIPUT_THROW_UNLESS(!lane_s_ranges.empty());
+  MALIPUT_THROW_UNLESS(tolerance >= 0.);
+
+  return std::any_of(lane_s_ranges.begin(), lane_s_ranges.end(), [position, tolerance](const auto& lane_s_range) {
+    if (position.lane->id() != lane_s_range.lane_id()) {
+      return false;
+    }
+    const double min_s_range =
+        (lane_s_range.s_range().WithS() ? lane_s_range.s_range().s0() : lane_s_range.s_range().s1()) - tolerance;
+    const double max_s_range =
+        (lane_s_range.s_range().WithS() ? lane_s_range.s_range().s1() : lane_s_range.s_range().s0()) + tolerance;
+    return is_in_range(min_s_range, max_s_range, position.pos.s());
+  });
+}
 
 RoutePhase::RoutePhase(int index, double lane_s_range_tolerance, const std::vector<api::RoadPosition>& start_positions,
                        const std::vector<api::RoadPosition>& end_positions,

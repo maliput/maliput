@@ -51,6 +51,7 @@ namespace routing {
 /// - The letters name the api::LaneSRanges in the Route.
 ///
 /// Thus,
+/// - `A` is LaneSRangeRelation::kCoincident with `A`.
 /// - `A` is LaneSRangeRelation::kAdjacentLeft of `B`.
 /// - `B` is LaneSRangeRelation::kAdjacentRight of `A`.
 /// - `A` is LaneSRangeRelation::kLeft of `D`.
@@ -76,6 +77,7 @@ enum class LaneSRangeRelation {
   kPreceedingStraight,
   kPreceedingLeft,
   kPreceedingRight,
+  kCoincident,
   kUnrelated,
   kUnknown,
 };

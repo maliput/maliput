@@ -28,6 +28,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
+#include <optional>
+#include <utility>
 #include <vector>
 
 #include "maliput/api/lane_data.h"
@@ -112,6 +114,11 @@ namespace routing {
 /// And if queried at any point in S3:L2: {S3:L2, S3:L1, S3:L0, S4:L0}.
 class Route final {
  public:
+  /// Type alias to index an api::LaneSRange within this Route.
+  /// std::pair::first indexes the RoutePhase.
+  /// std::pair::second indexes the api::LaneSRange in the RoutePhase.
+  using LaneSRangeIndex = std::pair<size_t, size_t>;
+
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Route);
   Route() = delete;
 
@@ -125,12 +132,7 @@ class Route final {
   /// @throws common::assertion_error When @p route_phases is not connected end
   /// to end.
   /// @throws common::assertion_error When @p road_network is nullptr.
-  Route(const std::vector<RoutePhase>& route_phases, const api::RoadNetwork* road_network)
-      : route_phases_(route_phases), road_network_(road_network) {
-    MALIPUT_THROW_UNLESS(!route_phases_.empty());
-    MALIPUT_THROW_UNLESS(road_network_ != nullptr);
-    /// TODO(#453): Validate end to end connection of the RoutePhases.
-  }
+  Route(const std::vector<RoutePhase>& route_phases, const api::RoadNetwork* road_network);
 
   /// @return The number of RoutePhases.
   int size() const { return static_cast<int>(route_phases_.size()); }
@@ -142,6 +144,20 @@ class Route final {
   /// @return The RoutePhase at @p index.
   /// @throws std::out_of_range When @p index is negative or >= `size()`.
   const RoutePhase& Get(int index) const { return route_phases_.at(index); }
+
+  /// Indexes an api::LaneSRange in a RoutePhases.
+  ///
+  /// @param route_phase_index The index of the RoutePhase. It must be
+  /// non-negative and less than `size()`.
+  /// @param lane_s_range_index The index of the api::LaneSRange. It must be
+  /// non-negative and less than `RoutePhase::lane_s_ranges().size()`.
+  /// @return The api::LaneSRange indexed at the @p route_phase_index -th
+  /// RoutePhase at the @p lane_s_range_index -th position.
+  /// @throws std::out_of_range When any of the preconditions of
+  /// @p route_phase_index or @p lane_s_range_index are unmet.
+  const api::LaneSRange& GetLaneSRange(int route_phase_index, int lane_s_range_index) const {
+    return Get(route_phase_index).lane_s_ranges().at(lane_s_range_index);
+  }
 
   /// @return The start of this Route.
   const api::RoadPosition& start_route_position() const { return route_phases_.front().start_positions().front(); }
@@ -164,9 +180,7 @@ class Route final {
   ///
   /// @param inertial_position The INERTIAL-Frame position.
   /// @return A RoutePositionResult.
-  RoutePositionResult FindRoutePositionBy(const api::InertialPosition& inertial_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  RoutePositionResult FindRoutePositionBy(const api::InertialPosition& inertial_position) const;
 
   /// Finds the RoutePositionResult which @p road_position best fits.
   ///
@@ -185,9 +199,7 @@ class Route final {
   /// @return A RoutePositionResult.
   /// @throws common::assertion_error When @p road_position is not
   /// valid.
-  RoutePositionResult FindRoutePositionBy(const api::RoadPosition& road_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  RoutePositionResult FindRoutePositionBy(const api::RoadPosition& road_position) const;
 
   /// Finds the relation between @p lane_s_range_b with respect to
   /// @p lane_s_range_a.
@@ -197,9 +209,7 @@ class Route final {
   /// @return The LaneSRangeRelation between @p lane_s_range_b with respect to
   /// @p lane_s_range_a.
   LaneSRangeRelation LaneSRangeRelationFor(const api::LaneSRange& lane_s_range_a,
-                                           const api::LaneSRange& lane_s_range_b) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+                                           const api::LaneSRange& lane_s_range_b) const;
 
   /// Computes an api::LaneSRoute from @p start_position towards
   /// end_route_position().
@@ -215,11 +225,45 @@ class Route final {
   /// @return The api::LaneSRoute connecting @p start_position and
   /// end_route_position().
   /// @throws common::assertion_error When @p start_position is not valid.
-  api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const;
 
  private:
+  // Defines the sign and increment of one unit towards the right the index of
+  // api::LaneSRanges in a RoutePhase.
+  static constexpr int kTowardsRight{-1};
+  // Defines the sign and increment of one unit towards the left the index of
+  // api::LaneSRanges in a RoutePhase.
+  static constexpr int kTowardsLeft{1};
+
+  // Finds the LaneSRangeIndex for an api::LaneSRange.
+  //
+  // To provide a match, @p lane_s_range must be within RoadNetwork's tolerance
+  // of any of the existing api::LaneSRanges within this Route.
+  //
+  // @param lane_s_range The api::LaneSRange to look for.
+  // @return An optional containing the index of the api::LaneSRange within this
+  // Route.
+  std::optional<LaneSRangeIndex> FindLaneSRangeIndexFor(const api::LaneSRange& lane_s_range) const;
+
+  // Finds the LaneSRangeIndex of the api::LaneSRange that is
+  // LaneSRelation::kPreceedingStraight with respect to @p lane_s_range_index
+  // api::LaneSRange.
+  //
+  // @param lane_s_range_index The index of the api::LaneSRange to find its
+  // LaneSRelation::kPreceedingStraight counterpart. It must be a valid index.
+  // @return An optional containing the LaneSRangeIndex of the api::LaneSRange.
+  std::optional<LaneSRangeIndex> FindStraightPredecessorFor(const LaneSRangeIndex& lane_s_range_index) const;
+
+  // Finds how to move the index of api::LaneSRanges within a RoutePhase to find
+  // the first one from @p lane_s_range_index.
+  //
+  // @param lane_s_range_index The index of api::LaneSRange within this Route.
+  // @return kTowardsLeft When moving towards the left within the RoutePhase,
+  // otherwise kTowardsRight.
+  // @throws common::assertion_error When `lane_s_range_index.first` is zero as
+  // there is no predecessor.
+  int FindDirectionTowardsLaneSRangeWithStraightPredecessor(const LaneSRangeIndex& lane_s_range_index) const;
+
   std::vector<RoutePhase> route_phases_;
   const api::RoadNetwork* road_network_{};
 };
