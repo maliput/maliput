@@ -54,26 +54,26 @@ namespace routing {
 /// api::LaneSRanges are included because they offer alternative volume for
 /// agents to maneuver in. At least one api::RoadPosition in both the start and
 /// end sets must be equal or overlapping in the INERTIAL-Frame another
-/// api::RoadPosition in the preceeding and succeeding RoutePhase respectively.
+/// api::RoadPosition in the preceeding and succeeding Phase respectively.
 ///
-/// Agents can localize themselves within a RoutePhase by using FindLaneSRange()
+/// Agents can localize themselves within a Phase by using FindLaneSRange()
 /// methods. This is useful when they are initially placing themselves on a path
 /// or for iterative querying.
-class RoutePhase final {
+class Phase final {
  public:
-  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(RoutePhase);
-  RoutePhase() = delete;
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Phase);
+  Phase() = delete;
 
-  /// Constructs a RoutePhase.
+  /// Constructs a Phase.
   ///
   /// @param index The index at the parent Route. It must be non-negative.
   /// @param lane_s_range_tolerance Tolerance to compare api::LaneSRanges.
   /// It must be non-negative.
   /// @param start_positions The start api::RoadPositions of this
-  /// RoutePhase. Each api::RoadPosition must be valid and it must be in
+  /// Phase. Each api::RoadPosition must be valid and it must be in
   /// @p lane_s_ranges. There must be at least one api::RoadPosition.
   /// @param end_position The end api::RoadPositions of this
-  /// RoutePhase. Each api::RoadPosition must be valid and it must be in
+  /// Phase. Each api::RoadPosition must be valid and it must be in
   /// @p lane_s_ranges. There must be at least one api::RoadPosition.
   /// @param lane_s_ranges List of api::LaneSRanges. It must not be empty, all
   /// elements must exist in @p road_network and should be consecutively
@@ -100,9 +100,9 @@ class RoutePhase final {
   /// @throws common::assertion_error When @p lane_s_ranges contains
   /// api::LaneSRanges that do not exist in @p road_network.
   /// @throws common::assertion_error When @p road_network is nullptr.
-  RoutePhase(int index, double lane_s_range_tolerance, const std::vector<api::RoadPosition>& start_positions,
-             const std::vector<api::RoadPosition>& end_positions, const std::vector<api::LaneSRange>& lane_s_ranges,
-             const api::RoadNetwork* road_network)
+  Phase(int index, double lane_s_range_tolerance, const std::vector<api::RoadPosition>& start_positions,
+        const std::vector<api::RoadPosition>& end_positions, const std::vector<api::LaneSRange>& lane_s_ranges,
+        const api::RoadNetwork* road_network)
       : index_(index),
         lane_s_range_tolerance_(lane_s_range_tolerance),
         start_positions_(start_positions),
@@ -124,13 +124,13 @@ class RoutePhase final {
     // TODO(#543): Validate api::LaneSRanges are in the RoadNetwork.
   }
 
-  /// @return The index of this RoutePhase.
+  /// @return The index of this Phase.
   int index() const { return index_; }
 
-  /// @return The start api::RoadPositions of this RoutePhase.
+  /// @return The start api::RoadPositions of this Phase.
   const std::vector<api::RoadPosition>& start_positions() const { return start_positions_; }
 
-  /// @return The end api::RoadPositions of this RoutePhase.
+  /// @return The end api::RoadPositions of this Phase.
   const std::vector<api::RoadPosition>& end_positions() const { return end_positions_; }
 
   /// @return The vector of api::LaneSRanges.
@@ -142,8 +142,8 @@ class RoutePhase final {
   /// the same set of rules api::RoadGeometry::ToRoadPosition() uses to
   /// find a matching api::RoadPositionResult within the api::RoadGeometry.
   /// When the @p inertial_position does not fall into the volume defined by the
-  /// set of api::LaneSRanges each RoutePhase has, the returned
-  /// RoutePhase will be the one that minimizes the Euclidean distance to the
+  /// set of api::LaneSRanges each Phase has, the returned
+  /// Phase will be the one that minimizes the Euclidean distance to the
   /// Route.
   /// The mapping is done right on `r=0, h=0` over the api::Lanes, i.e.
   /// at the centerline. This means that the returned `distance` and INERTIAL-
@@ -161,8 +161,8 @@ class RoutePhase final {
   /// the same set of rules api::RoadGeometry::ToRoadPosition() uses to
   /// find a matching api::RoadPositionResult within the api::RoadGeometry.
   /// When the @p road_position does not fall into the volume defined by the
-  /// set of api::LaneSRanges each RoutePhase has, the returned
-  /// RoutePhase will be the one that minimizes the Euclidean distance to the
+  /// set of api::LaneSRanges each Phase has, the returned
+  /// Phase will be the one that minimizes the Euclidean distance to the
   /// Route.
   /// The mapping is done right on `r=0, h=0` over the api::Lanes, i.e.
   /// at the centerline. This means that the returned `distance` and INERTIAL-

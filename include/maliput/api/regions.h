@@ -133,6 +133,8 @@ class LaneSRange {
 /// laterally adjacent LaneSRanges, or consecutive LaneSRanges. (In other words,
 /// taken as a Lane-space path with r=0 and h=0, it should present a
 /// G1-continuous curve.)
+// TODO(#543): Review this class semantics to express the relationship between
+// LaneSRanges (laterally adjacent or consecutive).
 class LaneSRoute {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneSRoute);

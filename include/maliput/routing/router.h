@@ -28,7 +28,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <optional>
+#include <vector>
 
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_network.h"
@@ -54,7 +54,7 @@ class Router {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Router);
 
-  /// Computes the Route that joins @p start to @p end under
+  /// Computes Routes that joins @p start to @p end under
   /// @p routing_constraints.
   ///
   /// @param start The start point in the api::RoadNetwork.
@@ -62,23 +62,23 @@ class Router {
   /// @param end The end point in the api::RoadNetwork.
   /// It must be a valid api::RoadPosition within the api::RoadNetwork.
   /// @param routing_constraints The set of constraints that apply to the routing
-  /// algorithm when computing the Route. It must be valid. @see ValidateRoutingConstraints().
-  /// @return An optional with a Route that joins @p start with @p end under
+  /// algorithm when computing a Route. It must be valid. @see ValidateRoutingConstraints().
+  /// @return A vector with Routes that joins @p start with @p end under
   /// @p routing_constraints.
   /// @throws common::assertion_error When @p start is not valid.
   /// @throws common::assertion_error When @p end is not valid.
   /// @throws common::assertion_error When @p routing_constraints is not valid.
-  std::optional<Route> ComputeRoute(const api::RoadPosition& start, const api::RoadPosition& end,
-                                    const RoutingConstraints& routing_constraints) const {
-    return DoComputeRoute(start, end, routing_constraints);
+  std::vector<Route> ComputeRoutes(const api::RoadPosition& start, const api::RoadPosition& end,
+                                   const RoutingConstraints& routing_constraints) const {
+    return DoComputeRoutes(start, end, routing_constraints);
   }
 
  protected:
   Router() = default;
 
  private:
-  virtual std::optional<Route> DoComputeRoute(const api::RoadPosition& start, const api::RoadPosition& end,
-                                              const RoutingConstraints& routing_constraints) const = 0;
+  virtual std::vector<Route> DoComputeRoutes(const api::RoadPosition& start, const api::RoadPosition& end,
+                                             const RoutingConstraints& routing_constraints) const = 0;
 };
 
 }  // namespace routing

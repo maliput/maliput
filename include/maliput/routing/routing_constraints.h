@@ -35,10 +35,18 @@ namespace routing {
 
 /// Holds the constraints that can be applied to the Router when computing a Route.
 struct RoutingConstraints {
-  /// Allows api::Lane switches within a RoutePhase when computing the Route.
+  /// Allows api::Lane switches within a Phase when computing the Route.
   bool allow_lane_switch{true};
-  /// Defines the maximum cost of a RoutePhase. When set, it must be positive.
-  std::optional<double> max_routing_phase_cost{};
+  /// Defines the maximum cost of a Phase. Cost is a router implementation
+  /// detail and is thus unitless. When set, it must be positive.
+  /// When both `max_route_cost` and this parameter are set,
+  /// `max_route_cost >= max_phase_cost`.
+  std::optional<double> max_phase_cost{};
+  /// Defines the maximim cost of a Route. Cost is a router implementation
+  /// detail and is thus unitless. When set, it must be positive.
+  /// When both `max_phase_cost` and this parameter are set,
+  /// `max_route_cost >= max_phase_cost`.
+  std::optional<double> max_route_cost{};
 };
 
 /// Validates the constraints of each parameter of @p routing_constraints.

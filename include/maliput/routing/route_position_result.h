@@ -35,7 +35,7 @@ namespace routing {
 
 /// The result of a position query on a Phase.
 struct PhasePositionResult {
-  /// The index of the api::LaneSRange within the RoutePhase.
+  /// The index of the api::LaneSRange within the Phase.
   int lane_s_range_index{};
   /// The LANE-Frame position within the LaneSRange referenced by `lane_s_range_index`.
   api::LanePosition lane_position;
@@ -47,9 +47,10 @@ struct PhasePositionResult {
 };
 
 /// The result of a position query on a Route.
+// TODO(#543): Consider leaving just one type and merging PhasePositionResult with this one.
 struct RoutePositionResult {
-  /// The index of the RoutePhase in the Route.
-  int route_phase_index{};
+  /// The index of the Phase in the Route.
+  int phase_index{};
   /// The position within the Phase.
   PhasePositionResult phase_position_result;
 };

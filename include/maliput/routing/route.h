@@ -35,7 +35,7 @@
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/routing/lane_s_range_relation.h"
-#include "maliput/routing/route_phase.h"
+#include "maliput/routing/phase.h"
 #include "maliput/routing/route_position_result.h"
 
 namespace maliput {
@@ -46,27 +46,27 @@ namespace routing {
 ///
 /// It hosts a subset of the api::RoadGeometry that represents a valid routing
 /// graph for agent navigation. For scalability, the route is divided into a
-/// sequence of RoutePhases. These entities allow agents to reduce the path
+/// sequence of Phases. These entities allow agents to reduce the path
 /// search space by constraining the lookup towards the end goal.
 ///
 /// Agents are expected to use the Router to obtain a Route. Once in the Route,
-/// they can iterate through the RoutePhases or find a specific RoutePhase via
+/// they can iterate through the Phases or find a specific Phase via
 /// an INERTIAL or LANE Frame coordinate and start driving from there towards
 /// the end goal.
 ///
-/// The first RoutePhase's first start position identifies the beginning of the
-/// Route. The last RoutePhase's first end position identifies the ending of the
-/// Route. The sequence of RoutePhases form a continuous route where the end of
-/// one RoutePhase exactly matches the beginning of the next RoutePhase in the
+/// The first Phase's first start position identifies the beginning of the
+/// Route. The last Phase's first end position identifies the ending of the
+/// Route. The sequence of Phases form a continuous route where the end of
+/// one Phase exactly matches the beginning of the next Phase in the
 /// sequence.
 ///
 /// Let:
 /// - `s` indicates the start of the Route.
 /// - `e` indicates the end of the Route.
-/// - `x` indicates the start of end of an api::LaneSRange.
-/// - `*` indicates the start of end of RoutingPhase.
+/// - `x` indicates the start or end of an api::LaneSRange.
+/// - `*` indicates the start or end of Phase.
 /// - `-` indicates the path of an api::LaneSRange.
-/// - `_` indicates the path of an api::LaneSRange within a RoutingPhase.
+/// - `_` indicates the path of an api::LaneSRange within a Phase.
 /// - `S0`, `S1`, ...: are api::Segments.
 /// - `L0`, `L1`, ...: are api::Lanes.
 ///
@@ -96,14 +96,14 @@ namespace routing {
 ///                                       e    L0
 ///                                     // x   L1
 ///                                   // //
-///                                 // // <-- RoutingPhase, index 3
+///                                 // // <-- Phase, index 3
 /// L0 x--------x________*________*  //
 /// L1 x--------x________*________*
 /// L2 x--------*________*________x--------    L0
-///            // ^        ^_ RoutingPhase, index 2
+///            // ^        ^_ Phase, index 2
 ///          //    \                  S5
-///        //        RoutingPhase, index 1
-///      //   <-- RoutingPhase, index 0
+///        //        Phase, index 1
+///      //   <-- Phase, index 0
 /// S0 s   L0
 /// </pre>
 ///
@@ -119,39 +119,39 @@ class Route final {
 
   /// Constructs a Route.
   ///
-  /// @param route_phases The sequence of RoutePhases. It must not be empty.
-  /// RoutePhases must be connected end to end.
+  /// @param phases The sequence of Phases. It must not be empty.
+  /// Phases must be connected end to end.
   /// @param road_network The api::RoadNetwork pointer. It must not be
   /// nullptr. The lifetime of this pointer must exceed that of this object.
-  /// @throws common::assertion_error When @p route_phases is empty.
-  /// @throws common::assertion_error When @p route_phases is not connected end
+  /// @throws common::assertion_error When @p phases is empty.
+  /// @throws common::assertion_error When @p phases is not connected end
   /// to end.
   /// @throws common::assertion_error When @p road_network is nullptr.
-  Route(const std::vector<RoutePhase>& route_phases, const api::RoadNetwork* road_network)
-      : route_phases_(route_phases), road_network_(road_network) {
-    MALIPUT_THROW_UNLESS(!route_phases_.empty());
+  Route(const std::vector<Phase>& phases, const api::RoadNetwork* road_network)
+      : phases_(phases), road_network_(road_network) {
+    MALIPUT_THROW_UNLESS(!phases_.empty());
     MALIPUT_THROW_UNLESS(road_network_ != nullptr);
-    /// TODO(#453): Validate end to end connection of the RoutePhases.
+    /// TODO(#453): Validate end to end connection of the Phases.
   }
 
-  /// @return The number of RoutePhases.
-  int size() const { return static_cast<int>(route_phases_.size()); }
+  /// @return The number of Phases.
+  int size() const { return static_cast<int>(phases_.size()); }
 
-  /// Indexes the RoutePhases.
+  /// Indexes the Phases.
   ///
-  /// @param index The index of the RoutePhase. It must be non-negative and
+  /// @param index The index of the Phase. It must be non-negative and
   /// less than `size()`.
-  /// @return The RoutePhase at @p index.
+  /// @return The Phase at @p index.
   /// @throws std::out_of_range When @p index is negative or >= `size()`.
-  const RoutePhase& Get(int index) const { return route_phases_.at(index); }
+  const Phase& Get(int index) const { return phases_.at(index); }
 
   /// Returns the start of this Route. This is a convenience method for
   /// Get(0).start_positions().front().
-  const api::RoadPosition& start_route_position() const { return route_phases_.front().start_positions().front(); }
+  const api::RoadPosition& start_route_position() const { return phases_.front().start_positions().front(); }
 
   /// Returns the end of this Route. This is a convenience method for
   /// Get(size() - 1).end_positions().front().
-  const api::RoadPosition& end_route_position() const { return route_phases_.back().end_positions().front(); }
+  const api::RoadPosition& end_route_position() const { return phases_.back().end_positions().front(); }
 
   /// Finds the RoutePositionResult which @p inertial_position best fits.
   ///
@@ -159,8 +159,8 @@ class Route final {
   /// the same set of rules api::RoadGeometry::ToRoadPosition() uses to
   /// find a matching api::RoadPositionResult within the api::RoadGeometry.
   /// When the @p inertial_position does not fall into the volume defined by the
-  /// set of api::LaneSRanges each RoutePhase has, the returned
-  /// RoutePhase will be the one that minimizes the Euclidean distance to the
+  /// set of api::LaneSRanges each Phase has, the returned
+  /// Phase will be the one that minimizes the Euclidean distance to the
   /// Route.
   /// The mapping is done right on `r=0, h=0` over the api::Lanes, i.e.
   /// at the centerline. This means that the returned `distance` and INERTIAL-
@@ -178,8 +178,8 @@ class Route final {
   /// the same set of rules api::RoadGeometry::ToRoadPosition() uses to
   /// find a matching api::RoadPositionResult within the api::RoadGeometry.
   /// When the @p road_position does not fall into the volume defined by the
-  /// set of api::LaneSRanges each RoutePhase has, the returned
-  /// RoutePhase will be the one that minimizes the Euclidean distance to the
+  /// set of api::LaneSRanges each Phase has, the returned
+  /// Phase will be the one that minimizes the Euclidean distance to the
   /// Route.
   /// The mapping is done right on `r=0, h=0` over the api::Lanes, i.e.
   /// at the centerline. This means that the returned `distance` and INERTIAL-
@@ -224,7 +224,7 @@ class Route final {
   }
 
  private:
-  std::vector<RoutePhase> route_phases_;
+  std::vector<Phase> phases_;
   const api::RoadNetwork* road_network_{};
 };
 
