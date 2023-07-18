@@ -64,7 +64,7 @@ namespace routing {
 /// - `s` indicates the start of the Route.
 /// - `e` indicates the end of the Route.
 /// - `x` indicates the start or end of an api::LaneSRange.
-/// - `*` indicates the start or end of Phase.
+/// - `*` indicates the start or end of a Phase.
 /// - `-` indicates the path of an api::LaneSRange.
 /// - `_` indicates the path of an api::LaneSRange within a Phase.
 /// - `S0`, `S1`, ...: are api::Segments.
