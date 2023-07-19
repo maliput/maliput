@@ -127,13 +127,14 @@ class LaneSRange {
   SRange s_range_;
 };
 
-// TODO(maddog@tri.global) Figure out if there would be any loss or gain of
-//                         utility if the contiguity requirement were removed.
-/// A longitudinal route, possibly spanning multiple (end-to-end) lanes.
+/// A route, possibly spanning multiple (end-to-end) lanes.
 ///
-/// The sequence of LaneSRanges should be contiguous.  (In other words,
+/// The sequence of LaneSRanges should be contiguous by either presenting
+/// laterally adjacent LaneSRanges, or consecutive LaneSRanges. (In other words,
 /// taken as a Lane-space path with r=0 and h=0, it should present a
 /// G1-continuous curve.)
+// TODO(#543): Review this class semantics to express the relationship between
+// LaneSRanges (laterally adjacent or consecutive).
 class LaneSRoute {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneSRoute);
@@ -147,6 +148,7 @@ class LaneSRoute {
   /// Returns the sequence of LaneSRanges.
   const std::vector<LaneSRange>& ranges() const { return ranges_; }
 
+  /// Returns the accumulated length of all LaneSRanges.
   double length() const {
     return std::accumulate(ranges_.cbegin(), ranges_.cend(), 0.,
                            [](const double acc, const LaneSRange& lane_range) { return acc + lane_range.length(); });
@@ -161,7 +163,7 @@ class LaneSRoute {
   bool Intersects(const LaneSRoute& lane_s_route, double tolerance) const;
 
   // TODO(maddog@tri.global)  Implement a "CheckInvariants()" method which
-  //                          ensures contiguity (with respect to a specified
+  //                          ensures adjacency (with respect to a specified
   //                          RoadGeometry).
 
  private:
