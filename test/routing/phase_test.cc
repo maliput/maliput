@@ -332,6 +332,7 @@ TEST_F(PhaseAccessorsTest, CorrectConstruction) {
                   road_network_.get());
 
   EXPECT_EQ(kIndex, dut.index());
+  EXPECT_EQ(kLaneSRangeTolerance, dut.lane_s_range_tolerance());
   EXPECT_EQ(kStartRoadPositions.size(), dut.start_positions().size());
   EXPECT_EQ(kStartRoadPositions[0].lane, dut.start_positions()[0].lane);
   EXPECT_EQ(kStartRoadPositions[0].pos.s(), dut.start_positions()[0].pos.s());
@@ -519,6 +520,66 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
 }
 
 // TODO: Test Phase::FindPhasePosition() when the LaneSRange::WithS() is false.
+
+class ValidatePositionIsInLaneSRangesTest : public ::testing::Test {
+ public:
+  static constexpr double kLaneSRangeTolerance{1e-3};
+  const api::LaneId kLaneIdA{"lane_a"};
+  const api::LaneId kLaneIdB{"lane_b"};
+  const api::LaneId kLaneIdC{"lane_c"};
+  const api::LaneSRange kLaneSRangeA{kLaneIdA, api::SRange{10., 100.}};
+  const api::LaneSRange kLaneSRangeB{kLaneIdB, api::SRange{5., 105}};
+  const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
+  const api::LanePosition kLanePositionInsideRangeA{50., 0., 0.};
+  const api::LanePosition kLanePositionOutsideRangeB{3., 0., 0.};
+  const api::LanePosition kLanePositionWithinToleranceRangeB{4.9995, 0., 0.};
+
+  void SetUp() override {
+    EXPECT_CALL(lane_a_, do_id()).WillRepeatedly(Return(kLaneIdA));
+    EXPECT_CALL(lane_b_, do_id()).WillRepeatedly(Return(kLaneIdB));
+    EXPECT_CALL(lane_c_, do_id()).WillRepeatedly(Return(kLaneIdC));
+  }
+
+  LaneMock lane_a_;
+  LaneMock lane_b_;
+  LaneMock lane_c_;
+};
+
+TEST_F(ValidatePositionIsInLaneSRangesTest, InvalidRoadPositionThrows) {
+  const api::RoadPosition position;
+  EXPECT_THROW({ ValidatePositionIsInLaneSRanges(position, kLaneSRanges, kLaneSRangeTolerance); },
+               common::assertion_error);
+}
+
+TEST_F(ValidatePositionIsInLaneSRangesTest, EmptyLaneSRangeThrows) {
+  const api::RoadPosition position(&lane_a_, kLanePositionInsideRangeA);
+  EXPECT_THROW({ ValidatePositionIsInLaneSRanges(position, {}, kLaneSRangeTolerance); }, common::assertion_error);
+}
+
+TEST_F(ValidatePositionIsInLaneSRangesTest, NegativeToleranceThrows) {
+  const api::RoadPosition position(&lane_a_, kLanePositionInsideRangeA);
+  EXPECT_THROW({ ValidatePositionIsInLaneSRanges(position, kLaneSRanges, -1.); }, common::assertion_error);
+}
+
+TEST_F(ValidatePositionIsInLaneSRangesTest, PositionWithinRangeAReturnsTrue) {
+  const api::RoadPosition position(&lane_a_, kLanePositionInsideRangeA);
+  EXPECT_TRUE(ValidatePositionIsInLaneSRanges(position, kLaneSRanges, kLaneSRangeTolerance));
+}
+
+TEST_F(ValidatePositionIsInLaneSRangesTest, PositionOutsideRangeBReturnsFalse) {
+  const api::RoadPosition position(&lane_b_, kLanePositionOutsideRangeB);
+  EXPECT_FALSE(ValidatePositionIsInLaneSRanges(position, kLaneSRanges, kLaneSRangeTolerance));
+}
+
+TEST_F(ValidatePositionIsInLaneSRangesTest, PositionWithinToleranceRangeBReturnsTrue) {
+  const api::RoadPosition position(&lane_b_, kLanePositionWithinToleranceRangeB);
+  EXPECT_TRUE(ValidatePositionIsInLaneSRanges(position, kLaneSRanges, kLaneSRangeTolerance));
+}
+
+TEST_F(ValidatePositionIsInLaneSRangesTest, PositionWithNoMatchingIdReturnsFalse) {
+  const api::RoadPosition position(&lane_c_, kLanePositionInsideRangeA);
+  EXPECT_FALSE(ValidatePositionIsInLaneSRanges(position, kLaneSRanges, kLaneSRangeTolerance));
+}
 
 }  // namespace
 }  // namespace test
