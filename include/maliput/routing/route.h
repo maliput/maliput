@@ -127,12 +127,7 @@ class Route final {
   /// @throws common::assertion_error When @p phases is not connected end
   /// to end.
   /// @throws common::assertion_error When @p road_network is nullptr.
-  Route(const std::vector<Phase>& phases, const api::RoadNetwork* road_network)
-      : phases_(phases), road_network_(road_network) {
-    MALIPUT_THROW_UNLESS(!phases_.empty());
-    MALIPUT_THROW_UNLESS(road_network_ != nullptr);
-    /// TODO(#453): Validate end to end connection of the Phases.
-  }
+  Route(const std::vector<Phase>& phases, const api::RoadNetwork* road_network);
 
   /// @return The number of Phases.
   int size() const { return static_cast<int>(phases_.size()); }
@@ -168,9 +163,7 @@ class Route final {
   ///
   /// @param inertial_position The INERTIAL-Frame position.
   /// @return A RoutePositionResult.
-  RoutePositionResult FindRoutePositionBy(const api::InertialPosition& inertial_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  RoutePositionResult FindRoutePosition(const api::InertialPosition& inertial_position) const;
 
   /// Finds the RoutePositionResult which @p road_position best fits.
   ///
@@ -189,9 +182,7 @@ class Route final {
   /// @return A RoutePositionResult.
   /// @throws common::assertion_error When @p road_position is not
   /// valid.
-  RoutePositionResult FindRoutePositionBy(const api::RoadPosition& road_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  RoutePositionResult FindRoutePosition(const api::RoadPosition& road_position) const;
 
   /// Finds the relation between @p lane_s_range_b with respect to
   /// @p lane_s_range_a.

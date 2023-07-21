@@ -7,6 +7,7 @@ if(BUILD_TESTING)
 set(TEST_UTILS_SOURCES
   check_id_indexing.cc
   maliput_math_compare.cc
+  maliput_routing_position_compare.cc
   maliput_types_compare.cc
   mock.cc
   mock_geometry.cc
@@ -36,8 +37,9 @@ target_include_directories(
 target_link_libraries(test_utilities
   maliput::api
   maliput::common
-  maliput::math
   maliput::geometry_base
+  maliput::math
+  maliput::routing
 )
 
 install(
