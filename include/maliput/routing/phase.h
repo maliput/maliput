@@ -106,6 +106,9 @@ class Phase final {
   /// @return The index of this Phase.
   int index() const { return index_; }
 
+  /// @return Tolerance to compare api::LaneSRanges.
+  double lane_s_range_tolerance() const { return lane_s_range_tolerance_; }
+
   /// @return The start api::RoadPositions of this Phase.
   const std::vector<api::RoadPosition>& start_positions() const { return start_positions_; }
 
@@ -159,6 +162,22 @@ class Phase final {
   std::vector<api::LaneSRange> lane_s_ranges_;
   const api::RoadNetwork* road_network_{};
 };
+
+/// Determines wether the @p position resides in any of @p lane_s_ranges.
+///
+/// @p tolerance is used to expand the range of @p lane_s_ranges when evaluating
+/// @p position.
+/// @param position The api::RoadPosition to evaluate. It must be valid.
+/// @param lane_s_ranges The api::LaneSRanges. It must not be empty.
+/// @param tolerance Tolerance to compare api::LaneSRanges' ranges with
+/// @p position. It must be non-negative.
+/// @return true When @p position is in any of @p lane_s_ranges with
+/// @p tolerance in the LANE-Frame s coordinate.
+/// @throws common::assertion_error When @p position is not valid.
+/// @throws common::assertion_error When @p lane_s_ranges is empty.
+/// @throws common::assertion_error When @p tolerance is negative.
+bool ValidatePositionIsInLaneSRanges(const maliput::api::RoadPosition& position,
+                                     const std::vector<api::LaneSRange>& lane_s_ranges, double tolerance);
 
 }  // namespace routing
 }  // namespace maliput
