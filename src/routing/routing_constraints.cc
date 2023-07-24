@@ -26,33 +26,24 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#pragma once
+#include "maliput/routing/routing_constraints.h"
 
-#include <optional>
+#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace routing {
 
-/// Holds the constraints that can be applied to the Router when computing a Route.
-struct RoutingConstraints {
-  /// Allows api::Lane switches within a Phase when computing the Route.
-  bool allow_lane_switch{true};
-  /// Defines the maximum cost of a Phase. Cost is a router implementation
-  /// detail and is thus unitless. When set, it must not be negative.
-  /// When both `max_route_cost` and this parameter are set,
-  /// `max_route_cost >= max_phase_cost`.
-  std::optional<double> max_phase_cost{};
-  /// Defines the maximim cost of a Route. Cost is a router implementation
-  /// detail and is thus unitless. When set, it must not be negative.
-  /// When both `max_phase_cost` and this parameter are set,
-  /// `max_route_cost >= max_phase_cost`.
-  std::optional<double> max_route_cost{};
-};
-
-/// Validates the constraints of each parameter of @p routing_constraints.
-/// @param routing_constraints A RoutingConstraints to validate.
-/// @throw common::assertion_error When one of the preconditions of @p routing_constraints are violated.
-void ValidateRoutingConstraints(const RoutingConstraints& routing_constraints);
+void ValidateRoutingConstraints(const RoutingConstraints& routing_constraints) {
+  if (routing_constraints.max_phase_cost.has_value()) {
+    MALIPUT_THROW_UNLESS(routing_constraints.max_phase_cost.value() >= 0.);
+  }
+  if (routing_constraints.max_route_cost.has_value()) {
+    MALIPUT_THROW_UNLESS(routing_constraints.max_route_cost.value() >= 0.);
+  }
+  if (routing_constraints.max_phase_cost.has_value() && routing_constraints.max_route_cost.has_value()) {
+    MALIPUT_THROW_UNLESS(routing_constraints.max_route_cost.value() >= routing_constraints.max_phase_cost.value());
+  }
+}
 
 }  // namespace routing
 }  // namespace maliput
