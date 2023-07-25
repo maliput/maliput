@@ -130,7 +130,7 @@ class Phase final {
   ///
   /// @param inertial_position The INERTIAL-Frame position.
   /// @return A PhasePositionResult.
-  PhasePositionResult FindPhasePositionBy(const api::InertialPosition& inertial_position) const;
+  PhasePositionResult FindPhasePosition(const api::InertialPosition& inertial_position) const;
 
   /// Finds the PhasePositionResult where @p road_position best fits.
   ///
@@ -149,7 +149,7 @@ class Phase final {
   /// @return A PhasePositionResult.
   /// @throws common::assertion_error When @p road_position is not
   /// valid.
-  PhasePositionResult FindPhasePositionBy(const api::RoadPosition& road_position) const;
+  PhasePositionResult FindPhasePosition(const api::RoadPosition& road_position) const;
 
  private:
   int index_{};

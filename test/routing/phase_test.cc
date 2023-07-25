@@ -29,7 +29,7 @@
 #include "maliput/routing/phase.h"
 
 #include <memory>
-#include <utility>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -64,9 +64,7 @@ class PhaseBaseTest : public ::testing::Test {
 class PhaseConstructorValidationsTest : public PhaseBaseTest {
  public:
   static constexpr int kIndex{1};
-  static constexpr int kWrongIndex{-2};
   static constexpr double kLaneSRangeTolerance{1e-3};
-  static constexpr double kWrongLaneSRangeTolerance{-1e-3};
   static constexpr double kLaneALength{100.};
   static constexpr double kLaneBLength{100.};
   static constexpr api::RoadNetwork* kNullptrRoadNetwork{nullptr};
@@ -78,19 +76,41 @@ class PhaseConstructorValidationsTest : public PhaseBaseTest {
   const api::LaneSRange kLaneSRangeAShort{kLaneIdA, api::SRange{10., kLaneALength - 10.}};
   const std::vector<api::RoadPosition> kEmptyRoadPositions{};
 
-  void SetUp() override { PhaseBaseTest::SetUp(); }
+  void SetUp() override {
+    PhaseBaseTest::SetUp();
+    EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
+
+    EXPECT_CALL(lane_a_, do_id()).WillRepeatedly(Return(kLaneIdA));
+    EXPECT_CALL(lane_a_, do_length()).WillRepeatedly(Return(kLaneALength));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a_));
+  }
+
+  void ConfigureLaneBMockOutsideRoadGeometry() {
+    EXPECT_CALL(lane_b_, do_id()).WillRepeatedly(Return(kLaneIdB));
+    EXPECT_CALL(lane_b_, do_length()).WillRepeatedly(Return(kLaneBLength));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(nullptr));
+  }
+
+  void ConfigureLaneBMockInsideRoadGeometry() {
+    EXPECT_CALL(lane_b_, do_id()).WillRepeatedly(Return(kLaneIdB));
+    EXPECT_CALL(lane_b_, do_length()).WillRepeatedly(Return(kLaneBLength));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b_));
+  }
+
+  void ConfigureAdjacentLanes(LaneMock* lane, LaneMock* left_lane = nullptr, LaneMock* right_lane = nullptr) {
+    EXPECT_CALL(*lane, do_to_left()).WillRepeatedly(Return(left_lane));
+    EXPECT_CALL(*lane, do_to_right()).WillRepeatedly(Return(right_lane));
+  }
+
+  LaneMock lane_a_;
+  LaneMock lane_b_;
 };
 
 TEST_F(PhaseConstructorValidationsTest, NegativeIndexThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  static constexpr int kWrongIndex{-2};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
 
   EXPECT_THROW(
@@ -102,15 +122,10 @@ TEST_F(PhaseConstructorValidationsTest, NegativeIndexThrows) {
 }
 
 TEST_F(PhaseConstructorValidationsTest, NegativeLaneSRangeToleranceThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  static constexpr double kWrongLaneSRangeTolerance{-1e-3};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
 
   EXPECT_THROW(
@@ -122,14 +137,8 @@ TEST_F(PhaseConstructorValidationsTest, NegativeLaneSRangeToleranceThrows) {
 }
 
 TEST_F(PhaseConstructorValidationsTest, EmptyStartPositionsThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
 
   EXPECT_THROW(
@@ -140,13 +149,7 @@ TEST_F(PhaseConstructorValidationsTest, EmptyStartPositionsThrows) {
 }
 
 TEST_F(PhaseConstructorValidationsTest, EmptyEndPositionsThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
 
   EXPECT_THROW(
@@ -158,16 +161,10 @@ TEST_F(PhaseConstructorValidationsTest, EmptyEndPositionsThrows) {
 }
 
 TEST_F(PhaseConstructorValidationsTest, InvalidRoadPositionsAtStartPositionsThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
   const std::vector<api::RoadPosition> kInvalidStartRoadPositions{
       api::RoadPosition{nullptr, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
 
   EXPECT_THROW(
@@ -179,13 +176,7 @@ TEST_F(PhaseConstructorValidationsTest, InvalidRoadPositionsAtStartPositionsThro
 }
 
 TEST_F(PhaseConstructorValidationsTest, InvalidRoadPositionsAtEndPositionsThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kInvalidEndRoadPositions{
       api::RoadPosition{nullptr, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
@@ -199,19 +190,10 @@ TEST_F(PhaseConstructorValidationsTest, InvalidRoadPositionsAtEndPositionsThrows
 }
 
 TEST_F(PhaseConstructorValidationsTest, StartRoadPositionsNotInRoadNetworkThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  LaneMock lane_b;
-  EXPECT_CALL(lane_b, do_id()).WillRepeatedly(Return(kLaneIdB));
-  EXPECT_CALL(lane_b, do_length()).WillRepeatedly(Return(kLaneBLength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_b, api::LanePosition{0., 0., 0.}}};
+  ConfigureLaneBMockOutsideRoadGeometry();
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_b_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
 
   EXPECT_THROW(
@@ -222,19 +204,10 @@ TEST_F(PhaseConstructorValidationsTest, StartRoadPositionsNotInRoadNetworkThrows
 }
 
 TEST_F(PhaseConstructorValidationsTest, EndRoadPositionsNotInRoadNetworkThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  LaneMock lane_b;
-  EXPECT_CALL(lane_b, do_id()).WillRepeatedly(Return(kLaneIdB));
-  EXPECT_CALL(lane_b, do_length()).WillRepeatedly(Return(kLaneBLength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  ConfigureLaneBMockOutsideRoadGeometry();
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_b, api::LanePosition{kLaneBLength, 0., 0.}}};
+      api::RoadPosition{&lane_b_, api::LanePosition{kLaneBLength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
 
   EXPECT_THROW(
@@ -245,15 +218,9 @@ TEST_F(PhaseConstructorValidationsTest, EndRoadPositionsNotInRoadNetworkThrows) 
 }
 
 TEST_F(PhaseConstructorValidationsTest, StartRoadPositionsNotInLaneSRangesThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneSRangeAShort.s_range().s1(), 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneSRangeAShort.s_range().s1(), 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeAShort};
 
   EXPECT_THROW(
@@ -264,16 +231,10 @@ TEST_F(PhaseConstructorValidationsTest, StartRoadPositionsNotInLaneSRangesThrows
 }
 
 TEST_F(PhaseConstructorValidationsTest, EndRoadPositionsNotInLaneSRangesThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
   const std::vector<api::RoadPosition> kStartRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneSRangeAShort.s_range().s0(), 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneSRangeAShort.s_range().s0(), 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeAShort};
 
   EXPECT_THROW(
@@ -284,15 +245,9 @@ TEST_F(PhaseConstructorValidationsTest, EndRoadPositionsNotInLaneSRangesThrows) 
 }
 
 TEST_F(PhaseConstructorValidationsTest, NullptrRoadNetworkThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
 
   EXPECT_THROW(
@@ -303,15 +258,9 @@ TEST_F(PhaseConstructorValidationsTest, NullptrRoadNetworkThrows) {
 }
 
 TEST_F(PhaseConstructorValidationsTest, EmptyLaneSRangesThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kEmptyLaneSRanges{};
 
   EXPECT_THROW(
@@ -323,19 +272,10 @@ TEST_F(PhaseConstructorValidationsTest, EmptyLaneSRangesThrows) {
 }
 
 TEST_F(PhaseConstructorValidationsTest, LaneSRangesNotInRoadNetworkThrows) {
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  LaneMock lane_b;
-  EXPECT_CALL(lane_b, do_id()).WillRepeatedly(Return(kLaneIdB));
-  EXPECT_CALL(lane_b, do_length()).WillRepeatedly(Return(kLaneBLength));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  ConfigureLaneBMockOutsideRoadGeometry();
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
 
   EXPECT_THROW(
@@ -346,23 +286,12 @@ TEST_F(PhaseConstructorValidationsTest, LaneSRangesNotInRoadNetworkThrows) {
 }
 
 TEST_F(PhaseConstructorValidationsTest, LaneSRangesNotAdjacentThrows) {
-  LaneMock lane_a;
-  LaneMock lane_b;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(lane_a, do_to_left()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_a, do_to_right()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_b, do_id()).WillRepeatedly(Return(kLaneIdB));
-  EXPECT_CALL(lane_b, do_length()).WillRepeatedly(Return(kLaneBLength));
-  EXPECT_CALL(lane_b, do_to_left()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_b, do_to_right()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  ConfigureAdjacentLanes(&lane_a_);
+  ConfigureLaneBMockInsideRoadGeometry();
+  ConfigureAdjacentLanes(&lane_b_);
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
 
   EXPECT_THROW(
@@ -373,24 +302,13 @@ TEST_F(PhaseConstructorValidationsTest, LaneSRangesNotAdjacentThrows) {
 }
 
 TEST_F(PhaseConstructorValidationsTest, CorrectConstruction) {
-  LaneMock lane_a;
-  LaneMock lane_b;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(lane_a, do_to_left()).WillRepeatedly(Return(&lane_b));
-  EXPECT_CALL(lane_a, do_to_right()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_b, do_id()).WillRepeatedly(Return(kLaneIdB));
-  EXPECT_CALL(lane_b, do_length()).WillRepeatedly(Return(kLaneBLength));
-  EXPECT_CALL(lane_b, do_to_left()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_b, do_to_right()).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  ConfigureAdjacentLanes(&lane_a_, &lane_b_ /* left lane */, nullptr /* right lane*/);
+  ConfigureLaneBMockInsideRoadGeometry();
+  ConfigureAdjacentLanes(&lane_b_, nullptr /* left lane */, &lane_a_ /* right lane*/);
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}},
-      api::RoadPosition{&lane_b, api::LanePosition{kLaneBLength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}},
+      api::RoadPosition{&lane_b_, api::LanePosition{kLaneBLength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
 
   EXPECT_NO_THROW({
@@ -401,24 +319,13 @@ TEST_F(PhaseConstructorValidationsTest, CorrectConstruction) {
 class PhaseAccessorsTest : public PhaseConstructorValidationsTest {};
 
 TEST_F(PhaseAccessorsTest, CorrectConstruction) {
-  LaneMock lane_a;
-  LaneMock lane_b;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(lane_a, do_to_left()).WillRepeatedly(Return(&lane_b));
-  EXPECT_CALL(lane_a, do_to_right()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_b, do_id()).WillRepeatedly(Return(kLaneIdB));
-  EXPECT_CALL(lane_b, do_length()).WillRepeatedly(Return(kLaneBLength));
-  EXPECT_CALL(lane_b, do_to_left()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_b, do_to_right()).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  ConfigureAdjacentLanes(&lane_a_, &lane_b_ /* left lane */, nullptr /* right lane*/);
+  ConfigureLaneBMockInsideRoadGeometry();
+  ConfigureAdjacentLanes(&lane_b_, nullptr /* left lane */, &lane_a_ /* right lane*/);
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}},
-      api::RoadPosition{&lane_b, api::LanePosition{kLaneBLength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}},
+      api::RoadPosition{&lane_b_, api::LanePosition{kLaneBLength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
 
   const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
@@ -450,28 +357,20 @@ TEST_F(PhaseAccessorsTest, CorrectConstruction) {
 
 class PhaseMappingTest : public PhaseConstructorValidationsTest {};
 
-TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithOneElement) {
+TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithSingleLaneSRangePhase) {
   const api::LanePositionResult kLanePositionResult{api::LanePosition{10., 0., 0.}, api::InertialPosition{1., 0., 0.},
                                                     0.2};
   const api::InertialPosition kInertialPosition{1., 2., 0.};
-
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(lane_a, do_to_left()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_a, do_to_right()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_a, DoToLanePosition(_)).WillRepeatedly(Return(kLanePositionResult));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  ConfigureAdjacentLanes(&lane_a_);
+  EXPECT_CALL(lane_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLanePositionResult));
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
   const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
                   road_network_.get());
 
-  const PhasePositionResult position_result = dut.FindPhasePositionBy(kInertialPosition);
+  const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
   EXPECT_EQ(0, position_result.lane_s_range_index);
   EXPECT_EQ(kLanePositionResult.lane_position.s(), position_result.lane_position.s());
@@ -483,37 +382,102 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithOneElement) {
   EXPECT_EQ(kLanePositionResult.distance, position_result.distance);
 }
 
-TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionOutsideLaneSRange) {
+TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithMultipleLaneSRangePhase) {
+  ConfigureAdjacentLanes(&lane_a_, &lane_b_ /* left lane */, nullptr /* right lane*/);
+  ConfigureLaneBMockInsideRoadGeometry();
+  ConfigureAdjacentLanes(&lane_b_, nullptr /* left lane */, &lane_a_ /* right lane*/);
+  SegmentMock segment;
+  EXPECT_CALL(segment, do_id()).WillRepeatedly(Return(api::SegmentId("segment_mock")));
+  EXPECT_CALL(lane_a_, do_segment()).WillRepeatedly(Return(&segment));
+  EXPECT_CALL(lane_b_, do_segment()).WillRepeatedly(Return(&segment));
+  const api::RBounds lane_lane_bounds(-2.5, 2.5);
+  EXPECT_CALL(lane_a_, do_lane_bounds(_)).WillRepeatedly(Return(lane_lane_bounds));
+  EXPECT_CALL(lane_b_, do_lane_bounds(_)).WillRepeatedly(Return(lane_lane_bounds));
+  const api::LanePositionResult kLaneAPositionResult{api::LanePosition{10., 0., 0.}, api::InertialPosition{1., 0., 0.},
+                                                     0.};
+  EXPECT_CALL(lane_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneAPositionResult));
+  const api::LanePositionResult kLaneBPositionResult{api::LanePosition{10., 5., 0.}, api::InertialPosition{1., 0., 0.},
+                                                     0.};
+  EXPECT_CALL(lane_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneBPositionResult));
+  const api::InertialPosition kInertialPosition{1., 2., 0.};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
+  const std::vector<api::RoadPosition> kEndRoadPositions{
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
+  const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
+  const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
+                  road_network_.get());
+
+  const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
+
+  EXPECT_EQ(0, position_result.lane_s_range_index);
+  EXPECT_EQ(kLaneAPositionResult.lane_position.s(), position_result.lane_position.s());
+  EXPECT_EQ(kLaneAPositionResult.lane_position.r(), position_result.lane_position.r());
+  EXPECT_EQ(kLaneAPositionResult.lane_position.h(), position_result.lane_position.h());
+  EXPECT_EQ(kLaneAPositionResult.nearest_position.x(), position_result.inertial_position.x());
+  EXPECT_EQ(kLaneAPositionResult.nearest_position.y(), position_result.inertial_position.y());
+  EXPECT_EQ(kLaneAPositionResult.nearest_position.z(), position_result.inertial_position.z());
+  EXPECT_EQ(kLaneAPositionResult.distance, position_result.distance);
+}
+
+TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionOutsidePhase) {
+  const api::LanePositionResult kLanePositionResult{api::LanePosition{5., 0., 0.}, api::InertialPosition{1., 0., 0.},
+                                                    0.2};
+  const api::InertialPosition kInertialPosition{1., 2., 0.};
+  const api::InertialPosition kNearestInertialPosition{3., 4., 0.};
+  const double distance = kNearestInertialPosition.Distance(kInertialPosition);
+  ConfigureAdjacentLanes(&lane_a_);
+  EXPECT_CALL(lane_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLanePositionResult));
+  EXPECT_CALL(lane_a_, DoToInertialPosition(_)).WillRepeatedly(Return(kNearestInertialPosition));
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{10., 0., 0.}}};
+  const std::vector<api::RoadPosition> kEndRoadPositions{
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength - 10., 0., 0.}}};
+  const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeAShort};
+  const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
+                  road_network_.get());
+
+  const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
+
+  EXPECT_EQ(0, position_result.lane_s_range_index);
+  EXPECT_EQ(kLaneSRangeAShort.s_range().s0(), position_result.lane_position.s());
+  EXPECT_EQ(0., position_result.lane_position.r());
+  EXPECT_EQ(0., position_result.lane_position.h());
+  EXPECT_EQ(kNearestInertialPosition.x(), position_result.inertial_position.x());
+  EXPECT_EQ(kNearestInertialPosition.y(), position_result.inertial_position.y());
+  EXPECT_EQ(kNearestInertialPosition.z(), position_result.inertial_position.z());
+  EXPECT_EQ(distance, position_result.distance);
+}
+
+TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionThrowsWithInvalidPosition) {
+  ConfigureAdjacentLanes(&lane_a_);
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
+  const std::vector<api::RoadPosition> kEndRoadPositions{
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
+  const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
+  const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
+                  road_network_.get());
+  const api::RoadPosition kInvalidRoadPosition{nullptr, api::LanePosition{10., 0., 0.}};
+
+  EXPECT_THROW({ dut.FindPhasePosition(kInvalidRoadPosition); }, common::assertion_error);
+}
+
+TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionOutsidePhase) {
   const api::LanePositionResult kLanePositionResult{api::LanePosition{10., 0., 0.}, api::InertialPosition{1., 0., 0.},
                                                     0.2};
   const api::InertialPosition kInertialPosition{1., 2., 0.};
-
-  LaneMock lane_a;
-  EXPECT_CALL(lane_a, do_id()).WillRepeatedly(Return(kLaneIdA));
-  EXPECT_CALL(lane_a, do_length()).WillRepeatedly(Return(kLaneALength));
-  EXPECT_CALL(lane_a, do_to_left()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_a, do_to_right()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_a, DoToLanePosition(_)).WillRepeatedly(Return(kLanePositionResult));
-  LaneMock lane_b;
-  EXPECT_CALL(lane_b, do_id()).WillRepeatedly(Return(kLaneIdB));
-  EXPECT_CALL(lane_b, do_length()).WillRepeatedly(Return(kLaneBLength));
-  EXPECT_CALL(lane_b, do_to_left()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_b, do_to_right()).WillRepeatedly(Return(nullptr));
-  EXPECT_CALL(lane_b, DoToInertialPosition(_)).WillRepeatedly(Return(kInertialPosition));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
-  EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b));
-  EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-
-  const api::RoadPosition kRoadPosition{&lane_b, api::LanePosition{10., 0., 0.}};
-
-  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a, api::LanePosition{0., 0., 0.}}};
+  ConfigureAdjacentLanes(&lane_a_);
+  EXPECT_CALL(lane_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLanePositionResult));
+  ConfigureLaneBMockInsideRoadGeometry();
+  ConfigureAdjacentLanes(&lane_b_);
+  EXPECT_CALL(lane_b_, DoToInertialPosition(_)).WillRepeatedly(Return(kInertialPosition));
+  const api::RoadPosition kRoadPosition{&lane_b_, api::LanePosition{10., 0., 0.}};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
   const std::vector<api::RoadPosition> kEndRoadPositions{
-      api::RoadPosition{&lane_a, api::LanePosition{kLaneALength, 0., 0.}}};
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
   const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
                   road_network_.get());
 
-  const PhasePositionResult position_result = dut.FindPhasePositionBy(kInertialPosition);
+  const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
   EXPECT_EQ(0, position_result.lane_s_range_index);
   EXPECT_EQ(kLanePositionResult.lane_position.s(), position_result.lane_position.s());
@@ -524,6 +488,37 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionOutsideLaneSRange) {
   EXPECT_EQ(kLanePositionResult.nearest_position.z(), position_result.inertial_position.z());
   EXPECT_EQ(kLanePositionResult.distance, position_result.distance);
 }
+
+TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
+  ConfigureAdjacentLanes(&lane_a_, &lane_b_ /* left lane */, nullptr /* right lane*/);
+  ConfigureLaneBMockInsideRoadGeometry();
+  ConfigureAdjacentLanes(&lane_b_, nullptr /* left lane */, &lane_a_ /* right lane*/);
+  const api::InertialPosition kInertialPosition{1., 2., 0.};
+  EXPECT_CALL(lane_b_, DoToInertialPosition(_)).WillRepeatedly(Return(kInertialPosition));
+  const api::LanePositionResult kLanePositionResult{api::LanePosition{10., 0., 0.}, api::InertialPosition{1., 0., 0.},
+                                                    0.2};
+  EXPECT_CALL(lane_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLanePositionResult));
+  const api::RoadPosition kRoadPosition{&lane_b_, api::LanePosition{10., 0., 0.}};
+  const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
+  const std::vector<api::RoadPosition> kEndRoadPositions{
+      api::RoadPosition{&lane_a_, api::LanePosition{kLaneALength, 0., 0.}}};
+  const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
+  const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
+                  road_network_.get());
+
+  const PhasePositionResult position_result = dut.FindPhasePosition(kRoadPosition);
+
+  EXPECT_EQ(1, position_result.lane_s_range_index);
+  EXPECT_EQ(kLanePositionResult.lane_position.s(), position_result.lane_position.s());
+  EXPECT_EQ(kLanePositionResult.lane_position.r(), position_result.lane_position.r());
+  EXPECT_EQ(kLanePositionResult.lane_position.h(), position_result.lane_position.h());
+  EXPECT_EQ(kLanePositionResult.nearest_position.x(), position_result.inertial_position.x());
+  EXPECT_EQ(kLanePositionResult.nearest_position.y(), position_result.inertial_position.y());
+  EXPECT_EQ(kLanePositionResult.nearest_position.z(), position_result.inertial_position.z());
+  EXPECT_EQ(kLanePositionResult.distance, position_result.distance);
+}
+
+// TODO: Test Phase::FindPhasePosition() when the LaneSRange::WithS() is false.
 
 }  // namespace
 }  // namespace test

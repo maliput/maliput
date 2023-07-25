@@ -28,6 +28,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/routing/phase.h"
 
+#include <algorithm>
 #include <iterator>
 
 #include "maliput/api/lane.h"
@@ -39,7 +40,7 @@ namespace maliput {
 namespace routing {
 namespace {
 
-// @return true When @p value is within @p min and @p max.
+// @return true When @p value is within @p min and @p max, inclusive.
 inline bool is_in_range(double min, double max, double value) { return value >= min && value <= max; }
 
 // @return true When @p position is in any of @p lane_s_ranges with @p tolerance in the LANE-Frame s coordinate.
@@ -71,7 +72,7 @@ bool ValidateLaneSRangeIsInRoadNetwork(const api::LaneSRange& lane_s_range, cons
          is_in_range(min_s_range, max_s_range, lane_s_range.s_range().s1());
 }
 
-// @return true When @p lane_s_range_a and @p lane_s_range_b are adjancent one to the other.
+// @return true When @p lane_s_range_a and @p lane_s_range_b are adjacent.
 bool ValidateLaneSRangesAreAdjancent(const api::LaneSRange& lane_s_range_a, const api::LaneSRange& lane_s_range_b,
                                      const api::RoadGeometry* road_geometry) {
   const api::Lane* lane_a = road_geometry->ById().GetLane(lane_s_range_a.lane_id());
@@ -126,16 +127,32 @@ Phase::Phase(int index, double lane_s_range_tolerance, const std::vector<api::Ro
   }
 }
 
-PhasePositionResult Phase::FindPhasePositionBy(const api::InertialPosition& inertial_position) const {
+PhasePositionResult Phase::FindPhasePosition(const api::InertialPosition& inertial_position) const {
   std::vector<api::RoadPositionResult> road_position_results;
   const api::RoadGeometry* road_geometry = road_network_->road_geometry();
-  std::transform(lane_s_ranges_.cbegin(), lane_s_ranges_.cend(), std::back_inserter(road_position_results),
-                 [road_geometry, &inertial_position](const auto& lane_s_range) {
-                   const api::Lane* lane = road_geometry->ById().GetLane(lane_s_range.lane_id());
-                   const api::LanePositionResult lane_position_result = lane->ToLanePosition(inertial_position);
-                   return api::RoadPositionResult{api::RoadPosition{lane, lane_position_result.lane_position},
-                                                  lane_position_result.nearest_position, lane_position_result.distance};
-                 });
+  std::transform(
+      lane_s_ranges_.cbegin(), lane_s_ranges_.cend(), std::back_inserter(road_position_results),
+      [road_geometry, &inertial_position, &tolerance = lane_s_range_tolerance_](const auto& lane_s_range) {
+        const api::Lane* lane = road_geometry->ById().GetLane(lane_s_range.lane_id());
+        const api::LanePositionResult lane_position_result = lane->ToLanePosition(inertial_position);
+        api::RoadPosition road_position{lane, lane_position_result.lane_position};
+        if (ValidatePositionIsInLaneSRanges(road_position, {lane_s_range}, tolerance)) {
+          return api::RoadPositionResult{road_position, lane_position_result.nearest_position,
+                                         lane_position_result.distance};
+        }
+        // Find the best candidate within the lane_s_range extent. Criteria follows:
+        // - Match the extent (s0 or s1) that is closer to the lane returned lane_position_result.
+        // - Create a new api::LanePosition in the center of the api::Lane whose s-coordinate
+        //   is equal to the closer extent (s0 or s1).
+        // - Complete the api::RoadPositionResults with that new api::LanePosition.
+        const double distance_to_s0 = std::abs(lane_position_result.lane_position.s() - lane_s_range.s_range().s0());
+        const double distance_to_s1 = std::abs(lane_position_result.lane_position.s() - lane_s_range.s_range().s1());
+        const api::LanePosition clamped_lane_position{
+            distance_to_s0 <= distance_to_s1 ? lane_s_range.s_range().s0() : lane_s_range.s_range().s1(), 0., 0.};
+        const api::InertialPosition nearest_position = lane->ToInertialPosition(clamped_lane_position);
+        const double distance = nearest_position.Distance(inertial_position);
+        return api::RoadPositionResult{api::RoadPosition{lane, clamped_lane_position}, nearest_position, distance};
+      });
 
   size_t best_candidate_index = 0u;
   for (size_t i = 1u; i < lane_s_ranges_.size(); ++i) {
@@ -151,10 +168,11 @@ PhasePositionResult Phase::FindPhasePositionBy(const api::InertialPosition& iner
                              road_position_results[best_candidate_index].distance};
 }
 
-PhasePositionResult Phase::FindPhasePositionBy(const api::RoadPosition& road_position) const {
-  api::RoadPosition query_road_position{};
+PhasePositionResult Phase::FindPhasePosition(const api::RoadPosition& road_position) const {
+  MALIPUT_THROW_UNLESS(road_position.lane != nullptr);
+
   if (!ValidatePositionIsInLaneSRanges(road_position, lane_s_ranges_, lane_s_range_tolerance_)) {
-    return FindPhasePositionBy(road_position.lane->ToInertialPosition(road_position.pos));
+    return FindPhasePosition(road_position.lane->ToInertialPosition(road_position.pos));
   }
   const auto best_candidate_it = std::find_if(
       lane_s_ranges_.begin(), lane_s_ranges_.end(),
