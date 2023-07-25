@@ -1,0 +1,45 @@
+codecov:
+  # Don't wait for all other statuses to pass before sending codecov status.
+  require_ci_to_pass: no
+
+# Disable pull request comments.
+comment: false
+
+# Use filters to classify coverage data by package.
+component_management:
+  # Rules inherited by all components.
+  default_rules:
+    statuses:
+      - type: project  # Measure overall project coverage.
+        # The minimum coverage ratio to send a success status is the base
+        # commit coverage (pull request base or parent commit).
+        target: auto
+        # If the patch coverage is 100% and there are no unexpected changes,
+        # pass the project status.
+        removed_code_behavior: fully_covered_patch
+
+  individual_components:
+    - component_id: package_maliput
+      name: maliput
+      paths:
+        - maliput/**
+
+coverage:
+  # Disable project and patch level coverage status check in favor of
+  # individual component status checks.
+  status:
+    project: off
+    patch: off
+
+# Recommended by https://github.com/ros-tooling/action-ros-ci#integrate-action-ros-ci-with-codecov
+fixes:
+  - "ros_ws/src/*/maliput/maliput/::"
+github_checks:
+  # Disable GitHub line-by-line annotations.
+  annotations: false
+
+# Exclude unwanted directories from code coverage reports.
+ignore:
+  - "maliput/doc"
+  - "maliput/test"
+  - "maliput/tools"

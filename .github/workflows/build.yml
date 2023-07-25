@@ -26,6 +26,20 @@ jobs:
         package-name: ${{ env.PACKAGE_NAME }}
         target-ros2-distro: ${{ env.ROS_DISTRO }}
         vcs-repo-file-url: ${GITHUB_WORKSPACE}/.github/dependencies.repos
+        colcon-defaults: |
+          {
+            "build": {
+              "mixin": ["coverage-gcc"]
+            }
+          }
+        # If possible, pin the repository in the workflow to a specific commit to avoid
+        # changes in colcon-mixin-repository from breaking your tests.
+        colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
+    - uses: codecov/codecov-action@v1.2.1
+      with:
+        files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
+        flags: unittests
+        name: codecov-umbrella
 
     # create tarball to push to github artifacts
     # Note that a file with the name of the bundle is created to pass the value
@@ -37,7 +51,7 @@ jobs:
       env:
         BUNDLE_NAME: maliput_underlay
       run: |
-        echo "Moving install space to ${BUNDLE_NAME}";
+        echo "Moving install space to ${BUNDLE_NAME}"; 
         mv install ${BUNDLE_NAME};
         CURRENT_BUNDLE_TARBALL_NAME="${BUNDLE_NAME}_$(date +%Y%m%d)_20.04.tar.gz"
         echo $CURRENT_BUNDLE_TARBALL_NAME > bundle_file_name
