@@ -1,6 +1,7 @@
 codecov:
   # Don't wait for all other statuses to pass before sending codecov status.
   require_ci_to_pass: no
+  disable_default_path_fixes: yes
 
 # See https://docs.codecov.com/docs/pull-request-comments
 comment:
@@ -30,4 +31,4 @@ github_checks:
 
 # Exclude unwanted directories from code coverage reports.
 ignore:
-  # - "test"
+  - "test"
