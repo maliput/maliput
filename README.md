@@ -1,5 +1,5 @@
 
-[![GCC](https://github.com/maliput/maliput/actions/workflows/build.yml/badge.svg)](https://github.com/maliput/maliput/actions/workflows/build.yml)
+[![GCC](https://github.com/maliput/maliput/actions/workflows/build.yml/badge.svg)](https://github.com/maliput/maliput/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/maliput/maliput/branch/main/graph/badge.svg?token=1Y6J4430ZM)](https://codecov.io/gh/maliput/maliput)
 
 # Maliput
 
