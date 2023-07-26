@@ -19,13 +19,15 @@ jobs:
       image: ubuntu:20.04
     steps:
     - uses: actions/checkout@v3
+      with:
+        path: checkouted_repo
     - uses: ros-tooling/setup-ros@v0.3
     - uses: ros-tooling/action-ros-ci@v0.2
       id: action_ros_ci_step
       with:
         package-name: ${{ env.PACKAGE_NAME }}
         target-ros2-distro: ${{ env.ROS_DISTRO }}
-        vcs-repo-file-url: ${GITHUB_WORKSPACE}/.github/dependencies.repos
+        vcs-repo-file-url: ${GITHUB_WORKSPACE}/checkouted_repo/.github/dependencies.repos
         colcon-defaults: |
           {
             "build": {
