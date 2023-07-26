@@ -56,7 +56,7 @@ jobs:
       env:
         BUNDLE_NAME: maliput_underlay
       run: |
-        echo "Moving install space to ${BUNDLE_NAME}"; 
+        echo "Moving install space to ${BUNDLE_NAME}";
         mv install ${BUNDLE_NAME};
         CURRENT_BUNDLE_TARBALL_NAME="${BUNDLE_NAME}_$(date +%Y%m%d)_20.04.tar.gz"
         echo $CURRENT_BUNDLE_TARBALL_NAME > bundle_file_name
