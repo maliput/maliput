@@ -5,7 +5,7 @@ codecov:
 comment:
   layout: " diff, flags, files"
   behavior: default # Update if exists, otherwise post new.
-  require_changes: false  # only post the comment if coverage changes
+  require_changes: false  # post the comment even when no coverage changes
 
 # See https://docs.codecov.com/docs/commit-status
 coverage:
@@ -22,8 +22,8 @@ coverage:
 # Recommended by https://github.com/ros-tooling/action-ros-ci#integrate-action-ros-ci-with-codecov
 fixes:
   - "ros_ws/src/*/maliput/::"
+
 github_checks:
-  # Disable GitHub line-by-line annotations.
   annotations: true
 
 # Exclude unwanted directories from code coverage reports.
