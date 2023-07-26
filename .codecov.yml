@@ -5,7 +5,7 @@ codecov:
 comment:
   layout: " diff, flags, files"
   behavior: default # Update if exists, otherwise post new.
-  require_changes: true  # only post the comment if coverage changes
+  require_changes: false  # only post the comment if coverage changes
 
 # See https://docs.codecov.com/docs/commit-status
 coverage:
