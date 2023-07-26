@@ -34,8 +34,8 @@ jobs:
           }
         # If possible, pin the repository in the workflow to a specific commit to avoid
         # changes in colcon-mixin-repository from breaking your tests.
-        colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
-    - uses: codecov/codecov-action@v1.2.1
+        colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/c75e4b34a3959524564afb584e2aa33c7eec323c/index.yaml
+    - uses: codecov/codecov-action@v3
       with:
         # Regarding token use in public repo:
         # See https://community.codecov.com/t/upload-issues-unable-to-locate-build-via-github-actions-api/3954
@@ -45,6 +45,13 @@ jobs:
         name: codecov-umbrella
         fail_ci_if_error: true
         verbose: true
+
+    - uses: actions/upload-artifact@v3
+      if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      with:
+        name: lcov
+        retention-days: 7
+        path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/lcov
 
     # create tarball to push to github artifacts
     # Note that a file with the name of the bundle is created to pass the value
