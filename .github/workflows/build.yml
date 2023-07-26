@@ -37,6 +37,9 @@ jobs:
         colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
     - uses: codecov/codecov-action@v1.2.1
       with:
+        # Regarding token use in public repo:
+        # See https://community.codecov.com/t/upload-issues-unable-to-locate-build-via-github-actions-api/3954
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: ros_ws/lcov/total_coverage.info
         flags: unittests
         name: codecov-umbrella
