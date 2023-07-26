@@ -21,7 +21,7 @@ coverage:
 
 # Recommended by https://github.com/ros-tooling/action-ros-ci#integrate-action-ros-ci-with-codecov
 fixes:
-  - "ros_ws/src/*/maliput/maliput/::"
+  - "ros_ws/src/*/maliput/::"
 github_checks:
   # Disable GitHub line-by-line annotations.
   annotations: true
