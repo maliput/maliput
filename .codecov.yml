@@ -2,8 +2,9 @@ codecov:
   # Don't wait for all other statuses to pass before sending codecov status.
   require_ci_to_pass: no
 
+# See https://docs.codecov.com/docs/pull-request-comments
 comment:
-  layout: " diff, flags, files"
+  layout: " diff, files"
   behavior: default # Update if exists, otherwise post new.
   require_changes: false  # post the comment even when no coverage changes
 
