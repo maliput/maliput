@@ -51,6 +51,13 @@ jobs:
         verbose: true
 
     - uses: actions/upload-artifact@v3
+      with:
+        name: colcon-logs
+        retention-days: 2
+        path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
+      if: always() # upload the logs even when the build fails
+
+    - uses: actions/upload-artifact@v3
       if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
       with:
         name: lcov
