@@ -44,6 +44,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         # files: ros_ws/lcov/total_coverage.info
         directory: ros_ws/lcov
+        working-directory: ros_ws
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: true
