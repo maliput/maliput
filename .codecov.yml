@@ -1,0 +1,35 @@
+codecov:
+  # Don't wait for all other statuses to pass before sending codecov status.
+  require_ci_to_pass: no
+
+# See https://docs.codecov.com/docs/pull-request-comments
+comment:
+  layout: " diff, files"
+  behavior: default # Update if exists, otherwise post new.
+  require_changes: false  # post the comment even when no coverage changes
+
+# See https://docs.codecov.com/docs/commit-status
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 5%
+        removed_code_behavior: fully_covered_patch
+    patch:
+      default:
+        target: auto
+        removed_code_behavior: fully_covered_patch
+
+# Recommended by https://github.com/ros-tooling/action-ros-ci#integrate-action-ros-ci-with-codecov
+fixes:
+  - "ros_ws/src/*/maliput/::"
+
+github_checks:
+  annotations: true
+
+# Exclude unwanted directories from code coverage reports.
+ignore:
+  - "doc"
+  - "test"
+  - "tools"
