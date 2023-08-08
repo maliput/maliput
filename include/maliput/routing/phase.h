@@ -34,7 +34,6 @@
 #include "maliput/api/regions.h"
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
-#include "maliput/common/maliput_throw.h"
 #include "maliput/routing/route_position_result.h"
 
 namespace maliput {
@@ -102,27 +101,7 @@ class Phase final {
   /// @throws common::assertion_error When @p road_network is nullptr.
   Phase(int index, double lane_s_range_tolerance, const std::vector<api::RoadPosition>& start_positions,
         const std::vector<api::RoadPosition>& end_positions, const std::vector<api::LaneSRange>& lane_s_ranges,
-        const api::RoadNetwork* road_network)
-      : index_(index),
-        lane_s_range_tolerance_(lane_s_range_tolerance),
-        start_positions_(start_positions),
-        end_positions_(end_positions),
-        lane_s_ranges_(lane_s_ranges),
-        road_network_(road_network) {
-    MALIPUT_THROW_UNLESS(index_ >= 0);
-    MALIPUT_THROW_UNLESS(lane_s_range_tolerance >= 0.);
-    MALIPUT_THROW_UNLESS(!start_positions_.empty());
-    MALIPUT_THROW_UNLESS(std::any_of(start_positions_.begin(), start_positions_.end(),
-                                     [](const auto& pos) { return pos.lane == nullptr; }));
-    MALIPUT_THROW_UNLESS(!end_positions_.empty());
-    MALIPUT_THROW_UNLESS(
-        std::any_of(end_positions_.begin(), end_positions_.end(), [](const auto& pos) { return pos.lane == nullptr; }));
-    MALIPUT_THROW_UNLESS(!lane_s_ranges_.empty());
-    MALIPUT_THROW_UNLESS(road_network_ != nullptr);
-    // TODO(#543): Validate that for start_positions_ and end_positions_ the api::RoadPositions are in lane_s_ranges_.
-    // TODO(#543): Validate that lane_s_ranges_ are effectively adjacent one to another.
-    // TODO(#543): Validate api::LaneSRanges are in the RoadNetwork.
-  }
+        const api::RoadNetwork* road_network);
 
   /// @return The index of this Phase.
   int index() const { return index_; }
@@ -151,9 +130,7 @@ class Phase final {
   ///
   /// @param inertial_position The INERTIAL-Frame position.
   /// @return A PhasePositionResult.
-  PhasePositionResult FindPhasePosition(const api::InertialPosition& inertial_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  PhasePositionResult FindPhasePosition(const api::InertialPosition& inertial_position) const;
 
   /// Finds the PhasePositionResult where @p road_position best fits.
   ///
@@ -172,9 +149,7 @@ class Phase final {
   /// @return A PhasePositionResult.
   /// @throws common::assertion_error When @p road_position is not
   /// valid.
-  PhasePositionResult FindPhasePosition(const api::RoadPosition& road_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  PhasePositionResult FindPhasePosition(const api::RoadPosition& road_position) const;
 
  private:
   int index_{};
