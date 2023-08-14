@@ -28,6 +28,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "maliput/api/lane_data.h"
@@ -192,9 +193,7 @@ class Route final {
   /// @return The LaneSRangeRelation between @p lane_s_range_b with respect to
   /// @p lane_s_range_a.
   LaneSRangeRelation LaneSRangeRelationFor(const api::LaneSRange& lane_s_range_a,
-                                           const api::LaneSRange& lane_s_range_b) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+                                           const api::LaneSRange& lane_s_range_b) const;
 
   /// Computes an api::LaneSRoute that connects @p start_position with
   /// end_route_position().
@@ -215,6 +214,21 @@ class Route final {
   }
 
  private:
+  // Type alias to index an api::LaneSRange within this Route.
+  // std::pair::first indexes the RoutePhase.
+  // std::pair::second indexes the api::LaneSRange in the RoutePhase.
+  using LaneSRangeIndex = std::pair<size_t, size_t>;
+
+  // Finds the LaneSRangeIndex for an api::LaneSRange.
+  //
+  // To provide a match, @p lane_s_range must be within RoadNetwork's tolerance
+  // of any of the existing api::LaneSRanges within this Route.
+  //
+  // @param lane_s_range The api::LaneSRange to look for.
+  // @return An optional containing the index of the api::LaneSRange within this
+  // Route.
+  std::optional<LaneSRangeIndex> FindLaneSRangeIndexFor(const api::LaneSRange& lane_s_range) const;
+
   std::vector<Phase> phases_;
   const api::RoadNetwork* road_network_{};
 };

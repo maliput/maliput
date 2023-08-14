@@ -92,5 +92,129 @@ RoutePositionResult Route::FindRoutePosition(const api::RoadPosition& road_posit
   return RoutePositionResult{phase_index, route_phase_it->FindPhasePosition(road_position)};
 }
 
+namespace {
+
+enum class RelativePosition { kLeft = 0, kCenter, kRight };
+
+RelativePosition ComputeRelativePositionFor(const api::RoadPosition& pos_a, const api::RoadPosition& pos_b,
+                                            double tolerance) {
+  const api::InertialPosition inerital_pos_a = pos_a.lane->ToInertialPosition(pos_a.pos);
+  const api::InertialPosition inerital_pos_b = pos_b.lane->ToInertialPosition(pos_b.pos);
+
+  // When points are within tolerance, they are considered the same.
+  const math::Vector3 b_to_a = inerital_pos_b.xyz() - inerital_pos_a.xyz();
+  if (b_to_a.norm() <= tolerance) {
+    return RelativePosition::kCenter;
+  }
+
+  const api::Rotation inertial_rotation_a = pos_a.lane->GetOrientation(pos_a.pos);
+  const math::Vector3& s_hat_a = inertial_rotation_a.Apply({1., 0., 0.}).xyz();
+  const math::Vector3& h_hat_a = inertial_rotation_a.Apply({0., 0., 1.}).xyz();
+
+  const math::Vector3 norm_b_to_a = (inerital_pos_b.xyz() - inerital_pos_a.xyz()).normalized();
+
+  const bool is_to_left = s_hat_a.cross(norm_b_to_a).dot(h_hat_a) > 0.;
+  return is_to_left ? RelativePosition::kLeft : RelativePosition::kRight;
+}
+
+}  // namespace
+
+LaneSRangeRelation Route::LaneSRangeRelationFor(const api::LaneSRange& lane_s_range_a,
+                                                const api::LaneSRange& lane_s_range_b) const {
+  // Find index of lane_s_range_a and lane_s_range_b.
+  const std::optional<LaneSRangeIndex> lane_s_range_a_index = FindLaneSRangeIndexFor(lane_s_range_a);
+  const std::optional<LaneSRangeIndex> lane_s_range_b_index = FindLaneSRangeIndexFor(lane_s_range_b);
+
+  // Determine whether lane_s_range_a and lane_s_range_b are in the same Route.
+  if (!lane_s_range_a_index.has_value() || !lane_s_range_b_index.has_value()) {
+    return LaneSRangeRelation::kUnknown;
+  }
+
+  // lane_s_range_b is unrelated to lane_s_range_a
+  if (lane_s_range_a_index->first > lane_s_range_b_index->first + 1 ||
+      lane_s_range_b_index->first > lane_s_range_a_index->first + 1) {
+    return LaneSRangeRelation::kUnrelated;
+  }
+
+  const size_t lane_s_range_b_next_index = lane_s_range_b_index->second + 1;
+  const size_t lane_s_range_b_previous_index = lane_s_range_b_index->second - 1;
+
+  // When both indices are the same, we should look into the indices for the lane_s_ranges.
+  if (lane_s_range_a_index->first == lane_s_range_b_index->first) {
+    if (lane_s_range_a_index->second == lane_s_range_b_index->second) {
+      return LaneSRangeRelation::kCoincident;
+    } else if (lane_s_range_a_index->second == lane_s_range_b_next_index) {
+      return LaneSRangeRelation::kAdjacentRight;
+    } else if (lane_s_range_a_index->second > lane_s_range_b_next_index) {
+      return LaneSRangeRelation::kRight;
+    } else if (lane_s_range_a_index->second == lane_s_range_b_previous_index) {
+      return LaneSRangeRelation::kAdjacentLeft;
+    } else {  // (lane_s_range_a_index->second < lane_s_range_b_previous_index)
+      return LaneSRangeRelation::kLeft;
+    }
+  }
+
+  auto get_lane_s_range_road_position = [&](size_t route_phase_index, size_t lane_range_index, bool start) {
+    const auto& lane_s_range = phases_[route_phase_index].lane_s_ranges()[lane_range_index];
+    const api::Lane* lane = road_network_->road_geometry()->ById().GetLane(lane_s_range.lane_id());
+    return api::RoadPosition(
+        lane, api::LanePosition(start ? lane_s_range.s_range().s0() : lane_s_range.s_range().s1(), 0., 0.));
+  };
+
+  static constexpr bool kStart{true};
+  static constexpr bool kEnd{!kStart};
+  static constexpr std::array<LaneSRangeRelation, 3> kRelativePositionToSuceedingLaneSRange{
+      LaneSRangeRelation::kSucceedingLeft, LaneSRangeRelation::kSucceedingStraight,
+      LaneSRangeRelation::kSucceedingRight};
+  static constexpr std::array<LaneSRangeRelation, 3> kRelativePositionToPreceedingLaneSRange{
+      LaneSRangeRelation::kPreceedingLeft, LaneSRangeRelation::kPreceedingStraight,
+      LaneSRangeRelation::kPreceedingRight};
+  const double tolerance = road_network_->road_geometry()->linear_tolerance();
+
+  // Determine whether lane_s_range_b is ahead of lane_s_range_a.
+  if (lane_s_range_a_index->first == lane_s_range_b_index->first - 1) {
+    const api::RoadPosition lane_s_range_a_road_pos =
+        get_lane_s_range_road_position(lane_s_range_a_index->first, lane_s_range_a_index->second, kEnd);
+    const api::RoadPosition lane_s_range_b_road_pos =
+        get_lane_s_range_road_position(lane_s_range_b_index->first, lane_s_range_b_index->second, kStart);
+
+    return kRelativePositionToSuceedingLaneSRange[static_cast<size_t>(
+        ComputeRelativePositionFor(lane_s_range_a_road_pos, lane_s_range_b_road_pos, tolerance))];
+  }
+
+  // lane_s_range_b is behind of lane_s_range_a.
+  // lane_s_range_a_index->first == lane_s_range_b_index->first - 1
+  const api::RoadPosition lane_s_range_a_road_pos =
+      get_lane_s_range_road_position(lane_s_range_a_index->first, lane_s_range_a_index->second, kStart);
+  const api::RoadPosition lane_s_range_b_road_pos =
+      get_lane_s_range_road_position(lane_s_range_b_index->first, lane_s_range_b_index->second, kEnd);
+
+  return kRelativePositionToPreceedingLaneSRange[static_cast<size_t>(
+      ComputeRelativePositionFor(lane_s_range_a_road_pos, lane_s_range_b_road_pos, tolerance))];
+}
+
+std::optional<Route::LaneSRangeIndex> Route::FindLaneSRangeIndexFor(const api::LaneSRange& lane_s_range) const {
+  auto is_lane_s_range_contained = [tolerance = road_network_->road_geometry()->linear_tolerance()](
+                                       const api::LaneSRange& lane_s_range_a, const api::LaneSRange& lane_s_range_b) {
+    if (lane_s_range_a.lane_id() != lane_s_range_b.lane_id()) {
+      return false;
+    }
+    const bool s1_is_in_range = lane_s_range_a.s_range().s1() + tolerance >= lane_s_range_b.s_range().s1() &&
+                                lane_s_range_a.s_range().s0() - tolerance <= lane_s_range_b.s_range().s1();
+    const bool s0_is_in_range = lane_s_range_a.s_range().s1() + tolerance >= lane_s_range_b.s_range().s0() &&
+                                lane_s_range_a.s_range().s0() - tolerance <= lane_s_range_b.s_range().s0();
+    return s1_is_in_range && s0_is_in_range;
+  };
+
+  for (size_t i = 0; i < phases_.size(); ++i) {
+    for (size_t j = 0; j < phases_[i].lane_s_ranges().size(); ++j) {
+      if (is_lane_s_range_contained(phases_[i].lane_s_ranges()[j], lane_s_range)) {
+        return {std::make_pair(i, j)};
+      }
+    }
+  }
+  return {};
+}
+
 }  // namespace routing
 }  // namespace maliput
