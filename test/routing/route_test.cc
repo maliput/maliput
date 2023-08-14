@@ -41,6 +41,9 @@
 #include "maliput/routing/lane_s_range_relation.h"
 #include "maliput/routing/phase.h"
 #include "maliput/routing/route_position_result.h"
+#include "maliput/test_utilities/maliput_routing_position_compare.h"
+#include "maliput/test_utilities/maliput_types_compare.h"
+#include "maliput/test_utilities/regions_test_utilities.h"
 #include "routing/road_network_mocks.h"
 
 namespace maliput {
@@ -144,6 +147,8 @@ TEST_F(RouteConstructorValidationsTest, CorrectConstruction) {
 class RouteAccessorsTest : public RouteConstructorValidationsTest {
  public:
   static constexpr int kPhaseAIndex{0};
+  const api::LanePosition kStartRouteLanePosition{0., 0., 0.};
+  const api::LanePosition kEndRouteLanePosition{kLaneBLength, 0., 0.};
 
   void SetUp() override {
     RouteConstructorValidationsTest::SetUp();
@@ -159,10 +164,8 @@ class RouteAccessorsTest : public RouteConstructorValidationsTest {
     EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a_));
     EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b_));
     EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
-    const std::vector<api::RoadPosition> kStartRoadPositions{
-        api::RoadPosition{&lane_a_, api::LanePosition{0., 0., 0.}}};
-    const std::vector<api::RoadPosition> kEndRoadPositions{
-        api::RoadPosition{&lane_b_, api::LanePosition{kLaneBLength, 0., 0.}}};
+    const std::vector<api::RoadPosition> kStartRoadPositions{api::RoadPosition{&lane_a_, kStartRouteLanePosition}};
+    const std::vector<api::RoadPosition> kEndRoadPositions{api::RoadPosition{&lane_b_, kEndRouteLanePosition}};
     const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
 
     phase_a_ = std::make_unique<Phase>(kPhaseAIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions,
@@ -184,21 +187,18 @@ TEST_F(RouteAccessorsTest, GetReturnsTheRightLaneSRange) {
   const Route dut({*phase_a_}, road_network_.get());
 
   const Phase& phase = dut.Get(0);
+
   EXPECT_EQ(phase.index(), phase_a_->index());
   EXPECT_EQ(phase.lane_s_range_tolerance(), phase_a_->lane_s_range_tolerance());
   EXPECT_EQ(phase.start_positions().size(), phase_a_->start_positions().size());
   EXPECT_EQ(phase.start_positions()[0].lane, &lane_a_);
-  EXPECT_EQ(phase.start_positions()[0].pos.srh(), api::LanePosition(0., 0., 0.).srh());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kStartRouteLanePosition, phase.start_positions()[0].pos, 0.));
   EXPECT_EQ(phase.end_positions().size(), phase_a_->end_positions().size());
   EXPECT_EQ(phase.end_positions()[0].lane, &lane_b_);
-  EXPECT_EQ(phase.end_positions()[0].pos.srh(), api::LanePosition(kLaneBLength, 0., 0.).srh());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kEndRouteLanePosition, phase.end_positions()[0].pos, 0.));
   EXPECT_EQ(phase.lane_s_ranges().size(), phase_a_->lane_s_ranges().size());
-  EXPECT_EQ(phase.lane_s_ranges()[0].lane_id(), phase_a_->lane_s_ranges()[0].lane_id());
-  EXPECT_EQ(phase.lane_s_ranges()[0].s_range().s0(), phase_a_->lane_s_ranges()[0].s_range().s0());
-  EXPECT_EQ(phase.lane_s_ranges()[0].s_range().s1(), phase_a_->lane_s_ranges()[0].s_range().s1());
-  EXPECT_EQ(phase.lane_s_ranges()[1].lane_id(), phase_a_->lane_s_ranges()[1].lane_id());
-  EXPECT_EQ(phase.lane_s_ranges()[1].s_range().s0(), phase_a_->lane_s_ranges()[1].s_range().s0());
-  EXPECT_EQ(phase.lane_s_ranges()[1].s_range().s1(), phase_a_->lane_s_ranges()[1].s_range().s1());
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(phase_a_->lane_s_ranges()[0], phase.lane_s_ranges()[0]));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(phase_a_->lane_s_ranges()[1], phase.lane_s_ranges()[1]));
 }
 
 TEST_F(RouteAccessorsTest, GetThrowsWhenPassingAWrongIndex) {
@@ -212,16 +212,18 @@ TEST_F(RouteAccessorsTest, StartRoutePositionIsOnLaneSRangeA) {
   const Route dut({*phase_a_}, road_network_.get());
 
   const api::RoadPosition& start_road_position = dut.start_route_position();
+
   EXPECT_EQ(start_road_position.lane, &lane_a_);
-  EXPECT_EQ(start_road_position.pos.srh(), api::LanePosition(0., 0., 0.).srh());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kStartRouteLanePosition, start_road_position.pos, 0.));
 }
 
 TEST_F(RouteAccessorsTest, EndRoutePositionIsOnLaneSRangeB) {
   const Route dut({*phase_a_}, road_network_.get());
 
   const api::RoadPosition& end_road_position = dut.end_route_position();
+
   EXPECT_EQ(end_road_position.lane, &lane_b_);
-  EXPECT_EQ(end_road_position.pos.srh(), api::LanePosition(kLaneBLength, 0., 0.).srh());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kEndRouteLanePosition, end_road_position.pos, 0.));
 }
 
 class RouteWithOnePhaseTest : public RouteAccessorsTest {
@@ -250,18 +252,13 @@ TEST_F(RouteWithOnePhaseTest, FindRoutePositionByInertialPositionIsMappedViaPhas
   EXPECT_CALL(lane_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneBPositionResult));
   const api::InertialPosition kInertialPosition{1., 2., 0.};
   const Route dut({*phase_a_}, road_network_.get());
+  const RoutePositionResult kExpectedRoutePositionResult{
+      kPhaseAIndex, PhasePositionResult{1, kLaneBPositionResult.lane_position, kLaneBPositionResult.nearest_position,
+                                        kLaneBPositionResult.distance}};
 
   const RoutePositionResult position_result = dut.FindRoutePosition(kInertialPosition);
 
-  EXPECT_EQ(kPhaseAIndex, position_result.phase_index);
-  EXPECT_EQ(1, position_result.phase_position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneBPositionResult.lane_position.s(), position_result.phase_position_result.lane_position.s());
-  EXPECT_EQ(kLaneBPositionResult.lane_position.r(), position_result.phase_position_result.lane_position.r());
-  EXPECT_EQ(kLaneBPositionResult.lane_position.h(), position_result.phase_position_result.lane_position.h());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.x(), position_result.phase_position_result.inertial_position.x());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.y(), position_result.phase_position_result.inertial_position.y());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.z(), position_result.phase_position_result.inertial_position.z());
-  EXPECT_EQ(kLaneBPositionResult.distance, position_result.phase_position_result.distance);
+  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
 }
 
 TEST_F(RouteWithOnePhaseTest, FindRoutePositionByRoadPositionThrowsWhenInvalid) {
@@ -283,18 +280,13 @@ TEST_F(RouteWithOnePhaseTest, FindRoutePositionByRoadPositionWhenRoadPositionIsN
   EXPECT_CALL(lane_c, DoToInertialPosition(_)).WillRepeatedly(Return(kInertialPosition));
   const api::RoadPosition road_position{&lane_c, api::LanePosition{0., 0., 0.}};
   const Route dut({*phase_a_}, road_network_.get());
+  const RoutePositionResult kExpectedRoutePositionResult{
+      kPhaseAIndex, PhasePositionResult{1, kLaneBPositionResult.lane_position, kLaneBPositionResult.nearest_position,
+                                        kLaneBPositionResult.distance}};
 
   const RoutePositionResult position_result = dut.FindRoutePosition(road_position);
 
-  EXPECT_EQ(0, position_result.phase_index);
-  EXPECT_EQ(1, position_result.phase_position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneBPositionResult.lane_position.s(), position_result.phase_position_result.lane_position.s());
-  EXPECT_EQ(kLaneBPositionResult.lane_position.r(), position_result.phase_position_result.lane_position.r());
-  EXPECT_EQ(kLaneBPositionResult.lane_position.h(), position_result.phase_position_result.lane_position.h());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.x(), position_result.phase_position_result.inertial_position.x());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.y(), position_result.phase_position_result.inertial_position.y());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.z(), position_result.phase_position_result.inertial_position.z());
-  EXPECT_EQ(kLaneBPositionResult.distance, position_result.phase_position_result.distance);
+  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
 }
 
 TEST_F(RouteWithOnePhaseTest,
@@ -304,18 +296,13 @@ TEST_F(RouteWithOnePhaseTest,
   EXPECT_CALL(lane_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneBPositionResult));
   const api::RoadPosition road_position{&lane_b_, api::LanePosition{10., 2.5, 0.}};
   const Route dut({*phase_a_}, road_network_.get());
+  const RoutePositionResult kExpectedRoutePositionResult{
+      kPhaseAIndex, PhasePositionResult{1, kLaneBPositionResult.lane_position, kLaneBPositionResult.nearest_position,
+                                        kLaneBPositionResult.distance}};
 
   const RoutePositionResult position_result = dut.FindRoutePosition(road_position);
 
-  EXPECT_EQ(kPhaseAIndex, position_result.phase_index);
-  EXPECT_EQ(1, position_result.phase_position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneBPositionResult.lane_position.s(), position_result.phase_position_result.lane_position.s());
-  EXPECT_EQ(kLaneBPositionResult.lane_position.r(), position_result.phase_position_result.lane_position.r());
-  EXPECT_EQ(kLaneBPositionResult.lane_position.h(), position_result.phase_position_result.lane_position.h());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.x(), position_result.phase_position_result.inertial_position.x());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.y(), position_result.phase_position_result.inertial_position.y());
-  EXPECT_EQ(kLaneBPositionResult.nearest_position.z(), position_result.phase_position_result.inertial_position.z());
-  EXPECT_EQ(kLaneBPositionResult.distance, position_result.phase_position_result.distance);
+  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
 }
 
 // Models the following Route:
@@ -424,14 +411,14 @@ TEST_F(RouteWithTwoPhasesTest, StartRoutePositionIsOnLaneAB) {
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
 
   EXPECT_EQ(&lane_a_b_, dut.start_route_position().lane);
-  EXPECT_EQ(kStartLanePositionPhaseA.srh(), dut.start_route_position().pos.srh());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kStartLanePositionPhaseA, dut.start_route_position().pos, 0.));
 }
 
 TEST_F(RouteWithTwoPhasesTest, EndRoutePositionIsOnLaneBA) {
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
 
   EXPECT_EQ(&lane_b_a_, dut.end_route_position().lane);
-  EXPECT_EQ(kEndLanePositionPhaseB.srh(), dut.end_route_position().pos.srh());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kEndLanePositionPhaseB, dut.end_route_position().pos, 0.));
 }
 
 TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPhaseOntoLaneSRangeAA) {
@@ -455,18 +442,13 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPha
   EXPECT_CALL(lane_a_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneABPositionResult));
   EXPECT_CALL(lane_b_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneBAPositionResult));
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
+  const RoutePositionResult kExpectedRoutePositionResult{
+      kPhaseAIndex, PhasePositionResult{kLaneSRangeAAIndex, kLaneAAPositionResult.lane_position,
+                                        kLaneAAPositionResult.nearest_position, kLaneAAPositionResult.distance}};
 
   const RoutePositionResult position_result = dut.FindRoutePosition(kInertialPosition);
 
-  EXPECT_EQ(kPhaseAIndex, position_result.phase_index);
-  EXPECT_EQ(kLaneSRangeAAIndex, position_result.phase_position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneAAPositionResult.lane_position.s(), position_result.phase_position_result.lane_position.s());
-  EXPECT_EQ(kLaneAAPositionResult.lane_position.r(), position_result.phase_position_result.lane_position.r());
-  EXPECT_EQ(kLaneAAPositionResult.lane_position.h(), position_result.phase_position_result.lane_position.h());
-  EXPECT_EQ(kLaneAAPositionResult.nearest_position.x(), position_result.phase_position_result.inertial_position.x());
-  EXPECT_EQ(kLaneAAPositionResult.nearest_position.y(), position_result.phase_position_result.inertial_position.y());
-  EXPECT_EQ(kLaneAAPositionResult.nearest_position.z(), position_result.phase_position_result.inertial_position.z());
-  EXPECT_EQ(kLaneAAPositionResult.distance, position_result.phase_position_result.distance);
+  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
 }
 
 TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPhaseOntoLaneSRangeBA) {
@@ -490,18 +472,13 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPha
   EXPECT_CALL(lane_a_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneABPositionResult));
   EXPECT_CALL(lane_b_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneBAPositionResult));
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
+  const RoutePositionResult kExpectedRoutePositionResult{
+      kPhaseBIndex, PhasePositionResult{kLaneSRangeBAIndex, kLaneBAPositionResult.lane_position,
+                                        kLaneBAPositionResult.nearest_position, kLaneBAPositionResult.distance}};
 
   const RoutePositionResult position_result = dut.FindRoutePosition(kInertialPosition);
 
-  EXPECT_EQ(kPhaseBIndex, position_result.phase_index);
-  EXPECT_EQ(kLaneSRangeBAIndex, position_result.phase_position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneBAPositionResult.lane_position.s(), position_result.phase_position_result.lane_position.s());
-  EXPECT_EQ(kLaneBAPositionResult.lane_position.r(), position_result.phase_position_result.lane_position.r());
-  EXPECT_EQ(kLaneBAPositionResult.lane_position.h(), position_result.phase_position_result.lane_position.h());
-  EXPECT_EQ(kLaneBAPositionResult.nearest_position.x(), position_result.phase_position_result.inertial_position.x());
-  EXPECT_EQ(kLaneBAPositionResult.nearest_position.y(), position_result.phase_position_result.inertial_position.y());
-  EXPECT_EQ(kLaneBAPositionResult.nearest_position.z(), position_result.phase_position_result.inertial_position.z());
-  EXPECT_EQ(kLaneBAPositionResult.distance, position_result.phase_position_result.distance);
+  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
 }
 
 TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByRoadPositionWhenRoadPositionIsNotInRouteBecomesByInertialPosition) {
@@ -530,18 +507,13 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByRoadPositionWhenRoadPositionIs
   EXPECT_CALL(lane_a_c, DoToInertialPosition(_)).WillRepeatedly(Return(kInertialPosition));
   const api::RoadPosition road_position{&lane_a_c, api::LanePosition{100., 0., 0.}};
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
+  const RoutePositionResult kExpectedRoutePositionResult{
+      kPhaseAIndex, PhasePositionResult{kLaneSRangeABIndex, kLaneABPositionResult.lane_position,
+                                        kLaneABPositionResult.nearest_position, kLaneABPositionResult.distance}};
 
   const RoutePositionResult position_result = dut.FindRoutePosition(road_position);
 
-  EXPECT_EQ(kPhaseAIndex, position_result.phase_index);
-  EXPECT_EQ(kLaneSRangeABIndex, position_result.phase_position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneABPositionResult.lane_position.s(), position_result.phase_position_result.lane_position.s());
-  EXPECT_EQ(kLaneABPositionResult.lane_position.r(), position_result.phase_position_result.lane_position.r());
-  EXPECT_EQ(kLaneABPositionResult.lane_position.h(), position_result.phase_position_result.lane_position.h());
-  EXPECT_EQ(kLaneABPositionResult.nearest_position.x(), position_result.phase_position_result.inertial_position.x());
-  EXPECT_EQ(kLaneABPositionResult.nearest_position.y(), position_result.phase_position_result.inertial_position.y());
-  EXPECT_EQ(kLaneABPositionResult.nearest_position.z(), position_result.phase_position_result.inertial_position.z());
-  EXPECT_EQ(kLaneABPositionResult.distance, position_result.phase_position_result.distance);
+  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
 }
 
 TEST_F(RouteWithTwoPhasesTest,
@@ -560,18 +532,13 @@ TEST_F(RouteWithTwoPhasesTest,
   const api::RoadPosition road_position{&lane_a_b_, api::LanePosition{50., -2.5, 0.}};
   EXPECT_CALL(lane_a_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneABPositionResult));
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
+  const RoutePositionResult kExpectedRoutePositionResult{
+      kPhaseAIndex, PhasePositionResult{kLaneSRangeABIndex, kLaneABPositionResult.lane_position,
+                                        kLaneABPositionResult.nearest_position, kLaneABPositionResult.distance}};
 
   const RoutePositionResult position_result = dut.FindRoutePosition(road_position);
 
-  EXPECT_EQ(kPhaseAIndex, position_result.phase_index);
-  EXPECT_EQ(kLaneSRangeABIndex, position_result.phase_position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneABPositionResult.lane_position.s(), position_result.phase_position_result.lane_position.s());
-  EXPECT_EQ(kLaneABPositionResult.lane_position.r(), position_result.phase_position_result.lane_position.r());
-  EXPECT_EQ(kLaneABPositionResult.lane_position.h(), position_result.phase_position_result.lane_position.h());
-  EXPECT_EQ(kLaneABPositionResult.nearest_position.x(), position_result.phase_position_result.inertial_position.x());
-  EXPECT_EQ(kLaneABPositionResult.nearest_position.y(), position_result.phase_position_result.inertial_position.y());
-  EXPECT_EQ(kLaneABPositionResult.nearest_position.z(), position_result.phase_position_result.inertial_position.z());
-  EXPECT_EQ(kLaneABPositionResult.distance, position_result.phase_position_result.distance);
+  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
 }
 
 }  // namespace
