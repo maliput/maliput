@@ -37,6 +37,9 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
 #include "maliput/common/assertion_error.h"
+#include "maliput/test_utilities/maliput_routing_position_compare.h"
+#include "maliput/test_utilities/maliput_types_compare.h"
+#include "maliput/test_utilities/regions_test_utilities.h"
 #include "routing/road_network_mocks.h"
 
 namespace maliput {
@@ -335,25 +338,15 @@ TEST_F(PhaseAccessorsTest, CorrectConstruction) {
   EXPECT_EQ(kLaneSRangeTolerance, dut.lane_s_range_tolerance());
   EXPECT_EQ(kStartRoadPositions.size(), dut.start_positions().size());
   EXPECT_EQ(kStartRoadPositions[0].lane, dut.start_positions()[0].lane);
-  EXPECT_EQ(kStartRoadPositions[0].pos.s(), dut.start_positions()[0].pos.s());
-  EXPECT_EQ(kStartRoadPositions[0].pos.r(), dut.start_positions()[0].pos.r());
-  EXPECT_EQ(kStartRoadPositions[0].pos.h(), dut.start_positions()[0].pos.h());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kStartRoadPositions[0].pos, dut.start_positions()[0].pos, 0.));
   EXPECT_EQ(kEndRoadPositions.size(), dut.end_positions().size());
   EXPECT_EQ(kEndRoadPositions[0].lane, dut.end_positions()[0].lane);
-  EXPECT_EQ(kEndRoadPositions[0].pos.s(), dut.end_positions()[0].pos.s());
-  EXPECT_EQ(kEndRoadPositions[0].pos.r(), dut.end_positions()[0].pos.r());
-  EXPECT_EQ(kEndRoadPositions[0].pos.h(), dut.end_positions()[0].pos.h());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kEndRoadPositions[0].pos, dut.end_positions()[0].pos, 0.));
   EXPECT_EQ(kEndRoadPositions[1].lane, dut.end_positions()[1].lane);
-  EXPECT_EQ(kEndRoadPositions[1].pos.s(), dut.end_positions()[1].pos.s());
-  EXPECT_EQ(kEndRoadPositions[1].pos.r(), dut.end_positions()[1].pos.r());
-  EXPECT_EQ(kEndRoadPositions[1].pos.h(), dut.end_positions()[1].pos.h());
+  EXPECT_TRUE(api::test::IsLanePositionClose(kEndRoadPositions[1].pos, dut.end_positions()[1].pos, 0.));
   EXPECT_EQ(kLaneSRanges.size(), dut.lane_s_ranges().size());
-  EXPECT_EQ(kLaneSRanges[0].lane_id(), dut.lane_s_ranges()[0].lane_id());
-  EXPECT_EQ(kLaneSRanges[0].s_range().s0(), dut.lane_s_ranges()[0].s_range().s0());
-  EXPECT_EQ(kLaneSRanges[0].s_range().s1(), dut.lane_s_ranges()[0].s_range().s1());
-  EXPECT_EQ(kLaneSRanges[1].lane_id(), dut.lane_s_ranges()[1].lane_id());
-  EXPECT_EQ(kLaneSRanges[1].s_range().s0(), dut.lane_s_ranges()[1].s_range().s0());
-  EXPECT_EQ(kLaneSRanges[1].s_range().s1(), dut.lane_s_ranges()[1].s_range().s1());
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(kLaneSRanges[0], dut.lane_s_ranges()[0]));
+  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(kLaneSRanges[1], dut.lane_s_ranges()[1]));
 }
 
 class PhaseMappingTest : public PhaseConstructorValidationsTest {};
@@ -370,17 +363,12 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithSingleLaneSRan
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
   const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
                   road_network_.get());
+  const PhasePositionResult kExpectedPhasePositionResult{
+      0, kLanePositionResult.lane_position, kLanePositionResult.nearest_position, kLanePositionResult.distance};
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_EQ(0, position_result.lane_s_range_index);
-  EXPECT_EQ(kLanePositionResult.lane_position.s(), position_result.lane_position.s());
-  EXPECT_EQ(kLanePositionResult.lane_position.r(), position_result.lane_position.r());
-  EXPECT_EQ(kLanePositionResult.lane_position.h(), position_result.lane_position.h());
-  EXPECT_EQ(kLanePositionResult.nearest_position.x(), position_result.inertial_position.x());
-  EXPECT_EQ(kLanePositionResult.nearest_position.y(), position_result.inertial_position.y());
-  EXPECT_EQ(kLanePositionResult.nearest_position.z(), position_result.inertial_position.z());
-  EXPECT_EQ(kLanePositionResult.distance, position_result.distance);
+  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithMultipleLaneSRangePhase) {
@@ -407,17 +395,12 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithMultipleLaneSR
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
   const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
                   road_network_.get());
+  const PhasePositionResult kExpectedPhasePositionResult{
+      0, kLaneAPositionResult.lane_position, kLaneAPositionResult.nearest_position, kLaneAPositionResult.distance};
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_EQ(0, position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneAPositionResult.lane_position.s(), position_result.lane_position.s());
-  EXPECT_EQ(kLaneAPositionResult.lane_position.r(), position_result.lane_position.r());
-  EXPECT_EQ(kLaneAPositionResult.lane_position.h(), position_result.lane_position.h());
-  EXPECT_EQ(kLaneAPositionResult.nearest_position.x(), position_result.inertial_position.x());
-  EXPECT_EQ(kLaneAPositionResult.nearest_position.y(), position_result.inertial_position.y());
-  EXPECT_EQ(kLaneAPositionResult.nearest_position.z(), position_result.inertial_position.z());
-  EXPECT_EQ(kLaneAPositionResult.distance, position_result.distance);
+  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionOutsidePhase) {
@@ -435,17 +418,12 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionOutsidePhase) {
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeAShort};
   const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
                   road_network_.get());
+  const PhasePositionResult kExpectedPhasePositionResult{0, api::LanePosition{kLaneSRangeAShort.s_range().s0(), 0., 0.},
+                                                         kNearestInertialPosition, distance};
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_EQ(0, position_result.lane_s_range_index);
-  EXPECT_EQ(kLaneSRangeAShort.s_range().s0(), position_result.lane_position.s());
-  EXPECT_EQ(0., position_result.lane_position.r());
-  EXPECT_EQ(0., position_result.lane_position.h());
-  EXPECT_EQ(kNearestInertialPosition.x(), position_result.inertial_position.x());
-  EXPECT_EQ(kNearestInertialPosition.y(), position_result.inertial_position.y());
-  EXPECT_EQ(kNearestInertialPosition.z(), position_result.inertial_position.z());
-  EXPECT_EQ(distance, position_result.distance);
+  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionThrowsWithInvalidPosition) {
@@ -477,17 +455,12 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionOutsidePhase) {
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA};
   const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
                   road_network_.get());
+  const PhasePositionResult kExpectedPhasePositionResult{
+      0, kLanePositionResult.lane_position, kLanePositionResult.nearest_position, kLanePositionResult.distance};
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_EQ(0, position_result.lane_s_range_index);
-  EXPECT_EQ(kLanePositionResult.lane_position.s(), position_result.lane_position.s());
-  EXPECT_EQ(kLanePositionResult.lane_position.r(), position_result.lane_position.r());
-  EXPECT_EQ(kLanePositionResult.lane_position.h(), position_result.lane_position.h());
-  EXPECT_EQ(kLanePositionResult.nearest_position.x(), position_result.inertial_position.x());
-  EXPECT_EQ(kLanePositionResult.nearest_position.y(), position_result.inertial_position.y());
-  EXPECT_EQ(kLanePositionResult.nearest_position.z(), position_result.inertial_position.z());
-  EXPECT_EQ(kLanePositionResult.distance, position_result.distance);
+  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
@@ -506,17 +479,12 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
   const std::vector<api::LaneSRange> kLaneSRanges{kLaneSRangeA, kLaneSRangeB};
   const Phase dut(kIndex, kLaneSRangeTolerance, kStartRoadPositions, kEndRoadPositions, kLaneSRanges,
                   road_network_.get());
+  const PhasePositionResult kExpectedPhasePositionResult{
+      1, kLanePositionResult.lane_position, kLanePositionResult.nearest_position, kLanePositionResult.distance};
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kRoadPosition);
 
-  EXPECT_EQ(1, position_result.lane_s_range_index);
-  EXPECT_EQ(kLanePositionResult.lane_position.s(), position_result.lane_position.s());
-  EXPECT_EQ(kLanePositionResult.lane_position.r(), position_result.lane_position.r());
-  EXPECT_EQ(kLanePositionResult.lane_position.h(), position_result.lane_position.h());
-  EXPECT_EQ(kLanePositionResult.nearest_position.x(), position_result.inertial_position.x());
-  EXPECT_EQ(kLanePositionResult.nearest_position.y(), position_result.inertial_position.y());
-  EXPECT_EQ(kLanePositionResult.nearest_position.z(), position_result.inertial_position.z());
-  EXPECT_EQ(kLanePositionResult.distance, position_result.distance);
+  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
 }
 
 // TODO: Test Phase::FindPhasePosition() when the LaneSRange::WithS() is false.
