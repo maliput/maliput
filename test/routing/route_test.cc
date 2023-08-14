@@ -28,6 +28,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/routing/route.h"
 
+#include <cmath>
 #include <memory>
 #include <stdexcept>
 #include <utility>
@@ -267,6 +268,7 @@ TEST_F(RouteWithOnePhaseTest, FindRoutePositionByRoadPositionThrowsWhenInvalid) 
   EXPECT_THROW({ dut.FindRoutePosition(api::RoadPosition{}); }, common::assertion_error);
 }
 
+// Failed -- to be checked.
 TEST_F(RouteWithOnePhaseTest, FindRoutePositionByRoadPositionWhenRoadPositionIsNotInRouteBecomesByInertialPosition) {
   const api::LanePositionResult kLaneAPositionResult{api::LanePosition{10., 5., 0.}, api::InertialPosition{1., 0., 0.},
                                                      2.};
@@ -318,6 +320,12 @@ TEST_F(RouteWithOnePhaseTest,
 // Where:
 // - * : is an entry / exit point of the Phase.
 // - x : is the extent of the api::LaneSRange.
+// - Phase A, api::LaneSRange AA starts at (0., 0., 0.) in the Inertial Frame.
+// - Phase A, api::LaneSRange AB starts at (0., -5., 0.) in the Inertial Frame.
+// - Phase A, api::LaneSRange AA ends at (100., 0., 0.) in the Inertial Frame.
+// - Phase A, api::LaneSRange AB ends at (100., -5., 0.) in the Inertial Frame.
+// - Phase B, api::LaneSRange BA starts at (100., 0., 0.) in the Inertial Frame.
+// - Phase B, api::LaneSRange BA ends at (200., 0., 0.) in the Inertial Frame.
 class RouteWithTwoPhasesTest : public RouteBaseTest {
  public:
   static constexpr int kPhaseAIndex{0};
@@ -432,12 +440,12 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPha
   //
   // </pre>
   const api::LanePositionResult kLaneAAPositionResult{api::LanePosition{10., 0., 0.},
-                                                      api::InertialPosition{10., 5., 0.}, 0.};
-  const api::LanePositionResult kLaneABPositionResult{api::LanePosition{10., 5., 0.},
-                                                      api::InertialPosition{10., 5., 0.}, 0.};
+                                                      api::InertialPosition{10., 0., 0.}, 0.};
+  const api::LanePositionResult kLaneABPositionResult{api::LanePosition{10., 2.5, 0.},
+                                                      api::InertialPosition{10., -2.5, 0.}, 2.5};
   const api::LanePositionResult kLaneBAPositionResult{api::LanePosition{0., 0., 0.},
-                                                      api::InertialPosition{100., 5., 0.}, 90.};
-  const api::InertialPosition kInertialPosition{10., 5., 0.};
+                                                      api::InertialPosition{100., 0., 0.}, 90.};
+  const api::InertialPosition kInertialPosition{10., 0., 0.};
   EXPECT_CALL(lane_a_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneAAPositionResult));
   EXPECT_CALL(lane_a_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneABPositionResult));
   EXPECT_CALL(lane_b_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneBAPositionResult));
@@ -462,12 +470,12 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPha
   //
   // </pre>
   const api::LanePositionResult kLaneAAPositionResult{api::LanePosition{100., 0., 0.},
-                                                      api::InertialPosition{100., 5., 0.}, 10.};
-  const api::LanePositionResult kLaneABPositionResult{api::LanePosition{100., 5., 0.},
-                                                      api::InertialPosition{100., 5., 0.}, 10.};
+                                                      api::InertialPosition{100., 0., 0.}, 10.};
+  const api::LanePositionResult kLaneABPositionResult{
+      api::LanePosition{100., 2.5, 0.}, api::InertialPosition{100., -2.5, 0.}, std::sqrt(10. * 10. + 2.5 * 2.5)};
   const api::LanePositionResult kLaneBAPositionResult{api::LanePosition{10., 0., 0.},
-                                                      api::InertialPosition{110., 5., 0.}, 0.};
-  const api::InertialPosition kInertialPosition{110., 5., 0.};
+                                                      api::InertialPosition{110., 0., 0.}, 0.};
+  const api::InertialPosition kInertialPosition{110., 0., 0.};
   EXPECT_CALL(lane_a_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneAAPositionResult));
   EXPECT_CALL(lane_a_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneABPositionResult));
   EXPECT_CALL(lane_b_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneBAPositionResult));
@@ -483,7 +491,8 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPha
 
 TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByRoadPositionWhenRoadPositionIsNotInRouteBecomesByInertialPosition) {
   // To simplify the modelled situation, please revisit the following diagram where the o
-  // indicates where the RoadPosition falls, and the m indicates the mapped position.
+  // indicates where the RoadPosition falls, s indicates the position where api::LaneSRange
+  // starts, and the m indicates the mapped position. api::LaneSRange AC does not belong to the Route.
   // <pre>
   //
   //      Phase A        Phase B
@@ -492,11 +501,11 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByRoadPositionWhenRoadPositionIs
   //  s------AC------o
   //
   // </pre>
-  const api::LanePositionResult kLaneAAPositionResult{api::LanePosition{100., -7.5, 0.},
-                                                      api::InertialPosition{100., -7.5, 0.}, 2.5};
+  const api::LanePositionResult kLaneAAPositionResult{api::LanePosition{100., -2.5, 0.},
+                                                      api::InertialPosition{100., -2.5, 0.}, 7.5};
   const api::LanePositionResult kLaneABPositionResult{api::LanePosition{100., -2.5, 0.},
                                                       api::InertialPosition{100., -7.5, 0.}, 2.5};
-  const api::LanePositionResult kLaneBAPositionResult{api::LanePosition{100., -2.5, 0.},
+  const api::LanePositionResult kLaneBAPositionResult{api::LanePosition{0., -2.5, 0.},
                                                       api::InertialPosition{100., -2.5, 0.}, 7.5};
   const api::InertialPosition kInertialPosition{100., -10., 0.};
   EXPECT_CALL(lane_a_a_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneAAPositionResult));
@@ -519,7 +528,7 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByRoadPositionWhenRoadPositionIs
 TEST_F(RouteWithTwoPhasesTest,
        FindRoutePositionByRoadPositionWhenRoadPositionIsInRouteBecomesFindPhasePositionByRoadPosition) {
   // To simplify the modelled situation, please revisit the following diagram where the o
-  // indicates where the RoadPosition falls, and the m indicates the mapped position.
+  // indicates where the RoadPosition falls.
   // <pre>
   //
   //      Phase A        Phase B
@@ -527,9 +536,9 @@ TEST_F(RouteWithTwoPhasesTest,
   //  *------o---AB--x
   //
   // </pre>
-  const api::LanePositionResult kLaneABPositionResult{api::LanePosition{50., -2.5, 0.},
+  const api::LanePositionResult kLaneABPositionResult{api::LanePosition{50., 2.5, 0.},
                                                       api::InertialPosition{50., -2.5, 0.}, 0.};
-  const api::RoadPosition road_position{&lane_a_b_, api::LanePosition{50., -2.5, 0.}};
+  const api::RoadPosition road_position{&lane_a_b_, api::LanePosition{50., 2.5, 0.}};
   EXPECT_CALL(lane_a_b_, DoToLanePosition(_)).WillRepeatedly(Return(kLaneABPositionResult));
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
   const RoutePositionResult kExpectedRoutePositionResult{
