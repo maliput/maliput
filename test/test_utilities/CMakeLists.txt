@@ -1,5 +1,6 @@
 find_package(ament_cmake_gtest REQUIRED)
 
+ament_add_gtest(maliput_routing_position_compare_test maliput_routing_position_compare_test.cc)
 ament_add_gtest(maliput_types_compare_test maliput_types_compare_test.cc)
 
 macro(add_dependencies_to_test target)
@@ -15,10 +16,12 @@ macro(add_dependencies_to_test target)
       target_link_libraries(${target}
           maliput::api
           maliput::common
+          maliput::routing
           maliput::test_utilities
       )
 
     endif()
 endmacro()
 
+add_dependencies_to_test(maliput_routing_position_compare_test)
 add_dependencies_to_test(maliput_types_compare_test)
