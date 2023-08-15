@@ -44,7 +44,7 @@ namespace test {
 ::testing::AssertionResult IsPhasePositionResultClose(const PhasePositionResult& ppr_a,
                                                       const PhasePositionResult& ppr_b, double tolerance);
 
-/// Compares equality within @p tolerance deviation of the RoutePositionResult @p ppr_a and @p ppr_b.
+/// Compares equality within @p tolerance deviation of the RoutePositionResult @p rpr_a and @p rpr_b.
 /// @param rpr_a The first RoutePositionResult to compare.
 /// @param rpr_b The second RoutePositionResult to compare.
 /// @param tolerance The tolerance to use for the comparison.
