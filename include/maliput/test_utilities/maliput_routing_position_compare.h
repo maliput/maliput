@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2023, Woven Planet. All rights reserved.
+// Copyright (c) 2023, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -37,6 +37,7 @@ namespace routing {
 namespace test {
 
 /// Compares equality within @p tolerance deviation of the PhasePositionResult @p ppr_a and @p ppr_b.
+///
 /// @param ppr_a The first PhasePositionResult to compare.
 /// @param ppr_b The second PhasePositionResult to compare.
 /// @param tolerance The tolerance to use for the comparison.
@@ -45,6 +46,7 @@ namespace test {
                                                       const PhasePositionResult& ppr_b, double tolerance);
 
 /// Compares equality within @p tolerance deviation of the RoutePositionResult @p rpr_a and @p rpr_b.
+///
 /// @param rpr_a The first RoutePositionResult to compare.
 /// @param rpr_b The second RoutePositionResult to compare.
 /// @param tolerance The tolerance to use for the comparison.

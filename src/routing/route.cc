@@ -83,6 +83,8 @@ RoutePositionResult Route::FindRoutePosition(const api::RoadPosition& road_posit
     return ValidatePositionIsInLaneSRanges(road_position, phase.lane_s_ranges(), phase.lane_s_range_tolerance());
   });
 
+  // The provided road_position does not fall into any of the Phases within this Route.
+  // Resort to finding the closest position using its Inertial position.
   if (route_phase_it == phases_.end()) {
     return FindRoutePosition(road_position.lane->ToInertialPosition(road_position.pos));
   }

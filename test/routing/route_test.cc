@@ -64,6 +64,7 @@ class RouteBaseTest : public ::testing::Test {
         const_cast<RoadGeometryMock*>(static_cast<const RoadGeometryMock*>(road_network_->road_geometry()));
   }
 
+ protected:
   std::unique_ptr<api::RoadNetwork> road_network_;
   RoadGeometryMock* road_geometry_ptr_{};
   IdIndexMock id_index_;
@@ -173,6 +174,7 @@ class RouteAccessorsTest : public RouteConstructorValidationsTest {
                                        kLaneSRanges, road_network_.get());
   }
 
+ protected:
   LaneMock lane_a_;
   LaneMock lane_b_;
   std::unique_ptr<Phase> phase_a_;
@@ -241,6 +243,7 @@ class RouteWithOnePhaseTest : public RouteAccessorsTest {
     EXPECT_CALL(lane_b_, do_lane_bounds(_)).WillRepeatedly(Return(lane_lane_bounds));
   }
 
+ protected:
   SegmentMock segment_a_;
 };
 
@@ -393,6 +396,7 @@ class RouteWithTwoPhasesTest : public RouteBaseTest {
                                        kEndRoadPositionsPhaseB, kLaneSRangesPhaseB, road_network_.get());
   }
 
+ protected:
   LaneMock lane_a_a_;
   LaneMock lane_a_b_;
   LaneMock lane_b_a_;

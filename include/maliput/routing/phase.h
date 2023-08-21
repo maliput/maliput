@@ -163,10 +163,11 @@ class Phase final {
   const api::RoadNetwork* road_network_{};
 };
 
-/// Determines wether the @p position resides in any of @p lane_s_ranges.
+/// Determines whether the @p position resides in any of @p lane_s_ranges.
 ///
 /// @p tolerance is used to expand the range of @p lane_s_ranges when evaluating
 /// @p position.
+///
 /// @param position The api::RoadPosition to evaluate. It must be valid.
 /// @param lane_s_ranges The api::LaneSRanges. It must not be empty.
 /// @param tolerance Tolerance to compare api::LaneSRanges' ranges with

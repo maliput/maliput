@@ -59,6 +59,7 @@ class PhaseBaseTest : public ::testing::Test {
         const_cast<RoadGeometryMock*>(static_cast<const RoadGeometryMock*>(road_network_->road_geometry()));
   }
 
+ protected:
   std::unique_ptr<api::RoadNetwork> road_network_;
   RoadGeometryMock* road_geometry_ptr_{};
   IdIndexMock id_index_;
@@ -105,6 +106,7 @@ class PhaseConstructorValidationsTest : public PhaseBaseTest {
     EXPECT_CALL(*lane, do_to_right()).WillRepeatedly(Return(right_lane));
   }
 
+ protected:
   LaneMock lane_a_;
   LaneMock lane_b_;
 };
@@ -492,6 +494,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
 class ValidatePositionIsInLaneSRangesTest : public ::testing::Test {
  public:
   static constexpr double kLaneSRangeTolerance{1e-3};
+
   const api::LaneId kLaneIdA{"lane_a"};
   const api::LaneId kLaneIdB{"lane_b"};
   const api::LaneId kLaneIdC{"lane_c"};
@@ -508,6 +511,7 @@ class ValidatePositionIsInLaneSRangesTest : public ::testing::Test {
     EXPECT_CALL(lane_c_, do_id()).WillRepeatedly(Return(kLaneIdC));
   }
 
+ protected:
   LaneMock lane_a_;
   LaneMock lane_b_;
   LaneMock lane_c_;
