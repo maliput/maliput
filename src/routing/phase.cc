@@ -40,21 +40,12 @@ namespace maliput {
 namespace routing {
 namespace {
 
-// @return true When @p value is within @p min and @p max, inclusive.
-inline bool is_in_range(double min, double max, double value) { return value >= min && value <= max; }
-
 // @return true When @p lane_s_range is a valid range in @p road_geometry with @p tolerance in the LANE-Frame s
 // coordinate.
 bool ValidateLaneSRangeIsInRoadNetwork(const api::LaneSRange& lane_s_range, const api::RoadGeometry* road_geometry,
                                        double tolerance) {
   const api::Lane* lane = road_geometry->ById().GetLane(lane_s_range.lane_id());
-  if (lane == nullptr) {
-    return false;
-  }
-  const double min_s_range = -tolerance;
-  const double max_s_range = lane->length() + tolerance;
-  return is_in_range(min_s_range, max_s_range, lane_s_range.s_range().s0()) &&
-         is_in_range(min_s_range, max_s_range, lane_s_range.s_range().s1());
+  return lane != nullptr && api::SRange(0., lane->length()).Contains(lane_s_range.s_range(), tolerance);
 }
 
 // @return true When @p lane_s_range_a and @p lane_s_range_b are adjacent.
@@ -78,11 +69,7 @@ bool ValidatePositionIsInLaneSRanges(const maliput::api::RoadPosition& position,
     if (position.lane->id() != lane_s_range.lane_id()) {
       return false;
     }
-    const double min_s_range =
-        (lane_s_range.s_range().WithS() ? lane_s_range.s_range().s0() : lane_s_range.s_range().s1()) - tolerance;
-    const double max_s_range =
-        (lane_s_range.s_range().WithS() ? lane_s_range.s_range().s1() : lane_s_range.s_range().s0()) + tolerance;
-    return is_in_range(min_s_range, max_s_range, position.pos.s());
+    return lane_s_range.s_range().Contains(api::SRange(position.pos.s(), position.pos.s()), tolerance);
   });
 }
 

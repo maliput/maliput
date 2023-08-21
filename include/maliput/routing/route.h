@@ -29,6 +29,8 @@
 #pragma once
 
 #include <optional>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "maliput/api/lane_data.h"
@@ -141,6 +143,20 @@ class Route final {
   /// @throws std::out_of_range When @p index is negative or >= `size()`.
   const Phase& Get(int index) const { return phases_.at(index); }
 
+  /// Indexes an api::LaneSRange in a Phase.
+  ///
+  /// @param phase_index The index of the Phase. It must be
+  /// non-negative and less than `size()`.
+  /// @param lane_s_range_index The index of the api::LaneSRange. It must be
+  /// non-negative and less than `Phase::lane_s_ranges().size()`.
+  /// @return The api::LaneSRange indexed at the @p phase_index -th
+  /// Phase at the @p lane_s_range_index -th position.
+  /// @throws std::out_of_range When any of the preconditions of
+  /// @p phase_index or @p lane_s_range_index are unmet.
+  const api::LaneSRange& GetLaneSRange(int phase_index, int lane_s_range_index) const {
+    return Get(phase_index).lane_s_ranges().at(lane_s_range_index);
+  }
+
   /// Returns the start of this Route. This is a convenience method for
   /// Get(0).start_positions().front().
   const api::RoadPosition& start_route_position() const { return phases_.front().start_positions().front(); }
@@ -209,14 +225,19 @@ class Route final {
   /// @return The api::LaneSRoute connecting @p start_position and
   /// end_route_position().
   /// @throws common::assertion_error When @p start_position is not valid.
-  api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const;
 
  private:
+  // Defines the sign and increment of one unit towards the right the index of
+  // api::LaneSRanges in a Phase.
+  static constexpr int kTowardsRight{-1};
+  // Defines the sign and increment of one unit towards the left the index of
+  // api::LaneSRanges in a Phase.
+  static constexpr int kTowardsLeft{1};
+
   // Type alias to index an api::LaneSRange within this Route.
-  // std::pair::first indexes the RoutePhase.
-  // std::pair::second indexes the api::LaneSRange in the RoutePhase.
+  // std::pair::first indexes the Phase.
+  // std::pair::second indexes the api::LaneSRange in the Phase.
   using LaneSRangeIndex = std::pair<size_t, size_t>;
 
   // Finds the LaneSRangeIndex for an api::LaneSRange.
@@ -229,7 +250,27 @@ class Route final {
   // Route.
   std::optional<LaneSRangeIndex> FindLaneSRangeIndexFor(const api::LaneSRange& lane_s_range) const;
 
+  // Finds the LaneSRangeIndex of the api::LaneSRange that is
+  // LaneSRelation::kPreceedingStraight with respect to @p lane_s_range_index
+  // api::LaneSRange.
+  //
+  // @param lane_s_range_index The index of the api::LaneSRange to find its
+  // LaneSRelation::kPreceedingStraight counterpart. It must be a valid index.
+  // @return An optional containing the LaneSRangeIndex of the api::LaneSRange.
+  std::optional<LaneSRangeIndex> FindStraightPredecessorFor(const LaneSRangeIndex& lane_s_range_index) const;
+
+  // Finds how to move the index of api::LaneSRanges within a Phase to find
+  // the first one from @p lane_s_range_index.
+  //
+  // @param lane_s_range_index The index of api::LaneSRange within this Route.
+  // @return kTowardsLeft When moving towards the left within the Phase,
+  // otherwise kTowardsRight.
+  // @throws common::assertion_error When `lane_s_range_index.first` is zero as
+  // there is no predecessor.
+  int FindDirectionTowardsLaneSRangeWithStraightPredecessor(const LaneSRangeIndex& lane_s_range_index) const;
+
   std::vector<Phase> phases_;
+  std::unordered_map<api::LaneId, std::vector<LaneSRangeIndex>> lane_id_to_lane_s_range_indices_;
   const api::RoadNetwork* road_network_{};
 };
 

@@ -133,6 +133,20 @@ GTEST_TEST(SRangeTest, Intersects) {
   EXPECT_THROW(s_range.Intersects(SRange{-5., 33.}, kLinearTolerance), common::assertion_error);
 }
 
+GTEST_TEST(SRangeTest, Contains) {
+  const SRange s_range(3., 10.);
+  EXPECT_TRUE(s_range.Contains(SRange{5., 5.}, kLinearTolerance));
+  EXPECT_FALSE(s_range.Contains(SRange{2., 5.}, kLinearTolerance));
+  EXPECT_FALSE(s_range.Contains(SRange{8., 13.}, kLinearTolerance));
+  EXPECT_FALSE(s_range.Contains(SRange{11., 9.}, kLinearTolerance));
+  EXPECT_FALSE(s_range.Contains(SRange{15., 33.}, kLinearTolerance));
+  EXPECT_FALSE(s_range.Contains(SRange{1., 1.5}, kLinearTolerance));
+  EXPECT_TRUE(s_range.Contains(SRange{4.5, 8.5}, kNegativeLinearTolerance / 2.));
+  EXPECT_FALSE(s_range.Contains(SRange{3.5, 9.5}, kNegativeLinearTolerance));
+  EXPECT_THROW(s_range.Contains(SRange{15., 33.}, kExcessiveNegativeLinearTolerance), common::assertion_error);
+  EXPECT_THROW(s_range.Contains(SRange{-5., 33.}, kLinearTolerance), common::assertion_error);
+}
+
 // Holds build configuration for SRangeGetIntersectionTest.
 struct SRangeGetIntersectionBuildFlags {
   SRange s_range{};
@@ -205,6 +219,17 @@ GTEST_TEST(LaneSRangeTest, Intersects) {
   EXPECT_TRUE(lane_s_range_a.Intersects(LaneSRange{kLaneId1, SRange(15., 25.)}, kLinearTolerance));
   EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{kLaneId1, SRange(55., 35.)}, kLinearTolerance));
   EXPECT_FALSE(lane_s_range_a.Intersects(LaneSRange{kLaneId3, SRange(70., 10.)}, kLinearTolerance));
+}
+
+GTEST_TEST(LaneSRangeTest, Contains) {
+  const LaneSRange lane_s_range_a(kLaneId1, SRange(20., 30.));
+  EXPECT_TRUE(lane_s_range_a.Contains(LaneSRange{kLaneId1, SRange(25., 25.)}, kLinearTolerance));
+  EXPECT_TRUE(lane_s_range_a.Contains(LaneSRange{kLaneId1, SRange(22., 28.)}, kLinearTolerance));
+  EXPECT_FALSE(lane_s_range_a.Contains(LaneSRange{kLaneId1, SRange(25., 35.)}, kLinearTolerance));
+  EXPECT_FALSE(lane_s_range_a.Contains(LaneSRange{kLaneId1, SRange(70., 10.)}, kLinearTolerance));
+  EXPECT_FALSE(lane_s_range_a.Contains(LaneSRange{kLaneId1, SRange(15., 25.)}, kLinearTolerance));
+  EXPECT_FALSE(lane_s_range_a.Contains(LaneSRange{kLaneId1, SRange(55., 35.)}, kLinearTolerance));
+  EXPECT_FALSE(lane_s_range_a.Contains(LaneSRange{kLaneId3, SRange(70., 10.)}, kLinearTolerance));
 }
 
 GTEST_TEST(LaneSRangeTest, GetIntersection) {

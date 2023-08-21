@@ -83,6 +83,11 @@ class SRange {
   /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
   bool Intersects(const SRange& s_range, double tolerance) const;
 
+  /// Determines whether this SRange contains `s_range`.
+  /// `tolerance` will modify this range and `s_range` by increasing the maximum tolerance
+  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  bool Contains(const SRange& s_range, double tolerance) const;
+
   /// Returns a std::optional<SRange> bearing the intersected SRange that results overlapping
   /// this SRange with `s_range`. When there is no common area, std::nullopt is returned.
   ///
@@ -117,6 +122,13 @@ class LaneSRange {
   /// `tolerance` will modify this LaneSRanges's ranges and `lane_s_range`'s ranges by increasing the maximum tolerance
   /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
   bool Intersects(const LaneSRange& lane_s_range, double tolerance) const;
+
+  /// Determines whether this LaneSRange contains `s_range`.
+  /// LaneIds are evaluated prior calling SRange::Contains() method.
+  ///
+  /// `tolerance` will modify this LaneSRanges's ranges and `lane_s_range`'s ranges by increasing the maximum tolerance
+  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  bool Contains(const LaneSRange& lane_s_range, double tolerance) const;
 
   /// Returns a std::optional<LaneSRange> bearing the intersected LaneSRange that results overlapping
   /// this LaneSRange with `lane_s_range`. When there is no common area, std::nullopt is returned.
