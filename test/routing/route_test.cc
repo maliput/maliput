@@ -660,46 +660,46 @@ class RouteLaneSRelationTest : public RouteBaseTest {
   std::unique_ptr<Phase> phase_two_;
 };
 
-TEST_F(RouteLaneSRelationTest, EvaluateLaneSRangeRelationForSameLaneSRanges) {
+TEST_F(RouteLaneSRelationTest, EvaluateComputeLaneSRangeRelationSameLaneSRanges) {
   const Route dut({*phase_zero_, *phase_one_, *phase_two_}, road_network_.get());
 
-  EXPECT_EQ(LaneSRangeRelation::kUnknown, dut.LaneSRangeRelationFor(kLaneSRangeUnknown, kLaneSRangeA));
+  EXPECT_EQ(LaneSRangeRelation::kUnknown, dut.ComputeLaneSRangeRelation(kLaneSRangeUnknown, kLaneSRangeA));
 
-  EXPECT_EQ(LaneSRangeRelation::kUnrelated, dut.LaneSRangeRelationFor(kLaneSRangeH, kLaneSRangeA));
+  EXPECT_EQ(LaneSRangeRelation::kUnrelated, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeA));
 
-  EXPECT_EQ(LaneSRangeRelation::kCoincident, dut.LaneSRangeRelationFor(kLaneSRangeA, kLaneSRangeA));
+  EXPECT_EQ(LaneSRangeRelation::kCoincident, dut.ComputeLaneSRangeRelation(kLaneSRangeA, kLaneSRangeA));
 
-  EXPECT_EQ(LaneSRangeRelation::kAdjacentLeft, dut.LaneSRangeRelationFor(kLaneSRangeB, kLaneSRangeA));
+  EXPECT_EQ(LaneSRangeRelation::kAdjacentLeft, dut.ComputeLaneSRangeRelation(kLaneSRangeB, kLaneSRangeA));
 
-  EXPECT_EQ(LaneSRangeRelation::kLeft, dut.LaneSRangeRelationFor(kLaneSRangeD, kLaneSRangeA));
+  EXPECT_EQ(LaneSRangeRelation::kLeft, dut.ComputeLaneSRangeRelation(kLaneSRangeD, kLaneSRangeA));
 
-  EXPECT_EQ(LaneSRangeRelation::kAdjacentRight, dut.LaneSRangeRelationFor(kLaneSRangeA, kLaneSRangeB));
+  EXPECT_EQ(LaneSRangeRelation::kAdjacentRight, dut.ComputeLaneSRangeRelation(kLaneSRangeA, kLaneSRangeB));
 
-  EXPECT_EQ(LaneSRangeRelation::kRight, dut.LaneSRangeRelationFor(kLaneSRangeA, kLaneSRangeD));
+  EXPECT_EQ(LaneSRangeRelation::kRight, dut.ComputeLaneSRangeRelation(kLaneSRangeA, kLaneSRangeD));
 
   EXPECT_CALL(lane_c_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{kLaneLength, 5., 0.}));
   EXPECT_CALL(lane_f_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{kLaneLength, 5., 0.}));
   EXPECT_CALL(lane_c_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
   EXPECT_CALL(lane_f_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
-  EXPECT_EQ(LaneSRangeRelation::kSucceedingStraight, dut.LaneSRangeRelationFor(kLaneSRangeC, kLaneSRangeF));
+  EXPECT_EQ(LaneSRangeRelation::kSucceedingStraight, dut.ComputeLaneSRangeRelation(kLaneSRangeC, kLaneSRangeF));
 
   EXPECT_CALL(lane_d_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
   EXPECT_CALL(lane_e_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{kLaneLength, 10., 0.}));
   EXPECT_CALL(lane_d_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
   EXPECT_CALL(lane_e_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
 
-  EXPECT_EQ(LaneSRangeRelation::kSucceedingLeft, dut.LaneSRangeRelationFor(kLaneSRangeD, kLaneSRangeE));
+  EXPECT_EQ(LaneSRangeRelation::kSucceedingLeft, dut.ComputeLaneSRangeRelation(kLaneSRangeD, kLaneSRangeE));
 
-  EXPECT_EQ(LaneSRangeRelation::kSucceedingLeft, dut.LaneSRangeRelationFor(kLaneSRangeD, kLaneSRangeF));
+  EXPECT_EQ(LaneSRangeRelation::kSucceedingLeft, dut.ComputeLaneSRangeRelation(kLaneSRangeD, kLaneSRangeF));
 
   EXPECT_CALL(lane_b_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{kLaneLength, 15., 0.}));
   EXPECT_CALL(lane_g_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
   EXPECT_CALL(lane_b_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
   EXPECT_CALL(lane_g_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
 
-  EXPECT_EQ(LaneSRangeRelation::kSucceedingRight, dut.LaneSRangeRelationFor(kLaneSRangeB, kLaneSRangeF));
+  EXPECT_EQ(LaneSRangeRelation::kSucceedingRight, dut.ComputeLaneSRangeRelation(kLaneSRangeB, kLaneSRangeF));
 
-  EXPECT_EQ(LaneSRangeRelation::kSucceedingRight, dut.LaneSRangeRelationFor(kLaneSRangeB, kLaneSRangeG));
+  EXPECT_EQ(LaneSRangeRelation::kSucceedingRight, dut.ComputeLaneSRangeRelation(kLaneSRangeB, kLaneSRangeG));
 
   EXPECT_CALL(lane_e_, DoToInertialPosition(_))
       .WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 10., 0.}));
@@ -708,21 +708,21 @@ TEST_F(RouteLaneSRelationTest, EvaluateLaneSRangeRelationForSameLaneSRanges) {
   EXPECT_CALL(lane_e_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
   EXPECT_CALL(lane_h_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
 
-  EXPECT_EQ(LaneSRangeRelation::kPreceedingStraight, dut.LaneSRangeRelationFor(kLaneSRangeH, kLaneSRangeE));
+  EXPECT_EQ(LaneSRangeRelation::kPreceedingStraight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeE));
 
   EXPECT_CALL(lane_i_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 5., 0.}));
   EXPECT_CALL(lane_i_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
 
-  EXPECT_EQ(LaneSRangeRelation::kPreceedingLeft, dut.LaneSRangeRelationFor(kLaneSRangeI, kLaneSRangeE));
+  EXPECT_EQ(LaneSRangeRelation::kPreceedingLeft, dut.ComputeLaneSRangeRelation(kLaneSRangeI, kLaneSRangeE));
 
   EXPECT_CALL(lane_f_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 5., 0.}));
   EXPECT_CALL(lane_g_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 0., 0.}));
   EXPECT_CALL(lane_f_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
   EXPECT_CALL(lane_g_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
 
-  EXPECT_EQ(LaneSRangeRelation::kPreceedingRight, dut.LaneSRangeRelationFor(kLaneSRangeH, kLaneSRangeF));
+  EXPECT_EQ(LaneSRangeRelation::kPreceedingRight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeF));
 
-  EXPECT_EQ(LaneSRangeRelation::kPreceedingRight, dut.LaneSRangeRelationFor(kLaneSRangeH, kLaneSRangeG));
+  EXPECT_EQ(LaneSRangeRelation::kPreceedingRight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeG));
 }
 
 }  // namespace

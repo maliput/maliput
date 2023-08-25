@@ -119,18 +119,18 @@ RelativePosition ComputeRelativePositionFor(const api::RoadPosition& pos_a, cons
 
 }  // namespace
 
-LaneSRangeRelation Route::LaneSRangeRelationFor(const api::LaneSRange& lane_s_range_a,
-                                                const api::LaneSRange& lane_s_range_b) const {
+LaneSRangeRelation Route::ComputeLaneSRangeRelation(const api::LaneSRange& lane_s_range_a,
+                                                    const api::LaneSRange& lane_s_range_b) const {
   // Find index of lane_s_range_a and lane_s_range_b.
-  const std::optional<LaneSRangeIndex> lane_s_range_a_index = FindLaneSRangeIndexFor(lane_s_range_a);
-  const std::optional<LaneSRangeIndex> lane_s_range_b_index = FindLaneSRangeIndexFor(lane_s_range_b);
+  const std::optional<LaneSRangeIndex> lane_s_range_a_index = FindLaneSRangeIndex(lane_s_range_a);
+  const std::optional<LaneSRangeIndex> lane_s_range_b_index = FindLaneSRangeIndex(lane_s_range_b);
 
   // Determine whether lane_s_range_a and lane_s_range_b are in the same Route.
   if (!lane_s_range_a_index.has_value() || !lane_s_range_b_index.has_value()) {
     return LaneSRangeRelation::kUnknown;
   }
 
-  // lane_s_range_b is unrelated to lane_s_range_a
+  // lane_s_range_b is unrelated to lane_s_range_a since they are in non-adjacent phases.
   if (lane_s_range_a_index->first > lane_s_range_b_index->first + 1 ||
       lane_s_range_b_index->first > lane_s_range_a_index->first + 1) {
     return LaneSRangeRelation::kUnrelated;
@@ -139,7 +139,7 @@ LaneSRangeRelation Route::LaneSRangeRelationFor(const api::LaneSRange& lane_s_ra
   const size_t lane_s_range_b_next_index = lane_s_range_b_index->second + 1;
   const size_t lane_s_range_b_previous_index = lane_s_range_b_index->second - 1;
 
-  // When both indices are the same, we should look into the indices for the lane_s_ranges.
+  // When both phase indices are the same, we should look into the indices for the lane_s_ranges.
   if (lane_s_range_a_index->first == lane_s_range_b_index->first) {
     if (lane_s_range_a_index->second == lane_s_range_b_index->second) {
       return LaneSRangeRelation::kCoincident;
@@ -193,7 +193,7 @@ LaneSRangeRelation Route::LaneSRangeRelationFor(const api::LaneSRange& lane_s_ra
       ComputeRelativePositionFor(lane_s_range_a_road_pos, lane_s_range_b_road_pos, tolerance))];
 }
 
-std::optional<Route::LaneSRangeIndex> Route::FindLaneSRangeIndexFor(const api::LaneSRange& lane_s_range) const {
+std::optional<Route::LaneSRangeIndex> Route::FindLaneSRangeIndex(const api::LaneSRange& lane_s_range) const {
   auto is_lane_s_range_contained = [tolerance = road_network_->road_geometry()->linear_tolerance()](
                                        const api::LaneSRange& lane_s_range_a, const api::LaneSRange& lane_s_range_b) {
     if (lane_s_range_a.lane_id() != lane_s_range_b.lane_id()) {
