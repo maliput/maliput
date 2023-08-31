@@ -194,7 +194,7 @@
 /// data or other procedural generation tools used to build `maliput` backends may contain
 /// noise or they may lack of sufficient data. This leads to another concept, out of the scope of the
 /// `maliput` API concept definition (or distinction), which is the _build time_ tolerance.
-/// It is subject to the specific data used and `maliput` backend implemetnations to 
+/// It is subject to the specific data used and `maliput` backend implemetnations to
 /// manage the differences between _build time_ and _runtime_ tolerances accordingly.
 ///
 /// Finally, in connection with the map or input data source, there is a scale notion
@@ -206,15 +206,15 @@
 /// the highway network in Honshu, Japan and another one representing the road network
 /// of Komae municipality in Tokyo, Japan. The scale of the two representations are
 /// significantly different. Thus:
-///  
+///
 /// - *Scale length*: it is a significative unit, used as a pattern to define together with the
-/// _linear tolerance_ the relative resolution of lengths in the `RoadGeometry`. 
+/// _linear tolerance_ the relative resolution of lengths in the `RoadGeometry`.
 ///
 /// Users and designers of `maliput` backends would rarely try other values different from
 /// 1m for `scale length`, and would generally prefer to adjust _linear tolerance_ accordingly.
 /// However, when the dimensions of the networks exceed the tens of km range, it is
-/// suggested to consider the detail level requirement and scale length becomes a great tool. 
-/// 
+/// suggested to consider the detail level requirement and scale length becomes a great tool.
+///
 /// @subsubsection inertial_frame_versus_lane_frame Inertial-frame versus Lane-frame
 ///
 /// Two types of coordinate frames are used in this model: the (single)
