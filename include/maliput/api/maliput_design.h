@@ -160,8 +160,6 @@
 ///
 /// @subsubsection scale_length_and_tolerances Scale Length and Tolerances
 ///
-/// > TODO: Explain the concepts of linear tolerance, angular tolerance, and
-/// > characteristic scale length.
 /// The set of abstractions conformed by the `RoadGeometry`, `Junction`, `Segment`,
 /// `Lane` and `BranchPoint` concentrate various aspects of map data, among which we can
 /// identify and highlight:
