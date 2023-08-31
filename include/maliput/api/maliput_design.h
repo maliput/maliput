@@ -162,7 +162,61 @@
 ///
 /// > TODO: Explain the concepts of linear tolerance, angular tolerance, and
 /// > characteristic scale length.
+/// The set of abstractions conformed by the `RoadGeometry`, `Junction`, `Segment`,
+/// `Lane` and `BranchPoint` concentrate various aspects of map data, among which we can
+/// identify and highlight:
+/// - Network topology.
+/// - Volume and surface information.
+/// - Dimensions.
 ///
+/// Depending on the data source type that will feed an actual implementation of `maliput`
+/// these three aspects will be given, derived or found at the moment of parsing the information
+/// and building the entities. In particular, there is one important characteristic of the
+/// `RoadGeometry` abstraction: the @f$ G^1 @f$ continuity of the road surface. That implies:
+/// - The road surface is continuous.
+/// - The road surface is orientable.
+///
+/// Provided the available map information is imperfect, the numeric system under use
+/// is also imperfect and discrete and there are non-continuities that are by far neglactable
+/// the use of tolerances becomes relevant for designers. The `maliput` API offers
+/// the following tolerance definitions and uses across the codebase:
+///
+/// - *Linear tolerance*: it is a one dimensional tolerance that is used to guarantee @f$ G^0 @f$
+/// continuity in the surfaces and also helps to constrain the expected minimum resolution of
+/// mappings done by implementations.
+/// - *Angular tolerance*: it is a one dimensional tolerance that is used to guarantee @f$ G^1 @f$
+/// continuity in the surfaces, i.e. surfaces are orientable at any point.
+///
+/// Together, these two tolerances constrain the result of geometric queries done via, mostly,
+/// `Lanes`. Their implementations are required to map road volumes that are end to end @f$ G^1 @f$
+/// and connect to other sibling `Lanes` respecting the @f$ G^1 @f$. _Tolerable_ variations in
+/// continuity and orientations are expressed by linear and angular tolerances.
+///
+/// These two tolerances can be further understood as _runtime_ tolerances. Input data, map
+/// data or other procedural generation tools used to build `maliput` backends may contain
+/// noise or they may lack of sufficient data. This leads to another concept, out of the scope of the
+/// `maliput` API concept definition (or distinction), which is the _build time_ tolerance.
+/// It is subject to the specific data used and `maliput` backend implemetnations to 
+/// manage the differences between _build time_ and _runtime_ tolerances accordingly.
+///
+/// Finally, in connection with the map or input data source, there is a scale notion
+/// that is worth noting. `maliput` has no restriction w.r.t. the extents of the space
+/// it can represent. However, designers and users of the API will be required to be
+/// aware of the scale of the modeled space. That will let them account for accumulated
+/// errors and permitted _runtime_ tolerances according to the space they want to model.
+/// An example of this can be seen when having two `RoadGeometries`, one representing
+/// the highway network in Honshu, Japan and another one representing the road network
+/// of Komae municipality in Tokyo, Japan. The scale of the two representations are
+/// significantly different. Thus:
+///  
+/// - *Scale length*: it is a significative unit, used as a pattern to define together with the
+/// _linear tolerance_ the relative resolution of lengths in the `RoadGeometry`. 
+///
+/// Users and designers of `maliput` backends would rarely try other values different from
+/// 1m for `scale length`, and would generally prefer to adjust _linear tolerance_ accordingly.
+/// However, when the dimensions of the networks exceed the tens of km range, it is
+/// suggested to consider the detail level requirement and scale length becomes a great tool. 
+/// 
 /// @subsubsection inertial_frame_versus_lane_frame Inertial-frame versus Lane-frame
 ///
 /// Two types of coordinate frames are used in this model: the (single)
