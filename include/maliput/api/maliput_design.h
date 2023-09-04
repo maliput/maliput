@@ -174,10 +174,10 @@
 /// - The road surface is continuous.
 /// - The road surface is orientable.
 ///
-/// Provided the available map information is imperfect, the numeric system under use
-/// is also imperfect and discrete and there are non-continuities that are by far neglactable
-/// the use of tolerances becomes relevant for designers. The `maliput` API offers
-/// the following tolerance definitions and uses across the codebase:
+/// Due to the various sources of noise, such as sensor data to build maps, the map design
+/// itself numeric system, or the numeric system, etc. the use of tolerances becomes relevant
+/// for designers. The `maliput` API offers the following tolerance definitions and uses across
+/// the codebase:
 ///
 /// - *Linear tolerance*: it is a one dimensional tolerance that is used to guarantee @f$ G^0 @f$
 /// continuity in the surfaces and also helps to constrain the expected minimum resolution of
@@ -194,8 +194,10 @@
 /// data or other procedural generation tools used to build `maliput` backends may contain
 /// noise or they may lack of sufficient data. This leads to another concept, out of the scope of the
 /// `maliput` API concept definition (or distinction), which is the _build time_ tolerance.
-/// It is subject to the specific data used and `maliput` backend implemetnations to
-/// manage the differences between _build time_ and _runtime_ tolerances accordingly.
+/// It is subject to the specific data used and `maliput` backend implementations to
+/// manage the differences between _build time_ and _runtime_ tolerances accordingly. For further
+/// examples and to review the discussion, please refer to this link
+/// https://github.com/maliput/maliput/issues/344.
 ///
 /// Finally, in connection with the map or input data source, there is a scale notion
 /// that is worth noting. `maliput` has no restriction w.r.t. the extents of the space
