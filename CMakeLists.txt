@@ -12,8 +12,7 @@ project(maliput LANGUAGES C CXX VERSION 3.0.0)
 message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
 find_package(ament_cmake REQUIRED)
-find_package(fmt 6.1.2 EXACT REQUIRED)
-find_package(gflags REQUIRED)
+find_package(fmt REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 ##############################################################################
@@ -70,6 +69,7 @@ add_subdirectory(src)
 
 if(BUILD_TESTING)
   find_package(ament_cmake_clang_format REQUIRED)
+  find_package(gflags REQUIRED)
   enable_testing()
   add_subdirectory(test)
   ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
