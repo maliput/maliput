@@ -13,7 +13,6 @@ message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
 find_package(ament_cmake REQUIRED)
 find_package(fmt 6.1.2 EXACT REQUIRED)
-find_package(gflags REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 ##############################################################################
