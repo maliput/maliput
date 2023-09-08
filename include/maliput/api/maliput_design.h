@@ -158,6 +158,36 @@
 /// continuity requirements because Maliput has no notion of laterally-adjacent
 /// `Segments`.
 ///
+/// @subsubsection continuity_types Continuity types
+///
+/// There are different types of continuity degrees between two
+/// different curves, surfaces, etc that connect. The degree is associated with how
+/// many consecutive derivatives of both functions are continuous at the evaluation point.
+/// Thus,
+///  * @f$ G^0 @f$: two functions are continuous when evaluated at certain point.
+///  * @f$ G^1 @f$: two functions and their first derivatives are are continuous when
+///    evaluated at certain point. This implies that not only the functions' images are
+///    the same but also the tangent vectors.
+///  * @f$ G^2 @f$: two functions, their first and second derivatives are continuous when
+///    evaluated at certain point. On top of @f$ G^1 @f$, this implies the rate of change
+///    of the tangent vectors are the same, i.e. the curvature is the same.
+///  * ...
+///
+/// This mathematical aspect of functions is of vital importance to road designers
+/// as not every type of vehicle can safely travel through different discontinuity degrees.
+/// For example, a car can travel through a line and then a piece of a circle but a train
+/// requires a transition through a spiral which offers a continuous change of curvature.
+///
+/// `maliput` requires by design @f$ G^1 @f$ road surfaces and observes it at the joints,
+/// i.e. `BranchPoints`.
+///
+/// Road designers may also be more familiar by how these transitions are built. Typically,
+/// CAD tooling offer control points to adjust curve and surface smoothness. One can associante
+/// the number of control points with the continuity constraint degree as:
+///   * One control point alingment f$ \to G^0 @f$, controls continuity.
+///   * Two control points alingment f$ \to G^1 @f$, control tangent.
+///   * Three control point alingment f$ \to G^2 @f$, control curvature.
+///
 /// @subsubsection scale_length_and_tolerances Scale Length and Tolerances
 ///
 /// The set of abstractions conformed by the `RoadGeometry`, `Junction`, `Segment`,
@@ -170,9 +200,7 @@
 /// Depending on the data source type that will feed an actual implementation of `maliput`
 /// these three aspects will be given, derived or found at the moment of parsing the information
 /// and building the entities. In particular, there is one important characteristic of the
-/// `RoadGeometry` abstraction: the @f$ G^1 @f$ continuity of the road surface. That implies:
-/// - The road surface is continuous.
-/// - The road surface is orientable.
+/// `RoadGeometry` abstraction: the @f$ G^1 @f$ continuity of the road surface.
 ///
 /// Due to the various sources of noise, such as sensor data to build maps, the map design
 /// itself numeric system, or the numeric system, etc. the use of tolerances becomes relevant
@@ -183,7 +211,7 @@
 /// continuity in the surfaces and also helps to constrain the expected minimum resolution of
 /// mappings done by implementations.
 /// - *Angular tolerance*: it is a one dimensional tolerance that is used to guarantee @f$ G^1 @f$
-/// continuity in the surfaces, i.e. surfaces are orientable at any point.
+/// continuity in the surfaces, i.e. surfaces' derivative is continuous at any point.
 ///
 /// Together, these two tolerances constrain the result of geometric queries done via, mostly,
 /// `Lanes`. Their implementations are required to map road volumes that are end to end @f$ G^1 @f$
@@ -192,7 +220,7 @@
 ///
 /// These two tolerances can be further understood as _runtime_ tolerances. Input data, map
 /// data or other procedural generation tools used to build `maliput` backends may contain
-/// noise or they may lack of sufficient data. This leads to another concept, out of the scope of the
+/// noise or they may lack sufficient data. This leads to another concept, out of the scope of the
 /// `maliput` API concept definition (or distinction), which is the _build time_ tolerance.
 /// It is subject to the specific data used and `maliput` backend implementations to
 /// manage the differences between _build time_ and _runtime_ tolerances accordingly. For further
