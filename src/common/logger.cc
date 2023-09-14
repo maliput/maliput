@@ -98,6 +98,14 @@ void Sink::log(const std::string& msg) {
   ;
 }
 
+const std::string Logger::format(const std::vector<std::string>& v) const {
+  std::string result;
+  for (const std::string& s : v) {
+    result += s;
+  }
+  return result;
+}
+
 }  // namespace common
 
 common::Logger* log() {

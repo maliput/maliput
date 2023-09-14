@@ -145,6 +145,9 @@ class Sink : public SinkBase {
 /// on the severity of the message.
 ///
 /// Comments about the design:
+/// - Type-erasure is used to hide the implementation of the format method. This was initially done
+///   due to the fact that the logger was using the fmt library, but it was later removed however the
+///   design was kept for future use and to avoid ABI breakage.
 /// - Within Logger::log() method the variadic arguments are unpacked and serialized using a functor @ref Serialize .
 ///   The alternative to the functor is to use a lambda expresion, but there is a bug in gcc that is not fixed until 8.1
 ///   version.
@@ -231,16 +234,10 @@ class Logger {
   // Minimum level of messages to be log.
   logger::level level_{logger::level::info};
 
-  // Create a string from a list of arguments.
-  // @tparam Args Variadic arguments to generate the list of arguments.
-  // @param args Is an argument list representing objects with an already defined serialization applied.
+  // Create a string from a vector of strings.
+  // @param v Vector of strings to be concatenated.
   // @return A string obtained by concatenating the arguments.
-  template <typename... Args>
-  const std::string format(Args&&... args) const {
-    std::string result;
-    ((result += args), ...);
-    return result;
-  }
+  const std::string format(const std::vector<std::string>& v) const;
 };
 
 /// Convenient functor for getting a string from a object that has serialization operator defined.
@@ -262,7 +259,8 @@ void Logger::log(logger::level lev, Args&&... args) {
   if (lev >= level_) {
     std::string msg{};
     msg += logger::kLevelToMessage.at(lev);
-    msg += format(Serialize()(std::forward<Args>(args))...);
+    // Performing type-erasure in the header file.
+    msg += format(std::vector<std::string>{Serialize()(std::forward<Args>(args))...});
     msg += "\n";
     sink_->log(msg);
   }
