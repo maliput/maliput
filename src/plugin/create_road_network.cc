@@ -42,11 +42,11 @@ std::unique_ptr<maliput::plugin::RoadNetworkLoader> MakeRoadNetworkLoader(const 
   static plugin::MaliputPluginManager manager{};
   const plugin::MaliputPlugin* maliput_plugin = manager.GetPlugin(plugin::MaliputPlugin::Id(road_network_loader_id));
   if (!maliput_plugin) {
-    maliput::log()->error("{} plugin can't be obtained.", road_network_loader_id);
+    maliput::log()->error(road_network_loader_id, " plugin can't be obtained.");
     MALIPUT_THROW_MESSAGE(road_network_loader_id + " plugin can't be obtained.");
   }
   if (maliput_plugin->GetType() != plugin::MaliputPluginType::kRoadNetworkLoader) {
-    maliput::log()->error("{} plugin should be a RoadNetworkLoader plugin type", road_network_loader_id);
+    maliput::log()->error(road_network_loader_id, " plugin should be a RoadNetworkLoader plugin type");
     MALIPUT_THROW_MESSAGE(road_network_loader_id + " plugin should be a RoadNetworkLoader plugin type.");
   }
   maliput::plugin::RoadNetworkLoaderPtr rn_loader_ptr =

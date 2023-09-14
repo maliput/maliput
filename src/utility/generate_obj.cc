@@ -664,7 +664,7 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
   MALIPUT_THROW_UNLESS(segment->junction() != nullptr);
   MALIPUT_THROW_UNLESS(segment->junction()->road_geometry() != nullptr);
   if (segment->num_lanes() == 0) {
-    maliput::log()->trace("The are no lanes to be rendered in Segment ID: {}.", segment->id().string());
+    maliput::log()->trace("The are no lanes to be rendered in Segment ID: ", segment->id().string(), ".");
     return;
   }
   const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
@@ -701,7 +701,7 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
     if (!lane) {
       continue;
     }
-    maliput::log()->trace("Creating meshes for lane id {}", lane->id().string());
+    maliput::log()->trace("Creating meshes for lane id ", lane->id().string());
     const double grid_unit = PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
     if (features.draw_lane_haze) {
       GeoMesh haze_mesh;
@@ -989,7 +989,7 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
                                                                       const ObjFeatures& features) {
   MALIPUT_PROFILE_FUNC();
   MALIPUT_THROW_UNLESS(rg != nullptr);
-  maliput::log()->trace("Building Meshes for RoadGeometry id {}...", rg->id().string());
+  maliput::log()->trace("Building Meshes for RoadGeometry id ", rg->id().string(), "...");
 
   GeoMesh asphalt_mesh;
   GeoMesh lane_mesh;
@@ -1013,14 +1013,14 @@ std::map<std::string, std::pair<mesh::GeoMesh, Material>> BuildMeshes(const api:
     const api::Junction* junction = rg->junction(ji);
     if (!junction) {
       continue;
-      maliput::log()->trace("Visiting junction id {}", junction->id().string());
+      maliput::log()->trace("Visiting junction id ", junction->id().string());
     }
     for (int si = 0; si < junction->num_segments(); ++si) {
       const api::Segment* segment = junction->segment(si);
       if (!segment) {
         continue;
       }
-      maliput::log()->trace("Rendering segment id {}", segment->id().string());
+      maliput::log()->trace("Rendering segment id ", segment->id().string());
       // TODO(maddog@tri.global)  Id's need well-defined comparison semantics.
       if (IsSegmentRenderedNormally(segment->id(), features.highlighted_segments)) {
         RenderSegment(segment, features, &asphalt_mesh, &lane_mesh, &marker_mesh, &h_bounds_mesh, &sidewalk_mesh);
