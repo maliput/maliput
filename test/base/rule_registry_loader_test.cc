@@ -32,8 +32,6 @@
 #include <fstream>
 #include <variant>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/discrete_value_rule.h"
@@ -70,42 +68,39 @@ class TestLoadingRuleTypesFromYaml : public ::testing::Test {
     const std::string kDirectionUsageRuleType = DirectionUsageRuleTypeId().string();
     const std::string kSpeedLimitRuleType = SpeedLimitRuleTypeId().string();
     const std::string kVehicleInStopBehaviour = VehicleStopInZoneBehaviorRuleTypeId().string();
-
-    return fmt::format(
-        R"R(RuleRegistry:
-  {}:
-    - value: "Go"
-      severity: 0
-      related_rules: [{}, {}]
-      related_unique_ids: [{}]
-    - value: "Stop"
-      severity: 1
-      related_rules: [{}]
-    - value: "StopThenGo"
-  {}:
-    - value: "Bidirectional"
-      severity: 0
-    - value: "WithS"
-      severity: 0
-    - value: "AgaintsS"
-      severity: 0
-    - value: "Undefined"
-      severity: 1
-  {}:
-    - range: [16.6, 27.8]
-      description: "Interstate highway - day time"
-      severity: 0
-    - range: [16.6, 22.2]
-      description: "Arterial road in Ciudad Autonoma de Buenos Aires"
-      severity: 1
-)R",
-        kRightOfWayRuleType, kVehicleInStopBehaviour, RelatedRulesKeys::kYieldGroup, RelatedUniqueIdsKeys::kBulbGroup,
-        kVehicleInStopBehaviour, kDirectionUsageRuleType, kSpeedLimitRuleType);
+    std::stringstream ss;
+    ss << "RuleRegistry:\n"
+       << "    " << kRightOfWayRuleType << ":\n"
+       << "      - value: \"Go\"\n"
+       << "        severity: 0\n"
+       << "        related_rules: [" << kVehicleInStopBehaviour << ", " << RelatedRulesKeys::kYieldGroup << "]\n"
+       << "        related_unique_ids: [" << RelatedUniqueIdsKeys::kBulbGroup << "]\n"
+       << "      - value: \"Stop\"\n"
+       << "        severity: 1\n"
+       << "        related_rules: [" << kVehicleInStopBehaviour << "]\n"
+       << "      - value: \"StopThenGo\"\n"
+       << "    " << kDirectionUsageRuleType << ":\n"
+       << "      - value: \"Bidirectional\"\n"
+       << "        severity: 0\n"
+       << "      - value: \"WithS\"\n"
+       << "        severity: 0\n"
+       << "      - value: \"AgaintsS\"\n"
+       << "        severity: 0\n"
+       << "      - value: \"Undefined\"\n"
+       << "        severity: 1\n"
+       << "    " << kSpeedLimitRuleType << ":\n"
+       << "      - range: [16.6, 27.8]\n"
+       << "        description: \"Interstate highway - day time\"\n"
+       << "        severity: 0\n"
+       << "      - range: [16.6, 22.2]\n"
+       << "        description: \"Arterial road in Ciudad Autonoma de Buenos Aires\"\n"
+       << "        severity: 1\n";
+    return ss.str();
   }
 
   void GenerateYamlFileFromString(const std::string& string_to_yaml, const std::string& filepath) {
     std::ofstream os(filepath);
-    fmt::print(os, string_to_yaml);
+    os << string_to_yaml;
   }
 
   common::Path directory_;
