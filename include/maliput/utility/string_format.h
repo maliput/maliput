@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,43 +26,18 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput/utility/generate_urdf.h"
+#pragma once
 
-#include <fstream>
-
-#include "maliput/utility/generate_obj.h"
+#include <string>
 
 namespace maliput {
 namespace utility {
 
-void GenerateUrdfFile(const api::RoadGeometry* road_geometry, const std::string& dirpath, const std::string& fileroot,
-                      const ObjFeatures& features) {
-  GenerateObjFile(road_geometry, dirpath, fileroot, features);
-
-  const std::string obj_filename = fileroot + ".obj";
-  const std::string urdf_filename = fileroot + ".urdf";
-
-  std::ofstream os(dirpath + "/" + urdf_filename, std::ios::binary);
-  os << "<?xml version=\"1.0\" ?>\n"
-     << "<robot name=\"" << road_geometry->id().string() << "\">\n"
-     << "  <link name=\"world\"/>\n"
-     << "\n"
-     << "  <joint name=\"world_to_road_joint\" type=\"continuous\">\n"
-     << "    <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n"
-     << "    <parent link=\"world\"/>\n"
-     << "    <child link=\"surface\"/>\n"
-     << "  </joint>\n"
-     << "\n"
-     << "  <link name=\"surface\">\n"
-     << "    <visual name=\"v1\">\n"
-     << "      <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n"
-     << "      <geometry>\n"
-     << "        <mesh filename=\"" << obj_filename << "\" scale=\"1.0 1.0 1.0\"/>\n"
-     << "      </geometry>\n"
-     << "    </visual>\n"
-     << "  </link>\n"
-     << "</robot>\n";
-}
+/// Converts a double to a string with the specified precision.
+/// @param value The double to convert.
+/// @param precision The number of digits after the decimal point.
+/// @return The string representation of the double.
+std::string to_str(double value, int precision);
 
 }  // namespace utility
 }  // namespace maliput

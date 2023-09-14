@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,43 +26,35 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput/utility/generate_urdf.h"
+#include "maliput/utility/string_format.h"
 
-#include <fstream>
+#include <string>
 
-#include "maliput/utility/generate_obj.h"
+#include <gtest/gtest.h>
+
+#include "maliput/common/assertion_error.h"
 
 namespace maliput {
 namespace utility {
+namespace test {
+namespace {
 
-void GenerateUrdfFile(const api::RoadGeometry* road_geometry, const std::string& dirpath, const std::string& fileroot,
-                      const ObjFeatures& features) {
-  GenerateObjFile(road_geometry, dirpath, fileroot, features);
+class ToStrTest : public ::testing::Test {};
 
-  const std::string obj_filename = fileroot + ".obj";
-  const std::string urdf_filename = fileroot + ".urdf";
-
-  std::ofstream os(dirpath + "/" + urdf_filename, std::ios::binary);
-  os << "<?xml version=\"1.0\" ?>\n"
-     << "<robot name=\"" << road_geometry->id().string() << "\">\n"
-     << "  <link name=\"world\"/>\n"
-     << "\n"
-     << "  <joint name=\"world_to_road_joint\" type=\"continuous\">\n"
-     << "    <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n"
-     << "    <parent link=\"world\"/>\n"
-     << "    <child link=\"surface\"/>\n"
-     << "  </joint>\n"
-     << "\n"
-     << "  <link name=\"surface\">\n"
-     << "    <visual name=\"v1\">\n"
-     << "      <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n"
-     << "      <geometry>\n"
-     << "        <mesh filename=\"" << obj_filename << "\" scale=\"1.0 1.0 1.0\"/>\n"
-     << "      </geometry>\n"
-     << "    </visual>\n"
-     << "  </link>\n"
-     << "</robot>\n";
+TEST_F(ToStrTest, Basic) {
+  const double value = 1.23456789;
+  const int precision = 3;
+  const std::string expected = "1.235";
+  EXPECT_EQ(to_str(value, precision), expected);
 }
 
+TEST_F(ToStrTest, NegativePrecision) {
+  const double value = 1.23456789;
+  const int precision = -3;
+  EXPECT_THROW(to_str(value, precision), maliput::common::assertion_error);
+}
+
+}  // namespace
+}  // namespace test
 }  // namespace utility
 }  // namespace maliput
