@@ -23,11 +23,6 @@ target_include_directories(common
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(common
-  PRIVATE
-    fmt::fmt
-)
-
 ##############################################################################
 # Export
 ##############################################################################

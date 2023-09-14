@@ -4,7 +4,7 @@
 /// To log with `maliput::common::logger`, you should:
 ///
 /// <pre>
-///   maliput::log()->trace("Trace message: {} {}", something, some_other);
+///   maliput::log()->trace("The approximate value is ", 3.14159);
 /// </pre>
 ///
 /// Similarly, it provides:
@@ -19,8 +19,7 @@
 /// </pre>
 ///
 ///
-/// The format string syntax is fmtlib; see http://fmtlib.net/5.3.0/syntax.html.
-/// In particular, any class that overloads `operator<<` for `ostream` can be
+/// Any class that overloads `operator<<` for `ostream` can be
 /// printed without any special handling.
 
 /// Code in this file is inspired by:
@@ -146,9 +145,6 @@ class Sink : public SinkBase {
 /// on the severity of the message.
 ///
 /// Comments about the design:
-/// - Given that fmt library is used to format the message to be logged it was consider neccesary
-///   not to expose the dependency in the header file and narrow it only to the implementation. That is why
-///   type-erasure was taken into account within Logger::log() method.
 /// - Within Logger::log() method the variadic arguments are unpacked and serialized using a functor @ref Serialize .
 ///   The alternative to the functor is to use a lambda expresion, but there is a bug in gcc that is not fixed until 8.1
 ///   version.
@@ -156,8 +152,6 @@ class Sink : public SinkBase {
 /// - Another way to do type-erasure is using std::any to allocate the variadic arguments, but this idea
 ///   was dismissed given that it wouldn't allow the logger to manage all kind of types, due to the fact that
 ///   an overload of any_cast<T>() for each new type to be serialized would be required.
-/// @see StackOverflow thread:
-/// https://stackoverflow.com/questions/56517207/implementing-pimpl-based-wrapper-around-a-class-using-variadic-template-function
 class Logger {
  public:
   /// Indicates the maximum number of arguments that a single log command is able to process.
@@ -168,7 +162,7 @@ class Logger {
   Logger() = default;
 
   /// \addtogroup levelmethods Logging Level Methods.
-  /// @param args Is an argument list representing objects to be formatted. See https://github.com/fmtlib/fmt.
+  /// @param args Is an argument list representing objects to be formatted.
   /// @{
 
   /// Log the message showing trace level prefix.
@@ -227,8 +221,7 @@ class Logger {
  private:
   // Send the message to the sink.
   // @param log_level Level of the message.
-  // @param args Is an argument list representing objects to be formatted using fmt library. See
-  // https://github.com/fmtlib/fmt.
+  // @param args Is an argument list to be processed as a string.
   template <typename... Args>
   void log(logger::level log_level, Args&&... args);
 
@@ -238,10 +231,16 @@ class Logger {
   // Minimum level of messages to be log.
   logger::level level_{logger::level::info};
 
-  // Create a string from a list of strings.
-  // @param v Is a list of strings of fmt type. See https://github.com/fmtlib/fmt.
-  // @return A string created from the list `v` using fmt library.
-  const std::string format(const std::vector<std::string>& v) const;
+  // Create a string from a list of arguments.
+  // @tparam Args Variadic arguments to generate the list of arguments.
+  // @param args Is an argument list representing objects with an already defined serialization applied.
+  // @return A string obtained by concatenating the arguments.
+  template <typename... Args>
+  const std::string format(Args&&... args) const {
+    std::string result;
+    ((result += args), ...);
+    return result;
+  }
 };
 
 /// Convenient functor for getting a string from a object that has serialization operator defined.
@@ -263,8 +262,7 @@ void Logger::log(logger::level lev, Args&&... args) {
   if (lev >= level_) {
     std::string msg{};
     msg += logger::kLevelToMessage.at(lev);
-    // Performing type-erasure in the header file.
-    msg += format(std::vector<std::string>{Serialize()(std::forward<Args>(args))...});
+    msg += format(Serialize()(std::forward<Args>(args))...);
     msg += "\n";
     sink_->log(msg);
   }
