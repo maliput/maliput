@@ -32,8 +32,6 @@
 #include <fstream>
 #include <memory>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <gtest/gtest.h>
 
 #include "maliput/api/rules/discrete_value_rule.h"
@@ -151,64 +149,66 @@ class StraightRoadNetworkHelpers {
 
   // Returns a YAML description based on the proposed RoadNetwork sample.
   static std::string PhaseRingBookYamlDescription() {
-    return fmt::format(
-        R"R(PhaseRings:
-- ID: StraightRoadCrossingPath
-  Rules: [{0}, {1}]
-  Phases:
-  - ID: AllGo
-    RightOfWayRuleStates: {{{0}: Go, {1}: Go}}
-    TrafficLightStates:
-      WestFacing:
-          WestFacingBulbs: {{RedBulb: Off, YellowBulb: Off, GreenBulb: On}}
-      EastFacing:
-          EastFacingBulbs: {{RedBulb: Off, YellowBulb: Off, GreenBulb: On}}
-  - ID: AllStop
-    RightOfWayRuleStates: {{{0}: Stop, {1}: Stop}}
-    TrafficLightStates:
-      WestFacing:
-          WestFacingBulbs: {{RedBulb: On, YellowBulb: Off, GreenBulb: Off}}
-      EastFacing:
-          EastFacingBulbs: {{RedBulb: On, YellowBulb: Off, GreenBulb: Off}}
-  PhaseTransitionGraph:
-    AllGo:
-    - ID: AllStop
-      duration_until: 45
-    AllStop:
-    - ID: AllGo
-)R",
-        maliput::RightOfWayRuleTypeId().string() + "/0_0_1", maliput::RightOfWayRuleTypeId().string() + "/0_1_2");
+    const std::string rule_1 = maliput::RightOfWayRuleTypeId().string() + "/0_0_1";
+    const std::string rule_2 = maliput::RightOfWayRuleTypeId().string() + "/0_1_2";
+    std::stringstream ss;
+    ss << "PhaseRings:\n"
+       << "- ID: StraightRoadCrossingPath\n"
+       << "  Rules: [" << rule_1 << ", " << rule_2 << "]\n"
+       << "  Phases:\n"
+       << "  - ID: AllGo\n"
+       << "    RightOfWayRuleStates: {" << rule_1 << ": Go, " << rule_2 << ": Go}\n"
+       << "    TrafficLightStates:\n"
+       << "      WestFacing:\n"
+       << "          WestFacingBulbs: {RedBulb: Off, YellowBulb: Off, GreenBulb: On}\n"
+       << "      EastFacing:\n"
+       << "          EastFacingBulbs: {RedBulb: Off, YellowBulb: Off, GreenBulb: On}\n"
+       << "  - ID: AllStop\n"
+       << "    RightOfWayRuleStates: {" << rule_1 << ": Stop, " << rule_2 << ": Stop}\n"
+       << "    TrafficLightStates:\n"
+       << "      WestFacing:\n"
+       << "          WestFacingBulbs: {RedBulb: On, YellowBulb: Off, GreenBulb: Off}\n"
+       << "      EastFacing:\n"
+       << "          EastFacingBulbs: {RedBulb: On, YellowBulb: Off, GreenBulb: Off}\n"
+       << "  PhaseTransitionGraph:\n"
+       << "    AllGo:\n"
+       << "    - ID: AllStop\n"
+       << "      duration_until: 45\n"
+       << "    AllStop:\n"
+       << "    - ID: AllGo\n";
+    return ss.str();
   }
 
   // Returns a YAML description based on the proposed RoadNetwork sample without RightOfWayRuleStates.
   static std::string PhaseRingBookYamlDescriptionWithoutRightOfWayRuleStates() {
-    return fmt::format(
-        R"R(PhaseRings:
-- ID: StraightRoadCrossingPath
-  Rules: [{0}, {1}]
-  Phases:
-  - ID: AllGo
-    RightOfWayRuleStates: {2}
-    TrafficLightStates:
-      WestFacing:
-          WestFacingBulbs: {{RedBulb: Off, YellowBulb: Off, GreenBulb: On}}
-      EastFacing:
-          EastFacingBulbs: {{RedBulb: Off, YellowBulb: Off, GreenBulb: On}}
-  - ID: AllStop
-    TrafficLightStates:
-      WestFacing:
-          WestFacingBulbs: {{RedBulb: On, YellowBulb: Off, GreenBulb: Off}}
-      EastFacing:
-          EastFacingBulbs: {{RedBulb: On, YellowBulb: Off, GreenBulb: Off}}
-  PhaseTransitionGraph:
-    AllGo:
-    - ID: AllStop
-      duration_until: 45
-    AllStop:
-    - ID: AllGo
-)R",
-        maliput::RightOfWayRuleTypeId().string() + "/0_0_1", maliput::RightOfWayRuleTypeId().string() + "/0_1_2",
-        "{}" /* Empty map */);
+    const std::string rule_1 = maliput::RightOfWayRuleTypeId().string() + "/0_0_1";
+    const std::string rule_2 = maliput::RightOfWayRuleTypeId().string() + "/0_1_2";
+    const std::string empty_right_of_way_rule_states = "{}";
+    std::stringstream ss;
+    ss << "PhaseRings:\n"
+       << "- ID: StraightRoadCrossingPath\n"
+       << "  Rules: [" << rule_1 << ", " << rule_2 << "]\n"
+       << "  Phases:\n"
+       << "  - ID: AllGo\n"
+       << "    RightOfWayRuleStates: " << empty_right_of_way_rule_states << "\n"
+       << "    TrafficLightStates:\n"
+       << "      WestFacing:\n"
+       << "          WestFacingBulbs: {RedBulb: Off, YellowBulb: Off, GreenBulb: On}\n"
+       << "      EastFacing:\n"
+       << "          EastFacingBulbs: {RedBulb: Off, YellowBulb: Off, GreenBulb: On}\n"
+       << "  - ID: AllStop\n"
+       << "    TrafficLightStates:\n"
+       << "      WestFacing:\n"
+       << "          WestFacingBulbs: {RedBulb: On, YellowBulb: Off, GreenBulb: Off}\n"
+       << "      EastFacing:\n"
+       << "          EastFacingBulbs: {RedBulb: On, YellowBulb: Off, GreenBulb: Off}\n"
+       << "  PhaseTransitionGraph:\n"
+       << "    AllGo:\n"
+       << "    - ID: AllStop\n"
+       << "      duration_until: 45\n"
+       << "    AllStop:\n"
+       << "    - ID: AllGo\n";
+    return ss.str();
   }
 
  private:
