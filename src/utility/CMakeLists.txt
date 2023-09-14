@@ -9,6 +9,7 @@ set(SOURCES
   generate_urdf.cc
   mesh_simplification.cc
   segment_analysis.cc
+  string_format.cc
   thread_pool.cc
 )
 add_library(utility ${SOURCES})
@@ -20,8 +21,6 @@ set_target_properties(utility
     OUTPUT_NAME maliput_utility
 )
 target_link_libraries(utility
-  PRIVATE
-    fmt::fmt
   PUBLIC
     stdc++fs
     maliput::api
