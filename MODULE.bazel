@@ -10,7 +10,4 @@ module(
 
 bazel_dep(name = "rules_cc", version = "0.0.8")
 
-# TODO(stonier) delete once https://github.com/maliput/maliput/pull/568 merges
-bazel_dep(name = "fmt", version = "10.1.0")
-
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
