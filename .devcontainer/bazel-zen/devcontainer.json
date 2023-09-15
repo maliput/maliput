@@ -1,0 +1,32 @@
+{
+    "name": "Bazel Zen",
+    "build": {
+        "dockerfile": "Dockerfile",
+        // Override image args only for special cases.
+        //
+        // If updating the officially supported image/version,
+        // update that in Dockerfile since that is a single source
+        // of truth for both local devcontainers (here) and
+        // the ci containers (.github/workflows/containers.yml).
+        // "args": {
+        //     "BASE_IMAGE": "focal",
+        //     "BAZEL_VERSION": "6.1.1"
+        // },
+        "context": ".."
+    },
+    "remoteUser": "zen",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bazelbuild.vscode-bazel",
+                "bierner.github-markdown-preview",
+                "bierner.markdown-preview-github-styles",
+                "github.vscode-github-actions",
+                "ms-vscode.cpptools-extension-pack",
+                "pbkit.vscode-pbkit",
+                "streetsidesoftware.code-spell-checker",
+                "yzhang.markdown-all-in-one"
+            ]
+        }
+    }
+}
