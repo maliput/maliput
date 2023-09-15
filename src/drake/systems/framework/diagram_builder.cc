@@ -48,21 +48,24 @@ void DiagramBuilder<T>::Connect(
   ThrowIfSystemNotRegistered(&dest.get_system());
   ThrowIfInputAlreadyWired(dest_id);
   if (src.get_data_type() != dest.get_data_type()) {
-    throw std::logic_error(fmt::format(
-        "DiagramBuilder::Connect: Cannot mix vector-valued and abstract-"
-        "valued ports while connecting output port {} of System {} to "
-        "input port {} of System {}",
-        src.get_name(), src.get_system().get_name(),
-        dest.get_name(), dest.get_system().get_name()));
+    std::stringstream oss;
+    oss << "DiagramBuilder::Connect: Cannot mix vector-valued and abstract-";
+    oss << "valued ports while connecting output port ";
+    oss << src.get_name() << " of System " << src.get_system().get_name();
+    oss << " to input port " << dest.get_name() << " of System ";
+    oss << dest.get_system().get_name();
+    throw std::logic_error(oss.str());
   }
   if ((src.get_data_type() != kAbstractValued) &&
       (src.size() != dest.size())) {
-    throw std::logic_error(fmt::format(
-        "DiagramBuilder::Connect: Mismatched vector sizes while connecting "
-        "output port {} of System {} (size {}) to "
-        "input port {} of System {} (size {})",
-        src.get_name(), src.get_system().get_name(), src.size(),
-        dest.get_name(), dest.get_system().get_name(), dest.size()));
+    std::stringstream oss;
+    oss << "DiagramBuilder::Connect: Mismatched vector sizes while connecting ";
+    oss << "output port " << src.get_name() << " of System ";
+    oss << src.get_system().get_name() << " (size ";
+    oss << src.size() << ") to input port " << dest.get_name();
+    oss << " of System " << dest.get_system().get_name() << " (size ";
+    oss << dest.size() << ")";
+    throw std::logic_error(oss.str());
   }
   if (src.get_data_type() == kAbstractValued) {
     auto model_output = src.Allocate();
@@ -70,14 +73,14 @@ void DiagramBuilder<T>::Connect(
     const std::type_info& output_type = model_output->static_type_info();
     const std::type_info& input_type = model_input->static_type_info();
     if (output_type != input_type) {
-      throw std::logic_error(fmt::format(
-          "DiagramBuilder::Connect: Mismatched value types while connecting "
-          "output port {} of System {} (type {}) to "
-          "input port {} of System {} (type {})",
-          src.get_name(), src.get_system().get_name(),
-          NiceTypeName::Get(output_type),
-          dest.get_name(), dest.get_system().get_name(),
-          NiceTypeName::Get(input_type)));
+      std::stringstream oss;
+      oss << "DiagramBuilder::Connect: Mismatched value types while connecting ";
+      oss << "output port " << src.get_name() << " of System ";
+      oss << src.get_system().get_name() << " (type ";
+      oss << NiceTypeName::Get(output_type) << ") to input port ";
+      oss << dest.get_name() << " of System " << dest.get_system().get_name();
+      oss << " (type " << NiceTypeName::Get(input_type) << ")";
+      throw std::logic_error(oss.str());
     }
   }
   connection_map_[dest_id] = src_id;
@@ -121,8 +124,9 @@ InputPortIndex DiagramBuilder<T>::DeclareInput(
 
   // Reject duplicate declarations.
   if (diagram_input_indices_.count(port_name) != 0) {
-    throw std::logic_error(
-        fmt::format("Diagram already has an input port named {}", port_name));
+    std::ostringstream oss;
+    oss << "Diagram already has an input port named " << port_name;
+    throw std::logic_error(oss.str());
   }
 
   // Save bookkeeping data.
@@ -154,20 +158,26 @@ void DiagramBuilder<T>::ConnectInput(
   const std::string& port_name = data.name;
   const InputPort<T>& model = model_id.first->get_input_port(model_id.second);
   if (model.get_data_type() != input.get_data_type()) {
-    throw std::logic_error(fmt::format(
-        "DiagramBuilder::ConnectInput: Cannot mix vector-valued and abstract-"
-        "valued ports while connecting input port {} of System {} to "
-        "input port {} of Diagram",
-        input.get_name(), input.get_system().get_name(), port_name));
+    std::ostringstream oss;
+    oss << "DiagramBuilder::ConnectInput: Cannot mix vector-valued and abstract-";
+    oss << "valued ports while connecting input port ";
+    oss << input.get_name() << " of System ";
+    oss << input.get_system().get_name() << " to input port ";
+    oss << port_name << " of Diagram";
+    throw std::logic_error(oss.str());
   }
   if ((model.get_data_type() != kAbstractValued) &&
       (model.size() != input.size())) {
-    throw std::logic_error(fmt::format(
-        "DiagramBuilder::ConnectInput: Mismatched vector sizes while "
-        "connecting input port {} of System {} (size {}) to "
-        "input port {} of Diagram (size {})",
-        input.get_name(), input.get_system().get_name(), input.size(),
-        port_name, model.size()));
+    std::ostringstream oss;
+    oss << "DiagramBuilder::ConnectInput: Mismatched vector sizes while ";
+    oss << "connecting input port ";
+    oss << input.get_name();
+    oss << " of System ";
+    oss << input.get_system().get_name() << " (size ";
+    oss << input.size() << ") to ";
+    oss << "input port " << port_name << " of Diagram (size ";
+    oss << model.size() << ")";
+    throw std::logic_error(oss.str());
   }
   if (model.get_data_type() == kAbstractValued) {
     auto model_model = model.get_system().AllocateInputAbstract(model);
@@ -175,13 +185,15 @@ void DiagramBuilder<T>::ConnectInput(
     const std::type_info& model_type = model_model->static_type_info();
     const std::type_info& input_type = model_input->static_type_info();
     if (model_type != input_type) {
-      throw std::logic_error(fmt::format(
-           "DiagramBuilder::ConnectInput: Mismatched value types while "
-           "connecting input port {} of System {} (type {}) to "
-           "input port {} of Diagram (type {})",
-           input.get_name(), input.get_system().get_name(),
-           NiceTypeName::Get(input_type),
-           port_name, NiceTypeName::Get(model_type)));
+      std::stringstream oss;
+      oss << "DiagramBuilder::ConnectInput: Mismatched value types while ";
+      oss << "connecting input port ";
+      oss << input.get_name() << " of System ";
+      oss << input.get_system().get_name() << "(type ";
+      oss << NiceTypeName::Get(input_type) << ") to input port ";
+      oss << port_name << " of Diagram type ";
+      oss << NiceTypeName::Get(model_type);
+      throw std::logic_error(oss.str());
     }
   }
 
@@ -247,10 +259,11 @@ void DiagramBuilder<T>::ThrowIfSystemNotRegistered(
     const System<T>* system) const {
   MALIPUT_DRAKE_DEMAND(system != nullptr);
   if (systems_.count(system) == 0) {
-    throw std::logic_error(fmt::format(
-        "DiagramBuilder: Cannot operate on ports of System {} "
-        "until it has been registered using AddSystem",
-        system->get_name()));
+    std::ostringstream oss;
+    oss << "DiagramBuilder: Cannot operate on ports of System ";
+    oss << system->get_name();
+    oss << " until it has been registered using AddSystem";
+    throw std::logic_error(oss.str());
   }
 }
 

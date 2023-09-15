@@ -242,10 +242,11 @@ SystemConstraintIndex System<T>::AddExternalConstraint(
     constraints_.emplace_back(std::make_unique<SystemConstraint<T>>(
         this, calc, constraint.bounds(), constraint.description()));
   } else {
+    std::ostringstream oss;
+    oss << constraint.description();
+    oss << " (disabled for this scalar type)";
     constraints_.emplace_back(std::make_unique<SystemConstraint<T>>(
-        this, fmt::format(
-            "{} (disabled for this scalar type)",
-            constraint.description())));
+        this, oss.str()));
   }
   external_constraints_.emplace_back(std::move(constraint));
   return SystemConstraintIndex(constraints_.size() - 1);
@@ -266,12 +267,14 @@ void System<T>::CalcImplicitTimeDerivativesResidual(
     EigenPtr<VectorX<T>> residual) const {
   MALIPUT_DRAKE_DEMAND(residual != nullptr);
   if (residual->size() != this->implicit_time_derivatives_residual_size()) {
-    throw std::logic_error(fmt::format(
-        "CalcImplicitTimeDerivativesResidual(): expected "
-        "residual vector of size {} but got one of size {}.\n"
-        "Use AllocateImplicitTimeDerivativesResidual() to "
-        "obtain a vector of the correct size.",
-        this->implicit_time_derivatives_residual_size(), residual->size()));
+    std::ostringstream oss;
+    oss << "CalcImplicitTimeDerivativesResidual(): expected ";
+    oss << "residual vector of size ";
+    oss << this->implicit_time_derivatives_residual_size();
+    oss << " but got one of size " << residual->size() << ".\n";
+    oss << "Use AllocateImplicitTimeDerivativesResidual() to ";
+    oss << "obtain a vector of the correct size.";
+    throw std::logic_error(oss.str());
   }
   ValidateContext(context);
   ValidateCreatedForThisSystem(proposed_derivatives);
@@ -356,24 +359,29 @@ T System<T>::CalcNextUpdateTime(const Context<T>& context,
   using std::isnan, std::isfinite;
 
   if (isnan(time)) {
-    throw std::logic_error(
-        fmt::format("System::CalcNextUpdateTime(): {} system '{}' overrode "
-                    "DoCalcNextUpdateTime() but at time={} it returned with no "
-                    "update time set (or the update time was set to NaN). "
-                    "Return infinity to indicate no next update time.",
-                    this->GetSystemType(), this->GetSystemPathname(),
-                    ExtractDoubleOrThrow(context.get_time())));
+    std::ostringstream oss;
+    oss << "System::CalcNextUpdateTime(): ";
+    oss << this->GetSystemType();
+    oss << " system '" << this->GetSystemPathname() << "' overrode ";
+    oss << "DoCalcNextUpdateTime() but at time=";
+    oss << ExtractDoubleOrThrow(context.get_time());
+    oss << " it returned with no ";
+    oss << "update time set (or the update time was set to NaN). ";
+    oss << "Return infinity to indicate no next update time.";
+    throw std::logic_error(oss.str());
   }
 
   if (isfinite(time) && !events->HasEvents()) {
-    throw std::logic_error(fmt::format(
-        "System::CalcNextUpdateTime(): {} system '{}' overrode "
-        "DoCalcNextUpdateTime() but at time={} it returned update "
-        "time {} with an empty Event collection. Return infinity "
-        "to indicate no next update time; otherwise at least one "
-        "Event object must be provided even if it does nothing.",
-        this->GetSystemType(), this->GetSystemPathname(),
-        ExtractDoubleOrThrow(context.get_time()), ExtractDoubleOrThrow(time)));
+    std::ostringstream oss;
+    oss << "System::CalcNextUpdateTime(): " << this->GetSystemType();
+    oss << " system '" << this->GetSystemPathname() << "' overrode ";
+    oss << "DoCalcNextUpdateTime() but at time=";
+    oss << ExtractDoubleOrThrow(context.get_time());
+    oss << " it returned update time " << ExtractDoubleOrThrow(time);
+    oss << " with an empty Event collection. Return infinity ";
+    oss << "to indicate no next update time; otherwise at least one ";
+    oss << "Event object must be provided even if it does nothing.";
+    throw std::logic_error(oss.str());
   }
 
   // If the context contains a perturbed current time, and
@@ -527,11 +535,12 @@ const Context<T>& System<T>::GetSubsystemContext(
   auto ret = DoGetTargetSystemContext(subsystem, &context);
   if (ret != nullptr) return *ret;
 
-  throw std::logic_error(
-      fmt::format("GetSubsystemContext(): {} subsystem '{}' is not "
-                  "contained in {} System '{}'.",
-                  subsystem.GetSystemType(), subsystem.GetSystemPathname(),
-                  this->GetSystemType(), this->GetSystemPathname()));
+  std::ostringstream oss;
+  oss << "GetSubsystemContext(): " << subsystem.GetSystemType();
+  oss << " subsystem '" << subsystem.GetSystemPathname() << "'";
+  oss << " is not contained in " << this->GetSystemType();
+  oss << " System '" << this->GetSystemPathname() << "'.";
+  throw std::logic_error(oss.str());
 }
 
 template <typename T>
@@ -959,11 +968,14 @@ SystemConstraintIndex System<T>::AddConstraint(
   MALIPUT_DRAKE_DEMAND(constraint != nullptr);
   MALIPUT_DRAKE_DEMAND(&constraint->get_system() == this);
   if (!external_constraints_.empty()) {
-    throw std::logic_error(fmt::format(
-        "System {} cannot add an internal constraint (named {}) "
-        "after an external constraint (named {}) has already been added",
-        GetSystemName(), constraint->description(),
-        external_constraints_.front().description()));
+    std::ostringstream oss;
+    oss << "System " << GetSystemName();
+    oss << " cannot add an internal constraint (named ";
+    oss << constraint->description() << ") ";
+    oss << "after an external constraint (named ";
+    oss << external_constraints_.front().description();
+    oss << ") has already been added";
+    throw std::logic_error(oss.str());
   }
   constraint->set_system_id(this->get_system_id());
   constraints_.push_back(std::move(constraint));
@@ -989,12 +1001,14 @@ void System<T>::DoCalcImplicitTimeDerivativesResidual(
   // declared residual size must match the number of continuous states (that's
   // the default if no one says otherwise).
   if (residual->size() != proposed_derivatives.size()) {
-    throw std::logic_error(fmt::format(
-        "System::DoCalcImplicitTimeDerivativesResidual(): "
-        "This default implementation requires that the declared residual size "
-        "(here {}) matches the number of continuous state variables ({}). "
-        "You must override this method if your residual is a different size.",
-        residual->size(), proposed_derivatives.size()));
+    std::ostringstream oss;
+    oss << "System::DoCalcImplicitTimeDerivativesResidual(): ";
+    oss << "This default implementation requires that the declared residual size ";
+    oss << "(here " << residual->size();
+    oss << ") matches the number of continuous state variables (";
+    oss << proposed_derivatives.size() << "). ";
+    oss << "You must override this method if your residual is a different size.";
+    throw std::logic_error(oss.str());
   }
   proposed_derivatives.get_vector().CopyToPreSizedVector(residual);
   *residual -= EvalTimeDerivatives(context).CopyToVector();
@@ -1145,12 +1159,15 @@ System<T>::MakeFixInputPortTypeChecker(
         if (actual_vector->size() != expected_size) {
           SystemBase::ThrowInputPortHasWrongType(
               "FixInputPortTypeCheck", path_name, port_index, port_name,
-              fmt::format("{} with size={}",
-                          NiceTypeName::Get<BasicVector<T>>(),
-                          expected_size),
-              fmt::format("{} with size={}",
-                          NiceTypeName::Get(*actual_vector),
-                          actual_vector->size()));
+              NiceTypeName::Get<BasicVector<T>>(),
+              // fmt::format("{} with size={}",
+              //             NiceTypeName::Get<BasicVector<T>>(),
+              //             expected_size),
+              NiceTypeName::Get(*actual_vector)
+              // fmt::format("{} with size={}",
+              //             NiceTypeName::Get(*actual_vector),
+              //             actual_vector->size())
+          );
         }
       };
     }

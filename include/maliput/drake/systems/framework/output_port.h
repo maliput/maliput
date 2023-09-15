@@ -6,8 +6,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "maliput/drake/common/default_scalars.h"
 #include "maliput/drake/common/drake_assert.h"
 #include "maliput/drake/common/drake_deprecated.h"
@@ -137,9 +135,10 @@ class OutputPort : public OutputPortBase {
   std::unique_ptr<AbstractValue> Allocate() const {
     std::unique_ptr<AbstractValue> value = DoAllocate();
     if (value == nullptr) {
-      throw std::logic_error(fmt::format(
-          "OutputPort::Allocate(): allocator returned a nullptr for {}.",
-          GetFullDescription()));
+      std::ostringstream oss;
+      oss << "OutputPort::Allocate(): allocator returned a nullptr for ";
+      oss << GetFullDescription() << ".";
+      throw std::logic_error(oss.str());
     }
     MALIPUT_DRAKE_ASSERT_VOID(CheckValidAllocation(*value));
     return value;

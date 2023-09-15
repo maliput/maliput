@@ -48,30 +48,29 @@ add_library(framework
   witness_function.cc
 )
 
-add_library(maliput_drake::framework ALIAS framework)
+add_library(maliput_drake::framework ALIAS drake-systems-framework)
 
 set_target_properties(
-  framework
+  drake-systems-framework
   PROPERTIES
     OUTPUT_NAME ${PROJECT_NAME}_framework
 )
 
 target_include_directories(
-  framework
+  drake-systems-framework
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(
-  framework
-    fmt::fmt
+  drake-systems-framework
     Eigen3::Eigen
     maliput_drake::common
 )
 
 install(
-  TARGETS framework
+  TARGETS drake-systems-framework
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib

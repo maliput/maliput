@@ -369,10 +369,11 @@ class Context : public ContextBase {
   /// @pre There is exactly one discrete state group.
   void SetDiscreteState(const Eigen::Ref<const VectorX<T>>& xd) {
     if (num_discrete_state_groups() != 1) {
-      throw std::logic_error(fmt::format(
-          "Context::SetDiscreteState(): expected exactly 1 discrete state "
-          "group but there were {} groups. Use the other signature if "
-          "you have multiple groups.", num_discrete_state_groups()));
+      std::ostringstream oss;
+      oss << "Context::SetDiscreteState(): expected exactly 1 discrete state ";
+      oss << "group but there were " << num_discrete_state_groups();
+      oss << " groups. Use the other signature if you have multiple groups.";
+      throw std::logic_error(oss.str());
     }
     SetDiscreteState(DiscreteStateIndex(0), xd);
   }

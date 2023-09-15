@@ -75,7 +75,9 @@ std::string logging::set_log_level(const std::string& level) {
   } else if (level == "unchanged") {
     value = prev_value;
   } else {
-    throw std::runtime_error(fmt::format("Unknown spdlog level: {}", level));
+    std::ostringstream oss;
+    oss << "Unknown spdlog level: " << level;
+    throw std::runtime_error(oss.str());
   }
   maliput::drake::log()->set_level(value);
   switch (prev_value) {

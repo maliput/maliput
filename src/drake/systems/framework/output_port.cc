@@ -9,18 +9,21 @@ void OutputPort<T>::CheckValidAllocation(const AbstractValue& proposed) const {
 
   const auto* const proposed_vec = proposed.maybe_get_value<BasicVector<T>>();
   if (proposed_vec == nullptr) {
-    throw std::logic_error(
-        fmt::format("OutputPort::Allocate(): expected BasicVector output type "
-                    "but got {} for {}.",
-                    proposed.GetNiceTypeName(), GetFullDescription()));
+    std::ostringstream oss;
+    oss << "OutputPort::Allocate(): expected BasicVector output type ";
+    oss << "but got " << proposed.GetNiceTypeName();
+    oss << " for " << GetFullDescription() << ".";
+    throw std::logic_error(oss.str());
   }
 
   const int proposed_size = proposed_vec->get_value().size();
   if (proposed_size != this->size()) {
-    throw std::logic_error(
-        fmt::format("OutputPort::Allocate(): expected vector output type of "
-                    "size {} but got a vector of size {} for {}.",
-                    this->size(), proposed_size, GetFullDescription()));
+    std::ostringstream oss;
+    oss << "OutputPort::Allocate(): expected vector output type of ";
+    oss << "size " << this->size() << " but got a vector of size ";
+    oss << proposed_size << " for ";
+    oss << GetFullDescription() << ".";
+    throw std::logic_error(oss.str());
   }
 }
 

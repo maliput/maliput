@@ -10,9 +10,11 @@ namespace systems {
 
 std::unique_ptr<ContextBase> ContextBase::Clone() const {
   if (!is_root_context()) {
-      throw std::logic_error(fmt::format(
-          "Context::Clone(): Cannot clone a non-root Context; "
-          "this Context was created by '{}'.", system_name_));
+    std::ostringstream oss;
+    oss << "Context::Clone(): Cannot clone a non-root Context; ";
+    oss << "this Context was created by '";
+    oss << system_name_ << "'.";
+    throw std::logic_error(oss.str());
   }
 
   std::unique_ptr<ContextBase> clone_ptr(CloneWithoutPointers(*this));

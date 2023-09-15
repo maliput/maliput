@@ -11,31 +11,30 @@ add_library(analysis
   stepwise_dense_output.cc
 )
 
-add_library(maliput_drake::analysis ALIAS analysis)
+add_library(maliput_drake::analysis ALIAS drake-systems-analysis)
 
 set_target_properties(
-  analysis
+  drake-systems-analysis
   PROPERTIES
     OUTPUT_NAME ${PROJECT_NAME}_analysis
 )
 
 target_include_directories(
-  analysis
+  drake-systems-analysis
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(
-  analysis
+  drake-systems-analysis
     Eigen3::Eigen
-    fmt::fmt
     maliput_drake::common
     maliput_drake::framework
 )
 
 install(
-  TARGETS analysis
+  TARGETS drake-systems-analysis
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib

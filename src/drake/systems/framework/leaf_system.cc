@@ -859,12 +859,13 @@ std::unique_ptr<AbstractValue> LeafSystem<T>::DoAllocateInput(
   if (input_port.get_data_type() == kVectorValued) {
     return std::make_unique<Value<BasicVector<T>>>(input_port.size());
   }
-  throw std::logic_error(fmt::format(
-      "System::AllocateInputAbstract(): a System with abstract input ports "
-      "must pass a model_value to DeclareAbstractInputPort; the port[{}] "
-      "named '{}' did not do so (System {})",
-      input_port.get_index(), input_port.get_name(),
-      this->GetSystemPathname()));
+  std::ostringstream oss;
+  oss << "System::AllocateInputAbstract(): a System with abstract input ports ";
+  oss << "must pass a model_value to DeclareAbstractInputPort; the port[";
+  oss << input_port.get_index() << "] named '";
+  oss << input_port.get_name() << "' did not do so (System ";
+  oss << this->GetSystemPathname() << ")";
+  throw std::logic_error(oss.str());
 }
 
 template <typename T>
@@ -987,11 +988,12 @@ LeafOutputPort<T>& LeafSystem<T>::CreateVectorLeafOutputPort(
     // TODO(sherm1) Make this error message more informative by capturing
     // system and port index info.
     if (value == nullptr) {
-      throw std::logic_error(fmt::format(
-          "An output port calculation required a {} object for its result "
-          "but got a {} object instead.",
-          NiceTypeName::Get<Value<BasicVector<T>>>(),
-          abstract->GetNiceTypeName()));
+      std::ostringstream oss;
+      oss << "An output port calculation required a ";
+      oss << NiceTypeName::Get<Value<BasicVector<T>>>();
+      oss << " object for its result  but got a ";
+      oss << abstract->GetNiceTypeName() << " object instead.";
+      throw std::logic_error(oss.str());
     }
     vector_calculator(context, value);
   };

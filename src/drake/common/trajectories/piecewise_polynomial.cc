@@ -6,7 +6,6 @@
 
 #include <Eigen/SparseCore>
 #include <Eigen/SparseLU>
-#include <fmt/format.h>
 
 #include "maliput/drake/common/drake_assert.h"
 #include "maliput/drake/common/drake_throw.h"
@@ -571,9 +570,11 @@ void PiecewisePolynomial<T>::
       throw std::runtime_error("Times must be in increasing order.");
     }
     if (times[i + 1] - times[i] < PiecewiseTrajectory<T>::kEpsilonTime) {
-      throw std::runtime_error(
-          fmt::format("Times must be at least {} apart.",
-                      PiecewiseTrajectory<T>::kEpsilonTime));
+      std::ostringstream oss;
+      oss << "Times must be at least ";
+      oss << PiecewiseTrajectory<T>::kEpsilonTime;
+      oss << " apart.";
+      throw std::runtime_error(oss.str());
     }
   }
 }

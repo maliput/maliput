@@ -2,8 +2,6 @@
 
 #include <stdexcept>
 
-#include <fmt/format.h>
-
 #include "maliput/drake/common/nice_type_name.h"
 
 namespace maliput::drake {
@@ -59,9 +57,12 @@ void ValueProducer::ThrowBadNull() {
 
 void ValueProducer::ThrowBadCast(const std::type_info& actual_type,
                                  const std::type_info& desired_type) {
-  throw std::logic_error(fmt::format(
-      "ValueProducer cannot cast a {} to a {}",
-      NiceTypeName::Get(actual_type), NiceTypeName::Get(desired_type)));
+  std::ostringstream oss;
+  oss << "ValueProducer cannot cast a ";
+  oss << NiceTypeName::Get(actual_type);
+  oss << " to a ";
+  oss << NiceTypeName::Get(desired_type);
+  throw std::logic_error(oss.str());
 }
 
 }  // namespace systems

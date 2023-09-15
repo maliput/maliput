@@ -1,8 +1,7 @@
 #include "maliput/drake/systems/framework/system_scalar_converter.h"
 
+#include <sstream>
 #include <stdexcept>
-
-#include <fmt/format.h>
 
 #include "maliput/drake/common/default_scalars.h"
 #include "maliput/drake/common/hash.h"
@@ -72,11 +71,12 @@ namespace system_scalar_converter_internal {
 void ThrowConversionMismatch(
     const type_info& s_t_info, const type_info& s_u_info,
     const type_info& other_info) {
-  throw std::runtime_error(fmt::format(
-      "SystemScalarConverter was configured to convert a {} into a {}"
-      " but was called with a {} at runtime",
-      NiceTypeName::Get(s_u_info), NiceTypeName::Get(s_t_info),
-      NiceTypeName::Get(other_info)));
+  std::ostringstream oss;
+  oss << "SystemScalarConverter was configured to convert a ";
+  oss << NiceTypeName::Get(s_u_info) << " into a ";
+  oss << NiceTypeName::Get(s_t_info) << " but was called with a ";
+  oss << NiceTypeName::Get(other_info) << "at runtime";
+  throw std::runtime_error(oss.str());
 }
 
 }  // namespace system_scalar_converter_internal

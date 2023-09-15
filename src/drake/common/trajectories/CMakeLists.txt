@@ -4,30 +4,29 @@ add_library(trajectories
   trajectory.cc
 )
 
-add_library(maliput_drake::trajectories ALIAS trajectories)
+add_library(maliput_drake::trajectories ALIAS drake-common-trajectories)
 
 set_target_properties(
-  trajectories
+  drake-common-trajectories
   PROPERTIES
     OUTPUT_NAME ${PROJECT_NAME}_trajectories
 )
 
 target_include_directories(
-  trajectories
+  drake-common-trajectories
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(
-  trajectories
+  drake-common-trajectories
     Eigen3::Eigen
-    fmt::fmt
     maliput_drake::common
 )
 
 install(
-  TARGETS trajectories
+  TARGETS drake-common-trajectories
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib

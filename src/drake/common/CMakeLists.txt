@@ -32,7 +32,6 @@ target_link_libraries(
   drake-common
     dl
     Eigen3::Eigen
-    fmt::fmt
 )
 
 install(

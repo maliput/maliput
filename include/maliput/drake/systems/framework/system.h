@@ -922,9 +922,11 @@ class System : public SystemBase {
   const InputPort<T>& get_input_port() const {
     static constexpr char message[] =
         "Cannot use the get_input_port() convenience method unless there is"
-        " exactly one input port. num_input_ports() = {}";
+        " exactly one input port. num_input_ports() = ";
     if (num_input_ports() != 1) {
-      throw std::logic_error(fmt::format(message, num_input_ports()));
+      std::ostringstream oss;
+      oss << message << num_input_ports();
+      throw std::logic_error(oss.str());
     }
     return get_input_port(0);
   }
@@ -963,9 +965,11 @@ class System : public SystemBase {
   const OutputPort<T>& get_output_port() const {
     static constexpr char message[] =
         "Cannot use the get_output_port() convenience method unless there is"
-        " exactly one output port. num_output_ports() = {}";
+        " exactly one output port. num_output_ports() = ";
     if (num_output_ports() != 1) {
-      throw std::logic_error(fmt::format(message, num_output_ports()));
+      std::ostringstream oss;
+      oss << message << num_output_ports();
+      throw std::logic_error(oss.str());
     }
     return get_output_port(0);
   }

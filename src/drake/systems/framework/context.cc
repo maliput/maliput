@@ -177,9 +177,10 @@ template <typename T>
 void Context<T>::ThrowIfNotRootContext(
     const char* func_name, const char* quantity) const {
   if (!is_root_context()) {
-    throw std::logic_error(
-        fmt::format("{}(): {} change allowed only in the root Context.",
-                    func_name, quantity));
+    std::ostringstream oss;
+    oss << func_name << "(): " << quantity;
+    oss << " change allowed only in the root Context.";
+    throw std::logic_error(oss.str());
   }
 }
 

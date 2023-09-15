@@ -5,8 +5,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "maliput/drake/common/drake_assert.h"
 #include "maliput/drake/common/eigen_types.h"
 #include "maliput/drake/common/unused.h"
@@ -109,11 +107,11 @@ class ValueToAbstractValue {
                                                    const ValueType& eigen_value,
                                                    ...) {
     unused(eigen_value);
-    throw std::logic_error(fmt::format(
-        "{}(): Eigen objects and expressions cannot automatically be stored "
-        "as a Drake abstract quantity. Specify the storage type explicitly "
-        "by providing an already-abstract object like a Value<MatrixXd>().",
-        api_name));
+    std::ostringstream oss;
+    oss << api_name << "(): Eigen objects and expressions cannot automatically be stored ";
+    oss << "as a Drake abstract quantity. Specify the storage type explicitly ";
+    oss << "by providing an already-abstract object like a Value<MatrixXd>().";
+    throw std::logic_error(oss.str());
   }
 
   // Returns true iff ValueType has an accessible Clone() method that
@@ -261,10 +259,11 @@ class ValueToVectorValue {
     if (cloned->maybe_get_value<BasicVector<T>>() != nullptr)
       return cloned;
 
-    throw std::logic_error(
-        fmt::format("{}(): the given AbstractValue containing type {} is not "
-                    "suitable for storage as a Drake vector quantity.",
-                    api_name, value.GetNiceTypeName()));
+    std::ostringstream oss;
+    oss << api_name << "(): the given AbstractValue containing type ";
+    oss << value.GetNiceTypeName() << " is not suitable for storage";
+    oss << " as a Drake vector quantity.";
+    throw std::logic_error(oss.str());
   }
 
   // The final signature exists just so we can throw an error message.
@@ -280,10 +279,11 @@ class ValueToVectorValue {
                   std::is_base_of_v<AbstractValue, ValueType>)>>
   static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
                                                    const ValueType&) {
-    throw std::logic_error(
-        fmt::format("{}(): the given value of type {} is not "
-                    "suitable for storage as a Drake vector quantity.",
-                    api_name, NiceTypeName::Get<ValueType>()));
+    std::ostringstream oss;
+    oss << api_name << "(): the given value of type ";
+    oss << NiceTypeName::Get<ValueType>();
+    oss << " is not suitable for storage as a Drake vector quantity.";
+    throw std::logic_error(oss.str());
   }
 };
 

@@ -6,8 +6,6 @@
 #include <memory>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "maliput/drake/common/default_scalars.h"
 #include "maliput/drake/common/drake_copyable.h"
 #include "maliput/drake/systems/analysis/dense_output.h"
@@ -41,9 +39,10 @@ class ScalarViewDenseOutput : public ScalarDenseOutput<T> {
       throw std::runtime_error("Base dense output to view is null.");
     }
     if (n < 0 || base_output_->size() <= n) {
-      throw std::runtime_error(fmt::format(
-          "Index {} out of base dense output [0, {}) range.",
-          n, base_output_->size()));
+      std::ostringstream oss;
+      oss << "Index " << n << " out of base dense output [0, ";
+      oss << base_output_->size() << ") range.";
+      throw std::runtime_error(oss.str());
     }
   }
 

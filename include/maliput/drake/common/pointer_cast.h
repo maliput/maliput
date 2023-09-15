@@ -1,9 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <sstream>
 #include <stdexcept>
-
-#include <fmt/format.h>
 
 #include "maliput/drake/common/nice_type_name.h"
 
@@ -55,19 +54,19 @@ std::unique_ptr<T> dynamic_pointer_cast(std::unique_ptr<U>&& other) noexcept {
 template <class T, class U>
 std::unique_ptr<T> dynamic_pointer_cast_or_throw(std::unique_ptr<U>&& other) {
   if (!other) {
-    throw std::logic_error(fmt::format(
-        "Cannot cast a unique_ptr<{}> containing nullptr to unique_ptr<{}>.",
-        NiceTypeName::Get<U>(),
-        NiceTypeName::Get<T>()));
+    std::ostringstream oss;
+    oss << "Cannot cast a unique_ptr<" << NiceTypeName::Get<U>() << "> ";
+    oss << "containing nullptr to ";
+    oss << "unique_ptr<" << NiceTypeName::Get<T>() << ">.";
+    throw std::logic_error(oss.str());
   }
   T* result = dynamic_cast<T*>(other.get());
   if (!result) {
-    throw std::logic_error(fmt::format(
-        "Cannot cast a unique_ptr<{}> containing an object of type {} to "
-        "unique_ptr<{}>.",
-        NiceTypeName::Get<U>(),
-        NiceTypeName::Get(*other),
-        NiceTypeName::Get<T>()));
+    std::ostringstream oss;
+    oss << "Cannot cast a unique_ptr<" << NiceTypeName::Get<U>() << "> ";
+    oss << "containing an object of type " << NiceTypeName::Get(*other);
+    oss << " to unique_ptr<" << NiceTypeName::Get<T>() << ">.";
+    throw std::logic_error(oss.str());
   }
   other.release();
   return std::unique_ptr<T>(result);

@@ -10,11 +10,14 @@ void LeafOutputPort<T>::ThrowIfInvalidPortValueType(
   const AbstractValue& value = cache_value.PeekAbstractValueOrThrow();
 
   if (proposed.type_info() != value.type_info()) {
-    throw std::logic_error(
-        fmt::format("OutputPort::Calc(): expected output type {} "
-                    "but got {} for {}.",
-                    value.GetNiceTypeName(), proposed.GetNiceTypeName(),
-                    PortBase::GetFullDescription()));
+    std::ostringstream oss;
+    oss << "OutputPort::Calc(): expected output type ";
+    oss << value.GetNiceTypeName();
+    oss << " but got ";
+    oss << proposed.GetNiceTypeName();
+    oss << " for ";
+    oss << PortBase::GetFullDescription();
+    throw std::logic_error(oss.str());
   }
 }
 

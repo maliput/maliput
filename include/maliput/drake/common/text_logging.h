@@ -83,11 +83,6 @@ used by Drake might be older.)
 // We always want text_logging.h to provide fmt support to those who include
 // it, even if spdlog is disabled.
 
-/* clang-format off */
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-/* clang-format on */
-
 #endif  // HAVE_SPDLOG
 #endif  // DRAKE_DOXYGEN_CXX
 

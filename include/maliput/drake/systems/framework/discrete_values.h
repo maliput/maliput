@@ -5,8 +5,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "maliput/drake/common/default_scalars.h"
 #include "maliput/drake/common/drake_assert.h"
 #include "maliput/drake/common/drake_copyable.h"
@@ -234,7 +232,9 @@ class DiscreteValues {
         "Cannot use DiscreteValues convenience methods unless there is"
         " exactly one group. num_groups() = {}";
     if (num_groups() != 1) {
-      throw std::logic_error(fmt::format(message, num_groups()));
+      std::ostringstream oss;
+      oss << message << num_groups();
+      throw std::logic_error(oss.str());
     }
   }
 

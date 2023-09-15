@@ -2,8 +2,6 @@
 
 #include <stdexcept>
 
-#include <fmt/format.h>
-
 #include "maliput/drake/common/default_scalars.h"
 #include "maliput/drake/common/drake_copyable.h"
 #include "maliput/drake/common/drake_deprecated.h"
@@ -36,9 +34,11 @@ class Subvector final : public VectorBase<T> {
     }
     if ((first_element < 0) || (num_elements < 0) ||
         (first_element + num_elements > vector->size())) {
-      throw std::logic_error(fmt::format(
-          "Subvector range [{}, {}) falls outside the valid range [{}, {}).",
-          first_element, first_element + num_elements, 0, vector->size()));
+      std::ostringstream oss;
+      oss << "Subvector range [" << first_element << ", ";
+      oss << first_element + num_elements << ") falls outside the";
+      oss << " valid range [" << 0 << ", " << vector->size() << ").";
+      throw std::logic_error(oss.str());
     }
   }
 

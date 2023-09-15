@@ -1,8 +1,7 @@
 #include "maliput/drake/systems/framework/system_base.h"
 
 #include <atomic>
-
-#include <fmt/format.h>
+#include <sstream>
 
 #include "maliput/drake/systems/framework/fixed_input_port_value.h"
 
@@ -10,7 +9,9 @@ namespace {
 
 // Output a string like "System::EvalInput()".
 std::string FmtFunc(const char* func) {
-  return fmt::format("System::{}()", func);
+  std::ostringstream oss;
+  oss << "System::" << func << "()";
+  return oss.str();
 }
 
 }
@@ -212,37 +213,48 @@ const AbstractValue* SystemBase::EvalAbstractInputImpl(
 void SystemBase::ThrowNegativePortIndex(const char* func,
                                         int port_index) const {
   MALIPUT_DRAKE_DEMAND(port_index < 0);
-  throw std::out_of_range(
-      fmt::format("{}: negative port index {} is illegal. (System {})",
-                  FmtFunc(func), port_index, GetSystemPathname()));
+  std::ostringstream oss;
+  oss << FmtFunc(func);
+  oss << ": negative port index ";
+  oss << port_index << " is illegal. (System ";
+  oss << GetSystemPathname() << ")";
+  throw std::out_of_range(oss.str());
 }
 
 void SystemBase::ThrowInputPortIndexOutOfRange(const char* func,
                                                InputPortIndex port) const {
-  throw std::out_of_range(fmt::format(
-      "{}: there is no input port with index {} because there "
-      "are only {} input ports in system {}.",
-      FmtFunc(func),  port, num_input_ports(), GetSystemPathname()));
+  std::ostringstream oss;
+  oss << FmtFunc(func);
+  oss << ": there is no input port with index ";
+  oss << port << " because there ";
+  oss << "are only " << num_input_ports() << " input ports ";
+  oss << "in system " << GetSystemPathname() << ".";
+
+  throw std::out_of_range(oss.str());
 }
 
 void SystemBase::ThrowOutputPortIndexOutOfRange(const char* func,
                                                 OutputPortIndex port) const {
-  throw std::out_of_range(fmt::format(
-      "{}: there is no output port with index {} because there "
-      "are only {} output ports in system {}.",
-      FmtFunc(func), port,
-      num_output_ports(), GetSystemPathname()));
+  std::ostringstream oss;
+  oss << FmtFunc(func);
+  oss << ": there is no output port with index ";
+  oss << port << " because there are only ";
+  oss << num_output_ports() << " output ports in system ";
+  oss << GetSystemPathname() << ".";
+  throw std::out_of_range(oss.str());
 }
 
 void SystemBase::ThrowNotAVectorInputPort(const char* func,
                                           InputPortIndex port) const {
-  throw std::logic_error(fmt::format(
-      "{}: vector port required, but input port '{}' (index {}) was declared "
-          "abstract. Even if the actual value is a vector, use "
-          "EvalInputValue<V> instead for an abstract port containing a vector "
-          "of type V. (System {})",
-      FmtFunc(func),  get_input_port_base(port).get_name(), port,
-      GetSystemPathname()));
+  std::ostringstream oss;
+  oss << FmtFunc(func);
+  oss << ": vector port required, but input port '";
+  oss << get_input_port_base(port).get_name();
+  oss << "' (index " << port << ") was declared ";
+  oss << "abstract. Even if the actual value is a vector, use ";
+  oss << "EvalInputValue<V> instead for an abstract port containing a vector ";
+  oss << "of type V. (System " << GetSystemPathname() << ")";
+  throw std::logic_error(oss.str());
 }
 
 void SystemBase::ThrowInputPortHasWrongType(
@@ -257,41 +269,54 @@ void SystemBase::ThrowInputPortHasWrongType(
     const char* func, const std::string& system_pathname, InputPortIndex port,
     const std::string& port_name, const std::string& expected_type,
     const std::string& actual_type) {
-  throw std::logic_error(fmt::format(
-      "{}: expected value of type {} for input port '{}' (index {}) "
-          "but the actual type was {}. (System {})",
-      FmtFunc(func), expected_type, port_name, port, actual_type,
-      system_pathname));
+  std::ostringstream oss;
+  oss << FmtFunc(func) << ": expected value of type ";
+  oss << expected_type;
+  oss << " for input port '" << port_name << "'";
+  oss << " (index " << port << ")";
+  oss << " but the actual type was ";
+  oss << actual_type << ". (System " << system_pathname << ")";
+  throw std::logic_error(oss.str());
 }
 
 void SystemBase::ThrowCantEvaluateInputPort(const char* func,
                                             InputPortIndex port) const {
-  throw std::logic_error(
-      fmt::format("{}: input port '{}' (index {}) is neither connected nor "
-                      "fixed so cannot be evaluated. (System {})",
-                  FmtFunc(func), get_input_port_base(port).get_name(), port,
-                  GetSystemPathname()));
+  std::ostringstream oss;
+  oss << FmtFunc(func) << ": input port '";
+  oss << get_input_port_base(port).get_name() << "' (index ";
+  oss << port;
+  oss << ") is neither connected nor fixed so cannot be evaluated.";
+  oss << " (System " << GetSystemPathname() << ")";
+  throw std::logic_error(oss.str());
 }
 
 void SystemBase::ThrowValidateContextMismatch(
     const ContextBase& context) const {
-  throw std::logic_error(fmt::format(
-      "Context was not created for {} system {}; it was created for system {}",
-      this->GetSystemType(), this->GetSystemPathname(),
-      context.GetSystemPathname()));
+  std::stringstream oss;
+  oss << "Context was not created for ";
+  oss << this->GetSystemType();
+  oss << " system ";
+  oss << this->GetSystemPathname();
+  oss << " it was created for system ";
+  oss << context.GetSystemPathname();
+  throw std::logic_error(oss.str());
 }
 
 void SystemBase::ThrowNotCreatedForThisSystemImpl(
     const std::string& nice_type_name, internal::SystemId id) const {
   if (!id.is_valid()) {
-    throw std::logic_error(fmt::format(
-        "{} was not associated with any System but should have been "
-        "created for {} System {}",
-        nice_type_name, GetSystemType(), GetSystemPathname()));
+    std::stringstream oss;
+    oss << nice_type_name;
+    oss << " was not associated with any System but should have been ";
+    oss << "created for ";
+    oss << GetSystemType() << " System ";
+    oss << GetSystemPathname();
+    throw std::logic_error(oss.str());
   } else {
-    throw std::logic_error(fmt::format("{} was not created for {} System {}",
-                                       nice_type_name, GetSystemType(),
-                                       GetSystemPathname()));
+    std::stringstream oss;
+    oss << nice_type_name << " was not created for ";
+    oss << GetSystemType() << " System " << GetSystemPathname();
+    throw std::logic_error(oss.str());
   }
 }
 

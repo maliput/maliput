@@ -5,10 +5,9 @@
 
 #include <initializer_list>
 #include <ostream>
+#include <sstream>
 #include <stdexcept>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "maliput/drake/common/default_scalars.h"
 #include "maliput/drake/common/drake_assert.h"
@@ -246,15 +245,19 @@ class VectorBase {
   }
 
   [[noreturn]] void ThrowOutOfRange(int index) const {
-    throw std::out_of_range(fmt::format(
-        "Index {} is not within [0, {}) while accessing {}.",
-        index, size(), NiceTypeName::Get(*this)));
+    std::ostringstream oss;
+    oss << "Index " << index << "is not within [0, ";
+    oss << size() << ") while accessing ";
+    oss << NiceTypeName::Get(*this) << ".";
+    throw std::out_of_range(oss.str());
   }
 
   [[noreturn]] void ThrowMismatchedSize(int other_size) const {
-    throw std::out_of_range(fmt::format(
-        "Operand vector size {} does not match this {} size {}",
-        other_size, NiceTypeName::Get(*this), size()));
+    std::ostringstream oss;
+    oss << "Operand vector size " << other_size << "does not";
+    oss << " match this " << NiceTypeName::Get(*this);
+    oss << " size " << size();
+    throw std::out_of_range(oss.str());
   }
 };
 

@@ -3,8 +3,6 @@
 #include <stdexcept>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "maliput/drake/common/drake_assert.h"
 
 namespace maliput::drake {
@@ -30,9 +28,11 @@ InputPortBase::InputPortBase(
 InputPortBase::~InputPortBase() = default;
 
 void InputPortBase::ThrowRequiredMissing() const {
-  throw std::logic_error(fmt::format(
-      "InputPort::Eval(): required {} is not connected",
-      GetFullDescription()));
+  std::ostringstream oss;
+  oss << "InputPort::Eval(): required ";
+  oss << GetFullDescription();
+  oss << " is not connected";
+  throw std::logic_error(oss.str());
 }
 
 }  // namespace systems
