@@ -4,7 +4,6 @@
 #include <limits>
 
 #include "maliput/drake/common/pointer_cast.h"
-#include "maliput/drake/systems/framework/system_symbolic_inspector.h"
 #include "maliput/drake/systems/framework/value_checker.h"
 
 namespace maliput::drake {

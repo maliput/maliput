@@ -45,28 +45,6 @@ struct Traits {
   using supported = std::true_type;
 };
 
-/// A concrete traits class providing sugar to disable support for symbolic
-/// evaluation (i.e., the symbolic::Expression scalar type).
-///
-/// For example, if MySystem does not support the symbolic expression scalar
-/// type, it could specialize Traits as follows:
-///
-/// @code
-/// namespace maliput::drake {
-/// namespace systems {
-/// namespace scalar_conversion {
-/// template <> struct Traits<MySystem> : public NonSymbolicTraits {};
-/// }  // namespace scalar_conversion
-/// }  // namespace systems
-/// }  // namespace maliput::drake
-/// @endcode
-// struct NonSymbolicTraits {
-//   template <typename T, typename U>
-//   using supported = typename std::bool_constant<
-//     !std::is_same_v<T, symbolic::Expression> &&
-//     !std::is_same_v<U, symbolic::Expression>>;
-// };
-
 /// A concrete traits class providing sugar to support for converting only from
 /// the `double` scalar type.  For example, if a MySystem<symbolic::Expression>
 /// cannot be converted into a MySystem<double>, it could specialize Traits as

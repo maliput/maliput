@@ -1,6 +1,4 @@
 add_library(drake_common
-  cond.cc
-  double_overloads.cc
   drake_assert_and_throw.cc
   hash.cc
   nice_type_name.cc
@@ -8,7 +6,6 @@ add_library(drake_common
   pointer_cast.cc
   polynomial.cc
   random.cc
-  sorted_pair.cc
   text_logging.cc
   value.cc
 )
