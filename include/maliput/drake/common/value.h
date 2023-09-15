@@ -34,17 +34,16 @@ using ValueTraits = ValueTraitsImpl<T, std::is_copy_constructible_v<T>>;
 // In our ctor overload that copies into the storage, choose_copy == true.
 template <bool choose_copy, typename T, typename Arg1, typename... Args>
 using ValueForwardingCtorEnabled = typename std::enable_if_t<
-  // There must be such a constructor.
-  std::is_constructible_v<T, Arg1, Args...> &&
-  // Disable this ctor when given T directly; in that case, we
-  // should call our Value(const T&) ctor above, not try to copy-
-  // construct a T(const T&).
-  !std::is_same_v<T, Arg1> &&
-  !std::is_same_v<T&, Arg1> &&
-  // Only allow real ctors, not POD "constructor"s.
-  !std::is_fundamental_v<T> &&
-  // Disambiguate our copy implementation from our clone implementation.
-  (choose_copy == std::is_copy_constructible_v<T>)>;
+    // There must be such a constructor.
+    std::is_constructible_v<T, Arg1, Args...> &&
+    // Disable this ctor when given T directly; in that case, we
+    // should call our Value(const T&) ctor above, not try to copy-
+    // construct a T(const T&).
+    !std::is_same_v<T, Arg1> && !std::is_same_v<T&, Arg1> &&
+    // Only allow real ctors, not POD "constructor"s.
+    !std::is_fundamental_v<T> &&
+    // Disambiguate our copy implementation from our clone implementation.
+    (choose_copy == std::is_copy_constructible_v<T>)>;
 
 template <typename T>
 using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
@@ -75,9 +74,7 @@ class AbstractValue {
   /// Constructs an AbstractValue using T's default constructor, if available.
   /// This is only available for T's that support default construction.
 #if !defined(DRAKE_DOXYGEN_CXX)
-  template <typename T,
-            typename = typename std::enable_if_t<
-                std::is_default_constructible_v<T>>>
+  template <typename T, typename = typename std::enable_if_t<std::is_default_constructible_v<T>>>
 #endif
   static std::unique_ptr<AbstractValue> Make();
 
@@ -91,7 +88,9 @@ class AbstractValue {
   /// AbstractValue::Make<T>() or Value<T>::Value().  If T does not match, a
   /// std::logic_error will be thrown with a helpful error message.
   template <typename T>
-  const T& get_value() const { return cast<T>().get_value(); }
+  const T& get_value() const {
+    return cast<T>().get_value();
+  }
 
   /// Returns the value wrapped in this AbstractValue as mutable reference.
   /// The reference remains valid only until this object is set or destroyed.
@@ -99,14 +98,18 @@ class AbstractValue {
   /// AbstractValue::Make<T>() or Value<T>::Value().  If T does not match, a
   /// std::logic_error will be thrown with a helpful error message.
   template <typename T>
-  T& get_mutable_value() { return cast<T>().get_mutable_value(); }
+  T& get_mutable_value() {
+    return cast<T>().get_mutable_value();
+  }
 
   /// Sets the value wrapped in this AbstractValue.
   /// @tparam T The originally declared type of this AbstractValue, e.g., from
   /// AbstractValue::Make<T>() or Value<T>::Value().  If T does not match, a
   /// std::logic_error will be thrown with a helpful error message.
   template <typename T>
-  void set_value(const T& v) { cast<T>().set_value(v); }
+  void set_value(const T& v) {
+    cast<T>().set_value(v);
+  }
 
   /// Returns the value wrapped in this AbstractValue, if T matches the
   /// originally declared type of this AbstractValue.
@@ -151,16 +154,21 @@ class AbstractValue {
   // Use a struct argument (instead of a bare size_t) so that no code
   // tries to convert a single-element numeric initializer_list to
   // a `const AbstractValue&`.  (This works around a bug in GCC 5.)
-  struct Wrap { size_t value{}; };
-  explicit AbstractValue(Wrap hash)
-      : type_hash_(hash.value) {}
+  struct Wrap {
+    size_t value{};
+  };
+  explicit AbstractValue(Wrap hash) : type_hash_(hash.value) {}
 #endif
 
  private:
-  template <typename T> bool is_maybe_matched() const;
-  template <typename T> const Value<T>& cast() const;
-  template <typename T> Value<T>& cast();
-  template <typename T> [[noreturn]] void ThrowCastError() const;
+  template <typename T>
+  bool is_maybe_matched() const;
+  template <typename T>
+  const Value<T>& cast() const;
+  template <typename T>
+  Value<T>& cast();
+  template <typename T>
+  [[noreturn]] void ThrowCastError() const;
   [[noreturn]] void ThrowCastError(const std::string&) const;
 
   // The TypeHash<T>::value supplied by the Value<T> constructor.
@@ -193,20 +201,15 @@ class Value : public AbstractValue {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(Value)
 
-  static_assert(
-      std::is_same_v<T, internal::remove_cvref_t<T>>,
-      "T should not have const, volatile, or reference qualifiers.");
+  static_assert(std::is_same_v<T, internal::remove_cvref_t<T>>,
+                "T should not have const, volatile, or reference qualifiers.");
 
-  static_assert(
-      !std::is_pointer_v<T> && !std::is_array_v<T>,
-      "T cannot be a pointer or array.");
+  static_assert(!std::is_pointer_v<T> && !std::is_array_v<T>, "T cannot be a pointer or array.");
 
   /// Constructs a Value<T> using T's default constructor, if available.
   /// This is only available for T's that support default construction.
 #if !defined(DRAKE_DOXYGEN_CXX)
-  template <typename T1 = T,
-            typename = typename std::enable_if_t<
-                std::is_default_constructible_v<T1>>>
+  template <typename T1 = T, typename = typename std::enable_if_t<std::is_default_constructible_v<T1>>>
 #endif
   Value();
 
@@ -221,12 +224,12 @@ class Value : public AbstractValue {
   explicit Value(Args&&... args);
 #else
   // This overload is for copyable T.
-  template <typename Arg1, typename... Args, typename =
-      typename internal::ValueForwardingCtorEnabled<true, T, Arg1, Args...>>
+  template <typename Arg1, typename... Args,
+            typename = typename internal::ValueForwardingCtorEnabled<true, T, Arg1, Args...>>
   explicit Value(Arg1&& arg1, Args&&... args);
   // This overload is for cloneable T.
-  template <typename Arg1, typename... Args, typename = void, typename =
-      typename internal::ValueForwardingCtorEnabled<false, T, Arg1, Args...>>
+  template <typename Arg1, typename... Args, typename = void,
+            typename = typename internal::ValueForwardingCtorEnabled<false, T, Arg1, Args...>>
   explicit Value(Arg1&& arg1, Args&&... args);
 #endif
 
@@ -254,8 +257,8 @@ class Value : public AbstractValue {
   const std::type_info& static_type_info() const final;
 
   // A using-declaration adds these methods into our class's Doxygen.
-  using AbstractValue::static_type_info;
   using AbstractValue::GetNiceTypeName;
+  using AbstractValue::static_type_info;
 
  private:
   using Traits = internal::ValueTraits<T>;
@@ -306,24 +309,24 @@ namespace internal {
 // at least something that looks like "T = ..." in it.
 //
 // Returns true on success / false on failure.
-constexpr bool hash_template_argument_from_pretty_func(
-    const char* pretty, int which_argument,
-    bool discard_nested, bool discard_cast,
-    FNV1aHasher* result) {
+constexpr bool hash_template_argument_from_pretty_func(const char* pretty, int which_argument, bool discard_nested,
+                                                       bool discard_cast, FNV1aHasher* result) {
   // Advance to the desired template argument.  For example, if which_argument
   // is 0 and pretty == "... calc() [T = int]", then advance to the typename
   // after the "T = " so that the cursor `p` is pointing at the 'i' in "int".
   const char* p = pretty;
   for (int n = 0; n <= which_argument; ++n) {
-    for (; (*p != '='); ++p) {}  // Advance to the '=' that we want.
-    ++p;                         // Advance to ' '.
-    ++p;                         // Advance to the typename we want.
+    for (; (*p != '='); ++p) {
+    }     // Advance to the '=' that we want.
+    ++p;  // Advance to ' '.
+    ++p;  // Advance to the typename we want.
   }
 
   // For enums, GCC 7's pretty says "(MyEnum)0" not "MyEnum::kFoo".  We'll strip
   // off the useless parenthetical.
   if (discard_cast && (*p == '(')) {
-    for (; (*p != ')'); ++p) {}  // Advance to the ')'.
+    for (; (*p != ')'); ++p) {
+    }  // Advance to the ')'.
     ++p;
   }
 
@@ -336,7 +339,9 @@ constexpr bool hash_template_argument_from_pretty_func(
     const char* clang_iter = clang_spelling;
     const char* pretty_iter = p;
     for (; *clang_iter != 0 && *pretty_iter != 0; ++clang_iter, ++pretty_iter) {
-      if (*clang_iter != *pretty_iter) { break; }
+      if (*clang_iter != *pretty_iter) {
+        break;
+      }
     }
     // ... and if we found the entire clang_spelling, emit gcc_spelling instead.
     if (*clang_iter == 0) {
@@ -353,8 +358,7 @@ constexpr bool hash_template_argument_from_pretty_func(
     const char* const unnamed_spelling = "<unnamed>";
     const char* unnamed_iter = unnamed_spelling;
     pretty_iter = p;
-    for (; *unnamed_iter != 0 && *pretty_iter != 0;
-         ++unnamed_iter, ++pretty_iter) {
+    for (; *unnamed_iter != 0 && *pretty_iter != 0; ++unnamed_iter, ++pretty_iter) {
       if (*unnamed_iter != *pretty_iter) {
         break;
       }
@@ -403,8 +407,7 @@ struct TypeHasherHasNonTypeTemplateParameter {
   static constexpr bool value = false;
 };
 template <typename T>
-struct TypeHasherHasNonTypeTemplateParameter<
-    T, typehasher_void_t<typename T::NonTypeTemplateParameter>> {
+struct TypeHasherHasNonTypeTemplateParameter<T, typehasher_void_t<typename T::NonTypeTemplateParameter>> {
   static constexpr bool value = true;
 };
 
@@ -423,9 +426,8 @@ struct TypeHasher {
     const int which_argument = 0;
     const bool discard_nested = false;
     const bool discard_cast = false;
-    return hash_template_argument_from_pretty_func(
-        __PRETTY_FUNCTION__, which_argument,
-        discard_nested, discard_cast, result);
+    return hash_template_argument_from_pretty_func(__PRETTY_FUNCTION__, which_argument, discard_nested, discard_cast,
+                                                   result);
   }
 };
 
@@ -462,9 +464,8 @@ struct TypeHasher<T<Args...>, false> {
     const int which_argument = 0;
     const bool discard_nested = true;
     const bool discard_cast = false;
-    bool success = hash_template_argument_from_pretty_func(
-        __PRETTY_FUNCTION__, which_argument,
-        discard_nested, discard_cast, result);
+    bool success = hash_template_argument_from_pretty_func(__PRETTY_FUNCTION__, which_argument, discard_nested,
+                                                           discard_cast, result);
     // Then, hash the "<Args...>".  Add delimiters so that parameter pack
     // nesting is correctly hashed.
     result->add_byte('<');
@@ -482,9 +483,8 @@ struct ValueHasher {
     const int which_argument = 1;
     const bool discard_nested = false;
     const bool discard_cast = true;
-    return hash_template_argument_from_pretty_func(
-        __PRETTY_FUNCTION__, which_argument,
-        discard_nested, discard_cast, result);
+    return hash_template_argument_from_pretty_func(__PRETTY_FUNCTION__, which_argument, discard_nested, discard_cast,
+                                                   result);
   }
 };
 
@@ -498,16 +498,13 @@ struct TypeHasher<T, true> {
     const int which_argument = 0;
     const bool discard_nested = true;
     const bool discard_cast = false;
-    hash_template_argument_from_pretty_func(
-        __PRETTY_FUNCTION__, which_argument,
-        discard_nested, discard_cast, result);
+    hash_template_argument_from_pretty_func(__PRETTY_FUNCTION__, which_argument, discard_nested, discard_cast, result);
     // Then, hash the "<U=u>".
     using U = typename T::NonTypeTemplateParameter::value_type;
     result->add_byte('<');
     bool success = TypeHasher<U>::calc(result);
     result->add_byte('=');
-    success = success &&
-        ValueHasher<U, T::NonTypeTemplateParameter::value>::calc(result);
+    success = success && ValueHasher<U, T::NonTypeTemplateParameter::value>::calc(result);
     result->add_byte('>');
     return success;
   }
@@ -540,17 +537,15 @@ struct IntPackHasher<N, Ns...> {
 };
 
 // Specializes TypeHasher for Eigen-like types.
-template <template <typename, int, int...> class T,
-          typename U, int N, int... Ns>
+template <template <typename, int, int...> class T, typename U, int N, int... Ns>
 struct TypeHasher<T<U, N, Ns...>, false> {
   static constexpr bool calc(FNV1aHasher* result) {
     // First, hash just the "T" template template type, not the "<U, N, Ns...>".
     const int which_argument = 0;
     const bool discard_nested = true;
     const bool discard_cast = false;
-    bool success = hash_template_argument_from_pretty_func(
-        __PRETTY_FUNCTION__, which_argument,
-        discard_nested, discard_cast, result);
+    bool success = hash_template_argument_from_pretty_func(__PRETTY_FUNCTION__, which_argument, discard_nested,
+                                                           discard_cast, result);
     // Then, hash the "<U, N, Ns...>".  Add delimiters so that parameter pack
     // nesting is correctly hashed.
     result->add_byte('<');
@@ -629,25 +624,19 @@ struct ValueTraitsImpl<T, true> {
 // we must Clone them; to access values, we must de-reference the pointer.
 template <typename T>
 struct ValueTraitsImpl<T, false> {
-  static_assert(
-      maliput::drake::is_cloneable<T>::value,
-      "Types placed into a Value<T> must either be copyable or cloneable");
+  static_assert(maliput::drake::is_cloneable<T>::value,
+                "Types placed into a Value<T> must either be copyable or cloneable");
 
   // We explicitly disallow Value<AbstractValue>.  In cases where it occurs, it
   // is likely that someone has created functions such as
   //   template DoBar(const AbstractValue& foo) { ... }
   //   template <class Foo> DoBar(const Foo& foo) { DoBar(Value<Foo>{foo}); }
   // and accidentally called DoBar<AbstractValue>, or similar mistakes.
-  static_assert(!std::is_same_v<T, std::remove_cv_t<AbstractValue>>,
-                "T in Value<T> cannot be AbstractValue.");
+  static_assert(!std::is_same_v<T, std::remove_cv_t<AbstractValue>>, "T in Value<T> cannot be AbstractValue.");
 
   using Storage = typename maliput::drake::copyable_unique_ptr<T>;
-  static void reinitialize_if_necessary(Storage* value) {
-    *value = std::make_unique<T>();
-  }
-  static Storage to_storage(const T& other) {
-    return Storage{other.Clone()};
-  }
+  static void reinitialize_if_necessary(Storage* value) { *value = std::make_unique<T>(); }
+  static Storage to_storage(const T& other) { return Storage{other.Clone()}; }
   static Storage to_storage(std::unique_ptr<T> other) {
     MALIPUT_DRAKE_DEMAND(other.get() != nullptr);
     return Storage{std::move(other)};
@@ -671,14 +660,18 @@ std::unique_ptr<AbstractValue> AbstractValue::Make(const T& value) {
 
 template <typename T>
 const T* AbstractValue::maybe_get_value() const {
-  if (!is_maybe_matched<T>()) { return nullptr; }
+  if (!is_maybe_matched<T>()) {
+    return nullptr;
+  }
   auto& self = static_cast<const Value<T>&>(*this);
   return &self.get_value();
 }
 
 template <typename T>
 T* AbstractValue::maybe_get_mutable_value() {
-  if (!is_maybe_matched<T>()) { return nullptr; }
+  if (!is_maybe_matched<T>()) {
+    return nullptr;
+  }
   auto& self = static_cast<Value<T>&>(*this);
   return &self.get_mutable_value();
 }
@@ -690,21 +683,24 @@ template <typename T>
 bool AbstractValue::is_maybe_matched() const {
   constexpr auto hash = internal::TypeHash<T>::value;
   internal::ReportUseOfTypeHash<T, hash>::used();
-  return (kDrakeAssertIsArmed || !hash) ? (typeid(T) == static_type_info()) :
-      (hash == type_hash_);
+  return (kDrakeAssertIsArmed || !hash) ? (typeid(T) == static_type_info()) : (hash == type_hash_);
 }
 
 // Casts this to a `const Value<T>&`, with error checking that throws.
 template <typename T>
 const Value<T>& AbstractValue::cast() const {
-  if (!is_maybe_matched<T>()) { ThrowCastError<T>(); }
+  if (!is_maybe_matched<T>()) {
+    ThrowCastError<T>();
+  }
   return static_cast<const Value<T>&>(*this);
 }
 
 // Casts this to a `Value<T>&`, with error checking that throws.
 template <typename T>
 Value<T>& AbstractValue::cast() {
-  if (!is_maybe_matched<T>()) { ThrowCastError<T>(); }
+  if (!is_maybe_matched<T>()) {
+    ThrowCastError<T>();
+  }
   return static_cast<Value<T>&>(*this);
 }
 
@@ -717,17 +713,13 @@ void AbstractValue::ThrowCastError() const {
 
 template <typename T>
 template <typename T1, typename T2>
-Value<T>::Value()
-    : AbstractValue(Wrap{internal::TypeHash<T>::value}),
-      value_{} {
+Value<T>::Value() : AbstractValue(Wrap{internal::TypeHash<T>::value}), value_{} {
   internal::ReportUseOfTypeHash<T, internal::TypeHash<T>::value>::used();
   Traits::reinitialize_if_necessary(&value_);
 }
 
 template <typename T>
-Value<T>::Value(const T& v)
-    : AbstractValue(Wrap{internal::TypeHash<T>::value}),
-      value_(Traits::to_storage(v)) {
+Value<T>::Value(const T& v) : AbstractValue(Wrap{internal::TypeHash<T>::value}), value_(Traits::to_storage(v)) {
   internal::ReportUseOfTypeHash<T, internal::TypeHash<T>::value>::used();
 }
 
@@ -735,8 +727,7 @@ Value<T>::Value(const T& v)
 template <typename T>
 template <typename Arg1, typename... Args, typename>
 Value<T>::Value(Arg1&& arg1, Args&&... args)
-    : AbstractValue(Wrap{internal::TypeHash<T>::value}),
-      value_{std::forward<Arg1>(arg1), std::forward<Args>(args)...} {
+    : AbstractValue(Wrap{internal::TypeHash<T>::value}), value_{std::forward<Arg1>(arg1), std::forward<Args>(args)...} {
   internal::ReportUseOfTypeHash<T, internal::TypeHash<T>::value>::used();
 }
 
@@ -745,8 +736,7 @@ template <typename T>
 template <typename Arg1, typename... Args, typename, typename>
 Value<T>::Value(Arg1&& arg1, Args&&... args)
     : AbstractValue(Wrap{internal::TypeHash<T>::value}),
-      value_{std::make_unique<T>(
-          std::forward<Arg1>(arg1), std::forward<Args>(args)...)} {
+      value_{std::make_unique<T>(std::forward<Arg1>(arg1), std::forward<Args>(args)...)} {
   internal::ReportUseOfTypeHash<T, internal::TypeHash<T>::value>::used();
 }
 
@@ -771,8 +761,7 @@ Value<T>::Value(Arg1&& arg1, Args&&... args)
 // unique_ptr<T> was transferred to Value<T> without any Clone.
 template <typename T>
 Value<T>::Value(std::unique_ptr<T> v)
-    : AbstractValue(Wrap{internal::TypeHash<T>::value}),
-      value_{Traits::to_storage(std::move(v))} {
+    : AbstractValue(Wrap{internal::TypeHash<T>::value}), value_{Traits::to_storage(std::move(v))} {
   internal::ReportUseOfTypeHash<T, internal::TypeHash<T>::value>::used();
 }
 

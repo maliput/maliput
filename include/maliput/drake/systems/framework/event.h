@@ -15,7 +15,8 @@ namespace maliput::drake {
 namespace systems {
 
 // Forward declaration to avoid circular dependencies.
-template <typename T> class System;
+template <typename T>
+class System;
 
 /** @defgroup events_description System Events
     @ingroup systems
@@ -240,9 +241,7 @@ class EventData {
   EventData() {}
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(EventData);
   virtual ~EventData() {}
-  virtual std::unique_ptr<EventData> Clone() const {
-    return std::unique_ptr<EventData>(DoClone());
-  }
+  virtual std::unique_ptr<EventData> Clone() const { return std::unique_ptr<EventData>(DoClone()); }
 
  protected:
   [[nodiscard]] virtual EventData* DoClone() const = 0;
@@ -297,14 +296,10 @@ class WitnessTriggeredEventData : public EventData {
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(WitnessTriggeredEventData);
 
   /// Gets the witness function that triggered the event handler.
-  const WitnessFunction<T>* triggered_witness() const {
-    return triggered_witness_;
-  }
+  const WitnessFunction<T>* triggered_witness() const { return triggered_witness_; }
 
   /// Sets the witness function that triggered the event handler.
-  void set_triggered_witness(const WitnessFunction<T>* triggered_witness) {
-    triggered_witness_ = triggered_witness;
-  }
+  void set_triggered_witness(const WitnessFunction<T>* triggered_witness) { triggered_witness_ = triggered_witness; }
 
   /// Gets the time at the left end of the window. Default is NaN (which
   /// indicates that the value is invalid).
@@ -444,11 +439,11 @@ using TriggerTypeSet = std::unordered_set<TriggerType, DefaultHash>;
 template <typename T>
 class Event {
  public:
-  #ifndef DRAKE_DOXYGEN_CXX
+#ifndef DRAKE_DOXYGEN_CXX
   // Constructs an Event with no trigger type and no event data.
   Event() { trigger_type_ = TriggerType::kUnknown; }
   virtual ~Event() {}
-  #endif
+#endif
 
   // TODO(eric.cousineau): Deprecate and remove this alias.
   using TriggerType = systems::TriggerType;
@@ -459,9 +454,7 @@ class Event {
   /**
    * Clones this instance.
    */
-  std::unique_ptr<Event> Clone() const {
-    return std::unique_ptr<Event>(DoClone());
-  }
+  std::unique_ptr<Event> Clone() const { return std::unique_ptr<Event>(DoClone()); }
 
   /**
    * Returns the trigger type.
@@ -487,17 +480,14 @@ class Event {
    */
   EventData* get_mutable_event_data() { return event_data_.get_mutable(); }
 
-  // Note: Users should not be calling this.
-  #if !defined(DRAKE_DOXYGEN_CXX)
+// Note: Users should not be calling this.
+#if !defined(DRAKE_DOXYGEN_CXX)
   // Sets the trigger type.
-  void set_trigger_type(const TriggerType trigger_type) {
-    trigger_type_ = trigger_type; }
+  void set_trigger_type(const TriggerType trigger_type) { trigger_type_ = trigger_type; }
 
   // Sets and transfers the ownership of @p data.
-  void set_event_data(std::unique_ptr<EventData> data) {
-    event_data_ = std::move(data);
-  }
-  #endif
+  void set_event_data(std::unique_ptr<EventData> data) { event_data_ = std::move(data); }
+#endif
 
   /**
    * Adds a clone of `this` event to the event collection `events`, with
@@ -508,11 +498,9 @@ class Event {
    *      unknown.
    * @pre `events` must not be null.
    */
-  void AddToComposite(TriggerType trigger_type,
-                      CompositeEventCollection<T>* events) const {
+  void AddToComposite(TriggerType trigger_type, CompositeEventCollection<T>* events) const {
     MALIPUT_DRAKE_DEMAND(events != nullptr);
-    MALIPUT_DRAKE_DEMAND(trigger_type_ == TriggerType::kUnknown ||
-                 trigger_type_ == trigger_type);
+    MALIPUT_DRAKE_DEMAND(trigger_type_ == TriggerType::kUnknown || trigger_type_ == trigger_type);
     DoAddToComposite(trigger_type, &*events);
   }
 
@@ -529,18 +517,17 @@ class Event {
  protected:
   DRAKE_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Event);
 
-  // Note: Users should not be calling this.
-  #if !defined(DRAKE_DOXYGEN_CXX)
+// Note: Users should not be calling this.
+#if !defined(DRAKE_DOXYGEN_CXX)
   // Constructs an Event with the specified @p trigger.
   explicit Event(const TriggerType& trigger) : trigger_type_(trigger) {}
-  #endif
+#endif
 
   /**
    * Derived classes must implement this to add a clone of this Event to
    * the event collection and unconditionally set its trigger type.
    */
-  virtual void DoAddToComposite(TriggerType trigger_type,
-                                CompositeEventCollection<T>* events) const = 0;
+  virtual void DoAddToComposite(TriggerType trigger_type, CompositeEventCollection<T>* events) const = 0;
 
   /**
    * Derived classes must implement this method to clone themselves. Any
@@ -559,11 +546,9 @@ class Event {
  * container, using an arbitrary comparison method.
  */
 struct PeriodicEventDataComparator {
-  bool operator()(const PeriodicEventData& a,
-    const PeriodicEventData& b) const {
-      if (a.period_sec() == b.period_sec())
-        return a.offset_sec() < b.offset_sec();
-      return a.period_sec() < b.period_sec();
+  bool operator()(const PeriodicEventData& a, const PeriodicEventData& b) const {
+    if (a.period_sec() == b.period_sec()) return a.offset_sec() < b.offset_sec();
+    return a.period_sec() < b.period_sec();
   }
 };
 
@@ -618,14 +603,12 @@ class PublishEvent final : public Event<T> {
   /**
    * Callback without system reference.
    */
-  typedef std::function<void(const Context<T>&, const PublishEvent<T>&)>
-      PublishCallback;
+  typedef std::function<void(const Context<T>&, const PublishEvent<T>&)> PublishCallback;
 
   /**
    * Callback with const system reference.
    */
-  typedef std::function<void(const System<T>&, const Context<T>&,
-                             const PublishEvent<T>&)> SystemCallback;
+  typedef std::function<void(const System<T>&, const Context<T>&, const PublishEvent<T>&)> SystemCallback;
   ///@}
 
   /// Makes a PublishEvent with no trigger type, no event data, and
@@ -634,33 +617,28 @@ class PublishEvent final : public Event<T> {
 
   /// Makes a PublishEvent with no trigger type, no event data, and
   /// the specified callback function.
-  explicit PublishEvent(const PublishCallback& callback)
-      : Event<T>(), callback_(callback) {}
+  explicit PublishEvent(const PublishCallback& callback) : Event<T>(), callback_(callback) {}
 
   /// Makes a PublishEvent with no trigger type, no event data, and
   /// the specified system callback function.
-  explicit PublishEvent(const SystemCallback& system_callback)
-      : Event<T>(), system_callback_(system_callback) {}
+  explicit PublishEvent(const SystemCallback& system_callback) : Event<T>(), system_callback_(system_callback) {}
 
-  // Note: Users should not be calling these.
-  #if !defined(DRAKE_DOXYGEN_CXX)
+// Note: Users should not be calling these.
+#if !defined(DRAKE_DOXYGEN_CXX)
   // Makes a PublishEvent with `trigger_type`, no event data, and
   // callback function `callback`, which can be null.
-  PublishEvent(const TriggerType& trigger_type,
-               const PublishCallback& callback)
+  PublishEvent(const TriggerType& trigger_type, const PublishCallback& callback)
       : Event<T>(trigger_type), callback_(callback) {}
 
   // Makes a PublishEvent with `trigger_type`, no event data, and
   // system callback function `system_callback`, which can be null.
-  PublishEvent(const TriggerType& trigger_type,
-               const SystemCallback& system_callback)
+  PublishEvent(const TriggerType& trigger_type, const SystemCallback& system_callback)
       : Event<T>(trigger_type), system_callback_(system_callback) {}
 
   // Makes a PublishEvent with `trigger_type`, no event data, and
   // no specified callback function.
-  explicit PublishEvent(const TriggerType& trigger_type)
-      : Event<T>(trigger_type) {}
-  #endif
+  explicit PublishEvent(const TriggerType& trigger_type) : Event<T>(trigger_type) {}
+#endif
 
   /**
    * Calls the optional callback or system callback function, if one exists,
@@ -677,17 +655,14 @@ class PublishEvent final : public Event<T> {
   }
 
  private:
-  void DoAddToComposite(TriggerType trigger_type,
-                        CompositeEventCollection<T>* events) const final {
+  void DoAddToComposite(TriggerType trigger_type, CompositeEventCollection<T>* events) const final {
     PublishEvent event(*this);
     event.set_trigger_type(trigger_type);
     events->AddPublishEvent(std::move(event));
   }
 
   // Clones PublishEvent-specific data.
-  [[nodiscard]] PublishEvent<T>* DoClone() const final {
-    return new PublishEvent(*this);
-  }
+  [[nodiscard]] PublishEvent<T>* DoClone() const final { return new PublishEvent(*this); }
 
   // Optional callback functions that handle this publish event. At most one
   // callback can be set; whichever one is set will be invoked. It is valid for
@@ -721,15 +696,13 @@ class DiscreteUpdateEvent final : public Event<T> {
   /**
    * Callback without system reference.
    */
-  typedef std::function<void(const Context<T>&, const DiscreteUpdateEvent<T>&,
-                             DiscreteValues<T>*)>
+  typedef std::function<void(const Context<T>&, const DiscreteUpdateEvent<T>&, DiscreteValues<T>*)>
       DiscreteUpdateCallback;
 
   /**
    * Callback with const system reference.
    */
-  typedef std::function<void(const System<T>&, const Context<T>&,
-                             const DiscreteUpdateEvent<T>&, DiscreteValues<T>*)>
+  typedef std::function<void(const System<T>&, const Context<T>&, const DiscreteUpdateEvent<T>&, DiscreteValues<T>*)>
       SystemCallback;
   ///@}
 
@@ -739,42 +712,36 @@ class DiscreteUpdateEvent final : public Event<T> {
 
   /// Makes a DiscreteUpdateEvent with no trigger type, no event data, and
   /// the specified callback function.
-  explicit DiscreteUpdateEvent(const DiscreteUpdateCallback& callback)
-      : Event<T>(), callback_(callback) {}
+  explicit DiscreteUpdateEvent(const DiscreteUpdateCallback& callback) : Event<T>(), callback_(callback) {}
 
   /// Makes a DiscreteUpdateEvent with no trigger type, no event data, and
   /// the specified system callback function.
-  explicit DiscreteUpdateEvent(const SystemCallback& system_callback)
-      : Event<T>(), system_callback_(system_callback) {}
+  explicit DiscreteUpdateEvent(const SystemCallback& system_callback) : Event<T>(), system_callback_(system_callback) {}
 
-  // Note: Users should not be calling these.
-  #if !defined(DRAKE_DOXYGEN_CXX)
+// Note: Users should not be calling these.
+#if !defined(DRAKE_DOXYGEN_CXX)
   // Makes a DiscreteUpdateEvent with `trigger_type` with no event data and
   // the callback function `callback`.
   // `callback` can be null.
-  DiscreteUpdateEvent(const TriggerType& trigger_type,
-                      const DiscreteUpdateCallback& callback)
+  DiscreteUpdateEvent(const TriggerType& trigger_type, const DiscreteUpdateCallback& callback)
       : Event<T>(trigger_type), callback_(callback) {}
 
   // Makes a DiscreteUpdateEvent with `trigger_type` with no event data and
   // the system callback function `system_callback`.
   // `system_callback` can be null.
-  DiscreteUpdateEvent(const TriggerType& trigger_type,
-                      const SystemCallback& system_callback)
+  DiscreteUpdateEvent(const TriggerType& trigger_type, const SystemCallback& system_callback)
       : Event<T>(trigger_type), system_callback_(system_callback) {}
 
   // Makes a DiscreteUpdateEvent with @p trigger_type with no event data and
   // no specified callback function.
-  explicit DiscreteUpdateEvent(const TriggerType& trigger_type)
-      : Event<T>(trigger_type) {}
-  #endif
+  explicit DiscreteUpdateEvent(const TriggerType& trigger_type) : Event<T>(trigger_type) {}
+#endif
 
   /**
    * Calls the optional callback function, if one exists, with @p system, @p
    * context, `this` and @p discrete_state.
    */
-  void handle(const System<T>& system, const Context<T>& context,
-              DiscreteValues<T>* discrete_state) const {
+  void handle(const System<T>& system, const Context<T>& context, DiscreteValues<T>* discrete_state) const {
     // At most one callback can be set.
     MALIPUT_DRAKE_ASSERT(!(callback_ && system_callback_));
     if (callback_ != nullptr) {
@@ -785,17 +752,14 @@ class DiscreteUpdateEvent final : public Event<T> {
   }
 
  private:
-  void DoAddToComposite(TriggerType trigger_type,
-                        CompositeEventCollection<T>* events) const final {
+  void DoAddToComposite(TriggerType trigger_type, CompositeEventCollection<T>* events) const final {
     DiscreteUpdateEvent<T> event(*this);
     event.set_trigger_type(trigger_type);
     events->AddDiscreteUpdateEvent(std::move(event));
   }
 
   // Clones DiscreteUpdateEvent-specific data.
-  [[nodiscard]] DiscreteUpdateEvent<T>* DoClone() const final {
-    return new DiscreteUpdateEvent(*this);
-  }
+  [[nodiscard]] DiscreteUpdateEvent<T>* DoClone() const final { return new DiscreteUpdateEvent(*this); }
 
   // Optional callback functions that handle this discrete update event. At
   // most one callback can be set; whichever one is set will be invoked. It is
@@ -829,15 +793,13 @@ class UnrestrictedUpdateEvent final : public Event<T> {
   /**
    * Callback without system reference.
    */
-  typedef std::function<void(const Context<T>&,
-                             const UnrestrictedUpdateEvent<T>&, State<T>*)>
+  typedef std::function<void(const Context<T>&, const UnrestrictedUpdateEvent<T>&, State<T>*)>
       UnrestrictedUpdateCallback;
 
   /**
    * Callback with const system reference.
    */
-  typedef std::function<void(const System<T>&, const Context<T>&,
-                             const UnrestrictedUpdateEvent<T>&, State<T>*)>
+  typedef std::function<void(const System<T>&, const Context<T>&, const UnrestrictedUpdateEvent<T>&, State<T>*)>
       SystemCallback;
   ///@}
 
@@ -847,42 +809,35 @@ class UnrestrictedUpdateEvent final : public Event<T> {
 
   /// Makes a UnrestrictedUpdateEvent with no trigger type, no event data, and
   /// the specified callback function.
-  explicit UnrestrictedUpdateEvent(const UnrestrictedUpdateCallback& callback)
-      : Event<T>(), callback_(callback) {}
+  explicit UnrestrictedUpdateEvent(const UnrestrictedUpdateCallback& callback) : Event<T>(), callback_(callback) {}
 
   /// Makes a UnrestrictedUpdateEvent with no trigger type, no event data, and
   /// the specified system callback function.
-  explicit UnrestrictedUpdateEvent(
-      const SystemCallback& system_callback)
+  explicit UnrestrictedUpdateEvent(const SystemCallback& system_callback)
       : Event<T>(), system_callback_(system_callback) {}
 
-  // Note: Users should not be calling these.
-  #if !defined(DRAKE_DOXYGEN_CXX)
+// Note: Users should not be calling these.
+#if !defined(DRAKE_DOXYGEN_CXX)
   // Makes an UnrestrictedUpdateEvent with `trigger_type` and callback function
   // `callback`. `callback` can be null.
-  UnrestrictedUpdateEvent(const TriggerType& trigger_type,
-                          const UnrestrictedUpdateCallback& callback)
+  UnrestrictedUpdateEvent(const TriggerType& trigger_type, const UnrestrictedUpdateCallback& callback)
       : Event<T>(trigger_type), callback_(callback) {}
 
   // Makes an UnrestrictedUpdateEvent with `trigger_type` and system callback
   // function `system_callback`. `system_callback` can be null.
-  UnrestrictedUpdateEvent(const TriggerType& trigger_type,
-                          const SystemCallback& system_callback)
+  UnrestrictedUpdateEvent(const TriggerType& trigger_type, const SystemCallback& system_callback)
       : Event<T>(trigger_type), system_callback_(system_callback) {}
 
   // Makes an UnrestrictedUpateEvent with @p trigger_type, no optional data, and
   // no callback function.
-  explicit UnrestrictedUpdateEvent(
-      const TriggerType& trigger_type)
-      : Event<T>(trigger_type) {}
-  #endif
+  explicit UnrestrictedUpdateEvent(const TriggerType& trigger_type) : Event<T>(trigger_type) {}
+#endif
 
   /**
    * Calls the optional callback function, if one exists, with @p system, @p
    * context, `this` and @p state.
    */
-  void handle(const System<T>& system, const Context<T>& context,
-              State<T>* state) const {
+  void handle(const System<T>& system, const Context<T>& context, State<T>* state) const {
     // At most one callback can be set.
     MALIPUT_DRAKE_ASSERT(!(callback_ && system_callback_));
     if (callback_ != nullptr) {
@@ -893,17 +848,14 @@ class UnrestrictedUpdateEvent final : public Event<T> {
   }
 
  private:
-  void DoAddToComposite(TriggerType trigger_type,
-                        CompositeEventCollection<T>* events) const final {
+  void DoAddToComposite(TriggerType trigger_type, CompositeEventCollection<T>* events) const final {
     UnrestrictedUpdateEvent<T> event(*this);
     event.set_trigger_type(trigger_type);
     events->AddUnrestrictedUpdateEvent(std::move(event));
   }
 
   // Clones event data specific to UnrestrictedUpdateEvent.
-  UnrestrictedUpdateEvent<T>* DoClone() const final {
-    return new UnrestrictedUpdateEvent(*this);
-  }
+  UnrestrictedUpdateEvent<T>* DoClone() const final { return new UnrestrictedUpdateEvent(*this); }
 
   // Optional callback functions that handle this unrestricted update event. At
   // most one callback can be set; whichever one is set will be invoked. It is
@@ -918,14 +870,10 @@ class UnrestrictedUpdateEvent final : public Event<T> {
 DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
     class ::maliput::drake::systems::WitnessTriggeredEventData)
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::Event)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::Event)
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::PublishEvent)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::PublishEvent)
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiscreteUpdateEvent)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiscreteUpdateEvent)
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::UnrestrictedUpdateEvent)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::UnrestrictedUpdateEvent)

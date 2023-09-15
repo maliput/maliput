@@ -2,7 +2,6 @@
 
 #define MALIPUT_USED
 
-
 #include <memory>
 
 #include "maliput/drake/common/copyable_unique_ptr.h"

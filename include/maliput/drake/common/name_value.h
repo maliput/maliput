@@ -68,8 +68,7 @@ class NameValue {
   /// (Advanced.)  Constructs a %NameValue.  Prefer DRAKE_NVP instead of this
   /// constructor.  Both pointers are aliased and must remain valid for the
   /// lifetime of this object.  Neither pointer can be nullptr.
-  NameValue(const char* name_in, T* value_in)
-      : name_(name_in), value_(value_in) {
+  NameValue(const char* name_in, T* value_in) : name_(name_in), value_(value_in) {
     MALIPUT_DRAKE_ASSERT(name_in != nullptr);
     MALIPUT_DRAKE_ASSERT(value_in != nullptr);
   }

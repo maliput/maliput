@@ -38,8 +38,7 @@ std::shared_ptr<logging::logger> onetime_create_log() {
 }  // namespace
 
 logging::logger* log() {
-  static const never_destroyed<std::shared_ptr<logging::logger>> g_logger(
-      onetime_create_log());
+  static const never_destroyed<std::shared_ptr<logging::logger>> g_logger(onetime_create_log());
   return g_logger.access().get();
 }
 
@@ -81,13 +80,20 @@ std::string logging::set_log_level(const std::string& level) {
   }
   maliput::drake::log()->set_level(value);
   switch (prev_value) {
-    case spdlog::level::trace: return "trace";
-    case spdlog::level::debug: return "debug";
-    case spdlog::level::info: return "info";
-    case spdlog::level::warn: return "warn";
-    case spdlog::level::err: return "err";
-    case spdlog::level::critical: return "critical";
-    case spdlog::level::off: return "off";
+    case spdlog::level::trace:
+      return "trace";
+    case spdlog::level::debug:
+      return "debug";
+    case spdlog::level::info:
+      return "info";
+    case spdlog::level::warn:
+      return "warn";
+    case spdlog::level::err:
+      return "err";
+    case spdlog::level::critical:
+      return "critical";
+    case spdlog::level::off:
+      return "off";
     default: {
       // N.B. `spdlog::level::level_enum` is not a `enum class`, so the
       // compiler does not know that it has a closed set of values. For
@@ -108,9 +114,7 @@ const char* const logging::kSetLogLevelHelpMessage =
     "'critical', "
     "'off'";
 
-void logging::set_log_pattern(const std::string& pattern) {
-  maliput::drake::log()->set_pattern(pattern);
-}
+void logging::set_log_pattern(const std::string& pattern) { maliput::drake::log()->set_pattern(pattern); }
 
 const char* const logging::kSetLogPatternHelpMessage =
     "sets the spdlog pattern for formatting; for more information, see "
@@ -134,17 +138,13 @@ logging::sink* logging::get_dist_sink() {
   return &g_sink;
 }
 
-std::string logging::set_log_level(const std::string&) {
-  return "";
-}
+std::string logging::set_log_level(const std::string&) { return ""; }
 
-const char* const logging::kSetLogLevelHelpMessage =
-    "(Text logging is unavailable.)";
+const char* const logging::kSetLogLevelHelpMessage = "(Text logging is unavailable.)";
 
 void logging::set_log_pattern(const std::string&) {}
 
-const char* const logging::kSetLogPatternHelpMessage =
-    "(Text logging is unavailable.)";
+const char* const logging::kSetLogPatternHelpMessage = "(Text logging is unavailable.)";
 
 #endif  // HAVE_SPDLOG
 

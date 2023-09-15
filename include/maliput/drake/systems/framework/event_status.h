@@ -51,8 +51,7 @@ class EventStatus {
   static EventStatus Succeeded() { return EventStatus(kSucceeded); }
 
   /** Returns "reached termination" status, with a message explaining why. */
-  static EventStatus ReachedTermination(const SystemBase* system,
-                                        std::string message) {
+  static EventStatus ReachedTermination(const SystemBase* system, std::string message) {
     return EventStatus(kReachedTermination, system, std::move(message));
   }
 

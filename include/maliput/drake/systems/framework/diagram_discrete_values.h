@@ -25,7 +25,7 @@ namespace systems {
 /// LeafSystem discrete values in a Diagram, the child objects are not owned.
 /// When this is cloned, deep copies are made that are owned here.
 template <typename T>
-class DiagramDiscreteValues final: public DiscreteValues<T> {
+class DiagramDiscreteValues final : public DiscreteValues<T> {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(DiagramDiscreteValues)
 
@@ -38,15 +38,13 @@ class DiagramDiscreteValues final: public DiscreteValues<T> {
   /// the Diagram itself. That is, the substates should be indexed by
   /// SubsystemIndex in the same order as the subsystems are.
   explicit DiagramDiscreteValues(std::vector<DiscreteValues<T>*> subdiscretes)
-      : DiscreteValues<T>(Flatten(subdiscretes)),
-        subdiscretes_(std::move(subdiscretes)) {
+      : DiscreteValues<T>(Flatten(subdiscretes)), subdiscretes_(std::move(subdiscretes)) {
     MALIPUT_DRAKE_ASSERT(internal::IsNonNull(subdiscretes_));
   }
 
   /// Constructs a DiagramDiscreteValues object that is composed (recursively)
   /// of other DiscreteValues objects, ownership of which is transferred here.
-  explicit DiagramDiscreteValues(
-      std::vector<std::unique_ptr<DiscreteValues<T>>> owned_subdiscretes)
+  explicit DiagramDiscreteValues(std::vector<std::unique_ptr<DiscreteValues<T>>> owned_subdiscretes)
       : DiagramDiscreteValues<T>(internal::Unpack(owned_subdiscretes)) {
     owned_subdiscretes_ = std::move(owned_subdiscretes);
     MALIPUT_DRAKE_ASSERT(internal::IsNonNull(owned_subdiscretes_));
@@ -69,9 +67,7 @@ class DiagramDiscreteValues final: public DiscreteValues<T> {
   /// Returns the number of DiscreteValues objects referenced by this
   /// %DiagramDiscreteValues object, necessarily the same as the number of
   /// subcontexts in the containing DiagramContext.
-  int num_subdiscretes() const {
-    return static_cast<int>(subdiscretes_.size());
-  }
+  int num_subdiscretes() const { return static_cast<int>(subdiscretes_.size()); }
 
   /// Returns a const reference to one of the referenced DiscreteValues
   /// objects which may or may not be owned locally.
@@ -95,10 +91,8 @@ class DiagramDiscreteValues final: public DiscreteValues<T> {
   std::unique_ptr<DiscreteValues<T>> DoClone() const final {
     std::vector<std::unique_ptr<DiscreteValues<T>>> owned_subdiscretes;
     // Make deep copies regardless of whether they were owned.
-    for (auto discrete : subdiscretes_)
-      owned_subdiscretes.push_back(discrete->Clone());
-    return std::make_unique<DiagramDiscreteValues>(
-        std::move(owned_subdiscretes));
+    for (auto discrete : subdiscretes_) owned_subdiscretes.push_back(discrete->Clone());
+    return std::make_unique<DiagramDiscreteValues>(std::move(owned_subdiscretes));
   }
 
   // Given a vector of DiscreteValues pointers, each potentially containing
@@ -106,8 +100,7 @@ class DiagramDiscreteValues final: public DiscreteValues<T> {
   // contained BasicVectors, unpacked in order. Because each of the referenced
   // DiscreteValues has been similarly unpacked, the result is a complete, flat
   // list of all the leaf BasicVectors below `this` DiagramDiscreteValues.
-  std::vector<BasicVector<T>*> Flatten(
-      const std::vector<DiscreteValues<T>*>& in) const {
+  std::vector<BasicVector<T>*> Flatten(const std::vector<DiscreteValues<T>*>& in) const {
     std::vector<BasicVector<T>*> out;
     for (const DiscreteValues<T>* xd : in) {
       const std::vector<BasicVector<T>*>& xd_data = xd->get_data();
@@ -130,5 +123,4 @@ class DiagramDiscreteValues final: public DiscreteValues<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiagramDiscreteValues)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiagramDiscreteValues)

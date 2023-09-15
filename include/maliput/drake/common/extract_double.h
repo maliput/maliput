@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define MALIPUT_USED
 
 #include <stdexcept>
@@ -30,10 +29,8 @@ DRAKE_DEPRECATED("2020-08-01",
                  "Provide a specific overload of ExtractDoubleOrThrow for any "
                  "type that really is sensible at compile time and should "
                  "defer failure to runtime; this version was too generic.")
-typename std::enable_if_t<!is_eigen_type<T>::value, double>
-ExtractDoubleOrThrow(const T&) {
-  throw std::runtime_error(NiceTypeName::Get<T>() +
-                           " cannot be converted to a double");
+typename std::enable_if_t<!is_eigen_type<T>::value, double> ExtractDoubleOrThrow(const T&) {
+  throw std::runtime_error(NiceTypeName::Get<T>() + " cannot be converted to a double");
 }
 
 /// Returns @p scalar as a double.  Never throws.
@@ -43,16 +40,11 @@ inline double ExtractDoubleOrThrow(double scalar) { return scalar; }
 /// allocation as @p matrix.  Calls ExtractDoubleOrThrow on each element of the
 /// matrix, and therefore throws if any one of the extractions fail.
 template <typename Derived>
-typename std::enable_if_t<
-    std::is_same_v<typename Derived::Scalar, double>,
-    Eigen::Matrix<double, Derived::RowsAtCompileTime,
-                  Derived::ColsAtCompileTime, Derived::Options,
-                  Derived::MaxRowsAtCompileTime, Derived::MaxColsAtCompileTime>>
+typename std::enable_if_t<std::is_same_v<typename Derived::Scalar, double>,
+                          Eigen::Matrix<double, Derived::RowsAtCompileTime, Derived::ColsAtCompileTime,
+                                        Derived::Options, Derived::MaxRowsAtCompileTime, Derived::MaxColsAtCompileTime>>
 ExtractDoubleOrThrow(const Eigen::MatrixBase<Derived>& matrix) {
-  return matrix.unaryExpr([](const typename Derived::Scalar& value) {
-        return ExtractDoubleOrThrow(value);
-      })
-      .eval();
+  return matrix.unaryExpr([](const typename Derived::Scalar& value) { return ExtractDoubleOrThrow(value); }).eval();
 }
 
 }  // namespace maliput::drake

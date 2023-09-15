@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define MALIPUT_USED
 
 #include <memory>
@@ -32,8 +31,7 @@ class ScalarViewDenseOutput : public ScalarDenseOutput<T> {
   /// @throws std::exception if given @p n does not refer to a valid
   ///                        base output dimension
   ///                        i.e. @p n ∉ [0, `base_output`->size()).
-  explicit ScalarViewDenseOutput(
-      std::unique_ptr<DenseOutput<T>> base_output, int n)
+  explicit ScalarViewDenseOutput(std::unique_ptr<DenseOutput<T>> base_output, int n)
       : base_output_(std::move(base_output)), n_(n) {
     if (base_output_ == nullptr) {
       throw std::runtime_error("Base dense output to view is null.");
@@ -48,26 +46,16 @@ class ScalarViewDenseOutput : public ScalarDenseOutput<T> {
 
   /// Returns the base dense output upon which the
   /// view operates.
-  const DenseOutput<T>* get_base_output() const {
-    return base_output_.get();
-  }
+  const DenseOutput<T>* get_base_output() const { return base_output_.get(); }
 
  protected:
-  T DoEvaluateScalar(const T& t) const override {
-    return base_output_->EvaluateNth(t, n_);
-  }
+  T DoEvaluateScalar(const T& t) const override { return base_output_->EvaluateNth(t, n_); }
 
-  bool do_is_empty() const override {
-    return base_output_->is_empty();
-  }
+  bool do_is_empty() const override { return base_output_->is_empty(); }
 
-  const T& do_start_time() const override {
-    return base_output_->start_time();
-  }
+  const T& do_start_time() const override { return base_output_->start_time(); }
 
-  const T& do_end_time() const override {
-    return base_output_->end_time();
-  }
+  const T& do_end_time() const override { return base_output_->end_time(); }
 
   // The base (vector) dense output being wrapped.
   const std::unique_ptr<DenseOutput<T>> base_output_;
@@ -79,5 +67,4 @@ class ScalarViewDenseOutput : public ScalarDenseOutput<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::systems::ScalarViewDenseOutput)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::systems::ScalarViewDenseOutput)

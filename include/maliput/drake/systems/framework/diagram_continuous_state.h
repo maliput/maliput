@@ -28,7 +28,7 @@ namespace systems {
 ///
 /// @tparam_default_scalar
 template <typename T>
-class DiagramContinuousState final: public ContinuousState<T> {
+class DiagramContinuousState final : public ContinuousState<T> {
  public:
   DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(DiagramContinuousState)
 
@@ -43,8 +43,7 @@ class DiagramContinuousState final: public ContinuousState<T> {
 
   /// Constructs a ContinuousState that is composed (recursively) of other
   /// ContinuousState objects, ownership of which is transferred here.
-  explicit DiagramContinuousState(
-      std::vector<std::unique_ptr<ContinuousState<T>>> substates);
+  explicit DiagramContinuousState(std::vector<std::unique_ptr<ContinuousState<T>>> substates);
 
   ~DiagramContinuousState() override;
 
@@ -66,9 +65,7 @@ class DiagramContinuousState final: public ContinuousState<T> {
 
   /// Returns the continuous state at the given `index`. Aborts if `index` is
   /// out-of-bounds.
-  ContinuousState<T>& get_mutable_substate(int index) {
-    return const_cast<ContinuousState<T>&>(get_substate(index));
-  }
+  ContinuousState<T>& get_mutable_substate(int index) { return const_cast<ContinuousState<T>&>(get_substate(index)); }
 
  private:
   // This completely replaces the base class default DoClone() so must
@@ -78,26 +75,17 @@ class DiagramContinuousState final: public ContinuousState<T> {
 
   // Returns a Supervector over the x, q, v, or z components of each
   // substate in `substates`, as indicated by `selector`.
-  static std::unique_ptr<VectorBase<T>> Span(
-      const std::vector<ContinuousState<T>*>& substates,
-      std::function<VectorBase<T>&(ContinuousState<T>*)> selector);
+  static std::unique_ptr<VectorBase<T>> Span(const std::vector<ContinuousState<T>*>& substates,
+                                             std::function<VectorBase<T>&(ContinuousState<T>*)> selector);
 
   // Returns the entire state vector in `xc`.
-  static VectorBase<T>& x_selector(ContinuousState<T>* xc) {
-    return xc->get_mutable_vector();
-  }
+  static VectorBase<T>& x_selector(ContinuousState<T>* xc) { return xc->get_mutable_vector(); }
   // Returns the generalized position vector in `xc`.
-  static VectorBase<T>& q_selector(ContinuousState<T>* xc) {
-    return xc->get_mutable_generalized_position();
-  }
+  static VectorBase<T>& q_selector(ContinuousState<T>* xc) { return xc->get_mutable_generalized_position(); }
   // Returns the generalized velocity vector in `xc`.
-  static VectorBase<T>& v_selector(ContinuousState<T>* xc) {
-    return xc->get_mutable_generalized_velocity();
-  }
+  static VectorBase<T>& v_selector(ContinuousState<T>* xc) { return xc->get_mutable_generalized_velocity(); }
   // Returns the misc continuous state vector in `xc`.
-  static VectorBase<T>& z_selector(ContinuousState<T>* xc) {
-    return xc->get_mutable_misc_continuous_state();
-  }
+  static VectorBase<T>& z_selector(ContinuousState<T>* xc) { return xc->get_mutable_misc_continuous_state(); }
 
   // Pointers to the underlying ContinuousStates that provide the actual
   // values. If these are owned, the pointers are equal to the pointers in
@@ -112,5 +100,4 @@ class DiagramContinuousState final: public ContinuousState<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiagramContinuousState)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiagramContinuousState)

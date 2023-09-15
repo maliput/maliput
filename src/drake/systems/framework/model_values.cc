@@ -7,12 +7,9 @@ namespace maliput::drake {
 namespace systems {
 namespace internal {
 
-int ModelValues::size() const {
-  return static_cast<int>(values_.size());
-}
+int ModelValues::size() const { return static_cast<int>(values_.size()); }
 
-void ModelValues::AddModel(
-    int index, std::unique_ptr<AbstractValue> model_value) {
+void ModelValues::AddModel(int index, std::unique_ptr<AbstractValue> model_value) {
   // Grow the values_ so that our new model will live at @p index.
   MALIPUT_DRAKE_DEMAND(index >= size());
   values_.resize(index);
@@ -30,7 +27,6 @@ std::unique_ptr<AbstractValue> ModelValues::CloneModel(int index) const {
   }
   return nullptr;
 }
-
 
 }  // namespace internal
 }  // namespace systems

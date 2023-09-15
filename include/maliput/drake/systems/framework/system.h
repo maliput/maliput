@@ -68,18 +68,15 @@ class System : public SystemBase {
   instance is used for populating collections of triggered events; for
   example, Simulator passes this object to System::CalcNextUpdateTime() to
   allow the system to identify and handle upcoming events. */
-  std::unique_ptr<CompositeEventCollection<T>>
-  AllocateCompositeEventCollection() const;
+  std::unique_ptr<CompositeEventCollection<T>> AllocateCompositeEventCollection() const;
 
   /** Given an input port, allocates the vector storage.  The @p input_port
   must match a port declared via DeclareInputPort. */
-  std::unique_ptr<BasicVector<T>> AllocateInputVector(
-      const InputPort<T>& input_port) const;
+  std::unique_ptr<BasicVector<T>> AllocateInputVector(const InputPort<T>& input_port) const;
 
   /** Given an input port, allocates the abstract storage.  The @p input_port
   must match a port declared via DeclareInputPort. */
-  std::unique_ptr<AbstractValue> AllocateInputAbstract(
-      const InputPort<T>& input_port) const;
+  std::unique_ptr<AbstractValue> AllocateInputAbstract(const InputPort<T>& input_port) const;
 
   /** Returns a container that can hold the values of all of this System's
   output ports. It is sized with the number of output ports and uses each
@@ -90,8 +87,7 @@ class System : public SystemBase {
   /** Returns a ContinuousState of the same size as the continuous_state
   allocated in CreateDefaultContext. The simulator will provide this state
   as the output argument to EvalTimeDerivatives. */
-  virtual std::unique_ptr<ContinuousState<T>> AllocateTimeDerivatives() const
-      = 0;
+  virtual std::unique_ptr<ContinuousState<T>> AllocateTimeDerivatives() const = 0;
 
   /** Returns an Eigen VectorX suitable for use as the output argument to
   the CalcImplicitTimeDerivativesResidual() method. The returned VectorX
@@ -105,8 +101,7 @@ class System : public SystemBase {
   /** Returns a DiscreteValues of the same dimensions as the discrete_state
   allocated in CreateDefaultContext. The simulator will provide this state
   as the output argument to Update. */
-  virtual std::unique_ptr<DiscreteValues<T>> AllocateDiscreteVariables() const
-      = 0;
+  virtual std::unique_ptr<DiscreteValues<T>> AllocateDiscreteVariables() const = 0;
 
   /** This convenience method allocates a context using AllocateContext() and
   sets its default values using SetDefaultContext(). */
@@ -114,13 +109,11 @@ class System : public SystemBase {
 
   /** Assigns default values to all elements of the state. Overrides must not
   change the number of state variables. */
-  virtual void SetDefaultState(const Context<T>& context,
-                               State<T>* state) const = 0;
+  virtual void SetDefaultState(const Context<T>& context, State<T>* state) const = 0;
 
   /** Assigns default values to all parameters. Overrides must not
   change the number of parameters. */
-  virtual void SetDefaultParameters(const Context<T>& context,
-                                    Parameters<T>* parameters) const = 0;
+  virtual void SetDefaultParameters(const Context<T>& context, Parameters<T>* parameters) const = 0;
 
   /** Sets Context fields to their default values.  User code should not
   override. */
@@ -137,8 +130,7 @@ class System : public SystemBase {
   Overrides must not change the number of state variables.
 
   @see @ref stochastic_systems */
-  virtual void SetRandomState(const Context<T>& context, State<T>* state,
-                              RandomGenerator* generator) const;
+  virtual void SetRandomState(const Context<T>& context, State<T>* state, RandomGenerator* generator) const;
 
   /** Assigns random values to all parameters.
   This default implementation calls SetDefaultParameters; override this
@@ -151,8 +143,7 @@ class System : public SystemBase {
   Overrides must not change the number of state variables.
 
   @see @ref stochastic_systems */
-  virtual void SetRandomParameters(const Context<T>& context,
-                                   Parameters<T>* parameters,
+  virtual void SetRandomParameters(const Context<T>& context, Parameters<T>* parameters,
                                    RandomGenerator* generator) const;
 
   /** Sets Context fields to random values.  User code should not
@@ -200,8 +191,7 @@ class System : public SystemBase {
   so that a step begins exactly at the next publication time. In the latter
   case the change in step size may affect the numerical result somewhat
   since a smaller integrator step produces a more accurate solution. */
-  void Publish(const Context<T>& context,
-               const EventCollection<PublishEvent<T>>& events) const;
+  void Publish(const Context<T>& context, const EventCollection<PublishEvent<T>>& events) const;
 
   /** Forces a publish on the system, given a @p context. The publish event will
   have a trigger type of kForced, with no additional data, attribute or
@@ -249,8 +239,7 @@ class System : public SystemBase {
                 of the same type and size as `context`'s continuous state.
   @see CalcTimeDerivatives(), CalcImplicitTimeDerivativesResidual(),
        get_time_derivatives_cache_entry() */
-  const ContinuousState<T>& EvalTimeDerivatives(
-      const Context<T>& context) const {
+  const ContinuousState<T>& EvalTimeDerivatives(const Context<T>& context) const {
     ValidateContext(context);
     const CacheEntry& entry = get_time_derivatives_cache_entry();
     return entry.Eval<ContinuousState<T>>(context);
@@ -366,30 +355,23 @@ class System : public SystemBase {
   @tparam Vec The template type of the input vector, which must be a
               subclass of BasicVector. */
   template <template <typename> class Vec = BasicVector>
-  const Vec<T>* EvalVectorInput(const Context<T>& context,
-                                int port_index) const {
-    static_assert(
-        std::is_base_of_v<BasicVector<T>, Vec<T>>,
-        "In EvalVectorInput<Vec>, Vec must be a subclass of BasicVector.");
+  const Vec<T>* EvalVectorInput(const Context<T>& context, int port_index) const {
+    static_assert(std::is_base_of_v<BasicVector<T>, Vec<T>>,
+                  "In EvalVectorInput<Vec>, Vec must be a subclass of BasicVector.");
 
     ValidateContext(context);
 
     // The API allows an int but we'll use InputPortIndex internally.
-    if (port_index < 0)
-      ThrowNegativePortIndex(__func__, port_index);
+    if (port_index < 0) ThrowNegativePortIndex(__func__, port_index);
     const InputPortIndex iport_index(port_index);
 
-    const BasicVector<T>* const basic_value =
-        EvalBasicVectorInputImpl(__func__, context, iport_index);
-    if (basic_value == nullptr)
-      return nullptr;  // An unconnected port.
+    const BasicVector<T>* const basic_value = EvalBasicVectorInputImpl(__func__, context, iport_index);
+    if (basic_value == nullptr) return nullptr;  // An unconnected port.
 
     // It's a BasicVector, but we're fussy about the subtype here.
     const Vec<T>* const value = dynamic_cast<const Vec<T>*>(basic_value);
     if (value == nullptr) {
-      ThrowInputPortHasWrongType(__func__, iport_index,
-                                 NiceTypeName::Get<Vec<T>>(),
-                                 NiceTypeName::Get(*basic_value));
+      ThrowInputPortHasWrongType(__func__, iport_index, NiceTypeName::Get<Vec<T>>(), NiceTypeName::Get(*basic_value));
     }
 
     return value;
@@ -405,8 +387,7 @@ class System : public SystemBase {
   @pre the port must be evaluable (connected or fixed).
 
   @see EvalVectorInput() */
-  Eigen::VectorBlock<const VectorX<T>> EvalEigenVectorInput(
-      const Context<T>& context, int port_index) const;
+  Eigen::VectorBlock<const VectorX<T>> EvalEigenVectorInput(const Context<T>& context, int port_index) const;
   //@}
 
   //----------------------------------------------------------------------------
@@ -425,8 +406,7 @@ class System : public SystemBase {
 
   The `constraint` will automatically persist across system scalar
   conversion. */
-  SystemConstraintIndex AddExternalConstraint(
-      ExternalSystemConstraint constraint);
+  SystemConstraintIndex AddExternalConstraint(ExternalSystemConstraint constraint);
   //@}
 
   //----------------------------------------------------------------------------
@@ -464,8 +444,7 @@ class System : public SystemBase {
   @see EvalTimeDerivatives() for more information.
   @see CalcImplicitTimeDerivativesResidual() for the implicit form of these
        equations.*/
-  void CalcTimeDerivatives(const Context<T>& context,
-                           ContinuousState<T>* derivatives) const;
+  void CalcTimeDerivatives(const Context<T>& context, ContinuousState<T>* derivatives) const;
 
   /** Evaluates the implicit form of the %System equations and returns the
   residual.
@@ -522,9 +501,8 @@ class System : public SystemBase {
   @see LeafSystem::DeclareImplicitTimeDerivativesResidualSize()
   @see DoCalcImplicitTimeDerivativesResidual()
   @see CalcTimeDerivatives() */
-  void CalcImplicitTimeDerivativesResidual(
-      const Context<T>& context, const ContinuousState<T>& proposed_derivatives,
-      EigenPtr<VectorX<T>> residual) const;
+  void CalcImplicitTimeDerivativesResidual(const Context<T>& context, const ContinuousState<T>& proposed_derivatives,
+                                           EigenPtr<VectorX<T>> residual) const;
 
   /** This method is the public entry point for dispatching all discrete
   variable update event handlers. Using all the discrete update handlers in
@@ -532,10 +510,8 @@ class System : public SystemBase {
   variables `xd(n)` in @p context and outputs the results to @p
   discrete_state. See documentation for
   DispatchDiscreteVariableUpdateHandler() for more details. */
-  void CalcDiscreteVariableUpdates(
-      const Context<T>& context,
-      const EventCollection<DiscreteUpdateEvent<T>>& events,
-      DiscreteValues<T>* discrete_state) const;
+  void CalcDiscreteVariableUpdates(const Context<T>& context, const EventCollection<DiscreteUpdateEvent<T>>& events,
+                                   DiscreteValues<T>* discrete_state) const;
 
   /** Given the @p discrete_state results of a previous call to
   CalcDiscreteVariableUpdates() that dispatched the given collection of
@@ -554,16 +530,14 @@ class System : public SystemBase {
   @pre @p discrete_state is the result of a previous
        CalcDiscreteVariableUpdates() call that dispatched this @p events
        collection. */
-  void ApplyDiscreteVariableUpdate(
-      const EventCollection<DiscreteUpdateEvent<T>>& events,
-      DiscreteValues<T>* discrete_state, Context<T>* context) const;
+  void ApplyDiscreteVariableUpdate(const EventCollection<DiscreteUpdateEvent<T>>& events,
+                                   DiscreteValues<T>* discrete_state, Context<T>* context) const;
 
   /** This method forces a discrete update on the system given a @p context,
   and the updated discrete state is stored in @p discrete_state. The
   discrete update event will have a trigger type of kForced, with no
   attribute or custom callback. */
-  void CalcDiscreteVariableUpdates(const Context<T>& context,
-                                   DiscreteValues<T>* discrete_state) const;
+  void CalcDiscreteVariableUpdates(const Context<T>& context, DiscreteValues<T>* discrete_state) const;
 
   /** This method is the public entry point for dispatching all unrestricted
   update event handlers. Using all the unrestricted update handers in
@@ -574,10 +548,8 @@ class System : public SystemBase {
 
   @throws std::exception if the dimensionality of the state variables
           changes in the callback. */
-  void CalcUnrestrictedUpdate(
-      const Context<T>& context,
-      const EventCollection<UnrestrictedUpdateEvent<T>>& events,
-      State<T>* state) const;
+  void CalcUnrestrictedUpdate(const Context<T>& context, const EventCollection<UnrestrictedUpdateEvent<T>>& events,
+                              State<T>* state) const;
 
   /** Given the @p state results of a previous call to CalcUnrestrictedUpdate()
   that dispatched the given collection of events, modifies the @p context to
@@ -595,9 +567,8 @@ class System : public SystemBase {
       to be different on return than they were on entry.
   @pre @p state is the result of a previous CalcUnrestrictedUpdate() call
        that dispatched this @p events collection. */
-  void ApplyUnrestrictedUpdate(
-      const EventCollection<UnrestrictedUpdateEvent<T>>& events,
-      State<T>* state, Context<T>* context) const;
+  void ApplyUnrestrictedUpdate(const EventCollection<UnrestrictedUpdateEvent<T>>& events, State<T>* state,
+                               Context<T>* context) const;
 
   /** This method forces an unrestricted update on the system given a
   @p context, and the updated state is stored in @p state. The
@@ -607,8 +578,7 @@ class System : public SystemBase {
   @sa CalcUnrestrictedUpdate(const Context<T>&, const
   EventCollection<UnrestrictedUpdateEvent<T>>*, State<T>* state)
       for more information. */
-  void CalcUnrestrictedUpdate(const Context<T>& context,
-                              State<T>* state) const;
+  void CalcUnrestrictedUpdate(const Context<T>& context, State<T>* state) const;
 
   /** This method is called by a Simulator during its calculation of the size of
   the next continuous step to attempt. The System returns the next time at
@@ -624,8 +594,7 @@ class System : public SystemBase {
   in the returned event collection.
 
   @p events cannot be null. @p events will be cleared on entry. */
-  T CalcNextUpdateTime(const Context<T>& context,
-                       CompositeEventCollection<T>* events) const;
+  T CalcNextUpdateTime(const Context<T>& context, CompositeEventCollection<T>* events) const;
 
   /** This method is called by Simulator::Initialize() to gather all update
   and publish events that are to be handled in AdvanceTo() at the point
@@ -639,16 +608,14 @@ class System : public SystemBase {
   continuous state.
 
   @p events cannot be null. @p events will be cleared on entry. */
-  void GetPerStepEvents(const Context<T>& context,
-                        CompositeEventCollection<T>* events) const;
+  void GetPerStepEvents(const Context<T>& context, CompositeEventCollection<T>* events) const;
 
   /** This method is called by Simulator::Initialize() to gather all
   update and publish events that need to be handled at initialization
   before the simulator starts integration.
 
   @p events cannot be null. @p events will be cleared on entry. */
-  void GetInitializationEvents(const Context<T>& context,
-                               CompositeEventCollection<T>* events) const;
+  void GetInitializationEvents(const Context<T>& context, CompositeEventCollection<T>* events) const;
 
   /** Gets whether there exists a unique periodic attribute that triggers
   one or more discrete update events (and, if so, returns that unique
@@ -658,8 +625,7 @@ class System : public SystemBase {
   times.
   @returns optional<PeriodicEventData> Contains the periodic trigger
   attributes if the unique periodic attribute exists, otherwise `nullopt`. */
-  std::optional<PeriodicEventData>
-      GetUniquePeriodicDiscreteUpdateAttribute() const;
+  std::optional<PeriodicEventData> GetUniquePeriodicDiscreteUpdateAttribute() const;
 
   /** Returns true iff the state dynamics of this system are governed
   exclusively by a difference equation on a single discrete state group
@@ -681,8 +647,7 @@ class System : public SystemBase {
   /** Gets all periodic triggered events for a system. Each periodic attribute
   (offset and period, in seconds) is mapped to one or more update events
   that are to be triggered at the proper times. */
-  std::map<PeriodicEventData, std::vector<const Event<T>*>,
-    PeriodicEventDataComparator> GetPeriodicEvents() const;
+  std::map<PeriodicEventData, std::vector<const Event<T>*>, PeriodicEventDataComparator> GetPeriodicEvents() const;
 
   /** Utility method that computes for _every_ output port i the value y(i) that
   should result from the current contents of the given Context. Note that
@@ -734,17 +699,14 @@ class System : public SystemBase {
   velocity in an Eigen VectorX object; this signature will copy the
   VectorBase into an Eigen object before performing the computation.
   @see MapQDotToVelocity() */
-  void MapVelocityToQDot(const Context<T>& context,
-                         const VectorBase<T>& generalized_velocity,
+  void MapVelocityToQDot(const Context<T>& context, const VectorBase<T>& generalized_velocity,
                          VectorBase<T>* qdot) const;
 
   /** Transforms the given generalized velocity to the time derivative of
   generalized configuration. See the other signature of MapVelocityToQDot()
   for more information. */
-  void MapVelocityToQDot(
-      const Context<T>& context,
-      const Eigen::Ref<const VectorX<T>>& generalized_velocity,
-      VectorBase<T>* qdot) const;
+  void MapVelocityToQDot(const Context<T>& context, const Eigen::Ref<const VectorX<T>>& generalized_velocity,
+                         VectorBase<T>* qdot) const;
 
   /** Transforms the time derivative `qdot` of the generalized configuration `q`
   to generalized velocities `v`. `v` and `qdot` are related linearly by
@@ -770,8 +732,7 @@ class System : public SystemBase {
   `q` to generalized velocity `v`. This signature takes `qdot` as an %Eigen
   VectorX object for faster speed. See the other signature of
   MapQDotToVelocity() for additional information. */
-  void MapQDotToVelocity(const Context<T>& context,
-                         const Eigen::Ref<const VectorX<T>>& qdot,
+  void MapQDotToVelocity(const Context<T>& context, const Eigen::Ref<const VectorX<T>>& qdot,
                          VectorBase<T>* generalized_velocity) const;
   //@}
 
@@ -800,15 +761,13 @@ class System : public SystemBase {
   contained %System `subsystem`.
   @throws std::exception if `subsystem` not contained in `this` %System.
   @pre The given `context` is valid for use with `this` %System. */
-  const Context<T>& GetSubsystemContext(const System<T>& subsystem,
-                                        const Context<T>& context) const;
+  const Context<T>& GetSubsystemContext(const System<T>& subsystem, const Context<T>& context) const;
 
   /** Returns a mutable reference to the subcontext that corresponds to the
   contained %System `subsystem`.
   @throws std::exception if `subsystem` not contained in `this` %System.
   @pre The given `context` is valid for use with `this` %System. */
-  Context<T>& GetMutableSubsystemContext(const System<T>& subsystem,
-                                         Context<T>* context) const;
+  Context<T>& GetMutableSubsystemContext(const System<T>& subsystem, Context<T>* context) const;
 
   /** Returns the const Context for `this` subsystem, given a root context. If
   `this` %System is already the top level (root) %System, just returns
@@ -834,38 +793,30 @@ class System : public SystemBase {
 
   // Returns @p context if @p target_system equals `this`, nullptr otherwise.
   // Should not be directly called.
-  virtual const Context<T>* DoGetTargetSystemContext(
-      const System<T>& target_system, const Context<T>* context) const;
+  virtual const Context<T>* DoGetTargetSystemContext(const System<T>& target_system, const Context<T>* context) const;
 
   // Returns @p state if @p target_system equals `this`, nullptr otherwise.
   // Should not be directly called.
-  virtual State<T>* DoGetMutableTargetSystemState(
-      const System<T>& target_system, State<T>* state) const;
+  virtual State<T>* DoGetMutableTargetSystemState(const System<T>& target_system, State<T>* state) const;
 
   // Returns @p state if @p target_system equals `this`, nullptr otherwise.
   // Should not be directly called.
-  virtual const State<T>* DoGetTargetSystemState(const System<T>& target_system,
-                                                 const State<T>* state) const;
+  virtual const State<T>* DoGetTargetSystemState(const System<T>& target_system, const State<T>* state) const;
 
   // Returns x꜀ if @p target_system equals `this`, nullptr otherwise.
   // Should not be directly called.
-  virtual const ContinuousState<T>* DoGetTargetSystemContinuousState(
-      const System<T>& target_system,
-      const ContinuousState<T>* xc) const;
+  virtual const ContinuousState<T>* DoGetTargetSystemContinuousState(const System<T>& target_system,
+                                                                     const ContinuousState<T>* xc) const;
 
   // Returns @p events if @p target_system equals `this`, nullptr otherwise.
   // Should not be directly called.
-  virtual CompositeEventCollection<T>*
-  DoGetMutableTargetSystemCompositeEventCollection(
-      const System<T>& target_system,
-      CompositeEventCollection<T>* events) const;
+  virtual CompositeEventCollection<T>* DoGetMutableTargetSystemCompositeEventCollection(
+      const System<T>& target_system, CompositeEventCollection<T>* events) const;
 
   // Returns @p events if @p target_system equals `this`, nullptr otherwise.
   // Should not be directly called.
-  virtual const CompositeEventCollection<T>*
-  DoGetTargetSystemCompositeEventCollection(
-      const System<T>& target_system,
-      const CompositeEventCollection<T>* events) const;
+  virtual const CompositeEventCollection<T>* DoGetTargetSystemCompositeEventCollection(
+      const System<T>& target_system, const CompositeEventCollection<T>* events) const;
 
   // The derived class implementation shall create the appropriate collection
   // for each of these three methods.
@@ -880,14 +831,13 @@ class System : public SystemBase {
   // (1) Make the overriding methods in LeafSystem and Diagram "final" and
   // (2) Use the doxygen cond/endcond tags so that these methods are hidden
   //     from the user (in the doxygen documentation).
-  virtual std::unique_ptr<EventCollection<PublishEvent<T>>>
-  AllocateForcedPublishEventCollection() const = 0;
+  virtual std::unique_ptr<EventCollection<PublishEvent<T>>> AllocateForcedPublishEventCollection() const = 0;
 
-  virtual std::unique_ptr<EventCollection<DiscreteUpdateEvent<T>>>
-  AllocateForcedDiscreteUpdateEventCollection() const = 0;
+  virtual std::unique_ptr<EventCollection<DiscreteUpdateEvent<T>>> AllocateForcedDiscreteUpdateEventCollection()
+      const = 0;
 
-  virtual std::unique_ptr<EventCollection<UnrestrictedUpdateEvent<T>>>
-  AllocateForcedUnrestrictedUpdateEventCollection() const = 0;
+  virtual std::unique_ptr<EventCollection<UnrestrictedUpdateEvent<T>>> AllocateForcedUnrestrictedUpdateEventCollection()
+      const = 0;
   /** @endcond */
 
   //----------------------------------------------------------------------------
@@ -914,8 +864,7 @@ class System : public SystemBase {
     // supplied via SystemBase::AddInputPort, which atop its implementation
     // has a check that port.get_system_interface() matches `this` which is a
     // System<T>, so we are safe.
-    return static_cast<const InputPort<T>&>(
-        this->GetInputPortBaseOrThrow(__func__, port_index));
+    return static_cast<const InputPort<T>&>(this->GetInputPortBaseOrThrow(__func__, port_index));
   }
 
   /** Convenience method for the case of exactly one input port. */
@@ -935,8 +884,7 @@ class System : public SystemBase {
   the InputPortIndex.  Returns nullptr if no port is selected.  This is
   provided as a convenience method since many algorithms provide the same
   common default or optional port semantics. */
-  const InputPort<T>* get_input_port_selection(
-      std::variant<InputPortSelection, InputPortIndex> port_index) const;
+  const InputPort<T>* get_input_port_selection(std::variant<InputPortSelection, InputPortIndex> port_index) const;
 
   /** Returns the typed input port with the unique name @p port_name.
   The current implementation performs a linear search over strings; prefer
@@ -957,8 +905,7 @@ class System : public SystemBase {
     // supplied via SystemBase::AddInputPort, which atop its implementation
     // has a check that port.get_system_interface() matches `this` which is a
     // System<T>, so we are safe.
-    return static_cast<const OutputPort<T>&>(
-        this->GetOutputPortBaseOrThrow(__func__, port_index));
+    return static_cast<const OutputPort<T>&>(this->GetOutputPortBaseOrThrow(__func__, port_index));
   }
 
   /** Convenience method for the case of exactly one output port. */
@@ -978,8 +925,7 @@ class System : public SystemBase {
   the OutputPortIndex.  Returns nullptr if no port is selected. This is
   provided as a convenience method since many algorithms provide the same
   common default or optional port semantics. */
-  const OutputPort<T>* get_output_port_selection(
-      std::variant<OutputPortSelection, OutputPortIndex> port_index) const;
+  const OutputPort<T>* get_output_port_selection(std::variant<OutputPortSelection, OutputPortIndex> port_index) const;
 
   /** Returns the typed output port with the unique name @p port_name.
   The current implementation performs a linear search over strings; prefer
@@ -991,20 +937,17 @@ class System : public SystemBase {
    port_name. */
   bool HasOutputPort(const std::string& port_name) const;
 
-
   /** Returns the number of constraints specified for the system. */
   int num_constraints() const;
 
   /** Returns the constraint at index @p constraint_index.
   @throws std::exception for an invalid constraint_index. */
-  const SystemConstraint<T>& get_constraint(
-      SystemConstraintIndex constraint_index) const;
+  const SystemConstraint<T>& get_constraint(SystemConstraintIndex constraint_index) const;
 
   /** Returns true if @p context satisfies all of the registered
   SystemConstraints with tolerance @p tol.  @see
   SystemConstraint::CheckSatisfied. */
-  boolean<T> CheckSystemConstraintsSatisfied(
-      const Context<T>& context, double tol) const;
+  boolean<T> CheckSystemConstraintsSatisfied(const Context<T>& context, double tol) const;
 
   /** Returns a copy of the continuous state vector x꜀ into an Eigen
   vector. */
@@ -1023,8 +966,7 @@ class System : public SystemBase {
 
   @see GenerateHtml
   */
-  std::string GetGraphvizString(
-      int max_depth = std::numeric_limits<int>::max()) const;
+  std::string GetGraphvizString(int max_depth = std::numeric_limits<int>::max()) const;
 
   /** Appends a Graphviz fragment to the @p dot stream.  The fragment must be
   valid Graphviz when wrapped in a `digraph` or `subgraph` stanza.  Does
@@ -1032,20 +974,15 @@ class System : public SystemBase {
 
   @param max_depth Sets a limit to the depth of nested diagrams to
   visualize.  Set to zero to render a diagram as a single system block. */
-  virtual void GetGraphvizFragment(int max_depth,
-                                   std::stringstream* dot) const;
+  virtual void GetGraphvizFragment(int max_depth, std::stringstream* dot) const;
 
   /** Appends a fragment to the @p dot stream identifying the graphviz node
   representing @p port. Does nothing by default. */
-  virtual void GetGraphvizInputPortToken(const InputPort<T>& port,
-                                         int max_depth,
-                                         std::stringstream* dot) const;
+  virtual void GetGraphvizInputPortToken(const InputPort<T>& port, int max_depth, std::stringstream* dot) const;
 
   /** Appends a fragment to the @p dot stream identifying the graphviz node
   representing @p port. Does nothing by default. */
-  virtual void GetGraphvizOutputPortToken(const OutputPort<T>& port,
-                                          int max_depth,
-                                          std::stringstream* dot) const;
+  virtual void GetGraphvizOutputPortToken(const OutputPort<T>& port, int max_depth, std::stringstream* dot) const;
 
   /** Returns an opaque integer that uniquely identifies this system in the
   Graphviz output. */
@@ -1153,8 +1090,7 @@ class System : public SystemBase {
   @throws std::exception if `this` system's scalar type T != double and
   `other_system` has any abstract input ports whose contained type depends on
   scalar type. */
-  void FixInputPortsFrom(const System<double>& other_system,
-                         const Context<double>& other_context,
+  void FixInputPortsFrom(const System<double>& other_system, const Context<double>& other_context,
                          Context<T>* target_context) const;
 
   /** (Advanced) Returns the SystemScalarConverter for this object.  This is an
@@ -1162,7 +1098,6 @@ class System : public SystemBase {
   prefer the convenience helpers such as System::ToAutoDiffXd. */
   const SystemScalarConverter& get_system_scalar_converter() const;
   //@}
-
 
   //----------------------------------------------------------------------------
   /** @name                Scalar type conversion by template parameter
@@ -1225,7 +1160,9 @@ class System : public SystemBase {
   template <typename U>
   std::unique_ptr<System<U>> ToScalarTypeMaybe() const {
     auto result = system_scalar_converter_.Convert<U, T>(*this);
-    if (result) { result->AddExternalConstraints(external_constraints_); }
+    if (result) {
+      result->AddExternalConstraints(external_constraints_);
+    }
     return result;
   }
   //@}
@@ -1237,21 +1174,18 @@ class System : public SystemBase {
   @param[out] w a valid pointer to an empty vector that will store
               pointers to the witness functions active for the current
               state. The method aborts if witnesses is null or non-empty. */
-  void GetWitnessFunctions(const Context<T>& context,
-                           std::vector<const WitnessFunction<T>*>* w) const;
+  void GetWitnessFunctions(const Context<T>& context, std::vector<const WitnessFunction<T>*>* w) const;
 
   /** Evaluates a witness function at the given context. */
-  T CalcWitnessValue(const Context<T>& context,
-                     const WitnessFunction<T>& witness_func) const;
+  T CalcWitnessValue(const Context<T>& context, const WitnessFunction<T>& witness_func) const;
 
   /** Add `event` to `events` due to a witness function triggering. `events`
   should be allocated with this system's AllocateCompositeEventCollection.
   Neither `event` nor `events` can be nullptr. Additionally, `event` must
   contain event data (event->get_event_data() must not be nullptr) and
   the type of that data must be WitnessTriggeredEventData. */
-  virtual void AddTriggeredWitnessFunctionToCompositeEventCollection(
-      Event<T>* event,
-      CompositeEventCollection<T>* events) const = 0;
+  virtual void AddTriggeredWitnessFunctionToCompositeEventCollection(Event<T>* event,
+                                                                     CompositeEventCollection<T>* events) const = 0;
 
   // Promote these frequently-used methods so users (and tutorial examples)
   // don't need "this->" everywhere when in templated derived classes.
@@ -1259,51 +1193,48 @@ class System : public SystemBase {
 
   // All pre-defined ticket methods should be listed here. They are ordered as
   // they appear in SystemBase to make it easy to check that none are missing.
-  using SystemBase::nothing_ticket;
-  using SystemBase::time_ticket;
-  using SystemBase::accuracy_ticket;
-  using SystemBase::q_ticket;
-  using SystemBase::v_ticket;
-  using SystemBase::z_ticket;
-  using SystemBase::xc_ticket;
-  using SystemBase::discrete_state_ticket;
-  using SystemBase::xd_ticket;
-  using SystemBase::abstract_state_ticket;
-  using SystemBase::xa_ticket;
-  using SystemBase::all_state_ticket;
-  using SystemBase::numeric_parameter_ticket;
-  using SystemBase::pn_ticket;
   using SystemBase::abstract_parameter_ticket;
-  using SystemBase::pa_ticket;
-  using SystemBase::all_parameters_ticket;
-  using SystemBase::input_port_ticket;
+  using SystemBase::abstract_state_ticket;
+  using SystemBase::accuracy_ticket;
   using SystemBase::all_input_ports_ticket;
+  using SystemBase::all_parameters_ticket;
   using SystemBase::all_sources_ticket;
+  using SystemBase::all_state_ticket;
   using SystemBase::cache_entry_ticket;
   using SystemBase::configuration_ticket;
-  using SystemBase::kinematics_ticket;
-  using SystemBase::xcdot_ticket;
-  using SystemBase::pe_ticket;
+  using SystemBase::discrete_state_ticket;
+  using SystemBase::input_port_ticket;
   using SystemBase::ke_ticket;
+  using SystemBase::kinematics_ticket;
+  using SystemBase::nothing_ticket;
+  using SystemBase::numeric_parameter_ticket;
+  using SystemBase::pa_ticket;
   using SystemBase::pc_ticket;
+  using SystemBase::pe_ticket;
+  using SystemBase::pn_ticket;
   using SystemBase::pnc_ticket;
+  using SystemBase::q_ticket;
+  using SystemBase::time_ticket;
+  using SystemBase::v_ticket;
+  using SystemBase::xa_ticket;
+  using SystemBase::xc_ticket;
+  using SystemBase::xcdot_ticket;
+  using SystemBase::xd_ticket;
+  using SystemBase::z_ticket;
 
   // Don't promote output_port_ticket() since it is for internal use only.
 
  protected:
   /** Derived classes will implement this method to evaluate a witness function
   at the given context. */
-  virtual T DoCalcWitnessValue(
-      const Context<T>& context,
-      const WitnessFunction<T>& witness_func) const = 0;
+  virtual T DoCalcWitnessValue(const Context<T>& context, const WitnessFunction<T>& witness_func) const = 0;
 
   /** Derived classes can override this method to provide witness functions
   active for the given state. The default implementation does nothing. On
   entry to this function, the context will have already been validated and
   the vector of witness functions will have been validated to be both empty
   and non-null. */
-  virtual void DoGetWitnessFunctions(const Context<T>&,
-      std::vector<const WitnessFunction<T>*>*) const;
+  virtual void DoGetWitnessFunctions(const Context<T>&, std::vector<const WitnessFunction<T>*>*) const;
 
   //----------------------------------------------------------------------------
   /** @name                 Event handler dispatch mechanism
@@ -1341,31 +1272,26 @@ class System : public SystemBase {
 
   /** This function dispatches all publish events to the appropriate
   handlers. */
-  virtual void DispatchPublishHandler(
-      const Context<T>& context,
-      const EventCollection<PublishEvent<T>>& events) const = 0;
+  virtual void DispatchPublishHandler(const Context<T>& context,
+                                      const EventCollection<PublishEvent<T>>& events) const = 0;
 
   /** This function dispatches all discrete update events to the appropriate
   handlers. @p discrete_state cannot be null. */
-  virtual void DispatchDiscreteVariableUpdateHandler(
-      const Context<T>& context,
-      const EventCollection<DiscreteUpdateEvent<T>>& events,
-      DiscreteValues<T>* discrete_state) const = 0;
+  virtual void DispatchDiscreteVariableUpdateHandler(const Context<T>& context,
+                                                     const EventCollection<DiscreteUpdateEvent<T>>& events,
+                                                     DiscreteValues<T>* discrete_state) const = 0;
 
-  virtual void DoApplyDiscreteVariableUpdate(
-      const EventCollection<DiscreteUpdateEvent<T>>& events,
-      DiscreteValues<T>* discrete_state, Context<T>* context) const = 0;
+  virtual void DoApplyDiscreteVariableUpdate(const EventCollection<DiscreteUpdateEvent<T>>& events,
+                                             DiscreteValues<T>* discrete_state, Context<T>* context) const = 0;
 
   /** This function dispatches all unrestricted update events to the appropriate
   handlers. @p state cannot be null. */
-  virtual void DispatchUnrestrictedUpdateHandler(
-      const Context<T>& context,
-      const EventCollection<UnrestrictedUpdateEvent<T>>& events,
-      State<T>* state) const = 0;
+  virtual void DispatchUnrestrictedUpdateHandler(const Context<T>& context,
+                                                 const EventCollection<UnrestrictedUpdateEvent<T>>& events,
+                                                 State<T>* state) const = 0;
 
-  virtual void DoApplyUnrestrictedUpdate(
-      const EventCollection<UnrestrictedUpdateEvent<T>>& events,
-      State<T>* state, Context<T>* context) const = 0;
+  virtual void DoApplyUnrestrictedUpdate(const EventCollection<UnrestrictedUpdateEvent<T>>& events, State<T>* state,
+                                         Context<T>* context) const = 0;
   //@}
 
   //----------------------------------------------------------------------------
@@ -1397,9 +1323,8 @@ class System : public SystemBase {
   @pre @p name must not be empty.
   @throws std::exception for a duplicate port name.
   @returns the declared port. */
-  InputPort<T>& DeclareInputPort(
-      std::variant<std::string, UseDefaultName> name, PortDataType type,
-      int size, std::optional<RandomDistribution> random_type = std::nullopt);
+  InputPort<T>& DeclareInputPort(std::variant<std::string, UseDefaultName> name, PortDataType type, int size,
+                                 std::optional<RandomDistribution> random_type = std::nullopt);
 
   //@}
 
@@ -1412,15 +1337,13 @@ class System : public SystemBase {
   //@{
 
   DRAKE_DEPRECATED("2021-10-01", "Pass a port name as the first argument.")
-  InputPort<T>& DeclareInputPort(
-      PortDataType type, int size,
-      std::optional<RandomDistribution> random_type = std::nullopt);
+  InputPort<T>& DeclareInputPort(PortDataType type, int size,
+                                 std::optional<RandomDistribution> random_type = std::nullopt);
   //@}
 
   /** Adds an already-created constraint to the list of constraints for this
   System.  Ownership of the SystemConstraint is transferred to this system. */
-  SystemConstraintIndex AddConstraint(
-      std::unique_ptr<SystemConstraint<T>> constraint);
+  SystemConstraintIndex AddConstraint(std::unique_ptr<SystemConstraint<T>> constraint);
 
   //----------------------------------------------------------------------------
   /** @name               Virtual methods for calculations
@@ -1454,8 +1377,7 @@ class System : public SystemBase {
 
   The default implementation does nothing if the `derivatives` vector is
   size zero and aborts otherwise. */
-  virtual void DoCalcTimeDerivatives(const Context<T>& context,
-                                     ContinuousState<T>* derivatives) const;
+  virtual void DoCalcTimeDerivatives(const Context<T>& context, ContinuousState<T>* derivatives) const;
 
   /** Override this if you have an efficient way to evaluate the implicit
   time derivatives residual for this System. Otherwise the default
@@ -1470,9 +1392,9 @@ class System : public SystemBase {
   SystemBase::implicit_time_derivatives_residual_size()). You do not have to
   check those two conditions in your implementation, but if you have additional
   restrictions you should validate that they are also met. */
-  virtual void DoCalcImplicitTimeDerivativesResidual(
-      const Context<T>& context, const ContinuousState<T>& proposed_derivatives,
-      EigenPtr<VectorX<T>> residual) const;
+  virtual void DoCalcImplicitTimeDerivativesResidual(const Context<T>& context,
+                                                     const ContinuousState<T>& proposed_derivatives,
+                                                     EigenPtr<VectorX<T>> residual) const;
 
   /** Computes the next time at which this System must perform a discrete
   action.
@@ -1491,17 +1413,14 @@ class System : public SystemBase {
 
   The default implementation returns with the next sample time being
   Infinity and no events added to @p events. */
-  virtual void DoCalcNextUpdateTime(const Context<T>& context,
-                                    CompositeEventCollection<T>* events,
-                                    T* time) const;
+  virtual void DoCalcNextUpdateTime(const Context<T>& context, CompositeEventCollection<T>* events, T* time) const;
 
   /** Implement this method to return all periodic triggered events.
   @see GetPeriodicEvents() for a detailed description of the returned
        variable.
   @note The default implementation returns an empty map. */
-  virtual std::map<PeriodicEventData,
-      std::vector<const Event<T>*>, PeriodicEventDataComparator>
-    DoGetPeriodicEvents() const = 0;
+  virtual std::map<PeriodicEventData, std::vector<const Event<T>*>, PeriodicEventDataComparator> DoGetPeriodicEvents()
+      const = 0;
 
   /** Implement this method to return any events to be handled before the
   simulator integrates the system's continuous state at each time step.
@@ -1512,9 +1431,7 @@ class System : public SystemBase {
 
   The default implementation returns without changing @p events.
   @sa GetPerStepEvents() */
-  virtual void DoGetPerStepEvents(
-      const Context<T>& context,
-      CompositeEventCollection<T>* events) const;
+  virtual void DoGetPerStepEvents(const Context<T>& context, CompositeEventCollection<T>* events) const;
 
   /** Implement this method to return any events to be handled at the
   simulator's initialization step. @p events is cleared in the public
@@ -1524,9 +1441,7 @@ class System : public SystemBase {
 
   The default implementation returns without changing @p events.
   @sa GetInitializationEvents() */
-  virtual void DoGetInitializationEvents(
-      const Context<T>& context,
-      CompositeEventCollection<T>* events) const;
+  virtual void DoGetInitializationEvents(const Context<T>& context, CompositeEventCollection<T>* events) const;
 
   /** Override this method for physical systems to calculate the potential
   energy PE currently stored in the configuration provided in the given
@@ -1592,8 +1507,7 @@ class System : public SystemBase {
   implement DoMapVelocityToQDot(). Implementations may assume that `qdot`
   has already been validated to be the same size as `q` in the given
   Context, and that `generalized_velocity` is non-null. */
-  virtual void DoMapQDotToVelocity(const Context<T>& context,
-                                   const Eigen::Ref<const VectorX<T>>& qdot,
+  virtual void DoMapQDotToVelocity(const Context<T>& context, const Eigen::Ref<const VectorX<T>>& qdot,
                                    VectorBase<T>* generalized_velocity) const;
 
   /** Provides the substantive implementation of MapVelocityToQDot().
@@ -1614,10 +1528,8 @@ class System : public SystemBase {
   implement DoMapQDotToVelocity(). Implementations may assume that
   `generalized_velocity` has already been validated to be the same size as
   `v` in the given Context, and that `qdot` is non-null. */
-  virtual void DoMapVelocityToQDot(
-      const Context<T>& context,
-      const Eigen::Ref<const VectorX<T>>& generalized_velocity,
-      VectorBase<T>* qdot) const;
+  virtual void DoMapVelocityToQDot(const Context<T>& context, const Eigen::Ref<const VectorX<T>>& generalized_velocity,
+                                   VectorBase<T>* qdot) const;
   //@}
 
   //----------------------------------------------------------------------------
@@ -1628,80 +1540,62 @@ class System : public SystemBase {
   index @p port_index in this system. All input ports that directly depend
   on this output port will be notified that upstream data has changed, and
   may invalidate cache entries as a result. */
-  Eigen::VectorBlock<VectorX<T>> GetMutableOutputVector(SystemOutput<T>* output,
-                                                        int port_index) const;
+  Eigen::VectorBlock<VectorX<T>> GetMutableOutputVector(SystemOutput<T>* output, int port_index) const;
   //@}
 
-  bool forced_publish_events_exist() const {
-    return forced_publish_events_ != nullptr;
-  }
+  bool forced_publish_events_exist() const { return forced_publish_events_ != nullptr; }
 
-  bool forced_discrete_update_events_exist() const {
-    return forced_discrete_update_events_ != nullptr;
-  }
+  bool forced_discrete_update_events_exist() const { return forced_discrete_update_events_ != nullptr; }
 
-  bool forced_unrestricted_update_events_exist() const {
-    return forced_unrestricted_update_events_ != nullptr;
-  }
+  bool forced_unrestricted_update_events_exist() const { return forced_unrestricted_update_events_ != nullptr; }
 
   EventCollection<PublishEvent<T>>& get_mutable_forced_publish_events() {
     MALIPUT_DRAKE_DEMAND(forced_publish_events_ != nullptr);
     return *forced_publish_events_;
   }
 
-  EventCollection<DiscreteUpdateEvent<T>>&
-  get_mutable_forced_discrete_update_events() {
+  EventCollection<DiscreteUpdateEvent<T>>& get_mutable_forced_discrete_update_events() {
     MALIPUT_DRAKE_DEMAND(forced_discrete_update_events_ != nullptr);
     return *forced_discrete_update_events_;
   }
 
-  EventCollection<UnrestrictedUpdateEvent<T>>&
-  get_mutable_forced_unrestricted_update_events() {
+  EventCollection<UnrestrictedUpdateEvent<T>>& get_mutable_forced_unrestricted_update_events() {
     MALIPUT_DRAKE_DEMAND(forced_unrestricted_update_events_ != nullptr);
     return *forced_unrestricted_update_events_;
   }
 
-  const EventCollection<PublishEvent<T>>&
-  get_forced_publish_events() const {
+  const EventCollection<PublishEvent<T>>& get_forced_publish_events() const {
     MALIPUT_DRAKE_DEMAND(forced_publish_events_ != nullptr);
     return *forced_publish_events_;
   }
 
-  const EventCollection<DiscreteUpdateEvent<T>>&
-  get_forced_discrete_update_events() const {
+  const EventCollection<DiscreteUpdateEvent<T>>& get_forced_discrete_update_events() const {
     MALIPUT_DRAKE_DEMAND(forced_discrete_update_events_ != nullptr);
     return *forced_discrete_update_events_;
   }
 
-  const EventCollection<UnrestrictedUpdateEvent<T>>&
-  get_forced_unrestricted_update_events() const {
+  const EventCollection<UnrestrictedUpdateEvent<T>>& get_forced_unrestricted_update_events() const {
     MALIPUT_DRAKE_DEMAND(forced_unrestricted_update_events_ != nullptr);
     return *forced_unrestricted_update_events_;
   }
 
-  void set_forced_publish_events(
-  std::unique_ptr<EventCollection<PublishEvent<T>>> forced) {
+  void set_forced_publish_events(std::unique_ptr<EventCollection<PublishEvent<T>>> forced) {
     forced_publish_events_ = std::move(forced);
   }
 
-  void set_forced_discrete_update_events(
-  std::unique_ptr<EventCollection<DiscreteUpdateEvent<T>>> forced) {
+  void set_forced_discrete_update_events(std::unique_ptr<EventCollection<DiscreteUpdateEvent<T>>> forced) {
     forced_discrete_update_events_ = std::move(forced);
   }
 
-  void set_forced_unrestricted_update_events(
-  std::unique_ptr<EventCollection<UnrestrictedUpdateEvent<T>>> forced) {
+  void set_forced_unrestricted_update_events(std::unique_ptr<EventCollection<UnrestrictedUpdateEvent<T>>> forced) {
     forced_unrestricted_update_events_ = std::move(forced);
   }
 
   /** Returns the SystemScalarConverter for `this` system. */
-  SystemScalarConverter& get_mutable_system_scalar_converter() {
-    return system_scalar_converter_;
-  }
+  SystemScalarConverter& get_mutable_system_scalar_converter() { return system_scalar_converter_; }
 
   template <template <typename> class Clazz>
-  DRAKE_DEPRECATED("2021-09-01",
-                   "Please use ValidateCreatedForThisSystem instead.")
+  DRAKE_DEPRECATED("2021-09-01", "Please use ValidateCreatedForThisSystem instead.")
   void ValidateChildOfContext(const Clazz<T>* object) const {
     ValidateCreatedForThisSystem(object);
   }
@@ -1710,37 +1604,33 @@ class System : public SystemBase {
   // For any T1 & T2, System<T1> considers System<T2> a friend, so that System
   // can safely and efficiently convert scalar types. See for example
   // System<T>::ToScalarTypeMaybe.
-  template <typename> friend class System;
+  template <typename>
+  friend class System;
 
   // Allocates an input of the leaf type that the System requires on the port
   // specified by @p input_port.  This is final in LeafSystem and Diagram.
-  virtual std::unique_ptr<AbstractValue> DoAllocateInput(
-      const InputPort<T>& input_port) const = 0;
+  virtual std::unique_ptr<AbstractValue> DoAllocateInput(const InputPort<T>& input_port) const = 0;
 
   // Allocates a composite event collection for use with this system.
   // Implementers should not set system_id; that is done by the wrapping
   // AllocateCompositeEventCollection method. This method is final in
   // LeafSystem and Diagram.
-  virtual std::unique_ptr<CompositeEventCollection<T>>
-  DoAllocateCompositeEventCollection() const = 0;
+  virtual std::unique_ptr<CompositeEventCollection<T>> DoAllocateCompositeEventCollection() const = 0;
 
-  std::function<void(const AbstractValue&)> MakeFixInputPortTypeChecker(
-      InputPortIndex port_index) const final;
+  std::function<void(const AbstractValue&)> MakeFixInputPortTypeChecker(InputPortIndex port_index) const final;
 
   // Shared code for updating a vector input port and returning a pointer to its
   // value as a BasicVector<T>, or nullptr if the port is not connected. Throws
   // a logic_error if the port_index is out of range or if the input port is not
   // declared to be a vector-valued port. `func` should be the user-visible API
   // function name obtained with __func__.
-  const BasicVector<T>* EvalBasicVectorInputImpl(
-      const char* func, const Context<T>& context,
-      InputPortIndex port_index) const;
+  const BasicVector<T>* EvalBasicVectorInputImpl(const char* func, const Context<T>& context,
+                                                 InputPortIndex port_index) const;
 
   // Adds "external" constraints to this System.  This is a helper function to
   // minimize inline bloat in scalar conversion; it is marked private since the
   // signature matches the private data field type for efficiency.
-  void AddExternalConstraints(
-      const std::vector<ExternalSystemConstraint>& constraints);
+  void AddExternalConstraints(const std::vector<ExternalSystemConstraint>& constraints);
 
   // The constraints_ vector encompass all constraints on this system, whether
   // they were declared by a concrete subclass during construction (e.g., by
@@ -1760,12 +1650,9 @@ class System : public SystemBase {
   // these contain at least one kForced triggered event. For a Diagram, they
   // are DiagramEventCollection, whose leafs are LeafEventCollection with
   // one or more kForced triggered events.
-  std::unique_ptr<EventCollection<PublishEvent<T>>>
-      forced_publish_events_{nullptr};
-  std::unique_ptr<EventCollection<DiscreteUpdateEvent<T>>>
-      forced_discrete_update_events_{nullptr};
-  std::unique_ptr<EventCollection<UnrestrictedUpdateEvent<T>>>
-      forced_unrestricted_update_events_{nullptr};
+  std::unique_ptr<EventCollection<PublishEvent<T>>> forced_publish_events_{nullptr};
+  std::unique_ptr<EventCollection<DiscreteUpdateEvent<T>>> forced_discrete_update_events_{nullptr};
+  std::unique_ptr<EventCollection<UnrestrictedUpdateEvent<T>>> forced_unrestricted_update_events_{nullptr};
 
   // Functions to convert this system to use alternative scalar types.
   SystemScalarConverter system_scalar_converter_;
@@ -1780,5 +1667,4 @@ class System : public SystemBase {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::System)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::System)

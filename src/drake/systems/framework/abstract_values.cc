@@ -9,19 +9,15 @@ AbstractValues::~AbstractValues() {}
 
 AbstractValues::AbstractValues() {}
 
-AbstractValues::AbstractValues(
-    std::vector<std::unique_ptr<AbstractValue>>&& data)
-    : owned_data_(std::move(data)) {
+AbstractValues::AbstractValues(std::vector<std::unique_ptr<AbstractValue>>&& data) : owned_data_(std::move(data)) {
   for (auto& datum : owned_data_) {
     data_.push_back(datum.get());
   }
 }
 
-AbstractValues::AbstractValues(const std::vector<AbstractValue*>& data)
-    : data_(data) {}
+AbstractValues::AbstractValues(const std::vector<AbstractValue*>& data) : data_(data) {}
 
-AbstractValues::AbstractValues(std::unique_ptr<AbstractValue> datum)
-    : AbstractValues() {
+AbstractValues::AbstractValues(std::unique_ptr<AbstractValue> datum) : AbstractValues() {
   data_.push_back(datum.get());
   owned_data_.push_back(std::move(datum));
 }

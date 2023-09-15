@@ -10,13 +10,10 @@ namespace maliput::drake {
 /// absolute elementwise @p tolerance.  Special values (infinities, NaN, etc.)
 /// do not compare as equal elements.
 template <typename DerivedA, typename DerivedB>
-bool is_approx_equal_abstol(const Eigen::MatrixBase<DerivedA>& m1,
-                            const Eigen::MatrixBase<DerivedB>& m2,
+bool is_approx_equal_abstol(const Eigen::MatrixBase<DerivedA>& m1, const Eigen::MatrixBase<DerivedB>& m2,
                             double tolerance) {
-  return (
-      (m1.rows() == m2.rows()) &&
-      (m1.cols() == m2.cols()) &&
-      ((m1 - m2).template lpNorm<Eigen::Infinity>() <= tolerance));
+  return ((m1.rows() == m2.rows()) && (m1.cols() == m2.cols()) &&
+          ((m1 - m2).template lpNorm<Eigen::Infinity>() <= tolerance));
 }
 
 /// Returns true if and only if a simple greedy search reveals a permutation
@@ -35,9 +32,8 @@ bool is_approx_equal_abstol(const Eigen::MatrixBase<DerivedA>& m1,
 /// pool. It is possible that other columns of m2 would also match m1(i) but
 /// that m2(j) is the only match possible for a later column of m1.
 template <typename DerivedA, typename DerivedB>
-bool IsApproxEqualAbsTolWithPermutedColumns(
-    const Eigen::MatrixBase<DerivedA>& m1,
-    const Eigen::MatrixBase<DerivedB>& m2, double tolerance) {
+bool IsApproxEqualAbsTolWithPermutedColumns(const Eigen::MatrixBase<DerivedA>& m1,
+                                            const Eigen::MatrixBase<DerivedB>& m2, double tolerance) {
   if ((m1.cols() != m2.cols()) || (m1.rows() != m2.rows())) return false;
 
   std::vector<bool> available(m2.cols());
@@ -46,8 +42,7 @@ bool IsApproxEqualAbsTolWithPermutedColumns(
   for (int i = 0; i < m1.cols(); i++) {
     bool found_match = false;
     for (int j = 0; j < m2.cols(); j++) {
-      if (available[j] &&
-          is_approx_equal_abstol(m1.col(i), m2.col(j), tolerance)) {
+      if (available[j] && is_approx_equal_abstol(m1.col(i), m2.col(j), tolerance)) {
         found_match = true;
         available[j] = false;
         break;
@@ -57,6 +52,5 @@ bool IsApproxEqualAbsTolWithPermutedColumns(
   }
   return true;
 }
-
 
 }  // namespace maliput::drake

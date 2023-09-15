@@ -29,24 +29,21 @@ State<T>& Context<T>::get_mutable_state() {
 template <typename T>
 ContinuousState<T>& Context<T>::get_mutable_continuous_state() {
   const int64_t change_event = this->start_new_change_event();
-  PropagateBulkChange(change_event,
-                      &Context<T>::NoteAllContinuousStateChanged);
+  PropagateBulkChange(change_event, &Context<T>::NoteAllContinuousStateChanged);
   return do_access_mutable_state().get_mutable_continuous_state();
 }
 
 template <typename T>
 DiscreteValues<T>& Context<T>::get_mutable_discrete_state() {
   const int64_t change_event = this->start_new_change_event();
-  PropagateBulkChange(change_event,
-                      &Context<T>::NoteAllDiscreteStateChanged);
+  PropagateBulkChange(change_event, &Context<T>::NoteAllDiscreteStateChanged);
   return do_access_mutable_state().get_mutable_discrete_state();
 }
 
 template <typename T>
 AbstractValues& Context<T>::get_mutable_abstract_state() {
   const int64_t change_event = this->start_new_change_event();
-  PropagateBulkChange(change_event,
-                      &Context<T>::NoteAllAbstractStateChanged);
+  PropagateBulkChange(change_event, &Context<T>::NoteAllAbstractStateChanged);
   return do_access_mutable_state().get_mutable_abstract_state();
 }
 
@@ -60,16 +57,14 @@ Parameters<T>& Context<T>::get_mutable_parameters() {
 template <typename T>
 BasicVector<T>& Context<T>::get_mutable_numeric_parameter(int index) {
   const int64_t change_event = this->start_new_change_event();
-  PropagateBulkChange(change_event,
-                      &Context<T>::NoteAllNumericParametersChanged);
+  PropagateBulkChange(change_event, &Context<T>::NoteAllNumericParametersChanged);
   return parameters_->get_mutable_numeric_parameter(index);
 }
 
 template <typename T>
 AbstractValue& Context<T>::get_mutable_abstract_parameter(int index) {
   const int64_t change_event = this->start_new_change_event();
-  PropagateBulkChange(change_event,
-                      &Context<T>::NoteAllAbstractParametersChanged);
+  PropagateBulkChange(change_event, &Context<T>::NoteAllAbstractParametersChanged);
   return parameters_->get_mutable_abstract_parameter(index);
 }
 
@@ -90,8 +85,7 @@ std::pair<VectorBase<T>*, VectorBase<T>*> Context<T>::GetMutableVZVectors() {
   PropagateBulkChange(change_event, &Context<T>::NoteAllVZChanged);
   ContinuousState<T>& xc =  // No invalidation here.
       do_access_mutable_state().get_mutable_continuous_state();
-  return {&xc.get_mutable_generalized_velocity(),
-          &xc.get_mutable_misc_continuous_state()};
+  return {&xc.get_mutable_generalized_velocity(), &xc.get_mutable_misc_continuous_state()};
 }
 
 template <typename T>
@@ -125,9 +119,8 @@ template <typename T>
 Context<T>::Context(const Context<T>&) = default;
 
 template <typename T>
-void Context<T>::PropagateTimeChange(
-    Context<T>* context, const T& time, const std::optional<T>& true_time,
-    int64_t change_event) {
+void Context<T>::PropagateTimeChange(Context<T>* context, const T& time, const std::optional<T>& true_time,
+                                     int64_t change_event) {
   MALIPUT_DRAKE_ASSERT(context != nullptr);
   context->NoteTimeChanged(change_event);
   context->time_ = time;
@@ -136,9 +129,8 @@ void Context<T>::PropagateTimeChange(
 }
 
 template <typename T>
-void Context<T>::PropagateAccuracyChange(
-    Context<T>* context, const std::optional<double>& accuracy,
-    int64_t change_event) {
+void Context<T>::PropagateAccuracyChange(Context<T>* context, const std::optional<double>& accuracy,
+                                         int64_t change_event) {
   MALIPUT_DRAKE_ASSERT(context != nullptr);
   context->NoteAccuracyChanged(change_event);
   context->accuracy_ = accuracy;
@@ -146,10 +138,8 @@ void Context<T>::PropagateAccuracyChange(
 }
 
 template <typename T>
-std::unique_ptr<Context<T>> Context<T>::CloneWithoutPointers(
-    const Context<T>& source) {
-  return dynamic_pointer_cast_or_throw<Context<T>>(
-      ContextBase::CloneWithoutPointers(source));
+std::unique_ptr<Context<T>> Context<T>::CloneWithoutPointers(const Context<T>& source) {
+  return dynamic_pointer_cast_or_throw<Context<T>>(ContextBase::CloneWithoutPointers(source));
 }
 
 template <typename T>
@@ -174,8 +164,7 @@ void Context<T>::init_parameters(std::unique_ptr<Parameters<T>> params) {
 }
 
 template <typename T>
-void Context<T>::ThrowIfNotRootContext(
-    const char* func_name, const char* quantity) const {
+void Context<T>::ThrowIfNotRootContext(const char* func_name, const char* quantity) const {
   if (!is_root_context()) {
     std::ostringstream oss;
     oss << func_name << "(): " << quantity;
@@ -185,17 +174,14 @@ void Context<T>::ThrowIfNotRootContext(
 }
 
 template <typename T>
-void Context<T>::SetTimeAndNoteContinuousStateChangeHelper(
-    const char* func_name, const T& time_sec) {
+void Context<T>::SetTimeAndNoteContinuousStateChangeHelper(const char* func_name, const T& time_sec) {
   ThrowIfNotRootContext(func_name, "Time");
   const int64_t change_event = this->start_new_change_event();
   PropagateTimeChange(this, time_sec, {}, change_event);
-  PropagateBulkChange(change_event,
-                      &Context<T>::NoteAllContinuousStateChanged);
+  PropagateBulkChange(change_event, &Context<T>::NoteAllContinuousStateChanged);
 }
 
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::Context)
+DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::Context)

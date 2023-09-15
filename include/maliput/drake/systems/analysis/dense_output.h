@@ -124,9 +124,7 @@ class DenseOutput {
   //          be less than or equal to that of indexing
   //          DoEvaluate(const T&) return value.
   // @see Evaluate(const T&, int)
-  virtual T DoEvaluateNth(const T& t, int n) const {
-    return this->DoEvaluate(t)(n);
-  }
+  virtual T DoEvaluateNth(const T& t, int n) const { return this->DoEvaluate(t)(n); }
 
   // @see is_empty()
   virtual bool do_is_empty() const = 0;
@@ -184,5 +182,4 @@ class DenseOutput {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::systems::DenseOutput)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::systems::DenseOutput)

@@ -49,10 +49,8 @@ class VectorSystem : public LeafSystem<T> {
   /// enable AutoDiff support, use the SystemScalarConverter-based constructor.
   /// (For that, see @ref system_scalar_conversion at the example titled
   /// "Example using maliput::drake::systems::VectorSystem as the base class".)
-  VectorSystem(int input_size, int output_size,
-               std::optional<bool> direct_feedthrough = std::nullopt)
-      : VectorSystem(SystemScalarConverter{}, input_size, output_size,
-                     direct_feedthrough) {}
+  VectorSystem(int input_size, int output_size, std::optional<bool> direct_feedthrough = std::nullopt)
+      : VectorSystem(SystemScalarConverter{}, input_size, output_size, direct_feedthrough) {}
 
   /// Creates a system with one input port and one output port of the given
   /// sizes, when the sizes are non-zero.  Either size can be zero, in which
@@ -82,29 +80,25 @@ class VectorSystem : public LeafSystem<T> {
       std::set<DependencyTicket> prerequisites_of_calc;
       if (direct_feedthrough.value_or(true)) {
         // Depend on everything.
-        prerequisites_of_calc = {
-          this->all_sources_ticket()
-        };
+        prerequisites_of_calc = {this->all_sources_ticket()};
       } else {
         // Depend on everything *except* for the inputs.
         prerequisites_of_calc = {
-          this->time_ticket(),
-          this->accuracy_ticket(),
-          this->all_state_ticket(),
-          this->all_parameters_ticket(),
+            this->time_ticket(),
+            this->accuracy_ticket(),
+            this->all_state_ticket(),
+            this->all_parameters_ticket(),
         };
       }
-      this->DeclareVectorOutputPort(
-          kUseDefaultName, output_size,
-          &VectorSystem::CalcVectorOutput, std::move(prerequisites_of_calc));
+      this->DeclareVectorOutputPort(kUseDefaultName, output_size, &VectorSystem::CalcVectorOutput,
+                                    std::move(prerequisites_of_calc));
     }
   }
 
   /// Causes the vector-valued input port to become up-to-date, and returns
   /// the port's value as an %Eigen vector.  If the system has zero inputs,
   /// then returns an empty vector.
-  Eigen::VectorBlock<const VectorX<T>> EvalVectorInput(
-      const Context<T>& context) const {
+  Eigen::VectorBlock<const VectorX<T>> EvalVectorInput(const Context<T>& context) const {
     // Obtain the block form of u (or the empty vector).
     if (this->num_input_ports() > 0) {
       return this->get_input_port().Eval(context);
@@ -115,8 +109,7 @@ class VectorSystem : public LeafSystem<T> {
 
   /// Returns a reference to an %Eigen vector version of the state from within
   /// the %Context.
-  Eigen::VectorBlock<const VectorX<T>> GetVectorState(
-      const Context<T>& context) const {
+  Eigen::VectorBlock<const VectorX<T>> GetVectorState(const Context<T>& context) const {
     // Obtain the block form of xc or xd.
     MALIPUT_DRAKE_ASSERT(context.num_abstract_states() == 0);
     const BasicVector<T>* state_vector{};
@@ -133,15 +126,13 @@ class VectorSystem : public LeafSystem<T> {
 
   /// Converts the parameters to Eigen::VectorBlock form, then delegates to
   /// DoCalcVectorTimeDerivatives().
-  void DoCalcTimeDerivatives(const Context<T>& context,
-                             ContinuousState<T>* derivatives) const final {
+  void DoCalcTimeDerivatives(const Context<T>& context, ContinuousState<T>* derivatives) const final {
     // Short-circuit when there's no work to do.
     if (derivatives->size() == 0) {
       return;
     }
 
-    const Eigen::VectorBlock<const VectorX<T>> input_block =
-        EvalVectorInput(context);
+    const Eigen::VectorBlock<const VectorX<T>> input_block = EvalVectorInput(context);
 
     // Obtain the block form of xc.
     MALIPUT_DRAKE_ASSERT(context.has_only_continuous_state());
@@ -155,44 +146,36 @@ class VectorSystem : public LeafSystem<T> {
         dynamic_cast<BasicVector<T>&>(derivatives_vector).get_mutable_value();
 
     // Delegate to subclass.
-    DoCalcVectorTimeDerivatives(context, input_block, state_block,
-                                &derivatives_block);
+    DoCalcVectorTimeDerivatives(context, input_block, state_block, &derivatives_block);
   }
 
   /// Converts the parameters to Eigen::VectorBlock form, then delegates to
   /// DoCalcVectorDiscreteVariableUpdates().
-  void DoCalcDiscreteVariableUpdates(
-      const Context<T>& context,
-      const std::vector<const DiscreteUpdateEvent<T>*>&,
-      DiscreteValues<T>* discrete_state) const final {
+  void DoCalcDiscreteVariableUpdates(const Context<T>& context, const std::vector<const DiscreteUpdateEvent<T>*>&,
+                                     DiscreteValues<T>* discrete_state) const final {
     // Short-circuit when there's no work to do.
     if (discrete_state->num_groups() == 0) {
       return;
     }
 
-    const Eigen::VectorBlock<const VectorX<T>> input_block =
-        EvalVectorInput(context);
+    const Eigen::VectorBlock<const VectorX<T>> input_block = EvalVectorInput(context);
 
     // Obtain the block form of xd before the update (i.e., the prior state).
     MALIPUT_DRAKE_ASSERT(context.has_only_discrete_state());
     const BasicVector<T>& state_vector = context.get_discrete_state(0);
-    const Eigen::VectorBlock<const VectorX<T>> state_block =
-        state_vector.get_value();
+    const Eigen::VectorBlock<const VectorX<T>> state_block = state_vector.get_value();
 
     // Obtain the block form of xd after the update (i.e., the next state).
     MALIPUT_DRAKE_ASSERT(discrete_state != nullptr);
-    Eigen::VectorBlock<VectorX<T>> discrete_update_block =
-        discrete_state->get_mutable_value();
+    Eigen::VectorBlock<VectorX<T>> discrete_update_block = discrete_state->get_mutable_value();
 
     // Delegate to subclass.
-    DoCalcVectorDiscreteVariableUpdates(context, input_block, state_block,
-                                        &discrete_update_block);
+    DoCalcVectorDiscreteVariableUpdates(context, input_block, state_block, &discrete_update_block);
   }
 
   /// Converts the parameters to Eigen::VectorBlock form, then delegates to
   /// DoCalcVectorOutput().
-  void CalcVectorOutput(const Context<T>& context,
-                        BasicVector<T>* output) const {
+  void CalcVectorOutput(const Context<T>& context, BasicVector<T>* output) const {
     // Should only get here if we've declared an output.
     MALIPUT_DRAKE_ASSERT(this->num_output_ports() > 0);
 
@@ -225,9 +208,8 @@ class VectorSystem : public LeafSystem<T> {
       // evaluate the input, even if the system is not supposed to have
       // feedthrough -- it is merely providing extra ignored data to the
       // DoCalcVectorOutput helper.
-      constexpr bool is_symbolic = false; // std::is_same_v<T, symbolic::Expression>;
-      const bool is_fixed_input =
-          (context.MaybeGetFixedInputPortValue(0) != nullptr);
+      constexpr bool is_symbolic = false;  // std::is_same_v<T, symbolic::Expression>;
+      const bool is_fixed_input = (context.MaybeGetFixedInputPortValue(0) != nullptr);
       if (is_symbolic && is_fixed_input) {
         should_eval_input = true;
       } else {
@@ -239,12 +221,10 @@ class VectorSystem : public LeafSystem<T> {
     // create a computational loop.
     static const never_destroyed<VectorX<T>> empty_vector(0);
     Eigen::VectorBlock<const VectorX<T>> input_block =
-        should_eval_input ? EvalVectorInput(context) :
-        empty_vector.access().segment(0, 0);
+        should_eval_input ? EvalVectorInput(context) : empty_vector.access().segment(0, 0);
 
     // Obtain the block form of xc or xd.
-    const Eigen::VectorBlock<const VectorX<T>> state_block =
-        GetVectorState(context);
+    const Eigen::VectorBlock<const VectorX<T>> state_block = GetVectorState(context);
 
     // Obtain the block form of y.
     Eigen::VectorBlock<VectorX<T>> output_block = output->get_mutable_value();
@@ -268,11 +248,9 @@ class VectorSystem : public LeafSystem<T> {
   ///
   /// By default, this function does nothing if the @p output is empty,
   /// and throws an exception otherwise.
-  virtual void DoCalcVectorOutput(
-      const Context<T>& context,
-      const Eigen::VectorBlock<const VectorX<T>>& input,
-      const Eigen::VectorBlock<const VectorX<T>>& state,
-      Eigen::VectorBlock<VectorX<T>>* output) const {
+  virtual void DoCalcVectorOutput(const Context<T>& context, const Eigen::VectorBlock<const VectorX<T>>& input,
+                                  const Eigen::VectorBlock<const VectorX<T>>& state,
+                                  Eigen::VectorBlock<VectorX<T>>* output) const {
     unused(context, input, state);
     MALIPUT_DRAKE_THROW_UNLESS(output->size() == 0);
   }
@@ -287,11 +265,9 @@ class VectorSystem : public LeafSystem<T> {
   ///
   /// By default, this function does nothing if the @p derivatives are empty,
   /// and throws an exception otherwise.
-  virtual void DoCalcVectorTimeDerivatives(
-      const Context<T>& context,
-      const Eigen::VectorBlock<const VectorX<T>>& input,
-      const Eigen::VectorBlock<const VectorX<T>>& state,
-      Eigen::VectorBlock<VectorX<T>>* derivatives) const {
+  virtual void DoCalcVectorTimeDerivatives(const Context<T>& context, const Eigen::VectorBlock<const VectorX<T>>& input,
+                                           const Eigen::VectorBlock<const VectorX<T>>& state,
+                                           Eigen::VectorBlock<VectorX<T>>* derivatives) const {
     unused(context, input, state);
     MALIPUT_DRAKE_THROW_UNLESS(derivatives->size() == 0);
   }
@@ -308,19 +284,17 @@ class VectorSystem : public LeafSystem<T> {
   ///
   /// By default, this function does nothing if the @p next_state is
   /// empty, and throws an exception otherwise.
-  virtual void DoCalcVectorDiscreteVariableUpdates(
-      const Context<T>& context,
-      const Eigen::VectorBlock<const VectorX<T>>& input,
-      const Eigen::VectorBlock<const VectorX<T>>& state,
-      Eigen::VectorBlock<VectorX<T>>* next_state) const {
+  virtual void DoCalcVectorDiscreteVariableUpdates(const Context<T>& context,
+                                                   const Eigen::VectorBlock<const VectorX<T>>& input,
+                                                   const Eigen::VectorBlock<const VectorX<T>>& state,
+                                                   Eigen::VectorBlock<VectorX<T>>* next_state) const {
     unused(context, input, state);
     MALIPUT_DRAKE_THROW_UNLESS(next_state->size() == 0);
   }
 
  private:
   // Confirms the VectorSystem invariants when allocating the context.
-  void DoValidateAllocatedLeafContext(
-      const LeafContext<T>& context) const final {
+  void DoValidateAllocatedLeafContext(const LeafContext<T>& context) const final {
     // N.B. The MALIPUT_DRAKE_THROW_UNLESS conditions can be triggered by subclass
     // mistakes, so are part of our unit tests.  The MALIPUT_DRAKE_DEMAND conditions
     // should be invariants guaranteed by the framework, so are asserted.
@@ -344,5 +318,4 @@ class VectorSystem : public LeafSystem<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::VectorSystem)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::VectorSystem)

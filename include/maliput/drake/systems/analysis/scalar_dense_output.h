@@ -39,13 +39,9 @@ class ScalarDenseOutput : public DenseOutput<T> {
  protected:
   ScalarDenseOutput() = default;
 
-  VectorX<T> DoEvaluate(const T& t) const override {
-    return VectorX<T>::Constant(1, this->DoEvaluateScalar(t));
-  }
+  VectorX<T> DoEvaluate(const T& t) const override { return VectorX<T>::Constant(1, this->DoEvaluateScalar(t)); }
 
-  int do_size() const override {
-    return 1;
-  }
+  int do_size() const override { return 1; }
 
   // @see EvaluateScalar(const T&)
   virtual T DoEvaluateScalar(const T& t) const = 0;
@@ -54,5 +50,4 @@ class ScalarDenseOutput : public DenseOutput<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::systems::ScalarDenseOutput)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::systems::ScalarDenseOutput)

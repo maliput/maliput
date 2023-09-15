@@ -114,8 +114,7 @@ class FixedInputPortValue {
   // Constructs an abstract-valued FixedInputPortValue from a value
   // of arbitrary type. Takes ownership of the given value and sets the serial
   // number to 1. The value must not be null.
-  explicit FixedInputPortValue(std::unique_ptr<AbstractValue> value)
-      : value_(std::move(value)), serial_number_{1} {
+  explicit FixedInputPortValue(std::unique_ptr<AbstractValue> value) : value_(std::move(value)), serial_number_{1} {
     MALIPUT_DRAKE_DEMAND(value_ != nullptr);
   }
 
@@ -168,14 +167,12 @@ class ContextBaseFixedInputAttorney {
   friend class maliput::drake::systems::ContextBase;
 
   // "Output" argument is first here since it is serving as a `this` pointer.
-  static void set_owning_subcontext(FixedInputPortValue* fixed,
-                                    ContextBase* owning_subcontext) {
+  static void set_owning_subcontext(FixedInputPortValue* fixed, ContextBase* owning_subcontext) {
     MALIPUT_DRAKE_DEMAND(fixed != nullptr);
     fixed->set_owning_subcontext(owning_subcontext);
   }
 
-  static void set_ticket(FixedInputPortValue* fixed,
-                         DependencyTicket ticket) {
+  static void set_ticket(FixedInputPortValue* fixed, DependencyTicket ticket) {
     MALIPUT_DRAKE_DEMAND(fixed != nullptr);
     fixed->set_ticket(ticket);
   }
@@ -183,11 +180,9 @@ class ContextBaseFixedInputAttorney {
   // This serves as the only accessible constructor for FixedInputPortValues.
   // It must be followed immediately by inserting into a Context with the
   // assigned ticket and the owning subcontext set using the above methods.
-  static std::unique_ptr<FixedInputPortValue> CreateFixedInputPortValue(
-      std::unique_ptr<AbstractValue> value) {
+  static std::unique_ptr<FixedInputPortValue> CreateFixedInputPortValue(std::unique_ptr<AbstractValue> value) {
     // Can't use make_unique here since constructor is private.
-    return std::unique_ptr<FixedInputPortValue>(
-        new FixedInputPortValue(std::move(value)));
+    return std::unique_ptr<FixedInputPortValue>(new FixedInputPortValue(std::move(value)));
   }
 };
 

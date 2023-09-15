@@ -31,15 +31,13 @@ class BasicVector : public VectorBase<T> {
 
   /// Initializes with the given @p size using the maliput::drake::dummy_value<T>, which
   /// is NaN when T = double.
-  explicit BasicVector(int size)
-      : values_(VectorX<T>::Constant(size, dummy_value<T>::get())) {}
+  explicit BasicVector(int size) : values_(VectorX<T>::Constant(size, dummy_value<T>::get())) {}
 
   /// Constructs a BasicVector with the specified @p vec data.
   explicit BasicVector(VectorX<T> vec) : values_(std::move(vec)) {}
 
   /// Constructs a BasicVector whose elements are the elements of @p init.
-  BasicVector(const std::initializer_list<T>& init)
-      : BasicVector<T>(init.size()) {
+  BasicVector(const std::initializer_list<T>& init) : BasicVector<T>(init.size()) {
     int i = 0;
     for (const T& datum : init) {
       (*this)[i++] = datum;
@@ -47,8 +45,7 @@ class BasicVector : public VectorBase<T> {
   }
 
   /// Constructs a BasicVector whose elements are the elements of @p init.
-  static std::unique_ptr<BasicVector<T>> Make(
-      const std::initializer_list<T>& init) {
+  static std::unique_ptr<BasicVector<T>> Make(const std::initializer_list<T>& init) {
     return std::make_unique<BasicVector<T>>(init);
   }
 
@@ -56,7 +53,7 @@ class BasicVector : public VectorBase<T> {
   /// placewise-corresponding member of @p args as the sole constructor
   /// argument.  For instance:
   ///   BasicVector<symbolic::Expression>::Make("x", "y", "z");
-  template<typename... Fargs>
+  template <typename... Fargs>
   static std::unique_ptr<BasicVector<T>> Make(Fargs&&... args) {
     auto data = std::make_unique<BasicVector<T>>(sizeof...(args));
     BasicVector<T>::MakeRecursive(data.get(), 0, args...);
@@ -70,33 +67,30 @@ class BasicVector : public VectorBase<T> {
   /// @throws std::exception if the new value has different dimensions.
   void set_value(const Eigen::Ref<const VectorX<T>>& value) {
     const int n = value.rows();
-    if (n != size()) { this->ThrowMismatchedSize(n); }
+    if (n != size()) {
+      this->ThrowMismatchedSize(n);
+    }
     values_ = value;
   }
 
   /// Returns the entire vector as a const Eigen::VectorBlock.
-  Eigen::VectorBlock<const VectorX<T>> get_value() const {
-    return values_.head(values_.rows());
-  }
+  Eigen::VectorBlock<const VectorX<T>> get_value() const { return values_.head(values_.rows()); }
 
   /// Returns the entire vector as a mutable Eigen::VectorBlock, which allows
   /// mutation of the values, but does not allow `resize()` to be invoked on
   /// the returned object.
-  Eigen::VectorBlock<VectorX<T>> get_mutable_value() {
-    return values_.head(values_.rows());
-  }
+  Eigen::VectorBlock<VectorX<T>> get_mutable_value() { return values_.head(values_.rows()); }
 
-  void SetFromVector(const Eigen::Ref<const VectorX<T>>& value) final {
-    set_value(value);
-  }
+  void SetFromVector(const Eigen::Ref<const VectorX<T>>& value) final { set_value(value); }
 
   VectorX<T> CopyToVector() const final { return values_; }
 
-  void ScaleAndAddToVector(const T& scale,
-                           EigenPtr<VectorX<T>> vec) const final {
+  void ScaleAndAddToVector(const T& scale, EigenPtr<VectorX<T>> vec) const final {
     MALIPUT_DRAKE_THROW_UNLESS(vec != nullptr);
     const int n = vec->rows();
-    if (n != size()) { this->ThrowMismatchedSize(n); }
+    if (n != size()) {
+      this->ThrowMismatchedSize(n);
+    }
     *vec += scale * values_;
   }
 
@@ -125,12 +119,16 @@ class BasicVector : public VectorBase<T> {
   }
 
   const T& DoGetAtIndexChecked(int index) const final {
-    if (index >= size()) { this->ThrowOutOfRange(index); }
+    if (index >= size()) {
+      this->ThrowOutOfRange(index);
+    }
     return values_[index];
   }
 
   T& DoGetAtIndexChecked(int index) final {
-    if (index >= size()) { this->ThrowOutOfRange(index); }
+    if (index >= size()) {
+      this->ThrowOutOfRange(index);
+    }
     return values_[index];
   }
 
@@ -140,25 +138,21 @@ class BasicVector : public VectorBase<T> {
   ///
   /// Subclasses of BasicVector must override DoClone to return their covariant
   /// type.
-  [[nodiscard]] virtual BasicVector<T>* DoClone() const {
-    return new BasicVector<T>(this->size());
-  }
+  [[nodiscard]] virtual BasicVector<T>* DoClone() const { return new BasicVector<T>(this->size()); }
 
   /// Sets @p data at @p index to an object of type T, which must have a
   /// single-argument constructor invoked via @p constructor_arg, and then
   /// recursively invokes itself on the next index with @p recursive args.
   /// Helper for BasicVector<T>::Make.
-  template<typename F, typename... Fargs>
-  static void MakeRecursive(BasicVector<T>* data, int index,
-                            F constructor_arg, Fargs&&... recursive_args) {
+  template <typename F, typename... Fargs>
+  static void MakeRecursive(BasicVector<T>* data, int index, F constructor_arg, Fargs&&... recursive_args) {
     (*data)[index++] = T(constructor_arg);
     BasicVector<T>::MakeRecursive(data, index, recursive_args...);
   }
 
   /// Base case for the MakeRecursive template recursion.
-  template<typename F, typename... Fargs>
-  static void MakeRecursive(BasicVector<T>* data, int index,
-                            F constructor_arg) {
+  template <typename F, typename... Fargs>
+  static void MakeRecursive(BasicVector<T>* data, int index, F constructor_arg) {
     (*data)[index++] = T(constructor_arg);
   }
 
@@ -174,11 +168,8 @@ class BasicVector : public VectorBase<T> {
   // implementation toward maximizing speed. This implementation should be able
   // to leverage Eigen's fast scale and add functions in the case that rhs_scal
   // is also (i.e., in addition to 'this') a contiguous vector.
-  void DoPlusEqScaled(
-      const std::initializer_list<std::pair<T, const VectorBase<T>&>>& rhs_scal)
-      final {
-    for (const auto& operand : rhs_scal)
-      operand.second.ScaleAndAddToVector(operand.first, &values_);
+  void DoPlusEqScaled(const std::initializer_list<std::pair<T, const VectorBase<T>&>>& rhs_scal) final {
+    for (const auto& operand : rhs_scal) operand.second.ScaleAndAddToVector(operand.first, &values_);
   }
 
   // The column vector of T values.
@@ -191,5 +182,4 @@ class BasicVector : public VectorBase<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::BasicVector)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::BasicVector)

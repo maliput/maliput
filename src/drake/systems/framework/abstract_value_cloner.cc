@@ -10,17 +10,14 @@ namespace internal {
 // our storage) because this constructor is private and the public constructor
 // always makes a copy before calling us, which means we're guaranteed that
 // nobody else has an alias of this model_value to mutate it out from under us.
-AbstractValueCloner::AbstractValueCloner(
-    std::unique_ptr<AbstractValue> model_value)
+AbstractValueCloner::AbstractValueCloner(std::unique_ptr<AbstractValue> model_value)
     : model_value_(std::move(model_value)) {
   MALIPUT_DRAKE_DEMAND(model_value_ != nullptr);
 }
 
 AbstractValueCloner::~AbstractValueCloner() = default;
 
-std::unique_ptr<AbstractValue> AbstractValueCloner::operator()() const {
-  return model_value_->Clone();
-}
+std::unique_ptr<AbstractValue> AbstractValueCloner::operator()() const { return model_value_->Clone(); }
 
 }  // namespace internal
 }  // namespace systems

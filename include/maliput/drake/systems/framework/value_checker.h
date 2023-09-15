@@ -34,9 +34,10 @@ void CheckBasicVectorInvariants(const BasicVector<T>* basic_vector) {
   if (original_type != cloned_type) {
     const std::string original_name = NiceTypeName::Get(*basic_vector);
     const std::string cloned_name = NiceTypeName::Get(*cloned_vector);
-    throw std::runtime_error(
-        "CheckBasicVectorInvariants failed: " + original_name + "::Clone "
-        "produced a " + cloned_name + " object instead of the same type");
+    throw std::runtime_error("CheckBasicVectorInvariants failed: " + original_name +
+                             "::Clone "
+                             "produced a " +
+                             cloned_name + " object instead of the same type");
   }
 }
 
@@ -58,8 +59,7 @@ void CheckBasicVectorInvariants(const BasicVector<T>* basic_vector) {
 template <typename T>
 void CheckVectorValueInvariants(const AbstractValue* abstract_value) {
   MALIPUT_DRAKE_THROW_UNLESS(abstract_value != nullptr);
-  const auto* const basic_vector =
-      abstract_value->maybe_get_value<BasicVector<T>>();
+  const auto* const basic_vector = abstract_value->maybe_get_value<BasicVector<T>>();
   if (basic_vector != nullptr) {
     // We are a Value<BasicVector<T>>, so check the invariants.
     CheckBasicVectorInvariants<T>(basic_vector);

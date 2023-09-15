@@ -91,9 +91,7 @@ using this. */
 constexpr UseDefaultName kUseDefaultName = {};
 
 /** (Advanced.) Sugar that compares a variant against kUseDefaultName. */
-inline bool operator==(
-    const std::variant<std::string, UseDefaultName>& value,
-    const UseDefaultName&) {
+inline bool operator==(const std::variant<std::string, UseDefaultName>& value, const UseDefaultName&) {
   return std::holds_alternative<UseDefaultName>(value);
 }
 
@@ -103,8 +101,7 @@ enum class InputPortSelection { kNoInput = -1, kUseFirstInputIfItExists = -2 };
 
 /** Intended for use in e.g. variant<OutputPortSelection, OutputPortIndex> for
 algorithms that support optional and/or default port indices. */
-enum class OutputPortSelection { kNoOutput = -1, kUseFirstOutputIfItExists =
-    -2 };
+enum class OutputPortSelection { kNoOutput = -1, kUseFirstOutputIfItExists = -2 };
 
 #ifndef DRAKE_DOXYGEN_CXX
 class ContextBase;
@@ -251,9 +248,8 @@ class SystemParentServiceInterface {
   // connected-to output port (likely belonging to a different child subsystem)
   // and returning its value as the value for the given input port.
   // @pre The given `input_port` must use same scalar type `T` as `this`.
-  virtual const AbstractValue* EvalConnectedSubsystemInputPort(
-      const ContextBase& context,
-      const InputPortBase& input_port) const = 0;
+  virtual const AbstractValue* EvalConnectedSubsystemInputPort(const ContextBase& context,
+                                                               const InputPortBase& input_port) const = 0;
 };
 
 // These dependency ticket numbers are common to all systems and contexts so
@@ -263,35 +259,35 @@ class SystemParentServiceInterface {
 enum BuiltInTicketNumbers {
   // This set of tickets represents independent source values in a Context,
   // and groupings of such source values.
-  kNothingTicket        =  0,  // Indicates "not dependent on anything".
-  kTimeTicket           =  1,  // Time.
-  kAccuracyTicket       =  2,  // Accuracy.
-  kQTicket              =  3,  // Continuous configuration variables.
-  kVTicket              =  4,  // Continuous velocity variables.
-  kZTicket              =  5,  // Miscellaneous continuous variables.
-  kXcTicket             =  6,  // All continuous variables xc = {q, v, z}.
-  kXdTicket             =  7,  // All discrete (numeric) state variables.
-  kXaTicket             =  8,  // All abstract state variables.
-  kXTicket              =  9,  // All state variables x = {xc, xd, xa}.
-  kPnTicket             = 10,  // All numeric parameters.
-  kPaTicket             = 11,  // All abstract parameters.
-  kAllParametersTicket  = 12,  // All parameters p = {pn, pa}.
+  kNothingTicket = 0,                      // Indicates "not dependent on anything".
+  kTimeTicket = 1,                         // Time.
+  kAccuracyTicket = 2,                     // Accuracy.
+  kQTicket = 3,                            // Continuous configuration variables.
+  kVTicket = 4,                            // Continuous velocity variables.
+  kZTicket = 5,                            // Miscellaneous continuous variables.
+  kXcTicket = 6,                           // All continuous variables xc = {q, v, z}.
+  kXdTicket = 7,                           // All discrete (numeric) state variables.
+  kXaTicket = 8,                           // All abstract state variables.
+  kXTicket = 9,                            // All state variables x = {xc, xd, xa}.
+  kPnTicket = 10,                          // All numeric parameters.
+  kPaTicket = 11,                          // All abstract parameters.
+  kAllParametersTicket = 12,               // All parameters p = {pn, pa}.
   kAllSourcesExceptInputPortsTicket = 13,  // Everything except input ports.
-  kAllInputPortsTicket  = 14,  // All input ports u.
-  kAllSourcesTicket     = 15,  // All of the above.
-  kConfigurationTicket  = 16,  // All values that may affect configuration.
-  kKinematicsTicket     = 17,  // Configuration plus velocity-affecting values.
-  kLastSourceTicket     = kKinematicsTicket,  // (Used in testing.)
+  kAllInputPortsTicket = 14,               // All input ports u.
+  kAllSourcesTicket = 15,                  // All of the above.
+  kConfigurationTicket = 16,               // All values that may affect configuration.
+  kKinematicsTicket = 17,                  // Configuration plus velocity-affecting values.
+  kLastSourceTicket = kKinematicsTicket,   // (Used in testing.)
 
   // The rest of these are pre-defined computations with associated cache
   // entries.
-  kXcdotTicket          = 18,  // d/dt xc = {qdot, vdot, zdot}.
-  kPeTicket             = 19,  // Potential energy.
-  kKeTicket             = 20,  // Kinetic energy.
-  kPcTicket             = 21,  // Conservative power.
-  kPncTicket            = 22,  // Non-conservative power.
+  kXcdotTicket = 18,  // d/dt xc = {qdot, vdot, zdot}.
+  kPeTicket = 19,     // Potential energy.
+  kKeTicket = 20,     // Kinetic energy.
+  kPcTicket = 21,     // Conservative power.
+  kPncTicket = 22,    // Non-conservative power.
 
-  kNextAvailableTicket  = kPncTicket+1
+  kNextAvailableTicket = kPncTicket + 1
 };
 
 // Specifies the prerequisite of an output port. It will always be either
@@ -308,11 +304,10 @@ struct OutputPortPrerequisite {
 
 // Returns a vector of raw pointers that correspond placewise with the
 // unique_ptrs in the vector `in`.
-template<typename U>
+template <typename U>
 std::vector<U*> Unpack(const std::vector<std::unique_ptr<U>>& in) {
   std::vector<U*> out(in.size());
-  std::transform(in.begin(), in.end(), out.begin(),
-                 [](const std::unique_ptr<U>& p) { return p.get(); });
+  std::transform(in.begin(), in.end(), out.begin(), [](const std::unique_ptr<U>& p) { return p.get(); });
   return out;
 }
 

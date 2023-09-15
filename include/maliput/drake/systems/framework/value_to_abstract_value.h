@@ -85,27 +85,22 @@ type explicitly by suppling a Value<EigenType>(your_expression) object. */
 class ValueToAbstractValue {
  public:
   // Signature (1): used for AbstractValue or Value<U> arguments.
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-      const AbstractValue& value) {
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const AbstractValue& value) {
     unused(api_name);
     return value.Clone();
   }
 
   // Signature (2): special case char* to std::string to avoid ugly compilation
   // messages for this case, where the user's intent is obvious.
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-      const char* c_string) {
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const char* c_string) {
     unused(api_name);
     return std::make_unique<Value<std::string>>(c_string);
   }
 
   // Signature (3): special case any Eigen vector expression so that we can
   // issue a runtime error message.
-  template <typename ValueType,
-            typename = std::enable_if_t<is_eigen_refable<ValueType>()>>
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-                                                   const ValueType& eigen_value,
-                                                   ...) {
+  template <typename ValueType, typename = std::enable_if_t<is_eigen_refable<ValueType>()>>
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const ValueType& eigen_value, ...) {
     unused(eigen_value);
     std::ostringstream oss;
     oss << api_name << "(): Eigen objects and expressions cannot automatically be stored ";
@@ -126,29 +121,22 @@ class ValueToAbstractValue {
   // it would be chosen instead of performing those conversions. Note that for
   // the AbstractPolicy, BasicVector ValueTypes are handled with this generic
   // method rather than by a specialized method as for VectorPolicy.
-  template <typename ValueType,
-            typename = std::enable_if_t<
-                !(std::is_base_of_v<AbstractValue, ValueType> ||
-                  is_eigen_refable<ValueType>())>>
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-      const ValueType& value) {
-    static_assert(
-        std::is_copy_constructible_v<ValueType> ||
-            has_accessible_clone<ValueType>(),
-        "ValueToAbstractValue(): value type must be copy constructible or "
-        "have an accessible Clone() method that returns std::unique_ptr.");
+  template <typename ValueType, typename = std::enable_if_t<!(std::is_base_of_v<AbstractValue, ValueType> ||
+                                                              is_eigen_refable<ValueType>())>>
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const ValueType& value) {
+    static_assert(std::is_copy_constructible_v<ValueType> || has_accessible_clone<ValueType>(),
+                  "ValueToAbstractValue(): value type must be copy constructible or "
+                  "have an accessible Clone() method that returns std::unique_ptr.");
     unused(api_name);
     return ValueHelper(value, 1, 1);
   }
 
  private:
   template <typename ValueType>
-  using CopyReturnType =
-      decltype(ValueType(std::declval<const ValueType>()));
+  using CopyReturnType = decltype(ValueType(std::declval<const ValueType>()));
 
   template <typename ValueType>
-  using CloneReturnType = std::remove_pointer_t<
-      decltype(std::declval<const ValueType>().Clone().release())>;
+  using CloneReturnType = std::remove_pointer_t<decltype(std::declval<const ValueType>().Clone().release())>;
 
   // This overload is chosen for the int argument if the Ref type exists,
   // otherwise there is an SFINAE failure here.
@@ -168,8 +156,7 @@ class ValueToAbstractValue {
   // cloneable, this method still gets invoked; we prefer use of the copy
   // constructor.
   template <typename ValueType, typename = CopyReturnType<ValueType>>
-  static std::unique_ptr<AbstractValue> ValueHelper(const ValueType& value, int,
-                                                    int) {
+  static std::unique_ptr<AbstractValue> ValueHelper(const ValueType& value, int, int) {
     return std::make_unique<Value<CopyReturnType<ValueType>>>(value);
   }
 
@@ -179,14 +166,11 @@ class ValueToAbstractValue {
   // but the type could be a base type of ValueType rather than ValueType
   // itself. In that case we store the value using the base type, although
   // presumably the concrete type has been properly cloned.
-  template <typename ValueType,
-      typename ClonedValueType = CloneReturnType<ValueType>>
-  static std::unique_ptr<AbstractValue> ValueHelper(const ValueType& value, int,
-                                                    ...) {
-    static_assert(
-        std::is_base_of_v<ClonedValueType, ValueType>,
-        "ValueToAbstractValue::ToAbstract(): accessible Clone() method must "
-        "return ValueType or a base class of ValueType.");
+  template <typename ValueType, typename ClonedValueType = CloneReturnType<ValueType>>
+  static std::unique_ptr<AbstractValue> ValueHelper(const ValueType& value, int, ...) {
+    static_assert(std::is_base_of_v<ClonedValueType, ValueType>,
+                  "ValueToAbstractValue::ToAbstract(): accessible Clone() method must "
+                  "return ValueType or a base class of ValueType.");
     return std::make_unique<Value<ClonedValueType>>(value.Clone());
   }
 
@@ -228,16 +212,14 @@ class ValueToVectorValue {
  public:
   // Signature (1): used for any Eigen vector type, but the argument is copied
   // to a BasicVector for the returned abstract value.
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-      const Eigen::Ref<const VectorX<T>>& vector) {
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const Eigen::Ref<const VectorX<T>>& vector) {
     unused(api_name);
     return std::make_unique<Value<BasicVector<T>>>(vector);
   }
 
   // Signature (2): used for a scalar of type T. The argument is copied
   // to a 1-element BasicVector for the returned abstract value.
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-                                                   const T& scalar) {
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const T& scalar) {
     return ToAbstract(api_name, Vector1<T>(scalar));  // Use signature (1).
   }
 
@@ -245,19 +227,16 @@ class ValueToVectorValue {
   // Value<BasicVector> to store a copy of the given object, even if it is from
   // a subclass of BasicVector, and even if it has its own Clone() method. The
   // actual type is preserved regardless.
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-      const BasicVector<T>& vector) {
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const BasicVector<T>& vector) {
     unused(api_name);
     return std::make_unique<Value<BasicVector<T>>>(vector.Clone());
   }
 
   // Signature (4): used for AbstractValue or Value<U> arguments. After cloning,
   // this must be exactly type Value<BasicVector<T>>.
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-      const AbstractValue& value) {
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const AbstractValue& value) {
     auto cloned = value.Clone();
-    if (cloned->maybe_get_value<BasicVector<T>>() != nullptr)
-      return cloned;
+    if (cloned->maybe_get_value<BasicVector<T>>() != nullptr) return cloned;
 
     std::ostringstream oss;
     oss << api_name << "(): the given AbstractValue containing type ";
@@ -272,13 +251,10 @@ class ValueToVectorValue {
   // non-templatized signatures above can be used (after possible conversions).
   // If we allowed this to instantiate it would be chosen instead of performing
   // those conversions.
-  template <typename ValueType,
-            typename = std::enable_if_t<
-                !(is_eigen_refable<ValueType>() ||
-                  std::is_base_of_v<BasicVector<T>, ValueType> ||
-                  std::is_base_of_v<AbstractValue, ValueType>)>>
-  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name,
-                                                   const ValueType&) {
+  template <typename ValueType, typename = std::enable_if_t<!(is_eigen_refable<ValueType>() ||
+                                                              std::is_base_of_v<BasicVector<T>, ValueType> ||
+                                                              std::is_base_of_v<AbstractValue, ValueType>)>>
+  static std::unique_ptr<AbstractValue> ToAbstract(const char* api_name, const ValueType&) {
     std::ostringstream oss;
     oss << api_name << "(): the given value of type ";
     oss << NiceTypeName::Get<ValueType>();
@@ -290,4 +266,3 @@ class ValueToVectorValue {
 }  // namespace internal
 }  // namespace systems
 }  // namespace maliput::drake
-

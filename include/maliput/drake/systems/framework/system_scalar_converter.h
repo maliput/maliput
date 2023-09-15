@@ -18,7 +18,8 @@
 namespace maliput::drake {
 namespace systems {
 
-template <typename T> class System;
+template <typename T>
+class System;
 
 /// Helper class to convert a System<U> into a System<T>, intended for internal
 /// use by the System framework, not directly by users.
@@ -77,8 +78,7 @@ class SystemScalarConverter {
   }
 
   enum class DRAKE_DEPRECATED("2021-11-01",
-      "Use MakeWithoutSubtypeChecking instead of kDisabled.")
-  GuaranteedSubtypePreservation {
+                              "Use MakeWithoutSubtypeChecking instead of kDisabled.") GuaranteedSubtypePreservation {
     /// The argument to Convert must be of the exact type S that was used to
     /// populate the SystemScalarConverter.
     kEnabled,
@@ -92,8 +92,7 @@ class SystemScalarConverter {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   template <template <typename> class S>
-  DRAKE_DEPRECATED("2021-11-01",
-      "Use MakeWithoutSubtypeChecking instead of kDisabled.")
+  DRAKE_DEPRECATED("2021-11-01", "Use MakeWithoutSubtypeChecking instead of kDisabled.")
   SystemScalarConverter(SystemTypeTag<S>, GuaranteedSubtypePreservation sub) {
     if (sub == GuaranteedSubtypePreservation::kEnabled) {
       AddConstructors<true, S>();
@@ -119,22 +118,18 @@ class SystemScalarConverter {
   bool empty() const { return funcs_.empty(); }
 
   template <typename T, typename U>
-  using ConverterFunction
-      DRAKE_DEPRECATED("2021-10-01",
-      "Only scalar-converting copy constructors are supported.")
-      = std::function<std::unique_ptr<System<T>>(const System<U>&)>;
+  using ConverterFunction DRAKE_DEPRECATED("2021-10-01", "Only scalar-converting copy constructors are supported.") =
+      std::function<std::unique_ptr<System<T>>(const System<U>&)>;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   template <typename T, typename U>
-  DRAKE_DEPRECATED("2021-10-01",
-      "Only scalar-converting copy constructors are supported.")
+  DRAKE_DEPRECATED("2021-10-01", "Only scalar-converting copy constructors are supported.")
   void Add(const ConverterFunction<T, U>&);
 #pragma GCC diagnostic pop
 
   template <template <typename> class S, typename T, typename U>
-  DRAKE_DEPRECATED("2021-10-01",
-      "User-defined scalar types cannot be added.")
+  DRAKE_DEPRECATED("2021-10-01", "User-defined scalar types cannot be added.")
   void AddIfSupported() {
     AddIfSupported<S, T, U>(GuaranteedSubtypePreservation::kEnabled);
   }
@@ -190,19 +185,15 @@ class SystemScalarConverter {
 
   // Adds a converter for an S<U> into an S<T> using S's scalar-converting copy
   // constructor, unless the traits have disabled the conversion.
-  template <bool subtype_preservation,
-            template <typename> class S, typename T, typename U>
+  template <bool subtype_preservation, template <typename> class S, typename T, typename U>
   void MaybeAddConstructor();
 
   // Given typeid(T), typeid(U), returns a converter.  If no converter has been
   // added yet, returns nullptr.
-  const ErasedConverterFunc* Find(
-      const std::type_info&, const std::type_info&) const;
+  const ErasedConverterFunc* Find(const std::type_info&, const std::type_info&) const;
 
   // Given typeid(T), typeid(U), adds a converter.
-  void Insert(
-      const std::type_info&, const std::type_info&,
-      const ErasedConverterFunc&);
+  void Insert(const std::type_info&, const std::type_info&, const ErasedConverterFunc&);
 
   // Maps from {T, U} to the function that converts from U into T.
   std::unordered_map<Key, ErasedConverterFunc, KeyHasher> funcs_;
@@ -235,8 +226,7 @@ bool SystemScalarConverter::IsConvertible() const {
 }
 
 template <typename T, typename U>
-std::unique_ptr<System<T>> SystemScalarConverter::Convert(
-    const System<U>& other) const {
+std::unique_ptr<System<T>> SystemScalarConverter::Convert(const System<U>& other) const {
   // Lookup the lambda that Add() stored and call it.
   System<T>* result = nullptr;
   const ErasedConverterFunc* converter = Find(typeid(T), typeid(U));
@@ -248,20 +238,16 @@ std::unique_ptr<System<T>> SystemScalarConverter::Convert(
 
 namespace system_scalar_converter_internal {
 // Throws an exception that `other` cannot be converted from S<U> to S<T>.
-[[noreturn]] void ThrowConversionMismatch(
-    const std::type_info& s_t_info,
-    const std::type_info& s_u_info,
-    const std::type_info& other_info);
+[[noreturn]] void ThrowConversionMismatch(const std::type_info& s_t_info, const std::type_info& s_u_info,
+                                          const std::type_info& other_info);
 
 // N.B. This logic should be reflected in `TemplateSystem._make` in the file
 // `scalar_conversion.py`.
-template <bool subtype_preservation,
-          template <typename> class S, typename T, typename U>
+template <bool subtype_preservation, template <typename> class S, typename T, typename U>
 static std::unique_ptr<System<T>> Make(const System<U>& other) {
   // We conditionally require that system scalar conversion maintain the exact
   // system type.  Fail fast if `other` is not of exact type S<U>.
-  if (subtype_preservation &&
-      (std::type_index{typeid(other)} != std::type_index{typeid(S<U>)})) {
+  if (subtype_preservation && (std::type_index{typeid(other)} != std::type_index{typeid(S<U>)})) {
     ThrowConversionMismatch(typeid(S<T>), typeid(S<U>), typeid(other));
   }
   const S<U>& my_other = dynamic_cast<const S<U>&>(other);
@@ -274,8 +260,7 @@ static std::unique_ptr<System<T>> Make(const System<U>& other) {
 }
 }  // namespace system_scalar_converter_internal
 
-template <bool subtype_preservation,
-          template <typename> class S, typename T, typename U>
+template <bool subtype_preservation, template <typename> class S, typename T, typename U>
 void SystemScalarConverter::MaybeAddConstructor() {
   using Traits = typename scalar_conversion::Traits<S>;
   if constexpr (Traits::template supported<T, U>::value) {
@@ -287,9 +272,7 @@ void SystemScalarConverter::MaybeAddConstructor() {
       // Dispatch to an overload based on whether S<U> ==> S<T> is supported.
       // (At runtime, this block is only executed for supported conversions,
       // but at compile time, Make will be instantiated unconditionally.)
-      std::unique_ptr<System<T>> result =
-          system_scalar_converter_internal::
-              Make<subtype_preservation, S, T, U>(other);
+      std::unique_ptr<System<T>> result = system_scalar_converter_internal::Make<subtype_preservation, S, T, U>(other);
       return result.release();
     };
     Insert(typeid(T), typeid(U), func);

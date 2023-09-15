@@ -20,11 +20,11 @@ void RungeKutta3Integrator<T>::DoInitialize() {
   if (isnan(this->get_initial_step_size_target())) {
     // Verify that maximum step size has been set.
     if (isnan(this->get_maximum_step_size()))
-      throw std::logic_error("Neither initial step size target nor maximum "
-                                 "step size has been set!");
+      throw std::logic_error(
+          "Neither initial step size target nor maximum "
+          "step size has been set!");
 
-    this->request_initial_step_size_target(
-        this->get_maximum_step_size() * kMaxStepFraction);
+    this->request_initial_step_size_target(this->get_maximum_step_size() * kMaxStepFraction);
   }
 
   // Sets the working accuracy to a good value.
@@ -64,8 +64,7 @@ bool RungeKutta3Integrator<T>::DoStep(const T& h) {
 
   // Evaluate derivative xcdot₀ ← xcdot(t₀, x(t₀), u(t₀)). Copy the result
   // into a temporary since we'll be calculating more derivatives below.
-  derivs0_->get_mutable_vector().SetFrom(
-      this->EvalTimeDerivatives(context).get_vector());
+  derivs0_->get_mutable_vector().SetFrom(this->EvalTimeDerivatives(context).get_vector());
   const VectorBase<T>& xcdot0 = derivs0_->get_vector();
 
   // Cache: xcdot0 references a *copy* of the derivative result so is immune
@@ -78,13 +77,11 @@ bool RungeKutta3Integrator<T>::DoStep(const T& h) {
   // the derivative cache entry. Note that xc is a live reference into the
   // context -- subsequent changes through that reference are unobservable so
   // will require manual out-of-date notifications.
-  VectorBase<T>& xc = context.SetTimeAndGetMutableContinuousStateVector(
-      t0 + h / 2);                      // t⁽ᵃ⁾ ← t₀ + h/2
-  xc.CopyToPreSizedVector(&save_xc0_);  // Save xc₀ while we can.
-  xc.PlusEqScaled(h / 2, xcdot0);       // xc⁽ᵃ⁾ ← xc₀ + h/2 xcdot₀
+  VectorBase<T>& xc = context.SetTimeAndGetMutableContinuousStateVector(t0 + h / 2);  // t⁽ᵃ⁾ ← t₀ + h/2
+  xc.CopyToPreSizedVector(&save_xc0_);                                                // Save xc₀ while we can.
+  xc.PlusEqScaled(h / 2, xcdot0);  // xc⁽ᵃ⁾ ← xc₀ + h/2 xcdot₀
 
-  derivs1_->get_mutable_vector().SetFrom(
-      this->EvalTimeDerivatives(context).get_vector());
+  derivs1_->get_mutable_vector().SetFrom(this->EvalTimeDerivatives(context).get_vector());
   const VectorBase<T>& xcdot_a = derivs1_->get_vector();  // xcdot⁽ᵃ⁾
 
   // Cache: xcdot_a references a *copy* of the derivative result so is immune
@@ -122,9 +119,7 @@ bool RungeKutta3Integrator<T>::DoStep(const T& h) {
   // Cache: xcdot_b still references the derivative cache value, which is
   // unchanged, although it is marked out of date. xcdot0 and xcdot_a are
   // unaffected.
-  xc.PlusEqScaled({{h6,     xcdot0},
-                   {4 * h6, xcdot_a},
-                   {h6,     xcdot_b}});
+  xc.PlusEqScaled({{h6, xcdot0}, {4 * h6, xcdot_a}, {h6, xcdot_b}});
 
   // If the size of the system has changed, the error estimate will no longer
   // be sized correctly. Verify that the error estimate is the correct size.
@@ -139,8 +134,8 @@ bool RungeKutta3Integrator<T>::DoStep(const T& h) {
   //              avoid the need for save_xc0_ and this copy altogether.
   err_est_vec_ = save_xc0_;  // ε ← xc₀
 
-  xcdot_a.ScaleAndAddToVector(h, &err_est_vec_);     // ε += h xcdot⁽ᵃ⁾
-  xc.ScaleAndAddToVector(-1.0, &err_est_vec_);       // ε -= xc₁
+  xcdot_a.ScaleAndAddToVector(h, &err_est_vec_);  // ε += h xcdot⁽ᵃ⁾
+  xc.ScaleAndAddToVector(-1.0, &err_est_vec_);    // ε -= xc₁
   err_est_vec_ = err_est_vec_.cwiseAbs();
   this->get_mutable_error_estimate()->SetFromVector(err_est_vec_);
 

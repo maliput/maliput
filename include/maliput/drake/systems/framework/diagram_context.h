@@ -60,9 +60,8 @@ class DiagramContext final : public Context<T> {
   ///
   /// User code should not call this method. It is for use during Diagram
   /// context allocation only.
-  void SubscribeExportedInputPortToDiagramPort(
-      InputPortIndex input_port_index,
-      const InputPortIdentifier& subsystem_input_port);
+  void SubscribeExportedInputPortToDiagramPort(InputPortIndex input_port_index,
+                                               const InputPortIdentifier& subsystem_input_port);
 
   /// (Internal use only) Declares that a particular output port of this
   /// diagram is simply forwarded from an output port of one of its child
@@ -71,9 +70,8 @@ class DiagramContext final : public Context<T> {
   ///
   /// User code should not call this method. It is for use during Diagram
   /// context allocation only.
-  void SubscribeDiagramPortToExportedOutputPort(
-      OutputPortIndex output_port_index,
-      const OutputPortIdentifier& subsystem_output_port);
+  void SubscribeDiagramPortToExportedOutputPort(OutputPortIndex output_port_index,
+                                                const OutputPortIdentifier& subsystem_output_port);
 
   /// (Internal use only) Declares that a connection exists between a peer
   /// output port and input port in this Diagram, and registers the input port's
@@ -84,8 +82,7 @@ class DiagramContext final : public Context<T> {
   ///
   /// User code should not call this method. It is for use during Diagram
   /// context allocation only.
-  void SubscribeInputPortToOutputPort(const OutputPortIdentifier& output_port,
-                                      const InputPortIdentifier& input_port);
+  void SubscribeInputPortToOutputPort(const OutputPortIdentifier& output_port, const InputPortIdentifier& input_port);
 
   /// (Internal use only) Makes the diagram state, parameter, and composite
   /// cache entry trackers subscribe to the corresponding constituent trackers
@@ -130,7 +127,7 @@ class DiagramContext final : public Context<T> {
 
  private:
   friend class DiagramContextTest;
-  using ContextBase::AddInputPort;    // For DiagramContextTest.
+  using ContextBase::AddInputPort;  // For DiagramContextTest.
   using ContextBase::AddOutputPort;
 
   std::unique_ptr<ContextBase> DoCloneWithoutPointers() const final;
@@ -142,9 +139,7 @@ class DiagramContext final : public Context<T> {
   std::string do_to_string() const final;
 
   // Returns the number of immediate child subcontexts in this DiagramContext.
-  int num_subcontexts() const {
-    return static_cast<int>(contexts_.size());
-  }
+  int num_subcontexts() const { return static_cast<int>(contexts_.size()); }
 
   const State<T>& do_access_state() const final {
     MALIPUT_DRAKE_ASSERT(state_ != nullptr);
@@ -157,32 +152,23 @@ class DiagramContext final : public Context<T> {
   }
 
   // Recursively sets the time on all subcontexts.
-  void DoPropagateTimeChange(const T& time_sec,
-                             const std::optional<T>& true_time,
-                             int64_t change_event) final;
+  void DoPropagateTimeChange(const T& time_sec, const std::optional<T>& true_time, int64_t change_event) final;
 
   // Recursively sets the accuracy on all subcontexts.
-  void DoPropagateAccuracyChange(const std::optional<double>& accuracy,
-                                 int64_t change_event) final;
+  void DoPropagateAccuracyChange(const std::optional<double>& accuracy, int64_t change_event) final;
 
   // Recursively notifies subcontexts of bulk changes.
-  void DoPropagateBulkChange(
-      int64_t change_event,
-      void (ContextBase::*note_bulk_change)(int64_t change_event)) final;
+  void DoPropagateBulkChange(int64_t change_event, void (ContextBase::*note_bulk_change)(int64_t change_event)) final;
 
   // Recursively notifies subcontexts of some caching behavior change.
-  void DoPropagateCachingChange(
-      void (Cache::*caching_change)()) const final;
+  void DoPropagateCachingChange(void (Cache::*caching_change)()) const final;
 
   // For this method `this` is the source being copied into `clone`.
-  void DoPropagateBuildTrackerPointerMap(
-      const ContextBase& clone,
-      DependencyTracker::PointerMap* tracker_map) const final;
+  void DoPropagateBuildTrackerPointerMap(const ContextBase& clone,
+                                         DependencyTracker::PointerMap* tracker_map) const final;
 
   // For this method, `this` is the clone copied from `source`.
-  void DoPropagateFixContextPointers(
-      const ContextBase& source,
-      const DependencyTracker::PointerMap& tracker_map) final;
+  void DoPropagateFixContextPointers(const ContextBase& source, const DependencyTracker::PointerMap& tracker_map) final;
 
   // The contexts are stored in SubsystemIndex order, and contexts_ is equal in
   // length to the number of subsystems specified at construction time.
@@ -195,5 +181,4 @@ class DiagramContext final : public Context<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiagramContext)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiagramContext)

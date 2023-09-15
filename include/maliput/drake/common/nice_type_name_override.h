@@ -20,8 +20,7 @@ struct type_erased_ptr {
 };
 
 // Callback for overriding an object's nice type name.
-using NiceTypeNamePtrOverride =
-    std::function<std::string(const type_erased_ptr&)>;
+using NiceTypeNamePtrOverride = std::function<std::string(const type_erased_ptr&)>;
 
 // Sets override for nice type names. This can only ever be set once, and
 // must be given a non-empty function<> object.

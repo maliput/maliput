@@ -14,41 +14,32 @@ namespace systems {
 template <typename T>
 ContinuousState<T>::ContinuousState(std::unique_ptr<VectorBase<T>> state) {
   state_ = std::move(state);
-  generalized_position_.reset(
-      new Subvector<T>(state_.get(), 0, 0));
-  generalized_velocity_.reset(
-      new Subvector<T>(state_.get(), 0, 0));
-  misc_continuous_state_.reset(
-      new Subvector<T>(state_.get(), 0, state_->size()));
+  generalized_position_.reset(new Subvector<T>(state_.get(), 0, 0));
+  generalized_velocity_.reset(new Subvector<T>(state_.get(), 0, 0));
+  misc_continuous_state_.reset(new Subvector<T>(state_.get(), 0, state_->size()));
   MALIPUT_DRAKE_ASSERT_VOID(DemandInvariants());
 }
 
 template <typename T>
-ContinuousState<T>::ContinuousState(
-    std::unique_ptr<VectorBase<T>> state, int num_q, int num_v, int num_z) {
+ContinuousState<T>::ContinuousState(std::unique_ptr<VectorBase<T>> state, int num_q, int num_v, int num_z) {
   state_ = std::move(state);
   if (state_->size() != num_q + num_v + num_z) {
-    throw std::out_of_range(
-        "Continuous state of size " + std::to_string(state_->size()) +
-        "cannot be partitioned as" + " q " + std::to_string(num_q) + " v " +
-        std::to_string(num_v) + " z " + std::to_string(num_z));
+    throw std::out_of_range("Continuous state of size " + std::to_string(state_->size()) + "cannot be partitioned as" +
+                            " q " + std::to_string(num_q) + " v " + std::to_string(num_v) + " z " +
+                            std::to_string(num_z));
   }
   if (num_v > num_q) {
-    throw std::logic_error("Number of velocity variables " +
-                           std::to_string(num_v) +
-                           " must not exceed number of position variables " +
-                           std::to_string(num_q));
+    throw std::logic_error("Number of velocity variables " + std::to_string(num_v) +
+                           " must not exceed number of position variables " + std::to_string(num_q));
   }
   generalized_position_.reset(new Subvector<T>(state_.get(), 0, num_q));
   generalized_velocity_.reset(new Subvector<T>(state_.get(), num_q, num_v));
-  misc_continuous_state_.reset(
-      new Subvector<T>(state_.get(), num_q + num_v, num_z));
+  misc_continuous_state_.reset(new Subvector<T>(state_.get(), num_q + num_v, num_z));
   MALIPUT_DRAKE_ASSERT_VOID(DemandInvariants());
 }
 
 template <typename T>
-ContinuousState<T>::ContinuousState()
-    : ContinuousState(std::make_unique<BasicVector<T>>(0)) {}
+ContinuousState<T>::ContinuousState() : ContinuousState(std::make_unique<BasicVector<T>>(0)) {}
 
 template <typename T>
 ContinuousState<T>::~ContinuousState() {}
@@ -61,11 +52,8 @@ std::unique_ptr<ContinuousState<T>> ContinuousState<T>::Clone() const {
 }
 
 template <typename T>
-ContinuousState<T>::ContinuousState(
-    std::unique_ptr<VectorBase<T>> state,
-    std::unique_ptr<VectorBase<T>> q,
-    std::unique_ptr<VectorBase<T>> v,
-    std::unique_ptr<VectorBase<T>> z)
+ContinuousState<T>::ContinuousState(std::unique_ptr<VectorBase<T>> state, std::unique_ptr<VectorBase<T>> q,
+                                    std::unique_ptr<VectorBase<T>> v, std::unique_ptr<VectorBase<T>> z)
     : state_(std::move(state)),
       generalized_position_(std::move(q)),
       generalized_velocity_(std::move(v)),
@@ -77,8 +65,7 @@ template <typename T>
 std::unique_ptr<ContinuousState<T>> ContinuousState<T>::DoClone() const {
   auto state = dynamic_cast<const BasicVector<T>*>(state_.get());
   MALIPUT_DRAKE_DEMAND(state != nullptr);
-  return std::make_unique<ContinuousState>(state->Clone(), num_q(), num_v(),
-                                           num_z());
+  return std::make_unique<ContinuousState>(state->Clone(), num_q(), num_v(), num_z());
 }
 
 template <typename T>
@@ -130,5 +117,4 @@ void ContinuousState<T>::DemandInvariants() const {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::ContinuousState)
+DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::ContinuousState)

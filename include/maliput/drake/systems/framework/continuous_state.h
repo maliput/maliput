@@ -93,8 +93,7 @@ class ContinuousState {
   ///
   /// We require that `num_q ≥ num_v` and that the sum of the partition sizes
   /// adds up to the size of `state`.
-  ContinuousState(std::unique_ptr<VectorBase<T>> state, int num_q, int num_v,
-                  int num_z);
+  ContinuousState(std::unique_ptr<VectorBase<T>> state, int num_q, int num_v, int num_z);
 
   /// Constructs a zero-length ContinuousState.
   ContinuousState();
@@ -141,39 +140,27 @@ class ContinuousState {
 
   /// Returns a const reference to the subset of the state vector that is
   /// generalized position `q`. May be zero length.
-  const VectorBase<T>& get_generalized_position() const {
-    return *generalized_position_;
-  }
+  const VectorBase<T>& get_generalized_position() const { return *generalized_position_; }
 
   /// Returns a mutable reference to the subset of the state vector that is
   /// generalized position `q`. May be zero length.
-  VectorBase<T>& get_mutable_generalized_position() {
-    return *generalized_position_.get();
-  }
+  VectorBase<T>& get_mutable_generalized_position() { return *generalized_position_.get(); }
 
   /// Returns a const reference to the subset of the continuous state vector
   /// that is generalized velocity `v`. May be zero length.
-  const VectorBase<T>& get_generalized_velocity() const {
-    return *generalized_velocity_;
-  }
+  const VectorBase<T>& get_generalized_velocity() const { return *generalized_velocity_; }
 
   /// Returns a mutable reference to the subset of the continuous state vector
   /// that is generalized velocity `v`. May be zero length.
-  VectorBase<T>& get_mutable_generalized_velocity() {
-    return *generalized_velocity_.get();
-  }
+  VectorBase<T>& get_mutable_generalized_velocity() { return *generalized_velocity_.get(); }
 
   /// Returns a const reference to the subset of the continuous state vector
   /// that is other continuous state `z`. May be zero length.
-  const VectorBase<T>& get_misc_continuous_state() const {
-    return *misc_continuous_state_;
-  }
+  const VectorBase<T>& get_misc_continuous_state() const { return *misc_continuous_state_; }
 
   /// Returns a mutable reference to the subset of the continuous state vector
   /// that is other continuous state `z`. May be zero length.
-  VectorBase<T>& get_mutable_misc_continuous_state() {
-    return *misc_continuous_state_.get();
-  }
+  VectorBase<T>& get_mutable_misc_continuous_state() { return *misc_continuous_state_.get(); }
 
   /// Copies the values from `other` into `this`, converting the scalar type as
   /// necessary.
@@ -183,8 +170,7 @@ class ContinuousState {
     MALIPUT_DRAKE_THROW_UNLESS(num_q() == other.num_q());
     MALIPUT_DRAKE_THROW_UNLESS(num_v() == other.num_v());
     MALIPUT_DRAKE_THROW_UNLESS(num_z() == other.num_z());
-    SetFromVector(other.CopyToVector().unaryExpr(
-        scalar_conversion::ValueConverter<T, U>{}));
+    SetFromVector(other.CopyToVector().unaryExpr(scalar_conversion::ValueConverter<T, U>{}));
   }
 
   /// Sets the entire continuous state vector from an Eigen expression.
@@ -216,10 +202,8 @@ class ContinuousState {
   /// @param q The subset of state that is generalized position.
   /// @param v The subset of state that is generalized velocity.
   /// @param z The subset of state that is neither position nor velocity.
-  ContinuousState(std::unique_ptr<VectorBase<T>> state,
-                  std::unique_ptr<VectorBase<T>> q,
-                  std::unique_ptr<VectorBase<T>> v,
-                  std::unique_ptr<VectorBase<T>> z);
+  ContinuousState(std::unique_ptr<VectorBase<T>> state, std::unique_ptr<VectorBase<T>> q,
+                  std::unique_ptr<VectorBase<T>> v, std::unique_ptr<VectorBase<T>> z);
 
   /// DiagramContinuousState must override this to maintain the necessary
   /// internal substructure, and to perform a deep copy so that the result
@@ -262,5 +246,4 @@ class ContinuousState {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::ContinuousState)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::ContinuousState)

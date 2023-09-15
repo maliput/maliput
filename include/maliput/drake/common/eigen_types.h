@@ -88,7 +88,6 @@ using RowVector = Eigen::Matrix<Scalar, 1, Cols>;
 template <typename Scalar>
 using RowVectorX = Eigen::Matrix<Scalar, 1, Eigen::Dynamic>;
 
-
 /// A matrix of 2 rows and 2 columns, templated on scalar type.
 template <typename Scalar>
 using Matrix2 = Eigen::Matrix<Scalar, 2, 2>;
@@ -129,8 +128,7 @@ using MatrixX = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
 /// and 6 columns. Rectangular matrices, with different number of rows and
 /// columns, are allowed.
 template <typename Scalar>
-using MatrixUpTo6 =
-Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, 0, 6, 6>;
+using MatrixUpTo6 = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, 0, 6, 6>;
 
 /// A matrix of 6 rows and dynamic column size up to a maximum of 6, templated
 /// on scalar type.
@@ -210,8 +208,7 @@ struct EigenSizeMinPreferFixed {
 /// sizes. Otherwise it gives Eigen::Dynamic.
 template <int a, int b>
 struct MultiplyEigenSizes {
-  static constexpr int value =
-      (a == Eigen::Dynamic || b == Eigen::Dynamic) ? Eigen::Dynamic : a * b;
+  static constexpr int value = (a == Eigen::Dynamic || b == Eigen::Dynamic) ? Eigen::Dynamic : a * b;
 };
 
 /*
@@ -226,18 +223,14 @@ struct is_eigen_type : std::is_base_of<Eigen::EigenBase<Derived>, Derived> {};
  */
 template <typename Derived, typename Scalar>
 struct is_eigen_scalar_same
-    : std::bool_constant<
-          is_eigen_type<Derived>::value &&
-              std::is_same_v<typename Derived::Scalar, Scalar>> {};
+    : std::bool_constant<is_eigen_type<Derived>::value && std::is_same_v<typename Derived::Scalar, Scalar>> {};
 
 /*
  * Determines if an EigenBase<> type is a compile-time (column) vector.
  * This will not check for run-time size.
  */
 template <typename Derived>
-struct is_eigen_vector
-    : std::bool_constant<is_eigen_type<Derived>::value &&
-                         Derived::ColsAtCompileTime == 1> {};
+struct is_eigen_vector : std::bool_constant<is_eigen_type<Derived>::value && Derived::ColsAtCompileTime == 1> {};
 
 /*
  * Determines if an EigenBase<> type is a compile-time (column) vector of a
@@ -245,9 +238,7 @@ struct is_eigen_vector
  */
 template <typename Derived, typename Scalar>
 struct is_eigen_vector_of
-    : std::bool_constant<
-          is_eigen_scalar_same<Derived, Scalar>::value &&
-              is_eigen_vector<Derived>::value> {};
+    : std::bool_constant<is_eigen_scalar_same<Derived, Scalar>::value && is_eigen_vector<Derived>::value> {};
 
 // TODO(eric.cousineau): A 1x1 matrix will be disqualified in this case, and
 // this logic will qualify it as a vector. Address the downstream logic if this
@@ -261,9 +252,7 @@ struct is_eigen_vector_of
  */
 template <typename Derived, typename Scalar>
 struct is_eigen_nonvector_of
-    : std::bool_constant<
-          is_eigen_scalar_same<Derived, Scalar>::value &&
-              !is_eigen_vector<Derived>::value> {};
+    : std::bool_constant<is_eigen_scalar_same<Derived, Scalar>::value && !is_eigen_vector<Derived>::value> {};
 
 // TODO(eric.cousineau): Add alias is_eigen_matrix_of = is_eigen_scalar_same if
 // appropriate.
@@ -396,9 +385,7 @@ class EigenPtr {
    public:
     DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(ReassignableRef)
     ReassignableRef() {}
-    ~ReassignableRef() {
-      reset();
-    }
+    ~ReassignableRef() { reset(); }
 
     // Reset value to null.
     void reset() {
@@ -432,8 +419,7 @@ class EigenPtr {
     RefType& raw_value() { return reinterpret_cast<RefType&>(storage_); }
 
     bool has_value_{};
-    typename std::aligned_storage<sizeof(RefType), alignof(RefType)>::type
-        storage_;
+    typename std::aligned_storage<sizeof(RefType), alignof(RefType)>::type storage_;
   };
 
   // Use mutable, reassignable ref to permit pointer-like semantics (with
@@ -459,9 +445,7 @@ class EigenPtr {
     return m_.value();
   }
 
-  bool is_valid() const {
-    return m_.has_value();
-  }
+  bool is_valid() const { return m_.has_value(); }
 };
 
 }  // namespace maliput::drake

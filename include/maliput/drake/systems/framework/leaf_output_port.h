@@ -51,13 +51,11 @@ class LeafOutputPort final : public OutputPort<T> {
 
   /** Signature of a function suitable for calculating a value of a particular
   output port, given a place to put the value. */
-  using CalcCallback =
-  std::function<void(const Context<T>&, AbstractValue*)>;
+  using CalcCallback = std::function<void(const Context<T>&, AbstractValue*)>;
 
   /** Signature of a function suitable for calculating a value of a particular
   vector-valued output port, given a place to put the value. */
-  using CalcVectorCallback =
-  std::function<void(const Context<T>&, BasicVector<T>*)>;
+  using CalcVectorCallback = std::function<void(const Context<T>&, BasicVector<T>*)>;
 
   /** Returns the cache entry associated with this output port. */
   const CacheEntry& cache_entry() const {
@@ -70,52 +68,36 @@ class LeafOutputPort final : public OutputPort<T> {
   different behavior with caching on or off and would like to determine if
   the problem is caused by this port.
   @see CacheEntry::disable_caching_by_default() */
-  void disable_caching_by_default() {
-    cache_entry_->disable_caching_by_default();
-  }
+  void disable_caching_by_default() { cache_entry_->disable_caching_by_default(); }
 
  private:
   friend class internal::FrameworkFactory;
 
   // Constructs a cached output port. The `system` parameter must be the same
   // object as the `system_interface` parameter.
-  LeafOutputPort(const System<T>* system,
-                 internal::SystemMessageInterface* system_interface,
-                 internal::SystemId system_id,
-                 std::string name, OutputPortIndex index,
-                 DependencyTicket ticket, PortDataType data_type, int size,
-                 CacheEntry* cache_entry)
-      : OutputPort<T>(system, system_interface, system_id, std::move(name),
-                      index, ticket, data_type, size),
+  LeafOutputPort(const System<T>* system, internal::SystemMessageInterface* system_interface,
+                 internal::SystemId system_id, std::string name, OutputPortIndex index, DependencyTicket ticket,
+                 PortDataType data_type, int size, CacheEntry* cache_entry)
+      : OutputPort<T>(system, system_interface, system_id, std::move(name), index, ticket, data_type, size),
         cache_entry_(cache_entry) {
     MALIPUT_DRAKE_DEMAND(cache_entry != nullptr);
   }
 
   // Invokes the cache entry's allocation function.
-  std::unique_ptr<AbstractValue> DoAllocate() const final {
-    return cache_entry().Allocate();
-  }
+  std::unique_ptr<AbstractValue> DoAllocate() const final { return cache_entry().Allocate(); }
 
   // Invokes the cache entry's calculator function.
-  void DoCalc(const Context<T>& context, AbstractValue* value) const final {
-    cache_entry().Calc(context, value);
-  }
+  void DoCalc(const Context<T>& context, AbstractValue* value) const final { cache_entry().Calc(context, value); }
 
   // Invokes the cache entry's Eval() function.
-  const AbstractValue& DoEval(const Context<T>& context) const final {
-    return cache_entry().EvalAbstract(context);
-  }
+  const AbstractValue& DoEval(const Context<T>& context) const final { return cache_entry().EvalAbstract(context); }
 
   // Returns the cache entry's ticket and no subsystem.
-  internal::OutputPortPrerequisite DoGetPrerequisite() const final {
-    return {std::nullopt, cache_entry().ticket()};
-  };
+  internal::OutputPortPrerequisite DoGetPrerequisite() const final { return {std::nullopt, cache_entry().ticket()}; };
 
   // Check that an AbstractValue provided to Calc() is suitable for this port
   // by comparing it with the port's cache entry value type.
-  void ThrowIfInvalidPortValueType(
-      const Context<T>& context,
-      const AbstractValue& proposed_value) const final;
+  void ThrowIfInvalidPortValueType(const Context<T>& context, const AbstractValue& proposed_value) const final;
 
   CacheEntry* const cache_entry_;
 };
@@ -123,5 +105,4 @@ class LeafOutputPort final : public OutputPort<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::LeafOutputPort)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::LeafOutputPort)

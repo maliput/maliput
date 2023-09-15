@@ -33,9 +33,9 @@ int ReportZeroHash(const std::type_info& detail) {
   oss << " See drake/common/test/value_test.cc for an example.";
   if (!has_warned) {
     log()->warn(oss.str() +
-        " This is the first instance of an impaired T within this process."
-        " Additional instances will not be warned about, but you may set"
-        " the maliput::drake::log() level to 'debug' to see all instances.");
+                " This is the first instance of an impaired T within this process."
+                " Additional instances will not be warned about, but you may set"
+                " the maliput::drake::log() level to 'debug' to see all instances.");
   } else {
     log()->debug(oss.str());
   }
@@ -46,8 +46,7 @@ int ReportZeroHash(const std::type_info& detail) {
 AbstractValue::~AbstractValue() = default;
 
 std::string AbstractValue::GetNiceTypeName() const {
-  return NiceTypeName::Canonicalize(
-      NiceTypeName::Demangle(type_info().name()));
+  return NiceTypeName::Canonicalize(NiceTypeName::Demangle(type_info().name()));
 }
 
 void AbstractValue::ThrowCastError(const std::string& requested_type) const {

@@ -100,25 +100,22 @@ class OutputPort : public OutputPortBase {
     return Eval<BasicVector<T>>(context).get_value();
   }
   // With ValueType == AbstractValue, we don't need to downcast.
-  template <typename ValueType, typename = std::enable_if_t<
-      std::is_same_v<AbstractValue, ValueType>>>
+  template <typename ValueType, typename = std::enable_if_t<std::is_same_v<AbstractValue, ValueType>>>
   const AbstractValue& Eval(const Context<T>& context) const {
     ValidateSystemId(context.get_system_id());
     return DoEval(context);
   }
   // With anything but a BasicVector subclass, we can just DoEval then cast.
-  template <typename ValueType, typename = std::enable_if_t<
-      !std::is_same_v<AbstractValue, ValueType> && (
-        !std::is_base_of_v<BasicVector<T>, ValueType> ||
-        std::is_same_v<BasicVector<T>, ValueType>)>>
+  template <typename ValueType, typename = std::enable_if_t<!std::is_same_v<AbstractValue, ValueType> &&
+                                                            (!std::is_base_of_v<BasicVector<T>, ValueType> ||
+                                                             std::is_same_v<BasicVector<T>, ValueType>)>>
   const ValueType& Eval(const Context<T>& context) const {
     ValidateSystemId(context.get_system_id());
     return PortEvalCast<ValueType>(DoEval(context));
   }
   // With a BasicVector subclass, we need to downcast twice.
-  template <typename ValueType, typename = std::enable_if_t<
-      std::is_base_of_v<BasicVector<T>, ValueType> &&
-      !std::is_same_v<BasicVector<T>, ValueType>>>
+  template <typename ValueType, typename = std::enable_if_t<std::is_base_of_v<BasicVector<T>, ValueType> &&
+                                                            !std::is_same_v<BasicVector<T>, ValueType>>>
   const ValueType& Eval(const Context<T>& context, int = 0) const {
     return PortEvalCast<ValueType>(Eval<BasicVector<T>>(context));
   }
@@ -160,16 +157,14 @@ class OutputPort : public OutputPortBase {
   /** Returns a reference to the System that owns this output port. Note that
   for a diagram output port this will be the diagram, not the leaf system whose
   output port was forwarded. */
-  const System<T>& get_system() const {
-    return system_;
-  }
+  const System<T>& get_system() const { return system_; }
 
   // A using-declaration adds these methods into our class's Doxygen.
   // (Placed in an order that makes sense for the class's table of contents.)
-  using PortBase::get_name;
-  using PortBase::GetFullDescription;
   using OutputPortBase::get_index;
   using PortBase::get_data_type;
+  using PortBase::get_name;
+  using PortBase::GetFullDescription;
   using PortBase::size;
   using PortBase::ticket;
 
@@ -182,14 +177,9 @@ class OutputPort : public OutputPortBase {
   parameter. */
   // The system and system_interface are provided separately since we don't have
   // access to System's declaration here so can't cast but the caller can.
-  OutputPort(const System<T>* system,
-             internal::SystemMessageInterface* system_interface,
-             internal::SystemId system_id, std::string name,
-             OutputPortIndex index, DependencyTicket ticket,
-             PortDataType data_type, int size)
-      : OutputPortBase(system_interface, system_id, std::move(name), index,
-                       ticket, data_type, size),
-        system_{*system} {
+  OutputPort(const System<T>* system, internal::SystemMessageInterface* system_interface, internal::SystemId system_id,
+             std::string name, OutputPortIndex index, DependencyTicket ticket, PortDataType data_type, int size)
+      : OutputPortBase(system_interface, system_id, std::move(name), index, ticket, data_type, size), system_{*system} {
     // Check the precondition on identical parameters; note that comparing as
     // void* is only valid because we have single inheritance.
     MALIPUT_DRAKE_DEMAND(static_cast<const void*>(system) == system_interface);
@@ -209,8 +199,7 @@ class OutputPort : public OutputPortBase {
   @param value   A pointer that has already be validated as non-null and
                  pointing to an object of the right type to hold a value of
                  this output port. */
-  virtual void DoCalc(const Context<T>& context,
-                      AbstractValue* value) const = 0;
+  virtual void DoCalc(const Context<T>& context, AbstractValue* value) const = 0;
 
   /** A concrete %OutputPort must provide access to the current value of this
   output port stored within the given Context. If the value is already up to
@@ -225,13 +214,11 @@ class OutputPort : public OutputPortBase {
   Derived classes should throw a helpful message if not (see LeafOutputPort
   for an example). It is OK for this to be an expensive check because we will
   only call it in Debug builds. */
-  virtual void ThrowIfInvalidPortValueType(
-      const Context<T>& context, const AbstractValue& proposed_value) const = 0;
+  virtual void ThrowIfInvalidPortValueType(const Context<T>& context, const AbstractValue& proposed_value) const = 0;
 
   /** Static method allows DiagramOutputPort to call this recursively. */
-  static void ThrowIfInvalidPortValueType(
-      const OutputPort<T>& port,
-      const Context<T>& context, const AbstractValue& proposed_value) {
+  static void ThrowIfInvalidPortValueType(const OutputPort<T>& port, const Context<T>& context,
+                                          const AbstractValue& proposed_value) {
     port.ThrowIfInvalidPortValueType(context, proposed_value);
   }
 
@@ -247,5 +234,4 @@ class OutputPort : public OutputPortBase {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::OutputPort)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::OutputPort)

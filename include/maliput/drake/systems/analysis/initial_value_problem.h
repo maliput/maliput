@@ -75,8 +75,7 @@ class InitialValueProblem {
   /// @param x The dependent vector variable 𝐱 ∈ ℝⁿ.
   /// @param k The vector of parameters 𝐤 ∈ ℝᵐ.
   /// @return The derivative vector d𝐱/dt ∈ ℝⁿ.
-  using OdeFunction = std::function<VectorX<T>(const T& t, const VectorX<T>& x,
-                                               const VectorX<T>& k)>;
+  using OdeFunction = std::function<VectorX<T>(const T& t, const VectorX<T>& x, const VectorX<T>& k)>;
 
   /// A collection of values i.e. initial time t₀, initial state vector 𝐱₀
   /// and parameters vector 𝐤.to further specify the ODE system (in order
@@ -91,20 +90,17 @@ class InitialValueProblem {
     /// @param t0_in Specified initial time t₀.
     /// @param x0_in Specified initial state vector 𝐱₀.
     /// @param k_in Specified parameter vector 𝐤.
-    OdeContext(const std::optional<T>& t0_in,
-               const std::optional<VectorX<T>>& x0_in,
+    OdeContext(const std::optional<T>& t0_in, const std::optional<VectorX<T>>& x0_in,
                const std::optional<VectorX<T>>& k_in)
         : t0(t0_in), x0(x0_in), k(k_in) {}
 
-    bool operator==(const OdeContext& rhs) const {
-      return (t0 == rhs.t0 && x0 == rhs.x0 && k == rhs.k);
-    }
+    bool operator==(const OdeContext& rhs) const { return (t0 == rhs.t0 && x0 == rhs.x0 && k == rhs.k); }
 
     bool operator!=(const OdeContext& rhs) const { return !operator==(rhs); }
 
     std::optional<T> t0;           ///< The initial time t₀ for the IVP.
     std::optional<VectorX<T>> x0;  ///< The initial state vector 𝐱₀ for the IVP.
-    std::optional<VectorX<T>> k;  ///< The parameter vector 𝐤 for the IVP.
+    std::optional<VectorX<T>> k;   ///< The parameter vector 𝐤 for the IVP.
   };
 
   /// Constructs an IVP described by the given @p ode_function, using
@@ -120,8 +116,7 @@ class InitialValueProblem {
   /// @pre An initial state vector @p default_values.x0 is given.
   /// @pre A parameter vector @p default_values.k is given.
   /// @throws std::exception if preconditions are not met.
-  InitialValueProblem(const OdeFunction& ode_function,
-                      const OdeContext& default_values);
+  InitialValueProblem(const OdeFunction& ode_function, const OdeContext& default_values);
 
   /// Solves the IVP for time @p tf, using the initial time t₀, initial state
   /// vector 𝐱₀ and parameter vector 𝐤 present in @p values, falling back to
@@ -168,8 +163,7 @@ class InitialValueProblem {
   ///      must match that of the parameter vector in the default specified
   ///      values given on construction.
   /// @throws std::exception if any of the preconditions is not met.
-  std::unique_ptr<DenseOutput<T>> DenseSolve(
-      const T& tf, const OdeContext& values = {}) const;
+  std::unique_ptr<DenseOutput<T>> DenseSolve(const T& tf, const OdeContext& values = {}) const;
 
   /// Resets the internal integrator instance by in-place
   /// construction of the given integrator type.
@@ -189,8 +183,7 @@ class InitialValueProblem {
   ///          InitialValueProblem::get_mutable_integrator().
   template <typename Integrator, typename... Args>
   Integrator* reset_integrator(Args&&... args) {
-    integrator_ =
-        std::make_unique<Integrator>(*system_, std::forward<Args>(args)...);
+    integrator_ = std::make_unique<Integrator>(*system_, std::forward<Args>(args)...);
     integrator_->reset_context(context_.get());
     return static_cast<Integrator*>(integrator_.get());
   }

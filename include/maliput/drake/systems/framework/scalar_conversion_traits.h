@@ -92,16 +92,12 @@ struct FromDoubleTraits {
 /// beyond the double value (e.g., possible derivatives) might be discarded.
 template <typename T, typename U>
 struct ValueConverter {
-  T operator()(const U& u) const {
-    return ExtractDoubleOrThrow(u);
-  }
+  T operator()(const U& u) const { return ExtractDoubleOrThrow(u); }
 };
 template <typename T>
 struct ValueConverter<T, T> {
   using U = T;
-  T operator()(const U& u) const {
-    return u;
-  }
+  T operator()(const U& u) const { return u; }
 };
 
 }  // namespace scalar_conversion

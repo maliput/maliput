@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define MALIPUT_USED
 
 #include <initializer_list>
@@ -62,7 +61,9 @@ class VectorBase {
   /// @throws std::exception if the index is >= size() or negative.
   /// Consider operator[]() instead if bounds-checking is unwanted.
   const T& GetAtIndex(int index) const {
-    if (index < 0) { this->ThrowOutOfRange(index); }
+    if (index < 0) {
+      this->ThrowOutOfRange(index);
+    }
     return DoGetAtIndexChecked(index);
   }
 
@@ -70,16 +71,16 @@ class VectorBase {
   /// @throws std::exception if the index is >= size() or negative.
   /// Consider operator[]() instead if bounds-checking is unwanted.
   T& GetAtIndex(int index) {
-    if (index < 0) { this->ThrowOutOfRange(index); }
+    if (index < 0) {
+      this->ThrowOutOfRange(index);
+    }
     return DoGetAtIndexChecked(index);
   }
 
   /// Replaces the state at the given index with the value.
   /// @throws std::exception if the index is >= size().
   /// Consider operator[]() instead if bounds-checking is unwanted.
-  void SetAtIndex(int index, const T& value) {
-    GetAtIndex(index) = value;
-  }
+  void SetAtIndex(int index, const T& value) { GetAtIndex(index) = value; }
 
   /// Replaces the entire vector with the contents of @p value.
   /// @throws std::exception if @p value is not a column vector with size()
@@ -89,7 +90,9 @@ class VectorBase {
   /// value and allocates no memory.
   virtual void SetFrom(const VectorBase<T>& value) {
     const int n = value.size();
-    if (n != size()) { this->ThrowMismatchedSize(n); }
+    if (n != size()) {
+      this->ThrowMismatchedSize(n);
+    }
     for (int i = 0; i < n; ++i) {
       (*this)[i] = value[i];
     }
@@ -103,7 +106,9 @@ class VectorBase {
   /// value and allocates no memory.
   virtual void SetFromVector(const Eigen::Ref<const VectorX<T>>& value) {
     const int n = value.rows();
-    if (n != size()) { this->ThrowMismatchedSize(n); }
+    if (n != size()) {
+      this->ThrowMismatchedSize(n);
+    }
     for (int i = 0; i < n; ++i) {
       (*this)[i] = value[i];
     }
@@ -137,7 +142,9 @@ class VectorBase {
   virtual void CopyToPreSizedVector(EigenPtr<VectorX<T>> vec) const {
     MALIPUT_DRAKE_THROW_UNLESS(vec != nullptr);
     const int n = vec->rows();
-    if (n != size()) { this->ThrowMismatchedSize(n); }
+    if (n != size()) {
+      this->ThrowMismatchedSize(n);
+    }
     for (int i = 0; i < n; ++i) {
       (*vec)[i] = (*this)[i];
     }
@@ -148,11 +155,12 @@ class VectorBase {
   ///
   /// Implementations should ensure this operation remains O(N) in the size of
   /// the value and allocates no memory.
-  virtual void ScaleAndAddToVector(const T& scale,
-                                   EigenPtr<VectorX<T>> vec) const {
+  virtual void ScaleAndAddToVector(const T& scale, EigenPtr<VectorX<T>> vec) const {
     MALIPUT_DRAKE_THROW_UNLESS(vec != nullptr);
     const int n = vec->rows();
-    if (n != size()) { this->ThrowMismatchedSize(n); }
+    if (n != size()) {
+      this->ThrowMismatchedSize(n);
+    }
     for (int i = 0; i < n; ++i) {
       (*vec)[i] += scale * (*this)[i];
     }
@@ -160,19 +168,18 @@ class VectorBase {
 
   /// Add in scaled vector @p rhs to this vector.
   /// @throws std::exception if @p rhs is a different size than this.
-  VectorBase& PlusEqScaled(const T& scale, const VectorBase<T>& rhs) {
-    return PlusEqScaled({{scale, rhs}});
-  }
+  VectorBase& PlusEqScaled(const T& scale, const VectorBase<T>& rhs) { return PlusEqScaled({{scale, rhs}}); }
 
   /// Add in multiple scaled vectors to this vector.
   /// @throws std::exception if any rhs are a different size than this.
-  VectorBase& PlusEqScaled(const std::initializer_list<
-                           std::pair<T, const VectorBase<T>&>>& rhs_scale) {
+  VectorBase& PlusEqScaled(const std::initializer_list<std::pair<T, const VectorBase<T>&>>& rhs_scale) {
     const int n = size();
     for (const auto& [scale, rhs] : rhs_scale) {
       unused(scale);
       const int rhs_n = rhs.size();
-      if (rhs_n != n) { this->ThrowMismatchedSize(rhs_n); }
+      if (rhs_n != n) {
+        this->ThrowMismatchedSize(rhs_n);
+      }
     }
     DoPlusEqScaled(rhs_scale);
     return *this;
@@ -180,22 +187,17 @@ class VectorBase {
 
   /// Add in vector @p rhs to this vector.
   /// @throws std::exception if @p rhs is a different size than this.
-  VectorBase& operator+=(const VectorBase<T>& rhs) {
-    return PlusEqScaled(T(1), rhs);
-  }
+  VectorBase& operator+=(const VectorBase<T>& rhs) { return PlusEqScaled(T(1), rhs); }
 
   /// Subtract in vector @p rhs to this vector.
   /// @throws std::exception if @p rhs is a different size than this.
-  VectorBase& operator-=(const VectorBase<T>& rhs) {
-    return PlusEqScaled(T(-1), rhs);
-  }
+  VectorBase& operator-=(const VectorBase<T>& rhs) { return PlusEqScaled(T(-1), rhs); }
 
   /// Get the bounds for the elements.
   /// If lower and upper are both empty size vectors, then there are no bounds.
   /// Otherwise, the bounds are (*lower)(i) <= GetAtIndex(i) <= (*upper)(i)
   /// The default output is no bounds.
-  virtual void GetElementBounds(Eigen::VectorXd* lower,
-                                Eigen::VectorXd* upper) const {
+  virtual void GetElementBounds(Eigen::VectorXd* lower, Eigen::VectorXd* upper) const {
     lower->resize(0);
     upper->resize(0);
   }
@@ -232,8 +234,7 @@ class VectorBase {
   /// operations should be far more efficient. Overriding implementations should
   /// ensure that this operation remains O(N) in the size of
   /// the value and allocates no memory.
-  virtual void DoPlusEqScaled(const std::initializer_list<
-                              std::pair<T, const VectorBase<T>&>>& rhs_scale) {
+  virtual void DoPlusEqScaled(const std::initializer_list<std::pair<T, const VectorBase<T>&>>& rhs_scale) {
     const int n = size();
     for (int i = 0; i < n; ++i) {
       T value(0);
@@ -272,5 +273,4 @@ std::ostream& operator<<(std::ostream& os, const VectorBase<T>& vec) {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::VectorBase)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::VectorBase)

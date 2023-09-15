@@ -52,9 +52,7 @@ class DiagramState : public State<T> {
   void Finalize();
 
  private:
-  int num_substates() const {
-    return static_cast<int>(substates_.size());
-  }
+  int num_substates() const { return static_cast<int>(substates_.size()); }
 
   bool finalized_{false};
   std::vector<State<T>*> substates_;
@@ -64,5 +62,4 @@ class DiagramState : public State<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiagramState)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiagramState)

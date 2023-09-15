@@ -39,9 +39,7 @@ std::vector<System<T>*> DiagramBuilder<T>::GetMutableSystems() {
 }
 
 template <typename T>
-void DiagramBuilder<T>::Connect(
-    const OutputPort<T>& src,
-    const InputPort<T>& dest) {
+void DiagramBuilder<T>::Connect(const OutputPort<T>& src, const InputPort<T>& dest) {
   InputPortLocator dest_id{&dest.get_system(), dest.get_index()};
   OutputPortLocator src_id{&src.get_system(), src.get_index()};
   ThrowIfSystemNotRegistered(&src.get_system());
@@ -56,8 +54,7 @@ void DiagramBuilder<T>::Connect(
     oss << dest.get_system().get_name();
     throw std::logic_error(oss.str());
   }
-  if ((src.get_data_type() != kAbstractValued) &&
-      (src.size() != dest.size())) {
+  if ((src.get_data_type() != kAbstractValued) && (src.size() != dest.size())) {
     std::stringstream oss;
     oss << "DiagramBuilder::Connect: Mismatched vector sizes while connecting ";
     oss << "output port " << src.get_name() << " of System ";
@@ -99,27 +96,23 @@ void DiagramBuilder<T>::Cascade(const System<T>& src, const System<T>& dest) {
 }
 
 template <typename T>
-InputPortIndex DiagramBuilder<T>::ExportInput(
-    const InputPort<T>& input,
-    std::variant<std::string, UseDefaultName> name) {
+InputPortIndex DiagramBuilder<T>::ExportInput(const InputPort<T>& input,
+                                              std::variant<std::string, UseDefaultName> name) {
   const InputPortIndex diagram_port_index = DeclareInput(input, name);
   ConnectInput(diagram_port_index, input);
   return diagram_port_index;
 }
 
 template <typename T>
-InputPortIndex DiagramBuilder<T>::DeclareInput(
-    const InputPort<T>& input,
-    std::variant<std::string, UseDefaultName> name) {
+InputPortIndex DiagramBuilder<T>::DeclareInput(const InputPort<T>& input,
+                                               std::variant<std::string, UseDefaultName> name) {
   InputPortLocator id{&input.get_system(), input.get_index()};
   ThrowIfSystemNotRegistered(&input.get_system());
 
   // The requirement that subsystem names are unique guarantees uniqueness
   // of the port names.
-  std::string port_name =
-      name == kUseDefaultName
-          ? input.get_system().get_name() + "_" + input.get_name()
-          : std::get<std::string>(std::move(name));
+  std::string port_name = name == kUseDefaultName ? input.get_system().get_name() + "_" + input.get_name()
+                                                  : std::get<std::string>(std::move(name));
   MALIPUT_DRAKE_DEMAND(!port_name.empty());
 
   // Reject duplicate declarations.
@@ -137,20 +130,17 @@ InputPortIndex DiagramBuilder<T>::DeclareInput(
 }
 
 template <typename T>
-void DiagramBuilder<T>::ConnectInput(
-    const std::string& diagram_port_name, const InputPort<T>& input) {
+void DiagramBuilder<T>::ConnectInput(const std::string& diagram_port_name, const InputPort<T>& input) {
   MALIPUT_DRAKE_THROW_UNLESS(diagram_input_indices_.count(diagram_port_name));
   ConnectInput(diagram_input_indices_[diagram_port_name], input);
 }
 
 template <typename T>
-void DiagramBuilder<T>::ConnectInput(
-    InputPortIndex diagram_port_index, const InputPort<T>& input) {
+void DiagramBuilder<T>::ConnectInput(InputPortIndex diagram_port_index, const InputPort<T>& input) {
   InputPortLocator id{&input.get_system(), input.get_index()};
   ThrowIfInputAlreadyWired(id);
   ThrowIfSystemNotRegistered(&input.get_system());
-  MALIPUT_DRAKE_THROW_UNLESS(
-      diagram_port_index < InputPortIndex(diagram_input_data_.size()));
+  MALIPUT_DRAKE_THROW_UNLESS(diagram_port_index < InputPortIndex(diagram_input_data_.size()));
 
   // Check that port types match.
   const ExportedInputData& data = diagram_input_data_[diagram_port_index];
@@ -166,8 +156,7 @@ void DiagramBuilder<T>::ConnectInput(
     oss << port_name << " of Diagram";
     throw std::logic_error(oss.str());
   }
-  if ((model.get_data_type() != kAbstractValued) &&
-      (model.size() != input.size())) {
+  if ((model.get_data_type() != kAbstractValued) && (model.size() != input.size())) {
     std::ostringstream oss;
     oss << "DiagramBuilder::ConnectInput: Mismatched vector sizes while ";
     oss << "connecting input port ";
@@ -204,20 +193,16 @@ void DiagramBuilder<T>::ConnectInput(
 }
 
 template <typename T>
-OutputPortIndex DiagramBuilder<T>::ExportOutput(
-    const OutputPort<T>& output,
-    std::variant<std::string, UseDefaultName> name) {
+OutputPortIndex DiagramBuilder<T>::ExportOutput(const OutputPort<T>& output,
+                                                std::variant<std::string, UseDefaultName> name) {
   ThrowIfSystemNotRegistered(&output.get_system());
   OutputPortIndex return_id(output_port_ids_.size());
-  output_port_ids_.push_back(
-      OutputPortLocator{&output.get_system(), output.get_index()});
+  output_port_ids_.push_back(OutputPortLocator{&output.get_system(), output.get_index()});
 
   // The requirement that subsystem names are unique guarantees uniqueness
   // of the port names.
-  std::string port_name =
-      name == kUseDefaultName
-          ? output.get_system().get_name() + "_" + output.get_name()
-          : std::get<std::string>(std::move(name));
+  std::string port_name = name == kUseDefaultName ? output.get_system().get_name() + "_" + output.get_name()
+                                                  : std::get<std::string>(std::move(name));
   MALIPUT_DRAKE_DEMAND(!port_name.empty());
   output_port_names_.emplace_back(std::move(port_name));
 
@@ -238,25 +223,21 @@ void DiagramBuilder<T>::BuildInto(Diagram<T>* target) {
 template <typename T>
 bool DiagramBuilder<T>::IsConnectedOrExported(const InputPort<T>& port) const {
   InputPortLocator id{&port.get_system(), port.get_index()};
-  if (this->connection_map_.count(id) > 0 ||
-      this->diagram_input_set_.count(id) > 0) {
+  if (this->connection_map_.count(id) > 0 || this->diagram_input_set_.count(id) > 0) {
     return true;
   }
   return false;
 }
 
 template <typename T>
-void DiagramBuilder<T>::ThrowIfInputAlreadyWired(
-    const InputPortLocator& id) const {
-  if (connection_map_.find(id) != connection_map_.end() ||
-      diagram_input_set_.find(id) != diagram_input_set_.end()) {
+void DiagramBuilder<T>::ThrowIfInputAlreadyWired(const InputPortLocator& id) const {
+  if (connection_map_.find(id) != connection_map_.end() || diagram_input_set_.find(id) != diagram_input_set_.end()) {
     throw std::logic_error("Input port is already wired.");
   }
 }
 
 template <typename T>
-void DiagramBuilder<T>::ThrowIfSystemNotRegistered(
-    const System<T>* system) const {
+void DiagramBuilder<T>::ThrowIfSystemNotRegistered(const System<T>* system) const {
   MALIPUT_DRAKE_DEMAND(system != nullptr);
   if (systems_.count(system) == 0) {
     std::ostringstream oss;
@@ -276,8 +257,7 @@ using EitherPortIndex = std::variant<InputPortIndex, OutputPortIndex>;
 // their own (the variant disambiguates input vs output indices, even though
 // their integer values overlap).  The SystemBase* field is supplementary (and
 // only used during error reporting).
-using PortIdentifier = std::tuple<
-    SubsystemIndex, EitherPortIndex, const SystemBase*>;
+using PortIdentifier = std::tuple<SubsystemIndex, EitherPortIndex, const SystemBase*>;
 
 bool is_input_port(const PortIdentifier& node) {
   const EitherPortIndex& either = std::get<1>(node);
@@ -287,18 +267,14 @@ bool is_input_port(const PortIdentifier& node) {
 std::string to_string(const PortIdentifier& port_id) {
   const SystemBase* const system = std::get<2>(port_id);
   const EitherPortIndex& index = std::get<1>(port_id);
-  return is_input_port(port_id) ?
-      system->get_input_port_base(std::get<0>(index)).GetFullDescription() :
-      system->get_output_port_base(std::get<1>(index)).GetFullDescription();
+  return is_input_port(port_id) ? system->get_input_port_base(std::get<0>(index)).GetFullDescription()
+                                : system->get_output_port_base(std::get<1>(index)).GetFullDescription();
 }
 
 // Helper to do the algebraic loop test. It recursively performs the
 // depth-first search on the graph to find cycles.
-bool HasCycleRecurse(
-    const PortIdentifier& n,
-    const std::map<PortIdentifier, std::set<PortIdentifier>>& edges,
-    std::set<PortIdentifier>* visited,
-    std::vector<PortIdentifier>* stack) {
+bool HasCycleRecurse(const PortIdentifier& n, const std::map<PortIdentifier, std::set<PortIdentifier>>& edges,
+                     std::set<PortIdentifier>* visited, std::vector<PortIdentifier>* stack) {
   MALIPUT_DRAKE_ASSERT(visited->count(n) == 0);
   visited->insert(n);
 
@@ -307,11 +283,9 @@ bool HasCycleRecurse(
     MALIPUT_DRAKE_ASSERT(std::find(stack->begin(), stack->end(), n) == stack->end());
     stack->push_back(n);
     for (const auto& target : edge_iter->second) {
-      if (visited->count(target) == 0 &&
-          HasCycleRecurse(target, edges, visited, stack)) {
+      if (visited->count(target) == 0 && HasCycleRecurse(target, edges, visited, stack)) {
         return true;
-      } else if (std::find(stack->begin(), stack->end(), target) !=
-                 stack->end()) {
+      } else if (std::find(stack->begin(), stack->end(), target) != stack->end()) {
         return true;
       }
     }
@@ -349,10 +323,8 @@ void DiagramBuilder<T>::ThrowIfAlgebraicLoopsExist() const {
     const InputPortIndex input_index = item.first.second;
     const SystemBase* const output_system = item.second.first;
     const OutputPortIndex output_index = item.second.second;
-    const PortIdentifier input{
-        system_to_index.at(input_system), input_index, input_system};
-    const PortIdentifier output{
-        system_to_index.at(output_system), output_index, output_system};
+    const PortIdentifier input{system_to_index.at(input_system), input_index, input_system};
+    const PortIdentifier output{system_to_index.at(output_system), output_index, output_system};
     nodes.insert(input);
     nodes.insert(output);
     edges[output].insert(input);
@@ -367,10 +339,8 @@ void DiagramBuilder<T>::ThrowIfAlgebraicLoopsExist() const {
     const SystemBase* const system = system_ptr.get();
     for (const auto& item : system->GetDirectFeedthroughs()) {
       const SubsystemIndex subsystem_index = system_to_index.at(system);
-      const PortIdentifier input{
-          subsystem_index, InputPortIndex{item.first}, system};
-      const PortIdentifier output{
-          subsystem_index, OutputPortIndex{item.second}, system};
+      const PortIdentifier input{subsystem_index, InputPortIndex{item.first}, system};
+      const PortIdentifier output{subsystem_index, OutputPortIndex{item.second}, system};
       if (nodes.count(input) > 0 && nodes.count(output) > 0) {
         edges[input].insert(output);
       }
@@ -431,5 +401,4 @@ std::unique_ptr<typename Diagram<T>::Blueprint> DiagramBuilder<T>::Compile() {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiagramBuilder)
+DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiagramBuilder)

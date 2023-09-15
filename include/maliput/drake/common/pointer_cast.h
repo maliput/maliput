@@ -36,7 +36,9 @@ std::unique_ptr<T> static_pointer_cast(std::unique_ptr<U>&& other) noexcept {
 template <class T, class U>
 std::unique_ptr<T> dynamic_pointer_cast(std::unique_ptr<U>&& other) noexcept {
   T* result = dynamic_cast<T*>(other.get());
-  if (!result) { return nullptr; }
+  if (!result) {
+    return nullptr;
+  }
   other.release();
   return std::unique_ptr<T>(result);
 }

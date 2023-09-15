@@ -17,7 +17,8 @@ namespace systems {
 
 // Forward declare for friendship below. Only System<T> may ever create
 // a SystemOutput<T>.
-template <typename T> class System;
+template <typename T>
+class System;
 
 /** Conveniently stores a snapshot of the values of every output port of
 a System. There is framework support for allocating the right types and filling
@@ -91,9 +92,7 @@ class SystemOutput {
   SystemOutput() = default;
 
   // Add a suitable object to hold values for the next output port.
-  void add_port(std::unique_ptr<AbstractValue> model_value) {
-    port_values_.emplace_back(std::move(model_value));
-  }
+  void add_port(std::unique_ptr<AbstractValue> model_value) { port_values_.emplace_back(std::move(model_value)); }
 
   // Records the id of the subsystem that created this output.
   // See @ref system_compatibility.
@@ -108,5 +107,4 @@ class SystemOutput {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::SystemOutput)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::SystemOutput)

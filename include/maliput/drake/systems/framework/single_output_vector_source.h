@@ -34,9 +34,7 @@ class SingleOutputVectorSource : public LeafSystem<T> {
   ~SingleOutputVectorSource() override = default;
 
   /// Returns the sole output port.
-  const OutputPort<T>& get_output_port() const {
-    return LeafSystem<T>::get_output_port(0);
-  }
+  const OutputPort<T>& get_output_port() const { return LeafSystem<T>::get_output_port(0); }
 
   // Don't use the indexed get_output_port when calling this system directly.
   void get_output_port(int) = delete;
@@ -47,16 +45,14 @@ class SingleOutputVectorSource : public LeafSystem<T> {
   /// @note Objects created using this constructor overload do not support
   /// system scalar conversion.  See @ref system_scalar_conversion.  Use a
   /// different constructor overload if such conversion is desired.
-  explicit SingleOutputVectorSource(int size)
-      : SingleOutputVectorSource({}, size) {}
+  explicit SingleOutputVectorSource(int size) : SingleOutputVectorSource({}, size) {}
 
   /// Creates a source with output type and dimension of the @p model_vector.
   ///
   /// @note Objects created using this constructor overload do not support
   /// system scalar conversion.  See @ref system_scalar_conversion.  Use a
   /// different constructor overload if such conversion is desired.
-  explicit SingleOutputVectorSource(const BasicVector<T>& model_vector)
-      : SingleOutputVectorSource({}, model_vector) {}
+  explicit SingleOutputVectorSource(const BasicVector<T>& model_vector) : SingleOutputVectorSource({}, model_vector) {}
 
   /// Creates a source with the given sole output port configuration.
   ///
@@ -75,21 +71,16 @@ class SingleOutputVectorSource : public LeafSystem<T> {
   ///
   /// @param converter is per LeafSystem::LeafSystem constructor documentation;
   /// see that function documentation for details.
-  SingleOutputVectorSource(
-      SystemScalarConverter converter, const BasicVector<T>& model_vector)
+  SingleOutputVectorSource(SystemScalarConverter converter, const BasicVector<T>& model_vector)
       : LeafSystem<T>(std::move(converter)) {
-    this->DeclareVectorOutputPort(
-        kUseDefaultName, model_vector,
-        &SingleOutputVectorSource<T>::CalcVectorOutput);
+    this->DeclareVectorOutputPort(kUseDefaultName, model_vector, &SingleOutputVectorSource<T>::CalcVectorOutput);
   }
 
   /// Provides a convenience method for %SingleOutputVectorSource subclasses.
   /// This method performs the same logical operation as System::DoCalcOutput
   /// but provides the single output's VectorBlock instead.  Subclasses should
   /// override this method, and not the base class method (which is `final`).
-  virtual void DoCalcVectorOutput(
-      const Context<T>& context,
-      Eigen::VectorBlock<VectorX<T>>* output) const = 0;
+  virtual void DoCalcVectorOutput(const Context<T>& context, Eigen::VectorBlock<VectorX<T>>* output) const = 0;
 
  private:
   // Confirms the single-output invariant when allocating the context.
@@ -100,8 +91,7 @@ class SingleOutputVectorSource : public LeafSystem<T> {
 
   // Converts the parameters to Eigen::VectorBlock form, then delegates to
   // DoCalcVectorOutput().
-  void CalcVectorOutput(const Context<T>& context,
-                        BasicVector<T>* output) const {
+  void CalcVectorOutput(const Context<T>& context, BasicVector<T>* output) const {
     Eigen::VectorBlock<VectorX<T>> block = output->get_mutable_value();
     DoCalcVectorOutput(context, &block);
   }

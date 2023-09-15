@@ -4,9 +4,8 @@ namespace maliput::drake {
 namespace systems {
 
 namespace {
-SystemConstraintType BoundsToType(
-    const Eigen::Ref<const Eigen::VectorXd>& lower,
-    const Eigen::Ref<const Eigen::VectorXd>& upper) {
+SystemConstraintType BoundsToType(const Eigen::Ref<const Eigen::VectorXd>& lower,
+                                  const Eigen::Ref<const Eigen::VectorXd>& upper) {
   MALIPUT_DRAKE_THROW_UNLESS(lower.size() == upper.size());
   MALIPUT_DRAKE_THROW_UNLESS((lower.array() <= upper.array()).all());
 
@@ -23,29 +22,16 @@ SystemConstraintType BoundsToType(
 }
 }  // namespace
 
-SystemConstraintBounds::SystemConstraintBounds(
-    const Eigen::Ref<const Eigen::VectorXd>& lower,
-    const Eigen::Ref<const Eigen::VectorXd>& upper)
-    : size_(lower.size()),
-      type_(BoundsToType(lower, upper)),
-      lower_(lower),
-      upper_(upper) {}
+SystemConstraintBounds::SystemConstraintBounds(const Eigen::Ref<const Eigen::VectorXd>& lower,
+                                               const Eigen::Ref<const Eigen::VectorXd>& upper)
+    : size_(lower.size()), type_(BoundsToType(lower, upper)), lower_(lower), upper_(upper) {}
 
-SystemConstraintBounds::SystemConstraintBounds(
-    const Eigen::Ref<const Eigen::VectorXd>& lower,
-    std::nullopt_t)
-    : SystemConstraintBounds(
-          lower,
-          Eigen::VectorXd::Constant(
-              lower.size(), std::numeric_limits<double>::infinity())) {}
+SystemConstraintBounds::SystemConstraintBounds(const Eigen::Ref<const Eigen::VectorXd>& lower, std::nullopt_t)
+    : SystemConstraintBounds(lower, Eigen::VectorXd::Constant(lower.size(), std::numeric_limits<double>::infinity())) {}
 
-SystemConstraintBounds::SystemConstraintBounds(
-    std::nullopt_t,
-    const Eigen::Ref<const Eigen::VectorXd>& upper)
-    : SystemConstraintBounds(
-          Eigen::VectorXd::Constant(
-              upper.size(), -std::numeric_limits<double>::infinity()),
-          upper) {}
+SystemConstraintBounds::SystemConstraintBounds(std::nullopt_t, const Eigen::Ref<const Eigen::VectorXd>& upper)
+    : SystemConstraintBounds(Eigen::VectorXd::Constant(upper.size(), -std::numeric_limits<double>::infinity()), upper) {
+}
 
 SystemConstraintBounds::SystemConstraintBounds(int size)
     : size_(size),
@@ -56,5 +42,4 @@ SystemConstraintBounds::SystemConstraintBounds(int size)
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::SystemConstraint)
+DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::SystemConstraint)

@@ -12,15 +12,15 @@ namespace is_less_than_comparable_internal {
 
 // Default case; assumes that a class is *not* less-than comparable.
 template <typename T, typename = void>
-struct is_less_than_comparable_helper : std::false_type { };
+struct is_less_than_comparable_helper : std::false_type {};
 
 // Special sauce for SFINAE. Only compiles if it can finds the method
 // `operator<`. If this exists, the is_less_than_comparable implicitly
 // prefers this overload over the default overload.
 template <typename T>
-struct is_less_than_comparable_helper<T, typename std::enable_if_t<true,
-    decltype(unused(std::declval<T&>() < std::declval<T&>()),
-    (void)0)>> : std::true_type {};
+struct is_less_than_comparable_helper<
+    T, typename std::enable_if_t<true, decltype(unused(std::declval<T&>() < std::declval<T&>()), (void)0)>>
+    : std::true_type {};
 
 }  // namespace is_less_than_comparable_internal
 
@@ -66,8 +66,7 @@ struct is_less_than_comparable_helper<T, typename std::enable_if_t<true,
  @tparam  T  The class to test for less-than comparability.
  */
 template <typename T>
-using is_less_than_comparable =
-    is_less_than_comparable_internal::is_less_than_comparable_helper<T, void>;
+using is_less_than_comparable = is_less_than_comparable_internal::is_less_than_comparable_helper<T, void>;
 
 }  // namespace maliput::drake
 

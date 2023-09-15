@@ -13,8 +13,7 @@ namespace maliput::drake {
 namespace trajectories {
 
 template <typename T>
-PiecewiseTrajectory<T>::PiecewiseTrajectory(const std::vector<T>& breaks)
-    : Trajectory<T>(), breaks_(breaks) {
+PiecewiseTrajectory<T>::PiecewiseTrajectory(const std::vector<T>& breaks) : Trajectory<T>(), breaks_(breaks) {
   for (int i = 1; i < get_number_of_segments() + 1; i++) {
     MALIPUT_DRAKE_DEMAND(breaks_[i] - breaks_[i - 1] >= kEpsilonTime);
   }
@@ -58,8 +57,7 @@ T PiecewiseTrajectory<T>::end_time() const {
 }
 
 template <typename T>
-int PiecewiseTrajectory<T>::GetSegmentIndexRecursive(const T& time, int start,
-                                                     int end) const {
+int PiecewiseTrajectory<T>::GetSegmentIndexRecursive(const T& time, int start, int end) const {
   MALIPUT_DRAKE_DEMAND(end >= start);
   MALIPUT_DRAKE_DEMAND(end < static_cast<int>(breaks_.size()));
   MALIPUT_DRAKE_DEMAND(start >= 0);
@@ -82,11 +80,10 @@ template <typename T>
 int PiecewiseTrajectory<T>::get_segment_index(const T& t) const {
   if (breaks_.empty()) return 0;
   // clip to min/max times
-  using std::min;
   using std::max;
+  using std::min;
   T time = min(max(t, start_time()), end_time());
-  return GetSegmentIndexRecursive(time, 0,
-                                  static_cast<int>(breaks_.size() - 1));
+  return GetSegmentIndexRecursive(time, 0, static_cast<int>(breaks_.size() - 1));
 }
 
 template <typename T>
@@ -95,12 +92,11 @@ const std::vector<T>& PiecewiseTrajectory<T>::get_segment_times() const {
 }
 
 template <typename T>
-void PiecewiseTrajectory<T>::segment_number_range_check(
-    int segment_number) const {
+void PiecewiseTrajectory<T>::segment_number_range_check(int segment_number) const {
   if (segment_number < 0 || segment_number >= get_number_of_segments()) {
     std::stringstream msg;
-    msg << "Segment number " << segment_number << " out of range [" << 0 << ", "
-        << get_number_of_segments() << ")" << std::endl;
+    msg << "Segment number " << segment_number << " out of range [" << 0 << ", " << get_number_of_segments() << ")"
+        << std::endl;
     throw std::runtime_error(msg.str().c_str());
   }
 }
@@ -121,8 +117,7 @@ std::vector<T> PiecewiseTrajectory<T>::RandomSegmentTimes(
 }
 
 template <typename T>
-bool PiecewiseTrajectory<T>::SegmentTimesEqual(
-    const PiecewiseTrajectory<T>& other, double tol) const {
+bool PiecewiseTrajectory<T>::SegmentTimesEqual(const PiecewiseTrajectory<T>& other, double tol) const {
   if (breaks_.size() != other.breaks_.size()) return false;
   using std::abs;
   for (size_t i = 0; i < breaks_.size(); i++) {
@@ -134,5 +129,4 @@ bool PiecewiseTrajectory<T>::SegmentTimesEqual(
 }  // namespace trajectories
 }  // namespace maliput::drake
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::trajectories::PiecewiseTrajectory)
+DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::trajectories::PiecewiseTrajectory)

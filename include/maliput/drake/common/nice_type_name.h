@@ -78,9 +78,7 @@ class NiceTypeName {
   /** Returns the nicely demangled and canonicalized type name of `info`. This
   must be calculated on the fly so is expensive whenever called, though very
   reasonable for use in error messages. */
-  static std::string Get(const std::type_info& info) {
-    return Canonicalize(Demangle(info.name()));
-  }
+  static std::string Get(const std::type_info& info) { return Canonicalize(Demangle(info.name())); }
 
   /** Using the algorithm appropriate to the current compiler, demangles a type
   name as returned by `typeid(T).name()`, with the result hopefully suitable for
@@ -110,8 +108,7 @@ class NiceTypeName {
   // No instances of this class should be created.
   NiceTypeName() = delete;
 
-  static std::string GetWithPossibleOverride(
-      const void* ptr, const std::type_info& info);
+  static std::string GetWithPossibleOverride(const void* ptr, const std::type_info& info);
 };
 
 }  // namespace maliput::drake

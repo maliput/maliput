@@ -73,25 +73,22 @@ class InputPort final : public InputPortBase {
     return Eval<BasicVector<T>>(context).get_value();
   }
   // With ValueType == AbstractValue, we don't need to downcast.
-  template <typename ValueType, typename = std::enable_if_t<
-      std::is_same_v<AbstractValue, ValueType>>>
+  template <typename ValueType, typename = std::enable_if_t<std::is_same_v<AbstractValue, ValueType>>>
   const AbstractValue& Eval(const Context<T>& context) const {
     ValidateSystemId(context.get_system_id());
     return DoEvalRequired(context);
   }
   // With anything but a BasicVector subclass, we can just DoEval then cast.
-  template <typename ValueType, typename = std::enable_if_t<
-      !std::is_same_v<AbstractValue, ValueType> && (
-        !std::is_base_of_v<BasicVector<T>, ValueType> ||
-        std::is_same_v<BasicVector<T>, ValueType>)>>
+  template <typename ValueType, typename = std::enable_if_t<!std::is_same_v<AbstractValue, ValueType> &&
+                                                            (!std::is_base_of_v<BasicVector<T>, ValueType> ||
+                                                             std::is_same_v<BasicVector<T>, ValueType>)>>
   const ValueType& Eval(const Context<T>& context) const {
     ValidateSystemId(context.get_system_id());
     return PortEvalCast<ValueType>(DoEvalRequired(context));
   }
   // With a BasicVector subclass, we need to downcast twice.
-  template <typename ValueType, typename = std::enable_if_t<
-      std::is_base_of_v<BasicVector<T>, ValueType> &&
-      !std::is_same_v<BasicVector<T>, ValueType>>>
+  template <typename ValueType, typename = std::enable_if_t<std::is_base_of_v<BasicVector<T>, ValueType> &&
+                                                            !std::is_same_v<BasicVector<T>, ValueType>>>
   const ValueType& Eval(const Context<T>& context, int = 0) const {
     return PortEvalCast<ValueType>(Eval<BasicVector<T>>(context));
   }
@@ -136,15 +133,13 @@ class InputPort final : public InputPortBase {
   @pre `context` is compatible with the System that owns this %InputPort.
   @pre `value` is compatible with this %InputPort's data type. */
   template <typename ValueType>
-  FixedInputPortValue& FixValue(Context<T>* context,
-                                const ValueType& value) const {
+  FixedInputPortValue& FixValue(Context<T>* context, const ValueType& value) const {
     MALIPUT_DRAKE_DEMAND(context != nullptr);
     ValidateSystemId(context->get_system_id());
     const bool is_vector_port = (get_data_type() == kVectorValued);
-    std::unique_ptr<AbstractValue> abstract_value =
-        is_vector_port
-            ? internal::ValueToVectorValue<T>::ToAbstract(__func__, value)
-            : internal::ValueToAbstractValue::ToAbstract(__func__, value);
+    std::unique_ptr<AbstractValue> abstract_value = is_vector_port
+                                                        ? internal::ValueToVectorValue<T>::ToAbstract(__func__, value)
+                                                        : internal::ValueToAbstractValue::ToAbstract(__func__, value);
     return context->FixInputPort(get_index(), *abstract_value);
   }
 
@@ -164,13 +159,13 @@ class InputPort final : public InputPortBase {
 
   // A using-declaration adds these methods into our class's Doxygen.
   // (Placed in an order that makes sense for the class's table of contents.)
+  using InputPortBase::get_index;
+  using InputPortBase::get_random_type;
+  using InputPortBase::is_random;
+  using PortBase::get_data_type;
   using PortBase::get_name;
   using PortBase::GetFullDescription;
-  using InputPortBase::get_index;
-  using PortBase::get_data_type;
   using PortBase::size;
-  using InputPortBase::is_random;
-  using InputPortBase::get_random_type;
   using PortBase::ticket;
 
  private:
@@ -179,15 +174,11 @@ class InputPort final : public InputPortBase {
   // See InputPortBase for the meaning of these parameters. The additional
   // `system` parameter must point to the same object as `system_interface`.
   // (They're separate because System is forward-declared so we can't cast.)
-  InputPort(
-      const System<T>* system,
-      internal::SystemMessageInterface* system_interface,
-      internal::SystemId system_id, std::string name,
-      InputPortIndex index, DependencyTicket ticket, PortDataType data_type,
-      int size, const std::optional<RandomDistribution>& random_type,
-      EvalAbstractCallback eval)
-      : InputPortBase(system_interface, system_id, std::move(name), index,
-                      ticket, data_type, size, random_type, std::move(eval)),
+  InputPort(const System<T>* system, internal::SystemMessageInterface* system_interface, internal::SystemId system_id,
+            std::string name, InputPortIndex index, DependencyTicket ticket, PortDataType data_type, int size,
+            const std::optional<RandomDistribution>& random_type, EvalAbstractCallback eval)
+      : InputPortBase(system_interface, system_id, std::move(name), index, ticket, data_type, size, random_type,
+                      std::move(eval)),
         system_(*system) {
     MALIPUT_DRAKE_DEMAND(system != nullptr);
     // Check the precondition on identical parameters; note that comparing as
@@ -201,5 +192,4 @@ class InputPort final : public InputPortBase {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::InputPort)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::InputPort)

@@ -5,7 +5,8 @@
 namespace maliput::drake {
 namespace systems {
 
-template <typename T> class System;
+template <typename T>
+class System;
 
 /// A tag object that denotes a System subclass `S` in function signatures.
 ///
@@ -28,8 +29,7 @@ template <typename T> class System;
 template <template <typename> class S>
 struct SystemTypeTag {
   SystemTypeTag() {
-    static_assert(std::is_base_of_v<System<double>, S<double>>,
-                  "The type argument to SystemTypeTag must be a System");
+    static_assert(std::is_base_of_v<System<double>, S<double>>, "The type argument to SystemTypeTag must be a System");
   }
 };
 

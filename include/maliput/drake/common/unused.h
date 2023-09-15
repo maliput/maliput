@@ -49,7 +49,7 @@ namespace maliput::drake {
 /// }
 /// @endcode
 ///
-template <typename ... Args>
-void unused(const Args& ...) {}
+template <typename... Args>
+void unused(const Args&...) {}
 
 }  // namespace maliput::drake

@@ -33,23 +33,20 @@ class InputPortBase : public PortBase {
   bool is_random() const { return static_cast<bool>(random_type_); }
 
   /** Returns the RandomDistribution if this is a random port. */
-  std::optional<RandomDistribution> get_random_type() const {
-    return random_type_;
-  }
+  std::optional<RandomDistribution> get_random_type() const { return random_type_; }
 
   // A using-declaration adds these methods into our class's Doxygen.
   // (Placed in an order that makes sense for the class's table of contents.)
+  using PortBase::get_data_type;
   using PortBase::get_name;
   using PortBase::GetFullDescription;
-  using PortBase::get_data_type;
   using PortBase::size;
   using PortBase::ticket;
 
  protected:
   /** Signature of a function suitable for returning the cached value of a
   particular input port. Will return nullptr if the port is not connected. */
-  using EvalAbstractCallback =
-      std::function<const AbstractValue*(const ContextBase&)>;
+  using EvalAbstractCallback = std::function<const AbstractValue*(const ContextBase&)>;
 
   /** Provides derived classes the ability to set the base class members at
   construction.
@@ -73,24 +70,21 @@ class InputPortBase : public PortBase {
   @param random_type
     Input ports may optionally be labeled as random, if the port is intended to
     model a random-source "noise" or "disturbance" input. */
-  InputPortBase(
-      internal::SystemMessageInterface* owning_system,
-      internal::SystemId owning_system_id, std::string name,
-      InputPortIndex index, DependencyTicket ticket, PortDataType data_type,
-      int size, const std::optional<RandomDistribution>& random_type,
-      EvalAbstractCallback eval);
+  InputPortBase(internal::SystemMessageInterface* owning_system, internal::SystemId owning_system_id, std::string name,
+                InputPortIndex index, DependencyTicket ticket, PortDataType data_type, int size,
+                const std::optional<RandomDistribution>& random_type, EvalAbstractCallback eval);
 
   /** Evaluate this port; throws an exception if the port is not connected. */
   const AbstractValue& DoEvalRequired(const ContextBase& context) const {
     const AbstractValue* const result = eval_(context);
-    if (!result) { ThrowRequiredMissing(); }
+    if (!result) {
+      ThrowRequiredMissing();
+    }
     return *result;
   }
 
   /** Evaluate this port; returns nullptr if the port is not connected. */
-  const AbstractValue* DoEvalOptional(const ContextBase& context) const {
-    return eval_(context);
-  }
+  const AbstractValue* DoEvalOptional(const ContextBase& context) const { return eval_(context); }
 
   /** Throws an exception that this port is not connected, but was expected to
   be connected (i.e., an Eval caller expected that it was always connected). */

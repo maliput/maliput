@@ -168,9 +168,7 @@ class IntegratorBase {
                   be maintained internally. The integrator must not outlive
                   the context.
    */
-  explicit IntegratorBase(const System<T>& system,
-                          Context<T>* context = nullptr)
-      : system_(system), context_(context) {
+  explicit IntegratorBase(const System<T>& system, Context<T>* context = nullptr) : system_(system), context_(context) {
     initialization_done_ = false;
   }
 
@@ -299,9 +297,7 @@ class IntegratorBase {
    estimation). If the integrator does not support error estimation, nullptr
    is returned.
    */
-  const ContinuousState<T>* get_error_estimate() const {
-    return err_est_.get();
-  }
+  const ContinuousState<T>* get_error_estimate() const { return err_est_.get(); }
 
   /**
    Return the step size the integrator would like to take next, based
@@ -334,9 +330,7 @@ class IntegratorBase {
    does not support error estimation, this function will always return `true`.
    @sa set_fixed_step_mode()
    */
-  bool get_fixed_step_mode() const {
-    return (!supports_error_estimation() || fixed_step_mode_);
-  }
+  bool get_fixed_step_mode() const { return (!supports_error_estimation() || fixed_step_mode_); }
   // @}
 
   /**
@@ -542,9 +536,7 @@ class IntegratorBase {
    as described in the group documentation. Only used for integrators that
    support error estimation.
    */
-  const Eigen::VectorXd& get_generalized_state_weight_vector() const {
-    return qbar_weight_;
-  }
+  const Eigen::VectorXd& get_generalized_state_weight_vector() const { return qbar_weight_; }
 
   /**
    Gets a mutable weighting vector (equivalent to a diagonal matrix) applied
@@ -558,8 +550,7 @@ class IntegratorBase {
    sets one of the entries to a negative value, an exception will be thrown
    when the integrator is initialized.
    */
-  Eigen::VectorBlock<Eigen::VectorXd>
-  get_mutable_generalized_state_weight_vector() {
+  Eigen::VectorBlock<Eigen::VectorXd> get_mutable_generalized_state_weight_vector() {
     initialization_done_ = false;
     return qbar_weight_.head(qbar_weight_.rows());
   }
@@ -569,9 +560,7 @@ class IntegratorBase {
    weighting errors in miscellaneous continuous state variables `z`. Only used
    for integrators that support error estimation.
    */
-  const Eigen::VectorXd& get_misc_state_weight_vector() const {
-    return z_weight_;
-  }
+  const Eigen::VectorXd& get_misc_state_weight_vector() const { return z_weight_; }
 
   /**
    Gets a mutable weighting vector (equivalent to a diagonal matrix) for
@@ -670,9 +659,7 @@ class IntegratorBase {
    `get_actual_initial_step_size_taken()`.
    @see request_initial_step_size_target()
    */
-  const T& get_initial_step_size_target() const {
-    return req_initial_step_size_;
-  }
+  const T& get_initial_step_size_target() const { return req_initial_step_size_; }
   // @}
 
   /**
@@ -805,8 +792,7 @@ class IntegratorBase {
    @sa set_requested_minimum_step_size()
    @sa get_working_minimum_step_size(T)
    */
-  const T& get_requested_minimum_step_size() const {
-    return req_min_step_size_; }
+  const T& get_requested_minimum_step_size() const { return req_min_step_size_; }
 
   /**
    Sets whether the integrator should throw a std::exception
@@ -816,18 +802,14 @@ class IntegratorBase {
    advance time and state using the minimum specified step size in such
    situations. See @ref integrator-minstep "this section" for more detail.
    */
-  void set_throw_on_minimum_step_size_violation(bool throws) {
-    min_step_exceeded_throws_ = throws;
-  }
+  void set_throw_on_minimum_step_size_violation(bool throws) { min_step_exceeded_throws_ = throws; }
 
   /**
    Reports the current setting of the throw_on_minimum_step_size_violation
    flag.
    @sa set_throw_on_minimum_step_size_violation().
    */
-  bool get_throw_on_minimum_step_size_violation() const {
-    return min_step_exceeded_throws_;
-  }
+  bool get_throw_on_minimum_step_size_violation() const { return min_step_exceeded_throws_; }
 
   /**
    Gets the current value of the working minimum step size `h_work(t)` for
@@ -836,8 +818,8 @@ class IntegratorBase {
    See @ref integrator-minstep "this section" for more detail.
    */
   T get_working_minimum_step_size() const {
-    using std::max;
     using std::abs;
+    using std::max;
     // Tolerance is just a number close to machine epsilon.
     const double tol = 1e-14;
 
@@ -905,16 +887,19 @@ class IntegratorBase {
     // Verify that user settings are reasonable.
     if constexpr (scalar_predicate<T>::is_bool) {
       if (max_step_size_ < req_min_step_size_) {
-        throw std::logic_error("Integrator maximum step size is less than the "
-                               "minimum step size");
+        throw std::logic_error(
+            "Integrator maximum step size is less than the "
+            "minimum step size");
       }
       if (req_initial_step_size_ > max_step_size_) {
-        throw std::logic_error("Requested integrator initial step size is "
-                               "larger than the maximum step size.");
+        throw std::logic_error(
+            "Requested integrator initial step size is "
+            "larger than the maximum step size.");
       }
       if (req_initial_step_size_ < req_min_step_size_) {
-        throw std::logic_error("Requested integrator initial step size is "
-                               "smaller than the minimum step size.");
+        throw std::logic_error(
+            "Requested integrator initial step size is "
+            "smaller than the minimum step size.");
       }
     }
 
@@ -931,8 +916,7 @@ class IntegratorBase {
       if (z_weight_.size() != misc_size) z_weight_.setOnes(misc_size);
 
       // Verify that minimum values of the weighting matrices are non-negative.
-      if ((qbar_weight_.size() && qbar_weight_.minCoeff() < 0) ||
-          (z_weight_.size() && z_weight_.minCoeff() < 0))
+      if ((qbar_weight_.size() && qbar_weight_.minCoeff() < 0) || (z_weight_.size() && z_weight_.minCoeff() < 0))
         throw std::logic_error("Scaling coefficient is less than zero.");
     }
 
@@ -978,8 +962,7 @@ class IntegratorBase {
    - Takes only a single step forward.
    */
   // TODO(edrumwri): Make the stretch size configurable.
-  StepResult IntegrateNoFurtherThanTime(
-    const T& publish_time, const T& update_time, const T& boundary_time);
+  StepResult IntegrateNoFurtherThanTime(const T& publish_time, const T& update_time, const T& boundary_time);
 
   /**
    Stepping function for integrators operating outside of Simulator that
@@ -1013,8 +996,7 @@ class IntegratorBase {
     const T inf = std::numeric_limits<double>::infinity();
 
     do {
-      IntegrateNoFurtherThanTime(inf, inf,
-          min(t_final, context.get_time() + get_maximum_step_size()));
+      IntegrateNoFurtherThanTime(inf, inf, min(t_final, context.get_time() + get_maximum_step_size()));
     } while (context.get_time() < t_final);
   }
 
@@ -1053,20 +1035,21 @@ class IntegratorBase {
    - Takes only a single step forward.
    */
   [[nodiscard]] bool IntegrateWithSingleFixedStepToTime(const T& t_target) {
-    using std::max;
     using std::abs;
+    using std::max;
 
     const T h = t_target - context_->get_time();
     if (scalar_predicate<T>::is_bool && h < 0) {
-      throw std::logic_error("IntegrateWithSingleFixedStepToTime() called with "
-                             "a negative step size.");
+      throw std::logic_error(
+          "IntegrateWithSingleFixedStepToTime() called with "
+          "a negative step size.");
     }
     if (!this->get_fixed_step_mode())
-      throw std::logic_error("IntegrateWithSingleFixedStepToTime() requires "
-                             "fixed stepping.");
+      throw std::logic_error(
+          "IntegrateWithSingleFixedStepToTime() requires "
+          "fixed stepping.");
 
-    if (!Step(h))
-      return false;
+    if (!Step(h)) return false;
 
     UpdateStepStatistics(h);
 
@@ -1075,7 +1058,7 @@ class IntegratorBase {
       // that time be non-negative.
       MALIPUT_DRAKE_DEMAND(context_->get_time() >= 0);
       const double tol = 10 * std::numeric_limits<double>::epsilon() *
-          ExtractDoubleOrThrow(max(1.0, max(t_target, context_->get_time())));
+                         ExtractDoubleOrThrow(max(1.0, max(t_target, context_->get_time())));
       MALIPUT_DRAKE_DEMAND(abs(context_->get_time() - t_target) < tol);
     }
 
@@ -1114,24 +1097,18 @@ class IntegratorBase {
    reductions was required to permit solving the necessary nonlinear system
    of equations).
    */
-  int64_t get_num_substep_failures() const {
-    return num_substep_failures_;
-  }
+  int64_t get_num_substep_failures() const { return num_substep_failures_; }
 
   /**
    Gets the number of step size shrinkages due to sub-step failures (e.g.,
    integrator convergence failures) since the last call to ResetStatistics()
    or Initialize().
    */
-  int64_t get_num_step_shrinkages_from_substep_failures() const {
-    return num_shrinkages_from_substep_failures_;
-  }
+  int64_t get_num_step_shrinkages_from_substep_failures() const { return num_shrinkages_from_substep_failures_; }
 
   /// Gets the number of step size shrinkages due to failure to meet targeted
   /// error tolerances, since the last call to ResetStatistics or Initialize().
-  int64_t get_num_step_shrinkages_from_error_control() const {
-    return num_shrinkages_from_error_control_;
-  }
+  int64_t get_num_step_shrinkages_from_error_control() const { return num_shrinkages_from_error_control_; }
 
   /**
    Returns the number of ODE function evaluations (calls to
@@ -1147,9 +1124,7 @@ class IntegratorBase {
   /**
    The actual size of the successful first step.
    */
-  const T& get_actual_initial_step_size_taken() const {
-    return actual_initial_step_size_taken_;
-  }
+  const T& get_actual_initial_step_size_taken() const { return actual_initial_step_size_taken_; }
 
   /**
    The size of the smallest step taken *as the result of a controlled
@@ -1157,17 +1132,13 @@ class IntegratorBase {
    ResetStatistics() call. This value will be NaN for integrators without
    error estimation.
    */
-  const T& get_smallest_adapted_step_size_taken() const {
-    return smallest_adapted_step_size_taken_;
-  }
+  const T& get_smallest_adapted_step_size_taken() const { return smallest_adapted_step_size_taken_; }
 
   /**
    The size of the largest step taken since the last Initialize() or
    ResetStatistics() call.
    */
-  const T& get_largest_step_size_taken() const {
-    return largest_step_size_taken_;
-  }
+  const T& get_largest_step_size_taken() const { return largest_step_size_taken_; }
 
   /**
    The number of integration steps taken since the last Initialize()
@@ -1212,7 +1183,6 @@ class IntegratorBase {
     initialization_done_ = false;
   }
 
-
   /**
    @name               Methods for dense output computation
    @anchor dense_output_computation
@@ -1245,8 +1215,9 @@ class IntegratorBase {
       throw std::logic_error("Integrator was not initialized.");
     }
     if (get_context().num_continuous_states() == 0) {
-      throw std::logic_error("System has no continuous state,"
-                             " no dense output can be built.");
+      throw std::logic_error(
+          "System has no continuous state,"
+          " no dense output can be built.");
     }
     if (get_dense_output()) {
       throw std::logic_error("Dense integration has been started already.");
@@ -1260,9 +1231,7 @@ class IntegratorBase {
    the last StartDenseIntegration() call. This is suitable to query the
    integrator's current dense output, if any (may be nullptr).
    */
-  const trajectories::PiecewisePolynomial<T>* get_dense_output() const {
-    return dense_output_.get();
-  }
+  const trajectories::PiecewisePolynomial<T>* get_dense_output() const { return dense_output_.get(); }
 
   /**
    Stops dense integration, yielding ownership of the current dense output
@@ -1302,9 +1271,7 @@ class IntegratorBase {
    Gets the size of the last (previous) integration step. If no integration
    steps have been taken, value will be NaN.
    */
-  const T& get_previous_integration_step_size() const {
-    return prev_step_size_;
-  }
+  const T& get_previous_integration_step_size() const { return prev_step_size_; }
 
  protected:
   /**
@@ -1332,13 +1299,11 @@ class IntegratorBase {
    function evaluations.
    */
   template <typename U>
-  const ContinuousState<U>& EvalTimeDerivatives(const System<U>& system,
-                                                const Context<U>& context) {
+  const ContinuousState<U>& EvalTimeDerivatives(const System<U>& system, const Context<U>& context) {
     const CacheEntry& entry = system.get_time_derivatives_cache_entry();
     const CacheEntryValue& value = entry.get_cache_entry_value(context);
     const int64_t serial_number_before = value.serial_number();
-    const ContinuousState<U>& derivs =
-        system.EvalTimeDerivatives(context);
+    const ContinuousState<U>& derivs = system.EvalTimeDerivatives(context);
     if (value.serial_number() != serial_number_before) {
       ++num_ode_evals_;  // Wasn't already cached.
     }
@@ -1413,10 +1378,7 @@ class IntegratorBase {
         otherwise. The value of the T type will be set to the recommended next
         step size.
    */
-  std::pair<bool, T> CalcAdjustedStepSize(
-      const T& err,
-      const T& attempted_step_size,
-      bool* at_minimum_step_size) const;
+  std::pair<bool, T> CalcAdjustedStepSize(const T& err, const T& attempted_step_size, bool* at_minimum_step_size) const;
 
   /**
    Derived classes can override this method to perform special
@@ -1438,9 +1400,7 @@ class IntegratorBase {
    derived classes to update the integrator's current dense output, if any
    (may be nullptr).
    */
-  trajectories::PiecewisePolynomial<T>* get_mutable_dense_output() {
-    return dense_output_.get();
-  }
+  trajectories::PiecewisePolynomial<T>* get_mutable_dense_output() { return dense_output_.get(); }
 
   /**
    Derived classes must implement this method to (1) integrate the continuous
@@ -1503,18 +1463,15 @@ class IntegratorBase {
     // isolation; it routinely back up the integration and try the same step
     // multiple times.  Note: we intentionally check for equality between
     // double values here.
-    if (dense_output_->get_segment_times().size() > 1 &&
-        start_time < dense_output_->end_time() &&
+    if (dense_output_->get_segment_times().size() > 1 && start_time < dense_output_->end_time() &&
         start_time == dense_output_->get_segment_times().end()[-2]) {
       dense_output_->RemoveFinalSegment();
     }
 
     const ContinuousState<T>& derivatives = EvalTimeDerivatives(*context_);
-    dense_output_->ConcatenateInTime(
-        trajectories::PiecewisePolynomial<T>::CubicHermite(
-            std::vector<T>({start_time, context_->get_time()}),
-            {start_state, state.CopyToVector()},
-            {start_derivatives, derivatives.CopyToVector()}));
+    dense_output_->ConcatenateInTime(trajectories::PiecewisePolynomial<T>::CubicHermite(
+        std::vector<T>({start_time, context_->get_time()}), {start_state, state.CopyToVector()},
+        {start_derivatives, derivatives.CopyToVector()}));
     return true;
   }
 
@@ -1526,22 +1483,16 @@ class IntegratorBase {
   ContinuousState<T>* get_mutable_error_estimate() { return err_est_.get(); }
 
   // Sets the actual initial step size taken.
-  void set_actual_initial_step_size_taken(const T& h) {
-    actual_initial_step_size_taken_ = h;
-  }
+  void set_actual_initial_step_size_taken(const T& h) { actual_initial_step_size_taken_ = h; }
 
   /**
    *  Sets the size of the smallest-step-taken statistic as the result of a
    *  controlled integration step adjustment.
    */
-  void set_smallest_adapted_step_size_taken(const T& h) {
-    smallest_adapted_step_size_taken_ = h;
-  }
+  void set_smallest_adapted_step_size_taken(const T& h) { smallest_adapted_step_size_taken_ = h; }
 
   // Sets the largest-step-size-taken statistic.
-  void set_largest_step_size_taken(const T& h) {
-    largest_step_size_taken_ = h;
-  }
+  void set_largest_step_size_taken(const T& h) { largest_step_size_taken_ = h; }
 
   // Sets the "ideal" next step size (typically done via error control).
   void set_ideal_next_step_size(const T& h) { ideal_next_step_size_ = h; }
@@ -1549,17 +1500,17 @@ class IntegratorBase {
  private:
   // Validates that a smaller step size does not fall below the working minimum
   // and throws an exception if desired.
-  void ValidateSmallerStepSize(const T& current_step_size,
-                               const T& new_step_size) const {
+  void ValidateSmallerStepSize(const T& current_step_size, const T& new_step_size) const {
     if (new_step_size < get_working_minimum_step_size() &&
         new_step_size < current_step_size &&  // Verify step adjusted downward.
         min_step_exceeded_throws_) {
-      DRAKE_LOGGER_DEBUG("Integrator wants to select too small step "
-          "size of {}; working minimum is ", new_step_size,
-          get_working_minimum_step_size());
+      DRAKE_LOGGER_DEBUG(
+          "Integrator wants to select too small step "
+          "size of {}; working minimum is ",
+          new_step_size, get_working_minimum_step_size());
       std::ostringstream str;
-      str << "Error control wants to select step smaller than minimum" <<
-           " allowed (" << get_working_minimum_step_size() << ")";
+      str << "Error control wants to select step smaller than minimum"
+          << " allowed (" << get_working_minimum_step_size() << ")";
       throw std::runtime_error(str.str());
     }
   }
@@ -1673,9 +1624,7 @@ class IntegratorBase {
   // defining this as a static constexpr member kNaN failed to instantiate
   // properly for the AutoDiffXd instantiation (worked in gcc and MSVC).
   // Restore to sanity when some later clang is current.
-  static constexpr double nan() {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  static constexpr double nan() { return std::numeric_limits<double>::quiet_NaN(); }
 
   double target_accuracy_{nan()};   // means "unspecified, use default"
   T req_initial_step_size_{nan()};  // means "unspecified, use default"
@@ -1684,5 +1633,4 @@ class IntegratorBase {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::systems::IntegratorBase)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::systems::IntegratorBase)

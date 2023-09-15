@@ -159,23 +159,17 @@ class Identifier {
   /** Compares one identifier with another of the same type for equality. This
    is considered invalid for invalid ids and is strictly enforced in Debug
    builds. */
-  bool operator==(Identifier other) const {
-    return this->get_value() == other.get_value();
-  }
+  bool operator==(Identifier other) const { return this->get_value() == other.get_value(); }
 
   /** Compares one identifier with another of the same type for inequality. This
    is considered invalid for invalid ids and is strictly enforced in Debug
    builds. */
-  bool operator!=(Identifier other) const {
-    return this->get_value() != other.get_value();
-  }
+  bool operator!=(Identifier other) const { return this->get_value() != other.get_value(); }
 
   /** Compare two identifiers in order to define a total ordering among
    identifiers. This makes identifiers compatible with data structures which
    require total ordering (e.g., std::set).  */
-  bool operator<(Identifier other) const {
-    return this->get_value() < other.get_value();
-  }
+  bool operator<(Identifier other) const { return this->get_value() < other.get_value(); }
 
   /** Generates a new identifier for this id type. This new identifier will be
    different from all previous identifiers created. This method does _not_
@@ -206,9 +200,7 @@ class Identifier {
   Debug builds. However, it is not an error if `this` id is invalid; that
   results in a `false` return. This method can be faster than testing
   separately for validity and equality. */
-  bool is_same_as_valid_id(Identifier valid_id) const {
-    return value_ == valid_id.get_value();
-  }
+  bool is_same_as_valid_id(Identifier valid_id) const { return value_ == valid_id.get_value(); }
 
  protected:
   // Instantiates an identifier from the underlying representation type.

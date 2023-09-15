@@ -137,7 +137,8 @@ referring to individual Systems within a diagram, we use the terms
                              maliput::drake::systems::LeafContext
 -->
 
-@image html drake/systems/framework/images/system_context_cache.png "Figure 1: Computational structure of a Drake System."
+@image html drake/systems/framework/images/system_context_cache.png "Figure 1: Computational structure of a Drake
+System."
 
 In Figure 1 above, values are shown in gray like the Context to emphasize
 that they are actually being stored in the %Context. The System can declare the

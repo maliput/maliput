@@ -8,10 +8,9 @@
 namespace maliput::drake {
 namespace systems {
 
-PortBase::PortBase(
-    const char* kind_string, internal::SystemMessageInterface* owning_system,
-    internal::SystemId owning_system_id, std::string name, int index,
-    DependencyTicket ticket, PortDataType data_type, int size)
+PortBase::PortBase(const char* kind_string, internal::SystemMessageInterface* owning_system,
+                   internal::SystemId owning_system_id, std::string name, int index, DependencyTicket ticket,
+                   PortDataType data_type, int size)
     : kind_string_(kind_string),
       owning_system_(*owning_system),
       owning_system_id_(owning_system_id),
@@ -44,8 +43,7 @@ void PortBase::ThrowValidateContextMismatch() const {
   throw std::logic_error(oss.str());
 }
 
-void PortBase::ThrowBadCast(
-    const std::string& value_typename, const std::string& eval_typename) const {
+void PortBase::ThrowBadCast(const std::string& value_typename, const std::string& eval_typename) const {
   std::ostringstream oss;
   oss << kind_string_ << "Port::Eval(): wrong value type ";
   oss << eval_typename << "specified;";

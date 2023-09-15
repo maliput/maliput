@@ -94,8 +94,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
   template <typename Derived>
   explicit PiecewisePolynomial(const Eigen::MatrixBase<Derived>& constant_value)
       : PiecewiseTrajectory<T>(
-            std::vector<T>({-std::numeric_limits<double>::infinity(),
-                            std::numeric_limits<double>::infinity()})) {
+            std::vector<T>({-std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()})) {
     polynomials_.push_back(constant_value.template cast<Polynomial<T>>());
   }
 
@@ -169,8 +168,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *
    * @pre `polynomials.size() == breaks.size() - 1`
    */
-  PiecewisePolynomial(const std::vector<PolynomialMatrix>& polynomials_matrix,
-                      const std::vector<T>& breaks);
+  PiecewisePolynomial(const std::vector<PolynomialMatrix>& polynomials_matrix, const std::vector<T>& breaks);
 
   /**
    * Constructs a %PiecewisePolynomial using scalar-output Polynomials defined
@@ -178,8 +176,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *
    * @pre `polynomials.size() == breaks.size() - 1`
    */
-  PiecewisePolynomial(const std::vector<Polynomial<T>>& polynomials,
-                      const std::vector<T>& breaks);
+  PiecewisePolynomial(const std::vector<Polynomial<T>>& polynomials, const std::vector<T>& breaks);
   // @}
 
   ~PiecewisePolynomial() override = default;
@@ -216,9 +213,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *         @ref coefficient_construction_methods.
    * @pydrake_mkdoc_identifier{matrix}
    */
-  static PiecewisePolynomial<T> ZeroOrderHold(
-      const std::vector<T>& breaks,
-      const std::vector<MatrixX<T>>& samples);
+  static PiecewisePolynomial<T> ZeroOrderHold(const std::vector<T>& breaks, const std::vector<MatrixX<T>>& samples);
 
   /**
    * Version of ZeroOrderHold(breaks, samples) that uses vector samples and
@@ -230,9 +225,8 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *         @ref coefficient_construction_methods.
    * @pydrake_mkdoc_identifier{vector}
    */
-  static PiecewisePolynomial<T> ZeroOrderHold(
-      const Eigen::Ref<const VectorX<T>>& breaks,
-      const Eigen::Ref<const MatrixX<T>>& samples);
+  static PiecewisePolynomial<T> ZeroOrderHold(const Eigen::Ref<const VectorX<T>>& breaks,
+                                              const Eigen::Ref<const MatrixX<T>>& samples);
 
   /**
    * Constructs a piecewise linear %PiecewisePolynomial using matrix samples.
@@ -241,9 +235,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *         @ref coefficient_construction_methods.
    * @pydrake_mkdoc_identifier{matrix}
    */
-  static PiecewisePolynomial<T> FirstOrderHold(
-      const std::vector<T>& breaks,
-      const std::vector<MatrixX<T>>& samples);
+  static PiecewisePolynomial<T> FirstOrderHold(const std::vector<T>& breaks, const std::vector<MatrixX<T>>& samples);
 
   /**
    * Version of FirstOrderHold(breaks, samples) that uses vector samples and
@@ -255,9 +247,8 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *         @ref coefficient_construction_methods.
    * @pydrake_mkdoc_identifier{vector}
    */
-  static PiecewisePolynomial<T> FirstOrderHold(
-      const Eigen::Ref<const VectorX<T>>& breaks,
-      const Eigen::Ref<const MatrixX<T>>& samples);
+  static PiecewisePolynomial<T> FirstOrderHold(const Eigen::Ref<const VectorX<T>>& breaks,
+                                               const Eigen::Ref<const MatrixX<T>>& samples);
 
   // TODO(russt): This version of the method is not exposed in pydrake, but
   //  the version that is has limited documentation that refers back to this
@@ -301,10 +292,9 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *         @ref coefficient_construction_methods.
    * @pydrake_mkdoc_identifier{matrix}
    */
-  static PiecewisePolynomial<T> CubicShapePreserving(
-      const std::vector<T>& breaks,
-      const std::vector<MatrixX<T>>& samples,
-      bool zero_end_point_derivatives = false);
+  static PiecewisePolynomial<T> CubicShapePreserving(const std::vector<T>& breaks,
+                                                     const std::vector<MatrixX<T>>& samples,
+                                                     bool zero_end_point_derivatives = false);
 
   /**
    * Version of CubicShapePreserving(breaks, samples,
@@ -316,10 +306,9 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *         @ref coefficient_construction_methods.
    * @pydrake_mkdoc_identifier{vector}
    */
-  static PiecewisePolynomial<T> CubicShapePreserving(
-      const Eigen::Ref<const VectorX<T>>& breaks,
-      const Eigen::Ref<const MatrixX<T>>& samples,
-      bool zero_end_point_derivatives = false);
+  static PiecewisePolynomial<T> CubicShapePreserving(const Eigen::Ref<const VectorX<T>>& breaks,
+                                                     const Eigen::Ref<const MatrixX<T>>& samples,
+                                                     bool zero_end_point_derivatives = false);
 
   /**
    * Constructs a third order %PiecewisePolynomial using matrix samples.
@@ -334,11 +323,10 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *         @ref coefficient_construction_methods.
    * @pydrake_mkdoc_identifier{4args_matrix}
    */
-  static PiecewisePolynomial<T> CubicWithContinuousSecondDerivatives(
-      const std::vector<T>& breaks,
-      const std::vector<MatrixX<T>>& samples,
-      const MatrixX<T>& sample_dot_at_start,
-      const MatrixX<T>& sample_dot_at_end);
+  static PiecewisePolynomial<T> CubicWithContinuousSecondDerivatives(const std::vector<T>& breaks,
+                                                                     const std::vector<MatrixX<T>>& samples,
+                                                                     const MatrixX<T>& sample_dot_at_start,
+                                                                     const MatrixX<T>& sample_dot_at_end);
 
   /**
    * Version of CubicWithContinuousSecondDerivatives() that uses vector
@@ -351,10 +339,8 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @pydrake_mkdoc_identifier{4args_vector}
    */
   static PiecewisePolynomial<T> CubicWithContinuousSecondDerivatives(
-      const Eigen::Ref<const VectorX<T>>& breaks,
-      const Eigen::Ref<const MatrixX<T>>& samples,
-      const Eigen::Ref<const VectorX<T>>& sample_dot_at_start,
-      const Eigen::Ref<const VectorX<T>>& sample_dot_at_end);
+      const Eigen::Ref<const VectorX<T>>& breaks, const Eigen::Ref<const MatrixX<T>>& samples,
+      const Eigen::Ref<const VectorX<T>>& sample_dot_at_start, const Eigen::Ref<const VectorX<T>>& sample_dot_at_end);
 
   /**
    * Constructs a third order %PiecewisePolynomial using matrix samples and
@@ -366,10 +352,8 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *
    * @pydrake_mkdoc_identifier{matrix}
    */
-  static PiecewisePolynomial<T> CubicHermite(
-      const std::vector<T>& breaks,
-      const std::vector<MatrixX<T>>& samples,
-      const std::vector<MatrixX<T>>& samples_dot);
+  static PiecewisePolynomial<T> CubicHermite(const std::vector<T>& breaks, const std::vector<MatrixX<T>>& samples,
+                                             const std::vector<MatrixX<T>>& samples_dot);
 
   /**
    * Version of CubicHermite(breaks, samples, samples_dot) that uses vector
@@ -380,10 +364,9 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @pre `samples.cols() == samples_dot.cols() == breaks.size()`.
    * @pydrake_mkdoc_identifier{vector}
    */
-  static PiecewisePolynomial<T> CubicHermite(
-      const Eigen::Ref<const VectorX<T>>& breaks,
-      const Eigen::Ref<const MatrixX<T>>& samples,
-      const Eigen::Ref<const MatrixX<T>>& samples_dot);
+  static PiecewisePolynomial<T> CubicHermite(const Eigen::Ref<const VectorX<T>>& breaks,
+                                             const Eigen::Ref<const MatrixX<T>>& samples,
+                                             const Eigen::Ref<const MatrixX<T>>& samples_dot);
 
   /**
    * Constructs a third order %PiecewisePolynomial using matrix samples.
@@ -410,10 +393,9 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * `periodic_end_condition` is `false` the problem is ill-defined.
    * @pydrake_mkdoc_identifier{3args_matrix}
    */
-  static PiecewisePolynomial<T> CubicWithContinuousSecondDerivatives(
-      const std::vector<T>& breaks,
-      const std::vector<MatrixX<T>>& samples,
-      bool periodic_end_condition = false);
+  static PiecewisePolynomial<T> CubicWithContinuousSecondDerivatives(const std::vector<T>& breaks,
+                                                                     const std::vector<MatrixX<T>>& samples,
+                                                                     bool periodic_end_condition = false);
 
   /**
    * Version of CubicWithContinuousSecondDerivatives(breaks, samples) that
@@ -423,17 +405,14 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @pre `samples.cols() == breaks.size()`.
    * @pydrake_mkdoc_identifier{3args_vector}
    */
-  static PiecewisePolynomial<T> CubicWithContinuousSecondDerivatives(
-      const Eigen::Ref<const VectorX<T>>& breaks,
-      const Eigen::Ref<const MatrixX<T>>& samples,
-      bool periodic_end_condition = false);
+  static PiecewisePolynomial<T> CubicWithContinuousSecondDerivatives(const Eigen::Ref<const VectorX<T>>& breaks,
+                                                                     const Eigen::Ref<const MatrixX<T>>& samples,
+                                                                     bool periodic_end_condition = false);
 
-  static PiecewisePolynomial<T> Cubic(
-      const Eigen::Ref<const VectorX<T>>& breaks,
-      const Eigen::Ref<const MatrixX<T>>& samples,
-      bool periodic_end_condition = false) {
-    return CubicWithContinuousSecondDerivatives(breaks, samples,
-        periodic_end_condition);
+  static PiecewisePolynomial<T> Cubic(const Eigen::Ref<const VectorX<T>>& breaks,
+                                      const Eigen::Ref<const MatrixX<T>>& samples,
+                                      bool periodic_end_condition = false) {
+    return CubicWithContinuousSecondDerivatives(breaks, samples, periodic_end_condition);
   }
 
   /**
@@ -445,8 +424,8 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @pre `samples.size() == times.size()`.
    * @pydrake_mkdoc_identifier{matrix}
    */
-  static PiecewisePolynomial LagrangeInterpolatingPolynomial(
-      const std::vector<T>& times, const std::vector<MatrixX<T>>& samples);
+  static PiecewisePolynomial LagrangeInterpolatingPolynomial(const std::vector<T>& times,
+                                                             const std::vector<MatrixX<T>>& samples);
 
   /**
    * Version of LagrangeInterpolatingPolynomial(times, samples) that
@@ -456,9 +435,8 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @pre `samples.cols() == times.size()`.
    * @pydrake_mkdoc_identifier{vector}
    */
-  static PiecewisePolynomial<T> LagrangeInterpolatingPolynomial(
-      const Eigen::Ref<const VectorX<T>>& times,
-      const Eigen::Ref<const MatrixX<T>>& samples);
+  static PiecewisePolynomial<T> LagrangeInterpolatingPolynomial(const Eigen::Ref<const VectorX<T>>& times,
+                                                                const Eigen::Ref<const MatrixX<T>>& samples);
 
   // @}
 
@@ -498,8 +476,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * first segment: adds `value_at_start_time(row,col)` as the constant term
    * (zeroth-order coefficient) of the resulting Polynomial.
    */
-  PiecewisePolynomial<T> integral(
-      const Eigen::Ref<MatrixX<T>>& value_at_start_time) const;
+  PiecewisePolynomial<T> integral(const Eigen::Ref<MatrixX<T>>& value_at_start_time) const;
 
   /**
    * Returns `true` if this trajectory has no breaks/samples/polynomials.
@@ -528,8 +505,8 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    *          above.
    */
   MatrixX<T> value(const T& t) const override {
-      const int derivative_order = 0;
-      return DoEvalDerivative(t, derivative_order);
+    const int derivative_order = 0;
+    return DoEvalDerivative(t, derivative_order);
   }
 
   /**
@@ -545,16 +522,14 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @note Calls PiecewiseTrajectory<T>::segment_number_range_check() to
    *       validate `segment_index`.
    */
-  const Polynomial<T>& getPolynomial(int segment_index, Eigen::Index row = 0,
-                                      Eigen::Index col = 0) const;
+  const Polynomial<T>& getPolynomial(int segment_index, Eigen::Index row = 0, Eigen::Index col = 0) const;
 
   /**
    * Gets the degree of the Polynomial with the given matrix row and column
    * index that corresponds to the given segment index. Equivalent to
    * `getPolynomial(segment_index, row, col).GetDegree()`.
    */
-  int getSegmentPolynomialDegree(int segment_index, Eigen::Index row = 0,
-                                 Eigen::Index col = 0) const;
+  int getSegmentPolynomialDegree(int segment_index, Eigen::Index row = 0, Eigen::Index col = 0) const;
 
   /**
    * Returns the row count of the output matrices.
@@ -583,8 +558,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @returns a PiecewisePolynomial such that
    *   ret.value(t) = this.value(t).block(i,j,p,q);
    */
-  PiecewisePolynomial Block(int start_row, int start_col, int block_rows,
-                            int block_cols) const;
+  PiecewisePolynomial Block(int start_row, int start_col, int block_rows, int block_cols) const;
 
   /**
    * Adds each Polynomial in the PolynomialMatrix of `other` to the
@@ -709,16 +683,14 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @pre `time` > end_time()
    * @pre `sample` and `sample_dot` must have size rows() x cols().
    */
-  void AppendCubicHermiteSegment(
-      const T& time, const Eigen::Ref<const MatrixX<T>>& sample,
-      const Eigen::Ref<const MatrixX<T>>& sample_dot);
+  void AppendCubicHermiteSegment(const T& time, const Eigen::Ref<const MatrixX<T>>& sample,
+                                 const Eigen::Ref<const MatrixX<T>>& sample_dot);
 
   /**
    * Given a new sample, this method adds one segment to the end of `this` using
    * a first-order hold, where the start sample is taken as the value at the
    * final break of `this`. */
-  void AppendFirstOrderSegment(
-      const T& time, const Eigen::Ref<const MatrixX<T>>& sample);
+  void AppendFirstOrderSegment(const T& time, const Eigen::Ref<const MatrixX<T>>& sample);
 
   /** Removes the final segment from the trajectory, reducing the number of
    * segments by 1.
@@ -764,8 +736,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
    * @warning This code relies upon Eigen to verify that the replacement
    *          block is not too large.
    */
-  void setPolynomialMatrixBlock(const PolynomialMatrix& replacement,
-                                int segment_index, Eigen::Index row_start = 0,
+  void setPolynomialMatrixBlock(const PolynomialMatrix& replacement, int segment_index, Eigen::Index row_start = 0,
                                 Eigen::Index col_start = 0);
 
   /**
@@ -784,15 +755,13 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
   // @pre derivative_order must be non-negative.
   MatrixX<T> DoEvalDerivative(const T& t, int derivative_order) const override;
 
-  std::unique_ptr<Trajectory<T>> DoMakeDerivative(
-      int derivative_order) const override {
+  std::unique_ptr<Trajectory<T>> DoMakeDerivative(int derivative_order) const override {
     return derivative(derivative_order).Clone();
   }
 
   bool do_has_derivative() const override { return true; }
 
-  T EvaluateSegmentAbsoluteTime(int segment_index, const T& t, Eigen::Index row,
-                                Eigen::Index col,
+  T EvaluateSegmentAbsoluteTime(int segment_index, const T& t, Eigen::Index row, Eigen::Index col,
                                 int derivative_order = 0) const;
 
   // a PolynomialMatrix for each piece (segment).
@@ -801,8 +770,7 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
   // Computes coeffecients for a cubic spline given the value and first
   // derivatives at the end points.
   // Throws `std::exception` if `dt < PiecewiseTrajectory::kEpsilonTime`.
-  static Eigen::Matrix<T, 4, 1> ComputeCubicSplineCoeffs(const T& dt, T y0,
-                                                         T y1, T yd0, T yd1);
+  static Eigen::Matrix<T, 4, 1> ComputeCubicSplineCoeffs(const T& dt, T y0, T y1, T yd0, T yd1);
 
   // For a cubic spline, there are 4 unknowns for each segment Pi, namely
   // the coefficients for Pi = a0 + a1 * t + a2 * t^2 + a3 * t^3.
@@ -839,23 +807,20 @@ class PiecewisePolynomial final : public PiecewiseTrajectory<T> {
   // sparse matrix by creating a vector of Triplets, `triplet_list` with each
   // representing the row, column and value to add to the sparse matrix. The
   // right-hand side of the constraint equations is loaded into `b`.
-  static int SetupCubicSplineInteriorCoeffsLinearSystem(
-      const std::vector<T>& breaks,
-      const std::vector<MatrixX<T>>& samples, int row, int col,
-      std::vector<Eigen::Triplet<T>>* triplet_list, VectorX<T>* b);
+  static int SetupCubicSplineInteriorCoeffsLinearSystem(const std::vector<T>& breaks,
+                                                        const std::vector<MatrixX<T>>& samples, int row, int col,
+                                                        std::vector<Eigen::Triplet<T>>* triplet_list, VectorX<T>* b);
 
   // Throws std::exception if
   // `breaks` and `samples` have different length,
   // `breaks` is not strictly increasing,
   // `samples` has inconsistent dimensions,
   // `breaks` has length smaller than min_length.
-  static void CheckSplineGenerationInputValidityOrThrow(
-      const std::vector<T>& breaks,
-      const std::vector<MatrixX<T>>& samples, int min_length);
+  static void CheckSplineGenerationInputValidityOrThrow(const std::vector<T>& breaks,
+                                                        const std::vector<MatrixX<T>>& samples, int min_length);
 };
 
 }  // namespace trajectories
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::trajectories::PiecewisePolynomial)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::trajectories::PiecewisePolynomial)

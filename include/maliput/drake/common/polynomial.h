@@ -63,15 +63,12 @@ class Polynomial {
     VarType var;
     PowerType power;
 
-    bool operator==(const Term& other) const {
-      return (var == other.var) && (power == other.power);
-    }
+    bool operator==(const Term& other) const { return (var == other.var) && (power == other.power); }
 
     /// A comparison to allow std::lexicographical_compare on this class; does
     /// not reflect any sort of mathematical total order.
     bool operator<(const Term& other) const {
-      return ((var < other.var) ||
-              ((var == other.var) && (power < other.power)));
+      return ((var < other.var) || ((var == other.var) && (power < other.power)));
     }
   };
 
@@ -89,8 +86,7 @@ class Polynomial {
     /// A comparison to allow std::lexicographical_compare on this class; does
     /// not reflect any sort of mathematical total order.
     bool operator<(const Monomial& other) const {
-      return ((coefficient < other.coefficient)  ||
-              ((coefficient == other.coefficient) && (terms < other.terms)));
+      return ((coefficient < other.coefficient) || ((coefficient == other.coefficient) && (terms < other.terms)));
     }
 
     int GetDegree() const;
@@ -129,8 +125,7 @@ class Polynomial {
   ///  - Polynomial(const T& scalar)
   ///  - Polynomial(const std::string& varname, const unsigned int num = 1)
   template <typename U = T>
-  explicit Polynomial(
-      const std::enable_if_t<std::is_same_v<U, double>, std::string>& varname)
+  explicit Polynomial(const std::enable_if_t<std::is_same_v<U, double>, std::string>& varname)
       : Polynomial<T>(varname, 1) {
     // TODO(soonho-tri): Consider deprecating this constructor to make the API
     // consistent for different scalar types.
@@ -202,23 +197,17 @@ class Polynomial {
    * @pre derivative_order must be non-negative.
    */
   template <typename U>
-  typename Product<T, U>::type EvaluateUnivariate(
-      const U& x, int derivative_order = 0) const {
+  typename Product<T, U>::type EvaluateUnivariate(const U& x, int derivative_order = 0) const {
     // Note: have to remove_const because Product<AutoDiff, AutoDiff>::type and
     // even Product<double, AutoDiff>::type returns const AutoDiff.
-    typedef typename std::remove_const_t<typename Product<T, U>::type>
-        ProductType;
+    typedef typename std::remove_const_t<typename Product<T, U>::type> ProductType;
 
-    if (!is_univariate_)
-      throw std::runtime_error(
-          "this method can only be used for univariate polynomials");
+    if (!is_univariate_) throw std::runtime_error("this method can only be used for univariate polynomials");
 
     MALIPUT_DRAKE_DEMAND(derivative_order >= 0);
     ProductType value = 0;
     using std::pow;
-    for (typename std::vector<Monomial>::const_iterator iter =
-             monomials_.begin();
-         iter != monomials_.end(); iter++) {
+    for (typename std::vector<Monomial>::const_iterator iter = monomials_.begin(); iter != monomials_.end(); iter++) {
       PowerType degree = iter->terms.empty() ? 0 : iter->terms[0].power;
       if (degree < derivative_order) continue;
       T coefficient = iter->coefficient;
@@ -247,17 +236,14 @@ class Polynomial {
    * CoefficientsType or RealScalar)
    */
   template <typename U>
-  typename Product<T, U>::type EvaluateMultivariate(
-      const std::map<VarType, U>& var_values) const {
+  typename Product<T, U>::type EvaluateMultivariate(const std::map<VarType, U>& var_values) const {
     using std::pow;
-    typedef typename std::remove_const_t<
-      typename Product<T, U>::type> ProductType;
+    typedef typename std::remove_const_t<typename Product<T, U>::type> ProductType;
     ProductType value = 0;
     for (const Monomial& monomial : monomials_) {
       ProductType monomial_value = monomial.coefficient;
       for (const Term& term : monomial.terms) {
-        monomial_value *=
-            pow(static_cast<ProductType>(var_values.at(term.var)), term.power);
+        monomial_value *= pow(static_cast<ProductType>(var_values.at(term.var)), term.power);
       }
       value += monomial_value;
     }
@@ -274,15 +260,13 @@ class Polynomial {
    * Returns a Polynomial in which each variable in var_values has been
    * replaced with its value and constants appropriately combined.
    */
-  Polynomial EvaluatePartial(
-      const std::map<VarType, T>& var_values) const;
+  Polynomial EvaluatePartial(const std::map<VarType, T>& var_values) const;
 
   /// Replaces all instances of variable orig with replacement.
   void Subs(const VarType& orig, const VarType& replacement);
 
   /// Replaces all instances of variable orig with replacement.
-  Polynomial Substitute(const VarType& orig,
-                        const Polynomial& replacement) const;
+  Polynomial Substitute(const VarType& orig, const Polynomial& replacement) const;
 
   /** Takes the derivative of this (univariate) Polynomial.
    *
@@ -331,42 +315,36 @@ class Polynomial {
 
   const Polynomial operator*(const Polynomial& other) const;
 
-  friend const Polynomial operator+(const Polynomial& p,
-                                    const T& scalar) {
+  friend const Polynomial operator+(const Polynomial& p, const T& scalar) {
     Polynomial ret = p;
     ret += scalar;
     return ret;
   }
 
-  friend const Polynomial operator+(const T& scalar,
-                                    const Polynomial& p) {
+  friend const Polynomial operator+(const T& scalar, const Polynomial& p) {
     Polynomial ret = p;
     ret += scalar;
     return ret;
   }
 
-  friend const Polynomial operator-(const Polynomial& p,
-                                    const T& scalar) {
+  friend const Polynomial operator-(const Polynomial& p, const T& scalar) {
     Polynomial ret = p;
     ret -= scalar;
     return ret;
   }
 
-  friend const Polynomial operator-(const T& scalar,
-                                    const Polynomial& p) {
+  friend const Polynomial operator-(const T& scalar, const Polynomial& p) {
     Polynomial ret = -p;
     ret += scalar;
     return ret;
   }
 
-  friend const Polynomial operator*(const Polynomial& p,
-                                    const T& scalar) {
+  friend const Polynomial operator*(const Polynomial& p, const T& scalar) {
     Polynomial ret = p;
     ret *= scalar;
     return ret;
   }
-  friend const Polynomial operator*(const T& scalar,
-                                    const Polynomial& p) {
+  friend const Polynomial operator*(const T& scalar, const Polynomial& p) {
     Polynomial ret = p;
     ret *= scalar;
     return ret;
@@ -399,9 +377,8 @@ class Polynomial {
    * is relative to a missing zero coefficient).  Use kAbsolute if you want to
    * ignore non-matching monomials with coefficients less than `tol`.
    */
-  boolean<T> CoefficientsAlmostEqual(
-      const Polynomial<T>& other, const RealScalar& tol = 0.0,
-      const ToleranceType& tol_type = ToleranceType::kAbsolute) const;
+  boolean<T> CoefficientsAlmostEqual(const Polynomial<T>& other, const RealScalar& tol = 0.0,
+                                     const ToleranceType& tol_type = ToleranceType::kAbsolute) const;
 
   /** Constructs a Polynomial representing the symbolic expression `e`.
    * Note that the ID of a variable is preserved in this translation.
@@ -422,8 +399,7 @@ class Polynomial {
       print_star = true;
     }
 
-    for (typename std::vector<Term>::const_iterator iter = m.terms.begin();
-         iter != m.terms.end(); iter++) {
+    for (typename std::vector<Term>::const_iterator iter = m.terms.begin(); iter != m.terms.end(); iter++) {
       if (print_star)
         os << '*';
       else
@@ -442,12 +418,10 @@ class Polynomial {
       return os;
     }
 
-    for (typename std::vector<Monomial>::const_iterator iter =
-             poly.monomials_.begin();
-         iter != poly.monomials_.end(); iter++) {
+    for (typename std::vector<Monomial>::const_iterator iter = poly.monomials_.begin(); iter != poly.monomials_.end();
+         iter++) {
       os << *iter;
-      if (iter + 1 != poly.monomials_.end() && (iter + 1)->coefficient != -1)
-        os << '+';
+      if (iter + 1 != poly.monomials_.end() && (iter + 1)->coefficient != -1) os << '+';
     }
     return os;
   }
@@ -456,15 +430,13 @@ class Polynomial {
   /** Variable name/ID conversion facility. */
   static bool IsValidVariableName(const std::string name);
 
-  static VarType VariableNameToId(const std::string name,
-                                  unsigned int m = 1);
+  static VarType VariableNameToId(const std::string name, unsigned int m = 1);
 
   static std::string IdToVariableName(const VarType id);
   //@}
 
   template <typename U>
-  friend Polynomial<U> pow(const Polynomial<U>& p,
-                           typename Polynomial<U>::PowerType n);
+  friend Polynomial<U> pow(const Polynomial<U>& p, typename Polynomial<U>::PowerType n);
 
  private:
   /// The Monomial atoms of the Polynomial.
@@ -479,9 +451,7 @@ class Polynomial {
 
 /** Provides power function for Polynomial. */
 template <typename T>
-Polynomial<T> pow(
-    const Polynomial<T>& base,
-    typename Polynomial<T>::PowerType exponent) {
+Polynomial<T> pow(const Polynomial<T>& base, typename Polynomial<T>::PowerType exponent) {
   MALIPUT_DRAKE_DEMAND(exponent >= 0);
   if (exponent == 0) {
     return Polynomial<T>{1.0};
@@ -495,9 +465,7 @@ Polynomial<T> pow(
 }
 
 template <typename T, int Rows, int Cols>
-std::ostream& operator<<(
-    std::ostream& os,
-    const Eigen::Matrix<Polynomial<T>, Rows, Cols>& poly_mat) {
+std::ostream& operator<<(std::ostream& os, const Eigen::Matrix<Polynomial<T>, Rows, Cols>& poly_mat) {
   for (int i = 0; i < poly_mat.rows(); i++) {
     os << "[ ";
     for (int j = 0; j < poly_mat.cols(); j++) {
@@ -515,5 +483,4 @@ typedef Polynomial<double> Polynomiald;
 typedef Eigen::Matrix<Polynomiald, Eigen::Dynamic, 1> VectorXPoly;
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::Polynomial)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::Polynomial)

@@ -21,14 +21,12 @@ class NodeWriter : public SystemVisitor<double> {
     *html_ << "group: \"" << parent_ << "\", ";
     *html_ << "input_ports: [ ";
     for (int i = 0; i < system.num_input_ports(); ++i) {
-      *html_ << "{ name: \"" << system.get_input_port(i).get_name()
-             << "\", id: \"u" << i << "\" }, ";
+      *html_ << "{ name: \"" << system.get_input_port(i).get_name() << "\", id: \"u" << i << "\" }, ";
     }
     *html_ << "],\n";
     *html_ << "output_ports: [ ";
     for (int i = 0; i < system.num_output_ports(); ++i) {
-      *html_ << "{ name: \"" << system.get_output_port(i).get_name()
-             << "\", id: \"y" << i << "\" }, ";
+      *html_ << "{ name: \"" << system.get_output_port(i).get_name() << "\", id: \"y" << i << "\" }, ";
     }
     *html_ << "],\n";
     *html_ << "},\n";
@@ -97,8 +95,7 @@ class NodeWriter : public SystemVisitor<double> {
 // or the output of a subsystem.
 class FromPortTokenWriter : public SystemVisitor<double> {
  public:
-  FromPortTokenWriter(int port_index, std::stringstream* html)
-      : port_index_(port_index), html_(html) {}
+  FromPortTokenWriter(int port_index, std::stringstream* html) : port_index_(port_index), html_(html) {}
 
   void VisitSystem(const System<double>& system) final {
     *html_ << "from: \"" << system.get_name() << "\", ";
@@ -118,8 +115,7 @@ class FromPortTokenWriter : public SystemVisitor<double> {
 // the input of a subsystem.
 class ToPortTokenWriter : public SystemVisitor<double> {
  public:
-  ToPortTokenWriter(int port_index, std::stringstream* html)
-      : port_index_(port_index), html_(html) {}
+  ToPortTokenWriter(int port_index, std::stringstream* html) : port_index_(port_index), html_(html) {}
 
   void VisitSystem(const System<double>& system) final {
     *html_ << "to: \"" << system.get_name() << "\", ";
@@ -176,8 +172,7 @@ class LinkWriter : public SystemVisitor<double> {
 
     // Add edges to the output ports.
     for (OutputPortIndex i(0); i < diagram.num_output_ports(); ++i) {
-      const Diagram<double>::OutputPortLocator& src =
-          diagram.get_output_port_locator(i);
+      const Diagram<double>::OutputPortLocator& src = diagram.get_output_port_locator(i);
       const System<double>* src_sys = src.first;
       *html_ << "{ ";
       FromPortTokenWriter input_writer(src.second, html_);

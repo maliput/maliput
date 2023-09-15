@@ -7,10 +7,7 @@ namespace maliput::drake {
 namespace systems {
 
 template <typename T>
-DiagramState<T>::DiagramState(int size)
-    : State<T>(),
-      substates_(size),
-      owned_substates_(size) {}
+DiagramState<T>::DiagramState(int size) : State<T>(), substates_(size), owned_substates_(size) {}
 
 template <typename T>
 void DiagramState<T>::Finalize() {
@@ -37,15 +34,12 @@ void DiagramState<T>::Finalize() {
   // parts of the constituent states.  The spanning vectors do not own any
   // of the actual memory that contains state variables. They just hold
   // pointers to that memory.
-  this->set_continuous_state(
-      std::make_unique<DiagramContinuousState<T>>(sub_xcs));
-  this->set_discrete_state(
-      std::make_unique<DiagramDiscreteValues<T>>(sub_xds));
+  this->set_continuous_state(std::make_unique<DiagramContinuousState<T>>(sub_xcs));
+  this->set_discrete_state(std::make_unique<DiagramDiscreteValues<T>>(sub_xds));
   this->set_abstract_state(std::make_unique<AbstractValues>(sub_xas));
 }
 
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiagramState)
+DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiagramState)

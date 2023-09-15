@@ -65,31 +65,29 @@
 
 // Users should NOT set these; only this header should set them.
 #ifdef MALIPUT_DRAKE_ASSERT_IS_ARMED
-# error Unexpected MALIPUT_DRAKE_ASSERT_IS_ARMED defined.
+#error Unexpected MALIPUT_DRAKE_ASSERT_IS_ARMED defined.
 #endif
 #ifdef MALIPUT_DRAKE_ASSERT_IS_DISARMED
-# error Unexpected MALIPUT_DRAKE_ASSERT_IS_DISARMED defined.
+#error Unexpected MALIPUT_DRAKE_ASSERT_IS_DISARMED defined.
 #endif
 
 // Decide whether Drake assertions are enabled.
 #if defined(MALIPUT_DRAKE_ENABLE_ASSERTS) && defined(MALIPUT_DRAKE_DISABLE_ASSERTS)
-# error Conflicting assertion toggles.
+#error Conflicting assertion toggles.
 #elif defined(MALIPUT_DRAKE_ENABLE_ASSERTS)
-# define MALIPUT_DRAKE_ASSERT_IS_ARMED
+#define MALIPUT_DRAKE_ASSERT_IS_ARMED
 #elif defined(MALIPUT_DRAKE_DISABLE_ASSERTS) || defined(NDEBUG)
-# define MALIPUT_DRAKE_ASSERT_IS_DISARMED
+#define MALIPUT_DRAKE_ASSERT_IS_DISARMED
 #else
-# define MALIPUT_DRAKE_ASSERT_IS_ARMED
+#define MALIPUT_DRAKE_ASSERT_IS_ARMED
 #endif
 
 namespace maliput::drake {
 namespace internal {
 // Abort the program with an error message.
-[[noreturn]] void Abort(const char* condition, const char* func,
-                        const char* file, int line);
+[[noreturn]] void Abort(const char* condition, const char* func, const char* file, int line);
 // Report an assertion failure; will either Abort(...) or throw.
-[[noreturn]] void AssertionFailed(const char* condition, const char* func,
-                                  const char* file, int line);
+[[noreturn]] void AssertionFailed(const char* condition, const char* func, const char* file, int line);
 }  // namespace internal
 namespace assert {
 // Allows for specialization of how to bool-convert Conditions used in
@@ -100,26 +98,21 @@ namespace assert {
 template <typename Condition>
 struct ConditionTraits {
   static constexpr bool is_valid = std::is_convertible_v<Condition, bool>;
-  static bool Evaluate(const Condition& value) {
-    return value;
-  }
+  static bool Evaluate(const Condition& value) { return value; }
 };
 }  // namespace assert
 }  // namespace maliput::drake
 
-#define MALIPUT_DRAKE_UNREACHABLE()                                             \
-  ::maliput::drake::internal::Abort(                                             \
-      "Unreachable code was reached?!", __func__, __FILE__, __LINE__)
+#define MALIPUT_DRAKE_UNREACHABLE() \
+  ::maliput::drake::internal::Abort("Unreachable code was reached?!", __func__, __FILE__, __LINE__)
 
-#define MALIPUT_DRAKE_DEMAND(condition)                                              \
-  do {                                                                       \
-    typedef ::maliput::drake::assert::ConditionTraits<                                \
-        typename std::remove_cv_t<decltype(condition)>> Trait;               \
-    static_assert(Trait::is_valid, "Condition should be bool-convertible."); \
-    if (!Trait::Evaluate(condition)) {                                       \
-      ::maliput::drake::internal::AssertionFailed(                                    \
-           #condition, __func__, __FILE__, __LINE__);                        \
-    }                                                                        \
+#define MALIPUT_DRAKE_DEMAND(condition)                                                                      \
+  do {                                                                                                       \
+    typedef ::maliput::drake::assert::ConditionTraits<typename std::remove_cv_t<decltype(condition)>> Trait; \
+    static_assert(Trait::is_valid, "Condition should be bool-convertible.");                                 \
+    if (!Trait::Evaluate(condition)) {                                                                       \
+      ::maliput::drake::internal::AssertionFailed(#condition, __func__, __FILE__, __LINE__);                 \
+    }                                                                                                        \
   } while (0)
 
 #ifdef MALIPUT_DRAKE_ASSERT_IS_ARMED
@@ -128,12 +121,11 @@ namespace maliput::drake {
 constexpr bool kDrakeAssertIsArmed = true;
 constexpr bool kDrakeAssertIsDisarmed = false;
 }  // namespace maliput::drake
-# define MALIPUT_DRAKE_ASSERT(condition) MALIPUT_DRAKE_DEMAND(condition)
-# define MALIPUT_DRAKE_ASSERT_VOID(expression) do {                     \
-    static_assert(                                              \
-        std::is_convertible_v<decltype(expression), void>,      \
-        "Expression should be void.");                          \
-    expression;                                                 \
+#define MALIPUT_DRAKE_ASSERT(condition) MALIPUT_DRAKE_DEMAND(condition)
+#define MALIPUT_DRAKE_ASSERT_VOID(expression)                                                       \
+  do {                                                                                              \
+    static_assert(std::is_convertible_v<decltype(expression), void>, "Expression should be void."); \
+    expression;                                                                                     \
   } while (0)
 #else
 // Assertions are disabled, so just typecheck the expression.
@@ -141,13 +133,11 @@ namespace maliput::drake {
 constexpr bool kDrakeAssertIsArmed = false;
 constexpr bool kDrakeAssertIsDisarmed = true;
 }  // namespace maliput::drake
-# define MALIPUT_DRAKE_ASSERT(condition) static_assert(                        \
-    ::maliput::drake::assert::ConditionTraits<                                  \
-        typename std::remove_cv_t<decltype(condition)>>::is_valid,     \
-    "Condition should be bool-convertible.");
-# define MALIPUT_DRAKE_ASSERT_VOID(expression) static_assert(           \
-    std::is_convertible_v<decltype(expression), void>,          \
-    "Expression should be void.")
+#define MALIPUT_DRAKE_ASSERT(condition)                                                                              \
+  static_assert(::maliput::drake::assert::ConditionTraits<typename std::remove_cv_t<decltype(condition)>>::is_valid, \
+                "Condition should be bool-convertible.");
+#define MALIPUT_DRAKE_ASSERT_VOID(expression) \
+  static_assert(std::is_convertible_v<decltype(expression), void>, "Expression should be void.")
 #endif
 
 #endif  // DRAKE_DOXYGEN_CXX

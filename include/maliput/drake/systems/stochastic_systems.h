@@ -7,7 +7,7 @@ namespace systems {
 stochastic system in Drake and writing algorithms that explicitly
 leverage the stochastic modeling framework.
 
-A discrete-time system in Drake can be viewed as having the state-space 
+A discrete-time system in Drake can be viewed as having the state-space
 dynamics
 
   x_{n+1} = f(p; n, x_n, u_n, w_n),

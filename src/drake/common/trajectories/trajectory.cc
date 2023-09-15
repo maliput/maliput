@@ -8,8 +8,7 @@ namespace trajectories {
 template <typename T>
 MatrixX<T> Trajectory<T>::vector_values(const std::vector<T>& t) const {
   if (cols() != 1 && rows() != 1) {
-    throw std::runtime_error(
-        "This method only supports vector-valued trajectories.");
+    throw std::runtime_error("This method only supports vector-valued trajectories.");
   }
   if (cols() == 1) {
     MatrixX<T> values(rows(), t.size());
@@ -36,14 +35,12 @@ bool Trajectory<T>::do_has_derivative() const {
 }
 
 template <typename T>
-MatrixX<T> Trajectory<T>::EvalDerivative(const T& t,
-                                         int derivative_order) const {
+MatrixX<T> Trajectory<T>::EvalDerivative(const T& t, int derivative_order) const {
   return DoEvalDerivative(t, derivative_order);
 }
 
 template <typename T>
-MatrixX<T> Trajectory<T>::DoEvalDerivative(const T& t,
-                                           int derivative_order) const {
+MatrixX<T> Trajectory<T>::DoEvalDerivative(const T& t, int derivative_order) const {
   unused(t);
   unused(derivative_order);
   if (has_derivative()) {
@@ -58,14 +55,12 @@ MatrixX<T> Trajectory<T>::DoEvalDerivative(const T& t,
 }
 
 template <typename T>
-std::unique_ptr<Trajectory<T>> Trajectory<T>::MakeDerivative(
-    int derivative_order) const {
+std::unique_ptr<Trajectory<T>> Trajectory<T>::MakeDerivative(int derivative_order) const {
   return DoMakeDerivative(derivative_order);
 }
 
 template <typename T>
-std::unique_ptr<Trajectory<T>> Trajectory<T>::DoMakeDerivative(
-    int derivative_order) const {
+std::unique_ptr<Trajectory<T>> Trajectory<T>::DoMakeDerivative(int derivative_order) const {
   unused(derivative_order);
   if (has_derivative()) {
     throw std::logic_error(
@@ -81,5 +76,4 @@ std::unique_ptr<Trajectory<T>> Trajectory<T>::DoMakeDerivative(
 }  // namespace trajectories
 }  // namespace maliput::drake
 
-DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::trajectories::Trajectory)
+DRAKE_DEFINE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::trajectories::Trajectory)

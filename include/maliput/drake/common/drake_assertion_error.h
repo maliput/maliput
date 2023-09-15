@@ -10,8 +10,7 @@ namespace internal {
 // configured to throw.
 class assertion_error : public std::runtime_error {
  public:
-  explicit assertion_error(const std::string& what_arg)
-      : std::runtime_error(what_arg) {}
+  explicit assertion_error(const std::string& what_arg) : std::runtime_error(what_arg) {}
 };
 
 }  // namespace internal

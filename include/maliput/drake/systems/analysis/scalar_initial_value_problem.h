@@ -60,8 +60,7 @@ class ScalarInitialValueProblem {
   /// @param x The dependent variable x ∈ ℝ .
   /// @param k The parameter vector 𝐤 ∈ ℝᵐ.
   /// @return The derivative dx/dt ∈ ℝ.
-  using ScalarOdeFunction =
-      std::function<T(const T& t, const T& x, const VectorX<T>& k)>;
+  using ScalarOdeFunction = std::function<T(const T& t, const T& x, const VectorX<T>& k)>;
 
   /// A collection of values i.e. initial time t₀, initial state x₀
   /// and parameter vector 𝐤 to further specify the ODE system (in
@@ -75,8 +74,7 @@ class ScalarInitialValueProblem {
     /// @param t0_in Specified initial time t₀.
     /// @param x0_in Specified initial state x₀.
     /// @param k_in Specified parameter vector 𝐤.
-    ScalarOdeContext(const std::optional<T>& t0_in,
-                     const std::optional<T>& x0_in,
+    ScalarOdeContext(const std::optional<T>& t0_in, const std::optional<T>& x0_in,
                      const std::optional<VectorX<T>>& k_in)
         : t0(t0_in), x0(x0_in), k(k_in) {}
 
@@ -98,17 +96,14 @@ class ScalarInitialValueProblem {
   /// @pre An initial state @p default_values.x0 is provided.
   /// @pre An parameter vector @p default_values.k is provided.
   /// @throws std::exception if preconditions are not met.
-  ScalarInitialValueProblem(const ScalarOdeFunction& scalar_ode_function,
-                            const ScalarOdeContext& default_values) {
+  ScalarInitialValueProblem(const ScalarOdeFunction& scalar_ode_function, const ScalarOdeContext& default_values) {
     // Wraps the given scalar ODE function as a vector ODE function.
     typename InitialValueProblem<T>::OdeFunction ode_function =
-        [scalar_ode_function](const T& t, const VectorX<T>& x,
-                              const VectorX<T>& k) -> VectorX<T> {
+        [scalar_ode_function](const T& t, const VectorX<T>& x, const VectorX<T>& k) -> VectorX<T> {
       return VectorX<T>::Constant(1, scalar_ode_function(t, x[0], k));
     };
     // Instantiates the vector initial value problem.
-    vector_ivp_ = std::make_unique<InitialValueProblem<T>>(
-        ode_function, ToVectorIVPOdeContext(default_values));
+    vector_ivp_ = std::make_unique<InitialValueProblem<T>>(ode_function, ToVectorIVPOdeContext(default_values));
   }
 
   /// Solves the IVP for time @p tf, using the initial time t₀, initial state
@@ -156,16 +151,14 @@ class ScalarInitialValueProblem {
   ///      must match that of the parameter vector in the default specified
   ///      values given on construction.
   /// @throws std::exception if any of the preconditions is not met.
-  std::unique_ptr<ScalarDenseOutput<T>> DenseSolve(
-      const T& tf, const ScalarOdeContext& values = {}) const {
+  std::unique_ptr<ScalarDenseOutput<T>> DenseSolve(const T& tf, const ScalarOdeContext& values = {}) const {
     // Delegates request to the vector form of this IVP by putting
     // specified values in vector form and the resulting dense output
     // back into scalar form.
     const int kDimension = 0;
     std::unique_ptr<DenseOutput<T>> vector_dense_output =
         this->vector_ivp_->DenseSolve(tf, ToVectorIVPOdeContext(values));
-    return std::make_unique<ScalarViewDenseOutput<T>>(
-        std::move(vector_dense_output), kDimension);
+    return std::make_unique<ScalarViewDenseOutput<T>>(std::move(vector_dense_output), kDimension);
   }
 
   /// Resets the internal integrator instance by in-place
@@ -186,25 +179,19 @@ class ScalarInitialValueProblem {
   ///          ScalarInitialValueProblem::get_mutable_integrator().
   template <typename Integrator, typename... Args>
   Integrator* reset_integrator(Args&&... args) {
-    return vector_ivp_->template reset_integrator<Integrator>(
-        std::forward<Args>(args)...);
+    return vector_ivp_->template reset_integrator<Integrator>(std::forward<Args>(args)...);
   }
 
   /// Gets a reference to the internal integrator instance.
-  const IntegratorBase<T>& get_integrator() const {
-    return vector_ivp_->get_integrator();
-  }
+  const IntegratorBase<T>& get_integrator() const { return vector_ivp_->get_integrator(); }
 
   /// Gets a mutable reference to the internal integrator instance.
-  IntegratorBase<T>& get_mutable_integrator() {
-    return vector_ivp_->get_mutable_integrator();
-  }
+  IntegratorBase<T>& get_mutable_integrator() { return vector_ivp_->get_mutable_integrator(); }
 
  private:
   // Transforms given scalar IVP specified @p values into vector
   // IVP specified values.
-  static typename InitialValueProblem<T>::OdeContext ToVectorIVPOdeContext(
-      const ScalarOdeContext& values) {
+  static typename InitialValueProblem<T>::OdeContext ToVectorIVPOdeContext(const ScalarOdeContext& values) {
     typename InitialValueProblem<T>::OdeContext vector_ivp_values;
     vector_ivp_values.k = values.k;
     vector_ivp_values.t0 = values.t0;

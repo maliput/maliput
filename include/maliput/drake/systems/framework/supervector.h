@@ -24,8 +24,7 @@ class Supervector final : public VectorBase<T> {
 
   /// Constructs a supervector consisting of all the vectors in
   /// subvectors, which must live at least as long as this supervector.
-  explicit Supervector(const std::vector<VectorBase<T>*>& subvectors)
-      : vectors_(subvectors) {
+  explicit Supervector(const std::vector<VectorBase<T>*>& subvectors) : vectors_(subvectors) {
     int sum = 0;
     for (const VectorBase<T>* vec : vectors_) {
       sum += vec->size();
@@ -33,9 +32,7 @@ class Supervector final : public VectorBase<T> {
     }
   }
 
-  int size() const final {
-    return lookup_table_.empty() ? 0 : lookup_table_.back();
-  }
+  int size() const final { return lookup_table_.empty() ? 0 : lookup_table_.back(); }
 
  private:
   const T& DoGetAtIndexUnchecked(int index) const final {
@@ -51,13 +48,17 @@ class Supervector final : public VectorBase<T> {
   }
 
   const T& DoGetAtIndexChecked(int index) const final {
-    if (index >= size()) { this->ThrowOutOfRange(index); }
+    if (index >= size()) {
+      this->ThrowOutOfRange(index);
+    }
     const auto& [subvector, offset] = GetSubvectorAndOffset(index);
     return (*subvector)[offset];
   }
 
   T& DoGetAtIndexChecked(int index) final {
-    if (index >= size()) { this->ThrowOutOfRange(index); }
+    if (index >= size()) {
+      this->ThrowOutOfRange(index);
+    }
     const auto& [subvector, offset] = GetSubvectorAndOffset(index);
     return (*subvector)[offset];
   }
@@ -76,13 +77,11 @@ class Supervector final : public VectorBase<T> {
   std::pair<VectorBase<T>*, int> GetSubvectorAndOffset(int index) const {
     // Binary-search the lookup_table_ for the first element that is larger
     // than the specified index.
-    const auto it =
-        std::upper_bound(lookup_table_.begin(), lookup_table_.end(), index);
+    const auto it = std::upper_bound(lookup_table_.begin(), lookup_table_.end(), index);
     MALIPUT_DRAKE_DEMAND(it != lookup_table_.end());
 
     // Use the lookup result to identify the subvector that contains the index.
-    const int subvector_id =
-        static_cast<int>(std::distance(lookup_table_.begin(), it));
+    const int subvector_id = static_cast<int>(std::distance(lookup_table_.begin(), it));
     VectorBase<T>* subvector = vectors_[subvector_id];
 
     // The item at index 0 in vectors_[subvector_id] corresponds to index
@@ -104,5 +103,4 @@ class Supervector final : public VectorBase<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::Supervector)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::Supervector)

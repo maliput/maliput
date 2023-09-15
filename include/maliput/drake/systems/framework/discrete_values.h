@@ -47,39 +47,32 @@ class DiscreteValues {
   /// The referenced data must outlive this DiscreteValues. Every entry must be
   /// non-null.
   /// @exclude_from_pydrake_mkdoc{This overload is not bound in pydrake.}
-  explicit DiscreteValues(const std::vector<BasicVector<T>*>& data)
-      : data_(data) {
+  explicit DiscreteValues(const std::vector<BasicVector<T>*>& data) : data_(data) {
     for (BasicVector<T>* basic_vector_ptr : data_) {
-      if (basic_vector_ptr == nullptr)
-        throw std::logic_error("DiscreteValues: null groups not allowed");
+      if (basic_vector_ptr == nullptr) throw std::logic_error("DiscreteValues: null groups not allowed");
     }
   }
 
   /// Constructs a %DiscreteValues that owns the underlying @p data. Every entry
   /// must be non-null.
-  explicit DiscreteValues(std::vector<std::unique_ptr<BasicVector<T>>>&& data)
-      : owned_data_(std::move(data)) {
+  explicit DiscreteValues(std::vector<std::unique_ptr<BasicVector<T>>>&& data) : owned_data_(std::move(data)) {
     // Initialize the unowned pointers.
     for (auto& datum : owned_data_) {
-      if (datum == nullptr)
-        throw std::logic_error("DiscreteValues: null groups not allowed");
+      if (datum == nullptr) throw std::logic_error("DiscreteValues: null groups not allowed");
       data_.push_back(datum.get());
     }
   }
 
   /// Constructs a one-group %DiscreteValues object that owns a single @p datum
   /// vector which may not be null.
-  explicit DiscreteValues(std::unique_ptr<BasicVector<T>> datum) {
-    AppendGroup(std::move(datum));
-  }
+  explicit DiscreteValues(std::unique_ptr<BasicVector<T>> datum) { AppendGroup(std::move(datum)); }
 
   /// Adds an additional group that owns the given @p datum, which must be
   /// non-null. Returns the assigned group number, counting up from 0 for the
   /// first group.
   int AppendGroup(std::unique_ptr<BasicVector<T>> datum) {
     if (datum == nullptr) {
-      throw std::logic_error(
-          "DiscreteValues::AppendGroup(): null groups not allowed");
+      throw std::logic_error("DiscreteValues::AppendGroup(): null groups not allowed");
     }
     const int group_num = static_cast<int>(data_.size());
     data_.push_back(datum.get());
@@ -100,19 +93,13 @@ class DiscreteValues {
   //@{
 
   /// Returns the number of elements in the only %DiscreteValues group.
-  int size() const {
-    return get_vector().size();
-  }
+  int size() const { return get_vector().size(); }
 
   /// Returns a mutable reference to an element in the _only_ group.
-  T& operator[](std::size_t idx) {
-    return get_mutable_vector()[idx];
-  }
+  T& operator[](std::size_t idx) { return get_mutable_vector()[idx]; }
 
   /// Returns a const reference to an element in the _only_ group.
-  const T& operator[](std::size_t idx) const {
-    return get_vector()[idx];
-  }
+  const T& operator[](std::size_t idx) const { return get_vector()[idx]; }
 
   /// Returns a const reference to the BasicVector containing the values for
   /// the _only_ group.
@@ -181,10 +168,7 @@ class DiscreteValues {
   }
 
   /// Sets the vector to the given value for the indicated group.
-  void set_value(
-      int index, const Eigen::Ref<const VectorX<T>>& value) {
-    get_mutable_vector(index).set_value(value);
-  }
+  void set_value(int index, const Eigen::Ref<const VectorX<T>>& value) { get_mutable_vector(index).set_value(value); }
 
   /// Resets the values in this DiscreteValues from the values in @p other,
   /// possibly writing through to unowned data. Throws if the dimensions don't
@@ -196,8 +180,7 @@ class DiscreteValues {
       BasicVector<T>& this_i = *data_[i];
       const BasicVector<U>& other_i = other.get_vector(i);
       MALIPUT_DRAKE_THROW_UNLESS(this_i.size() == other_i.size());
-      this_i.get_mutable_value() = other_i.get_value().unaryExpr(
-          scalar_conversion::ValueConverter<T, U>{});
+      this_i.get_mutable_value() = other_i.get_value().unaryExpr(scalar_conversion::ValueConverter<T, U>{});
     }
   }
 
@@ -248,8 +231,7 @@ class DiscreteValues {
     std::vector<std::unique_ptr<BasicVector<T>>> cloned_data;
     // Make deep copies regardless of previous ownership.
     cloned_data.reserve(data_.size());
-    for (const BasicVector<T>* datum : data_)
-      cloned_data.push_back(datum->Clone());
+    for (const BasicVector<T>* datum : data_) cloned_data.push_back(datum->Clone());
     return std::make_unique<DiscreteValues<T>>(std::move(cloned_data));
   }
 
@@ -265,8 +247,7 @@ class DiscreteValues {
   internal::SystemId system_id_;
 };
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiscreteValues)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiscreteValues)
 
 }  // namespace systems
 }  // namespace maliput::drake

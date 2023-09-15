@@ -14,8 +14,7 @@ using std::type_info;
 namespace maliput::drake {
 namespace systems {
 
-SystemScalarConverter::Key::Key(
-    const type_info& t_info, const type_info& u_info)
+SystemScalarConverter::Key::Key(const type_info& t_info, const type_info& u_info)
     : pair<type_index, type_index>(t_info, u_info) {}
 
 size_t SystemScalarConverter::KeyHasher::operator()(const Key& key) const {
@@ -28,9 +27,8 @@ size_t SystemScalarConverter::KeyHasher::operator()(const Key& key) const {
 
 SystemScalarConverter::SystemScalarConverter() = default;
 
-void SystemScalarConverter::Insert(
-    const std::type_info& t_info, const std::type_info& u_info,
-    const ErasedConverterFunc& converter) {
+void SystemScalarConverter::Insert(const std::type_info& t_info, const std::type_info& u_info,
+                                   const ErasedConverterFunc& converter) {
   const auto& key = Key{t_info, u_info};
   const auto& insert_result = funcs_.insert({key, converter});
   MALIPUT_DRAKE_ASSERT(insert_result.second);
@@ -41,8 +39,8 @@ void SystemScalarConverter::Remove() {
   funcs_.erase(Key(typeid(T), typeid(U)));
 }
 
-const SystemScalarConverter::ErasedConverterFunc* SystemScalarConverter::Find(
-    const std::type_info& t_info, const std::type_info& u_info) const {
+const SystemScalarConverter::ErasedConverterFunc* SystemScalarConverter::Find(const std::type_info& t_info,
+                                                                              const std::type_info& u_info) const {
   const auto& key = Key{t_info, u_info};
   auto iter = funcs_.find(key);
   if (iter != funcs_.end()) {
@@ -52,11 +50,10 @@ const SystemScalarConverter::ErasedConverterFunc* SystemScalarConverter::Find(
   }
 }
 
-void SystemScalarConverter::RemoveUnlessAlsoSupportedBy(
-    const SystemScalarConverter& other) {
+void SystemScalarConverter::RemoveUnlessAlsoSupportedBy(const SystemScalarConverter& other) {
   // Remove the items from `funcs_` whose key is absent from `other`.
   // (This would use erase_if, if we had it.)
-  for (auto iter = funcs_.begin(); iter != funcs_.end(); ) {
+  for (auto iter = funcs_.begin(); iter != funcs_.end();) {
     const Key& our_key = iter->first;
     if (other.funcs_.count(our_key) == 0) {
       iter = funcs_.erase(iter);
@@ -68,9 +65,7 @@ void SystemScalarConverter::RemoveUnlessAlsoSupportedBy(
 
 namespace system_scalar_converter_internal {
 
-void ThrowConversionMismatch(
-    const type_info& s_t_info, const type_info& s_u_info,
-    const type_info& other_info) {
+void ThrowConversionMismatch(const type_info& s_t_info, const type_info& s_u_info, const type_info& other_info) {
   std::ostringstream oss;
   oss << "SystemScalarConverter was configured to convert a ";
   oss << NiceTypeName::Get(s_u_info) << " into a ";
@@ -81,9 +76,7 @@ void ThrowConversionMismatch(
 
 }  // namespace system_scalar_converter_internal
 
-DRAKE_DEFINE_FUNCTION_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS((
-    &SystemScalarConverter::Remove<T, U>
-))
+DRAKE_DEFINE_FUNCTION_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS((&SystemScalarConverter::Remove<T, U>))
 
 }  // namespace systems
 }  // namespace maliput::drake

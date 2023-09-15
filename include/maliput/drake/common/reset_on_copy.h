@@ -90,17 +90,13 @@ class reset_on_copy {
   /// an implicit conversion, so that %reset_on_copy<T> behaves more like
   /// the unwrapped type.
   // NOLINTNEXTLINE(runtime/explicit)
-  reset_on_copy(const T& value) noexcept(
-      std::is_nothrow_copy_constructible_v<T>)
-      : value_(value) {}
+  reset_on_copy(const T& value) noexcept(std::is_nothrow_copy_constructible_v<T>) : value_(value) {}
 
   /// Constructs a %reset_on_copy<T> with the given wrapped value, by move
   /// construction if possible. This is an implicit conversion, so that
   /// %reset_on_copy<T> behaves more like the unwrapped type.
   // NOLINTNEXTLINE(runtime/explicit)
-  reset_on_copy(T&& value) noexcept(
-      std::is_nothrow_move_constructible_v<T>)
-      : value_(std::move(value)) {}
+  reset_on_copy(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>) : value_(std::move(value)) {}
 
   /// @name Implements copy/move construction and assignment.
   /// These make %reset_on_copy objects CopyConstructible, CopyAssignable,
@@ -108,15 +104,13 @@ class reset_on_copy {
   //@{
 
   /// Copy constructor just value-initializes instead; the source is ignored.
-  reset_on_copy(const reset_on_copy&) noexcept(
-      std::is_nothrow_default_constructible_v<T>) {}
+  reset_on_copy(const reset_on_copy&) noexcept(std::is_nothrow_default_constructible_v<T>) {}
 
   /// Copy assignment just destructs the contained value and then
   /// value-initializes it, _except_ for self-assignment which does nothing.
   /// The source argument is otherwise ignored.
   reset_on_copy& operator=(const reset_on_copy& source) noexcept(
-      std::is_nothrow_destructible_v<T> &&
-          std::is_nothrow_default_constructible_v<T>) {
+      std::is_nothrow_destructible_v<T>&& std::is_nothrow_default_constructible_v<T>) {
     if (this != &source) destruct_and_reset_value();
     return *this;
   }
@@ -124,8 +118,7 @@ class reset_on_copy {
   /// Move construction uses T's move constructor, then destructs and
   /// value initializes the source.
   reset_on_copy(reset_on_copy&& source) noexcept(
-      std::is_nothrow_move_constructible_v<T> &&
-          std::is_nothrow_destructible_v<T> &&
+      std::is_nothrow_move_constructible_v<T>&& std::is_nothrow_destructible_v<T>&&
           std::is_nothrow_default_constructible_v<T>)
       : value_(std::move(source.value_)) {
     source.destruct_and_reset_value();
@@ -135,8 +128,7 @@ class reset_on_copy {
   /// initializes the source, _except_ for self-assignment which does nothing.
   /// The source argument is otherwise ignored.
   reset_on_copy& operator=(reset_on_copy&& source) noexcept(
-      std::is_nothrow_move_assignable_v<T> &&
-          std::is_nothrow_destructible_v<T> &&
+      std::is_nothrow_move_assignable_v<T>&& std::is_nothrow_destructible_v<T>&&
           std::is_nothrow_default_constructible_v<T>) {
     if (this != &source) {
       value_ = std::move(source);
@@ -163,9 +155,8 @@ class reset_on_copy {
   }
 
   template <typename T1 = T>
-  std::enable_if_t<std::is_pointer_v<T1>,
-                   std::add_lvalue_reference_t<std::remove_pointer_t<T>>>
-  operator*() const noexcept {
+  std::enable_if_t<std::is_pointer_v<T1>, std::add_lvalue_reference_t<std::remove_pointer_t<T>>> operator*()
+      const noexcept {
     return *value_;
   }
   //@}
@@ -176,7 +167,7 @@ class reset_on_copy {
   // this to `value_ = T{}` which would introduce an additional dependence on
   // the behavior of T's copy assignment operator.
   void destruct_and_reset_value() {
-    value_.~T();  // Invokes destructor if there is one.
+    value_.~T();        // Invokes destructor if there is one.
     new (&value_) T{};  // Placement new; no heap activity.
   }
 

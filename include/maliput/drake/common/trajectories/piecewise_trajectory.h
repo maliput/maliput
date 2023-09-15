@@ -52,7 +52,7 @@ class PiecewiseTrajectory : public Trajectory<T> {
 
   static std::vector<T> RandomSegmentTimes(
       // TODO(#2274) Fix this NOLINTNEXTLINE(runtime/references)
-      int num_segments, std::default_random_engine &generator);
+      int num_segments, std::default_random_engine& generator);
 
  protected:
   // Final subclasses are allowed to make copy/move/assign public.
@@ -62,8 +62,7 @@ class PiecewiseTrajectory : public Trajectory<T> {
   /// @p breaks increments must be greater or equal to kEpsilonTime.
   explicit PiecewiseTrajectory(const std::vector<T>& breaks);
 
-  bool SegmentTimesEqual(const PiecewiseTrajectory& b,
-                         double tol = kEpsilonTime) const;
+  bool SegmentTimesEqual(const PiecewiseTrajectory& b, double tol = kEpsilonTime) const;
 
   const std::vector<T>& breaks() const { return breaks_; }
   std::vector<T>& get_mutable_breaks() { return breaks_; }
@@ -77,5 +76,4 @@ class PiecewiseTrajectory : public Trajectory<T> {
 }  // namespace trajectories
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class maliput::drake::trajectories::PiecewiseTrajectory)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class maliput::drake::trajectories::PiecewiseTrajectory)

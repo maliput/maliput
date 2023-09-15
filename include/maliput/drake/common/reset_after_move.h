@@ -56,9 +56,7 @@ class reset_after_move {
   /// an implicit conversion, so that reset_after_move<T> behaves more like
   /// the unwrapped type.
   // NOLINTNEXTLINE(runtime/explicit)
-  reset_after_move(const T& value) noexcept(
-      std::is_nothrow_copy_constructible_v<T>)
-      : value_(value) {}
+  reset_after_move(const T& value) noexcept(std::is_nothrow_copy_constructible_v<T>) : value_(value) {}
 
   /// @name Implements CopyConstructible, CopyAssignable, MoveConstructible,
   /// MoveAssignable.
@@ -66,14 +64,12 @@ class reset_after_move {
   reset_after_move(const reset_after_move&) = default;
   reset_after_move& operator=(const reset_after_move&) = default;
   reset_after_move(reset_after_move&& other) noexcept(
-      std::is_nothrow_default_constructible_v<T> &&
-      std::is_nothrow_move_assignable_v<T>) {
+      std::is_nothrow_default_constructible_v<T>&& std::is_nothrow_move_assignable_v<T>) {
     value_ = std::move(other.value_);
     other.value_ = T{};
   }
   reset_after_move& operator=(reset_after_move&& other) noexcept(
-      std::is_nothrow_default_constructible_v<T> &&
-      std::is_nothrow_move_assignable_v<T>) {
+      std::is_nothrow_default_constructible_v<T>&& std::is_nothrow_move_assignable_v<T>) {
     if (this != &other) {
       value_ = std::move(other.value_);
       other.value_ = T{};
@@ -98,9 +94,7 @@ class reset_after_move {
     return value_;
   }
   template <typename T1 = T>
-  std::enable_if_t<std::is_pointer_v<T1>,
-                   std::add_lvalue_reference_t<std::remove_pointer_t<T>>>
-  operator*() const {
+  std::enable_if_t<std::is_pointer_v<T1>, std::add_lvalue_reference_t<std::remove_pointer_t<T>>> operator*() const {
     return *value_;
   }
   //@}

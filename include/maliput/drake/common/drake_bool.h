@@ -49,8 +49,7 @@ typename Derived::Scalar all(const Eigen::DenseBase<Derived>& m) {
 template <typename Derived>
 boolean<typename Derived::Scalar> all_of(
     const Eigen::MatrixBase<Derived>& m,
-    const std::function<boolean<typename Derived::Scalar>(
-        const typename Derived::Scalar&)>& pred) {
+    const std::function<boolean<typename Derived::Scalar>(const typename Derived::Scalar&)>& pred) {
   return maliput::drake::all(m.unaryExpr(pred));
 }
 
@@ -73,8 +72,7 @@ typename Derived::Scalar any(const Eigen::DenseBase<Derived>& m) {
 template <typename Derived>
 boolean<typename Derived::Scalar> any_of(
     const Eigen::MatrixBase<Derived>& m,
-    const std::function<boolean<typename Derived::Scalar>(
-        const typename Derived::Scalar&)>& pred) {
+    const std::function<boolean<typename Derived::Scalar>(const typename Derived::Scalar&)>& pred) {
   return any(m.unaryExpr(pred));
 }
 
@@ -91,8 +89,7 @@ typename Derived::Scalar none(const Eigen::MatrixBase<Derived>& m) {
 template <typename Derived>
 boolean<typename Derived::Scalar> none_of(
     const Eigen::MatrixBase<Derived>& m,
-    const std::function<boolean<typename Derived::Scalar>(
-        const typename Derived::Scalar&)>& pred) {
+    const std::function<boolean<typename Derived::Scalar>(const typename Derived::Scalar&)>& pred) {
   return none(m.unaryExpr(pred));
 }
 }  // namespace maliput::drake

@@ -47,17 +47,13 @@ class CacheEntry {
   /** Signature of a function suitable for allocating an object that can hold
   a value of a particular cache entry. The result is always returned as an
   AbstractValue but must contain the correct concrete type. */
-  using AllocCallback
-      DRAKE_DEPRECATED("2021-10-01",
-          "Use ValueProducer::AllocateCallback instead.")
-      = ValueProducer::AllocateCallback;
+  using AllocCallback DRAKE_DEPRECATED("2021-10-01", "Use ValueProducer::AllocateCallback instead.") =
+      ValueProducer::AllocateCallback;
 
   /** Signature of a function suitable for calculating a value of a particular
   cache entry, given a place to put the value. */
-  using CalcCallback
-      DRAKE_DEPRECATED("2021-10-01",
-          "Use ValueProducer::CalcCallback instead.")
-      = ValueProducer::CalcCallback;
+  using CalcCallback DRAKE_DEPRECATED("2021-10-01",
+                                      "Use ValueProducer::CalcCallback instead.") = ValueProducer::CalcCallback;
 
   // All the nontrivial parameters here are moved to the CacheEntry which is
   // why they aren't references.
@@ -89,25 +85,19 @@ class CacheEntry {
   @throws std::exception if the prerequisite list is empty.
 
   @see maliput::drake::systems::SystemBase::DeclareCacheEntry() */
-  CacheEntry(const internal::SystemMessageInterface* owning_system,
-             CacheIndex index, DependencyTicket ticket, std::string description,
-             ValueProducer value_producer,
-             std::set<DependencyTicket> prerequisites_of_calc);
+  CacheEntry(const internal::SystemMessageInterface* owning_system, CacheIndex index, DependencyTicket ticket,
+             std::string description, ValueProducer value_producer, std::set<DependencyTicket> prerequisites_of_calc);
 
   DRAKE_DEPRECATED("2021-10-01", "Use the ValueProducer overload instead.")
-  CacheEntry(
-      const internal::SystemMessageInterface* owning_system,
-      CacheIndex index, DependencyTicket ticket, std::string description,
-      std::function<std::unique_ptr<AbstractValue>()> alloc_function,
-      std::function<void(const ContextBase&, AbstractValue*)> calc_function,
-      std::set<DependencyTicket> prerequisites_of_calc);
+  CacheEntry(const internal::SystemMessageInterface* owning_system, CacheIndex index, DependencyTicket ticket,
+             std::string description, std::function<std::unique_ptr<AbstractValue>()> alloc_function,
+             std::function<void(const ContextBase&, AbstractValue*)> calc_function,
+             std::set<DependencyTicket> prerequisites_of_calc);
 
   /** Returns a reference to the set of prerequisites needed by this cache
   entry's Calc() function. These are all within the same subsystem that
   owns this %CacheEntry. */
-  const std::set<DependencyTicket>& prerequisites() const {
-    return prerequisites_of_calc_;
-  }
+  const std::set<DependencyTicket>& prerequisites() const { return prerequisites_of_calc_; }
 
   /** (Advanced) Returns a mutable reference to the set of prerequisites needed
   by this entry's Calc() function. Any tickets in this set are interpreted as
@@ -125,9 +115,7 @@ class CacheEntry {
   as-yet-undeclared prerequisites. If performance requirements preclude that
   approach, then an advanced user may use this method to add more prerequisites
   as their tickets become available. */
-  std::set<DependencyTicket>& mutable_prerequisites() {
-    return prerequisites_of_calc_;
-  }
+  std::set<DependencyTicket>& mutable_prerequisites() { return prerequisites_of_calc_; }
 
   /** Invokes this cache entry's allocator function to allocate a concrete
   object suitable for holding the value to be held in this cache entry, and
@@ -194,8 +182,7 @@ class CacheEntry {
   const ValueType& GetKnownUpToDate(const ContextBase& context) const {
     const CacheEntryValue& cache_value = get_cache_entry_value(context);
     if (cache_value.is_out_of_date()) ThrowOutOfDate(__func__);
-    return ExtractValueOrThrow<ValueType>(cache_value.get_abstract_value(),
-                                          __func__);
+    return ExtractValueOrThrow<ValueType>(cache_value.get_abstract_value(), __func__);
   }
 
   /** Returns a reference to the _known up-to-date_ abstract value of this cache
@@ -206,8 +193,7 @@ class CacheEntry {
   @throws std::exception if the value is not up to date. */
   // Keep this method as small as possible to encourage inlining; it gets
   // called *a lot*.
-  const AbstractValue& GetKnownUpToDateAbstract(
-      const ContextBase& context) const {
+  const AbstractValue& GetKnownUpToDateAbstract(const ContextBase& context) const {
     const CacheEntryValue& cache_value = get_cache_entry_value(context);
     if (cache_value.is_out_of_date()) ThrowOutOfDate(__func__);
     return cache_value.get_abstract_value();
@@ -218,9 +204,7 @@ class CacheEntry {
   Eval() method will not perform any computation when invoked, unless caching
   has been disabled for this entry. If this returns `true` the
   GetKnownUpToDate() methods will fail if invoked. */
-  bool is_out_of_date(const ContextBase& context) const {
-    return get_cache_entry_value(context).is_out_of_date();
-  }
+  bool is_out_of_date(const ContextBase& context) const { return get_cache_entry_value(context).is_out_of_date(); }
 
   /** (Debugging) Returns `true` if caching has been disabled for this cache
   entry in the given `context`. That means Eval() will recalculate even if the
@@ -253,9 +237,7 @@ class CacheEntry {
   observed a difference between cached and non-cached behavior that can't be
   diagnosed with the runtime disable_caching() method.
   @see disable_caching() */
-  void disable_caching_by_default() {
-    is_disabled_by_default_ = true;
-  }
+  void disable_caching_by_default() { is_disabled_by_default_ = true; }
 
   /** (Debugging) Returns the current value of this flag. It is `false` unless
   a call to `disable_caching_by_default()` has previously been made. */
@@ -270,8 +252,7 @@ class CacheEntry {
   respect to its prerequisites. If you just need the value, use the Eval()
   method rather than this one. This method is constant time and _very_ fast in
   all circumstances. */
-  const CacheEntryValue& get_cache_entry_value(
-      const ContextBase& context) const {
+  const CacheEntryValue& get_cache_entry_value(const ContextBase& context) const {
     MALIPUT_DRAKE_ASSERT_VOID(owning_system_->ValidateContext(context));
     return context.get_cache().get_cache_entry_value(cache_index_);
   }
@@ -281,11 +262,9 @@ class CacheEntry {
   `context` is const; cache values are mutable. Don't call this method unless
   you know what you're doing. This method is constant time and _very_ fast in
   all circumstances. */
-  CacheEntryValue& get_mutable_cache_entry_value(
-      const ContextBase& context) const {
+  CacheEntryValue& get_mutable_cache_entry_value(const ContextBase& context) const {
     MALIPUT_DRAKE_ASSERT_VOID(owning_system_->ValidateContext(context));
-    return context.get_mutable_cache().get_mutable_cache_entry_value(
-        cache_index_);
+    return context.get_mutable_cache().get_mutable_cache_entry_value(cache_index_);
   }
 
   /** Returns the CacheIndex used to locate this %CacheEntry within the
@@ -312,8 +291,7 @@ class CacheEntry {
     // TODO(sherm1) Make this bulletproof with a way to distinguish
     // "took the default" from "specified the default value".
     return prerequisites_of_calc_.size() == 1 &&
-           *prerequisites_of_calc_.begin() ==
-               DependencyTicket(internal::kAllSourcesTicket);
+           *prerequisites_of_calc_.begin() == DependencyTicket(internal::kAllSourcesTicket);
   }
 
  private:
@@ -322,8 +300,7 @@ class CacheEntry {
   // because caching was disabled).
   void UpdateValue(const ContextBase& context) const {
     // We can get a mutable cache entry value from a const context.
-    CacheEntryValue& mutable_cache_value =
-        get_mutable_cache_entry_value(context);
+    CacheEntryValue& mutable_cache_value = get_mutable_cache_entry_value(context);
     AbstractValue& value = mutable_cache_value.GetMutableAbstractValueOrThrow();
     // If Calc() throws a recoverable exception, the cache remains out of date.
     Calc(context, &value);
@@ -331,35 +308,28 @@ class CacheEntry {
   }
 
   // The value was unexpectedly out of date. Issue a helpful message.
-  void ThrowOutOfDate(const char* api) const {
-    throw std::logic_error(FormatName(api) + "value out of date.");
-  }
+  void ThrowOutOfDate(const char* api) const { throw std::logic_error(FormatName(api) + "value out of date."); }
 
   // The user told us the cache entry would have a particular concrete type
   // but it doesn't.
   template <typename ValueType>
   void ThrowBadValueType(const char* api, const AbstractValue& abstract) const {
-    throw std::logic_error(FormatName(api) + "wrong value type <" +
-                           NiceTypeName::Get<ValueType>() +
-                           "> specified but actual type was <" +
-                           abstract.GetNiceTypeName() + ">.");
+    throw std::logic_error(FormatName(api) + "wrong value type <" + NiceTypeName::Get<ValueType>() +
+                           "> specified but actual type was <" + abstract.GetNiceTypeName() + ">.");
   }
 
   // Pull a value of a given type from an abstract value or issue a nice
   // message if the type is not correct. Keep this small and inlineable.
   template <typename ValueType>
-  const ValueType& ExtractValueOrThrow(const AbstractValue& abstract,
-                                       const char* api) const {
+  const ValueType& ExtractValueOrThrow(const AbstractValue& abstract, const char* api) const {
     const ValueType* value = abstract.maybe_get_value<ValueType>();
-    if (!value)
-      ThrowBadValueType<ValueType>(api, abstract);
+    if (!value) ThrowBadValueType<ValueType>(api, abstract);
     return *value;
   }
 
   // Check that an AbstractValue provided to Calc() is suitable for this cache
   // entry.
-  void CheckValidAbstractValue(const ContextBase& context,
-                               const AbstractValue& proposed) const;
+  void CheckValidAbstractValue(const ContextBase& context, const AbstractValue& proposed) const;
 
   // Provides an identifying prefix for error messages.
   std::string FormatName(const char* api) const;

@@ -72,9 +72,7 @@ class AntiderivativeFunction {
     /// Constructor that specifies all values.
     /// @param v_in Specified lower integration bound v.
     /// @param k_in Specified parameter vector 𝐤.
-    IntegrableFunctionContext(const std::optional<T>& v_in,
-                              const std::optional<VectorX<T>>& k_in)
-        : v(v_in), k(k_in) {}
+    IntegrableFunctionContext(const std::optional<T>& v_in, const std::optional<VectorX<T>>& k_in) : v(v_in), k(k_in) {}
 
     std::optional<T> v;           ///< The lower integration bound v.
     std::optional<VectorX<T>> k;  ///< The parameter vector 𝐤.
@@ -92,19 +90,16 @@ class AntiderivativeFunction {
   AntiderivativeFunction(const IntegrableFunction& integrable_function,
                          const IntegrableFunctionContext& default_values = {}) {
     // Expresses the scalar integral to be solved as an ODE.
-    typename ScalarInitialValueProblem<T>::ScalarOdeFunction
-        scalar_ode_function = [integrable_function](const T& t, const T& x,
-                                                    const VectorX<T>& k) -> T {
+    typename ScalarInitialValueProblem<T>::ScalarOdeFunction scalar_ode_function =
+        [integrable_function](const T& t, const T& x, const VectorX<T>& k) -> T {
       unused(x);
       return integrable_function(t, k);
     };
 
-    typename ScalarInitialValueProblem<T>::ScalarOdeContext
-        scalar_ivp_default_values;
+    typename ScalarInitialValueProblem<T>::ScalarOdeContext scalar_ivp_default_values;
     // Default initial time for the scalar ODE form falls back
     // to 0 if no lower integration bound is specified.
-    scalar_ivp_default_values.t0 =
-        default_values.v.value_or(static_cast<T>(0.0));
+    scalar_ivp_default_values.t0 = default_values.v.value_or(static_cast<T>(0.0));
     // Default initial state for the scalar ODE form is set to 0.
     scalar_ivp_default_values.x0 = static_cast<T>(0.0);
     // Default parameter vector for the scalar ODE falls back to
@@ -112,8 +107,7 @@ class AntiderivativeFunction {
     scalar_ivp_default_values.k = default_values.k.value_or(VectorX<T>());
 
     // Instantiates the scalar initial value problem.
-    scalar_ivp_ = std::make_unique<ScalarInitialValueProblem<T>>(
-        scalar_ode_function, scalar_ivp_default_values);
+    scalar_ivp_ = std::make_unique<ScalarInitialValueProblem<T>>(scalar_ode_function, scalar_ivp_default_values);
   }
 
   /// Evaluates the definite integral F(u; 𝐤) = ∫ᵥᵘ f(x; 𝐤) dx from the lower
@@ -131,8 +125,7 @@ class AntiderivativeFunction {
   ///      values given on construction.
   /// @throws std::exception if any of the preconditions is not met.
   T Evaluate(const T& u, const IntegrableFunctionContext& values = {}) const {
-    typename ScalarInitialValueProblem<T>::ScalarOdeContext scalar_ivp_values(
-        values.v, {}, values.k);
+    typename ScalarInitialValueProblem<T>::ScalarOdeContext scalar_ivp_values(values.v, {}, values.k);
     return scalar_ivp_->Solve(u, scalar_ivp_values);
   }
 
@@ -164,12 +157,11 @@ class AntiderivativeFunction {
   ///      must match that of the parameter vector 𝐤 in the default specified
   ///      values given on construction.
   /// @throws std::exception if any of the preconditions is not met.
-  std::unique_ptr<ScalarDenseOutput<T>> MakeDenseEvalFunction(
-      const T& w, const IntegrableFunctionContext& values = {}) const {
+  std::unique_ptr<ScalarDenseOutput<T>> MakeDenseEvalFunction(const T& w,
+                                                              const IntegrableFunctionContext& values = {}) const {
     // Delegates request to the scalar IVP used for computations, by putting
     // specified values in scalar IVP terms.
-    typename ScalarInitialValueProblem<T>::ScalarOdeContext scalar_ivp_values(
-        values.v, {}, values.k);
+    typename ScalarInitialValueProblem<T>::ScalarOdeContext scalar_ivp_values(values.v, {}, values.k);
     return this->scalar_ivp_->DenseSolve(w, scalar_ivp_values);
   }
 
@@ -190,19 +182,14 @@ class AntiderivativeFunction {
   ///          AntiderivativeFunction::get_mutable_integrator().
   template <typename Integrator, typename... Args>
   Integrator* reset_integrator(Args&&... args) {
-    return scalar_ivp_->template reset_integrator<Integrator>(
-        std::forward<Args>(args)...);
+    return scalar_ivp_->template reset_integrator<Integrator>(std::forward<Args>(args)...);
   }
 
   /// Gets a reference to the internal integrator instance.
-  const IntegratorBase<T>& get_integrator() const {
-    return scalar_ivp_->get_integrator();
-  }
+  const IntegratorBase<T>& get_integrator() const { return scalar_ivp_->get_integrator(); }
 
   /// Gets a mutable reference to the internal integrator instance.
-  IntegratorBase<T>& get_mutable_integrator() {
-    return scalar_ivp_->get_mutable_integrator();
-  }
+  IntegratorBase<T>& get_mutable_integrator() { return scalar_ivp_->get_mutable_integrator(); }
 
  private:
   // Scalar IVP used to perform quadrature.

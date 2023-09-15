@@ -26,14 +26,11 @@ class Subvector final : public VectorBase<T> {
   /// @param vector The vector to slice.  Must not be nullptr. Must remain
   ///               valid for the lifetime of this object.
   Subvector(VectorBase<T>* vector, int first_element, int num_elements)
-      : vector_(vector),
-        first_element_(first_element),
-        num_elements_(num_elements) {
+      : vector_(vector), first_element_(first_element), num_elements_(num_elements) {
     if (vector_ == nullptr) {
       throw std::logic_error("Cannot create Subvector of a nullptr vector.");
     }
-    if ((first_element < 0) || (num_elements < 0) ||
-        (first_element + num_elements > vector->size())) {
+    if ((first_element < 0) || (num_elements < 0) || (first_element + num_elements > vector->size())) {
       std::ostringstream oss;
       oss << "Subvector range [" << first_element << ", ";
       oss << first_element + num_elements << ") falls outside the";
@@ -56,12 +53,16 @@ class Subvector final : public VectorBase<T> {
   }
 
   const T& DoGetAtIndexChecked(int index) const final {
-    if (index >= size()) { this->ThrowOutOfRange(index); }
+    if (index >= size()) {
+      this->ThrowOutOfRange(index);
+    }
     return (*vector_)[first_element_ + index];
   }
 
   T& DoGetAtIndexChecked(int index) final {
-    if (index >= size()) { this->ThrowOutOfRange(index); }
+    if (index >= size()) {
+      this->ThrowOutOfRange(index);
+    }
     return (*vector_)[first_element_ + index];
   }
 
@@ -73,5 +74,4 @@ class Subvector final : public VectorBase<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::Subvector)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::Subvector)

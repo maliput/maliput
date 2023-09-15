@@ -65,9 +65,7 @@ class Context : public ContextBase {
   const T& get_time() const { return time_; }
 
   /// Returns a const reference to the whole State.
-  const State<T>& get_state() const {
-    return do_access_state();
-  }
+  const State<T>& get_state() const { return do_access_state(); }
 
   /// Returns true if the Context has no state.
   bool is_stateless() const {
@@ -101,45 +99,32 @@ class Context : public ContextBase {
   int num_total_states() const {
     MALIPUT_DRAKE_THROW_UNLESS(num_abstract_states() == 0);
     int count = num_continuous_states();
-    for (int i = 0; i < num_discrete_state_groups(); i++)
-      count += get_discrete_state(i).size();
+    for (int i = 0; i < num_discrete_state_groups(); i++) count += get_discrete_state(i).size();
     return count;
   }
 
   /// Returns the number of continuous state variables `xc = {q, v, z}`.
-  int num_continuous_states() const {
-    return get_continuous_state().size();
-  }
+  int num_continuous_states() const { return get_continuous_state().size(); }
 
   /// Returns a const reference to the continuous component of the state,
   /// which may be of size zero.
-  const ContinuousState<T>& get_continuous_state() const {
-    return get_state().get_continuous_state();
-  }
+  const ContinuousState<T>& get_continuous_state() const { return get_state().get_continuous_state(); }
 
   /// Returns a reference to the continuous state vector, devoid of second-order
   /// structure. The vector may be of size zero.
-  const VectorBase<T>& get_continuous_state_vector() const {
-    return get_continuous_state().get_vector();
-  }
+  const VectorBase<T>& get_continuous_state_vector() const { return get_continuous_state().get_vector(); }
 
   /// Returns the number of vectors (groups) in the discrete state.
-  int num_discrete_state_groups() const {
-    return get_state().get_discrete_state().num_groups();
-  }
+  int num_discrete_state_groups() const { return get_state().get_discrete_state().num_groups(); }
 
   /// Returns a reference to the entire discrete state, which may consist of
   /// multiple discrete state vectors (groups).
-  const DiscreteValues<T>& get_discrete_state() const {
-    return get_state().get_discrete_state();
-  }
+  const DiscreteValues<T>& get_discrete_state() const { return get_state().get_discrete_state(); }
 
   /// Returns a reference to the _only_ discrete state vector. The vector may be
   /// of size zero.
   /// @pre There is only one discrete state group.
-  const BasicVector<T>& get_discrete_state_vector() const {
-    return get_discrete_state().get_vector();
-  }
+  const BasicVector<T>& get_discrete_state_vector() const { return get_discrete_state().get_vector(); }
 
   /// Returns a const reference to group (vector) @p index of the discrete
   /// state.
@@ -150,15 +135,11 @@ class Context : public ContextBase {
   }
 
   /// Returns the number of elements in the abstract state.
-  int num_abstract_states() const {
-    return get_state().get_abstract_state().size();
-  }
+  int num_abstract_states() const { return get_state().get_abstract_state().size(); }
 
   /// Returns a const reference to the abstract component of the state, which
   /// may be of size zero.
-  const AbstractValues& get_abstract_state() const {
-    return get_state().get_abstract_state();
-  }
+  const AbstractValues& get_abstract_state() const { return get_state().get_abstract_state(); }
 
   /// Returns a const reference to the abstract component of the
   /// state at @p index.
@@ -179,20 +160,14 @@ class Context : public ContextBase {
   const Parameters<T>& get_parameters() const { return *parameters_; }
 
   /// Returns the number of vector-valued parameters.
-  int num_numeric_parameter_groups() const {
-    return parameters_->num_numeric_parameter_groups();
-  }
+  int num_numeric_parameter_groups() const { return parameters_->num_numeric_parameter_groups(); }
 
   /// Returns a const reference to the vector-valued parameter at @p index.
   /// @pre @p index must identify an existing parameter.
-  const BasicVector<T>& get_numeric_parameter(int index) const {
-    return parameters_->get_numeric_parameter(index);
-  }
+  const BasicVector<T>& get_numeric_parameter(int index) const { return parameters_->get_numeric_parameter(index); }
 
   /// Returns the number of abstract-valued parameters.
-  int num_abstract_parameters() const {
-    return get_parameters().num_abstract_parameters();
-  }
+  int num_abstract_parameters() const { return get_parameters().num_abstract_parameters(); }
 
   /// Returns a const reference to the abstract-valued parameter at @p index.
   /// @pre @p index must identify an existing parameter.
@@ -343,9 +318,7 @@ class Context : public ContextBase {
   /// The supplied vector must be the same size as the existing continuous
   /// state. Sends out of date notifications for all continuous-state-dependent
   /// computations.
-  void SetContinuousState(const Eigen::Ref<const VectorX<T>>& xc) {
-    get_mutable_continuous_state().SetFromVector(xc);
-  }
+  void SetContinuousState(const Eigen::Ref<const VectorX<T>>& xc) { get_mutable_continuous_state().SetFromVector(xc); }
 
   // TODO(sherm1) Consider whether this should avoid invalidation of
   // time-dependent quantities if the new time is the same as the old time.
@@ -353,11 +326,8 @@ class Context : public ContextBase {
   /// notification sweep to avoid duplicate notifications for computations that
   /// depend on both time and state.
   /// @throws std::exception if this is not the root context.
-  void SetTimeAndContinuousState(const T& time_sec,
-                                 const Eigen::Ref<const VectorX<T>>& xc) {
-    VectorBase<T>& xc_vector =
-        SetTimeAndGetMutableContinuousStateHelper(__func__, time_sec)
-            .get_mutable_vector();
+  void SetTimeAndContinuousState(const T& time_sec, const Eigen::Ref<const VectorX<T>>& xc) {
+    VectorBase<T>& xc_vector = SetTimeAndGetMutableContinuousStateHelper(__func__, time_sec).get_mutable_vector();
     xc_vector.SetFromVector(xc);
   }
 
@@ -385,10 +355,8 @@ class Context : public ContextBase {
   /// depend on this discrete state group.
   /// @pre @p group_index identifies an existing group.
   /// @note Currently notifies dependents of _all_ groups.
-  void SetDiscreteState(int group_index,
-                        const Eigen::Ref<const VectorX<T>>& xd) {
-    get_mutable_discrete_state(DiscreteStateIndex(group_index))
-        .SetFromVector(xd);
+  void SetDiscreteState(int group_index, const Eigen::Ref<const VectorX<T>>& xd) {
+    get_mutable_discrete_state(DiscreteStateIndex(group_index)).SetFromVector(xd);
   }
 
   // TODO(sherm1) Invalidate only dependents of this one abstract variable.
@@ -535,9 +503,7 @@ class Context : public ContextBase {
   /// Returns a mutable reference to the continuous state vector, devoid
   /// of second-order structure. The vector may be of size zero. Sends out of
   /// date notifications for all continuous-state-dependent computations.
-  VectorBase<T>& get_mutable_continuous_state_vector() {
-    return get_mutable_continuous_state().get_mutable_vector();
-  }
+  VectorBase<T>& get_mutable_continuous_state_vector() { return get_mutable_continuous_state().get_mutable_vector(); }
 
   /// Returns a mutable reference to the discrete component of the state,
   /// which may be of size zero. Sends out of date notifications for all
@@ -549,9 +515,7 @@ class Context : public ContextBase {
   /// computations.
   /// @sa get_discrete_state_vector().
   /// @pre There is only one discrete state group.
-  BasicVector<T>& get_mutable_discrete_state_vector() {
-    return get_mutable_discrete_state().get_mutable_vector();
-  }
+  BasicVector<T>& get_mutable_discrete_state_vector() { return get_mutable_discrete_state().get_mutable_vector(); }
 
   // TODO(sherm1) Invalidate only dependents of this one discrete group.
   /// Returns a mutable reference to group (vector) @p index of the discrete
@@ -624,8 +588,7 @@ class Context : public ContextBase {
   /// @see SetTimeAndNoteContinuousStateChange()
   /// @see SetTimeAndGetMutableContinuousState()
   VectorBase<T>& SetTimeAndGetMutableContinuousStateVector(const T& time_sec) {
-    return SetTimeAndGetMutableContinuousStateHelper(__func__, time_sec)
-        .get_mutable_vector();
+    return SetTimeAndGetMutableContinuousStateHelper(__func__, time_sec).get_mutable_vector();
   }
 
   /// (Advanced) Sets time and returns a mutable reference to the second-order
@@ -666,8 +629,7 @@ class Context : public ContextBase {
   /// @see SetTimeAndNoteContinuousStateChange()
   void NoteContinuousStateChange() {
     const int64_t change_event = this->start_new_change_event();
-    PropagateBulkChange(change_event,
-                        &Context<T>::NoteAllContinuousStateChanged);
+    PropagateBulkChange(change_event, &Context<T>::NoteAllContinuousStateChanged);
   }
   //@}
 
@@ -724,15 +686,12 @@ class Context : public ContextBase {
 
   /// (Internal use only) Sets a new time and notifies time-dependent
   /// quantities that they are now invalid, as part of a given change event.
-  static void PropagateTimeChange(Context<T>* context, const T& time,
-                                  const std::optional<T>& true_time,
+  static void PropagateTimeChange(Context<T>* context, const T& time, const std::optional<T>& true_time,
                                   int64_t change_event);
 
   /// (Internal use only) Sets a new accuracy and notifies accuracy-dependent
   /// quantities that they are now invalid, as part of a given change event.
-  static void PropagateAccuracyChange(Context<T>* context,
-                                      const std::optional<double>& accuracy,
-                                      int64_t change_event);
+  static void PropagateAccuracyChange(Context<T>* context, const std::optional<double>& accuracy, int64_t change_event);
 
   /// (Internal use only) Returns a reference to mutable parameters _without_
   /// invalidation notifications. Use get_mutable_parameters() instead for
@@ -754,8 +713,7 @@ class Context : public ContextBase {
   /// pointers.
   // This is just an intentional shadowing of the base class method to return a
   // more convenient type.
-  static std::unique_ptr<Context<T>> CloneWithoutPointers(
-      const Context<T>& source);
+  static std::unique_ptr<Context<T>> CloneWithoutPointers(const Context<T>& source);
 
   /// Returns a const reference to its concrete State object.
   virtual const State<T>& do_access_state() const = 0;
@@ -777,16 +735,14 @@ class Context : public ContextBase {
   /// Invokes PropagateTimeChange() on all subcontexts of this Context. The
   /// default implementation does nothing, which is suitable for leaf contexts.
   /// Diagram contexts must override.
-  virtual void DoPropagateTimeChange(const T& time_sec,
-      const std::optional<T>& true_time, int64_t change_event) {
+  virtual void DoPropagateTimeChange(const T& time_sec, const std::optional<T>& true_time, int64_t change_event) {
     unused(time_sec, true_time, change_event);
   }
 
   /// Invokes PropagateAccuracyChange() on all subcontexts of this Context. The
   /// default implementation does nothing, which is suitable for leaf contexts.
   /// Diagram contexts must override.
-  virtual void DoPropagateAccuracyChange(const std::optional<double>& accuracy,
-                                         int64_t change_event) {
+  virtual void DoPropagateAccuracyChange(const std::optional<double>& accuracy, int64_t change_event) {
     unused(accuracy, change_event);
   }
 
@@ -813,8 +769,7 @@ class Context : public ContextBase {
 
  private:
   // Call with arguments like (__func__, "Time"), capitalized as shown.
-  void ThrowIfNotRootContext(const char* func_name,
-                             const char* quantity) const;
+  void ThrowIfNotRootContext(const char* func_name, const char* quantity) const;
 
   // TODO(xuchenhan-tri) Should treat fixed input port values the same as
   // parameters.
@@ -823,8 +778,7 @@ class Context : public ContextBase {
   // This helper allow us to reuse this code in several APIs with a single
   // change_event.
   template <typename U>
-  void SetStateAndParametersFromHelper(const Context<U>& source,
-                                       int64_t change_event) {
+  void SetStateAndParametersFromHelper(const Context<U>& source, int64_t change_event) {
     // Notification is separate from the actual value change for bulk changes.
     PropagateBulkChange(change_event, &Context<T>::NoteAllStateChanged);
     do_access_mutable_state().SetFrom(source.get_state());
@@ -837,11 +791,9 @@ class Context : public ContextBase {
 
   // These helpers allow us to reuse this code in several APIs while the
   // error message contains the actual API name.
-  void SetTimeAndNoteContinuousStateChangeHelper(const char* func_name,
-      const T& time_sec);
+  void SetTimeAndNoteContinuousStateChangeHelper(const char* func_name, const T& time_sec);
 
-  ContinuousState<T>& SetTimeAndGetMutableContinuousStateHelper(
-      const char* func_name, const T& time_sec) {
+  ContinuousState<T>& SetTimeAndGetMutableContinuousStateHelper(const char* func_name, const T& time_sec) {
     SetTimeAndNoteContinuousStateChangeHelper(func_name, time_sec);
     return do_access_mutable_state().get_mutable_continuous_state();
   }
@@ -860,8 +812,7 @@ class Context : public ContextBase {
   std::optional<double> accuracy_;
 
   // The parameter values (p) for this Context; this is never null.
-  copyable_unique_ptr<Parameters<T>> parameters_{
-      std::make_unique<Parameters<T>>()};
+  copyable_unique_ptr<Parameters<T>> parameters_{std::make_unique<Parameters<T>>()};
 };
 
 template <typename T>
@@ -873,5 +824,4 @@ std::ostream& operator<<(std::ostream& os, const Context<T>& context) {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::Context)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::Context)

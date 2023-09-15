@@ -192,187 +192,123 @@ class ValueProducer final {
 
   /** Overload (1a). This is the best choice. Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const)
-      : ValueProducer(make_allocate_mode_a<SomeOutput>(),
-                      make_calc_mode_1(instance, calc)) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const)
+      : ValueProducer(make_allocate_mode_a<SomeOutput>(), make_calc_mode_1(instance, calc)) {}
 
   /** Overload (1b). This is the second-best choice. Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      const SomeOutput& model_value,
-      void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const)
-      : ValueProducer(make_allocate_mode_b(model_value),
-                      make_calc_mode_1(instance, calc)) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, const SomeOutput& model_value,
+                void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const)
+      : ValueProducer(make_allocate_mode_b(model_value), make_calc_mode_1(instance, calc)) {}
 
   /** Overload (1c). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
-      void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const)
-      : ValueProducer(make_allocate_mode_c(instance, allocate),
-                      make_calc_mode_1(instance, calc)) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
+                void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const)
+      : ValueProducer(make_allocate_mode_c(instance, allocate), make_calc_mode_1(instance, calc)) {}
 
   /* Overload (1d). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      AllocateCallback allocate,
-      void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const)
-      : ValueProducer(std::move(allocate),
-                      make_calc_mode_1(instance, calc)) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, AllocateCallback allocate,
+                void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const)
+      : ValueProducer(std::move(allocate), make_calc_mode_1(instance, calc)) {}
 
   /** Overload (2a). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      SomeOutput (SomeClass::*calc)(const SomeContext&) const)
-      : ValueProducer(make_allocate_mode_a<SomeOutput>(),
-                      make_calc_mode_2(instance, calc)) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, SomeOutput (SomeClass::*calc)(const SomeContext&) const)
+      : ValueProducer(make_allocate_mode_a<SomeOutput>(), make_calc_mode_2(instance, calc)) {}
 
   /** Overload (2b). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      const SomeOutput& model_value,
-      SomeOutput (SomeClass::*calc)(const SomeContext&) const)
-      : ValueProducer(make_allocate_mode_b(model_value),
-                      make_calc_mode_2(instance, calc)) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, const SomeOutput& model_value,
+                SomeOutput (SomeClass::*calc)(const SomeContext&) const)
+      : ValueProducer(make_allocate_mode_b(model_value), make_calc_mode_2(instance, calc)) {}
 
   /** Overload (2c). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
-      SomeOutput (SomeClass::*calc)(const SomeContext&) const)
-      : ValueProducer(make_allocate_mode_c(instance, allocate),
-                      make_calc_mode_2(instance, calc)) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
+                SomeOutput (SomeClass::*calc)(const SomeContext&) const)
+      : ValueProducer(make_allocate_mode_c(instance, allocate), make_calc_mode_2(instance, calc)) {}
 
   /** Overload (2d). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      AllocateCallback allocate,
-      SomeOutput (SomeClass::*calc)(const SomeContext&) const)
-      : ValueProducer(std::move(allocate),
-                      make_calc_mode_2(instance, calc)) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, AllocateCallback allocate,
+                SomeOutput (SomeClass::*calc)(const SomeContext&) const)
+      : ValueProducer(std::move(allocate), make_calc_mode_2(instance, calc)) {}
 
   /** Overload (3a). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
   template <typename SomeContext, typename SomeOutput>
-  explicit ValueProducer(
-      std::function<void(const SomeContext&, SomeOutput*)> calc)
-      : ValueProducer(make_allocate_mode_a<SomeOutput>(),
-                      make_calc_mode_3(std::move(calc))) {}
+  explicit ValueProducer(std::function<void(const SomeContext&, SomeOutput*)> calc)
+      : ValueProducer(make_allocate_mode_a<SomeOutput>(), make_calc_mode_3(std::move(calc))) {}
 
   /** Overload (3b). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
   template <typename SomeContext, typename SomeOutput>
-  ValueProducer(
-      const SomeOutput& model_value,
-      std::function<void(const SomeContext&, SomeOutput*)> calc)
-      : ValueProducer(make_allocate_mode_b(model_value),
-                      make_calc_mode_3(std::move(calc))) {}
+  ValueProducer(const SomeOutput& model_value, std::function<void(const SomeContext&, SomeOutput*)> calc)
+      : ValueProducer(make_allocate_mode_b(model_value), make_calc_mode_3(std::move(calc))) {}
 
   /** Overload (3c). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
-      std::function<void(const SomeContext&, SomeOutput*)> calc)
-      : ValueProducer(make_allocate_mode_c(instance, allocate),
-                      make_calc_mode_3(std::move(calc))) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
+                std::function<void(const SomeContext&, SomeOutput*)> calc)
+      : ValueProducer(make_allocate_mode_c(instance, allocate), make_calc_mode_3(std::move(calc))) {}
 
   /** Overload (3d). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
   template <typename SomeContext, typename SomeOutput>
-  ValueProducer(
-      AllocateCallback allocate,
-      std::function<void(const SomeContext&, SomeOutput*)> calc)
-      : ValueProducer(std::move(allocate),
-                      make_calc_mode_3(std::move(calc))) {}
+  ValueProducer(AllocateCallback allocate, std::function<void(const SomeContext&, SomeOutput*)> calc)
+      : ValueProducer(std::move(allocate), make_calc_mode_3(std::move(calc))) {}
 
   /** Overload (4a). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
   template <typename SomeContext, typename SomeOutput>
-  explicit ValueProducer(
-      std::function<SomeOutput(const SomeContext&)> calc)
-      : ValueProducer(make_allocate_mode_a<SomeOutput>(),
-                      make_calc_mode_4(std::move(calc))) {}
+  explicit ValueProducer(std::function<SomeOutput(const SomeContext&)> calc)
+      : ValueProducer(make_allocate_mode_a<SomeOutput>(), make_calc_mode_4(std::move(calc))) {}
 
   /** Overload (4b). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
   template <typename SomeContext, typename SomeOutput>
-  ValueProducer(
-      const SomeOutput& model_value,
-      std::function<SomeOutput(const SomeContext&)> calc)
-      : ValueProducer(make_allocate_mode_b(model_value),
-                      make_calc_mode_4(std::move(calc))) {}
+  ValueProducer(const SomeOutput& model_value, std::function<SomeOutput(const SomeContext&)> calc)
+      : ValueProducer(make_allocate_mode_b(model_value), make_calc_mode_4(std::move(calc))) {}
 
   /** Overload (4c). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
-      std::function<SomeOutput(const SomeContext&)> calc)
-      : ValueProducer(make_allocate_mode_c(instance, allocate),
-                      make_calc_mode_4(std::move(calc))) {}
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  ValueProducer(const SomeInstance* instance, std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
+                std::function<SomeOutput(const SomeContext&)> calc)
+      : ValueProducer(make_allocate_mode_c(instance, allocate), make_calc_mode_4(std::move(calc))) {}
 
   /** Overload (4d). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
   template <typename SomeContext, typename SomeOutput>
-  ValueProducer(
-      AllocateCallback allocate,
-      std::function<SomeOutput(const SomeContext&)> calc)
-      : ValueProducer(std::move(allocate),
-                      make_calc_mode_4(std::move(calc))) {}
+  ValueProducer(AllocateCallback allocate, std::function<SomeOutput(const SomeContext&)> calc)
+      : ValueProducer(std::move(allocate), make_calc_mode_4(std::move(calc))) {}
 
   // Overload (5a) is omitted because we cannot infer the type of SomeOutput
   // from a generic CalcCallback.
 
   /** Overload (5b). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
-  template <typename SomeOutput,
-      typename = std::enable_if_t<!std::is_convertible_v<
-          SomeOutput, AllocateCallback>>>
-  ValueProducer(
-      const SomeOutput& model_value,
-      CalcCallback calc)
-      : ValueProducer(make_allocate_mode_b(model_value),
-                      std::move(calc)) {}
+  template <typename SomeOutput, typename = std::enable_if_t<!std::is_convertible_v<SomeOutput, AllocateCallback>>>
+  ValueProducer(const SomeOutput& model_value, CalcCallback calc)
+      : ValueProducer(make_allocate_mode_b(model_value), std::move(calc)) {}
 
   /** Overload (5c). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
   template <class SomeInstance, typename SomeClass, typename SomeOutput>
-  ValueProducer(
-      const SomeInstance* instance,
-      std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
-      CalcCallback calc)
-      : ValueProducer(make_allocate_mode_c(instance, allocate),
-                      std::move(calc)) {}
+  ValueProducer(const SomeInstance* instance, std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const,
+                CalcCallback calc)
+      : ValueProducer(make_allocate_mode_c(instance, allocate), std::move(calc)) {}
 
   /** Overload (5d). Refer to the
   @ref ValueProducer_constructors "Constructor overloads" for details. */
@@ -406,9 +342,7 @@ class ValueProducer final {
   [[noreturn]] static void ThrowBadNull();
 
   /** Reports that a dynamic_cast failed. */
-  [[noreturn]] static void ThrowBadCast(
-      const std::type_info& actual_type,
-      const std::type_info& desired_type);
+  [[noreturn]] static void ThrowBadCast(const std::type_info& actual_type, const std::type_info& desired_type);
 
   template <typename SomeClass, class SomeInstance>
   static const SomeClass* instance_cast(const SomeInstance* instance) {
@@ -432,11 +366,9 @@ class ValueProducer final {
   }
 
   // For overload series (1).
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  static CalcCallback make_calc_mode_1(
-      const SomeInstance* instance,
-      void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const) {
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  static CalcCallback make_calc_mode_1(const SomeInstance* instance,
+                                       void (SomeClass::*calc)(const SomeContext&, SomeOutput*) const) {
     static_assert(std::is_base_of_v<ContextBase, SomeContext>,
                   "The inferred type of SomeContext was invalid;"
                   " typically it should be Context<T>.");
@@ -444,8 +376,7 @@ class ValueProducer final {
     if (calc == nullptr) {
       ThrowBadNull();
     }
-    return [typed_instance, calc](const ContextBase& context,
-                                  AbstractValue* result) {
+    return [typed_instance, calc](const ContextBase& context, AbstractValue* result) {
       const SomeContext& typed_context = context_cast<SomeContext>(context);
       SomeOutput& typed_result = result->get_mutable_value<SomeOutput>();
       (typed_instance->*calc)(typed_context, &typed_result);
@@ -453,11 +384,9 @@ class ValueProducer final {
   }
 
   // For overload series (2).
-  template <class SomeInstance, typename SomeClass, typename SomeContext,
-            typename SomeOutput>
-  static CalcCallback make_calc_mode_2(
-      const SomeInstance* instance,
-      SomeOutput (SomeClass::*calc)(const SomeContext&) const) {
+  template <class SomeInstance, typename SomeClass, typename SomeContext, typename SomeOutput>
+  static CalcCallback make_calc_mode_2(const SomeInstance* instance,
+                                       SomeOutput (SomeClass::*calc)(const SomeContext&) const) {
     static_assert(std::is_base_of_v<ContextBase, SomeContext>,
                   "The inferred type of SomeContext was invalid;"
                   " typically it should be Context<T>.");
@@ -465,8 +394,7 @@ class ValueProducer final {
     if (calc == nullptr) {
       ThrowBadNull();
     }
-    return [typed_instance, calc](const ContextBase& context,
-                                  AbstractValue* result) {
+    return [typed_instance, calc](const ContextBase& context, AbstractValue* result) {
       const SomeContext& typed_context = context_cast<SomeContext>(context);
       SomeOutput& typed_result = result->get_mutable_value<SomeOutput>();
       typed_result = (typed_instance->*calc)(typed_context);
@@ -475,16 +403,14 @@ class ValueProducer final {
 
   // For overload series (3).
   template <typename SomeContext, typename SomeOutput>
-  static CalcCallback make_calc_mode_3(
-      std::function<void(const SomeContext&, SomeOutput*)>&& calc) {
+  static CalcCallback make_calc_mode_3(std::function<void(const SomeContext&, SomeOutput*)>&& calc) {
     static_assert(std::is_base_of_v<ContextBase, SomeContext>,
                   "The inferred type of SomeContext was invalid;"
                   " typically it should be Context<T>.");
     if (calc == nullptr) {
       ThrowBadNull();
     }
-    return [captured_calc = std::move(calc)](const ContextBase& context,
-                                             AbstractValue* result) {
+    return [captured_calc = std::move(calc)](const ContextBase& context, AbstractValue* result) {
       const SomeContext& typed_context = context_cast<SomeContext>(context);
       SomeOutput& typed_result = result->get_mutable_value<SomeOutput>();
       captured_calc(typed_context, &typed_result);
@@ -493,16 +419,14 @@ class ValueProducer final {
 
   // For overload series (4).
   template <typename SomeContext, typename SomeOutput>
-  static CalcCallback make_calc_mode_4(
-      std::function<SomeOutput(const SomeContext&)>&& calc) {
+  static CalcCallback make_calc_mode_4(std::function<SomeOutput(const SomeContext&)>&& calc) {
     static_assert(std::is_base_of_v<ContextBase, SomeContext>,
                   "The inferred type of SomeContext was invalid;"
                   " typically it should be Context<T>.");
     if (calc == nullptr) {
       ThrowBadNull();
     }
-    return [captured_calc = std::move(calc)](const ContextBase& context,
-                                             AbstractValue* result) {
+    return [captured_calc = std::move(calc)](const ContextBase& context, AbstractValue* result) {
       const SomeContext& typed_context = context_cast<SomeContext>(context);
       SomeOutput& typed_result = result->get_mutable_value<SomeOutput>();
       typed_result = captured_calc(typed_context);
@@ -512,13 +436,11 @@ class ValueProducer final {
   // For overload series (a).
   template <typename SomeOutput>
   static AllocateCallback make_allocate_mode_a() {
-    static_assert(
-        std::is_default_constructible_v<SomeOutput>,
-        "When ValueProducer is used with an output type that is not default"
-        " constructible, then you must provide either a model_value or an"
-        " allocate callback function.");
-    return static_cast<std::unique_ptr<maliput::drake::AbstractValue>(*)()>(
-        &AbstractValue::Make<SomeOutput>);
+    static_assert(std::is_default_constructible_v<SomeOutput>,
+                  "When ValueProducer is used with an output type that is not default"
+                  " constructible, then you must provide either a model_value or an"
+                  " allocate callback function.");
+    return static_cast<std::unique_ptr<maliput::drake::AbstractValue> (*)()>(&AbstractValue::Make<SomeOutput>);
   }
 
   // For overload series (b).
@@ -529,9 +451,8 @@ class ValueProducer final {
 
   // For overload series (c).
   template <class SomeInstance, typename SomeClass, typename SomeOutput>
-  static AllocateCallback make_allocate_mode_c(
-      const SomeInstance* instance,
-      std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const) {
+  static AllocateCallback make_allocate_mode_c(const SomeInstance* instance,
+                                               std::unique_ptr<SomeOutput> (SomeClass::*allocate)() const) {
     const SomeClass* typed_instance = instance_cast<SomeClass>(instance);
     if (allocate == nullptr) {
       ThrowBadNull();

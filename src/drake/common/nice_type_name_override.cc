@@ -19,9 +19,7 @@ void SetNiceTypeNamePtrOverride(NiceTypeNamePtrOverride new_ptr_override) {
   ptr_override() = new_ptr_override;
 }
 
-const NiceTypeNamePtrOverride& GetNiceTypeNamePtrOverride() {
-  return ptr_override();
-}
+const NiceTypeNamePtrOverride& GetNiceTypeNamePtrOverride() { return ptr_override(); }
 
 }  // namespace internal
 }  // namespace maliput::drake

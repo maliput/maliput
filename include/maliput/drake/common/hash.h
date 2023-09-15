@@ -75,25 +75,19 @@ namespace maliput::drake {
 
 /// Provides @ref hash_append for integral constants.
 template <class HashAlgorithm, class T>
-std::enable_if_t<std::is_integral_v<T>>
-hash_append(
-    HashAlgorithm& hasher, const T& item) noexcept {
+std::enable_if_t<std::is_integral_v<T>> hash_append(HashAlgorithm& hasher, const T& item) noexcept {
   hasher(std::addressof(item), sizeof(item));
 }
 
 /// Provides @ref hash_append for enumerations.
 template <class HashAlgorithm, class T>
-std::enable_if_t<std::is_enum_v<T>>
-hash_append(
-    HashAlgorithm& hasher, const T& item) noexcept {
+std::enable_if_t<std::is_enum_v<T>> hash_append(HashAlgorithm& hasher, const T& item) noexcept {
   hasher(std::addressof(item), sizeof(item));
 }
 
 /// Provides @ref hash_append for floating point values.
 template <class HashAlgorithm, class T>
-std::enable_if_t<std::is_floating_point_v<T>>
-hash_append(
-    HashAlgorithm& hasher, const T& item) noexcept {
+std::enable_if_t<std::is_floating_point_v<T>> hash_append(HashAlgorithm& hasher, const T& item) noexcept {
   // Hashing a NaN makes no sense, since they cannot compare as equal.
   MALIPUT_DRAKE_ASSERT(!std::isnan(item));
   // +0.0 and -0.0 are equal, so must hash identically.
@@ -108,9 +102,7 @@ hash_append(
 /// Provides @ref hash_append for std::string.
 /// (Technically, any string based on `CharT = char`.)
 template <class HashAlgorithm, class Traits, class Allocator>
-void hash_append(
-    HashAlgorithm& hasher,
-    const std::basic_string<char, Traits, Allocator>& item) noexcept {
+void hash_append(HashAlgorithm& hasher, const std::basic_string<char, Traits, Allocator>& item) noexcept {
   using maliput::drake::hash_append;
   hasher(item.data(), item.size());
   // All collection types must send their size, after their contents.
@@ -120,8 +112,7 @@ void hash_append(
 
 /// Provides @ref hash_append for std::pair.
 template <class HashAlgorithm, class T1, class T2>
-void hash_append(
-    HashAlgorithm& hasher, const std::pair<T1, T2>& item) noexcept {
+void hash_append(HashAlgorithm& hasher, const std::pair<T1, T2>& item) noexcept {
   using maliput::drake::hash_append;
   hash_append(hasher, item.first);
   hash_append(hasher, item.second);
@@ -134,8 +125,7 @@ void hash_append(
 /// same hash as that of the value `v` itself.  Hash operations implemented
 /// with this `hash_append` do *not* provide that invariant.
 template <class HashAlgorithm, class T>
-void hash_append(
-    HashAlgorithm& hasher, const std::optional<T>& item) noexcept {
+void hash_append(HashAlgorithm& hasher, const std::optional<T>& item) noexcept {
   if (item) {
     hash_append(hasher, *item);
   }
@@ -161,15 +151,8 @@ void hash_append_range(
 ///
 /// Note that there is no `hash_append` overload for `std::unordered_map`, and
 /// such an overload must never appear.  See n3980.html#unordered for details.
-template <
-  class HashAlgorithm,
-  class T1,
-  class T2,
-  class Compare,
-  class Allocator>
-void hash_append(
-    HashAlgorithm& hasher,
-    const std::map<T1, T2, Compare, Allocator>& item) noexcept {
+template <class HashAlgorithm, class T1, class T2, class Compare, class Allocator>
+void hash_append(HashAlgorithm& hasher, const std::map<T1, T2, Compare, Allocator>& item) noexcept {
   return hash_append_range(hasher, item.begin(), item.end());
 };
 
@@ -177,14 +160,8 @@ void hash_append(
 ///
 /// Note that there is no `hash_append` overload for `std::unordered_set`, and
 /// such an overload must never appear.  See n3980.html#unordered for details.
-template <
-  class HashAlgorithm,
-  class Key,
-  class Compare,
-  class Allocator>
-void hash_append(
-    HashAlgorithm& hasher,
-    const std::set<Key, Compare, Allocator>& item) noexcept {
+template <class HashAlgorithm, class Key, class Compare, class Allocator>
+void hash_append(HashAlgorithm& hasher, const std::set<Key, Compare, Allocator>& item) noexcept {
   return hash_append_range(hasher, item.begin(), item.end());
 };
 
@@ -221,14 +198,10 @@ class FNV1aHasher {
   }
 
   /// Feeds a single byte into this hash.
-  constexpr void add_byte(uint8_t byte) noexcept {
-    hash_ = (hash_ ^ byte) * kFnvPrime;
-  }
+  constexpr void add_byte(uint8_t byte) noexcept { hash_ = (hash_ ^ byte) * kFnvPrime; }
 
   /// Returns the hash.
-  explicit constexpr operator size_t() noexcept {
-    return hash_;
-  }
+  explicit constexpr operator size_t() noexcept { return hash_; }
 
  private:
   static_assert(sizeof(result_type) == (64 / 8), "We require a 64-bit size_t");
@@ -259,9 +232,7 @@ struct DelegatingHasher {
   }
 
   /// Append [data, data + length) bytes into the wrapped algorithm.
-  void operator()(const void* data, size_t length) noexcept {
-    func_(data, length);
-  }
+  void operator()(const void* data, size_t length) noexcept { func_(data, length); }
 
  private:
   const Func func_;

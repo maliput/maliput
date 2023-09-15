@@ -36,10 +36,10 @@ class RandomGenerator {
 /// Drake supports explicit reasoning about a few carefully chosen random
 /// distributions.
 enum class RandomDistribution {
-  kUniform = 0,   ///< Vector elements are independent and uniformly distributed
-                  ///  ∈ [0.0, 1.0).
-  kGaussian = 1,  ///< Vector elements are independent and drawn from a
-                  ///  mean-zero, unit-variance normal (Gaussian) distribution.
+  kUniform = 0,      ///< Vector elements are independent and uniformly distributed
+                     ///  ∈ [0.0, 1.0).
+  kGaussian = 1,     ///< Vector elements are independent and drawn from a
+                     ///  mean-zero, unit-variance normal (Gaussian) distribution.
   kExponential = 2,  ///< Vector elements are independent and drawn from an
                      ///  exponential distribution with λ=1.0.
 };
@@ -56,6 +56,5 @@ enum class RandomDistribution {
  * compiler might have problem to deduce the scalar type automatically.
  */
 template <typename T>
-T CalcProbabilityDensity(RandomDistribution distribution,
-                         const Eigen::Ref<const VectorX<T>>& x);
+T CalcProbabilityDensity(RandomDistribution distribution, const Eigen::Ref<const VectorX<T>>& x);
 }  // namespace maliput::drake

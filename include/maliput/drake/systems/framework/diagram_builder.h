@@ -50,7 +50,7 @@ class DiagramBuilder {
   /// @endcode
   ///
   /// @tparam S The type of system to add.
-  template<class S>
+  template <class S>
   S* AddSystem(std::unique_ptr<S> system) {
     if (system->get_name().empty()) {
       system->set_name(system->GetMemoryObjectName());
@@ -85,7 +85,7 @@ class DiagramBuilder {
   ///
   /// @exclude_from_pydrake_mkdoc{Not bound in pydrake -- emplacement while
   /// specifying <T> doesn't make sense for that language.}
-  template<class S, typename... Args>
+  template <class S, typename... Args>
   S* AddSystem(Args&&... args) {
     return AddSystem(std::make_unique<S>(std::forward<Args>(args)...));
   }
@@ -115,7 +115,7 @@ class DiagramBuilder {
   ///
   /// @exclude_from_pydrake_mkdoc{Not bound in pydrake -- emplacement while
   /// specifying <T> doesn't make sense for that language.}
-  template<template<typename Scalar> class S, typename... Args>
+  template <template <typename Scalar> class S, typename... Args>
   S<T>* AddSystem(Args&&... args) {
     return AddSystem(std::make_unique<S<T>>(std::forward<Args>(args)...));
   }
@@ -131,7 +131,7 @@ class DiagramBuilder {
   ///
   /// @tparam S The type of system to add.
   /// @post The system's name is @p name.
-  template<class S>
+  template <class S>
   S* AddNamedSystem(const std::string& name, std::unique_ptr<S> system) {
     system->set_name(name);
     return AddSystem(std::move(system));
@@ -161,10 +161,9 @@ class DiagramBuilder {
   ///
   /// @exclude_from_pydrake_mkdoc{Not bound in pydrake -- emplacement while
   /// specifying <T> doesn't make sense for that language.}
-  template<class S, typename... Args>
+  template <class S, typename... Args>
   S* AddNamedSystem(const std::string& name, Args&&... args) {
-    return AddNamedSystem(
-        name, std::make_unique<S>(std::forward<Args>(args)...));
+    return AddNamedSystem(name, std::make_unique<S>(std::forward<Args>(args)...));
   }
 
   /// Constructs a new system with the given @p args, applies @p name to it,
@@ -193,10 +192,9 @@ class DiagramBuilder {
   ///
   /// @exclude_from_pydrake_mkdoc{Not bound in pydrake -- emplacement while
   /// specifying <T> doesn't make sense for that language.}
-  template<template<typename Scalar> class S, typename... Args>
+  template <template <typename Scalar> class S, typename... Args>
   S<T>* AddNamedSystem(const std::string& name, Args&&... args) {
-    return AddNamedSystem(
-        name, std::make_unique<S<T>>(std::forward<Args>(args)...));
+    return AddNamedSystem(name, std::make_unique<S<T>>(std::forward<Args>(args)...));
   }
 
   /// Returns whether any Systems have been added yet.
@@ -249,34 +247,30 @@ class DiagramBuilder {
   /// @pre A port indicated by the resolution of @p name must not exist.
   /// @post @p input is connected to the new exported input port.
   /// @return The index of the exported input port of the entire diagram.
-  InputPortIndex ExportInput(
-      const InputPort<T>& input,
-      std::variant<std::string, UseDefaultName> name = kUseDefaultName);
+  InputPortIndex ExportInput(const InputPort<T>& input,
+                             std::variant<std::string, UseDefaultName> name = kUseDefaultName);
 
   /// Connects an input to the entire Diagram, indicated by @p
   /// diagram_port_name, to the given @p input port of a constituent system.
   /// @pre The Diagram input indicated by @p diagram_port_name must have been
   /// previously built via ExportInput().
   /// @post @p input is connected to the indicated Diagram input port.
-  void ConnectInput(
-      const std::string& diagram_port_name, const InputPort<T>& input);
+  void ConnectInput(const std::string& diagram_port_name, const InputPort<T>& input);
 
   /// Connects an input to the entire Diagram, indicated by @p
   /// diagram_port_index, to the given @p input port of a constituent system.
   /// @pre The Diagram input indicated by @p diagram_port_index must have been
   /// previously built via ExportInput().
   /// @post @p input is connected to the indicated Diagram input port.
-  void ConnectInput(
-      InputPortIndex diagram_port_index, const InputPort<T>& input);
+  void ConnectInput(InputPortIndex diagram_port_index, const InputPort<T>& input);
 
   /// Declares that the given @p output port of a constituent system is an
   /// output of the entire diagram.  @p name is an optional name for the output
   /// port; if it is unspecified, then a default name will be provided.
   /// @pre If supplied at all, @p name must not be empty.
   /// @return The index of the exported output port of the entire diagram.
-  OutputPortIndex ExportOutput(
-      const OutputPort<T>& output,
-      std::variant<std::string, UseDefaultName> name = kUseDefaultName);
+  OutputPortIndex ExportOutput(const OutputPort<T>& output,
+                               std::variant<std::string, UseDefaultName> name = kUseDefaultName);
 
   /// Builds the Diagram that has been described by the calls to Connect,
   /// ExportInput, and ExportOutput.
@@ -307,9 +301,8 @@ class DiagramBuilder {
   // @pre A port indicated by the resolution of @p name must not exist.
   // @post @p model_input is *not* connected to the new exported input port.
   // @return The index of the exported input port of the entire diagram.
-  InputPortIndex DeclareInput(
-      const InputPort<T>& model_input,
-      std::variant<std::string, UseDefaultName> name = kUseDefaultName);
+  InputPortIndex DeclareInput(const InputPort<T>& model_input,
+                              std::variant<std::string, UseDefaultName> name = kUseDefaultName);
 
   // Throws if the given input port (belonging to a child subsystem) has
   // already been connected to an output port, or exported to be an input
@@ -363,5 +356,4 @@ class DiagramBuilder {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiagramBuilder)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiagramBuilder)

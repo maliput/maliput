@@ -97,8 +97,7 @@ class CacheEntryValue {
                          some detectable way. */
   void SetInitialValue(std::unique_ptr<AbstractValue> init_value) {
     if (init_value == nullptr) {
-      throw std::logic_error(FormatName(__func__) +
-                             "initial value may not be null.");
+      throw std::logic_error(FormatName(__func__) + "initial value may not be null.");
     }
     ThrowIfValuePresent(__func__);
     value_ = std::move(init_value);
@@ -125,9 +124,7 @@ class CacheEntryValue {
   out of date.
   @throws std::exception if there is no value or it is out of date.
   @see get_abstract_value() */
-  const AbstractValue& GetAbstractValueOrThrow() const {
-    return GetAbstractValueOrThrowHelper(__func__);
-  }
+  const AbstractValue& GetAbstractValueOrThrow() const { return GetAbstractValueOrThrowHelper(__func__); }
 
   /** Returns a const reference to the contained value of known type V. It is
   an error to call this if there is no stored value, or the value is out of
@@ -183,9 +180,7 @@ class CacheEntryValue {
                          up to date.
   @throws std::exception if the cache is frozen.
   @see SetValueOrThrow(), set_value(), mark_up_to_date() */
-  AbstractValue& GetMutableAbstractValueOrThrow() {
-    return GetMutableAbstractValueOrThrowHelper(__func__);
-  }
+  AbstractValue& GetMutableAbstractValueOrThrow() { return GetMutableAbstractValueOrThrowHelper(__func__); }
 
   /** (Advanced) Convenience method that returns a mutable reference to the
   contained value downcast to its known concrete type. Throws an exception if
@@ -368,9 +363,7 @@ class CacheEntryValue {
   @note Operation of this method is unaffected by whether the cache is frozen.
   If you call it in that case the corresponding value will become
   inaccessible since it would require recomputation. */
-  void mark_out_of_date() {
-    flags_ |= kValueIsOutOfDate;
-  }
+  void mark_out_of_date() { flags_ |= kValueIsOutOfDate; }
 
   /** Returns the serial number of the contained value. This counts up every
   time the contained value changes, or whenever mutable access is granted. */
@@ -418,8 +411,7 @@ class CacheEntryValue {
   @throws std::exception for anything that goes wrong, with an appropriate
                          explanatory message. */
   // These invariants hold for all CacheEntryValues except the dummy one.
-  void ThrowIfBadCacheEntryValue(const internal::ContextMessageInterface*
-                                     owning_subcontext = nullptr) const;
+  void ThrowIfBadCacheEntryValue(const internal::ContextMessageInterface* owning_subcontext = nullptr) const;
 
   /** (Advanced) Disables caching for just this cache entry value. When
   disabled, the corresponding entry's Eval() method will unconditionally invoke
@@ -430,25 +422,19 @@ class CacheEntryValue {
   cache access will fail since recomputation is not permitted in a frozen
   cache. Once unfrozen, caching will remain disabled unless enable_caching()
   is called. */
-  void disable_caching() {
-    flags_ |= kCacheEntryIsDisabled;
-  }
+  void disable_caching() { flags_ |= kCacheEntryIsDisabled; }
 
   /** (Advanced) Enables caching for this cache entry value if it was previously
   disabled. When enabled (the default condition) the corresponding entry's
   Eval() method will check the `out_of_date` flag and invoke Calc() only if the
   entry is marked out of date. It is also independent of whether the cache is
   frozen; in that case caching will be enabled once the cache is unfrozen. */
-  void enable_caching() {
-    flags_ &= ~kCacheEntryIsDisabled;
-  }
+  void enable_caching() { flags_ &= ~kCacheEntryIsDisabled; }
 
   /** (Advanced) Returns `true` if caching is disabled for this cache entry.
   This is independent of the `out_of_date` flag, and independent of whether
   the cache is currently frozen. */
-  bool is_cache_entry_disabled() const {
-    return (flags_ & kCacheEntryIsDisabled) != 0;
-  }
+  bool is_cache_entry_disabled() const { return (flags_ & kCacheEntryIsDisabled) != 0; }
   //@}
 
 #ifndef DRAKE_DOXYGEN_CXX
@@ -481,16 +467,14 @@ class CacheEntryValue {
 
   // Default constructor can only be used privately to construct an empty
   // CacheEntryValue with description "DUMMY" and a meaningless value.
-  CacheEntryValue()
-      : description_("DUMMY"), value_(AbstractValue::Make<int>()) {}
+  CacheEntryValue() : description_("DUMMY"), value_(AbstractValue::Make<int>()) {}
 
   // Creates a new cache value with the given human-readable description and
   // (optionally) an abstract value that defines the right concrete type for
   // this value. The given cache index and dependency ticket must be valid and
   // are recorded here. Unless you have a good reason to do otherwise, make the
   // description identical to the CacheEntry for which this is the value.
-  CacheEntryValue(CacheIndex index, DependencyTicket ticket,
-                  std::string description,
+  CacheEntryValue(CacheIndex index, DependencyTicket ticket, std::string description,
                   const internal::ContextMessageInterface* owning_subcontext,
                   std::unique_ptr<AbstractValue> initial_value)
       : cache_index_(index),
@@ -508,8 +492,7 @@ class CacheEntryValue {
   CacheEntryValue(const CacheEntryValue&) = default;
 
   // This is the post-copy cleanup method.
-  void set_owning_subcontext(
-      const internal::ContextMessageInterface* owning_subcontext) {
+  void set_owning_subcontext(const internal::ContextMessageInterface* owning_subcontext) {
     MALIPUT_DRAKE_DEMAND(owning_subcontext != nullptr);
     MALIPUT_DRAKE_DEMAND(owning_subcontext_ == nullptr);
     owning_subcontext_ = owning_subcontext;
@@ -548,29 +531,24 @@ class CacheEntryValue {
   }
 
   void ThrowIfNoValuePresent(const char* api) const {
-    if (!has_value())
-      throw std::logic_error(FormatName(api) + "no value is present.");
+    if (!has_value()) throw std::logic_error(FormatName(api) + "no value is present.");
   }
 
   void ThrowIfValuePresent(const char* api) const {
     if (has_value()) {
-      throw std::logic_error(FormatName(api) +
-          "there is already a value object in this CacheEntryValue.");
+      throw std::logic_error(FormatName(api) + "there is already a value object in this CacheEntryValue.");
     }
   }
 
   // Throws if "other" doesn't have the same concrete type as this value.
   // Don't call this unless you've already verified that there is a value.
-  void ThrowIfBadOtherValue(
-      const char* api,
-      const std::unique_ptr<AbstractValue>* other_value_ptr) const;
+  void ThrowIfBadOtherValue(const char* api, const std::unique_ptr<AbstractValue>* other_value_ptr) const;
 
   // This means literally that the out-of-date bit is set; it does not look
   // at whether caching is disabled.
   void ThrowIfOutOfDate(const char* api) const {
     if (is_out_of_date()) {
-      throw std::logic_error(FormatName(api) +
-                             "the current value is out of date.");
+      throw std::logic_error(FormatName(api) + "the current value is out of date.");
     }
   }
 
@@ -578,8 +556,7 @@ class CacheEntryValue {
   // or caching is disabled.
   void ThrowIfAlreadyComputed(const char* api) const {
     if (!needs_recomputation()) {
-      throw std::logic_error(FormatName(api) +
-          "the current value is already up to date.");
+      throw std::logic_error(FormatName(api) + "the current value is already up to date.");
     }
   }
 
@@ -587,8 +564,7 @@ class CacheEntryValue {
   // cache entry value.
   void ThrowIfFrozen(const char* api) const {
     if (owning_subcontext_->is_cache_frozen()) {
-      throw std::logic_error(FormatName(api) +
-          "the cache is frozen but this entry is out of date.");
+      throw std::logic_error(FormatName(api) + "the cache is frozen but this entry is out of date.");
     }
   }
 
@@ -600,11 +576,7 @@ class CacheEntryValue {
   // The sense of these flag bits is chosen so that Eval() can check in a single
   // instruction whether it must recalculate. Only if flags==0 (kReadyToUse) can
   // we reuse the existing value. See needs_recomputation() above.
-  enum Flags : int {
-    kReadyToUse           = 0b00,
-    kValueIsOutOfDate     = 0b01,
-    kCacheEntryIsDisabled = 0b10
-  };
+  enum Flags : int { kReadyToUse = 0b00, kValueIsOutOfDate = 0b01, kCacheEntryIsDisabled = 0b10 };
 
   // The index for this CacheEntryValue within its containing subcontext.
   CacheIndex cache_index_;
@@ -619,8 +591,7 @@ class CacheEntryValue {
 
   // Pointer to the system name service of the owning subcontext. Used for
   // error messages.
-  reset_on_copy<const internal::ContextMessageInterface*>
-      owning_subcontext_;
+  reset_on_copy<const internal::ContextMessageInterface*> owning_subcontext_;
 
   // The value, its serial number, and its validity. The value is copyable so
   // that we can use a default copy constructor. The serial number is
@@ -654,8 +625,7 @@ class Cache {
 
   /** Constructor creates an empty cache referencing the system pathname
   service of its owning subcontext. The supplied pointer must not be null. */
-  explicit Cache(const internal::ContextMessageInterface* owning_subcontext)
-      : owning_subcontext_(owning_subcontext) {
+  explicit Cache(const internal::ContextMessageInterface* owning_subcontext) : owning_subcontext_(owning_subcontext) {
     MALIPUT_DRAKE_DEMAND(owning_subcontext != nullptr);
   }
 
@@ -674,11 +644,8 @@ class Cache {
   Cache. The graph must already contain trackers for the indicated
   prerequisites. The tracker will retain a pointer to the created
   CacheEntryValue for invalidation purposes. */
-  CacheEntryValue& CreateNewCacheEntryValue(
-      CacheIndex index, DependencyTicket ticket,
-      const std::string& description,
-      const std::set<DependencyTicket>& prerequisites,
-      DependencyGraph* graph);
+  CacheEntryValue& CreateNewCacheEntryValue(CacheIndex index, DependencyTicket ticket, const std::string& description,
+                                            const std::set<DependencyTicket>& prerequisites, DependencyGraph* graph);
 
   /** Returns true if there is a CacheEntryValue in this cache that has the
   given index. */
@@ -735,16 +702,12 @@ class Cache {
   /** (Advanced) Sets the "is frozen" flag. Cache entry values should check this
   before permitting mutable access to values.
   @see ContextBase::FreezeCache() for the user-facing API */
-  void freeze_cache() {
-    is_cache_frozen_ = true;
-  }
+  void freeze_cache() { is_cache_frozen_ = true; }
 
   /** (Advanced) Clears the "is frozen" flag, permitting normal cache
   activity.
   @see ContextBase::UnfreezeCache() for the user-facing API */
-  void unfreeze_cache() {
-    is_cache_frozen_ = false;
-  }
+  void unfreeze_cache() { is_cache_frozen_ = false; }
 
   /** (Advanced) Reports the current value of the "is frozen" flag.
   @see ContextBase::is_cache_frozen() for the user-facing API */
@@ -765,13 +728,11 @@ class Cache {
   // to the system name-providing service of the new owning Context, and sets
   // those pointers. The supplied pointer must not be null, and there must not
   // already be an owning subcontext set here.
-  void RepairCachePointers(
-      const internal::ContextMessageInterface* owning_subcontext);
+  void RepairCachePointers(const internal::ContextMessageInterface* owning_subcontext);
 
   // The system name service of the subcontext that owns this cache. This should
   // not be copied since it would still refer to the source subcontext.
-  reset_on_copy<const internal::ContextMessageInterface*>
-      owning_subcontext_;
+  reset_on_copy<const internal::ContextMessageInterface*> owning_subcontext_;
 
   // All CacheEntryValue objects, indexed by CacheIndex.
   std::vector<copyable_unique_ptr<CacheEntryValue>> store_;

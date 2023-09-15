@@ -56,12 +56,12 @@ class LeafContext : public Context<T> {
 
  private:
   friend class LeafContextTest;
-  using ContextBase::AddInputPort;    // For LeafContextTest.
-  using ContextBase::AddOutputPort;
-  using ContextBase::AddDiscreteStateTicket;
-  using ContextBase::AddAbstractStateTicket;
-  using ContextBase::AddNumericParameterTicket;
   using ContextBase::AddAbstractParameterTicket;
+  using ContextBase::AddAbstractStateTicket;
+  using ContextBase::AddDiscreteStateTicket;
+  using ContextBase::AddInputPort;  // For LeafContextTest.
+  using ContextBase::AddNumericParameterTicket;
+  using ContextBase::AddOutputPort;
 
   const State<T>& do_access_state() const final {
     MALIPUT_DRAKE_ASSERT(state_ != nullptr);
@@ -86,5 +86,4 @@ class LeafContext : public Context<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::LeafContext)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::LeafContext)

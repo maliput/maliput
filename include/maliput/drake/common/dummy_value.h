@@ -16,8 +16,7 @@ namespace maliput::drake {
 template <typename T>
 struct dummy_value {
   static constexpr T get() {
-    static_assert(std::numeric_limits<T>::has_quiet_NaN,
-                  "Custom scalar types should specialize this struct");
+    static_assert(std::numeric_limits<T>::has_quiet_NaN, "Custom scalar types should specialize this struct");
     return std::numeric_limits<T>::quiet_NaN();
   }
 };

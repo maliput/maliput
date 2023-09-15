@@ -37,76 +37,55 @@ class Parameters {
   /// Constructs Parameters both @p numeric and @p abstract.
   Parameters(std::vector<std::unique_ptr<BasicVector<T>>>&& numeric,
              std::vector<std::unique_ptr<AbstractValue>>&& abstract)
-      : numeric_parameters_(
-            std::make_unique<DiscreteValues<T>>(std::move(numeric))),
-        abstract_parameters_(
-            std::make_unique<AbstractValues>(std::move(abstract))) {}
+      : numeric_parameters_(std::make_unique<DiscreteValues<T>>(std::move(numeric))),
+        abstract_parameters_(std::make_unique<AbstractValues>(std::move(abstract))) {}
 
   /// Constructs Parameters that are purely @p numeric.
-  explicit Parameters(std::vector<std::unique_ptr<BasicVector<T>>>&& numeric)
-      : Parameters(std::move(numeric), {}) {}
+  explicit Parameters(std::vector<std::unique_ptr<BasicVector<T>>>&& numeric) : Parameters(std::move(numeric), {}) {}
 
   /// Constructs Parameters that are purely @p abstract.
-  explicit Parameters(std::vector<std::unique_ptr<AbstractValue>>&& abstract)
-      : Parameters({}, std::move(abstract)) {}
+  explicit Parameters(std::vector<std::unique_ptr<AbstractValue>>&& abstract) : Parameters({}, std::move(abstract)) {}
 
   /// Constructs Parameters in the common case where the parameters consist of
   /// exactly one numeric vector.
   explicit Parameters(std::unique_ptr<BasicVector<T>> vec)
-      : numeric_parameters_(
-            std::make_unique<DiscreteValues<T>>(std::move(vec))),
+      : numeric_parameters_(std::make_unique<DiscreteValues<T>>(std::move(vec))),
         abstract_parameters_(std::make_unique<AbstractValues>()) {}
 
   /// Constructs Parameters in the common case where the parameters consist of
   /// exactly one abstract value.
   explicit Parameters(std::unique_ptr<AbstractValue> value)
       : numeric_parameters_(std::make_unique<DiscreteValues<T>>()),
-        abstract_parameters_(
-            std::make_unique<AbstractValues>(std::move(value))) {}
+        abstract_parameters_(std::make_unique<AbstractValues>(std::move(value))) {}
 
   virtual ~Parameters() {}
 
-  int num_numeric_parameter_groups() const {
-    return numeric_parameters_->num_groups();
-  }
+  int num_numeric_parameter_groups() const { return numeric_parameters_->num_groups(); }
 
-  int num_abstract_parameters() const {
-    return abstract_parameters_->size();
-  }
+  int num_abstract_parameters() const { return abstract_parameters_->size(); }
 
   /// Returns the vector-valued parameter at @p index. Asserts if the index
   /// is out of bounds.
-  const BasicVector<T>& get_numeric_parameter(int index) const {
-    return numeric_parameters_->get_vector(index);
-  }
+  const BasicVector<T>& get_numeric_parameter(int index) const { return numeric_parameters_->get_vector(index); }
 
   /// Returns the vector-valued parameter at @p index. Asserts if the index
   /// is out of bounds.
-  BasicVector<T>& get_mutable_numeric_parameter(int index) {
-    return numeric_parameters_->get_mutable_vector(index);
-  }
+  BasicVector<T>& get_mutable_numeric_parameter(int index) { return numeric_parameters_->get_mutable_vector(index); }
 
-  const DiscreteValues<T>& get_numeric_parameters() const {
-    return *numeric_parameters_;
-  }
+  const DiscreteValues<T>& get_numeric_parameters() const { return *numeric_parameters_; }
 
-  void set_numeric_parameters(
-      std::unique_ptr<DiscreteValues<T>> numeric_params) {
+  void set_numeric_parameters(std::unique_ptr<DiscreteValues<T>> numeric_params) {
     MALIPUT_DRAKE_DEMAND(numeric_params != nullptr);
     numeric_parameters_ = std::move(numeric_params);
   }
 
   /// Returns the abstract-valued parameter at @p index. Asserts if the index
   /// is out of bounds.
-  const AbstractValue& get_abstract_parameter(int index) const {
-    return abstract_parameters_->get_value(index);
-  }
+  const AbstractValue& get_abstract_parameter(int index) const { return abstract_parameters_->get_value(index); }
 
   /// Returns the abstract-valued parameter at @p index. Asserts if the index
   /// is out of bounds.
-  AbstractValue& get_mutable_abstract_parameter(int index) {
-    return abstract_parameters_->get_mutable_value(index);
-  }
+  AbstractValue& get_mutable_abstract_parameter(int index) { return abstract_parameters_->get_mutable_value(index); }
 
   /// Returns the abstract-valued parameter at @p index. Asserts if the index
   /// is out of bounds, and throws if the parameter is not of type V.
@@ -119,16 +98,12 @@ class Parameters {
   /// is out of bounds, and throws if the parameter is not of type V.
   template <typename V>
   V& get_mutable_abstract_parameter(int index) {
-    return get_mutable_abstract_parameter(index).
-        template get_mutable_value<V>();
+    return get_mutable_abstract_parameter(index).template get_mutable_value<V>();
   }
 
-  const AbstractValues& get_abstract_parameters() const {
-    return *abstract_parameters_;
-  }
+  const AbstractValues& get_abstract_parameters() const { return *abstract_parameters_; }
 
-  void set_abstract_parameters(
-      std::unique_ptr<AbstractValues> abstract_params) {
+  void set_abstract_parameters(std::unique_ptr<AbstractValues> abstract_params) {
     MALIPUT_DRAKE_DEMAND(abstract_params != nullptr);
     abstract_parameters_ = std::move(abstract_params);
   }
@@ -175,5 +150,4 @@ class Parameters {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::Parameters)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::Parameters)

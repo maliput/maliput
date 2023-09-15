@@ -34,9 +34,7 @@ class DiagramOutputPort final : public OutputPort<T> {
   /** Obtains a reference to the subsystem output port that was exported to
   create this diagram port. Note that the source may itself be a diagram
   output port. */
-  const OutputPort<T>& get_source_output_port() const {
-    return *source_output_port_;
-  }
+  const OutputPort<T>& get_source_output_port() const { return *source_output_port_; }
 
  private:
   friend class internal::FrameworkFactory;
@@ -70,17 +68,11 @@ class DiagramOutputPort final : public OutputPort<T> {
   // doesn't have access to a declaration of Diagram<T> so would not be able
   // to static_cast up to System<T> as is required by OutputPort. We expect
   // the caller to do that cast for us so take a System<T> here.
-  DiagramOutputPort(const System<T>* diagram,
-                    internal::SystemMessageInterface* system_interface,
-                    internal::SystemId system_id,
-                    std::string name,
-                    OutputPortIndex index,
-                    DependencyTicket ticket,
-                    const OutputPort<T>* source_output_port,
-                    SubsystemIndex source_subsystem_index)
-      : OutputPort<T>(diagram, system_interface, system_id, std::move(name),
-                      index, ticket, source_output_port->get_data_type(),
-                      source_output_port->size()),
+  DiagramOutputPort(const System<T>* diagram, internal::SystemMessageInterface* system_interface,
+                    internal::SystemId system_id, std::string name, OutputPortIndex index, DependencyTicket ticket,
+                    const OutputPort<T>* source_output_port, SubsystemIndex source_subsystem_index)
+      : OutputPort<T>(diagram, system_interface, system_id, std::move(name), index, ticket,
+                      source_output_port->get_data_type(), source_output_port->size()),
         source_output_port_(source_output_port),
         source_subsystem_index_(source_subsystem_index) {
     MALIPUT_DRAKE_DEMAND(index.is_valid() && ticket.is_valid());
@@ -89,14 +81,11 @@ class DiagramOutputPort final : public OutputPort<T> {
   }
 
   // Asks the source system output port to allocate an appropriate object.
-  std::unique_ptr<AbstractValue> DoAllocate() const final {
-    return source_output_port_->Allocate();
-  }
+  std::unique_ptr<AbstractValue> DoAllocate() const final { return source_output_port_->Allocate(); }
 
   // Given the whole Diagram context, extracts the appropriate subcontext and
   // delegates to the source output port.
-  void DoCalc(const Context<T>& diagram_context,
-              AbstractValue* value) const final {
+  void DoCalc(const Context<T>& diagram_context, AbstractValue* value) const final {
     const Context<T>& subcontext = get_subcontext(diagram_context);
     return source_output_port_->Calc(subcontext, value);
   }
@@ -116,11 +105,8 @@ class DiagramOutputPort final : public OutputPort<T> {
 
   // Check that an AbstractValue provided to Calc() is suitable for this port
   // by asking the source port to do it.
-  void ThrowIfInvalidPortValueType(
-      const Context<T>& context,
-      const AbstractValue& proposed_value) const final {
-    OutputPort<T>::ThrowIfInvalidPortValueType(
-        *source_output_port_, get_subcontext(context), proposed_value);
+  void ThrowIfInvalidPortValueType(const Context<T>& context, const AbstractValue& proposed_value) const final {
+    OutputPort<T>::ThrowIfInvalidPortValueType(*source_output_port_, get_subcontext(context), proposed_value);
   }
 
   // Digs out the right subcontext for delegation.
@@ -130,11 +116,9 @@ class DiagramOutputPort final : public OutputPort<T> {
     // validate the SystemId, so that we know this Context is ours. As of this
     // writing, only OutputPort::Eval and OutputPort::Calc invoke this and
     // they do so safely.
-    const DiagramContext<T>* diagram_context_downcast =
-        static_cast<const DiagramContext<T>*>(&diagram_context);
+    const DiagramContext<T>* diagram_context_downcast = static_cast<const DiagramContext<T>*>(&diagram_context);
     MALIPUT_DRAKE_DEMAND(diagram_context_downcast != nullptr);
-    return diagram_context_downcast->GetSubsystemContext(
-        source_subsystem_index_);
+    return diagram_context_downcast->GetSubsystemContext(source_subsystem_index_);
   }
 
   const OutputPort<T>* const source_output_port_;
@@ -144,5 +128,4 @@ class DiagramOutputPort final : public OutputPort<T> {
 }  // namespace systems
 }  // namespace maliput::drake
 
-DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(
-    class ::maliput::drake::systems::DiagramOutputPort)
+DRAKE_DECLARE_CLASS_TEMPLATE_INSTANTIATIONS_ON_DEFAULT_SCALARS(class ::maliput::drake::systems::DiagramOutputPort)
