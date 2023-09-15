@@ -1159,14 +1159,8 @@ System<T>::MakeFixInputPortTypeChecker(
         if (actual_vector->size() != expected_size) {
           SystemBase::ThrowInputPortHasWrongType(
               "FixInputPortTypeCheck", path_name, port_index, port_name,
-              NiceTypeName::Get<BasicVector<T>>(),
-              // fmt::format("{} with size={}",
-              //             NiceTypeName::Get<BasicVector<T>>(),
-              //             expected_size),
-              NiceTypeName::Get(*actual_vector)
-              // fmt::format("{} with size={}",
-              //             NiceTypeName::Get(*actual_vector),
-              //             actual_vector->size())
+              NiceTypeName::Get<BasicVector<T>>() + std::string(" with size=") + std::to_string(expected_size),
+              NiceTypeName::Get(*actual_vector) + std::string(" with size=") + std::to_string(actual_vector->size())
           );
         }
       };
