@@ -110,3 +110,16 @@ cc_library(
         ":utility",
     ],
 )
+
+# TODO(stonier): prune, simplify and merge into common/math
+cc_library(
+    name = "drake",
+    srcs = glob(["src/drake/**/*.cc"]),
+    hdrs = glob(["include/maliput/drake/**/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@eigen",
+    ],
+)
