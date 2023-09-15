@@ -1,4 +1,4 @@
-add_library(framework
+add_library(drake_systems_framework
   abstract_value_cloner.cc
   abstract_values.cc
   basic_vector.cc
@@ -48,29 +48,29 @@ add_library(framework
   witness_function.cc
 )
 
-add_library(maliput_drake::framework ALIAS drake-systems-framework)
+add_library(maliput::drake_systems_framework ALIAS drake_systems_framework)
 
 set_target_properties(
-  drake-systems-framework
+  drake_systems_framework
   PROPERTIES
     OUTPUT_NAME ${PROJECT_NAME}_framework
 )
 
 target_include_directories(
-  drake-systems-framework
+  drake_systems_framework
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(
-  drake-systems-framework
+  drake_systems_framework
     Eigen3::Eigen
-    maliput_drake::common
+    maliput::drake_common
 )
 
 install(
-  TARGETS drake-systems-framework
+  TARGETS drake_systems_framework
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib

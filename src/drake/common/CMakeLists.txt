@@ -1,4 +1,4 @@
-add_library(common
+add_library(drake_common
   cond.cc
   double_overloads.cc
   drake_assert_and_throw.cc
@@ -13,29 +13,29 @@ add_library(common
   value.cc
 )
 
-add_library(maliput_drake::common ALIAS drake-common)
+add_library(maliput::drake_common ALIAS drake_common)
 
 set_target_properties(
-  drake-common
+  drake_common
   PROPERTIES
     OUTPUT_NAME ${PROJECT_NAME}_drake_common
 )
 
 target_include_directories(
-  drake-common
+  drake_common
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(
-  drake-common
+  drake_common
     dl
     Eigen3::Eigen
 )
 
 install(
-  TARGETS drake-common
+  TARGETS drake_common
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib

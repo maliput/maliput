@@ -1,32 +1,32 @@
-add_library(trajectories
+add_library(drake_common_trajectories
   piecewise_polynomial.cc
   piecewise_trajectory.cc
   trajectory.cc
 )
 
-add_library(maliput_drake::trajectories ALIAS drake-common-trajectories)
+add_library(maliput::drake_common_trajectories ALIAS drake_common_trajectories)
 
 set_target_properties(
-  drake-common-trajectories
+  drake_common_trajectories
   PROPERTIES
-    OUTPUT_NAME ${PROJECT_NAME}_trajectories
+    OUTPUT_NAME ${PROJECT_NAME}_common_trajectories
 )
 
 target_include_directories(
-  drake-common-trajectories
+  drake_common_trajectories
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(
-  drake-common-trajectories
+  drake_common_trajectories
     Eigen3::Eigen
-    maliput_drake::common
+    maliput::drake_common
 )
 
 install(
-  TARGETS drake-common-trajectories
+  TARGETS drake_common_trajectories
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib

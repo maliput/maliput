@@ -12,6 +12,8 @@ project(maliput LANGUAGES C CXX VERSION 3.0.0)
 message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
 find_package(ament_cmake REQUIRED)
+find_package(eigen3_cmake_module REQUIRED)
+find_package(Eigen3)
 find_package(yaml-cpp REQUIRED)
 
 ##############################################################################
