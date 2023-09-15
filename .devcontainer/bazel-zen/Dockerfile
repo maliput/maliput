@@ -78,4 +78,4 @@ RUN echo "export PS1='\[\033[01;36m\](docker)\[\033[00m\] \[\033[01;32m\]\u@${NA
     echo "alias ls='ls --color=auto -Nh'" >> /home/${USERNAME}/.bashrc && \
     echo "alias bazel='bazelisk'" >> /home/${USERNAME}/.bashrc
 
-ENV BLESSING="May you be blessed by a tickle from his noodly apppendages..."
+ENV BLESSING="May you be blessed by a tickle from his noodly appendages..."
