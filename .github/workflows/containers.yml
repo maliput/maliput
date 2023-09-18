@@ -5,6 +5,7 @@ permissions: write-all
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}-bazel-ci
+  BAZEL_VERSION: "6.1.1"
 
 on:
   push:
@@ -45,6 +46,9 @@ jobs:
       with:
         file: ./.devcontainer/bazel-zen/Dockerfile
         push: true
+        build-args: |
+            BAZEL_VERSION=${{ env.BAZEL_VERSION }}
         tags: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:bazel
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:bazel${{ env.BAZEL_VERSION }}
         labels: ${{ steps.meta.outputs.labels }}

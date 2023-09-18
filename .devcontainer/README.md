@@ -22,6 +22,8 @@
 
 #### Getting Started
 
+Locally:
+
 * [Install VSCode](https://code.visualstudio.com/docs/setup/linux#_debian-and-ubuntu-based-distributions)
 * Open the project in VSCode
 * CTRL-SHIFT-P &rarr; Reopen in Container
@@ -29,6 +31,20 @@
 
 ```
 (docker) zen@bazel-zen:/workspaces/maliput$ bazel build //...
+```
+
+CodeSpaces:
+
+* Go to Codespaces
+* Select 'New with Options'
+* 'Default' 'Bazel'
+
+<img src="./resources/codespaces.png" alt="codespaces" width="600">
+
+* Open a terminal in the container and run
+
+```
+@<github-username> ➜ /workspaces/maliput (main) $ bazel build //...
 ```
 
 ## ROS-Zen

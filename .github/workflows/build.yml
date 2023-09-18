@@ -11,9 +11,26 @@ env:
   PACKAGE_NAME: maliput
   ROS_DISTRO: foxy
 
+# Cancel previously running PR jobs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
 jobs:
-  compile_and_test:
-    name: Compile and test
+  bazel:
+    name: Compile and Test (Bazel)
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}-bazel-ci:latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      shell: bash
+      run: |
+        bazel build //...
+
+  cmake:
+    name: Compile and Test (CMake)
     runs-on: ubuntu-latest
     container:
       image: ubuntu:20.04
