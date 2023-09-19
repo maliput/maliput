@@ -45,8 +45,7 @@ namespace maliput::drake {
 /// source on move doesn't change semantics since the condition of the source
 /// after a move is generally undefined. It is instead opportunistic good
 /// hygiene for early detection of bugs, taking advantage of the fact that we
-/// know type T can be value-initialized. See reset_after_move for more
-/// discussion.
+/// know type T can be value-initialized.
 ///
 /// Example:
 ///
@@ -75,7 +74,6 @@ namespace maliput::drake {
 /// zero, regardless of whether 0 is one of the specified enumeration values.
 ///
 /// @tparam T must satisfy `std::is_scalar<T>`.
-/// @see reset_after_move
 template <typename T>
 class reset_on_copy {
  public:

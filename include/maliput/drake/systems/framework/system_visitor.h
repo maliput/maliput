@@ -45,10 +45,6 @@ class SystemVisitor {
   Diagram<T>. */
   virtual void VisitSystem(const System<T>& system) = 0;
 
-  /** This method will be called by System<T>::accept() if the System *is* a
-  Diagram<T>. */
-  virtual void VisitDiagram(const Diagram<T>& diagram) = 0;
-
  protected:
   SystemVisitor() = default;
 };

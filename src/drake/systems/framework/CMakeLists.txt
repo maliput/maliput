@@ -8,13 +8,6 @@ add_library(drake_systems_framework
   context.cc
   continuous_state.cc
   dependency_tracker.cc
-  diagram_builder.cc
-  diagram.cc
-  diagram_context.cc
-  diagram_continuous_state.cc
-  diagram_discrete_values.cc
-  diagram_output_port.cc
-  diagram_state.cc
   discrete_values.cc
   event_collection.cc
   fixed_input_port_value.cc
@@ -29,22 +22,17 @@ add_library(drake_systems_framework
   parameters.cc
   port_base.cc
   scalar_conversion_traits.cc
-  single_output_vector_source.cc
   state.cc
   subvector.cc
-  supervector.cc
   system_base.cc
   system.cc
   system_constraint.cc
-  system_html.cc
   system_output.cc
   system_scalar_converter.cc
-  system_symbolic_inspector.cc
   system_type_tag.cc
   system_visitor.cc
   value_producer.cc
   vector_base.cc
-  vector_system.cc
   witness_function.cc
 )
 
