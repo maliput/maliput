@@ -87,6 +87,7 @@ cc_library(
     srcs = glob(["src/utility/**/*.cc"]),
     hdrs = glob(["include/maliput/utility/**/*.h"]),
     copts = ["-std=c++17"],
+    linkopts = ["-lstdc++fs"],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
