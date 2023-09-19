@@ -36,8 +36,8 @@ Locally:
 CodeSpaces:
 
 * Go to Codespaces
-* Select 'New with Options'
-* 'Default' 'Bazel'
+* Select `New with Options`
+* Select `Bazel Zen` from the `Dev Container Configuration`
 
 <img src="./resources/codespaces.png" alt="codespaces" width="600">
 
