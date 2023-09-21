@@ -30,6 +30,7 @@ target_link_libraries(
   drake_systems_analysis
     Eigen3::Eigen
     maliput::drake_common
+    maliput::drake_common_trajectories
     maliput::drake_systems_framework
 )
 
