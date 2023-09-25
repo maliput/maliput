@@ -1,7 +1,5 @@
 #include "maliput/drake/systems/analysis/initial_value_problem.h"
 
-#define MALIPUT_USED
-
 #include <stdexcept>
 
 #include "maliput/drake/systems/analysis/hermitian_dense_output.h"

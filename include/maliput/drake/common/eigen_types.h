@@ -1,7 +1,5 @@
 #pragma once
 
-#define MALIPUT_USED
-
 /// @file
 /// This file contains abbreviated definitions for certain specializations of
 /// Eigen::Matrix that are commonly used in Drake.

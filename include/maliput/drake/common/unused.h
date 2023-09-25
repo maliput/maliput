@@ -1,7 +1,5 @@
 #pragma once
 
-#define MALIPUT_USED
-
 namespace maliput::drake {
 
 /// Documents the argument(s) as unused, placating GCC's -Wunused-parameter

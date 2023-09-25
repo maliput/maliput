@@ -1,7 +1,5 @@
 #pragma once
 
-#define MALIPUT_USED
-
 #include "maliput/drake/common/default_scalars.h"
 #include "maliput/drake/common/drake_copyable.h"
 #include "maliput/drake/systems/analysis/dense_output.h"
