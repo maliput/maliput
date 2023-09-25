@@ -1,7 +1,5 @@
 #pragma once
 
-#define MALIPUT_USED
-
 #include <stdexcept>
 
 #include "maliput/drake/common/drake_deprecated.h"

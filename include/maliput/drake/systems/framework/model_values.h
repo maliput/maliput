@@ -1,5 +1,4 @@
 #pragma once
-#define MALIPUT_USED
 
 #include <memory>
 #include <utility>

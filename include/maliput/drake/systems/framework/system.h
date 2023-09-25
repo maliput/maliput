@@ -1,7 +1,5 @@
 #pragma once
 
-#define MALIPUT_USED
-
 #include <cmath>
 #include <functional>
 #include <limits>
