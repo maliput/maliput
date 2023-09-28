@@ -31,13 +31,13 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/compare.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/common/compare.h"
 #include "maliput/math/compare.h"
 #include "maliput/math/matrix.h"
 #include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
-#include "maliput/test_utilities/maliput_types_compare.h"
 #include "maliput/test_utilities/mock.h"
 #include "test_utilities/assert_compare.h"
 
@@ -325,8 +325,8 @@ GTEST_TEST(Rotation, ApplyTest) {
   const double kRotationTolerance = 1e-8;
   const Rotation dut = Rotation::FromRpy(1.75, 2.91, 0.38);
   const InertialPosition inertial_position = dut.Apply({15., 33., 148.});
-  EXPECT_TRUE(test::IsInertialPositionClose(
-      inertial_position, InertialPosition{43.93919835, -145.60056097, -9.37141893}, kRotationTolerance));
+  EXPECT_TRUE(maliput::test::AssertCompare(IsInertialPositionClose(
+      inertial_position, InertialPosition{43.93919835, -145.60056097, -9.37141893}, kRotationTolerance)));
 }
 
 GTEST_TEST(Rotation, DistanceTest) {

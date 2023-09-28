@@ -4,6 +4,7 @@
 
 set(API_SOURCES
   basic_id_index.cc
+  compare.cc
   intersection.cc
   lane.cc
   lane_data.cc
