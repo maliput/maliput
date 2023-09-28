@@ -139,6 +139,9 @@ class Matrix {
   /// @throw common::assertion_error When matrix is singular.
   Matrix<N> inverse() const;
 
+  /// @return A string representation of the matrix.
+  std::string to_str() const;
+
   /// Assignment operator overload.
   /// @param other Matrix<N> object.
   Matrix<N>& operator=(const Matrix<N>& other);

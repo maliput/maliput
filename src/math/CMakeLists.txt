@@ -5,6 +5,7 @@
 set(MATH_SOURCES
   axis_aligned_box.cc
   bounding_box.cc
+  compare.cc
   matrix.cc
   quaternion.cc
   overlapping_type.cc
