@@ -49,6 +49,9 @@ jobs:
           {
             "build": {
               "mixin": ["coverage-gcc"]
+            },
+            "lcov-result": {
+              "lcov-config-file": "${{ github.workspace }}/.lcovrc"
             }
           }
         # If possible, pin the repository in the workflow to a specific commit to avoid
