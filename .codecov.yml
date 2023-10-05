@@ -15,10 +15,7 @@ coverage:
       default:
         target: auto
         threshold: 5%
-        removed_code_behavior: fully_covered_patch
-    patch:
-      default:
-        target: auto
+        base: auto
         removed_code_behavior: fully_covered_patch
 
 # Recommended by https://github.com/ros-tooling/action-ros-ci#integrate-action-ros-ci-with-codecov
