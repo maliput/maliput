@@ -29,8 +29,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include "maliput/api/lane_data.h"
 #include "maliput/common/compare.h"
 
