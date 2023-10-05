@@ -39,6 +39,8 @@ namespace maliput {
 namespace math {
 namespace {
 
+using maliput::test::AssertCompare;
+
 static constexpr double kTolerance{1e-10};
 
 using maliput::test::AssertCompare;
