@@ -3,6 +3,7 @@
 ##############################################################################
 
 set(ROUTING_SOURCES
+  compare.cc
   derive_lane_s_routes.cc
   find_lane_sequences.cc
   phase.cc

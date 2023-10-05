@@ -1,4 +1,5 @@
 ament_add_gmock(route_test route_test.cc)
+ament_add_gtest(routing_compare_test compare_test.cc)
 ament_add_gmock(routing_phase_test phase_test.cc)
 ament_add_gtest(routing_constraints_test routing_constraints_test.cc)
 
@@ -23,5 +24,6 @@ macro(add_dependencies_to_test target)
 endmacro()
 
 add_dependencies_to_test(route_test)
+add_dependencies_to_test(routing_compare_test)
 add_dependencies_to_test(routing_phase_test)
 add_dependencies_to_test(routing_constraints_test)
