@@ -32,12 +32,14 @@
 #include <gtest/gtest.h>
 
 #include "maliput/common/assertion_error.h"
+#include "maliput/common/compare.h"
+#include "maliput/math/compare.h"
 #include "maliput/math/matrix.h"
 #include "maliput/math/quaternion.h"
 #include "maliput/math/vector.h"
-#include "maliput/test_utilities/maliput_math_compare.h"
 #include "maliput/test_utilities/maliput_types_compare.h"
 #include "maliput/test_utilities/mock.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace api {
@@ -230,16 +232,17 @@ const double kRotationTolerance = 1e-15;
 
 // TODO(francocipollone): Once RollPitchYaw and Quaternion implementation are
 //                        complete the followings arguments of the CompareVectors could be modified.
-#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                                        \
-  do {                                                                                                               \
-    EXPECT_TRUE(math::test::CompareVectors(dut.quat().coeffs(), math::Vector4(_w, _x, _y, _z), kRotationTolerance)); \
-    EXPECT_TRUE(math::test::CompareVectors(                                                                          \
-        math::Vector3(dut.rpy().roll_angle(), dut.rpy().pitch_angle(), dut.rpy().yaw_angle()),                       \
-        math::Vector3(_ro, _pi, _ya), kRotationTolerance));                                                          \
-    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                                \
-    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                               \
-    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                                 \
-    EXPECT_TRUE(math::test::CompareMatrices(dut.matrix(), _ma, kRotationTolerance));                                 \
+#define CHECK_ALL_ROTATION_ACCESSORS(dut, _w, _x, _y, _z, _ro, _pi, _ya, _ma)                                 \
+  do {                                                                                                        \
+    EXPECT_TRUE(maliput::test::AssertCompare(                                                                 \
+        CompareVectors(dut.quat().coeffs(), math::Vector4(_w, _x, _y, _z), kRotationTolerance)));             \
+    EXPECT_TRUE(maliput::test::AssertCompare(                                                                 \
+        CompareVectors(math::Vector3(dut.rpy().roll_angle(), dut.rpy().pitch_angle(), dut.rpy().yaw_angle()), \
+                       math::Vector3(_ro, _pi, _ya), kRotationTolerance)));                                   \
+    EXPECT_NEAR(dut.roll(), _ro, kRotationTolerance);                                                         \
+    EXPECT_NEAR(dut.pitch(), _pi, kRotationTolerance);                                                        \
+    EXPECT_NEAR(dut.yaw(), _ya, kRotationTolerance);                                                          \
+    EXPECT_TRUE(maliput::test::AssertCompare(CompareMatrices(dut.matrix(), _ma, kRotationTolerance)));        \
   } while (0)
 
 class RotationTest : public ::testing::Test {
@@ -385,12 +388,12 @@ GTEST_TEST(Rotation, ReverseTest) {
   // Tolerance has been empirically found for these testing values.
   const double kLinearTolerance = 1e-15;
   const Rotation dut = Rotation::FromRpy(0., 0., 0.).Reverse();
-  EXPECT_TRUE(math::test::CompareVectors(math::Vector3(-1., 0., 0.),
-                                         dut.quat().TransformVector(math::Vector3(1., 0., 0)), kLinearTolerance));
-  EXPECT_TRUE(math::test::CompareVectors(math::Vector3(0., -1., 0.),
-                                         dut.quat().TransformVector(math::Vector3(0., 1., 0)), kLinearTolerance));
-  EXPECT_TRUE(math::test::CompareVectors(math::Vector3(0., 0., 1.),
-                                         dut.quat().TransformVector(math::Vector3(0., 0., 1.)), kLinearTolerance));
+  EXPECT_TRUE(maliput::test::AssertCompare(CompareVectors(
+      math::Vector3(-1., 0., 0.), dut.quat().TransformVector(math::Vector3(1., 0., 0)), kLinearTolerance)));
+  EXPECT_TRUE(maliput::test::AssertCompare(CompareVectors(
+      math::Vector3(0., -1., 0.), dut.quat().TransformVector(math::Vector3(0., 1., 0)), kLinearTolerance)));
+  EXPECT_TRUE(maliput::test::AssertCompare(CompareVectors(
+      math::Vector3(0., 0., 1.), dut.quat().TransformVector(math::Vector3(0., 0., 1.)), kLinearTolerance)));
 }
 
 #undef CHECK_ALL_ROTATION_ACCESSORS

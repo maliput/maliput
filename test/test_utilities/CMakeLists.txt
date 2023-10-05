@@ -1,5 +1,6 @@
 find_package(ament_cmake_gtest REQUIRED)
 
+ament_add_gtest(assert_compare_test assert_compare_test.cc)
 ament_add_gtest(maliput_routing_position_compare_test maliput_routing_position_compare_test.cc)
 ament_add_gtest(maliput_types_compare_test maliput_types_compare_test.cc)
 
@@ -23,5 +24,6 @@ macro(add_dependencies_to_test target)
     endif()
 endmacro()
 
+add_dependencies_to_test(assert_compare_test)
 add_dependencies_to_test(maliput_routing_position_compare_test)
 add_dependencies_to_test(maliput_types_compare_test)
