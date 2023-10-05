@@ -23,7 +23,8 @@ fixes:
   - "ros_ws/src/*/maliput/::"
 
 github_checks:
-  annotations: true
+  # Disable GitHub line-by-line annotations.
+  annotations: false
 
 # Exclude unwanted directories from code coverage reports.
 ignore:
