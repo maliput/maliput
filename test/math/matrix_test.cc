@@ -40,6 +40,8 @@ namespace {
 
 static constexpr double kTolerance{1e-10};
 
+using maliput::test::AssertCompare;
+
 GTEST_TEST(MatrixTest, Constructors) {
   {  // 2- dimension matrix.
     EXPECT_EQ(Matrix<2>{}, Matrix<2>({0., 0., 0., 0.}));
@@ -104,7 +106,7 @@ GTEST_TEST(MatrixTest, PublicMethods) {
     EXPECT_EQ(kDut.cofactor(), Matrix<2>({{5., -8.}, {-12., 1.}}));
     EXPECT_EQ(kDut * kDut.inverse(), Matrix<2>::Identity());
     const Matrix<2> kResult = kDut * kDut.inverse();
-    EXPECT_TRUE(maliput::test::AssertCompare(CompareMatrices(kResult, Matrix<2>::Identity(), kTolerance)));
+    EXPECT_TRUE(AssertCompare(CompareMatrices(kResult, Matrix<2>::Identity(), kTolerance)));
   }
   {  // 3- dimension matrix.
     const Matrix<3> kDut{{1., 12., 3.}, {8., 5., 3.}, {6., 14., 9.}};
@@ -122,7 +124,7 @@ GTEST_TEST(MatrixTest, PublicMethods) {
     EXPECT_EQ(kDut.reduce(1, 1), Matrix<2>({{1., 3.}, {6., 9.}}));
     EXPECT_EQ(kDut.cofactor(), Matrix<3>({{3., -54., 82.}, {-66., -9., 58.}, {21., 21., -91}}));
     const Matrix<3> kResult = kDut * kDut.inverse();
-    EXPECT_TRUE(maliput::test::AssertCompare(CompareMatrices(kResult, Matrix<3>::Identity(), kTolerance)));
+    EXPECT_TRUE(AssertCompare(CompareMatrices(kResult, Matrix<3>::Identity(), kTolerance)));
   }
   {  // 4- dimension matrix.
     const Matrix<4> kDut{{1., 12., 3., 2.}, {8., 5., 3., 7.}, {6., 14., 9., 25.}, {13., 4., 7., 8.}};
@@ -146,7 +148,7 @@ GTEST_TEST(MatrixTest, PublicMethods) {
                                           {-69., -354., 1705., -399.}}));
     EXPECT_EQ(kDut.cofactor().transpose(), kDut.adjoint());
     const Matrix<4> kResult = kDut * kDut.inverse();
-    EXPECT_TRUE(maliput::test::AssertCompare(CompareMatrices(kResult, Matrix<4>::Identity(), kTolerance)));
+    EXPECT_TRUE(AssertCompare(CompareMatrices(kResult, Matrix<4>::Identity(), kTolerance)));
   }
 }
 

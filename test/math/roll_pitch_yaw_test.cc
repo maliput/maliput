@@ -39,6 +39,8 @@ namespace maliput {
 namespace math {
 namespace {
 
+using maliput::test::AssertCompare;
+
 static constexpr double kTolerance{1e-10};
 
 void ExpectDoubleEq(const RollPitchYaw& rpy1, const RollPitchYaw& rpy2) {
@@ -86,7 +88,7 @@ GTEST_TEST(RollPitchYawTest, PublicMethods) {
     EXPECT_DOUBLE_EQ(kDut.roll_angle(), M_PI / 2);
     EXPECT_DOUBLE_EQ(kDut.pitch_angle(), 0.);
     EXPECT_DOUBLE_EQ(kDut.yaw_angle(), M_PI / 2);
-    EXPECT_TRUE(maliput::test::AssertCompare(
+    EXPECT_TRUE(AssertCompare(
         CompareMatrices(kDut.ToMatrix(), Matrix3({{0., 0., 1.}, {1., 0., 0.}, {0., 1., 0.}}), kTolerance)));
     ExpectDoubleEq(kDut.ToQuaternion(), Quaternion(0.5, 0.5, 0.5, 0.5));
   }
@@ -152,7 +154,7 @@ GTEST_TEST(RollPitchYawTest, OrdinaryDerivativeRotationMatrixRollPitchYaw) {
                      -s1*c0*pDt - s0*c1*rDt});
   // clang-format on
 
-  EXPECT_TRUE(maliput::test::AssertCompare(CompareMatrices(RDt, MDt, kTolerance)));
+  EXPECT_TRUE(AssertCompare(CompareMatrices(RDt, MDt, kTolerance)));
 }
 
 }  // namespace
