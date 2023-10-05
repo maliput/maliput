@@ -48,6 +48,7 @@ namespace routing {
 namespace test {
 namespace {
 
+using maliput::test::AssertCompare;
 using ::testing::_;
 using ::testing::Return;
 using ::testing::ReturnRef;
@@ -341,15 +342,12 @@ TEST_F(PhaseAccessorsTest, CorrectConstruction) {
   EXPECT_EQ(kLaneSRangeTolerance, dut.lane_s_range_tolerance());
   EXPECT_EQ(kStartRoadPositions.size(), dut.start_positions().size());
   EXPECT_EQ(kStartRoadPositions[0].lane, dut.start_positions()[0].lane);
-  EXPECT_TRUE(
-      maliput::test::AssertCompare(IsLanePositionClose(kStartRoadPositions[0].pos, dut.start_positions()[0].pos, 0.)));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kStartRoadPositions[0].pos, dut.start_positions()[0].pos, 0.)));
   EXPECT_EQ(kEndRoadPositions.size(), dut.end_positions().size());
   EXPECT_EQ(kEndRoadPositions[0].lane, dut.end_positions()[0].lane);
-  EXPECT_TRUE(
-      maliput::test::AssertCompare(IsLanePositionClose(kEndRoadPositions[0].pos, dut.end_positions()[0].pos, 0.)));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndRoadPositions[0].pos, dut.end_positions()[0].pos, 0.)));
   EXPECT_EQ(kEndRoadPositions[1].lane, dut.end_positions()[1].lane);
-  EXPECT_TRUE(
-      maliput::test::AssertCompare(IsLanePositionClose(kEndRoadPositions[1].pos, dut.end_positions()[1].pos, 0.)));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndRoadPositions[1].pos, dut.end_positions()[1].pos, 0.)));
   EXPECT_EQ(kLaneSRanges.size(), dut.lane_s_ranges().size());
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(kLaneSRanges[0], dut.lane_s_ranges()[0]));
   EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(kLaneSRanges[1], dut.lane_s_ranges()[1]));

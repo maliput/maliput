@@ -42,6 +42,8 @@ namespace maliput {
 namespace geometry_base {
 namespace {
 
+using maliput::test::AssertCompare;
+
 GTEST_TEST(FilterRoadPositionResultsTest, FilterRoadPositionResults) {
   const double kZeroTolerance{0.};
 
@@ -65,24 +67,24 @@ GTEST_TEST(FilterRoadPositionResultsTest, FilterRoadPositionResults) {
   result = FilterRoadPositionResults(unfiltered_positions, filter_always_true);
   EXPECT_EQ(static_cast<int>(result.size()), 2);
   EXPECT_EQ(result[0].road_position.lane, unfiltered_positions[0].road_position.lane);
-  EXPECT_TRUE(maliput::test::AssertCompare(
+  EXPECT_TRUE(AssertCompare(
       IsLanePositionClose(result[0].road_position.pos, unfiltered_positions[0].road_position.pos, kZeroTolerance)));
-  EXPECT_TRUE(maliput::test::AssertCompare(
+  EXPECT_TRUE(AssertCompare(
       IsInertialPositionClose(result[0].nearest_position, unfiltered_positions[0].nearest_position, kZeroTolerance)));
   EXPECT_NEAR(result[0].distance, unfiltered_positions[0].distance, kZeroTolerance);
   EXPECT_EQ(result[1].road_position.lane, unfiltered_positions[1].road_position.lane);
-  EXPECT_TRUE(maliput::test::AssertCompare(
+  EXPECT_TRUE(AssertCompare(
       IsLanePositionClose(result[1].road_position.pos, unfiltered_positions[1].road_position.pos, kZeroTolerance)));
-  EXPECT_TRUE(maliput::test::AssertCompare(
+  EXPECT_TRUE(AssertCompare(
       IsInertialPositionClose(result[1].nearest_position, unfiltered_positions[1].nearest_position, kZeroTolerance)));
   EXPECT_NEAR(result[1].distance, unfiltered_positions[1].distance, kZeroTolerance);
 
   result = FilterRoadPositionResults(unfiltered_positions, filter_lane_1);
   EXPECT_EQ(static_cast<int>(result.size()), 1);
   EXPECT_EQ(result[0].road_position.lane, unfiltered_positions[1].road_position.lane);
-  EXPECT_TRUE(maliput::test::AssertCompare(
+  EXPECT_TRUE(AssertCompare(
       IsLanePositionClose(result[0].road_position.pos, unfiltered_positions[1].road_position.pos, kZeroTolerance)));
-  EXPECT_TRUE(maliput::test::AssertCompare(
+  EXPECT_TRUE(AssertCompare(
       IsInertialPositionClose(result[0].nearest_position, unfiltered_positions[1].nearest_position, kZeroTolerance)));
   EXPECT_NEAR(result[0].distance, unfiltered_positions[1].distance, kZeroTolerance);
 }

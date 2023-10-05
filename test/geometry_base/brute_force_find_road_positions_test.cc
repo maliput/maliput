@@ -58,6 +58,8 @@ namespace {
 const double kRadius{3.};
 const double kDistance{3.};
 
+using maliput::test::AssertCompare;
+
 class BruteForceTest : public ::testing::Test {
  protected:
   const double linear_tolerance{1.};
@@ -73,7 +75,7 @@ class InertialPositionMatcher : public MatcherInterface<const api::InertialPosit
       : inertial_position_(inertial_position), tolerance_(tolerance) {}
 
   bool MatchAndExplain(const api::InertialPosition& other, MatchResultListener*) const override {
-    return maliput::test::AssertCompare(IsInertialPositionClose(inertial_position_, other, tolerance_));
+    return AssertCompare(IsInertialPositionClose(inertial_position_, other, tolerance_));
   }
 
   void DescribeTo(std::ostream* os) const override {
@@ -187,9 +189,9 @@ TEST_F(BruteForceTest, LaneInAndOutRadius) {
   api::LaneId id = results.front().road_position.lane->id();
 
   EXPECT_TRUE(id == lanes.front()->id());
-  EXPECT_TRUE(maliput::test::AssertCompare(
-      IsLanePositionClose(results.front().road_position.pos, kExpectedLanePosition, kZeroTolerance)));
-  EXPECT_TRUE(maliput::test::AssertCompare(
+  EXPECT_TRUE(
+      AssertCompare(IsLanePositionClose(results.front().road_position.pos, kExpectedLanePosition, kZeroTolerance)));
+  EXPECT_TRUE(AssertCompare(
       IsInertialPositionClose(results.front().nearest_position, kExpectedInertialPosition, kZeroTolerance)));
   EXPECT_NEAR(results.front().distance, kExpectedDistance, kZeroTolerance);
 
@@ -234,9 +236,9 @@ TEST_F(BruteForceTest, AllLanesCalled) {
     EXPECT_TRUE(std::any_of(
         lanes.begin(), lanes.end(),
         [id = road_position_result.road_position.lane->id()](LaneMock* lane) mutable { return id == lane->id(); }));
-    EXPECT_TRUE(maliput::test::AssertCompare(
+    EXPECT_TRUE(AssertCompare(
         IsLanePositionClose(road_position_result.road_position.pos, kExpectedLanePosition, kZeroTolerance)));
-    EXPECT_TRUE(maliput::test::AssertCompare(
+    EXPECT_TRUE(AssertCompare(
         IsInertialPositionClose(road_position_result.nearest_position, kExpectedInertialPosition, kZeroTolerance)));
     EXPECT_NEAR(road_position_result.distance, kExpectedDistance, kZeroTolerance);
   }
