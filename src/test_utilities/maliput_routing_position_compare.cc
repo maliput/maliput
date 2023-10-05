@@ -30,7 +30,8 @@
 
 #include <string>
 
-#include "maliput/test_utilities/maliput_types_compare.h"
+#include "maliput/api/compare.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace routing {
@@ -44,12 +45,12 @@ namespace test {
            << ppr_a.lane_s_range_index << " vs. ppr_b.lane_s_range_index: " << ppr_b.lane_s_range_index << "\n";
   }
   const ::testing::AssertionResult lane_position_assertion_result =
-      maliput::api::test::IsLanePositionClose(ppr_a.lane_position, ppr_b.lane_position, tolerance);
+      maliput::test::AssertCompare(IsLanePositionClose(ppr_a.lane_position, ppr_b.lane_position, tolerance));
   if (!lane_position_assertion_result) {
     return lane_position_assertion_result;
   }
-  const ::testing::AssertionResult inertial_position_assertion_result =
-      maliput::api::test::IsInertialPositionClose(ppr_a.inertial_position, ppr_b.inertial_position, tolerance);
+  const ::testing::AssertionResult inertial_position_assertion_result = maliput::test::AssertCompare(
+      IsInertialPositionClose(ppr_a.inertial_position, ppr_b.inertial_position, tolerance));
   if (!inertial_position_assertion_result) {
     return inertial_position_assertion_result;
   }

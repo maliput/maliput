@@ -33,12 +33,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "maliput/api/compare.h"
 #include "maliput/api/lane.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
-#include "maliput/test_utilities/maliput_types_compare.h"
 #include "maliput/test_utilities/mock_geometry.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
+#include "test_utilities/assert_compare.h"
 
 using ::testing::_;
 using ::testing::An;
@@ -57,6 +58,8 @@ namespace {
 const double kRadius{3.};
 const double kDistance{3.};
 
+using maliput::test::AssertCompare;
+
 class BruteForceTest : public ::testing::Test {
  protected:
   const double linear_tolerance{1.};
@@ -72,7 +75,7 @@ class InertialPositionMatcher : public MatcherInterface<const api::InertialPosit
       : inertial_position_(inertial_position), tolerance_(tolerance) {}
 
   bool MatchAndExplain(const api::InertialPosition& other, MatchResultListener*) const override {
-    return maliput::api::test::IsInertialPositionClose(inertial_position_, other, tolerance_);
+    return AssertCompare(IsInertialPositionClose(inertial_position_, other, tolerance_));
   }
 
   void DescribeTo(std::ostream* os) const override {
@@ -186,9 +189,10 @@ TEST_F(BruteForceTest, LaneInAndOutRadius) {
   api::LaneId id = results.front().road_position.lane->id();
 
   EXPECT_TRUE(id == lanes.front()->id());
-  EXPECT_TRUE(api::test::IsLanePositionClose(results.front().road_position.pos, kExpectedLanePosition, kZeroTolerance));
   EXPECT_TRUE(
-      api::test::IsInertialPositionClose(results.front().nearest_position, kExpectedInertialPosition, kZeroTolerance));
+      AssertCompare(IsLanePositionClose(results.front().road_position.pos, kExpectedLanePosition, kZeroTolerance)));
+  EXPECT_TRUE(AssertCompare(
+      IsInertialPositionClose(results.front().nearest_position, kExpectedInertialPosition, kZeroTolerance)));
   EXPECT_NEAR(results.front().distance, kExpectedDistance, kZeroTolerance);
 
   rg = MakeOneLaneRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length,
@@ -232,10 +236,10 @@ TEST_F(BruteForceTest, AllLanesCalled) {
     EXPECT_TRUE(std::any_of(
         lanes.begin(), lanes.end(),
         [id = road_position_result.road_position.lane->id()](LaneMock* lane) mutable { return id == lane->id(); }));
-    EXPECT_TRUE(
-        api::test::IsLanePositionClose(road_position_result.road_position.pos, kExpectedLanePosition, kZeroTolerance));
-    EXPECT_TRUE(api::test::IsInertialPositionClose(road_position_result.nearest_position, kExpectedInertialPosition,
-                                                   kZeroTolerance));
+    EXPECT_TRUE(AssertCompare(
+        IsLanePositionClose(road_position_result.road_position.pos, kExpectedLanePosition, kZeroTolerance)));
+    EXPECT_TRUE(AssertCompare(
+        IsInertialPositionClose(road_position_result.nearest_position, kExpectedInertialPosition, kZeroTolerance)));
     EXPECT_NEAR(road_position_result.distance, kExpectedDistance, kZeroTolerance);
   }
 }

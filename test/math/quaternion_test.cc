@@ -231,6 +231,8 @@ using maliput::test::AssertCompare;
 
 constexpr double kTolerance{1e-15};
 
+using maliput::test::AssertCompare;
+
 GTEST_TEST(Quaternion, DefaultConstructor) {
   const Quaternion dut;
   EXPECT_EQ(dut.w(), 1.);

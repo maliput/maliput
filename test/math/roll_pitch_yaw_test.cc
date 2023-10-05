@@ -43,6 +43,8 @@ using maliput::test::AssertCompare;
 
 static constexpr double kTolerance{1e-10};
 
+using maliput::test::AssertCompare;
+
 void ExpectDoubleEq(const RollPitchYaw& rpy1, const RollPitchYaw& rpy2) {
   EXPECT_DOUBLE_EQ(rpy1.roll_angle(), rpy2.roll_angle());
   EXPECT_DOUBLE_EQ(rpy1.pitch_angle(), rpy2.pitch_angle());
