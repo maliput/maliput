@@ -12,6 +12,7 @@ set(API_SOURCES
   road_geometry.cc
   road_network.cc
   road_network_validator.cc
+  rules/compare.cc
   rules/direction_usage_rule.cc
   rules/discrete_value_rule.cc
   rules/phase.cc

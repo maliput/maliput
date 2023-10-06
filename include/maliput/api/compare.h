@@ -29,7 +29,15 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
+#include <optional>
+#include <string>
+
+#include "maliput/api/branch_point.h"
+#include "maliput/api/junction.h"
 #include "maliput/api/lane_data.h"
+#include "maliput/api/regions.h"
+#include "maliput/api/road_geometry.h"
+#include "maliput/api/segment.h"
 #include "maliput/common/compare.h"
 
 namespace maliput {
@@ -101,6 +109,39 @@ common::ComparisonResult<HBounds> IsHBoundsClose(const HBounds& hbounds1, const 
 /// @param lane_end2 A LaneEnd object to compare.
 /// @returns A ComparisonResult indicating whether the two LaneEnds are equal.
 common::ComparisonResult<LaneEnd> IsLaneEndEqual(const LaneEnd& lane_end1, const LaneEnd& lane_end2);
+
+common::ComparisonResult<Junction> IsEqual(const char* a_expression, const char* b_expression, const Junction* a,
+                                           const Junction* b);
+common::ComparisonResult<Segment> IsEqual(const char* a_expression, const char* b_expression, const Segment* a,
+                                          const Segment* b);
+common::ComparisonResult<Lane> IsEqual(const char* a_expression, const char* b_expression, const Lane* a,
+                                       const Lane* b);
+common::ComparisonResult<BranchPoint> IsEqual(const char* a_expression, const char* b_expression, const BranchPoint* a,
+                                              const BranchPoint* b);
+
+common::ComparisonResult<bool> IsEqual(const char* a_expression, const char* b_expression, bool a, bool b);
+common::ComparisonResult<double> IsEqual(const char* a_expression, const char* b_expression, double a, double b);
+common::ComparisonResult<std::size_t> IsEqual(const char* a_expression, const char* b_expression, std::size_t a,
+                                              std::size_t b);
+
+template <typename T>
+common::ComparisonResult<TypeSpecificIdentifier<T>> IsEqual(const char* a_expression, const char* b_expression,
+                                                            const TypeSpecificIdentifier<T>& a,
+                                                            const TypeSpecificIdentifier<T>& b) {
+  if (a != b) {
+    return {"Values are different. " + std::string(a_expression) + ": " + a.string() + " vs. " +
+            std::string(b_expression) + ": " + b.string() + "\n"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<SRange> IsEqual(const SRange& srange1, const SRange& srange2);
+common::ComparisonResult<LaneSRange> IsEqual(const LaneSRange& lane_s_range_1, const LaneSRange& lane_s_range_2);
+common::ComparisonResult<std::vector<LaneSRange>> IsEqual(const std::vector<LaneSRange>& lane_s_ranges_1,
+                                                          const std::vector<LaneSRange>& lane_s_ranges_2);
+common::ComparisonResult<LaneSRoute> IsEqual(const LaneSRoute& lane_s_route_1, const LaneSRoute& lane_s_route_2);
+
+std::optional<std::string> CheckIdIndexing(const RoadGeometry* road_geometry);
 
 }  // namespace api
 }  // namespace maliput

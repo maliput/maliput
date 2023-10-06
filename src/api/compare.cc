@@ -37,6 +37,19 @@
 
 namespace maliput {
 namespace api {
+namespace {
+
+template <typename T>
+common::ComparisonResult<T> IsEqual(const char* object_type, const char* a_expression, const char* b_expression,
+                                    const T* a, const T* b) {
+  if (a != b) {
+    return {"Pointers are referenced to different " + std::string(object_type) + " objects. " +
+            std::string(a_expression) + " vs. " + std::string(b_expression) + "\n"};
+  }
+  return {std::nullopt};
+}
+
+}  // namespace
 
 common::ComparisonResult<InertialPosition> IsInertialPositionClose(const InertialPosition& pos1,
                                                                    const InertialPosition& pos2, double tolerance) {
@@ -233,6 +246,112 @@ common::ComparisonResult<LaneEnd> IsLaneEndEqual(const LaneEnd& lane_end1, const
             " vs. lane_end2.end: " + which_to_string(lane_end2.end) + "\n"};
   }
   return {std::nullopt};
+}
+
+common::ComparisonResult<bool> IsEqual(const char* a_expression, const char* b_expression, bool a, bool b) {
+  if (a != b) {
+    return {"Values are different. " + std::string(a_expression) + ": " + std::to_string(a) + " vs. " +
+            std::string(b_expression) + ": " + std::to_string(b) + "\n"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<double> IsEqual(const char* a_expression, const char* b_expression, double a, double b) {
+  const double delta = std::abs(a - b);
+  if (delta > 1e-6) {
+    return {"Values are different. " + std::string(a_expression) + ": " + std::to_string(a) + " vs. " +
+            std::string(b_expression) + ": " + std::to_string(b) + ", diff = " + std::to_string(delta) + "\n"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<std::size_t> IsEqual(const char* a_expression, const char* b_expression, std::size_t a,
+                                              std::size_t b) {
+  if (a != b) {
+    return {"Values are different. " + std::string(a_expression) + ": " + std::to_string(a) + " vs. " +
+            std::string(b_expression) + ": " + std::to_string(b) + "\n"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<SRange> IsEqual(const SRange& s_range_1, const SRange& s_range_2) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, IsEqual("s_range_1.s0()", "s_range_2.s0()", s_range_1.s0(), s_range_2.s0()));
+  MALIPUT_ADD_RESULT(c, IsEqual("s_range_1.s1()", "s_range_2.s1()", s_range_1.s1(), s_range_2.s1()));
+  return {c.result()};
+}
+
+common::ComparisonResult<LaneSRange> IsEqual(const LaneSRange& lane_s_range_1, const LaneSRange& lane_s_range_2) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, IsEqual("lane_s_range_1.lane_id()", "lane_s_range_2.lane_id()", lane_s_range_1.lane_id(),
+                                lane_s_range_2.lane_id()));
+  MALIPUT_ADD_RESULT(c, IsEqual(lane_s_range_1.s_range(), lane_s_range_2.s_range()));
+  return {c.result()};
+}
+
+common::ComparisonResult<std::vector<LaneSRange>> IsEqual(const std::vector<LaneSRange>& lane_s_ranges_1,
+                                                          const std::vector<LaneSRange>& lane_s_ranges_2) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(
+      c, IsEqual("lane_s_ranges_1.size()", "lane_s_ranges_2.size()", lane_s_ranges_1.size(), lane_s_ranges_2.size()));
+  const int smallest = std::min(lane_s_ranges_1.size(), lane_s_ranges_2.size());
+  for (int i = 0; i < smallest; ++i) {
+    MALIPUT_ADD_RESULT(c, IsEqual(lane_s_ranges_1[i], lane_s_ranges_2[i]));
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<LaneSRoute> IsEqual(const LaneSRoute& lane_s_route_1, const LaneSRoute& lane_s_route_2) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, IsEqual(lane_s_route_1.ranges(), lane_s_route_2.ranges()));
+  return {c.result()};
+}
+
+common::ComparisonResult<maliput::api::Junction> IsEqual(const char* a_expression, const char* b_expression,
+                                                         const maliput::api::Junction* a,
+                                                         const maliput::api::Junction* b) {
+  return IsEqual<maliput::api::Junction>("Junction", a_expression, b_expression, a, b);
+}
+
+common::ComparisonResult<Segment> IsEqual(const char* a_expression, const char* b_expression, const Segment* a,
+                                          const Segment* b) {
+  return IsEqual<Segment>("Segment", a_expression, b_expression, a, b);
+}
+
+common::ComparisonResult<Lane> IsEqual(const char* a_expression, const char* b_expression, const Lane* a,
+                                       const Lane* b) {
+  return IsEqual<Lane>("Lane", a_expression, b_expression, a, b);
+}
+
+common::ComparisonResult<BranchPoint> IsEqual(const char* a_expression, const char* b_expression, const BranchPoint* a,
+                                              const BranchPoint* b) {
+  return IsEqual<BranchPoint>("BranchPoint", a_expression, b_expression, a, b);
+}
+
+std::optional<std::string> CheckIdIndexing(const RoadGeometry* road_geometry) {
+  common::ComparisonResultCollector c;
+  for (int ji = 0; ji < road_geometry->num_junctions(); ++ji) {
+    const api::Junction* junction = road_geometry->junction(ji);
+    MALIPUT_ADD_RESULT(
+        c, IsEqual("road_geometry->ById().GetJunction(junction->id())", "static_cast<const Junction*>(junction)",
+                   road_geometry->ById().GetJunction(junction->id()), junction));
+    for (int si = 0; si < junction->num_segments(); ++si) {
+      const api::Segment* segment = junction->segment(si);
+      MALIPUT_ADD_RESULT(c, IsEqual("road_geometry->ById().GetSegment(segment->id())", "segment",
+                                    road_geometry->ById().GetSegment(segment->id()), segment));
+      for (int li = 0; li < segment->num_lanes(); ++li) {
+        const api::Lane* lane = segment->lane(li);
+        MALIPUT_ADD_RESULT(c, IsEqual("road_geometry->ById().GetLane(lane->id())", "lane",
+                                      road_geometry->ById().GetLane(lane->id()), lane));
+      }
+    }
+    for (int bi = 0; bi < road_geometry->num_branch_points(); ++bi) {
+      const api::BranchPoint* branch_point = road_geometry->branch_point(bi);
+      MALIPUT_ADD_RESULT(c, IsEqual("road_geometry->ById().GetBranchPoint(branch_point->id())", "branch_point",
+                                    road_geometry->ById().GetBranchPoint(branch_point->id()), branch_point));
+    }
+  }
+  return c.result();
 }
 
 }  // namespace api
