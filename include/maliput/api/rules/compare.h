@@ -53,10 +53,6 @@ namespace rules {
 common::ComparisonResult<RuleStates> IsEqual(const RuleStates& a, const RuleStates& b);
 #pragma GCC diagnostic pop
 
-common::ComparisonResult<BulbState> IsEqual(const BulbState& a, const BulbState& b);
-common::ComparisonResult<std::optional<BulbStates>> IsEqual(const std::optional<BulbStates>& a,
-                                                            const std::optional<BulbStates>& b);
-
 common::ComparisonResult<Phase> IsEqual(const Phase& a, const Phase& b);
 
 common::ComparisonResult<PhaseRing::NextPhase> IsEqual(const PhaseRing::NextPhase& a, const PhaseRing::NextPhase& b);
@@ -130,6 +126,28 @@ common::ComparisonResult<rules::SpeedLimitRule> IsEqual(const rules::SpeedLimitR
 common::ComparisonResult<std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>> IsEqual(
     const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& a,
     const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& b);
+
+common::ComparisonResult<BulbColor> IsEqual(const BulbColor& a, const BulbColor& b);
+
+common::ComparisonResult<BulbType> IsEqual(const BulbType& a, const BulbType& b);
+
+common::ComparisonResult<BulbState> IsEqual(const BulbState& a, const BulbState& b);
+common::ComparisonResult<std::optional<BulbStates>> IsEqual(const std::optional<BulbStates>& a,
+                                                            const std::optional<BulbStates>& b);
+
+common::ComparisonResult<std::optional<double>> IsEqual(const std::optional<double>& a, const std::optional<double>& b);
+
+common::ComparisonResult<Bulb::BoundingBox> IsEqual(const Bulb::BoundingBox& a, const Bulb::BoundingBox& b);
+
+common::ComparisonResult<Bulb> IsEqual(const Bulb* a, const Bulb* b);
+
+common::ComparisonResult<std::vector<const Bulb*>> IsEqual(const char* a_expression, const char* b_expression,
+                                                           const std::vector<const Bulb*>& a,
+                                                           const std::vector<const Bulb*>& b);
+
+common::ComparisonResult<BulbGroup> IsEqual(const BulbGroup* a, const BulbGroup* b);
+
+common::ComparisonResult<TrafficLight> IsEqual(const TrafficLight* a, const TrafficLight* b);
 
 }  // namespace rules
 }  // namespace api

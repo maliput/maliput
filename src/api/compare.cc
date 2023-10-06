@@ -354,5 +354,23 @@ std::optional<std::string> CheckIdIndexing(const RoadGeometry* road_geometry) {
   return c.result();
 }
 
+common::ComparisonResult<InertialPosition> IsEqual(const InertialPosition& inertial_position_1,
+                                                   const InertialPosition& inertial_position_2) {
+  if (inertial_position_1 != inertial_position_2) {
+    return {std::string("InertialPositions are different. ") +
+            "inertial_position_1: " + inertial_position_1.xyz().to_str() +
+            " vs. inertial_position_2: " + inertial_position_2.xyz().to_str() + "\n"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<Rotation> IsEqual(const Rotation& rotation_1, const Rotation& rotation_2) {
+  if (rotation_1.matrix() != rotation_2.matrix()) {
+    return {std::string("Rotations are different. ") + "rotation_1: " + rotation_1.matrix().to_str() +
+            " vs. rotation_2: " + rotation_2.matrix().to_str() + "\n"};
+  }
+  return {std::nullopt};
+}
+
 }  // namespace api
 }  // namespace maliput

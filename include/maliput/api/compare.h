@@ -141,6 +141,11 @@ common::ComparisonResult<std::vector<LaneSRange>> IsEqual(const std::vector<Lane
                                                           const std::vector<LaneSRange>& lane_s_ranges_2);
 common::ComparisonResult<LaneSRoute> IsEqual(const LaneSRoute& lane_s_route_1, const LaneSRoute& lane_s_route_2);
 
+common::ComparisonResult<InertialPosition> IsEqual(const InertialPosition& inertial_position_1,
+                                                   const InertialPosition& inertial_position_2);
+
+common::ComparisonResult<Rotation> IsEqual(const Rotation& rotation_1, const Rotation& rotation_2);
+
 std::optional<std::string> CheckIdIndexing(const RoadGeometry* road_geometry);
 
 }  // namespace api

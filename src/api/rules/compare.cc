@@ -68,26 +68,6 @@ common::ComparisonResult<std::unordered_map<Rule::Id, DiscreteValueRule::Discret
   }
   return {c.result()};
 }
-common::ComparisonResult<BulbState> IsEqual(const BulbState& a, const BulbState& b) {
-  if (a != b) {
-    return {"BulbStates are different: " + std::string(BulbStateMapper().at(a)) +
-            " != " + std::string(BulbStateMapper().at(b))};
-  }
-  return {std::nullopt};
-}
-
-common::ComparisonResult<std::optional<BulbStates>> IsEqual(const std::optional<BulbStates>& a,
-                                                            const std::optional<BulbStates>& b) {
-  common::ComparisonResultCollector c;
-  MALIPUT_ADD_RESULT(c, api::IsEqual("a.has_value()", "b.has_value()", a.has_value(), b.has_value()));
-  if (a.has_value()) {
-    MALIPUT_ADD_RESULT(c, api::IsEqual("a->size()", "b->size()", a->size(), b->size()));
-    for (const auto& bulb_state : *a) {
-      MALIPUT_ADD_RESULT(c, IsEqual(b->at(bulb_state.first), bulb_state.second));
-    }
-  }
-  return {c.result()};
-}
 
 common::ComparisonResult<Phase> IsEqual(const Phase& a, const Phase& b) {
   common::ComparisonResultCollector c;
@@ -368,6 +348,118 @@ common::ComparisonResult<std::unordered_map<TrafficLight::Id, std::vector<BulbGr
         }
       }
     }
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<BulbColor> IsEqual(const BulbColor& a, const BulbColor& b) {
+  if (a != b) {
+    return {"BulbColors are different: " + std::string(BulbColorMapper().at(a)) +
+            " != " + std::string(BulbColorMapper().at(b))};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<BulbType> IsEqual(const BulbType& a, const BulbType& b) {
+  if (a != b) {
+    return {"BulbTypes are different: " + std::string(BulbTypeMapper().at(a)) +
+            " != " + std::string(BulbTypeMapper().at(b))};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<BulbState> IsEqual(const BulbState& a, const BulbState& b) {
+  if (a != b) {
+    return {"BulbStates are different: " + std::string(BulbStateMapper().at(a)) +
+            " != " + std::string(BulbStateMapper().at(b))};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<std::optional<BulbStates>> IsEqual(const std::optional<BulbStates>& a,
+                                                            const std::optional<BulbStates>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.has_value()", "b.has_value()", a.has_value(), b.has_value()));
+  if (a.has_value()) {
+    MALIPUT_ADD_RESULT(c, api::IsEqual("a->size()", "b->size()", a->size(), b->size()));
+    for (const auto& bulb_state : *a) {
+      MALIPUT_ADD_RESULT(c, IsEqual(b->at(bulb_state.first), bulb_state.second));
+    }
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<std::optional<double>> IsEqual(const std::optional<double>& a,
+                                                        const std::optional<double>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.has_value()", "b.has_value()", a.has_value(), b.has_value()));
+  if (a.has_value()) {
+    MALIPUT_ADD_RESULT(c, api::IsEqual("a.value()", "b.value()", a.value(), b.value()));
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<Bulb::BoundingBox> IsEqual(const Bulb::BoundingBox& a, const Bulb::BoundingBox& b) {
+  common::ComparisonResultCollector c;
+  for (int i = 0; i < 3; ++i) {
+    MALIPUT_ADD_RESULT(c, api::IsEqual("a.p_BMin[i]", "b.p_BMin[i]", a.p_BMin[i], b.p_BMin[i]));
+    MALIPUT_ADD_RESULT(c, api::IsEqual("a.p_BMax[i]", "b.p_BMax[i]", a.p_BMax[i], b.p_BMax[i]));
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<Bulb> IsEqual(const Bulb* a, const Bulb* b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a->id()", "b->id()", a->id(), b->id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a->position_bulb_group(), b->position_bulb_group()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a->orientation_bulb_group(), b->orientation_bulb_group()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a->color(), b->color()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a->type(), b->type()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a->arrow_orientation_rad(), b->arrow_orientation_rad()));
+  const std::vector<BulbState>& a_states = a->states();
+  const std::vector<BulbState>& b_states = b->states();
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a->states().size()", "b->states().size()", a_states.size(), b_states.size()));
+  const int smallest = std::min(a_states.size(), b_states.size());
+  for (int i = 0; i < smallest; ++i) {
+    MALIPUT_ADD_RESULT(c, IsEqual(a_states.at(i), b_states.at(i)));
+  }
+  MALIPUT_ADD_RESULT(c, IsEqual(a->bounding_box(), b->bounding_box()));
+  return {c.result()};
+}
+
+common::ComparisonResult<std::vector<const Bulb*>> IsEqual(const char* a_expression, const char* b_expression,
+                                                           const std::vector<const Bulb*>& a,
+                                                           const std::vector<const Bulb*>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a_expression, b_expression, a.size(), b.size()));
+  const int smallest = std::min(a.size(), b.size());
+  for (int i = 0; i < smallest; ++i) {
+    MALIPUT_ADD_RESULT(c, IsEqual(a.at(i), b.at(i)));
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<BulbGroup> IsEqual(const BulbGroup* a, const BulbGroup* b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a->id()", "b->id()", a->id(), b->id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a->position_traffic_light(), b->position_traffic_light()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a->orientation_traffic_light(), b->orientation_traffic_light()));
+  MALIPUT_ADD_RESULT(c, IsEqual("a->bulbs()", "b->bulbs()", a->bulbs(), b->bulbs()));
+  return {c.result()};
+}
+
+common::ComparisonResult<TrafficLight> IsEqual(const TrafficLight* a, const TrafficLight* b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a->id()", "b->id()", a->id(), b->id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a->position_road_network(), b->position_road_network()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a->orientation_road_network(), b->orientation_road_network()));
+  const std::vector<const BulbGroup*> bulb_groups_a = a->bulb_groups();
+  const std::vector<const BulbGroup*> bulb_groups_b = b->bulb_groups();
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a->bulb_groups().size()", "b->bulb_groups().size()", bulb_groups_a.size(),
+                                     bulb_groups_b.size()));
+  const int smallest = std::min(bulb_groups_a.size(), bulb_groups_b.size());
+  for (int i = 0; i < smallest; ++i) {
+    MALIPUT_ADD_RESULT(c, IsEqual(bulb_groups_a.at(i), bulb_groups_b.at(i)));
   }
   return {c.result()};
 }
