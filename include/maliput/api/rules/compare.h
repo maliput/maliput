@@ -38,6 +38,8 @@
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
 #include "maliput/api/rules/range_value_rule.h"
+#include "maliput/api/rules/right_of_way_rule.h"
+#include "maliput/api/rules/right_of_way_rule_state_provider.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/compare.h"
 
@@ -94,7 +96,34 @@ common::ComparisonResult<std::unordered_map<DirectionUsageRule::State::Id, Direc
     const std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>& b);
 
 common::ComparisonResult<DirectionUsageRule> IsEqual(const DirectionUsageRule& a, const DirectionUsageRule& b);
+
+common::ComparisonResult<rules::RightOfWayRule::ZoneType> IsEqual(rules::RightOfWayRule::ZoneType a,
+                                                                  rules::RightOfWayRule::ZoneType b);
+
+common::ComparisonResult<rules::RightOfWayRule::State::Type> IsEqual(rules::RightOfWayRule::State::Type a,
+                                                                     rules::RightOfWayRule::State::Type b);
+
+common::ComparisonResult<std::vector<rules::RightOfWayRule::Id>> IsEqual(
+    const std::vector<rules::RightOfWayRule::Id>& a, const std::vector<rules::RightOfWayRule::Id>& b);
+
+common::ComparisonResult<rules::RightOfWayRule::State> IsEqual(const rules::RightOfWayRule::State& a,
+                                                               const rules::RightOfWayRule::State& b);
+
+common::ComparisonResult<std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>> IsEqual(
+    const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& a,
+    const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& b);
+
+common::ComparisonResult<rules::RightOfWayRule> IsEqual(const rules::RightOfWayRule& a, const rules::RightOfWayRule& b);
+
+common::ComparisonResult<rules::RightOfWayRuleStateProvider::RightOfWayResult> IsEqual(
+    const rules::RightOfWayRuleStateProvider::RightOfWayResult& a,
+    const rules::RightOfWayRuleStateProvider::RightOfWayResult& b);
+
 #pragma GCC diagnostic pop
+
+common::ComparisonResult<std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>> IsEqual(
+    const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& a,
+    const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& b);
 
 }  // namespace rules
 }  // namespace api

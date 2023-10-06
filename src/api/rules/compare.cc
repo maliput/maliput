@@ -234,7 +234,124 @@ common::ComparisonResult<DirectionUsageRule> IsEqual(const DirectionUsageRule& a
   }
   return {c.result()};
 }
+
+common::ComparisonResult<rules::RightOfWayRule::ZoneType> IsEqual(rules::RightOfWayRule::ZoneType a,
+                                                                  rules::RightOfWayRule::ZoneType b) {
+  if (a != b) {
+    return {"RightOfWayRule::ZoneType are different"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<rules::RightOfWayRule::State::Type> IsEqual(rules::RightOfWayRule::State::Type a,
+                                                                     rules::RightOfWayRule::State::Type b) {
+  if (a != b) {
+    return {"RightOfWayRule::State::Type are different"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<std::vector<rules::RightOfWayRule::Id>> IsEqual(
+    const std::vector<rules::RightOfWayRule::Id>& a, const std::vector<rules::RightOfWayRule::Id>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.size()", "b.size()", a.size(), b.size()));
+  const int smallest = std::min(a.size(), b.size());
+  for (int i = 0; i < smallest; ++i) {
+    MALIPUT_ADD_RESULT(c, IsEqual("a.at(i)", "b.at(i)", a.at(i), b.at(i)));
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<rules::RightOfWayRule::State> IsEqual(const rules::RightOfWayRule::State& a,
+                                                               const rules::RightOfWayRule::State& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.id()", "b.id()", a.id(), b.id()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.type(), b.type()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.yield_to(), b.yield_to()));
+  return {c.result()};
+}
+
+common::ComparisonResult<std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>> IsEqual(
+    const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& a,
+    const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.size()", "b.size()", a.size(), b.size()));
+  const std::unordered_map<rules::RightOfWayRule::State::Id, rules::RightOfWayRule::State>& largest =
+      (a.size() < b.size()) ? b : a;
+  for (const auto& pair : largest) {
+    const rules::RightOfWayRule::State::Id& key = pair.first;
+    auto a_it = a.find(key);
+    auto b_it = b.find(key);
+    MALIPUT_ADD_RESULT(c, api::IsEqual("(a_it != a.cend())", "true", (a_it != a.cend()), true));
+    MALIPUT_ADD_RESULT(c, api::IsEqual("(b_it != b.cend())", "true", (b_it != b.cend()), true));
+    if ((a_it != a.cend()) && (b_it != b.cend())) {
+      MALIPUT_ADD_RESULT(c, IsEqual(a_it->second, b_it->second));
+    }
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<rules::RightOfWayRule> IsEqual(const rules::RightOfWayRule& a,
+                                                        const rules::RightOfWayRule& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.id()", "b.id()", a.id(), b.id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a.zone(), b.zone()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.zone_type(), b.zone_type()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.is_static()", "b.is_static()", a.is_static(), b.is_static()));
+  if (a.is_static() && b.is_static()) {
+    MALIPUT_ADD_RESULT(c, IsEqual(a.static_state(), b.static_state()));
+  } else {
+    MALIPUT_ADD_RESULT(c, IsEqual(a.states(), b.states()));
+  }
+  MALIPUT_ADD_RESULT(c, IsEqual(a.related_bulb_groups(), b.related_bulb_groups()));
+  return {c.result()};
+}
+
+common::ComparisonResult<rules::RightOfWayRuleStateProvider::RightOfWayResult> IsEqual(
+    const rules::RightOfWayRuleStateProvider::RightOfWayResult& a,
+    const rules::RightOfWayRuleStateProvider::RightOfWayResult& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.state", "b.state", a.state, b.state));
+  MALIPUT_ADD_RESULT(c,
+                     api::IsEqual("a.next.has_value()", "b.next.has_value()", a.next.has_value(), b.next.has_value()));
+  if (a.next.has_value() && b.next.has_value()) {
+    MALIPUT_ADD_RESULT(c, api::IsEqual("a.next->state", "b.next->state", a.next->state, b.next->state));
+    MALIPUT_ADD_RESULT(c, api::IsEqual("a.next->duration_until.has_value()", "b.next->duration_until.has_value()",
+                                       a.next->duration_until.has_value(), b.next->duration_until.has_value()));
+    if (a.next->duration_until.has_value() && b.next->duration_until.has_value()) {
+      MALIPUT_ADD_RESULT(c, api::IsEqual("a.next->duration_until.value()", "b.next->duration_until.value()",
+                                         a.next->duration_until.value(), b.next->duration_until.value()));
+    }
+  }
+  return {c.result()};
+}
+
 #pragma GCC diagnostic pop
+
+common::ComparisonResult<std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>> IsEqual(
+    const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& a,
+    const std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.size()", "b.size()", a.size(), b.size()));
+  if (a.size() == b.size()) {
+    for (const auto& traffic_light_bulb_group : a) {
+      const auto& b_it = b.find(traffic_light_bulb_group.first);
+      MALIPUT_ADD_RESULT(c, api::IsEqual("(b_it != b.cend())", "true", (b_it != b.cend()), true));
+      if (b_it == b.cend()) {
+        break;
+      }
+      for (const BulbGroup::Id& bulb_group_id : traffic_light_bulb_group.second) {
+        const auto& b_bulb_group_id_it = std::find(b_it->second.cbegin(), b_it->second.cend(), bulb_group_id);
+        MALIPUT_ADD_RESULT(c, api::IsEqual("(b_bulb_group_id_it != b_it->second.cend())", "true",
+                                           (b_bulb_group_id_it != b_it->second.cend()), true));
+        if (b_bulb_group_id_it == b_it->second.cend()) {
+          break;
+        }
+      }
+    }
+  }
+  return {c.result()};
+}
 
 }  // namespace rules
 }  // namespace api
