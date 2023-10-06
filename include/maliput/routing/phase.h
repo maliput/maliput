@@ -34,7 +34,6 @@
 #include "maliput/api/regions.h"
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
-#include "maliput/common/maliput_throw.h"
 #include "maliput/routing/route_position_result.h"
 
 namespace maliput {
@@ -75,9 +74,9 @@ class Phase final {
   /// @param end_position The end api::RoadPositions of this
   /// Phase. Each api::RoadPosition must be valid and it must be in
   /// @p lane_s_ranges. There must be at least one api::RoadPosition.
-  /// @param lane_s_ranges List of api::LaneSRanges. It must not be empty, all
-  /// elements must exist in @p road_network and should be consecutively
-  /// adjacent.
+  /// @param lane_s_ranges A right-to-left (see api::Segment semantics) ordered
+  /// list of api::LaneSRanges. It must not be empty, all elements must exist
+  /// in @p road_network and should be consecutively adjacent and ordered.
   /// @param road_network The pointer to the api::RoadNetwork. It must
   /// not be nullptr. The lifetime of this pointer must exceed that of this
   /// object.
@@ -96,36 +95,19 @@ class Phase final {
   /// positions in @p lane_s_ranges.
   /// @throws common::assertion_error When @p lane_s_ranges is empty.
   /// @throws common::assertion_error When @p lane_s_ranges contains
-  /// non-adjacent consecutive api::LaneSRanges.
+  /// non-adjacent or ordered consecutive api::LaneSRanges.
   /// @throws common::assertion_error When @p lane_s_ranges contains
   /// api::LaneSRanges that do not exist in @p road_network.
   /// @throws common::assertion_error When @p road_network is nullptr.
   Phase(int index, double lane_s_range_tolerance, const std::vector<api::RoadPosition>& start_positions,
         const std::vector<api::RoadPosition>& end_positions, const std::vector<api::LaneSRange>& lane_s_ranges,
-        const api::RoadNetwork* road_network)
-      : index_(index),
-        lane_s_range_tolerance_(lane_s_range_tolerance),
-        start_positions_(start_positions),
-        end_positions_(end_positions),
-        lane_s_ranges_(lane_s_ranges),
-        road_network_(road_network) {
-    MALIPUT_THROW_UNLESS(index_ >= 0);
-    MALIPUT_THROW_UNLESS(lane_s_range_tolerance >= 0.);
-    MALIPUT_THROW_UNLESS(!start_positions_.empty());
-    MALIPUT_THROW_UNLESS(std::any_of(start_positions_.begin(), start_positions_.end(),
-                                     [](const auto& pos) { return pos.lane == nullptr; }));
-    MALIPUT_THROW_UNLESS(!end_positions_.empty());
-    MALIPUT_THROW_UNLESS(
-        std::any_of(end_positions_.begin(), end_positions_.end(), [](const auto& pos) { return pos.lane == nullptr; }));
-    MALIPUT_THROW_UNLESS(!lane_s_ranges_.empty());
-    MALIPUT_THROW_UNLESS(road_network_ != nullptr);
-    // TODO(#543): Validate that for start_positions_ and end_positions_ the api::RoadPositions are in lane_s_ranges_.
-    // TODO(#543): Validate that lane_s_ranges_ are effectively adjacent one to another.
-    // TODO(#543): Validate api::LaneSRanges are in the RoadNetwork.
-  }
+        const api::RoadNetwork* road_network);
 
   /// @return The index of this Phase.
   int index() const { return index_; }
+
+  /// @return Tolerance to compare api::LaneSRanges.
+  double lane_s_range_tolerance() const { return lane_s_range_tolerance_; }
 
   /// @return The start api::RoadPositions of this Phase.
   const std::vector<api::RoadPosition>& start_positions() const { return start_positions_; }
@@ -151,9 +133,7 @@ class Phase final {
   ///
   /// @param inertial_position The INERTIAL-Frame position.
   /// @return A PhasePositionResult.
-  PhasePositionResult FindPhasePosition(const api::InertialPosition& inertial_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  PhasePositionResult FindPhasePosition(const api::InertialPosition& inertial_position) const;
 
   /// Finds the PhasePositionResult where @p road_position best fits.
   ///
@@ -172,9 +152,7 @@ class Phase final {
   /// @return A PhasePositionResult.
   /// @throws common::assertion_error When @p road_position is not
   /// valid.
-  PhasePositionResult FindPhasePosition(const api::RoadPosition& road_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  PhasePositionResult FindPhasePosition(const api::RoadPosition& road_position) const;
 
  private:
   int index_{};
@@ -184,6 +162,23 @@ class Phase final {
   std::vector<api::LaneSRange> lane_s_ranges_;
   const api::RoadNetwork* road_network_{};
 };
+
+/// Determines whether the @p position resides in any of @p lane_s_ranges.
+///
+/// @p tolerance is used to expand the range of @p lane_s_ranges when evaluating
+/// @p position.
+///
+/// @param position The api::RoadPosition to evaluate. It must be valid.
+/// @param lane_s_ranges The api::LaneSRanges. It must not be empty.
+/// @param tolerance Tolerance to compare api::LaneSRanges' ranges with
+/// @p position. It must be non-negative.
+/// @return true When @p position is in any of @p lane_s_ranges with
+/// @p tolerance in the LANE-Frame s coordinate.
+/// @throws common::assertion_error When @p position is not valid.
+/// @throws common::assertion_error When @p lane_s_ranges is empty.
+/// @throws common::assertion_error When @p tolerance is negative.
+bool ValidatePositionIsInLaneSRanges(const maliput::api::RoadPosition& position,
+                                     const std::vector<api::LaneSRange>& lane_s_ranges, double tolerance);
 
 }  // namespace routing
 }  // namespace maliput

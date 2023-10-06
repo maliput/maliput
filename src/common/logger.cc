@@ -67,41 +67,12 @@
 
 #include "maliput/common/logger.h"
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-#include <fmt/printf.h>
+#include <iostream>
 
 #include "maliput/common/maliput_never_destroyed.h"
 
 namespace maliput {
 namespace common {
-
-namespace {
-
-// Apply fmt::format to a list of arguments defined by an array `v`.
-// @tparam N Is the size of the array.
-// @tparam T Is the type of the variable that contains the array.
-// @tparam args Variadic arguments to generate the list of arguments.
-// @param array Is the array that contains the values to be converted in arguments.
-// @param index_sequence Is the index sequence to indicate the index of the array.
-template <std::size_t N, typename T, std::size_t... args>
-auto call_fmt_format_helper(const std::array<T, N>& array, std::index_sequence<args...> index_sequence) {
-  return fmt::format(std::get<args>(array)...);
-}
-
-// Wrapper for call_fmt_format_helper function.
-// Creates an index sequence from an array and pass that as an argument to call_fmt_format_helper function.
-// Intermediate function to obtain a list of arguments from an array.
-// @tparam N Is the size of the array.
-// @tparam T Is the type of the variable that contains the array.
-// @param array Is the array that contains the values to be converted in arguments.
-// @see https://stackoverflow.com/questions/41467721/conversion-of-vector-or-array-to-a-list-of-arguments-in-c
-template <std::size_t N, typename T>
-auto call_fmt_format(const std::array<T, N>& array) {
-  return call_fmt_format_helper<N>(array, std::make_index_sequence<N>());
-}
-
-}  // namespace
 
 std::string Logger::set_level(logger::level log_level) {
   if (log_level == logger::level::unchanged) {
@@ -122,15 +93,18 @@ std::string set_log_level(const std::string& level) {
   return log()->set_level(common::logger::kStringToLevel.at(level));
 }
 
-const std::string Logger::format(const std::vector<std::string>& v) const {
-  std::array<std::string, kNumberOfArguments> args;
-  for (int i = 0; i < static_cast<int>(v.size()) && i < kNumberOfArguments; i++) {
-    args[i] = v[i];
-  }
-  return call_fmt_format(args);
+void Sink::log(const std::string& msg) {
+  std::cout << msg << std::endl;
+  ;
 }
 
-void Sink::log(const std::string& msg) { fmt::printf(msg); }
+const std::string Logger::format(const std::vector<std::string>& v) const {
+  std::string result;
+  for (const std::string& s : v) {
+    result += s;
+  }
+  return result;
+}
 
 }  // namespace common
 

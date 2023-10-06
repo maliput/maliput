@@ -66,7 +66,7 @@ std::vector<std::string> GetAllFilePathsFromDirectory(const std::string& directo
 std::vector<std::string> GetAllPathsFromEnvironment(const std::string& env_var) {
   char* env = std::getenv(env_var.c_str());
   if (env == nullptr) {
-    maliput::log()->warn("Env var '{}' isn't set.", env_var);
+    maliput::log()->warn("Env var '", env_var, "' isn't set.");
     return {};
   }
   std::istringstream path_stream(env);

@@ -215,17 +215,23 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/common/compare.h"
+#include "maliput/math/compare.h"
 #include "maliput/math/matrix.h"
 #include "maliput/math/roll_pitch_yaw.h"
 #include "maliput/math/vector.h"
-#include "maliput/test_utilities/maliput_math_compare.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace math {
 namespace test {
 namespace {
 
+using maliput::test::AssertCompare;
+
 constexpr double kTolerance{1e-15};
+
+using maliput::test::AssertCompare;
 
 GTEST_TEST(Quaternion, DefaultConstructor) {
   const Quaternion dut;
@@ -280,7 +286,7 @@ GTEST_TEST(Quaternion, RotationMatrixRoundTrip) {
       for (double yaw = kMinAngle; yaw <= kMaxAngle; yaw += kAngleStep) {
         const Matrix3 kRotationMatrix = RollPitchYaw(roll, pitch, yaw).ToMatrix();
         const Quaternion dut(kRotationMatrix);
-        EXPECT_TRUE(CompareMatrices(kRotationMatrix, dut.ToRotationMatrix(), kTolerance));
+        EXPECT_TRUE(AssertCompare(CompareMatrices(kRotationMatrix, dut.ToRotationMatrix(), kTolerance)));
       }
     }
   }
@@ -326,8 +332,8 @@ GTEST_TEST(Quaternion, VectorAndCoefficients) {
   EXPECT_EQ(dut.y(), kY);
   EXPECT_EQ(dut.z(), kZ);
 
-  EXPECT_TRUE(CompareVectors(Vector3(kX, kY, kZ), dut.vec(), 0. /* tolerance */));
-  EXPECT_TRUE(CompareVectors(Vector4(kW, kX, kY, kZ), dut.coeffs(), 0. /* tolerance */));
+  EXPECT_TRUE(AssertCompare(CompareVectors(Vector3(kX, kY, kZ), dut.vec(), 0. /* tolerance */)));
+  EXPECT_TRUE(AssertCompare(CompareVectors(Vector4(kW, kX, kY, kZ), dut.coeffs(), 0. /* tolerance */)));
 }
 
 GTEST_TEST(Quaternion, SetIdentity) {
@@ -419,15 +425,17 @@ GTEST_TEST(Quaternion, NormalizeAndNormalized) {
     Quaternion dut(kW, kX, kY, kZ);
     dut.normalize();
     EXPECT_NEAR(1., dut.norm(), kTolerance);
-    EXPECT_TRUE(CompareVectors(Vector4(0.18257418583505536, 0.3651483716701107, 0.5477225575051661, 0.7302967433402214),
-                               dut.coeffs(), kTolerance));
+    EXPECT_TRUE(AssertCompare(
+        CompareVectors(Vector4(0.18257418583505536, 0.3651483716701107, 0.5477225575051661, 0.7302967433402214),
+                       dut.coeffs(), kTolerance)));
   }
   {
     const Quaternion dut(kW, kX, kY, kZ);
     const Quaternion normalized_quaternion = dut.normalized();
     EXPECT_NEAR(1., normalized_quaternion.norm(), kTolerance);
-    EXPECT_TRUE(CompareVectors(Vector4(0.18257418583505536, 0.3651483716701107, 0.5477225575051661, 0.7302967433402214),
-                               normalized_quaternion.coeffs(), kTolerance));
+    EXPECT_TRUE(AssertCompare(
+        CompareVectors(Vector4(0.18257418583505536, 0.3651483716701107, 0.5477225575051661, 0.7302967433402214),
+                       normalized_quaternion.coeffs(), kTolerance)));
   }
 }
 
@@ -517,14 +525,14 @@ GTEST_TEST(Quaternion, Inverse) {
   const double kZ{0.306};
 
   const Quaternion dut(kW, kX, kY, kZ);
-  EXPECT_TRUE(
+  EXPECT_TRUE(AssertCompare(
       CompareVectors(Vector4(0.8839496148719523, -0.30598255899413734, -0.1769899115750402, -0.30598255899413734),
-                     dut.Inverse().coeffs(), kTolerance));
+                     dut.Inverse().coeffs(), kTolerance)));
   // Zero quaternion is handled separately up to Quaternion's tolerance.
-  EXPECT_TRUE(CompareVectors(Vector4(0., 0., 0., 0.),
-                             Quaternion(Quaternion::kTolerance / 2., 0., 0., 0.).Inverse().coeffs(), kTolerance));
-  EXPECT_TRUE(CompareVectors(Vector4(0., 0., 0., 0.), Quaternion(Quaternion::kTolerance, 0., 0., 0.).Inverse().coeffs(),
-                             kTolerance));
+  EXPECT_TRUE(AssertCompare(CompareVectors(
+      Vector4(0., 0., 0., 0.), Quaternion(Quaternion::kTolerance / 2., 0., 0., 0.).Inverse().coeffs(), kTolerance)));
+  EXPECT_TRUE(AssertCompare(CompareVectors(
+      Vector4(0., 0., 0., 0.), Quaternion(Quaternion::kTolerance, 0., 0., 0.).Inverse().coeffs(), kTolerance)));
 }
 
 GTEST_TEST(Quaternion, Conjugate) {
@@ -570,11 +578,11 @@ GTEST_TEST(Quaternion, MultiplicationBetweenQuaternions) {
 
   const Quaternion q1 = Quaternion::FromTwoVectors(kUnitX, kUnitY);
   const Quaternion q2 = Quaternion::FromTwoVectors(kUnitY, kUnitX);
-  EXPECT_TRUE(CompareVectors(Quaternion::Identity().coeffs(), (q1 * q2).coeffs(), kTolerance));
+  EXPECT_TRUE(AssertCompare(CompareVectors(Quaternion::Identity().coeffs(), (q1 * q2).coeffs(), kTolerance)));
 
   const Quaternion q3 = Quaternion::FromTwoVectors(kUnitZ, kAnyDirection);
   const Quaternion q4 = Quaternion::FromTwoVectors(kAnyDirection, kUnitZ);
-  EXPECT_TRUE(CompareVectors(Quaternion::Identity().coeffs(), (q3 * q4).coeffs(), kTolerance));
+  EXPECT_TRUE(AssertCompare(CompareVectors(Quaternion::Identity().coeffs(), (q3 * q4).coeffs(), kTolerance)));
 }
 
 GTEST_TEST(Quaternion, MultiplicationAndAssingmentBetweenQuaternions) {
@@ -586,12 +594,12 @@ GTEST_TEST(Quaternion, MultiplicationAndAssingmentBetweenQuaternions) {
   const Quaternion q1 = Quaternion::FromTwoVectors(kUnitX, kUnitY);
   Quaternion q2 = Quaternion::FromTwoVectors(kUnitY, kUnitX);
   q2 *= q1;
-  EXPECT_TRUE(CompareVectors(Quaternion::Identity().coeffs(), q2.coeffs(), kTolerance));
+  EXPECT_TRUE(AssertCompare(CompareVectors(Quaternion::Identity().coeffs(), q2.coeffs(), kTolerance)));
 
   const Quaternion q3 = Quaternion::FromTwoVectors(kUnitZ, kAnyDirection);
   Quaternion q4 = Quaternion::FromTwoVectors(kAnyDirection, kUnitZ);
   q4 *= q3;
-  EXPECT_TRUE(CompareVectors(Quaternion::Identity().coeffs(), q4.coeffs(), kTolerance));
+  EXPECT_TRUE(AssertCompare(CompareVectors(Quaternion::Identity().coeffs(), q4.coeffs(), kTolerance)));
 }
 
 GTEST_TEST(Quaternion, TransformVector) {
@@ -599,7 +607,7 @@ GTEST_TEST(Quaternion, TransformVector) {
   const Quaternion dut(1., 0., 1., 0.);
   const Vector3 kExpectedResult(3., 1., 1.);
 
-  EXPECT_TRUE(CompareVectors(kExpectedResult, dut.TransformVector(v), kTolerance));
+  EXPECT_TRUE(AssertCompare(CompareVectors(kExpectedResult, dut.TransformVector(v), kTolerance)));
 }
 
 GTEST_TEST(Quaternion, MultiplicationByVector) {
@@ -607,7 +615,7 @@ GTEST_TEST(Quaternion, MultiplicationByVector) {
   const Quaternion dut(1., 0., 1., 0.);
   const Vector3 kExpectedResult(3., 1., 1.);
 
-  EXPECT_TRUE(CompareVectors(kExpectedResult, dut * v, kTolerance));
+  EXPECT_TRUE(AssertCompare(CompareVectors(kExpectedResult, dut * v, kTolerance)));
 }
 
 GTEST_TEST(Quaternion, Slerp) {
@@ -618,7 +626,8 @@ GTEST_TEST(Quaternion, Slerp) {
 
   // Degrading tolerance in this test on purpose because of the overhead in the
   // computation and the expected result.
-  EXPECT_TRUE(CompareVectors(Vector4(0.554528, -0.717339, 0.32579, 0.267925), q3.coeffs(), 1e-6 /* tolerance */));
+  EXPECT_TRUE(AssertCompare(
+      CompareVectors(Vector4(0.554528, -0.717339, 0.32579, 0.267925), q3.coeffs(), 1e-6 /* tolerance */)));
 }
 
 GTEST_TEST(Quaternion, Serialization) {
@@ -638,30 +647,30 @@ GTEST_TEST(Quaternion, FromTwoVectors) {
 
   {  // X to Y.
     const Quaternion dut = Quaternion::FromTwoVectors(kUnitX, kUnitY);
-    EXPECT_TRUE(CompareVectors(Vector4(kW, 0., 0., kU), dut.coeffs(), kTolerance));
+    EXPECT_TRUE(AssertCompare(CompareVectors(Vector4(kW, 0., 0., kU), dut.coeffs(), kTolerance)));
   }
   {
     Quaternion dut;
     dut.SetFromTwoVectors(kUnitX, kUnitY);
-    EXPECT_TRUE(CompareVectors(Vector4(kW, 0., 0., kU), dut.coeffs(), kTolerance));
+    EXPECT_TRUE(AssertCompare(CompareVectors(Vector4(kW, 0., 0., kU), dut.coeffs(), kTolerance)));
   }
   {  // Y to Z.
     const Quaternion dut = Quaternion::FromTwoVectors(kUnitY, kUnitZ);
-    EXPECT_TRUE(CompareVectors(Vector4(kW, kU, 0., 0.), dut.coeffs(), kTolerance));
+    EXPECT_TRUE(AssertCompare(CompareVectors(Vector4(kW, kU, 0., 0.), dut.coeffs(), kTolerance)));
   }
   {
     Quaternion dut;
     dut.SetFromTwoVectors(kUnitY, kUnitZ);
-    EXPECT_TRUE(CompareVectors(Vector4(kW, kU, 0., 0.), dut.coeffs(), kTolerance));
+    EXPECT_TRUE(AssertCompare(CompareVectors(Vector4(kW, kU, 0., 0.), dut.coeffs(), kTolerance)));
   }
   {  // Z to X.
     const Quaternion dut = Quaternion::FromTwoVectors(kUnitZ, kUnitX);
-    EXPECT_TRUE(CompareVectors(Vector4(kW, 0., kU, 0.), dut.coeffs(), kTolerance));
+    EXPECT_TRUE(AssertCompare(CompareVectors(Vector4(kW, 0., kU, 0.), dut.coeffs(), kTolerance)));
   }
   {
     Quaternion dut;
     dut.SetFromTwoVectors(kUnitZ, kUnitX);
-    EXPECT_TRUE(CompareVectors(Vector4(kW, 0., kU, 0.), dut.coeffs(), kTolerance));
+    EXPECT_TRUE(AssertCompare(CompareVectors(Vector4(kW, 0., kU, 0.), dut.coeffs(), kTolerance)));
   }
 }
 

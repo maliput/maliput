@@ -44,13 +44,13 @@ namespace {
 std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
   const auto paths_from_env = maliput::utility::GetAllPathsFromEnvironment(env_var);
   std::vector<std::string> filepaths{};
-  maliput::log()->trace("'{}' env var contains {} paths:", env_var, paths_from_env.size());
+  maliput::log()->trace("'", env_var, "' env var contains ", paths_from_env.size(), " paths:");
   for (const auto& path_from_env : paths_from_env) {
-    maliput::log()->trace("\t'{}'", path_from_env);
+    maliput::log()->trace("\t'", path_from_env, "'");
     const maliput::common::Path path{path_from_env};
     if (!path.is_directory()) {
-      maliput::log()->warn("The path '{}' isn't a valid directory for the {} env var, omitting...", path_from_env,
-                           env_var);
+      maliput::log()->warn("The path '", path_from_env, "' isn't a valid directory for the ", env_var,
+                           " env var, omitting...");
       continue;
     }
     const auto filepaths_from_dir = maliput::utility::GetAllFilePathsFromDirectory(path.get_path(), "so");
@@ -66,7 +66,7 @@ MaliputPluginManager::MaliputPluginManager() {
   for (const auto& path : library_paths) {
     AddPlugin(path);
   }
-  maliput::log()->info("Number of plugins loaded: {}", plugins_.size());
+  maliput::log()->info("Number of plugins loaded: ", plugins_.size());
 }
 
 const MaliputPlugin* MaliputPluginManager::GetPlugin(const MaliputPlugin::Id& id) const {
@@ -80,8 +80,8 @@ void MaliputPluginManager::AddPlugin(const std::string& path_to_plugin) {
   const auto id = maliput_plugin->GetId();
   const bool is_repeated{plugins_.find(MaliputPlugin::Id(id)) != plugins_.end()};
   plugins_[MaliputPlugin::Id(id)] = std::move(maliput_plugin);
-  maliput::log()->info(
-      (is_repeated ? "A new version of Plugin Id: {} was loaded." : "Plugin Id: {} was correctly loaded."), id);
+  maliput::log()->info((is_repeated ? "A new version of Plugin Id: " + id + " was loaded."
+                                    : "Plugin Id: " + id + " was correctly loaded."));
 }
 
 std::unordered_map<MaliputPlugin::Id, MaliputPluginType> MaliputPluginManager::ListPlugins() const {

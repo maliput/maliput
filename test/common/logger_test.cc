@@ -31,8 +31,6 @@
 
 #include <string>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <gtest/gtest.h>
 
 #include "maliput/common/assertion_error.h"
@@ -85,9 +83,9 @@ GTEST_TEST(LoggerTest, SetLogLevel) {
 
 class LoggingMesagesTest : public ::testing::Test {
  protected:
-  static constexpr char const* kMessage1 = " Hello World. {}{}.";
+  static constexpr char const* kMessage1 = "Hello World. ";
   static constexpr char const* kMessage2 = "The value of PI is: ";
-  static constexpr char const* kExpectedMessage = "  Hello World. The value of PI is: 3.14159.\n";
+  static constexpr char const* kExpectedMessage = "Hello World. The value of PI is: 3.14159\n";
   static constexpr double kPI = 3.14159;
 
   void SetUp() override {
@@ -100,46 +98,38 @@ class LoggingMesagesTest : public ::testing::Test {
   MockSink* mock_sink_ptr{nullptr};
 };
 
-TEST_F(LoggingMesagesTest, EscapingFormatting) {
-  // Double curly braces escapes fmt formating.
-  const std::string message{"Escape {{formatting}}"};
-  const std::string expected_message{"[TRACE] Escape {formatting}\n"};
-  log()->trace(message);
-  EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_message);
-}
-
 TEST_F(LoggingMesagesTest, TraceLog) {
-  const std::string expected_message{"[TRACE]" + std::string(kExpectedMessage)};
+  const std::string expected_message{"[TRACE] " + std::string(kExpectedMessage)};
   log()->trace(kMessage1, kMessage2, kPI);
   EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_message);
 }
 
 TEST_F(LoggingMesagesTest, DebugLog) {
-  const std::string expected_message{"[DEBUG]" + std::string(kExpectedMessage)};
+  const std::string expected_message{"[DEBUG] " + std::string(kExpectedMessage)};
   log()->debug(kMessage1, kMessage2, kPI);
   EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_message);
 }
 
 TEST_F(LoggingMesagesTest, InfoLog) {
-  const std::string expected_message{"[INFO]" + std::string(kExpectedMessage)};
+  const std::string expected_message{"[INFO] " + std::string(kExpectedMessage)};
   log()->info(kMessage1, kMessage2, kPI);
   EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_message);
 }
 
 TEST_F(LoggingMesagesTest, WarningLog) {
-  const std::string expected_message{"[WARNING]" + std::string(kExpectedMessage)};
+  const std::string expected_message{"[WARNING] " + std::string(kExpectedMessage)};
   log()->warn(kMessage1, kMessage2, kPI);
   EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_message);
 }
 
 TEST_F(LoggingMesagesTest, ErrorLog) {
-  const std::string expected_message{"[ERROR]" + std::string(kExpectedMessage)};
+  const std::string expected_message{"[ERROR] " + std::string(kExpectedMessage)};
   log()->error(kMessage1, kMessage2, kPI);
   EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_message);
 }
 
 TEST_F(LoggingMesagesTest, CriticalLog) {
-  const std::string expected_message{"[CRITICAL]" + std::string(kExpectedMessage)};
+  const std::string expected_message{"[CRITICAL] " + std::string(kExpectedMessage)};
   log()->critical(kMessage1, kMessage2, kPI);
   EXPECT_EQ(mock_sink_ptr->get_log_message(), expected_message);
 }

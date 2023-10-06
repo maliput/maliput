@@ -1,3 +1,4 @@
+ament_add_gtest(api_compare_test compare_test.cc)
 ament_add_gmock(branch_point_test branch_point_test.cc)
 ament_add_gtest(discrete_value_rule_state_provider_test discrete_value_rule_state_provider_test.cc)
 ament_add_gmock(lane_test lane_test.cc)
@@ -40,6 +41,7 @@ macro(add_dependencies_to_test target)
     endif()
 endmacro()
 
+add_dependencies_to_test(api_compare_test)
 add_dependencies_to_test(branch_point_test)
 add_dependencies_to_test(discrete_value_rule_state_provider_test)
 add_dependencies_to_test(lane_test)

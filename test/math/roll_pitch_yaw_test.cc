@@ -31,13 +31,19 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/test_utilities/maliput_math_compare.h"
+#include "maliput/common/compare.h"
+#include "maliput/math/compare.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace math {
 namespace {
 
+using maliput::test::AssertCompare;
+
 static constexpr double kTolerance{1e-10};
+
+using maliput::test::AssertCompare;
 
 void ExpectDoubleEq(const RollPitchYaw& rpy1, const RollPitchYaw& rpy2) {
   EXPECT_DOUBLE_EQ(rpy1.roll_angle(), rpy2.roll_angle());
@@ -84,8 +90,8 @@ GTEST_TEST(RollPitchYawTest, PublicMethods) {
     EXPECT_DOUBLE_EQ(kDut.roll_angle(), M_PI / 2);
     EXPECT_DOUBLE_EQ(kDut.pitch_angle(), 0.);
     EXPECT_DOUBLE_EQ(kDut.yaw_angle(), M_PI / 2);
-    EXPECT_TRUE(
-        test::CompareMatrices(kDut.ToMatrix(), Matrix3({{0., 0., 1.}, {1., 0., 0.}, {0., 1., 0.}}), kTolerance));
+    EXPECT_TRUE(AssertCompare(
+        CompareMatrices(kDut.ToMatrix(), Matrix3({{0., 0., 1.}, {1., 0., 0.}, {0., 1., 0.}}), kTolerance)));
     ExpectDoubleEq(kDut.ToQuaternion(), Quaternion(0.5, 0.5, 0.5, 0.5));
   }
   // mutable references
@@ -150,7 +156,7 @@ GTEST_TEST(RollPitchYawTest, OrdinaryDerivativeRotationMatrixRollPitchYaw) {
                      -s1*c0*pDt - s0*c1*rDt});
   // clang-format on
 
-  EXPECT_TRUE(test::CompareMatrices(RDt, MDt, kTolerance));
+  EXPECT_TRUE(AssertCompare(CompareMatrices(RDt, MDt, kTolerance)));
 }
 
 }  // namespace

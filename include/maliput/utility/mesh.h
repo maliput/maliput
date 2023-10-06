@@ -37,11 +37,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include <fmt/ostream.h>
-
 #include "maliput/api/lane.h"
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_hash.h"
+#include "maliput/utility/string_format.h"
 
 namespace maliput {
 namespace utility {
@@ -242,30 +241,30 @@ class GeoMesh {
       return std::make_tuple(vertex_index_offset, normal_index_offset);
     }
 
-    // NOLINTNEXTLINE(build/namespaces)  Usage documented by fmt library.
-    using namespace fmt::literals;
-    fmt::print(os, "# Vertices\n");
+    os << "# Vertices\n";
     for (const GeoVertex* gv : vertices_.vector()) {
-      fmt::print(os, "v {x:.{p}f} {y:.{p}f} {z:.{p}f}\n", "x"_a = (gv->v().x() - origin.x()),
-                 "y"_a = (gv->v().y() - origin.y()), "z"_a = (gv->v().z() - origin.z()), "p"_a = precision);
+      os << "v " << to_str(gv->v().x() - origin.x(), precision) << " " << to_str(gv->v().y() - origin.y(), precision)
+         << " " << to_str(gv->v().z() - origin.z(), precision) << "\n";
     }
-    fmt::print(os, "# Normals\n");
+    os << "# Normals\n";
     for (const GeoNormal* gn : normals_.vector()) {
-      fmt::print(os, "vn {x:.{p}f} {y:.{p}f} {z:.{p}f}\n", "x"_a = gn->n().x(), "y"_a = gn->n().y(),
-                 "z"_a = gn->n().z(), "p"_a = precision);
+      const api::InertialPosition& n = gn->n();
+      os << "vn " << to_str(n.x(), precision) << " " << to_str(n.y(), precision) << " " << to_str(n.z(), precision)
+         << "\n";
     }
-    fmt::print(os, "\n");
-    fmt::print(os, "# Faces\n");
+    os << "\n";
+    os << "# Faces\n";
     if (!material.empty()) {
-      fmt::print(os, "usemtl {}\n", material);
+      os << "usemtl"
+         << " " << material << "\n";
     }
     for (const IndexFace& f : faces_) {
-      fmt::print(os, "f");
+      os << "f";
       for (const IndexFace::Vertex& ifv : f.vertices()) {
-        fmt::print(os, " {}//{}", (ifv.vertex_index + 1 + vertex_index_offset),
-                   (ifv.normal_index + 1 + normal_index_offset));
+        os << " " << (ifv.vertex_index + 1 + vertex_index_offset) << "//"
+           << (ifv.normal_index + 1 + normal_index_offset);
       }
-      fmt::print(os, "\n");
+      os << "\n";
     }
     return std::make_tuple(vertex_index_offset + vertices_.vector().size(),
                            normal_index_offset + normals_.vector().size());

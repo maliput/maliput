@@ -1,0 +1,31 @@
+########################################
+# Bzlmod Configuration
+########################################
+
+# Uncomment to build with bzlmod (i.e. use MODULE.bazel) or
+# use --enable_bzlmod on the command line.
+common --enable_bzlmod
+
+# TODO(daniel.stonier) Delete once 'yaml-cpp' has made it into the official BCR
+build --registry=https://raw.githubusercontent.com/stonier/bazel-central-registry/maliput_releases/
+
+########################################
+# Bazel Configuration
+########################################
+
+# https://bazel.build/docs/user-manual#verbose-failures
+build --verbose_failures
+
+########################################
+# C++ Configuration
+########################################
+
+build --cxxopt="-std=c++17"
+build --cxxopt="-Werror"
+
+# Silence compiler warnings for external dependencies.
+#  - https://github.com/bazelbuild/bazel/commit/08936aecb96f2937c61bdedfebcf1c5a41a0786d
+build --features=external_include_paths
+# In case that the above feature leaks some warnings, silence all warnings from the 'external' folder.
+# If in the future there are warnings leaked from other 3rd libs, add more 'per_file_copt' to include their paths.
+build --per_file_copt=external.*\.(cc|cpp|h|hpp|c)@-w

@@ -1,0 +1,22 @@
+{
+    "name": "Bazel Zen",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "remoteUser": "zen",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bazelbuild.vscode-bazel",
+                "bierner.github-markdown-preview",
+                "bierner.markdown-preview-github-styles",
+                "github.vscode-github-actions",
+                "ms-vscode.cpptools-extension-pack",
+                "pbkit.vscode-pbkit",
+                "streetsidesoftware.code-spell-checker",
+                "yzhang.markdown-all-in-one"
+            ]
+        }
+    }
+}

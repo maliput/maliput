@@ -3,8 +3,11 @@
 ##############################################################################
 
 set(ROUTING_SOURCES
+  compare.cc
   derive_lane_s_routes.cc
   find_lane_sequences.cc
+  phase.cc
+  route.cc
   routing_constraints.cc
 )
 
@@ -26,6 +29,8 @@ target_link_libraries(routing
   PUBLIC
     maliput::api
     maliput::common
+  PRIVATE
+    maliput::geometry_base
 )
 
 if(MALIPUT_PROFILER_ENABLE)
