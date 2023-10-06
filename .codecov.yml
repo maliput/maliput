@@ -31,3 +31,4 @@ ignore:
   - "doc"
   - "test"
   - "tools"
+  - "*/drake/*" # Exclude drake as it is brought under direct copy.
