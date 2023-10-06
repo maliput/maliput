@@ -38,7 +38,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
 #include "maliput/common/assertion_error.h"
-#include "maliput/test_utilities/maliput_routing_position_compare.h"
+#include "maliput/routing/compare.h"
 #include "maliput/test_utilities/regions_test_utilities.h"
 #include "routing/road_network_mocks.h"
 #include "test_utilities/assert_compare.h"
@@ -372,7 +372,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithSingleLaneSRan
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithMultipleLaneSRangePhase) {
@@ -404,7 +404,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithMultipleLaneSR
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionOutsidePhase) {
@@ -427,7 +427,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionOutsidePhase) {
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionThrowsWithInvalidPosition) {
@@ -464,7 +464,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionOutsidePhase) {
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
@@ -488,7 +488,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kRoadPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 // TODO: Test Phase::FindPhasePosition() when the LaneSRange::WithS() is false.
