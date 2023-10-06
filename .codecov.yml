@@ -28,7 +28,7 @@ github_checks:
 
 # Exclude unwanted directories from code coverage reports.
 ignore:
-  - "doc"
-  - "test"
-  - "tools"
-  - "*/drake/*" # Exclude drake as it is brought under direct copy.
+  - "**/doc"
+  - "**/test"
+  - "**/tools"
+  - "**/drake"
