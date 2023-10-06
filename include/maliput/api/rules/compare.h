@@ -33,8 +33,10 @@
 #include <string>
 #include <vector>
 
+#include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
+#include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/compare.h"
 
@@ -47,13 +49,6 @@ namespace rules {
 common::ComparisonResult<RuleStates> IsEqual(const RuleStates& a, const RuleStates& b);
 #pragma GCC diagnostic pop
 
-common::ComparisonResult<DiscreteValueRule::DiscreteValue> IsEqual(const DiscreteValueRule::DiscreteValue& a,
-                                                                   const DiscreteValueRule::DiscreteValue& b);
-
-common::ComparisonResult<std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>> IsEqual(
-    const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& a,
-    const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& b);
-
 common::ComparisonResult<BulbState> IsEqual(const BulbState& a, const BulbState& b);
 common::ComparisonResult<std::optional<BulbStates>> IsEqual(const std::optional<BulbStates>& a,
                                                             const std::optional<BulbStates>& b);
@@ -64,6 +59,22 @@ common::ComparisonResult<PhaseRing::NextPhase> IsEqual(const PhaseRing::NextPhas
 
 common::ComparisonResult<std::vector<PhaseRing::NextPhase>> IsEqual(const std::vector<PhaseRing::NextPhase>& a,
                                                                     const std::vector<PhaseRing::NextPhase>& b);
+
+common::ComparisonResult<RangeValueRule::Range> IsEqual(const rules::RangeValueRule::Range& a,
+                                                        const rules::RangeValueRule::Range& b);
+common::ComparisonResult<RangeValueRule> IsEqual(const rules::RangeValueRule& a, const rules::RangeValueRule& b);
+common::ComparisonResult<std::vector<rules::RangeValueRule::Range>> IsEqual(
+    const std::vector<rules::RangeValueRule::Range>& a, const std::vector<rules::RangeValueRule::Range>& b);
+
+common::ComparisonResult<DiscreteValueRule::DiscreteValue> IsEqual(const DiscreteValueRule::DiscreteValue& a,
+                                                                   const DiscreteValueRule::DiscreteValue& b);
+common::ComparisonResult<DiscreteValueRule> IsEqual(const DiscreteValueRule& a, const DiscreteValueRule& b);
+common::ComparisonResult<std::vector<DiscreteValueRule::DiscreteValue>> IsEqual(
+    const std::vector<DiscreteValueRule::DiscreteValue>& a, const std::vector<DiscreteValueRule::DiscreteValue>& b);
+
+common::ComparisonResult<std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>> IsEqual(
+    const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& a,
+    const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& b);
 
 }  // namespace rules
 }  // namespace api

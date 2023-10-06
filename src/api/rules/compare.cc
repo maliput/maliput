@@ -123,6 +123,57 @@ common::ComparisonResult<std::vector<PhaseRing::NextPhase>> IsEqual(const std::v
   return {c.result()};
 }
 
+common::ComparisonResult<RangeValueRule::Range> IsEqual(const rules::RangeValueRule::Range& a,
+                                                        const rules::RangeValueRule::Range& b) {
+  return {a != b ? std::make_optional<std::string>(
+                       "Range with min: " + std::to_string(a.min) + " , max: " + std::to_string(a.max) +
+                       " and description: " + a.description +
+                       " is different from Range with min: " + std::to_string(b.min) +
+                       " , max: " + std::to_string(b.max) + " and description: " + b.description)
+                 : std::nullopt};
+}
+
+common::ComparisonResult<std::vector<rules::RangeValueRule::Range>> IsEqual(
+    const std::vector<rules::RangeValueRule::Range>& a, const std::vector<rules::RangeValueRule::Range>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.size()", "b.size()", a.size(), b.size()));
+  const int smallest = std::min(a.size(), b.size());
+  for (int i = 0; i < smallest; ++i) {
+    MALIPUT_ADD_RESULT(c, IsEqual(a.at(i), b.at(i)));
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<RangeValueRule> IsEqual(const rules::RangeValueRule& a, const rules::RangeValueRule& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.id()", "b.id()", a.id(), b.id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.type_id()", "b.type_id()", a.type_id(), b.type_id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a.zone(), b.zone()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.states(), b.states()));
+  return {c.result()};
+}
+
+common::ComparisonResult<DiscreteValueRule> IsEqual(const DiscreteValueRule& a, const DiscreteValueRule& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.id()", "b.id()", a.id(), b.id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.type_id()", "b.type_id()", a.type_id(), b.type_id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a.zone(), b.zone()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.states(), b.states()));
+  return {c.result()};
+}
+
+common::ComparisonResult<std::vector<DiscreteValueRule::DiscreteValue>> IsEqual(
+    const std::vector<DiscreteValueRule::DiscreteValue>& a, const std::vector<DiscreteValueRule::DiscreteValue>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.size()", "b.size()", a.size(), b.size()));
+  const int smallest = std::min(a.size(), b.size());
+  for (int i = 0; i < smallest; ++i) {
+    MALIPUT_ADD_RESULT(c, api::IsEqual("std::find(b.begin(), b.end(), a.at(i)) != b.end()", "true",
+                                       std::find(b.begin(), b.end(), a.at(i)) != b.end(), true));
+  }
+  return {c.result()};
+}
+
 }  // namespace rules
 }  // namespace api
 }  // namespace maliput
