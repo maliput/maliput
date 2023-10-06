@@ -174,6 +174,68 @@ common::ComparisonResult<std::vector<DiscreteValueRule::DiscreteValue>> IsEqual(
   return {c.result()};
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+common::ComparisonResult<DirectionUsageRule::State::Type> IsEqual(DirectionUsageRule::State::Type a,
+                                                                  DirectionUsageRule::State::Type b) {
+  if (a != b) {
+    return {"DirectionUsageRule::State::Type are different"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<DirectionUsageRule::State::Severity> IsEqual(DirectionUsageRule::State::Severity a,
+                                                                      DirectionUsageRule::State::Severity b) {
+  if (a != b) {
+    return {"DirectionUsageRule::State::Severity are different"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<DirectionUsageRule::State> IsEqual(const DirectionUsageRule::State& a,
+                                                            const DirectionUsageRule::State& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.id()", "b.id()", a.id(), b.id()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.severity(), b.severity()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.type(), b.type()));
+  return {c.result()};
+}
+
+common::ComparisonResult<std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>> IsEqual(
+
+    const std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>& a,
+    const std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.size()", "b.size()", a.size(), b.size()));
+  const std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>& largest =
+      (a.size() < b.size()) ? b : a;
+  for (const auto& pair : largest) {
+    const DirectionUsageRule::State::Id& key = pair.first;
+    auto a_it = a.find(key);
+    auto b_it = b.find(key);
+    MALIPUT_ADD_RESULT(c, api::IsEqual("(a_it != a.cend())", "true", (a_it != a.cend()), true));
+    MALIPUT_ADD_RESULT(c, api::IsEqual("(b_it != b.cend())", "true", (b_it != b.cend()), true));
+    if ((a_it != a.cend()) && (b_it != b.cend())) {
+      MALIPUT_ADD_RESULT(c, IsEqual(a_it->second, b_it->second));
+    }
+  }
+  return {c.result()};
+}
+
+common::ComparisonResult<DirectionUsageRule> IsEqual(const DirectionUsageRule& a, const DirectionUsageRule& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.id()", "b.id()", a.id(), b.id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a.zone(), b.zone()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.states(), b.states()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.is_static()", "b.is_static()", a.is_static(), b.is_static()));
+  if (a.is_static() && b.is_static()) {
+    MALIPUT_ADD_RESULT(c, IsEqual(a.static_state(), b.static_state()));
+  }
+  return {c.result()};
+}
+#pragma GCC diagnostic pop
+
 }  // namespace rules
 }  // namespace api
 }  // namespace maliput

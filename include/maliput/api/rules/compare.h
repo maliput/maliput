@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 
+#include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/phase_ring.h"
@@ -75,6 +76,25 @@ common::ComparisonResult<std::vector<DiscreteValueRule::DiscreteValue>> IsEqual(
 common::ComparisonResult<std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>> IsEqual(
     const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& a,
     const std::unordered_map<Rule::Id, DiscreteValueRule::DiscreteValue>& b);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+common::ComparisonResult<DirectionUsageRule::State::Type> IsEqual(DirectionUsageRule::State::Type a,
+                                                                  DirectionUsageRule::State::Type b);
+
+common::ComparisonResult<DirectionUsageRule::State::Severity> IsEqual(DirectionUsageRule::State::Severity a,
+                                                                      DirectionUsageRule::State::Severity b);
+
+common::ComparisonResult<DirectionUsageRule::State> IsEqual(const DirectionUsageRule::State& a,
+                                                            const DirectionUsageRule::State& b);
+
+common::ComparisonResult<std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>> IsEqual(
+
+    const std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>& a,
+    const std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>& b);
+
+common::ComparisonResult<DirectionUsageRule> IsEqual(const DirectionUsageRule& a, const DirectionUsageRule& b);
+#pragma GCC diagnostic pop
 
 }  // namespace rules
 }  // namespace api
