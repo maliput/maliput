@@ -40,6 +40,7 @@
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/right_of_way_rule_state_provider.h"
+#include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/compare.h"
 
@@ -118,6 +119,11 @@ common::ComparisonResult<rules::RightOfWayRule> IsEqual(const rules::RightOfWayR
 common::ComparisonResult<rules::RightOfWayRuleStateProvider::RightOfWayResult> IsEqual(
     const rules::RightOfWayRuleStateProvider::RightOfWayResult& a,
     const rules::RightOfWayRuleStateProvider::RightOfWayResult& b);
+
+common::ComparisonResult<rules::SpeedLimitRule::Severity> IsEqual(rules::SpeedLimitRule::Severity a,
+                                                                  rules::SpeedLimitRule::Severity b);
+
+common::ComparisonResult<rules::SpeedLimitRule> IsEqual(const rules::SpeedLimitRule& a, const rules::SpeedLimitRule& b);
 
 #pragma GCC diagnostic pop
 

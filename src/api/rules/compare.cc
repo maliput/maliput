@@ -326,6 +326,25 @@ common::ComparisonResult<rules::RightOfWayRuleStateProvider::RightOfWayResult> I
   return {c.result()};
 }
 
+common::ComparisonResult<rules::SpeedLimitRule::Severity> IsEqual(rules::SpeedLimitRule::Severity a,
+                                                                  rules::SpeedLimitRule::Severity b) {
+  if (a != b) {
+    return {"SpeedLimitRule::Severity are different"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<rules::SpeedLimitRule> IsEqual(const rules::SpeedLimitRule& a,
+                                                        const rules::SpeedLimitRule& b) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.id()", "b.id()", a.id(), b.id()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual(a.zone(), b.zone()));
+  MALIPUT_ADD_RESULT(c, IsEqual(a.severity(), b.severity()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.max()", "b.max()", a.max(), b.max()));
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a.min()", "b.min()", a.min(), b.min()));
+  return {c.result()};
+}
+
 #pragma GCC diagnostic pop
 
 common::ComparisonResult<std::unordered_map<TrafficLight::Id, std::vector<BulbGroup::Id>>> IsEqual(
