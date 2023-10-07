@@ -33,7 +33,6 @@
 
 #include "maliput/api/lane_data.h"
 #include "maliput/api/rules/compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
 #include "test_utilities/assert_compare.h"
 
 namespace maliput {

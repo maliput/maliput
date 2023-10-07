@@ -44,7 +44,6 @@
 #include "maliput/base/rule_registry.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
 #include "test_utilities/assert_compare.h"
 
 namespace maliput {

@@ -227,6 +227,18 @@ common::ComparisonResult<InertialPosition> IsEqual(const InertialPosition& inert
 /// @returns A ComparisonResult indicating whether the two Rotations are equal.
 common::ComparisonResult<Rotation> IsEqual(const Rotation& rotation_1, const Rotation& rotation_2);
 
+/// Compares equality of two LaneEnd::Which.
+/// @param which_1 The first LaneEnd::Which to compare.
+/// @param which_2 The second LaneEnd::Which to compare.
+/// @returns A ComparisonResult indicating whether the two LaneEnd::Which are equal.
+common::ComparisonResult<LaneEnd::Which> IsEqual(const LaneEnd::Which& which_1, const LaneEnd::Which& which_2);
+
+/// Compares equality of two LaneEnd.
+/// @param lane_end_1 The first LaneEnd to compare.
+/// @param lane_end_2 The second LaneEnd to compare.
+/// @returns A ComparisonResult indicating whether the two LaneEnds are equal.
+common::ComparisonResult<LaneEnd> IsEqual(const LaneEnd& lane_end_1, const LaneEnd& lane_end_2);
+
 /// Checks that the given RoadGeometry's ById() indexing is correct.
 /// @param road_geometry The RoadGeometry to check.
 /// @returns A std::optional<std::string> containing an error message if the indexing is incorrect.
