@@ -37,15 +37,18 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/compare.h"
 #include "maliput/api/regions.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
 #include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace {
+
+using maliput::test::AssertCompare;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -100,7 +103,7 @@ TEST_F(DirectionUsageTest, AccessCopyAssign) {
     EXPECT_TRUE(MALIPUT_IS_EQUAL(source, dut2));
     EXPECT_TRUE(MALIPUT_IS_EQUAL(source, dut1));
 
-    EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(source.zone(), dut1.zone()));
+    EXPECT_TRUE(AssertCompare(IsEqual(source.zone(), dut1.zone())));
     EXPECT_TRUE(MALIPUT_IS_EQUAL(source.is_static(), dut2.is_static()));
     EXPECT_TRUE(MALIPUT_IS_EQUAL(source.static_state(), dut2.static_state()));
     EXPECT_TRUE(MALIPUT_IS_EQUAL(source.static_state().type(), dut1.static_state().type()));

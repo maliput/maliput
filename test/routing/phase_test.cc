@@ -39,7 +39,6 @@
 #include "maliput/api/regions.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/routing/compare.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
 #include "routing/road_network_mocks.h"
 #include "test_utilities/assert_compare.h"
 
@@ -349,8 +348,8 @@ TEST_F(PhaseAccessorsTest, CorrectConstruction) {
   EXPECT_EQ(kEndRoadPositions[1].lane, dut.end_positions()[1].lane);
   EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndRoadPositions[1].pos, dut.end_positions()[1].pos, 0.)));
   EXPECT_EQ(kLaneSRanges.size(), dut.lane_s_ranges().size());
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(kLaneSRanges[0], dut.lane_s_ranges()[0]));
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(kLaneSRanges[1], dut.lane_s_ranges()[1]));
+  EXPECT_TRUE(AssertCompare(IsEqual(kLaneSRanges[0], dut.lane_s_ranges()[0])));
+  EXPECT_TRUE(AssertCompare(IsEqual(kLaneSRanges[1], dut.lane_s_ranges()[1])));
 }
 
 class PhaseMappingTest : public PhaseConstructorValidationsTest {};

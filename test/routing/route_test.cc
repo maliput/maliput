@@ -44,7 +44,6 @@
 #include "maliput/routing/phase.h"
 #include "maliput/routing/route_position_result.h"
 #include "maliput/test_utilities/maliput_routing_position_compare.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
 #include "routing/road_network_mocks.h"
 #include "test_utilities/assert_compare.h"
 
@@ -199,8 +198,8 @@ TEST_F(RouteAccessorsTest, GetReturnsTheRightLaneSRange) {
   EXPECT_EQ(phase.end_positions()[0].lane, &lane_b_);
   EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndRouteLanePosition, phase.end_positions()[0].pos, 0.)));
   EXPECT_EQ(phase.lane_s_ranges().size(), phase_a_->lane_s_ranges().size());
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(phase_a_->lane_s_ranges()[0], phase.lane_s_ranges()[0]));
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(phase_a_->lane_s_ranges()[1], phase.lane_s_ranges()[1]));
+  EXPECT_TRUE(AssertCompare(IsEqual(phase_a_->lane_s_ranges()[0], phase.lane_s_ranges()[0])));
+  EXPECT_TRUE(AssertCompare(IsEqual(phase_a_->lane_s_ranges()[1], phase.lane_s_ranges()[1])));
 }
 
 TEST_F(RouteAccessorsTest, GetThrowsWhenPassingAWrongIndex) {
