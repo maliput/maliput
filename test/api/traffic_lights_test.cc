@@ -42,15 +42,18 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/rules/compare.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
-#include "maliput/test_utilities/traffic_lights_compare.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace {
+
+using maliput::test::AssertCompare;
 
 GTEST_TEST(BulbColorTest, InstantiateAndAssign) {
   BulbColor dut{};
@@ -161,7 +164,7 @@ TEST_F(BulbTest, Accessors) {
   EXPECT_TRUE(bulb_.IsValidState(BulbState::kOff));
   EXPECT_TRUE(bulb_.IsValidState(BulbState::kOn));
   EXPECT_FALSE(bulb_.IsValidState(BulbState::kBlinking));
-  MALIPUT_IS_EQUAL(bulb_.bounding_box(), Bulb::BoundingBox());
+  EXPECT_TRUE(AssertCompare(IsEqual(bulb_.bounding_box(), Bulb::BoundingBox())));
 }
 
 GTEST_TEST(DefaultBulbStateTest, CorrectDefaultAndIsValidStateQueries) {
