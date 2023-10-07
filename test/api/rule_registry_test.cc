@@ -32,9 +32,9 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/compare.h"
+#include "maliput/api/rules/compare.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/rules_compare.h"
 #include "test_utilities/assert_compare.h"
 
 namespace maliput {
@@ -265,14 +265,14 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
   EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
   EXPECT_TRUE(AssertCompare(IsEqual(range_value_rule.zone(), kZone)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.states(), {kRangeA}));
+  EXPECT_TRUE(AssertCompare(IsEqual(range_value_rule.states(), {kRangeA})));
 
   // Builds and evaluates a RangeValueRule of the same type but with non-empty RelatedRules.
   range_value_rule = dut.BuildRangeValueRule(kRangeRuleId, kRangeValueRuleType, kZone, {kRangeB});
   EXPECT_EQ(range_value_rule.id(), kRangeRuleId);
   EXPECT_EQ(range_value_rule.type_id(), kRangeValueRuleType);
   EXPECT_TRUE(AssertCompare(IsEqual(range_value_rule.zone(), kZone)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(range_value_rule.states(), {kRangeB}));
+  EXPECT_TRUE(AssertCompare(IsEqual(range_value_rule.states(), {kRangeB})));
 
   // Unregistered type.
   EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {kRangeA}),
@@ -292,7 +292,7 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
   EXPECT_EQ(discrete_value_rule.id(), kDiscreteValueRuleId);
   EXPECT_EQ(discrete_value_rule.type_id(), kDiscreteValueRuleType);
   EXPECT_TRUE(AssertCompare(IsEqual(discrete_value_rule.zone(), kZone)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(discrete_value_rule.states(), kExpectedDiscreteValues));
+  EXPECT_TRUE(AssertCompare(IsEqual(discrete_value_rule.states(), kExpectedDiscreteValues)));
 
   // Unregistered type.
   EXPECT_THROW(dut.BuildDiscreteValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, kExpectedDiscreteValues),

@@ -31,16 +31,19 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/rules/compare.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/rules_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace {
+
+using maliput::test::AssertCompare;
 
 // Mock class to evaluate DiscreteValueRuleStateProvider interface.
 class MockDiscreteValueRuleStateProvider : public DiscreteValueRuleStateProvider {
@@ -93,9 +96,9 @@ GTEST_TEST(DiscreteValueRuleStateProviderTest, GetStateById) {
       dut.GetState(MockDiscreteValueRuleStateProvider::kRuleId);
 
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue()));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->state, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue())));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue()));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->next->state, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue())));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), 123.456);
 
@@ -109,9 +112,9 @@ GTEST_TEST(DiscreteValueRuleStateProviderTest, GetStateByRoadPositionAndType) {
                    MockDiscreteValueRuleStateProvider::kTolerance);
 
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue()));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->state, MockDiscreteValueRuleStateProvider::MakeCurrentDiscreteValue())));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue()));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->next->state, MockDiscreteValueRuleStateProvider::MakeNextDiscreteValue())));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), 123.456);
 
