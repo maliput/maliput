@@ -37,7 +37,6 @@
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/rules_speed_limit_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
 #include "test_utilities/assert_compare.h"
 
@@ -123,7 +122,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveSpeedLimit) {
 
   EXPECT_THROW(dut.GetRule(kSpeedLimit.id()), std::out_of_range);
   dut.AddRule(kSpeedLimit);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kSpeedLimit.id()), kSpeedLimit)));
   EXPECT_THROW(dut.AddRule(kSpeedLimit), maliput::common::assertion_error);
   dut.RemoveRule(kSpeedLimit.id());
   EXPECT_THROW(dut.GetRule(kSpeedLimit.id()), std::out_of_range);
@@ -220,7 +219,7 @@ TEST_F(ManualRulebookTest, RemoveAll) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kRightOfWay.id()), kRightOfWay)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kSpeedLimit.id()), kSpeedLimit)));
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kDirectionUsage.id()), kDirectionUsage)));
 #pragma GCC diagnostic pop
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule)));
