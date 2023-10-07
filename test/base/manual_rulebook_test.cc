@@ -37,7 +37,6 @@
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/rules_direction_usage_compare.h"
 #include "maliput/test_utilities/rules_right_of_way_compare.h"
 #include "maliput/test_utilities/rules_speed_limit_compare.h"
 #include "maliput/test_utilities/rules_test_utilities.h"
@@ -137,7 +136,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveDirectionUsage) {
 
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
   dut.AddRule(kDirectionUsage);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDirectionUsage.id()), kDirectionUsage));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kDirectionUsage.id()), kDirectionUsage)));
   EXPECT_THROW(dut.AddRule(kDirectionUsage), maliput::common::assertion_error);
   dut.RemoveRule(kDirectionUsage.id());
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
@@ -223,7 +222,7 @@ TEST_F(ManualRulebookTest, RemoveAll) {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kRightOfWay.id()), kRightOfWay));
   EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDirectionUsage.id()), kDirectionUsage));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kDirectionUsage.id()), kDirectionUsage)));
 #pragma GCC diagnostic pop
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule)));
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule)));
