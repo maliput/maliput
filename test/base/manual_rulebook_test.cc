@@ -32,15 +32,12 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/regions.h"
+#include "maliput/api/rules/compare.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/rules_compare.h"
-#include "maliput/test_utilities/rules_direction_usage_compare.h"
-#include "maliput/test_utilities/rules_right_of_way_compare.h"
-#include "maliput/test_utilities/rules_speed_limit_compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace test {
@@ -58,6 +55,8 @@ using api::rules::Rule;
 using api::rules::SpeedLimitRule;
 using api::test::CreateEmptyRelatedRules;
 using api::test::CreateEmptyRelatedUniqueIds;
+using test::AssertCompare;
+
 class ManualRulebookTest : public ::testing::Test {
  protected:
   const LaneSRange kZone{LaneId("a"), {10., 20.}};
@@ -110,7 +109,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveRightOfWay) {
 
   EXPECT_THROW(dut.GetRule(kRightOfWay.id()), std::out_of_range);
   dut.AddRule(kRightOfWay);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kRightOfWay.id()), kRightOfWay));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kRightOfWay.id()), kRightOfWay)));
   EXPECT_THROW(dut.AddRule(kRightOfWay), maliput::common::assertion_error);
   dut.RemoveRule(kRightOfWay.id());
   EXPECT_THROW(dut.GetRule(kRightOfWay.id()), std::out_of_range);
@@ -122,7 +121,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveSpeedLimit) {
 
   EXPECT_THROW(dut.GetRule(kSpeedLimit.id()), std::out_of_range);
   dut.AddRule(kSpeedLimit);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kSpeedLimit.id()), kSpeedLimit)));
   EXPECT_THROW(dut.AddRule(kSpeedLimit), maliput::common::assertion_error);
   dut.RemoveRule(kSpeedLimit.id());
   EXPECT_THROW(dut.GetRule(kSpeedLimit.id()), std::out_of_range);
@@ -134,7 +133,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveDirectionUsage) {
 
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
   dut.AddRule(kDirectionUsage);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDirectionUsage.id()), kDirectionUsage));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kDirectionUsage.id()), kDirectionUsage)));
   EXPECT_THROW(dut.AddRule(kDirectionUsage), maliput::common::assertion_error);
   dut.RemoveRule(kDirectionUsage.id());
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
@@ -147,7 +146,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
 
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
   dut.AddRule(kRangeValueRule);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule)));
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
   dut.RemoveRule(kRangeValueRule.id());
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
@@ -170,7 +169,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
 
   EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
   dut.AddRule(kDiscreteValueRule);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule)));
   EXPECT_THROW(dut.AddRule(kDiscreteValueRule), maliput::common::assertion_error);
   dut.RemoveRule(kDiscreteValueRule.id());
   EXPECT_THROW({ dut.GetDiscreteValueRule(kDiscreteValueRule.id()); }, std::out_of_range);
@@ -218,12 +217,12 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   dut.AddRule(kRangeValueRule);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kRightOfWay.id()), kRightOfWay));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kSpeedLimit.id()), kSpeedLimit));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRule(kDirectionUsage.id()), kDirectionUsage));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kRightOfWay.id()), kRightOfWay)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kSpeedLimit.id()), kSpeedLimit)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kDirectionUsage.id()), kDirectionUsage)));
 #pragma GCC diagnostic pop
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule)));
 }
 
 TEST_F(ManualRulebookTest, FindRules) {

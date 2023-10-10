@@ -32,14 +32,15 @@
 #include <gtest/gtest.h>
 
 #include "maliput/api/lane_data.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
-#include "maliput/test_utilities/traffic_lights_compare.h"
+#include "maliput/api/rules/compare.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace {
 
 using api::rules::BulbGroup;
 using api::rules::TrafficLight;
+using maliput::test::AssertCompare;
 
 GTEST_TEST(TrafficLightBookTest, BasicTest) {
   const TrafficLight::Id id("my traffic light");
@@ -55,11 +56,11 @@ GTEST_TEST(TrafficLightBookTest, BasicTest) {
 
   dut.AddTrafficLight(std::move(traffic_light));
   EXPECT_EQ(dut.GetTrafficLight(TrafficLight::Id("unknown_traffic light")), nullptr);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetTrafficLight(id), traffic_light_ptr));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetTrafficLight(id), traffic_light_ptr)));
 
   const std::vector<const TrafficLight*> nonempty = dut.TrafficLights();
   EXPECT_EQ(static_cast<int>(nonempty.size()), 1);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(nonempty.at(0), traffic_light_ptr));
+  EXPECT_TRUE(AssertCompare(IsEqual(nonempty.at(0), traffic_light_ptr)));
 }
 
 }  // namespace

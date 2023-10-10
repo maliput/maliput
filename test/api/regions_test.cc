@@ -34,14 +34,17 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/compare.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace api {
 namespace {
+
+using maliput::test::AssertCompare;
 
 // Tolerance small enough to test possibly actual use cases.
 const double kLinearTolerance = 1e-3;
@@ -94,14 +97,14 @@ GTEST_TEST(SRangeTest, Setters) {
 GTEST_TEST(SRangeTest, Copying) {
   const SRange source(12., 24.);
   const SRange dut(source);
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 
 GTEST_TEST(SRangeTest, Assignment) {
   const SRange source(12., 24.);
   SRange dut;
   dut = source;
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 
 GTEST_TEST(SRangeTest, Size) {
@@ -178,7 +181,7 @@ INSTANTIATE_TEST_CASE_P(SRangeGetIntersectionTestGroup, SRangeGetIntersectionTes
 GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
   const LaneSRange dut(kLaneId1, SRange(34., 0.));
   EXPECT_EQ(dut.lane_id(), kLaneId1);
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.s_range(), SRange(34., 0.)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.s_range(), SRange(34., 0.))));
 
   // Exercise convenient construction via initializer list for s_range.
   EXPECT_NO_THROW(LaneSRange(kLaneId1, {0., 50.}));
@@ -187,14 +190,14 @@ GTEST_TEST(LaneSRangeTest, ConstructionAndAccessors) {
 GTEST_TEST(LaneSRangeTest, Copying) {
   const LaneSRange source(kLaneId1, SRange(20., 30.));
   const LaneSRange dut(source);
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 
 GTEST_TEST(LaneSRangeTest, Assignment) {
   const LaneSRange source(kLaneId1, SRange(20., 30.));
   LaneSRange dut(kLaneId2, SRange(40., 99.));
   dut = source;
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 
 GTEST_TEST(LaneSRangeTest, Intersects) {
@@ -218,7 +221,7 @@ GTEST_TEST(LaneSRangeTest, GetIntersection) {
   LaneSRange expected_intersection{kLaneId1, SRange(25., 30.)};
   dut = lane_s_range_a.GetIntersection(LaneSRange{kLaneId1, SRange(25., 35.)}, kLinearTolerance);
   ASSERT_TRUE(dut.has_value());
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.value(), expected_intersection));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.value(), expected_intersection)));
 
   // Same lane id, different range. No intersection is expected.
   dut = lane_s_range_a.GetIntersection(LaneSRange{kLaneId1, SRange(35., 40.)}, kLinearTolerance);
@@ -242,20 +245,20 @@ TEST_F(LaneSRouteTest, DefaultConstructionAndAccessors) {
 
 TEST_F(LaneSRouteTest, NondefaultConstructionAndAccessors) {
   const LaneSRoute dut(source_);
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.ranges(), source_));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.ranges(), source_)));
 }
 
 TEST_F(LaneSRouteTest, Copying) {
   const LaneSRoute dut_source(source_);
   const LaneSRoute dut(dut_source);
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, dut_source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, dut_source)));
 }
 
 TEST_F(LaneSRouteTest, Assignment) {
   const LaneSRoute dut_source(source_);
   LaneSRoute dut;
   dut = dut_source;
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut, dut_source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, dut_source)));
 }
 
 TEST_F(LaneSRouteTest, Intersects) {

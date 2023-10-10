@@ -34,16 +34,18 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/compare.h"
 #include "maliput/api/regions.h"
+#include "maliput/api/rules/compare.h"
 #include "maliput/common/assertion_error.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
-#include "maliput/test_utilities/rules_speed_limit_compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace {
+
+using maliput::test::AssertCompare;
 
 const LaneSRange kZone(LaneId("the_lane"), SRange(13., 15.));
 
@@ -67,7 +69,7 @@ GTEST_TEST(SpeedLimitRuleTest, Construction) {
 GTEST_TEST(SpeedLimitRuleTest, Accessors) {
   const SpeedLimitRule dut(SpeedLimitRule::Id("dut_id"), kZone, SpeedLimitRule::Severity::kStrict, 5., 8.);
   EXPECT_EQ(dut.id(), SpeedLimitRule::Id("dut_id"));
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), kZone));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.zone(), kZone)));
   EXPECT_EQ(dut.severity(), SpeedLimitRule::Severity::kStrict);
   EXPECT_EQ(dut.min(), 5.);
   EXPECT_EQ(dut.max(), 8.);
@@ -82,7 +84,7 @@ GTEST_TEST(SpeedLimitRuleTest, Copying) {
   const SpeedLimitRule source(SpeedLimitRule::Id("dut_id"), kZone, SpeedLimitRule::Severity::kStrict, 5., 8.);
 
   const SpeedLimitRule dut(source);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 
 GTEST_TEST(SpeedLimitRuleTest, Assignment) {
@@ -90,7 +92,7 @@ GTEST_TEST(SpeedLimitRuleTest, Assignment) {
   SpeedLimitRule dut(SpeedLimitRule::Id("other_id"), kZone, SpeedLimitRule::Severity::kAdvisory, 70., 90.);
 
   dut = source;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 #pragma GCC diagnostic pop
 

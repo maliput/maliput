@@ -373,5 +373,20 @@ common::ComparisonResult<Rotation> IsEqual(const Rotation& rotation_1, const Rot
   return {std::nullopt};
 }
 
+common::ComparisonResult<LaneEnd::Which> IsEqual(const LaneEnd::Which& which_1, const LaneEnd::Which& which_2) {
+  if (which_1 != which_2) {
+    return {std::string("LaneEnd::Which are different. ") + "which_1: " + std::to_string(which_1) +
+            " vs. which_2: " + std::to_string(which_2) + "\n"};
+  }
+  return {std::nullopt};
+}
+
+common::ComparisonResult<LaneEnd> IsEqual(const LaneEnd& lane_end_1, const LaneEnd& lane_end_2) {
+  common::ComparisonResultCollector c;
+  MALIPUT_ADD_RESULT(c, IsEqual("lane_end_1.lane", "lane_end_2.lane", lane_end_1.lane, lane_end_2.lane));
+  MALIPUT_ADD_RESULT(c, IsEqual(lane_end_1.end, lane_end_2.end));
+  return {c.result()};
+}
+
 }  // namespace api
 }  // namespace maliput

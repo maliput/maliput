@@ -42,8 +42,6 @@
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/api/rules/traffic_lights.h"
-#include "maliput/test_utilities/phases_compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
 namespace api {

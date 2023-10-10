@@ -35,43 +35,16 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/compare.h"
 #include "maliput/common/maliput_unused.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
-
-// TODO(maddog@tri.global) When the maliput test machinery is cleaned up (e.g.,
-//                         moved out of the `rules` namespace), these predicates
-//                         should become proper public-use predicates in the
-//                         api's test_utilities.
-namespace api {
-namespace rules {
-namespace test {
-
-// Predicate-formatter which tests equality of Lane*.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const api::Lane* a,
-                                          const api::Lane* b) {
-  return ::testing::internal::CmpHelperEQ(a_expression, b_expression, a, b);
-}
-
-// Predicate-formatter which tests equality of LaneEnd.
-inline ::testing::AssertionResult IsEqual(const char* a_expression, const char* b_expression, const api::LaneEnd& a,
-                                          const api::LaneEnd& b) {
-  maliput::common::unused(a_expression, b_expression);
-  AssertionResultCollector c;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.lane, b.lane));
-  ;
-  MALIPUT_ADD_RESULT(c, MALIPUT_IS_EQUAL(a.end, b.end));
-  return c.result();
-}
-
-}  // namespace test
-}  // namespace rules
-}  // namespace api
-
 namespace geometry_base {
 namespace test {
 namespace {
+
+using maliput::test::AssertCompare;
 
 GTEST_TEST(GeometryBaseTest, LaneEndSet) {
   LaneEndSet dut;
@@ -87,7 +60,7 @@ GTEST_TEST(GeometryBaseTest, LaneEndSet) {
   EXPECT_THROW(dut.Add(kInvalidLaneEnd), std::exception);
   EXPECT_NO_THROW(dut.Add(kValidLaneEnd));
   EXPECT_EQ(dut.size(), 1);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.get(0), kValidLaneEnd));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.get(0), kValidLaneEnd)));
 }
 
 GTEST_TEST(GeometryBaseLaneTest, BasicConstruction) {
@@ -134,7 +107,7 @@ GTEST_TEST(GeometryBaseBranchPointTest, AddingLanes) {
   dut.AddBBranch(&lane1, kStart);
   EXPECT_EQ(dut.GetASide()->size(), 0);
   EXPECT_EQ(dut.GetBSide()->size(), 1);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetBSide()->get(0), api::LaneEnd(&lane1, kStart)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetBSide()->get(0), api::LaneEnd(&lane1, kStart))));
   EXPECT_EQ(dut.GetConfluentBranches({&lane1, kStart})->size(), 1);
   EXPECT_EQ(dut.GetOngoingBranches({&lane1, kStart})->size(), 0);
   EXPECT_FALSE(dut.GetDefaultBranch({&lane1, kStart}).has_value());
@@ -151,17 +124,18 @@ GTEST_TEST(GeometryBaseBranchPointTest, AddingLanes) {
   dut.AddABranch(&lane2, kFinish);
   EXPECT_EQ(lane2.GetBranchPoint(kFinish), &dut);
   EXPECT_EQ(dut.GetOngoingBranches({&lane2, kFinish})->size(), 2);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetOngoingBranches({&lane2, kFinish})->get(0), api::LaneEnd(&lane1, kStart)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetOngoingBranches({&lane2, kFinish})->get(1), api::LaneEnd(&lane1, kFinish)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetOngoingBranches({&lane2, kFinish})->get(0), api::LaneEnd(&lane1, kStart))));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetOngoingBranches({&lane2, kFinish})->get(1), api::LaneEnd(&lane1, kFinish))));
   EXPECT_EQ(dut.GetOngoingBranches({&lane1, kStart})->size(), 1);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetOngoingBranches({&lane1, kStart})->get(0), api::LaneEnd(&lane2, kFinish)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetOngoingBranches({&lane1, kStart})->get(0), api::LaneEnd(&lane2, kFinish))));
 
   // Add a third lane-end to the "B-side" again.
   dut.AddBBranch(&lane3, kFinish);
   EXPECT_EQ(dut.GetConfluentBranches({&lane1, kStart})->size(), 3);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetConfluentBranches({&lane1, kStart})->get(0), api::LaneEnd(&lane1, kStart)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetOngoingBranches({&lane2, kFinish})->get(1), api::LaneEnd(&lane1, kFinish)));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetConfluentBranches({&lane1, kStart})->get(2), api::LaneEnd(&lane3, kFinish)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetConfluentBranches({&lane1, kStart})->get(0), api::LaneEnd(&lane1, kStart))));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetOngoingBranches({&lane2, kFinish})->get(1), api::LaneEnd(&lane1, kFinish))));
+  EXPECT_TRUE(
+      AssertCompare(IsEqual(dut.GetConfluentBranches({&lane1, kStart})->get(2), api::LaneEnd(&lane3, kFinish))));
 
   // Set default branches.
   // First try:  fails because specified default is not an ongoing branch.
@@ -169,7 +143,7 @@ GTEST_TEST(GeometryBaseBranchPointTest, AddingLanes) {
   // Second try:  succeeds.
   dut.SetDefault({&lane1, kStart}, {&lane2, kFinish});
   EXPECT_TRUE(dut.GetDefaultBranch({&lane1, kStart}).has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetDefaultBranch({&lane1, kStart}).value(), api::LaneEnd(&lane2, kFinish)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDefaultBranch({&lane1, kStart}).value(), api::LaneEnd(&lane2, kFinish))));
 }
 
 GTEST_TEST(GeometryBaseSegmentTest, BasicConstruction) {

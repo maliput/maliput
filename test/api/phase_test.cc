@@ -36,9 +36,9 @@
 
 #include <gtest/gtest.h>
 
+#include "maliput/api/rules/compare.h"
 #include "maliput/common/assertion_error.h"
-#include "maliput/test_utilities/phases_compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
+#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace api {
@@ -97,7 +97,7 @@ TEST_F(PhaseTest, Accessors) {
 
 TEST_F(PhaseTest, Copying) {
   const Phase dut(phase_);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, phase_));
+  EXPECT_TRUE(test::AssertCompare(IsEqual(dut, phase_)));
 }
 
 TEST_F(PhaseTest, Assignment) {
@@ -106,7 +106,7 @@ TEST_F(PhaseTest, Assignment) {
   Phase dut(Phase::Id("other_dut_id"), RuleStates(), discrete_value_rule_states_);
 #pragma GCC diagnostic pop
   dut = phase_;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, phase_));
+  EXPECT_TRUE(test::AssertCompare(IsEqual(dut, phase_)));
 }
 
 }  // namespace
