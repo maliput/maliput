@@ -47,5 +47,43 @@ struct ComparisonResult {
   std::optional<std::string> message;
 };
 
+/// @brief ComparisonResultCollector is a class that collects the results of a series
+///       of comparisons between objects of type T.
+class ComparisonResultCollector {
+ public:
+  ComparisonResultCollector() = default;
+
+  template <typename T>
+  void AddResult(const char* filename, int line, const char* expression, ComparisonResult<T> result) {
+    ++count_;
+    if (result.message.has_value()) {
+      ++failed_;
+      failure_message_ = failure_message_ + filename + ":" + std::to_string(line) + ": Failure #" +
+                         std::to_string(failed_) + ":\n" + "Expression '" + expression + "' failed:\n" +
+                         result.message.value() + "\n";
+    }
+  }
+  std::optional<std::string> result() const {
+    if (failed_ > 0) {
+      return std::to_string(failed_) + " out of " + std::to_string(count_) + " comparisons failed:\n" +
+             failure_message_;
+    }
+    return std::nullopt;
+  }
+
+  /// Returns the number of results collected.
+  int count() const { return count_; }
+
+  /// Returns the number of failure results collected.
+  int failed() const { return failed_; }
+
+ private:
+  int count_{0};
+  int failed_{0};
+  std::string failure_message_;
+};
+
+#define MALIPUT_ADD_RESULT(collector, result) collector.AddResult(__FILE__, __LINE__, #result, result)
+
 }  // namespace common
 }  // namespace maliput
