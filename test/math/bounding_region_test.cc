@@ -31,15 +31,23 @@
 
 #include <memory>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "maliput/math/overlapping_type.h"
 #include "maliput/math/vector.h"
-#include "maliput/test_utilities/mock_math.h"
 
 namespace maliput {
 namespace math {
 namespace test {
 namespace {
+
+class MockBoundingRegion : public BoundingRegion<Vector3> {
+ public:
+  MOCK_METHOD((const Vector3&), do_position, (), (const, override));
+  MOCK_METHOD((bool), DoContains, (const Vector3&), (const, override));
+  MOCK_METHOD((OverlappingType), DoOverlaps, (const BoundingRegion<Vector3>&), (const, override));
+};
 
 // Tests API interface.
 class BoundingRegionTest : public ::testing::Test {
