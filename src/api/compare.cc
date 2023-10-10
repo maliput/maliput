@@ -30,6 +30,7 @@
 #include "maliput/api/compare.h"
 
 #include <cmath>
+#include <limits>
 #include <optional>
 #include <string>
 
@@ -258,7 +259,7 @@ common::ComparisonResult<bool> IsEqual(const char* a_expression, const char* b_e
 
 common::ComparisonResult<double> IsEqual(const char* a_expression, const char* b_expression, double a, double b) {
   const double delta = std::abs(a - b);
-  if (delta > 1e-6) {
+  if (delta > std::numeric_limits<double>::epsilon()) {
     return {"Values are different. " + std::string(a_expression) + ": " + std::to_string(a) + " vs. " +
             std::string(b_expression) + ": " + std::to_string(b) + ", diff = " + std::to_string(delta) + "\n"};
   }

@@ -183,7 +183,6 @@ common::ComparisonResult<DirectionUsageRule::State> IsEqual(const DirectionUsage
 }
 
 common::ComparisonResult<std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>> IsEqual(
-
     const std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>& a,
     const std::unordered_map<DirectionUsageRule::State::Id, DirectionUsageRule::State>& b) {
   common::ComparisonResultCollector c;
