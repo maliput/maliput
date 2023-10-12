@@ -112,7 +112,7 @@ cc_library(
     ],
 )
 
-# TODO(stonier): prune, simplify and merge into common/math
+# TODO(stonier): Prune, simplify and merge into common/math
 cc_library(
     name = "drake",
     srcs = glob(["src/drake/**/*.cc"]),
@@ -124,3 +124,25 @@ cc_library(
         "@eigen",
     ],
 )
+
+# TODO(stonier): Need to ponder what to do with this. Downstream
+# (e.g. maliput_malidrive) depends on this library for unit testing,
+# but if we were to ship this here, it would bring in gtest as
+# part of the actual software package (undesired).
+#
+# cc_library(
+#     name = "test_utilities",
+#     srcs = glob(["src/test_utilities/**/*.cc"]),
+#     hdrs = glob(["include/maliput/test_utilities/**/*.h"]),
+#     copts = ["-std=c++17"],
+#     strip_include_prefix = "include",
+#     visibility = ["//visibility:public"],
+#     deps = [
+#         ":api",
+#         ":common",
+#         ":geometry_base",
+#         "@googletest//:gtest",
+#         ":math",
+#         ":routing",
+#     ],
+# )
