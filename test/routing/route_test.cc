@@ -36,6 +36,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
 #include "maliput/api/compare.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
@@ -45,7 +46,6 @@
 #include "maliput/routing/phase.h"
 #include "maliput/routing/route_position_result.h"
 #include "routing/road_network_mocks.h"
-#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace routing {

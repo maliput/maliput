@@ -30,8 +30,8 @@
 
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
 #include "maliput/api/lane_data.h"
-#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace routing {

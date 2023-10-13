@@ -42,10 +42,10 @@
 
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
 #include "maliput/api/rules/compare.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace api {

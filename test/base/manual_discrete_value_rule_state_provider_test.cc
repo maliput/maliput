@@ -34,6 +34,7 @@
 
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/compare.h"
 #include "maliput/api/rules/discrete_value_rule.h"
@@ -43,7 +44,6 @@
 #include "maliput/base/rule_tools.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace test {

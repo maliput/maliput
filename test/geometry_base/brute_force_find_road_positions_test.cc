@@ -33,12 +33,12 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
 #include "maliput/api/compare.h"
 #include "maliput/api/lane.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
 #include "maliput/test_utilities/mock_geometry.h"
-#include "test_utilities/assert_compare.h"
 
 using ::testing::_;
 using ::testing::An;
