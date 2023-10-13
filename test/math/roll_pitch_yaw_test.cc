@@ -31,9 +31,9 @@
 
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
 #include "maliput/common/compare.h"
 #include "maliput/math/compare.h"
-#include "test_utilities/assert_compare.h"
 
 namespace maliput {
 namespace math {
