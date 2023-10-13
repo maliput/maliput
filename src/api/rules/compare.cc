@@ -86,8 +86,7 @@ common::ComparisonResult<PhaseRing::NextPhase> IsEqual(const PhaseRing::NextPhas
   MALIPUT_ADD_RESULT(c, api::IsEqual("a.id", "b.id", a.id, b.id));
   MALIPUT_ADD_RESULT(c, api::IsEqual("a.duration_until.has_value()", "b.duration_until.has_value()",
                                      a.duration_until.has_value(), b.duration_until.has_value()));
-  MALIPUT_ADD_RESULT(c, api::IsEqual("a.duration_until.value()", "b.duration_until.value()", a.duration_until.value(),
-                                     b.duration_until.value()));
+  MALIPUT_ADD_RESULT(c, api::rules::IsEqual(a.duration_until, b.duration_until));
   return {c.result()};
 }
 
