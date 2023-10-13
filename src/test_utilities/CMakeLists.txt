@@ -31,7 +31,6 @@ target_link_libraries(test_utilities
   maliput::common
   maliput::geometry_base
   maliput::math
-  maliput::routing
 )
 
 install(

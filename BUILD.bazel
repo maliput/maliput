@@ -124,3 +124,18 @@ cc_library(
         "@eigen",
     ],
 )
+
+cc_library(
+    name = "test_utilities",
+    srcs = glob(["src/test_utilities/**/*.cc"]),
+    hdrs = glob(["include/maliput/test_utilities/**/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":api",
+        ":common",
+        ":geometry_base",
+        ":math",
+    ],
+)
