@@ -165,7 +165,7 @@
 /// many consecutive derivatives of both functions are continuous at the evaluation point.
 /// Thus,
 ///  * @f$ G^0 @f$: two functions are continuous when evaluated at certain point.
-///  * @f$ G^1 @f$: two functions and their first derivatives are are continuous when
+///  * @f$ G^1 @f$: two functions and their first derivatives are continuous when
 ///    evaluated at certain point. This implies that not only the functions' images are
 ///    the same but also the tangent vectors.
 ///  * @f$ G^2 @f$: two functions, their first and second derivatives are continuous when
@@ -184,9 +184,9 @@
 /// Road designers may also be more familiar by how these transitions are built. Typically,
 /// CAD tooling offer control points to adjust curve and surface smoothness. One can associante
 /// the number of control points with the continuity constraint degree as:
-///   * One control point alingment f$ \to G^0 @f$, controls continuity.
-///   * Two control points alingment f$ \to G^1 @f$, control tangent.
-///   * Three control point alingment f$ \to G^2 @f$, control curvature.
+///   * One control point alignment f$ \to G^0 @f$, controls continuity.
+///   * Two control points alignment f$ \to G^1 @f$, control tangent.
+///   * Three control point alignment f$ \to G^2 @f$, control curvature.
 ///
 /// @subsubsection scale_length_and_tolerances Scale Length and Tolerances
 ///
