@@ -108,8 +108,8 @@ RelativePosition ComputeRelativePositionFor(const api::RoadPosition& pos_a, cons
   }
 
   const api::Rotation inertial_rotation_a = pos_a.lane->GetOrientation(pos_a.pos);
-  const math::Vector3& s_hat_a = inertial_rotation_a.Apply({1., 0., 0.}).xyz();
-  const math::Vector3& h_hat_a = inertial_rotation_a.Apply({0., 0., 1.}).xyz();
+  const math::Vector3 s_hat_a = inertial_rotation_a.Apply({1., 0., 0.}).xyz();
+  const math::Vector3 h_hat_a = inertial_rotation_a.Apply({0., 0., 1.}).xyz();
 
   const math::Vector3 norm_b_to_a = (inerital_pos_b.xyz() - inerital_pos_a.xyz()).normalized();
 
