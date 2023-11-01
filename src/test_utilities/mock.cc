@@ -540,10 +540,10 @@ std::unique_ptr<RoadGeometry> CreateMultipleLanesRoadGeometry(const std::vector<
 }
 
 std::unique_ptr<RoadNetwork> CreateRoadNetwork() {
-  return std::make_unique<RoadNetwork>(
-      CreateRoadGeometry(), CreateRoadRulebook(), CreateTrafficLightBook(), CreateIntersectionBook(),
-      CreatePhaseRingBook(), CreateRightOfWayRuleStateProvider(), CreatePhaseProvider(), CreateRuleRegistry(),
-      CreateDiscreteValueRuleStateProvider(), CreateRangeValueRuleStateProvider());
+  return std::make_unique<RoadNetwork>(CreateRoadGeometry(), CreateRoadRulebook(), CreateTrafficLightBook(),
+                                       CreateIntersectionBook(), CreatePhaseRingBook(),
+                                       CreateRightOfWayRuleStateProvider(), CreatePhaseProvider(), CreateRuleRegistry(),
+                                       CreateDiscreteValueRuleStateProvider(), CreateRangeValueRuleStateProvider());
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
