@@ -34,12 +34,15 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/test_utilities/rules_right_of_way_compare.h"
+#include "assert_compare.h"
+#include "maliput/api/rules/compare.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace {
+
+using maliput::test::AssertCompare;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -75,8 +78,8 @@ TEST_F(RightOfWayRuleStateProviderTest, ExerciseInterface) {
   const MockStateProvider dut(this);
 
   EXPECT_TRUE(dut.GetState(kExistingId).has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.GetState(kExistingId).value(),
-                               (Result{kCurrentStateId, Result::Next{kNextStateId, kDurationUntil}})));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetState(kExistingId).value(),
+                                    (Result{kCurrentStateId, Result::Next{kNextStateId, kDurationUntil}}))));
 
   EXPECT_FALSE(dut.GetState(kNonExistingId).has_value());
 }

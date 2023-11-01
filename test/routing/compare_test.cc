@@ -26,10 +26,12 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput/test_utilities/maliput_routing_position_compare.h"
+#include "maliput/routing/compare.h"
 
 #include <gtest/gtest.h>
-#include <maliput/api/lane_data.h>
+
+#include "assert_compare.h"
+#include "maliput/api/lane_data.h"
 
 namespace maliput {
 namespace routing {
@@ -37,6 +39,8 @@ namespace test {
 namespace {
 
 static constexpr double kTolerance = 1e-3;
+
+using maliput::test::AssertCompare;
 
 TEST(IsPhasePositionResultClose, Test) {
   constexpr int kLaneSRangeIndex{1};
@@ -57,11 +61,15 @@ TEST(IsPhasePositionResultClose, Test) {
   const PhasePositionResult ppr_different_distance{kLaneSRangeIndex, kLanePosition, kInertialPosition,
                                                    kDifferentDistance};
 
-  EXPECT_EQ(testing::AssertionFailure(), IsPhasePositionResultClose(ppr, ppr_different_lane_s_range_index, kTolerance));
-  EXPECT_EQ(testing::AssertionFailure(), IsPhasePositionResultClose(ppr, ppr_different_lane_position, kTolerance));
-  EXPECT_EQ(testing::AssertionFailure(), IsPhasePositionResultClose(ppr, ppr_different_inertial_position, kTolerance));
-  EXPECT_EQ(testing::AssertionFailure(), IsPhasePositionResultClose(ppr, ppr_different_distance, kTolerance));
-  EXPECT_EQ(testing::AssertionSuccess(), IsPhasePositionResultClose(ppr, ppr, kTolerance));
+  EXPECT_EQ(testing::AssertionFailure(),
+            AssertCompare(IsPhasePositionResultClose(ppr, ppr_different_lane_s_range_index, kTolerance)));
+  EXPECT_EQ(testing::AssertionFailure(),
+            AssertCompare(IsPhasePositionResultClose(ppr, ppr_different_lane_position, kTolerance)));
+  EXPECT_EQ(testing::AssertionFailure(),
+            AssertCompare(IsPhasePositionResultClose(ppr, ppr_different_inertial_position, kTolerance)));
+  EXPECT_EQ(testing::AssertionFailure(),
+            AssertCompare(IsPhasePositionResultClose(ppr, ppr_different_distance, kTolerance)));
+  EXPECT_EQ(testing::AssertionSuccess(), AssertCompare(IsPhasePositionResultClose(ppr, ppr, kTolerance)));
 }
 
 TEST(IsRoutePositionResultClose, Test) {
@@ -79,9 +87,10 @@ TEST(IsRoutePositionResultClose, Test) {
   const RoutePositionResult rpr_different_phase_index{kDifferentPhaseIndex, ppr};
   const RoutePositionResult rpr_different_ppr{kPhaseIndex, ppr_different_lane_s_range_index};
 
-  EXPECT_EQ(testing::AssertionFailure(), IsRoutePositionResultClose(rpr, rpr_different_phase_index, kTolerance));
-  EXPECT_EQ(testing::AssertionFailure(), IsRoutePositionResultClose(rpr, rpr_different_ppr, kTolerance));
-  EXPECT_EQ(testing::AssertionSuccess(), IsRoutePositionResultClose(rpr, rpr, kTolerance));
+  EXPECT_EQ(testing::AssertionFailure(),
+            AssertCompare(IsRoutePositionResultClose(rpr, rpr_different_phase_index, kTolerance)));
+  EXPECT_EQ(testing::AssertionFailure(), AssertCompare(IsRoutePositionResultClose(rpr, rpr_different_ppr, kTolerance)));
+  EXPECT_EQ(testing::AssertionSuccess(), AssertCompare(IsRoutePositionResultClose(rpr, rpr, kTolerance)));
 }
 
 }  // namespace

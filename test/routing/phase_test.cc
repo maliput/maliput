@@ -34,12 +34,12 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
+#include "maliput/api/compare.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
 #include "maliput/common/assertion_error.h"
-#include "maliput/test_utilities/maliput_routing_position_compare.h"
-#include "maliput/test_utilities/maliput_types_compare.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
+#include "maliput/routing/compare.h"
 #include "routing/road_network_mocks.h"
 
 namespace maliput {
@@ -47,6 +47,7 @@ namespace routing {
 namespace test {
 namespace {
 
+using maliput::test::AssertCompare;
 using ::testing::_;
 using ::testing::Return;
 using ::testing::ReturnRef;
@@ -340,15 +341,15 @@ TEST_F(PhaseAccessorsTest, CorrectConstruction) {
   EXPECT_EQ(kLaneSRangeTolerance, dut.lane_s_range_tolerance());
   EXPECT_EQ(kStartRoadPositions.size(), dut.start_positions().size());
   EXPECT_EQ(kStartRoadPositions[0].lane, dut.start_positions()[0].lane);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kStartRoadPositions[0].pos, dut.start_positions()[0].pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kStartRoadPositions[0].pos, dut.start_positions()[0].pos, 0.)));
   EXPECT_EQ(kEndRoadPositions.size(), dut.end_positions().size());
   EXPECT_EQ(kEndRoadPositions[0].lane, dut.end_positions()[0].lane);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kEndRoadPositions[0].pos, dut.end_positions()[0].pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndRoadPositions[0].pos, dut.end_positions()[0].pos, 0.)));
   EXPECT_EQ(kEndRoadPositions[1].lane, dut.end_positions()[1].lane);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kEndRoadPositions[1].pos, dut.end_positions()[1].pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndRoadPositions[1].pos, dut.end_positions()[1].pos, 0.)));
   EXPECT_EQ(kLaneSRanges.size(), dut.lane_s_ranges().size());
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(kLaneSRanges[0], dut.lane_s_ranges()[0]));
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(kLaneSRanges[1], dut.lane_s_ranges()[1]));
+  EXPECT_TRUE(AssertCompare(IsEqual(kLaneSRanges[0], dut.lane_s_ranges()[0])));
+  EXPECT_TRUE(AssertCompare(IsEqual(kLaneSRanges[1], dut.lane_s_ranges()[1])));
 }
 
 class PhaseMappingTest : public PhaseConstructorValidationsTest {};
@@ -370,7 +371,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithSingleLaneSRan
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithMultipleLaneSRangePhase) {
@@ -402,7 +403,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionWithMultipleLaneSR
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionOutsidePhase) {
@@ -425,7 +426,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByInertialPositionOutsidePhase) {
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionThrowsWithInvalidPosition) {
@@ -462,7 +463,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionOutsidePhase) {
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
@@ -486,7 +487,7 @@ TEST_F(PhaseAccessorsTest, FindPhasePositionByRoadPositionInsidePhase) {
 
   const PhasePositionResult position_result = dut.FindPhasePosition(kRoadPosition);
 
-  EXPECT_TRUE(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsPhasePositionResultClose(kExpectedPhasePositionResult, position_result, 0.)));
 }
 
 // TODO: Test Phase::FindPhasePosition() when the LaneSRange::WithS() is false.

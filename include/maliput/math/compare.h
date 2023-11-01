@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,18 +28,16 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <gtest/gtest.h>
-
+#include "maliput/common/compare.h"
 #include "maliput/math/matrix.h"
 
 namespace maliput {
 namespace math {
-namespace test {
 
 enum class CompareType { kAbsolute, kRelative };
 
 /**
- * Assert that two vectors @p v1 and @p v2 are equal down to a certain @p tolerance.
+ * Evaluate that two vectors @p v1 and @p v2 are equal down to a certain @p tolerance.
  *
  * Instantiations for comparing Vector2, Vector3 and Vector4 are provided.
  *
@@ -48,15 +45,15 @@ enum class CompareType { kAbsolute, kRelative };
  * @param v2 The second vector to compare.
  * @param tolerance The tolerance for determining equivalence.
  * @param compare_type Whether the tolerance is absolute or relative.
- * @return \::testing\::AssertionSuccess if the two matrices are equal based on the specified
- * tolerance, \::testing\::AssertionFailure otherwise.
+ * @return A ComparisonResult<VectorBase<N, Derived>> object.
  */
 template <std::size_t N, typename Derived>
-testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, const math::VectorBase<N, Derived>& v2,
-                                        double tolerance = 0.0, CompareType compare_type = CompareType::kAbsolute);
+common::ComparisonResult<math::VectorBase<N, Derived>> CompareVectors(
+    const math::VectorBase<N, Derived>& v1, const math::VectorBase<N, Derived>& v2, double tolerance = 0.0,
+    CompareType compare_type = CompareType::kAbsolute);
 
 /**
- * Assert that two matrices @p m1 and @p m2 are equal down to a certain @p tolerance.
+ * Evaluate that two matrices @p m1 and @p m2 are equal down to a certain @p tolerance.
  *
  * Instantiations for comparing Matrix2, Matrix3 and Matrix4 are provided.
  *
@@ -64,13 +61,12 @@ testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, 
  * @param m2 The second matrix to compare.
  * @param tolerance The tolerance for determining equivalence.
  * @param compare_type Whether the tolerance is absolute or relative.
- * @return \::testing\::AssertionSuccess if the two matrices are equal based on the specified
- * tolerance, \::testing\::AssertionFailure otherwise.
+ * @return A ComparisonResult<Matrix<N>> object.
  */
 template <std::size_t N>
-testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2, double tolerance = 0.0,
-                                         CompareType compare_type = CompareType::kAbsolute);
+common::ComparisonResult<math::Matrix<N>> CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2,
+                                                          double tolerance = 0.0,
+                                                          CompareType compare_type = CompareType::kAbsolute);
 
-}  // namespace test
 }  // namespace math
 }  // namespace maliput

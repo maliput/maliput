@@ -34,17 +34,19 @@
 
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
+#include "maliput/api/compare.h"
 #include "maliput/api/regions.h"
+#include "maliput/api/rules/compare.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
-#include "maliput/test_utilities/rules_right_of_way_compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace {
+
+using maliput::test::AssertCompare;
 
 // Tests for RightOfWayRule::State
 
@@ -68,7 +70,7 @@ GTEST_TEST(RightOfWayRuleStateTest, Copying) {
   const RightOfWayRule::State source(RightOfWayRule::State::Id("dut_id"), RightOfWayRule::State::Type::kStopThenGo,
                                      api::test::YieldGroup2());
   const RightOfWayRule::State dut(source);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 
 GTEST_TEST(RightOfWayRuleStateTest, Assignment) {
@@ -77,7 +79,7 @@ GTEST_TEST(RightOfWayRuleStateTest, Assignment) {
   RightOfWayRule::State dut(RightOfWayRule::State::Id("dut_id"), RightOfWayRule::State::Type::kGo,
                             api::test::YieldGroup2());
   dut = source;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 
 // Tests for RightOfWayRule itself
@@ -116,12 +118,12 @@ GTEST_TEST(RightOfWayRuleTest, Accessors) {
                            RightOfWayRule::ZoneType::kStopExcluded,
                            {api::test::NoYieldState(), api::test::YieldState()}, api::test::RelatedBulbGroups());
   EXPECT_EQ(dut.id(), RightOfWayRule::Id("dut_id"));
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), api::test::CreateLaneSRoute()));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.zone(), api::test::CreateLaneSRoute())));
   EXPECT_EQ(dut.zone_type(), RightOfWayRule::ZoneType::kStopExcluded);
   EXPECT_EQ(static_cast<int>(dut.states().size()), 2);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states().at(RightOfWayRule::State::Id("s1")), api::test::NoYieldState()));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states().at(RightOfWayRule::State::Id("s2")), api::test::YieldState()));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.related_bulb_groups(), api::test::RelatedBulbGroups()));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.states().at(RightOfWayRule::State::Id("s1")), api::test::NoYieldState())));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.states().at(RightOfWayRule::State::Id("s2")), api::test::YieldState())));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.related_bulb_groups(), api::test::RelatedBulbGroups())));
   EXPECT_FALSE(dut.is_static());
   EXPECT_THROW(dut.static_state(), std::exception);
 }
@@ -133,7 +135,7 @@ GTEST_TEST(RightOfWayRuleTest, StaticRuleOnlyAccessors) {
                            {} /* related_bulb_groups */);
   EXPECT_TRUE(dut.is_static());
   EXPECT_NO_THROW(dut.static_state());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.static_state(), api::test::YieldState()));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.static_state(), api::test::YieldState())));
 }
 
 GTEST_TEST(RightOfWayRuleTest, Copying) {
@@ -142,7 +144,7 @@ GTEST_TEST(RightOfWayRuleTest, Copying) {
                               {api::test::NoYieldState(), api::test::YieldState()}, {} /* related_bulb_groups */);
 
   const RightOfWayRule dut(source);
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 
 GTEST_TEST(RightOfWayRuleTest, Assignment) {
@@ -154,7 +156,7 @@ GTEST_TEST(RightOfWayRuleTest, Assignment) {
                      RightOfWayRule::ZoneType::kStopAllowed, {api::test::NoYieldState()}, {} /* related_bulb_groups */);
 
   dut = source;
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut, source));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut, source)));
 }
 #pragma GCC diagnostic pop
 

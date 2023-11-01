@@ -28,32 +28,31 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <gtest/gtest.h>
-
+#include "maliput/common/compare.h"
 #include "maliput/routing/route_position_result.h"
 
 namespace maliput {
 namespace routing {
-namespace test {
 
 /// Compares equality within @p tolerance deviation of the PhasePositionResult @p ppr_a and @p ppr_b.
 ///
 /// @param ppr_a The first PhasePositionResult to compare.
 /// @param ppr_b The second PhasePositionResult to compare.
 /// @param tolerance The tolerance to use for the comparison.
-/// @return An ::testing::AssertionResult with the result of the comparison.
-::testing::AssertionResult IsPhasePositionResultClose(const PhasePositionResult& ppr_a,
-                                                      const PhasePositionResult& ppr_b, double tolerance);
+/// @returns A ComparisonResult indicating whether the two PhasePositionResults are the equivalent within the tolerance.
+common::ComparisonResult<PhasePositionResult> IsPhasePositionResultClose(const PhasePositionResult& ppr_a,
+                                                                         const PhasePositionResult& ppr_b,
+                                                                         double tolerance);
 
 /// Compares equality within @p tolerance deviation of the RoutePositionResult @p rpr_a and @p rpr_b.
 ///
 /// @param rpr_a The first RoutePositionResult to compare.
 /// @param rpr_b The second RoutePositionResult to compare.
 /// @param tolerance The tolerance to use for the comparison.
-/// @return An ::testing::AssertionResult with the result of the comparison.
-::testing::AssertionResult IsRoutePositionResultClose(const RoutePositionResult& rpr_a,
-                                                      const RoutePositionResult& rpr_b, double tolerance);
+/// @returns A ComparisonResult indicating whether the two RoutePositionResults are the equivalent within the tolerance.
+common::ComparisonResult<RoutePositionResult> IsRoutePositionResultClose(const RoutePositionResult& rpr_a,
+                                                                         const RoutePositionResult& rpr_b,
+                                                                         double tolerance);
 
-}  // namespace test
 }  // namespace routing
 }  // namespace maliput

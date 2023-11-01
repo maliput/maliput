@@ -33,8 +33,10 @@
 
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
 #include "maliput/api/lane.h"
 #include "maliput/api/regions.h"
+#include "maliput/api/rules/compare.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/base/manual_phase_provider.h"
@@ -43,8 +45,6 @@
 #include "maliput/base/rule_registry.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/rules_compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
 namespace {
@@ -62,6 +62,7 @@ using maliput::api::rules::PhaseRing;
 using maliput::api::rules::RightOfWayRule;
 using maliput::api::rules::RoadRulebook;
 using maliput::api::rules::Rule;
+using maliput::test::AssertCompare;
 
 // Evaluates constructor constraints.
 GTEST_TEST(PhasedDiscreteRuleStateProviderTest, ConstructorConstraints) {
@@ -281,9 +282,9 @@ TEST_F(ManualBasedBehaviorTest, SetStateTest) {
   EXPECT_NO_THROW(dut.SetState(kRuleId, kStateA, {kStateB}, {kDurationUntil}));
   const std::optional<DiscreteValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kStateA));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->state, kStateA)));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, kStateB));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->next->state, kStateB)));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), kDurationUntil);
 }

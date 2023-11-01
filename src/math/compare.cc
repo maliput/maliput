@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,19 +26,20 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput/test_utilities/maliput_math_compare.h"
+#include "maliput/math/compare.h"
 
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <optional>
 
 namespace maliput {
 namespace math {
-namespace test {
 
 template <std::size_t N, typename Derived>
-testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, const math::VectorBase<N, Derived>& v2,
-                                        double tolerance, CompareType compare_type) {
+common::ComparisonResult<math::VectorBase<N, Derived>> CompareVectors(const math::VectorBase<N, Derived>& v1,
+                                                                      const math::VectorBase<N, Derived>& v2,
+                                                                      double tolerance, CompareType compare_type) {
   for (int i = 0; i < static_cast<int>(N); i++) {
     // First handle the corner cases of positive infinity, negative infinity,
     // and NaN
@@ -55,7 +55,7 @@ testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, 
 
     // Check for case where one value is NaN and the other is not
     if ((std::isnan(v1[i]) && !std::isnan(v2[i])) || (!std::isnan(v1[i]) && std::isnan(v2[i]))) {
-      return ::testing::AssertionFailure() << "NaN mismatch at (" << i << "):\nv1 =\n" << v1 << "\nv2 =\n" << v2;
+      return {"Nan mismatch at (" + std::to_string(i) + "):\nv1 =\n" + v1.to_str() + "\nv2 =\n" + v2.to_str()};
     }
 
     // Determine whether the difference between the two vectors is less than
@@ -66,12 +66,10 @@ testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, 
       // Perform comparison using absolute tolerance.
 
       if (delta > tolerance) {
-        return ::testing::AssertionFailure()
-               << "Value at (" << i << ") exceeds tolerance: " << v1[i] << " vs. " << v2[i] << ", diff = " << delta
-               << ", tolerance = " << tolerance << "\nv1 =\n"
-               << v1 << "\nv2 =\n"
-               << v2 << "\ndelta=\n"
-               << (v1 - v2);
+        return {"Value at (" + std::to_string(i) + ") exceeds tolerance: " + std::to_string(v1[i]) + " vs. " +
+                std::to_string(v2[i]) + ", diff = " + std::to_string(delta) +
+                ", tolerance = " + std::to_string(tolerance) + "\nv1 =\n" + v1.to_str() + "\nv2 =\n" + v2.to_str() +
+                "\ndelta=\n" + (v1 - v2).to_str()};
       }
     } else {
       // Perform comparison using relative tolerance, see:
@@ -80,22 +78,20 @@ testing::AssertionResult CompareVectors(const math::VectorBase<N, Derived>& v1, 
       const auto relative_tolerance = tolerance * std::max(1., max_value);
 
       if (delta > relative_tolerance) {
-        return ::testing::AssertionFailure()
-               << "Value at (" << i << ") exceeds tolerance: " << v1[i] << " vs. " << v2[i] << ", diff = " << delta
-               << ", tolerance = " << tolerance << ", relative tolerance = " << relative_tolerance << "\nv1 =\n"
-               << v1 << "\nv2 =\n"
-               << v2 << "\ndelta=\n"
-               << (v1 - v2);
+        return {"Value at (" + std::to_string(i) + ") exceeds tolerance: " + std::to_string(v1[i]) + " vs. " +
+                std::to_string(v2[i]) + ", diff = " + std::to_string(delta) + ", tolerance = " +
+                std::to_string(tolerance) + ", relative tolerance = " + std::to_string(relative_tolerance) +
+                "\nv1 =\n" + v1.to_str() + "\nv2 =\n" + v2.to_str() + "\ndelta=\n" + (v1 - v2).to_str()};
       }
     }
   }
 
-  return ::testing::AssertionSuccess() << "v1 =\n" << v1 << "\nis approximately equal to v2 =\n" << v2;
+  return {std::nullopt};
 }
 
 template <std::size_t N>
-testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2, double tolerance,
-                                         CompareType compare_type) {
+common::ComparisonResult<math::Matrix<N>> CompareMatrices(const math::Matrix<N>& m1, const math::Matrix<N>& m2,
+                                                          double tolerance, CompareType compare_type) {
   for (int ii = 0; ii < static_cast<int>(N); ii++) {
     for (int jj = 0; jj < static_cast<int>(N); jj++) {
       // First handle the corner cases of positive infinity, negative infinity,
@@ -112,9 +108,8 @@ testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::
 
       // Check for case where one value is NaN and the other is not
       if ((std::isnan(m1[ii][jj]) && !std::isnan(m2[ii][jj])) || (!std::isnan(m1[ii][jj]) && std::isnan(m2[ii][jj]))) {
-        return ::testing::AssertionFailure() << "NaN mismatch at (" << ii << ", " << jj << "):\nm1 =\n"
-                                             << m1 << "\nm2 =\n"
-                                             << m2;
+        return {"NaN mismatch at (" + std::to_string(ii) + ", " + std::to_string(jj) + "):\nm1 =\n" + m1.to_str() +
+                "\nm2 =\n" + m2.to_str()};
       }
 
       // Determine whether the difference between the two matrices is less than
@@ -125,12 +120,10 @@ testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::
         // Perform comparison using absolute tolerance.
 
         if (delta > tolerance) {
-          return ::testing::AssertionFailure()
-                 << "Value at (" << ii << ", " << jj << ") exceeds tolerance: " << m1[ii][jj] << " vs. " << m2[ii][jj]
-                 << ", diff = " << delta << ", tolerance = " << tolerance << "\nm1 =\n"
-                 << m1 << "\nm2 =\n"
-                 << m2 << "\ndelta=\n"
-                 << (m1 - m2);
+          return {"Value at (" + std::to_string(ii) + ", " + std::to_string(jj) +
+                  ") exceeds tolerance: " + std::to_string(m1[ii][jj]) + " vs. " + std::to_string(m2[ii][jj]) +
+                  ", diff = " + std::to_string(delta) + ", tolerance = " + std::to_string(tolerance) + "\nm1 =\n" +
+                  m1.to_str() + "\nm2 =\n" + m2.to_str() + "\ndelta=\n" + (m1 - m2).to_str()};
         }
       } else {
         // Perform comparison using relative tolerance, see:
@@ -139,34 +132,37 @@ testing::AssertionResult CompareMatrices(const math::Matrix<N>& m1, const math::
         const auto relative_tolerance = tolerance * std::max(1., max_value);
 
         if (delta > relative_tolerance) {
-          return ::testing::AssertionFailure()
-                 << "Value at (" << ii << ", " << jj << ") exceeds tolerance: " << m1[ii][jj] << " vs. " << m2[ii][jj]
-                 << ", diff = " << delta << ", tolerance = " << tolerance
-                 << ", relative tolerance = " << relative_tolerance << "\nm1 =\n"
-                 << m1 << "\nm2 =\n"
-                 << m2 << "\ndelta=\n"
-                 << (m1 - m2);
+          return {"Value at (" + std::to_string(ii) + ", " + std::to_string(jj) +
+                  ") exceeds tolerance: " + std::to_string(m1[ii][jj]) + " vs. " + std::to_string(m2[ii][jj]) +
+                  ", diff = " + std::to_string(delta) + ", tolerance = " + std::to_string(tolerance) +
+                  ", relative tolerance = " + std::to_string(relative_tolerance) + "\nm1 =\n" + m1.to_str() +
+                  "\nm2 =\n" + m2.to_str() + "\ndelta=\n" + (m1 - m2).to_str()};
         }
       }
     }
   }
 
-  return ::testing::AssertionSuccess() << "m1 =\n" << m1 << "\nis approximately equal to m2 =\n" << m2;
+  return {std::nullopt};
 }
 
 //! @cond Doxygen_Suppress
-// Explicit instanciations
-template ::testing::AssertionResult CompareVectors(const VectorBase<2, Vector2>&, const VectorBase<2, Vector2>&, double,
-                                                   CompareType);
-template ::testing::AssertionResult CompareVectors(const VectorBase<3, Vector3>&, const VectorBase<3, Vector3>&, double,
-                                                   CompareType);
-template ::testing::AssertionResult CompareVectors(const VectorBase<4, Vector4>&, const VectorBase<4, Vector4>&, double,
-                                                   CompareType);
-template ::testing::AssertionResult CompareMatrices(const Matrix<2>&, const Matrix<2>&, double, CompareType);
-template ::testing::AssertionResult CompareMatrices(const Matrix<3>&, const Matrix<3>&, double, CompareType);
-template ::testing::AssertionResult CompareMatrices(const Matrix<4>&, const Matrix<4>&, double, CompareType);
+// Explicit instantiations
+template common::ComparisonResult<math::VectorBase<2, Vector2>> CompareVectors(const VectorBase<2, Vector2>&,
+                                                                               const VectorBase<2, Vector2>&, double,
+                                                                               CompareType);
+template common::ComparisonResult<math::VectorBase<3, Vector3>> CompareVectors(const VectorBase<3, Vector3>&,
+                                                                               const VectorBase<3, Vector3>&, double,
+                                                                               CompareType);
+template common::ComparisonResult<math::VectorBase<4, Vector4>> CompareVectors(const VectorBase<4, Vector4>&,
+                                                                               const VectorBase<4, Vector4>&, double,
+                                                                               CompareType);
+template common::ComparisonResult<math::Matrix<2>> CompareMatrices(const Matrix<2>&, const Matrix<2>&, double,
+                                                                   CompareType);
+template common::ComparisonResult<math::Matrix<3>> CompareMatrices(const Matrix<3>&, const Matrix<3>&, double,
+                                                                   CompareType);
+template common::ComparisonResult<math::Matrix<4>> CompareMatrices(const Matrix<4>&, const Matrix<4>&, double,
+                                                                   CompareType);
 //! @endcond
 
-}  // namespace test
 }  // namespace math
 }  // namespace maliput

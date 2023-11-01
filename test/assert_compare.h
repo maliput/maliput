@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2023, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -31,19 +30,18 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/api/road_geometry.h"
+#include "maliput/common/compare.h"
 
 namespace maliput {
-namespace api {
 namespace test {
 
-/// Walks the object graph of @p road_geometry and checks that every
-/// component can be found via `ById().Get*(const *Id& id)` methods.
-///
-/// @return \::testing\::AssertionSuccess() when all objects are found,
-/// otherwise \::testing\::AssertionFailure().
-::testing::AssertionResult CheckIdIndexing(const RoadGeometry* road_geometry);
+template <typename T>
+::testing::AssertionResult AssertCompare(const common::ComparisonResult<T>& res) {
+  if (!res.message.has_value()) {
+    return ::testing::AssertionSuccess();
+  }
+  return ::testing::AssertionFailure() << res.message.value();
+}
 
 }  // namespace test
-}  // namespace api
 }  // namespace maliput

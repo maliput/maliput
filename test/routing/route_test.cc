@@ -36,15 +36,15 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
+#include "maliput/api/compare.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
 #include "maliput/common/assertion_error.h"
+#include "maliput/routing/compare.h"
 #include "maliput/routing/lane_s_range_relation.h"
 #include "maliput/routing/phase.h"
 #include "maliput/routing/route_position_result.h"
-#include "maliput/test_utilities/maliput_routing_position_compare.h"
-#include "maliput/test_utilities/maliput_types_compare.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
 #include "routing/road_network_mocks.h"
 
 namespace maliput {
@@ -52,6 +52,7 @@ namespace routing {
 namespace test {
 namespace {
 
+using maliput::test::AssertCompare;
 using ::testing::_;
 using ::testing::Return;
 using ::testing::ReturnRef;
@@ -192,13 +193,13 @@ TEST_F(RouteAccessorsTest, GetReturnsTheRightLaneSRange) {
   EXPECT_EQ(phase.lane_s_range_tolerance(), phase_a_->lane_s_range_tolerance());
   EXPECT_EQ(phase.start_positions().size(), phase_a_->start_positions().size());
   EXPECT_EQ(phase.start_positions()[0].lane, &lane_a_);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kStartRouteLanePosition, phase.start_positions()[0].pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kStartRouteLanePosition, phase.start_positions()[0].pos, 0.)));
   EXPECT_EQ(phase.end_positions().size(), phase_a_->end_positions().size());
   EXPECT_EQ(phase.end_positions()[0].lane, &lane_b_);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kEndRouteLanePosition, phase.end_positions()[0].pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndRouteLanePosition, phase.end_positions()[0].pos, 0.)));
   EXPECT_EQ(phase.lane_s_ranges().size(), phase_a_->lane_s_ranges().size());
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(phase_a_->lane_s_ranges()[0], phase.lane_s_ranges()[0]));
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(phase_a_->lane_s_ranges()[1], phase.lane_s_ranges()[1]));
+  EXPECT_TRUE(AssertCompare(IsEqual(phase_a_->lane_s_ranges()[0], phase.lane_s_ranges()[0])));
+  EXPECT_TRUE(AssertCompare(IsEqual(phase_a_->lane_s_ranges()[1], phase.lane_s_ranges()[1])));
 }
 
 TEST_F(RouteAccessorsTest, GetThrowsWhenPassingAWrongIndex) {
@@ -214,7 +215,7 @@ TEST_F(RouteAccessorsTest, StartRoutePositionIsOnLaneSRangeA) {
   const api::RoadPosition& start_road_position = dut.start_route_position();
 
   EXPECT_EQ(start_road_position.lane, &lane_a_);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kStartRouteLanePosition, start_road_position.pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kStartRouteLanePosition, start_road_position.pos, 0.)));
 }
 
 TEST_F(RouteAccessorsTest, EndRoutePositionIsOnLaneSRangeB) {
@@ -223,7 +224,7 @@ TEST_F(RouteAccessorsTest, EndRoutePositionIsOnLaneSRangeB) {
   const api::RoadPosition& end_road_position = dut.end_route_position();
 
   EXPECT_EQ(end_road_position.lane, &lane_b_);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kEndRouteLanePosition, end_road_position.pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndRouteLanePosition, end_road_position.pos, 0.)));
 }
 
 class RouteWithOnePhaseTest : public RouteAccessorsTest {
@@ -256,7 +257,7 @@ TEST_F(RouteWithOnePhaseTest, FindRoutePositionByInertialPositionIsMappedViaPhas
 
   const RoutePositionResult position_result = dut.FindRoutePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.)));
 }
 
 TEST_F(RouteWithOnePhaseTest, FindRoutePositionByRoadPositionThrowsWhenInvalid) {
@@ -285,7 +286,7 @@ TEST_F(RouteWithOnePhaseTest, FindRoutePositionByRoadPositionWhenRoadPositionIsN
 
   const RoutePositionResult position_result = dut.FindRoutePosition(road_position);
 
-  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.)));
 }
 
 TEST_F(RouteWithOnePhaseTest,
@@ -301,7 +302,7 @@ TEST_F(RouteWithOnePhaseTest,
 
   const RoutePositionResult position_result = dut.FindRoutePosition(road_position);
 
-  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.)));
 }
 
 // Models the following Route:
@@ -401,14 +402,14 @@ TEST_F(RouteWithTwoPhasesTest, StartRoutePositionIsOnLaneAB) {
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
 
   EXPECT_EQ(&lane_a_b_, dut.start_route_position().lane);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kStartLanePositionPhaseA, dut.start_route_position().pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kStartLanePositionPhaseA, dut.start_route_position().pos, 0.)));
 }
 
 TEST_F(RouteWithTwoPhasesTest, EndRoutePositionIsOnLaneBA) {
   const Route dut({*phase_a_, *phase_b_}, road_network_.get());
 
   EXPECT_EQ(&lane_b_a_, dut.end_route_position().lane);
-  EXPECT_TRUE(api::test::IsLanePositionClose(kEndLanePositionPhaseB, dut.end_route_position().pos, 0.));
+  EXPECT_TRUE(AssertCompare(IsLanePositionClose(kEndLanePositionPhaseB, dut.end_route_position().pos, 0.)));
 }
 
 TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPhaseOntoLaneSRangeAA) {
@@ -438,7 +439,7 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPha
 
   const RoutePositionResult position_result = dut.FindRoutePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.)));
 }
 
 TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPhaseOntoLaneSRangeBA) {
@@ -468,7 +469,7 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByInertialPositionIsMappedViaPha
 
   const RoutePositionResult position_result = dut.FindRoutePosition(kInertialPosition);
 
-  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.)));
 }
 
 TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByRoadPositionWhenRoadPositionIsNotInRouteBecomesByInertialPosition) {
@@ -504,7 +505,7 @@ TEST_F(RouteWithTwoPhasesTest, FindRoutePositionByRoadPositionWhenRoadPositionIs
 
   const RoutePositionResult position_result = dut.FindRoutePosition(road_position);
 
-  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.)));
 }
 
 TEST_F(RouteWithTwoPhasesTest,
@@ -529,7 +530,7 @@ TEST_F(RouteWithTwoPhasesTest,
 
   const RoutePositionResult position_result = dut.FindRoutePosition(road_position);
 
-  EXPECT_TRUE(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.));
+  EXPECT_TRUE(AssertCompare(IsRoutePositionResultClose(kExpectedRoutePositionResult, position_result, 0.)));
 }
 
 // Models the following Route:
