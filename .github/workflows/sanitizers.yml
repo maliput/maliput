@@ -11,9 +11,14 @@ env:
   ROS_WS: maliput_ws
   UBSAN_OPTIONS: halt_on_error=1
 
+# Cancel previously running PR jobs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
 jobs:
   compile_and_test:
-    if: contains(github.event.pull_request.labels.*.name, 'do-clang-test')
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'do-clang-test') || github.event_name == 'workflow_dispatch'}}
     name: Compile and test with sanitizer
     runs-on: ubuntu-latest
     container:
