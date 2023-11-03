@@ -33,8 +33,10 @@ namespace routing {
 
 /// Defines the possible relationships the routing API can interpret between
 /// two api::LaneSRanges within a Route.
-/// Relations described in this enum must be mutually exclusive. The following
-/// ASCII art helps to understand the relative relations described below.
+/// Relations described in this enum must be mutually exclusive and comprehensive, i.e.,
+/// exactly one relation will apply for any given pair of `LaneSRange` objects.
+///
+/// The following ASCII art helps to understand the relative relations described below.
 ///
 /// <pre>
 ///
@@ -66,6 +68,7 @@ namespace routing {
 ///
 /// LaneSRangeRelation::kUnknown represents the case when any of the
 /// api::LaneSRanges is not found in the Route.
+// TODO(#543): revisit the need of kAdjacentLeft and kAdjacentRight.
 enum class LaneSRangeRelation {
   kAdjacentLeft,
   kAdjacentRight,

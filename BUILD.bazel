@@ -1,0 +1,141 @@
+
+# TODO(stonier): dig into the cflags maliput sets in cmake/DefaultCFlags.cmake
+# and verify they all work in a bazel environment. Be a little cautious and
+# discerning - bazel packages are source packages, some of those flags
+# may have ramifications for people on other platforms (e.g. -std=c++17
+# immediately breaks if someone depends on maliput from windows) and/or
+# compilers.
+
+cc_library(
+    name = "common",
+    srcs = glob(["src/common/*.cc"]),
+    hdrs = glob(["include/maliput/common/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "math",
+    srcs = glob(["src/math/*.cc"]),
+    hdrs = glob(["include/maliput/math/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":common",
+    ],
+)
+
+cc_library(
+    name = "api",
+    srcs = glob(["src/api/**/*.cc"]),
+    hdrs = glob(["include/maliput/api/**/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":common",
+        ":math",
+    ],
+)
+
+cc_library(
+    name = "base",
+    srcs = glob(["src/base/**/*.cc"]),
+    hdrs = glob(["include/maliput/base/**/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":api",
+        ":common",
+        "@yaml-cpp",
+    ],
+)
+
+cc_library(
+    name = "geometry_base",
+    srcs = glob(["src/geometry_base/**/*.cc"]),
+    hdrs = glob(["include/maliput/geometry_base/**/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":api",
+    ],
+)
+
+cc_library(
+    name = "routing",
+    srcs = glob(["src/routing/**/*.cc"]),
+    hdrs = glob(["include/maliput/routing/**/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":api",
+        ":common",
+        ":geometry_base"
+    ],
+)
+
+cc_library(
+    name = "utility",
+    srcs = glob(["src/utility/**/*.cc"]),
+    hdrs = glob(["include/maliput/utility/**/*.h"]),
+    copts = ["-std=c++17"],
+    linkopts = ["-lstdc++fs"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":api",
+        ":common",
+        ":math",
+    ],
+)
+
+cc_library(
+    name = "plugin",
+    srcs = glob(["src/plugin/**/*.cc"]),
+    hdrs = glob(["include/maliput/plugin/**/*.h"]),
+    copts = ["-std=c++17"],
+    linkopts = ['-ldl'],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":api",
+        ":common",
+        ":utility",
+    ],
+)
+
+# TODO(stonier): prune, simplify and merge into common/math
+cc_library(
+    name = "drake",
+    srcs = glob(["src/drake/**/*.cc"]),
+    hdrs = glob(["include/maliput/drake/**/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "test_utilities",
+    srcs = glob(["src/test_utilities/**/*.cc"]),
+    hdrs = glob(["include/maliput/test_utilities/**/*.h"]),
+    copts = ["-std=c++17"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":api",
+        ":common",
+        ":geometry_base",
+        ":math",
+    ],
+)

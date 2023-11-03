@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
+#include <sstream>
 
 #include "maliput/common/maliput_throw.h"
 
@@ -170,6 +171,13 @@ Matrix<N> Matrix<N>::inverse() const {
   const double d = determinant();
   if (std::abs(d) < kTolerance) MALIPUT_THROW_MESSAGE("Matrix is singular");
   return {(1 / d) * adjoint()};
+}
+
+template <std::size_t N>
+std::string Matrix<N>::to_str() const {
+  std::stringstream ss;
+  ss << (*this);
+  return ss.str();
 }
 
 template <std::size_t N>

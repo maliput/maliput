@@ -118,13 +118,13 @@ std::optional<api::rules::RangeValueRuleStateProvider::StateResult> ManualRangeV
   };
   const auto filtered_rules = FilterRules(query_result_rules, {}, {rule_type_filter, zone_filter});
   if (filtered_rules.range_value_rules.size() > 1) {
-    maliput::log()->warn(
-        "For rule_type: {} and road_position: [LaneId: {}, LanePos: {}] there are more than one possible rules: ",
-        rule_type.string(), road_position.lane->id(), road_position.pos.srh().to_str());
+    maliput::log()->warn("For rule_type: ", rule_type.string(),
+                         " and road_position: [LaneId: ", road_position.lane->id(),
+                         ", LanePos: ", road_position.pos.srh().to_str(), "] there are more than one possible rules: ");
     for (const auto& rule : filtered_rules.range_value_rules) {
-      maliput::log()->warn("\tRule id: {} matches with rule_type: {} and road_position: [LaneId: {}, LanePos: {}]",
-                           rule.first.string(), rule_type.string(), road_position.lane->id(),
-                           road_position.pos.srh().to_str());
+      maliput::log()->warn("\tRule id: ", rule.first.string(), " matches with rule_type: ", rule_type.string(),
+                           " and road_position: [LaneId: ", road_position.lane->id(),
+                           ", LanePos: ", road_position.pos.srh().to_str(), "]");
     }
   }
   std::optional<api::rules::RangeValueRuleStateProvider::StateResult> current_state{std::nullopt};

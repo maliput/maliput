@@ -29,18 +29,20 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
+#include "maliput/api/compare.h"
+#include "maliput/api/rules/compare.h"
 #include "maliput/api/rules/discrete_value_rule.h"
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/regions_test_utilities.h"
-#include "maliput/test_utilities/rules_compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 namespace {
+
+using maliput::test::AssertCompare;
 
 class RuleTest : public ::testing::Test {
  protected:
@@ -170,8 +172,8 @@ TEST_F(RuleTest, RangeValueRuleAccessors) {
 
   EXPECT_EQ(dut.id(), kId);
   EXPECT_EQ(dut.type_id(), kTypeId);
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), kZone));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states(), kRanges));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.zone(), kZone)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.states(), kRanges)));
 }
 
 // Evaluates the equal and not equal operator overloads for
@@ -374,8 +376,8 @@ TEST_F(RuleTest, DiscreteValueRuleAccessors) {
 
   EXPECT_EQ(dut.id(), kId);
   EXPECT_EQ(dut.type_id(), kTypeId);
-  EXPECT_TRUE(MALIPUT_REGIONS_IS_EQUAL(dut.zone(), kZone));
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(dut.states(), kDiscreteValues));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.zone(), kZone)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.states(), kDiscreteValues)));
 }
 
 // Evaluates the equal and not equal operator overloads for

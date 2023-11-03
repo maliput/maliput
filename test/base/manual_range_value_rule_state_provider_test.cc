@@ -33,12 +33,12 @@
 
 #include <gtest/gtest.h>
 
+#include "assert_compare.h"
+#include "maliput/api/rules/compare.h"
 #include "maliput/api/rules/range_value_rule.h"
 #include "maliput/api/rules/rule.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/test_utilities/mock.h"
-#include "maliput/test_utilities/rules_compare.h"
-#include "maliput/test_utilities/rules_test_utilities.h"
 
 namespace maliput {
 namespace test {
@@ -53,6 +53,7 @@ using api::rules::RangeValueRule;
 using api::rules::RangeValueRuleStateProvider;
 using api::rules::RoadRulebook;
 using api::rules::Rule;
+using test::AssertCompare;
 
 class ManualRangeValueRuleStateProviderTest : public ::testing::Test {
  protected:
@@ -100,9 +101,9 @@ TEST_F(ManualRangeValueRuleStateProviderTest, SetStateTest) {
   EXPECT_NO_THROW(dut.SetState(kRuleId, kRangeA, {kRangeA}, {kDurationUntil}));
   const std::optional<RangeValueRuleStateProvider::StateResult> result = dut.GetState(kRuleId);
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kRangeA));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->state, kRangeA)));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, kRangeA));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->next->state, kRangeA)));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), kDurationUntil);
 }
@@ -122,9 +123,9 @@ TEST_F(ManualRangeValueRuleStateProviderTest, GetStateByRoadPositionAndRuleType)
   const std::optional<RangeValueRuleStateProvider::StateResult> result =
       dut.GetState(road_position, kRuleType, tolerance);
   EXPECT_TRUE(result.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->state, kRangeA));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->state, kRangeA)));
   EXPECT_TRUE(result->next.has_value());
-  EXPECT_TRUE(MALIPUT_IS_EQUAL(result->next->state, kRangeA));
+  EXPECT_TRUE(AssertCompare(IsEqual(result->next->state, kRangeA)));
   EXPECT_TRUE(result->next->duration_until.has_value());
   EXPECT_EQ(result->next->duration_until.value(), kDurationUntil);
 }

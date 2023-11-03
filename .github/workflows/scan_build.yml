@@ -10,9 +10,14 @@ env:
   ROS_DISTRO: foxy
   ROS_WS: maliput_ws
 
+# Cancel previously running PR jobs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
 jobs:
   static_analysis:
-    if: contains(github.event.pull_request.labels.*.name, 'do-static-analyzer-test')
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'do-static-analyzer-test') || github.event_name == 'workflow_dispatch'}}
     name: Static analysis
     runs-on: ubuntu-latest
     container:

@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "maliput/api/lane_data.h"
+#include "maliput/api/regions.h"
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
@@ -201,15 +202,15 @@ class Route final {
   /// valid.
   RoutePositionResult FindRoutePosition(const api::RoadPosition& road_position) const;
 
-  /// Finds the relation between @p lane_s_range_b with respect to
+  /// Computes the relation between @p lane_s_range_b with respect to
   /// @p lane_s_range_a.
   ///
   /// @param lane_s_range_a An api::LaneSRange.
   /// @param lane_s_range_b An api::LaneSRange.
   /// @return The LaneSRangeRelation between @p lane_s_range_b with respect to
   /// @p lane_s_range_a.
-  LaneSRangeRelation LaneSRangeRelationFor(const api::LaneSRange& lane_s_range_a,
-                                           const api::LaneSRange& lane_s_range_b) const;
+  LaneSRangeRelation ComputeLaneSRangeRelation(const api::LaneSRange& lane_s_range_a,
+                                               const api::LaneSRange& lane_s_range_b) const;
 
   /// Computes an api::LaneSRoute that connects @p start_position with
   /// end_route_position().
@@ -248,7 +249,7 @@ class Route final {
   // @param lane_s_range The api::LaneSRange to look for.
   // @return An optional containing the index of the api::LaneSRange within this
   // Route.
-  std::optional<LaneSRangeIndex> FindLaneSRangeIndexFor(const api::LaneSRange& lane_s_range) const;
+  std::optional<LaneSRangeIndex> FindLaneSRangeIndex(const api::LaneSRange& lane_s_range) const;
 
   // Finds the LaneSRangeIndex of the api::LaneSRange that is
   // LaneSRelation::kPreceedingStraight with respect to @p lane_s_range_index
@@ -257,7 +258,7 @@ class Route final {
   // @param lane_s_range_index The index of the api::LaneSRange to find its
   // LaneSRelation::kPreceedingStraight counterpart. It must be a valid index.
   // @return An optional containing the LaneSRangeIndex of the api::LaneSRange.
-  std::optional<LaneSRangeIndex> FindStraightPredecessorFor(const LaneSRangeIndex& lane_s_range_index) const;
+  std::optional<LaneSRangeIndex> FindStraightPredecessor(const LaneSRangeIndex& lane_s_range_index) const;
 
   // Finds how to move the index of api::LaneSRanges within a Phase to find
   // the first one from @p lane_s_range_index.

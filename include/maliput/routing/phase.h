@@ -74,9 +74,9 @@ class Phase final {
   /// @param end_position The end api::RoadPositions of this
   /// Phase. Each api::RoadPosition must be valid and it must be in
   /// @p lane_s_ranges. There must be at least one api::RoadPosition.
-  /// @param lane_s_ranges List of api::LaneSRanges. It must not be empty, all
-  /// elements must exist in @p road_network and should be consecutively
-  /// adjacent.
+  /// @param lane_s_ranges A right-to-left (see api::Segment semantics) ordered
+  /// list of api::LaneSRanges. It must not be empty, all elements must exist
+  /// in @p road_network and should be consecutively adjacent and ordered.
   /// @param road_network The pointer to the api::RoadNetwork. It must
   /// not be nullptr. The lifetime of this pointer must exceed that of this
   /// object.
@@ -95,7 +95,7 @@ class Phase final {
   /// positions in @p lane_s_ranges.
   /// @throws common::assertion_error When @p lane_s_ranges is empty.
   /// @throws common::assertion_error When @p lane_s_ranges contains
-  /// non-adjacent consecutive api::LaneSRanges.
+  /// non-adjacent or ordered consecutive api::LaneSRanges.
   /// @throws common::assertion_error When @p lane_s_ranges contains
   /// api::LaneSRanges that do not exist in @p road_network.
   /// @throws common::assertion_error When @p road_network is nullptr.
