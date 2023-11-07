@@ -37,6 +37,12 @@
 namespace maliput {
 namespace routing {
 
+/// Returns the S coordinate in @p lane that is on the border with @p next_lane.
+/// When @p lane is not connected to @p next_lane , std::nullopt is returned.
+/// @throws maliput::common::assertion_error When @p lane is nullptr.
+/// @throws maliput::common::assertion_error When @p next_lane is nullptr.
+std::optional<double> DetermineEdgeS(const api::Lane* lane, const api::Lane* next_lane);
+
 /// Derives and returns a set of LaneSRoute objects that go from @p start to
 /// @p end. If no routes are found, a vector of length zero is returned.
 /// Parameter @p max_length_m is the maximum length of the intermediate lanes

@@ -54,7 +54,6 @@
 #include <maliput/api/segment.h>
 
 namespace maliput {
-namespace routing {
 namespace test {
 
 /// @brief Google mock api::RoadGeometry.
@@ -99,6 +98,12 @@ class LaneMock final : public api::Lane {
   MOCK_METHOD(api::LanePositionResult, DoToSegmentPosition, (const api::InertialPosition&), (const));
   MOCK_METHOD(const api::LaneEndSet*, DoGetConfluentBranches, (const api::LaneEnd::Which), (const));
   MOCK_METHOD(const api::LaneEndSet*, DoGetOngoingBranches, (const api::LaneEnd::Which), (const));
+};
+
+class LaneEndSetMock final : public api::LaneEndSet {
+ public:
+  MOCK_METHOD(int, do_size, (), (const));
+  MOCK_METHOD(const api::LaneEnd&, do_get, (int), (const));
 };
 
 /// @brief Google mock api::RoadGeometry::IdIndex.
@@ -204,5 +209,4 @@ inline std::unique_ptr<api::RoadNetwork> MakeMockedRoadNetwork() {
 }
 
 }  // namespace test
-}  // namespace routing
 }  // namespace maliput

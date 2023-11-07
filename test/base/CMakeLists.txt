@@ -1,4 +1,5 @@
 ament_add_gtest(base_rule_registry_test rule_registry_test.cc)
+ament_add_gmock(distance_router_test distance_router_test.cc)
 ament_add_gtest(intersection_test intersection_test.cc)
 ament_add_gtest(intersection_book_test intersection_book_test.cc)
 ament_add_gtest(manual_phase_provider_test manual_phase_provider_test.cc)
@@ -28,6 +29,8 @@ macro(add_dependencies_to_test target)
       target_link_libraries(${target}
           maliput::api
           maliput::base
+          maliput::common
+          maliput::routing
           test_utilities
       )
 
@@ -35,6 +38,7 @@ macro(add_dependencies_to_test target)
 endmacro()
 
 add_dependencies_to_test(base_rule_registry_test)
+add_dependencies_to_test(distance_router_test)
 add_dependencies_to_test(intersection_test)
 add_dependencies_to_test(intersection_book_test)
 add_dependencies_to_test(manual_phase_provider_test)
