@@ -35,7 +35,6 @@
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/routing/route.h"
-#include "maliput/routing/route_phase.h"
 #include "maliput/routing/routing_constraints.h"
 
 namespace maliput {
@@ -53,6 +52,8 @@ namespace routing {
 class Router {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Router);
+
+  virtual ~Router() = default;
 
   /// Computes Routes that joins @p start to @p end under
   /// @p routing_constraints.
