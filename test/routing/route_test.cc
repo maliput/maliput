@@ -730,7 +730,7 @@ TEST_F(RouteLaneSRelationTest, EvaluateComputeLaneSRangeRelationSameLaneSRanges)
 }
 
 // The following set of tests evaluate specific conditions of the topology of the graphs.
-// That allows to validate the internal routing to verify the resulting api::LaneSRoute is correct.
+// That enables validating the internal routing to verify the resulting api::LaneSRoute is correct.
 
 /// Wraps api::LanePosition comparison into a MatcherInterface.
 class LanePositionMatcher : public MatcherInterface<const api::LanePosition&> {
@@ -875,7 +875,7 @@ TEST_F(RouteComputeLaneSRouteCaseATest, ComputeLaneSRoute) {
 }
 
 // Case B:
-// - Feature under evaluation: can move to the left at the beginning in the same Phase.
+// - Feature under evaluation: can move to the right at the beginning in the same Phase.
 // - Topology:
 // <pre>
 //
@@ -941,7 +941,7 @@ TEST_F(RouteComputeLaneSRouteCaseBTest, ComputeLaneSRoute) {
 }
 
 // Case C:
-// - Feature under evaluation: can move to the right at the beginning in the same Phase.
+// - Feature under evaluation: can move to the left at the beginning in the same Phase.
 // - Topology:
 // <pre>
 //
@@ -1007,7 +1007,7 @@ TEST_F(RouteComputeLaneSRouteCaseCTest, ComputeLaneSRoute) {
 }
 
 // Case D:
-// - Feature under evaluation: can move to the left at the end in the same Phase.
+// - Feature under evaluation: can move to the right at the end in the same Phase.
 // - Topology:
 // <pre>
 //
@@ -1072,7 +1072,7 @@ TEST_F(RouteComputeLaneSRouteCaseDTest, ComputeLaneSRoute) {
 }
 
 // Case E:
-// - Feature under evaluation: can move to the right at the end in the same Phase.
+// - Feature under evaluation: can move to the left at the end in the same Phase.
 // - Topology:
 // <pre>
 //

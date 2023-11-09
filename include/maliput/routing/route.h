@@ -146,7 +146,7 @@ class Route final {
 
   /// Indexes an api::LaneSRange in a Phase.
   ///
-  /// @param phase_index The index of the Phase. It must be
+  /// @param phase_index The index of the api::LaneSRange in the Phase specified by @p phase_index. It must be
   /// non-negative and less than `size()`.
   /// @param lane_s_range_index The index of the api::LaneSRange. It must be
   /// non-negative and less than `Phase::lane_s_ranges().size()`.
@@ -229,12 +229,22 @@ class Route final {
   api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const;
 
  private:
-  // Defines the sign and increment of one unit towards the right the index of
+  // @{
+
+  // The direction of travel along the Routes is defined by the underlying Phases' api::LaneSRanges.
+  // Each api::LaneSRange by means of its api::SRange::WithS() defines the direction of travel.
+  // When true, forward means in +s direction, and left means in the +r direction. Otherwise,
+  // forward means in the -s direction, and left means in the -r direction.
+
+  // Defines the sign and increment of one unit towards the right of the index of
   // api::LaneSRanges in a Phase.
   static constexpr int kTowardsRight{-1};
-  // Defines the sign and increment of one unit towards the left the index of
+
+  // Defines the sign and increment of one unit towards the left of the index of
   // api::LaneSRanges in a Phase.
   static constexpr int kTowardsLeft{1};
+
+  // @}
 
   // Type alias to index an api::LaneSRange within this Route.
   // std::pair::first indexes the Phase.
@@ -261,7 +271,7 @@ class Route final {
   std::optional<LaneSRangeIndex> FindStraightPredecessor(const LaneSRangeIndex& lane_s_range_index) const;
 
   // Finds how to move the index of api::LaneSRanges within a Phase to find
-  // the first one from @p lane_s_range_index.
+  // the predecessor of the api::LanesRange at @p lane_s_range_index.
   //
   // @param lane_s_range_index The index of api::LaneSRange within this Route.
   // @return kTowardsLeft When moving towards the left within the Phase,

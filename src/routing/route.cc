@@ -206,11 +206,11 @@ LaneSRangeRelation Route::ComputeLaneSRangeRelation(const api::LaneSRange& lane_
 api::LaneSRoute Route::ComputeLaneSRoute(const api::RoadPosition& start_position) const {
   MALIPUT_THROW_UNLESS(start_position.lane != nullptr);
 
-  const api::RoadPosition& end_road_position = end_route_position();
+  const api::RoadPosition& end_position = end_route_position();
   // Creates a point like api::LaneSRange to find the appropriate LaneSRangeIndex of the start
   // and end positions.
-  const api::LaneSRange end_lane_s_range_point(end_road_position.lane->id(),
-                                               api::SRange(end_road_position.pos.s(), end_road_position.pos.s()));
+  const api::LaneSRange end_lane_s_range_point(end_position.lane->id(),
+                                               api::SRange(end_position.pos.s(), end_position.pos.s()));
   const api::LaneSRange start_lane_s_range_point(start_position.lane->id(),
                                                  api::SRange(start_position.pos.s(), start_position.pos.s()));
 
@@ -220,7 +220,7 @@ api::LaneSRoute Route::ComputeLaneSRoute(const api::RoadPosition& start_position
   const std::optional<LaneSRangeIndex> end_lane_s_range_index = FindLaneSRangeIndex(end_lane_s_range_point);
   MALIPUT_THROW_UNLESS(end_lane_s_range_index.has_value());
 
-  // Inserts @p lane_s_range_index into @p lane_s_range at the beginning.
+  // Inserts @p lane_s_range_index into @p lane_s_ranges at the beginning.
   auto prepend_lane_s_range_to_route = [this](const LaneSRangeIndex& lane_s_range_index,
                                               std::vector<api::LaneSRange>* lane_s_ranges) -> void {
     lane_s_ranges->insert(lane_s_ranges->begin(), GetLaneSRange(lane_s_range_index.first, lane_s_range_index.second));
@@ -236,7 +236,7 @@ api::LaneSRoute Route::ComputeLaneSRoute(const api::RoadPosition& start_position
   std::vector<api::LaneSRange> lane_s_ranges;
 
   // The following double nested loop performs the routing within the Route from the ending api::LaneSRange
-  // towards the starting api::LaneSRange. The is always a possible logical solution, and it is based on
+  // towards the starting api::LaneSRange. It is always a possible logical solution, and it is based on
   // one simple set of premises:
   //
   // 1- Move straight backwards first, otherwise
@@ -245,7 +245,9 @@ api::LaneSRoute Route::ComputeLaneSRoute(const api::RoadPosition& start_position
 
   // TODO(#543): this process should be simpler once we process in the constructor end-to-end Phase
   // connectivity as we can cache in the interfaces those LaneSRangeIndices that connect with each other.
-  while (!is_same_phase(current_lane_s_range_index, *start_lane_s_range_index)) {
+  int num_phases_to_check = phases_.size() - start_lane_s_range_index->first;
+  while (num_phases_to_check >= 0 && !is_same_phase(current_lane_s_range_index, *start_lane_s_range_index)) {
+    num_phases_to_check--;
     // Adds the current LaneSRange to the last list.
     prepend_lane_s_range_to_route(current_lane_s_range_index, &lane_s_ranges);
     // Moves within the Phase towards the first LaneSRange with a straight predecessor.
@@ -258,12 +260,17 @@ api::LaneSRoute Route::ComputeLaneSRoute(const api::RoadPosition& start_position
         prepend_lane_s_range_to_route(current_lane_s_range_index, &lane_s_ranges);
       }
     }
-    // Changes to the preceeding Phase - LaneSRange.
+    // Changes to the preceding Phase - LaneSRange.
     current_lane_s_range_index = *predecessor_lane_s_range_index;
   }
+  // Check that we have found a solution.
+  MALIPUT_VALIDATE(num_phases_to_check >= 0,
+                   "Failed to find an api::LaneSRoute at Route::ComputeLaneSRoute. The backwards path finding exceeded "
+                   "the phase iterations.");
 
   // TODO(#543): make the set of LaneSRanges of the right length once we can easily map s-coordinates LaneSRange to
   // LaneSRange.
+  // Prepend the remaining api::LaneSRanges within the initial Phase towards the starting api::LaneSRange.
   LaneSRangeRelation lane_s_range_relation{LaneSRangeRelation::kUnknown};
   while (lane_s_range_relation != LaneSRangeRelation::kCoincident) {
     prepend_lane_s_range_to_route(current_lane_s_range_index, &lane_s_ranges);
