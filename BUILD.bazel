@@ -1,3 +1,13 @@
+###############################################################################
+# Loaders
+###############################################################################
+
+load("//:bazel/variables.bzl", "COPTS")
+
+
+###############################################################################
+# Libraries
+###############################################################################
 
 # TODO(stonier): dig into the cflags maliput sets in cmake/DefaultCFlags.cmake
 # and verify they all work in a bazel environment. Be a little cautious and
@@ -10,7 +20,7 @@ cc_library(
     name = "common",
     srcs = glob(["src/common/*.cc"]),
     hdrs = glob(["include/maliput/common/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
@@ -21,7 +31,7 @@ cc_library(
     name = "math",
     srcs = glob(["src/math/*.cc"]),
     hdrs = glob(["include/maliput/math/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
@@ -33,7 +43,7 @@ cc_library(
     name = "api",
     srcs = glob(["src/api/**/*.cc"]),
     hdrs = glob(["include/maliput/api/**/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
@@ -46,7 +56,7 @@ cc_library(
     name = "base",
     srcs = glob(["src/base/**/*.cc"]),
     hdrs = glob(["include/maliput/base/**/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
@@ -60,7 +70,7 @@ cc_library(
     name = "geometry_base",
     srcs = glob(["src/geometry_base/**/*.cc"]),
     hdrs = glob(["include/maliput/geometry_base/**/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
@@ -72,7 +82,7 @@ cc_library(
     name = "routing",
     srcs = glob(["src/routing/**/*.cc"]),
     hdrs = glob(["include/maliput/routing/**/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
@@ -86,7 +96,7 @@ cc_library(
     name = "utility",
     srcs = glob(["src/utility/**/*.cc"]),
     hdrs = glob(["include/maliput/utility/**/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     linkopts = ["-lstdc++fs"],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
@@ -101,7 +111,7 @@ cc_library(
     name = "plugin",
     srcs = glob(["src/plugin/**/*.cc"]),
     hdrs = glob(["include/maliput/plugin/**/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     linkopts = ['-ldl'],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
@@ -117,7 +127,7 @@ cc_library(
     name = "drake",
     srcs = glob(["src/drake/**/*.cc"]),
     hdrs = glob(["include/maliput/drake/**/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
@@ -129,7 +139,7 @@ cc_library(
     name = "test_utilities",
     srcs = glob(["src/test_utilities/**/*.cc"]),
     hdrs = glob(["include/maliput/test_utilities/**/*.h"]),
-    copts = ["-std=c++17"],
+    copts = COPTS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
