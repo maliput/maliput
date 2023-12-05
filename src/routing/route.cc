@@ -43,12 +43,11 @@ Route::Route(const std::vector<Phase>& phases, const api::RoadNetwork* road_netw
   MALIPUT_THROW_UNLESS(road_network_ != nullptr);
   /// TODO(#453): Validate end to end connection of the Phases.
 
-  // Populate the lane_id_to_lane_s_range_indices_ dictionary.
-  for (int phase_index = 0; phase_index < static_cast<int>(phases_.size()); ++phase_index) {
+  // Populate the lane_id_to_indices_ dictionary.
+  for (size_t phase_index = 0u; phase_index < phases_.size(); ++phase_index) {
     const std::vector<api::LaneSRange>& lane_s_ranges = phases_[phase_index].lane_s_ranges();
-    for (int lane_s_range_index = 0; lane_s_range_index < static_cast<int>(lane_s_ranges.size());
-         ++lane_s_range_index) {
-      lane_id_to_lane_s_range_indices_[lane_s_ranges[lane_s_range_index].lane_id()].push_back(
+    for (size_t lane_s_range_index = 0u; lane_s_range_index < lane_s_ranges.size(); ++lane_s_range_index) {
+      lane_id_to_indices_[lane_s_ranges[lane_s_range_index].lane_id()].push_back(
           LaneSRangeIndex{phase_index, lane_s_range_index});
     }
   }
@@ -132,34 +131,33 @@ RelativePosition ComputeRelativePosition(const api::RoadPosition& pos_a, const a
 LaneSRangeRelation Route::ComputeLaneSRangeRelation(const api::LaneSRange& lane_s_range_a,
                                                     const api::LaneSRange& lane_s_range_b) const {
   // Find index of lane_s_range_a and lane_s_range_b.
-  const std::optional<LaneSRangeIndex> lane_s_range_a_index = FindLaneSRangeIndex(lane_s_range_a);
-  const std::optional<LaneSRangeIndex> lane_s_range_b_index = FindLaneSRangeIndex(lane_s_range_b);
+  const std::optional<LaneSRangeIndex> index_a = FindLaneSRangeIndex(lane_s_range_a);
+  const std::optional<LaneSRangeIndex> index_b = FindLaneSRangeIndex(lane_s_range_b);
 
   // Determine whether lane_s_range_a and lane_s_range_b are in the same Route.
-  if (!lane_s_range_a_index.has_value() || !lane_s_range_b_index.has_value()) {
+  if (!index_a.has_value() || !index_b.has_value()) {
     return LaneSRangeRelation::kUnknown;
   }
 
-  // lane_s_range_b is unrelated to lane_s_range_a
-  if (lane_s_range_a_index->first > lane_s_range_b_index->first + 1 ||
-      lane_s_range_b_index->first > lane_s_range_a_index->first + 1) {
+  // lane_s_range_b is unrelated to lane_s_range_a because they are in different non-adjacent phases.
+  if (index_a->phase > index_b->phase + 1 || index_b->phase > index_a->phase + 1) {
     return LaneSRangeRelation::kUnrelated;
   }
 
-  const size_t lane_s_range_b_next_index = lane_s_range_b_index->second + 1;
-  const size_t lane_s_range_b_previous_index = lane_s_range_b_index->second - 1;
+  const size_t lane_s_range_b_next_index = index_b->lane_s_range + 1;
+  const size_t lane_s_range_b_previous_index = index_b->lane_s_range - 1;
 
-  // When both indices are the same, we should look into the indices for the lane_s_ranges.
-  if (lane_s_range_a_index->first == lane_s_range_b_index->first) {
-    if (lane_s_range_a_index->second == lane_s_range_b_index->second) {
+  // When both Phase indices are the same, we should look into the indices for the lane_s_ranges.
+  if (index_a->phase == index_b->phase) {
+    if (index_a->lane_s_range == index_b->lane_s_range) {
       return LaneSRangeRelation::kCoincident;
-    } else if (lane_s_range_a_index->second == lane_s_range_b_next_index) {
+    } else if (index_a->lane_s_range == lane_s_range_b_next_index) {
       return LaneSRangeRelation::kAdjacentRight;
-    } else if (lane_s_range_a_index->second > lane_s_range_b_next_index) {
+    } else if (index_a->lane_s_range > lane_s_range_b_next_index) {
       return LaneSRangeRelation::kRight;
-    } else if (lane_s_range_a_index->second == lane_s_range_b_previous_index) {
+    } else if (index_a->lane_s_range == lane_s_range_b_previous_index) {
       return LaneSRangeRelation::kAdjacentLeft;
-    } else {  // (lane_s_range_a_index->second < lane_s_range_b_previous_index)
+    } else {  // (index_a->lane_s_range < lane_s_range_b_previous_index)
       return LaneSRangeRelation::kLeft;
     }
   }
@@ -182,22 +180,22 @@ LaneSRangeRelation Route::ComputeLaneSRangeRelation(const api::LaneSRange& lane_
   const double tolerance = road_network_->road_geometry()->linear_tolerance();
 
   // Determine whether lane_s_range_b is ahead of lane_s_range_a.
-  if (lane_s_range_a_index->first == lane_s_range_b_index->first - 1) {
+  if (index_a->phase == index_b->phase - 1) {
     const api::RoadPosition lane_s_range_a_road_pos =
-        get_lane_s_range_road_position(lane_s_range_a_index->first, lane_s_range_a_index->second, kEnd);
+        get_lane_s_range_road_position(index_a->phase, index_a->lane_s_range, kEnd);
     const api::RoadPosition lane_s_range_b_road_pos =
-        get_lane_s_range_road_position(lane_s_range_b_index->first, lane_s_range_b_index->second, kStart);
+        get_lane_s_range_road_position(index_b->phase, index_b->lane_s_range, kStart);
 
     return kRelativePositionToSuceedingLaneSRange[static_cast<size_t>(
         ComputeRelativePosition(lane_s_range_a_road_pos, lane_s_range_b_road_pos, tolerance))];
   }
 
   // lane_s_range_b is behind of lane_s_range_a.
-  // lane_s_range_a_index->first == lane_s_range_b_index->first - 1
+  // index_a->phase == index_b->phase - 1
   const api::RoadPosition lane_s_range_a_road_pos =
-      get_lane_s_range_road_position(lane_s_range_a_index->first, lane_s_range_a_index->second, kStart);
+      get_lane_s_range_road_position(index_a->phase, index_a->lane_s_range, kStart);
   const api::RoadPosition lane_s_range_b_road_pos =
-      get_lane_s_range_road_position(lane_s_range_b_index->first, lane_s_range_b_index->second, kEnd);
+      get_lane_s_range_road_position(index_b->phase, index_b->lane_s_range, kEnd);
 
   return kRelativePositionToPreceedingLaneSRange[static_cast<size_t>(
       ComputeRelativePosition(lane_s_range_a_road_pos, lane_s_range_b_road_pos, tolerance))];
@@ -209,31 +207,25 @@ api::LaneSRoute Route::ComputeLaneSRoute(const api::RoadPosition& start_position
   const api::RoadPosition& end_position = end_route_position();
   // Creates a point like api::LaneSRange to find the appropriate LaneSRangeIndex of the start
   // and end positions.
-  const api::LaneSRange end_lane_s_range_point(end_position.lane->id(),
-                                               api::SRange(end_position.pos.s(), end_position.pos.s()));
-  const api::LaneSRange start_lane_s_range_point(start_position.lane->id(),
-                                                 api::SRange(start_position.pos.s(), start_position.pos.s()));
+  const api::LaneSRange end_point(end_position.lane->id(), api::SRange(end_position.pos.s(), end_position.pos.s()));
+  const api::LaneSRange start_point(start_position.lane->id(),
+                                    api::SRange(start_position.pos.s(), start_position.pos.s()));
 
-  const std::optional<LaneSRangeIndex> start_lane_s_range_index = FindLaneSRangeIndex(start_lane_s_range_point);
-  MALIPUT_THROW_UNLESS(start_lane_s_range_index.has_value());
+  const std::optional<LaneSRangeIndex> start_index = FindLaneSRangeIndex(start_point);
+  MALIPUT_THROW_UNLESS(start_index.has_value());
 
-  const std::optional<LaneSRangeIndex> end_lane_s_range_index = FindLaneSRangeIndex(end_lane_s_range_point);
-  MALIPUT_THROW_UNLESS(end_lane_s_range_index.has_value());
+  const std::optional<LaneSRangeIndex> end_index = FindLaneSRangeIndex(end_point);
+  MALIPUT_THROW_UNLESS(end_index.has_value());
 
-  // Inserts @p lane_s_range_index into @p lane_s_ranges at the beginning.
-  auto prepend_lane_s_range_to_route = [this](const LaneSRangeIndex& lane_s_range_index,
-                                              std::vector<api::LaneSRange>* lane_s_ranges) -> void {
-    lane_s_ranges->insert(lane_s_ranges->begin(), GetLaneSRange(lane_s_range_index.first, lane_s_range_index.second));
+  // Inserts @p index into the beginning of @p lane_s_ranges.
+  auto prepend_to_route = [this](const LaneSRangeIndex& index, std::vector<api::LaneSRange>* lane_s_ranges) -> void {
+    lane_s_ranges->insert(lane_s_ranges->begin(), GetLaneSRange(index.phase, index.lane_s_range));
   };
 
-  // Returns true when @p lane_s_range_index_a.first is equal to @p lane_s_range_index_b.first.
-  auto is_same_phase = [](const Route::LaneSRangeIndex& lane_s_range_index_a,
-                          const Route::LaneSRangeIndex& lane_s_range_index_b) -> bool {
-    return lane_s_range_index_a.first == lane_s_range_index_b.first;
+  // Returns true when @p index_a.phase is equal to @p index_b.phase.
+  auto is_same_phase = [](const Route::LaneSRangeIndex& index_a, const Route::LaneSRangeIndex& index_b) -> bool {
+    return index_a.phase == index_b.phase;
   };
-
-  LaneSRangeIndex current_lane_s_range_index = end_lane_s_range_index.value();
-  std::vector<api::LaneSRange> lane_s_ranges;
 
   // The following double nested loop performs the routing within the Route from the ending api::LaneSRange
   // towards the starting api::LaneSRange. It is always a possible logical solution, and it is based on
@@ -243,51 +235,55 @@ api::LaneSRoute Route::ComputeLaneSRoute(const api::RoadPosition& start_position
   // 2- Move towards the left / right, the one that offers the lesser number of hops with a possible
   //    straight backwards movement. Go to step 1.
 
+  LaneSRangeIndex current_index = end_index.value();
+  std::vector<api::LaneSRange> lane_s_ranges;
+
   // TODO(#543): this process should be simpler once we process in the constructor end-to-end Phase
   // connectivity as we can cache in the interfaces those LaneSRangeIndices that connect with each other.
-  int num_phases_to_check = phases_.size() - start_lane_s_range_index->first;
-  while (num_phases_to_check >= 0 && !is_same_phase(current_lane_s_range_index, *start_lane_s_range_index)) {
+  int num_phases_to_check = phases_.size() - start_index->phase;
+  while (num_phases_to_check >= 0 && !is_same_phase(current_index, *start_index)) {
     num_phases_to_check--;
     // Adds the current LaneSRange to the last list.
-    prepend_lane_s_range_to_route(current_lane_s_range_index, &lane_s_ranges);
+    prepend_to_route(current_index, &lane_s_ranges);
     // Moves within the Phase towards the first LaneSRange with a straight predecessor.
-    std::optional<LaneSRangeIndex> predecessor_lane_s_range_index{};
-    while (!predecessor_lane_s_range_index.has_value()) {
-      predecessor_lane_s_range_index = FindStraightPredecessor(current_lane_s_range_index);
-      if (!predecessor_lane_s_range_index.has_value()) {
-        current_lane_s_range_index.second +=
-            FindDirectionTowardsLaneSRangeWithStraightPredecessor(current_lane_s_range_index);
-        prepend_lane_s_range_to_route(current_lane_s_range_index, &lane_s_ranges);
+    std::optional<LaneSRangeIndex> predecessor_index{};
+    int num_lane_s_ranges_to_check = static_cast<int>(phases_[current_index.phase].lane_s_ranges().size());
+    while (!predecessor_index.has_value() && num_lane_s_ranges_to_check >= 0) {
+      predecessor_index = FindStraightPredecessor(current_index);
+      if (!predecessor_index.has_value()) {
+        current_index.lane_s_range += FindDirectionTowardsLaneSRangeWithStraightPredecessor(current_index);
+        prepend_to_route(current_index, &lane_s_ranges);
       }
+      num_lane_s_ranges_to_check--;
     }
+    MALIPUT_VALIDATE(num_lane_s_ranges_to_check >= 0 && predecessor_index.has_value(),
+                     "Failed to find an api::LaneSRange at Route::ComputeLaneSRoute that has a straight predecessor.");
     // Changes to the preceding Phase - LaneSRange.
-    current_lane_s_range_index = *predecessor_lane_s_range_index;
+    current_index = *predecessor_index;
   }
   // Check that we have found a solution.
   MALIPUT_VALIDATE(num_phases_to_check >= 0,
                    "Failed to find an api::LaneSRoute at Route::ComputeLaneSRoute. The backwards path finding exceeded "
-                   "the phase iterations.");
+                   "the number of phases to check.");
 
   // TODO(#543): make the set of LaneSRanges of the right length once we can easily map s-coordinates LaneSRange to
   // LaneSRange.
   // Prepend the remaining api::LaneSRanges within the initial Phase towards the starting api::LaneSRange.
   LaneSRangeRelation lane_s_range_relation{LaneSRangeRelation::kUnknown};
   while (lane_s_range_relation != LaneSRangeRelation::kCoincident) {
-    prepend_lane_s_range_to_route(current_lane_s_range_index, &lane_s_ranges);
-    const api::LaneSRange start_lane_s_range =
-        GetLaneSRange(start_lane_s_range_index->first, start_lane_s_range_index->second);
-    const api::LaneSRange current_lane_s_range =
-        GetLaneSRange(current_lane_s_range_index.first, current_lane_s_range_index.second);
+    prepend_to_route(current_index, &lane_s_ranges);
+    const api::LaneSRange start_lane_s_range = GetLaneSRange(start_index->phase, start_index->lane_s_range);
+    const api::LaneSRange current_lane_s_range = GetLaneSRange(current_index.phase, current_index.lane_s_range);
     lane_s_range_relation = ComputeLaneSRangeRelation(start_lane_s_range, current_lane_s_range);
     switch (lane_s_range_relation) {
       case LaneSRangeRelation::kLeft:
       case LaneSRangeRelation::kAdjacentLeft:
-        current_lane_s_range_index.second += kTowardsRight;
+        current_index.lane_s_range += kTowardsRight;
         break;
 
       case LaneSRangeRelation::kRight:
       case LaneSRangeRelation::kAdjacentRight:
-        current_lane_s_range_index.second += kTowardsLeft;
+        current_index.lane_s_range += kTowardsLeft;
         break;
 
       case LaneSRangeRelation::kCoincident:
@@ -303,24 +299,24 @@ api::LaneSRoute Route::ComputeLaneSRoute(const api::RoadPosition& start_position
 }
 
 std::optional<Route::LaneSRangeIndex> Route::FindLaneSRangeIndex(const api::LaneSRange& lane_s_range) const {
-  if (lane_id_to_lane_s_range_indices_.find(lane_s_range.lane_id()) == lane_id_to_lane_s_range_indices_.end()) {
-    return {};
+  if (lane_id_to_indices_.find(lane_s_range.lane_id()) == lane_id_to_indices_.end()) {
+    return std::nullopt;
   }
   const double tolerance = road_network_->road_geometry()->linear_tolerance();
-  const std::vector<LaneSRangeIndex> lane_s_range_indices = lane_id_to_lane_s_range_indices_.at(lane_s_range.lane_id());
-  for (const LaneSRangeIndex& idx : lane_s_range_indices) {
-    if (phases_[idx.first].lane_s_ranges()[idx.second].Contains(lane_s_range, tolerance)) {
+  const std::vector<LaneSRangeIndex> indices = lane_id_to_indices_.at(lane_s_range.lane_id());
+  for (const LaneSRangeIndex& idx : indices) {
+    if (phases_[idx.phase].lane_s_ranges()[idx.lane_s_range].Contains(lane_s_range, tolerance)) {
       return {idx};
     }
   }
-  return {};
+  return std::nullopt;
 }
 
-std::optional<Route::LaneSRangeIndex> Route::FindStraightPredecessor(
-    const Route::LaneSRangeIndex& lane_s_range_index) const {
-  const size_t preceeding_phase_index = lane_s_range_index.first - 1u;
+std::optional<Route::LaneSRangeIndex> Route::FindStraightPredecessor(const Route::LaneSRangeIndex& index) const {
+  MALIPUT_THROW_UNLESS(index.phase > 0u);
+  const size_t preceeding_phase_index = index.phase - 1u;
   const Phase& preceeding_phase = phases_.at(preceeding_phase_index);
-  const api::LaneSRange& lane_s_range = GetLaneSRange(lane_s_range_index.first, lane_s_range_index.second);
+  const api::LaneSRange& lane_s_range = GetLaneSRange(index.phase, index.lane_s_range);
   const auto preceeding_lane_s_range_it =
       std::find_if(preceeding_phase.lane_s_ranges().begin(), preceeding_phase.lane_s_ranges().end(),
                    [this, lane_s_range](const api::LaneSRange& preceeding_lane_s_range) {
@@ -328,38 +324,36 @@ std::optional<Route::LaneSRangeIndex> Route::FindStraightPredecessor(
                             LaneSRangeRelation::kPreceedingStraight;
                    });
   if (preceeding_lane_s_range_it == preceeding_phase.lane_s_ranges().end()) {
-    return {};
+    return std::nullopt;
   }
-  const size_t preceeding_lane_s_range_index =
+  const size_t preceeding_index =
       static_cast<size_t>(std::distance(preceeding_phase.lane_s_ranges().begin(), preceeding_lane_s_range_it));
-  return {LaneSRangeIndex{preceeding_phase_index, preceeding_lane_s_range_index}};
+  return {LaneSRangeIndex{preceeding_phase_index, preceeding_index}};
 }
 
-int Route::FindDirectionTowardsLaneSRangeWithStraightPredecessor(
-    const Route::LaneSRangeIndex& lane_s_range_index) const {
-  const Phase& current_phase = Get(lane_s_range_index.first);
-  const size_t min_current_lane_s_range_index = 0u;
-  const size_t max_current_lane_s_range_index = current_phase.lane_s_ranges().size() - 1u;
+int Route::FindDirectionTowardsLaneSRangeWithStraightPredecessor(const Route::LaneSRangeIndex& index) const {
+  const Phase& current_phase = Get(index.phase);
+  const size_t min_current_index = 0u;
+  const size_t max_current_index = current_phase.lane_s_ranges().size() - 1u;
 
   // Quick checks before looking for one side.
-  if (lane_s_range_index.second == min_current_lane_s_range_index) {  // This is the top right index, move to the left.
+  if (index.lane_s_range == min_current_index) {  // This is the top right index, move to the left.
     return kTowardsLeft;
-  } else if (lane_s_range_index.second ==
-             max_current_lane_s_range_index) {  // This is the top right index, move to the left.
+  } else if (index.lane_s_range == max_current_index) {  // This is the top right index, move to the right.
     return kTowardsRight;
   }
 
   // Evaluate if there are less elements to the right than to the left.
-  if (lane_s_range_index.second <= (max_current_lane_s_range_index - max_current_lane_s_range_index)) {
-    for (size_t i = lane_s_range_index.second - 1; i >= min_current_lane_s_range_index; i--) {
-      if (FindStraightPredecessor({lane_s_range_index.first, i} /* right_lane_s_range_index */).has_value()) {
+  if (index.lane_s_range <= (max_current_index - max_current_index)) {
+    for (size_t i = index.lane_s_range - 1; i >= min_current_index; i--) {
+      if (FindStraightPredecessor({index.phase, i} /* right_index */).has_value()) {
         return kTowardsRight;
       }
     }
     return kTowardsLeft;
   }
-  for (size_t i = lane_s_range_index.second + 1; i <= max_current_lane_s_range_index; i++) {
-    if (FindStraightPredecessor({lane_s_range_index.first, i} /* left_lane_s_range_index */).has_value()) {
+  for (size_t i = index.lane_s_range + 1; i <= max_current_index; i++) {
+    if (FindStraightPredecessor({index.phase, i} /* left_index */).has_value()) {
       return kTowardsLeft;
     }
   }
