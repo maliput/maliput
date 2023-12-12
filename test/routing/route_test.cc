@@ -770,10 +770,12 @@ class RouteComputeLaneSRouteBaseTest : public RouteBaseTest {
   const api::LaneId kLaneIdA{"lane_a"};
   const api::LaneId kLaneIdB{"lane_b"};
   const api::LaneId kLaneIdC{"lane_c"};
+  const api::LaneId kLaneIdD{"lane_d"};
 
   const api::LaneSRange kLaneSRangeA{kLaneIdA, api::SRange{0., kLaneLength}};
   const api::LaneSRange kLaneSRangeB{kLaneIdB, api::SRange{0., kLaneLength}};
   const api::LaneSRange kLaneSRangeC{kLaneIdC, api::SRange{0., kLaneLength}};
+  const api::LaneSRange kLaneSRangeD{kLaneIdD, api::SRange{0., kLaneLength}};
 
   const api::LanePosition kStartLanePositionPhase{0., 0., 0.};
   const api::LanePosition kEndLanePositionPhase{kLaneLength, 0., 0.};
@@ -784,6 +786,7 @@ class RouteComputeLaneSRouteBaseTest : public RouteBaseTest {
   LaneMock lane_a_;
   LaneMock lane_b_;
   LaneMock lane_c_;
+  LaneMock lane_d_;
   SegmentMock segment_zero_;
   SegmentMock segment_one_;
   std::unique_ptr<Phase> phase_zero_;
@@ -874,7 +877,7 @@ TEST_F(RouteComputeLaneSRouteCaseATest, ComputeLaneSRoute) {
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
 }
 
-// Case B:
+// Case B.1:
 // - Feature under evaluation: can move to the right at the beginning in the same Phase.
 // - Topology:
 // <pre>
@@ -883,7 +886,7 @@ TEST_F(RouteComputeLaneSRouteCaseATest, ComputeLaneSRoute) {
 // *----B>----x----C>----x
 //
 // </pre>
-class RouteComputeLaneSRouteCaseBTest : public RouteComputeLaneSRouteBaseTest {
+class RouteComputeLaneSRouteCaseB1Test : public RouteComputeLaneSRouteBaseTest {
  public:
   const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeB, kLaneSRangeA};
   const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeC};
@@ -926,7 +929,7 @@ class RouteComputeLaneSRouteCaseBTest : public RouteComputeLaneSRouteBaseTest {
   }
 };
 
-TEST_F(RouteComputeLaneSRouteCaseBTest, ComputeLaneSRoute) {
+TEST_F(RouteComputeLaneSRouteCaseB1Test, ComputeLaneSRoute) {
   const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
@@ -940,7 +943,82 @@ TEST_F(RouteComputeLaneSRouteCaseBTest, ComputeLaneSRoute) {
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
 }
 
-// Case C:
+// Case B.2:
+// - Feature under evaluation: can perform multiple lane switches to the right at the beginning in the same Phase.
+// - Topology:
+// <pre>
+//
+// x----A>----*
+// x----B>----*
+// *----C>----x----D>----x
+//
+// </pre>
+class RouteComputeLaneSRouteCaseB2Test : public RouteComputeLaneSRouteBaseTest {
+ public:
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeC, kLaneSRangeB, kLaneSRangeA};
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeD};
+
+  void SetUp() override {
+    RouteComputeLaneSRouteBaseTest::SetUp();
+    EXPECT_CALL(segment_zero_, do_id()).WillRepeatedly(Return(kSegmentZeroId));
+    EXPECT_CALL(segment_one_, do_id()).WillRepeatedly(Return(kSegmentOneId));
+    // Segment zero.
+    SetUpLane(&lane_a_, kLaneIdA, nullptr, &lane_b_, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_a_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_a_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_b_, kLaneIdB, &lane_a_, &lane_c_, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_b_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, -5., 0.}));
+    EXPECT_CALL(lane_b_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_c_, kLaneIdC, &lane_b_, nullptr, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_c_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, -10., 0.}));
+    EXPECT_CALL(lane_c_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    // Segment one.
+    SetUpLane(&lane_d_, kLaneIdD, nullptr, nullptr, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_d_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, -10., 0.}));
+    EXPECT_CALL(lane_d_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdC)).WillRepeatedly(Return(&lane_c_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdD)).WillRepeatedly(Return(&lane_d_));
+    EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseZero{
+        api::RoadPosition{&lane_a_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseZero{api::RoadPosition{&lane_c_, kEndLanePositionPhase}};
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseOne{
+        api::RoadPosition{&lane_d_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseOne{api::RoadPosition{&lane_d_, kEndLanePositionPhase}};
+
+    phase_zero_ = std::make_unique<Phase>(kPhaseZeroIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseZero,
+                                          kEndRoadPositionsPhaseZero, kLaneSRangesPhaseZero, road_network_.get());
+    phase_one_ = std::make_unique<Phase>(kPhaseOneIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseOne,
+                                         kEndRoadPositionsPhaseOne, kLaneSRangesPhaseOne, road_network_.get());
+    EXPECT_CALL(*road_geometry_ptr_, do_linear_tolerance()).WillRepeatedly(Return(kLinearTolerance));
+  }
+};
+
+TEST_F(RouteComputeLaneSRouteCaseB2Test, ComputeLaneSRoute) {
+  const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionD{&lane_d_, kQueryLanePosition};
+  const api::LaneSRoute kExpectedLaneSRouteFromA({kLaneSRangeA, kLaneSRangeB, kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromB({kLaneSRangeB, kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromC({kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromD({kLaneSRangeD});
+  const Route dut({*phase_zero_, *phase_one_}, road_network_.get());
+
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromA, dut.ComputeLaneSRoute(kRoadPositionA))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromB, dut.ComputeLaneSRoute(kRoadPositionB))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromD, dut.ComputeLaneSRoute(kRoadPositionD))));
+}
+
+// Case C.1:
 // - Feature under evaluation: can move to the left at the beginning in the same Phase.
 // - Topology:
 // <pre>
@@ -949,7 +1027,7 @@ TEST_F(RouteComputeLaneSRouteCaseBTest, ComputeLaneSRoute) {
 // x----A>----*
 //
 // </pre>
-class RouteComputeLaneSRouteCaseCTest : public RouteComputeLaneSRouteBaseTest {
+class RouteComputeLaneSRouteCaseC1Test : public RouteComputeLaneSRouteBaseTest {
  public:
   const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeA, kLaneSRangeB};
   const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeC};
@@ -992,7 +1070,7 @@ class RouteComputeLaneSRouteCaseCTest : public RouteComputeLaneSRouteBaseTest {
   }
 };
 
-TEST_F(RouteComputeLaneSRouteCaseCTest, ComputeLaneSRoute) {
+TEST_F(RouteComputeLaneSRouteCaseC1Test, ComputeLaneSRoute) {
   const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
@@ -1006,7 +1084,82 @@ TEST_F(RouteComputeLaneSRouteCaseCTest, ComputeLaneSRoute) {
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
 }
 
-// Case D:
+// Case C.2:
+// - Feature under evaluation: can move multiple lane switches to the left at the beginning in the same Phase.
+// - Topology:
+// <pre>
+//
+// *----C>----x----D>----x
+// x----B>----*
+// x----A>----*
+//
+// </pre>
+class RouteComputeLaneSRouteCaseC2Test : public RouteComputeLaneSRouteBaseTest {
+ public:
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeA, kLaneSRangeB, kLaneSRangeC};
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeD};
+
+  void SetUp() override {
+    RouteComputeLaneSRouteBaseTest::SetUp();
+    EXPECT_CALL(segment_zero_, do_id()).WillRepeatedly(Return(kSegmentZeroId));
+    EXPECT_CALL(segment_one_, do_id()).WillRepeatedly(Return(kSegmentOneId));
+    // Segment zero.
+    SetUpLane(&lane_a_, kLaneIdA, &lane_b_, nullptr, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_a_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, -10., 0.}));
+    EXPECT_CALL(lane_a_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_b_, kLaneIdB, &lane_c_, &lane_a_, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_b_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, -5., 0.}));
+    EXPECT_CALL(lane_b_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_c_, kLaneIdC, nullptr, &lane_b_, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_c_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_c_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    // Segment one.
+    SetUpLane(&lane_d_, kLaneIdD, nullptr, nullptr, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_d_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_d_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdC)).WillRepeatedly(Return(&lane_c_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdD)).WillRepeatedly(Return(&lane_d_));
+    EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseZero{
+        api::RoadPosition{&lane_a_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseZero{api::RoadPosition{&lane_c_, kEndLanePositionPhase}};
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseOne{
+        api::RoadPosition{&lane_d_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseOne{api::RoadPosition{&lane_d_, kEndLanePositionPhase}};
+
+    phase_zero_ = std::make_unique<Phase>(kPhaseZeroIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseZero,
+                                          kEndRoadPositionsPhaseZero, kLaneSRangesPhaseZero, road_network_.get());
+    phase_one_ = std::make_unique<Phase>(kPhaseOneIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseOne,
+                                         kEndRoadPositionsPhaseOne, kLaneSRangesPhaseOne, road_network_.get());
+    EXPECT_CALL(*road_geometry_ptr_, do_linear_tolerance()).WillRepeatedly(Return(kLinearTolerance));
+  }
+};
+
+TEST_F(RouteComputeLaneSRouteCaseC2Test, ComputeLaneSRoute) {
+  const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionD{&lane_d_, kQueryLanePosition};
+  const api::LaneSRoute kExpectedLaneSRouteFromA({kLaneSRangeA, kLaneSRangeB, kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromB({kLaneSRangeB, kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromC({kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromD({kLaneSRangeD});
+  const Route dut({*phase_zero_, *phase_one_}, road_network_.get());
+
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromA, dut.ComputeLaneSRoute(kRoadPositionA))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromB, dut.ComputeLaneSRoute(kRoadPositionB))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromD, dut.ComputeLaneSRoute(kRoadPositionD))));
+}
+
+// Case D.1:
 // - Feature under evaluation: can move to the right at the end in the same Phase.
 // - Topology:
 // <pre>
@@ -1015,7 +1168,7 @@ TEST_F(RouteComputeLaneSRouteCaseCTest, ComputeLaneSRoute) {
 //            *----C>----x
 //
 // </pre>
-class RouteComputeLaneSRouteCaseDTest : public RouteComputeLaneSRouteBaseTest {
+class RouteComputeLaneSRouteCaseD1Test : public RouteComputeLaneSRouteBaseTest {
  public:
   const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeA};
   const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeC, kLaneSRangeB};
@@ -1057,7 +1210,7 @@ class RouteComputeLaneSRouteCaseDTest : public RouteComputeLaneSRouteBaseTest {
   }
 };
 
-TEST_F(RouteComputeLaneSRouteCaseDTest, ComputeLaneSRoute) {
+TEST_F(RouteComputeLaneSRouteCaseD1Test, ComputeLaneSRoute) {
   const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
@@ -1071,7 +1224,81 @@ TEST_F(RouteComputeLaneSRouteCaseDTest, ComputeLaneSRoute) {
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
 }
 
-// Case E:
+// Case D.2:
+// - Feature under evaluation: can move multiple times to the right at the end in the same Phase.
+// - Topology:
+// <pre>
+//
+// x----A>----x----B>----*
+//            *----C>----*
+//            *----D>----x
+//
+// </pre>
+class RouteComputeLaneSRouteCaseD2Test : public RouteComputeLaneSRouteBaseTest {
+ public:
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeA};
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeD, kLaneSRangeC, kLaneSRangeB};
+
+  void SetUp() override {
+    RouteComputeLaneSRouteBaseTest::SetUp();
+    EXPECT_CALL(segment_zero_, do_id()).WillRepeatedly(Return(kSegmentZeroId));
+    EXPECT_CALL(segment_one_, do_id()).WillRepeatedly(Return(kSegmentOneId));
+    // Segment zero.
+    SetUpLane(&lane_a_, kLaneIdA, nullptr, nullptr, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_a_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_a_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    // Segment one.
+    SetUpLane(&lane_b_, kLaneIdB, &lane_c_, nullptr, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_b_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_b_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_c_, kLaneIdC, &lane_d_, &lane_b_, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_c_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, -5., 0.}));
+    EXPECT_CALL(lane_c_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_d_, kLaneIdD, nullptr, &lane_c_, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_d_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, -10., 0.}));
+    EXPECT_CALL(lane_d_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdC)).WillRepeatedly(Return(&lane_c_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdD)).WillRepeatedly(Return(&lane_d_));
+    EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseZero{
+        api::RoadPosition{&lane_a_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseZero{api::RoadPosition{&lane_a_, kEndLanePositionPhase}};
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseOne{
+        api::RoadPosition{&lane_b_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseOne{api::RoadPosition{&lane_d_, kEndLanePositionPhase}};
+    phase_zero_ = std::make_unique<Phase>(kPhaseZeroIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseZero,
+                                          kEndRoadPositionsPhaseZero, kLaneSRangesPhaseZero, road_network_.get());
+    phase_one_ = std::make_unique<Phase>(kPhaseOneIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseOne,
+                                         kEndRoadPositionsPhaseOne, kLaneSRangesPhaseOne, road_network_.get());
+    EXPECT_CALL(*road_geometry_ptr_, do_linear_tolerance()).WillRepeatedly(Return(kLinearTolerance));
+  }
+};
+
+TEST_F(RouteComputeLaneSRouteCaseD2Test, ComputeLaneSRoute) {
+  const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionD{&lane_d_, kQueryLanePosition};
+  const api::LaneSRoute kExpectedLaneSRouteFromA({kLaneSRangeA, kLaneSRangeB, kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromB({kLaneSRangeB, kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromC({kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromD({kLaneSRangeD});
+  const Route dut({*phase_zero_, *phase_one_}, road_network_.get());
+
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromA, dut.ComputeLaneSRoute(kRoadPositionA))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromB, dut.ComputeLaneSRoute(kRoadPositionB))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromD, dut.ComputeLaneSRoute(kRoadPositionD))));
+}
+
+// Case E.1:
 // - Feature under evaluation: can move to the left at the end in the same Phase.
 // - Topology:
 // <pre>
@@ -1080,7 +1307,7 @@ TEST_F(RouteComputeLaneSRouteCaseDTest, ComputeLaneSRoute) {
 // *----A>----x----B>----*
 //
 // </pre>
-class RouteComputeLaneSRouteCaseETest : public RouteComputeLaneSRouteBaseTest {
+class RouteComputeLaneSRouteCaseE1Test : public RouteComputeLaneSRouteBaseTest {
  public:
   const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeA};
   const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeB, kLaneSRangeC};
@@ -1122,7 +1349,7 @@ class RouteComputeLaneSRouteCaseETest : public RouteComputeLaneSRouteBaseTest {
   }
 };
 
-TEST_F(RouteComputeLaneSRouteCaseETest, ComputeLaneSRoute) {
+TEST_F(RouteComputeLaneSRouteCaseE1Test, ComputeLaneSRoute) {
   const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
@@ -1136,7 +1363,81 @@ TEST_F(RouteComputeLaneSRouteCaseETest, ComputeLaneSRoute) {
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
 }
 
-// Case F:
+// Case E.2:
+// - Feature under evaluation: can move multiple times to the left at the end in the same Phase.
+// - Topology:
+// <pre>
+//
+//            *----D>----x
+//            *----C>----*
+// *----A>----x----B>----*
+//
+// </pre>
+class RouteComputeLaneSRouteCaseE2Test : public RouteComputeLaneSRouteBaseTest {
+ public:
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeA};
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeB, kLaneSRangeC, kLaneSRangeD};
+
+  void SetUp() override {
+    RouteComputeLaneSRouteBaseTest::SetUp();
+    EXPECT_CALL(segment_zero_, do_id()).WillRepeatedly(Return(kSegmentZeroId));
+    EXPECT_CALL(segment_one_, do_id()).WillRepeatedly(Return(kSegmentOneId));
+    // Segment zero.
+    SetUpLane(&lane_a_, kLaneIdA, nullptr, nullptr, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_a_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_a_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    // Segment one.
+    SetUpLane(&lane_b_, kLaneIdB, nullptr, &lane_c_, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_b_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_b_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_c_, kLaneIdC, &lane_b_, &lane_d_, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_c_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 5., 0.}));
+    EXPECT_CALL(lane_c_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_d_, kLaneIdD, &lane_c_, nullptr, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_d_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 10., 0.}));
+    EXPECT_CALL(lane_d_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdC)).WillRepeatedly(Return(&lane_c_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdD)).WillRepeatedly(Return(&lane_d_));
+    EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseZero{
+        api::RoadPosition{&lane_a_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseZero{api::RoadPosition{&lane_a_, kEndLanePositionPhase}};
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseOne{
+        api::RoadPosition{&lane_b_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseOne{api::RoadPosition{&lane_d_, kEndLanePositionPhase}};
+    phase_zero_ = std::make_unique<Phase>(kPhaseZeroIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseZero,
+                                          kEndRoadPositionsPhaseZero, kLaneSRangesPhaseZero, road_network_.get());
+    phase_one_ = std::make_unique<Phase>(kPhaseOneIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseOne,
+                                         kEndRoadPositionsPhaseOne, kLaneSRangesPhaseOne, road_network_.get());
+    EXPECT_CALL(*road_geometry_ptr_, do_linear_tolerance()).WillRepeatedly(Return(kLinearTolerance));
+  }
+};
+
+TEST_F(RouteComputeLaneSRouteCaseE2Test, ComputeLaneSRoute) {
+  const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionD{&lane_d_, kQueryLanePosition};
+  const api::LaneSRoute kExpectedLaneSRouteFromA({kLaneSRangeA, kLaneSRangeB, kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromB({kLaneSRangeB, kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromC({kLaneSRangeC, kLaneSRangeD});
+  const api::LaneSRoute kExpectedLaneSRouteFromD({kLaneSRangeD});
+  const Route dut({*phase_zero_, *phase_one_}, road_network_.get());
+
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromA, dut.ComputeLaneSRoute(kRoadPositionA))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromB, dut.ComputeLaneSRoute(kRoadPositionB))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromD, dut.ComputeLaneSRoute(kRoadPositionD))));
+}
+
+// Case F.1:
 // - Feature under evaluation: combines all movements.
 // - Topology:
 // <pre>
@@ -1145,7 +1446,7 @@ TEST_F(RouteComputeLaneSRouteCaseETest, ComputeLaneSRoute) {
 // *----A>----x----B>----*          *----F>----x----G>----*
 //
 // </pre>
-class RouteComputeLaneSRouteCaseFTest : public RouteComputeLaneSRouteBaseTest {
+class RouteComputeLaneSRouteCaseF1Test : public RouteComputeLaneSRouteBaseTest {
  public:
   static constexpr int kPhaseTwoIndex{2};
   static constexpr int kPhaseThreeIndex{3};
@@ -1158,12 +1459,10 @@ class RouteComputeLaneSRouteCaseFTest : public RouteComputeLaneSRouteBaseTest {
   const api::SegmentId kSegmentThreeId{"segment_3"};
   const api::SegmentId kSegmentFourId{"segment_4"};
 
-  const api::LaneId kLaneIdD{"lane_d"};
   const api::LaneId kLaneIdE{"lane_e"};
   const api::LaneId kLaneIdF{"lane_f"};
   const api::LaneId kLaneIdG{"lane_g"};
 
-  const api::LaneSRange kLaneSRangeD{kLaneIdD, api::SRange{0., kLaneLength}};
   const api::LaneSRange kLaneSRangeE{kLaneIdE, api::SRange{0., kLaneLength}};
   const api::LaneSRange kLaneSRangeF{kLaneIdF, api::SRange{0., kLaneLength}};
   const api::LaneSRange kLaneSRangeG{kLaneIdG, api::SRange{0., kLaneLength}};
@@ -1219,7 +1518,7 @@ class RouteComputeLaneSRouteCaseFTest : public RouteComputeLaneSRouteBaseTest {
     EXPECT_CALL(lane_f_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
         .WillRepeatedly(Return(api::InertialPosition{4. * kLaneLength, 0., 0.}));
     EXPECT_CALL(lane_f_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
-    // Segment two.
+    // Segment four.
     SetUpLane(&lane_g_, kLaneIdG, nullptr, nullptr, &segment_four_, kLaneBounds, kLaneLength);
     EXPECT_CALL(lane_g_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
         .WillRepeatedly(Return(api::InertialPosition{4. * kLaneLength, 0., 0.}));
@@ -1264,7 +1563,6 @@ class RouteComputeLaneSRouteCaseFTest : public RouteComputeLaneSRouteBaseTest {
   }
 
  protected:
-  LaneMock lane_d_;
   LaneMock lane_e_;
   LaneMock lane_f_;
   LaneMock lane_g_;
@@ -1276,7 +1574,7 @@ class RouteComputeLaneSRouteCaseFTest : public RouteComputeLaneSRouteBaseTest {
   std::unique_ptr<Phase> phase_four_;
 };
 
-TEST_F(RouteComputeLaneSRouteCaseFTest, ComputeLaneSRoute) {
+TEST_F(RouteComputeLaneSRouteCaseF1Test, ComputeLaneSRoute) {
   const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
   const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
@@ -1303,6 +1601,201 @@ TEST_F(RouteComputeLaneSRouteCaseFTest, ComputeLaneSRoute) {
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromE, dut.ComputeLaneSRoute(kRoadPositionE))));
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromF, dut.ComputeLaneSRoute(kRoadPositionF))));
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromG, dut.ComputeLaneSRoute(kRoadPositionG))));
+}
+
+// Case F.2:
+// - Feature under evaluation: combines all movements.
+// - Topology:
+// <pre>
+//
+//            *----D>----x----E>----x----F>----*
+//            *----C>----*          x----G>----*
+// *----A>----x----B>----*          *----H>----x----I>----*
+//
+// </pre>
+class RouteComputeLaneSRouteCaseF2Test : public RouteComputeLaneSRouteBaseTest {
+ public:
+  static constexpr int kPhaseTwoIndex{2};
+  static constexpr int kPhaseThreeIndex{3};
+  static constexpr int kPhaseFourIndex{4};
+  static constexpr double kLinearTolerance{1e-3};
+  static constexpr double kLaneSRangeTolerance{1e-3};
+  static constexpr double kLaneLength{100.};
+
+  const api::SegmentId kSegmentTwoId{"segment_2"};
+  const api::SegmentId kSegmentThreeId{"segment_3"};
+  const api::SegmentId kSegmentFourId{"segment_4"};
+
+  const api::LaneId kLaneIdE{"lane_e"};
+  const api::LaneId kLaneIdF{"lane_f"};
+  const api::LaneId kLaneIdG{"lane_g"};
+  const api::LaneId kLaneIdH{"lane_h"};
+  const api::LaneId kLaneIdI{"lane_i"};
+
+  const api::LaneSRange kLaneSRangeE{kLaneIdE, api::SRange{0., kLaneLength}};
+  const api::LaneSRange kLaneSRangeF{kLaneIdF, api::SRange{0., kLaneLength}};
+  const api::LaneSRange kLaneSRangeG{kLaneIdG, api::SRange{0., kLaneLength}};
+  const api::LaneSRange kLaneSRangeH{kLaneIdH, api::SRange{0., kLaneLength}};
+  const api::LaneSRange kLaneSRangeI{kLaneIdI, api::SRange{0., kLaneLength}};
+
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseZero{kLaneSRangeA};
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseOne{kLaneSRangeB, kLaneSRangeC, kLaneSRangeD};
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseTwo{kLaneSRangeE};
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseThree{kLaneSRangeH, kLaneSRangeG, kLaneSRangeF};
+  const std::vector<api::LaneSRange> kLaneSRangesPhaseFour{kLaneSRangeI};
+
+  void SetUp() override {
+    RouteComputeLaneSRouteBaseTest::SetUp();
+    EXPECT_CALL(segment_zero_, do_id()).WillRepeatedly(Return(kSegmentZeroId));
+    EXPECT_CALL(segment_one_, do_id()).WillRepeatedly(Return(kSegmentOneId));
+    EXPECT_CALL(segment_two_, do_id()).WillRepeatedly(Return(kSegmentTwoId));
+    EXPECT_CALL(segment_three_, do_id()).WillRepeatedly(Return(kSegmentThreeId));
+    EXPECT_CALL(segment_four_, do_id()).WillRepeatedly(Return(kSegmentFourId));
+    // Segment zero.
+    SetUpLane(&lane_a_, kLaneIdA, nullptr, nullptr, &segment_zero_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_a_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_a_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    // Segment one.
+    SetUpLane(&lane_b_, kLaneIdB, nullptr, &lane_c_, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_b_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_b_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_b_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_c_, kLaneIdC, &lane_b_, &lane_d_, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_c_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 5., 0.}));
+    EXPECT_CALL(lane_c_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 5., 0.}));
+    EXPECT_CALL(lane_c_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_d_, kLaneIdD, &lane_c_, nullptr, &segment_one_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_d_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{kLaneLength, 10., 0.}));
+    EXPECT_CALL(lane_d_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 10., 0.}));
+    EXPECT_CALL(lane_d_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    // Segment two.
+    SetUpLane(&lane_e_, kLaneIdE, nullptr, nullptr, &segment_two_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_e_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 10., 0.}));
+    EXPECT_CALL(lane_e_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{3. * kLaneLength, 10., 0.}));
+    EXPECT_CALL(lane_e_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    // Segment three.
+    SetUpLane(&lane_f_, kLaneIdF, &lane_g_, nullptr, &segment_three_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_f_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{3. * kLaneLength, 10., 0.}));
+    EXPECT_CALL(lane_f_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{4. * kLaneLength, 10., 0.}));
+    EXPECT_CALL(lane_f_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_g_, kLaneIdG, &lane_h_, &lane_f_, &segment_three_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_g_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{3. * kLaneLength, 5., 0.}));
+    EXPECT_CALL(lane_g_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{4. * kLaneLength, 5., 0.}));
+    EXPECT_CALL(lane_g_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    SetUpLane(&lane_h_, kLaneIdH, nullptr, &lane_g_, &segment_three_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_h_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{3. * kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_h_, DoToInertialPosition(Matches(kEndLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{4. * kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_h_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+    // Segment four.
+    SetUpLane(&lane_i_, kLaneIdI, nullptr, nullptr, &segment_four_, kLaneBounds, kLaneLength);
+    EXPECT_CALL(lane_i_, DoToInertialPosition(Matches(kStartLanePositionPhase)))
+        .WillRepeatedly(Return(api::InertialPosition{4. * kLaneLength, 0., 0.}));
+    EXPECT_CALL(lane_i_, DoGetOrientation(_)).WillRepeatedly(Return(kRotation));
+
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdC)).WillRepeatedly(Return(&lane_c_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdD)).WillRepeatedly(Return(&lane_d_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdE)).WillRepeatedly(Return(&lane_e_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdF)).WillRepeatedly(Return(&lane_f_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdG)).WillRepeatedly(Return(&lane_g_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdH)).WillRepeatedly(Return(&lane_h_));
+    EXPECT_CALL(id_index_, DoGetLane(kLaneIdI)).WillRepeatedly(Return(&lane_i_));
+    EXPECT_CALL(*(road_geometry_ptr_), DoById()).WillRepeatedly(ReturnRef(id_index_));
+
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseZero{
+        api::RoadPosition{&lane_a_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseZero{api::RoadPosition{&lane_a_, kEndLanePositionPhase}};
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseOne{
+        api::RoadPosition{&lane_b_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseOne{api::RoadPosition{&lane_d_, kEndLanePositionPhase}};
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseTwo{
+        api::RoadPosition{&lane_e_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseTwo{api::RoadPosition{&lane_e_, kEndLanePositionPhase}};
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseThree{
+        api::RoadPosition{&lane_f_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseThree{
+        api::RoadPosition{&lane_h_, kEndLanePositionPhase}};
+    const std::vector<api::RoadPosition> kStartRoadPositionsPhaseFour{
+        api::RoadPosition{&lane_i_, kStartLanePositionPhase}};
+    const std::vector<api::RoadPosition> kEndRoadPositionsPhaseFour{api::RoadPosition{&lane_i_, kEndLanePositionPhase}};
+    phase_zero_ = std::make_unique<Phase>(kPhaseZeroIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseZero,
+                                          kEndRoadPositionsPhaseZero, kLaneSRangesPhaseZero, road_network_.get());
+    phase_one_ = std::make_unique<Phase>(kPhaseOneIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseOne,
+                                         kEndRoadPositionsPhaseOne, kLaneSRangesPhaseOne, road_network_.get());
+    phase_two_ = std::make_unique<Phase>(kPhaseTwoIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseTwo,
+                                         kEndRoadPositionsPhaseTwo, kLaneSRangesPhaseTwo, road_network_.get());
+    phase_three_ = std::make_unique<Phase>(kPhaseThreeIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseThree,
+                                           kEndRoadPositionsPhaseThree, kLaneSRangesPhaseThree, road_network_.get());
+    phase_four_ = std::make_unique<Phase>(kPhaseFourIndex, kLaneSRangeTolerance, kStartRoadPositionsPhaseFour,
+                                          kEndRoadPositionsPhaseFour, kLaneSRangesPhaseFour, road_network_.get());
+    EXPECT_CALL(*road_geometry_ptr_, do_linear_tolerance()).WillRepeatedly(Return(kLinearTolerance));
+  }
+
+ protected:
+  LaneMock lane_e_;
+  LaneMock lane_f_;
+  LaneMock lane_g_;
+  LaneMock lane_h_;
+  LaneMock lane_i_;
+  SegmentMock segment_two_;
+  SegmentMock segment_three_;
+  SegmentMock segment_four_;
+  std::unique_ptr<Phase> phase_two_;
+  std::unique_ptr<Phase> phase_three_;
+  std::unique_ptr<Phase> phase_four_;
+};
+
+TEST_F(RouteComputeLaneSRouteCaseF2Test, ComputeLaneSRoute) {
+  const api::RoadPosition kRoadPositionA{&lane_a_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionB{&lane_b_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionC{&lane_c_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionD{&lane_d_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionE{&lane_e_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionF{&lane_f_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionG{&lane_g_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionH{&lane_h_, kQueryLanePosition};
+  const api::RoadPosition kRoadPositionI{&lane_i_, kQueryLanePosition};
+  const api::LaneSRoute kExpectedLaneSRouteFromA({kLaneSRangeA, kLaneSRangeB, kLaneSRangeC, kLaneSRangeD, kLaneSRangeE,
+                                                  kLaneSRangeF, kLaneSRangeG, kLaneSRangeH, kLaneSRangeI});
+  const api::LaneSRoute kExpectedLaneSRouteFromB(
+      {kLaneSRangeB, kLaneSRangeC, kLaneSRangeD, kLaneSRangeE, kLaneSRangeF, kLaneSRangeG, kLaneSRangeH, kLaneSRangeI});
+  const api::LaneSRoute kExpectedLaneSRouteFromC(
+      {kLaneSRangeC, kLaneSRangeD, kLaneSRangeE, kLaneSRangeF, kLaneSRangeG, kLaneSRangeH, kLaneSRangeI});
+  const api::LaneSRoute kExpectedLaneSRouteFromD(
+      {kLaneSRangeD, kLaneSRangeE, kLaneSRangeF, kLaneSRangeG, kLaneSRangeH, kLaneSRangeI});
+  const api::LaneSRoute kExpectedLaneSRouteFromE(
+      {kLaneSRangeE, kLaneSRangeF, kLaneSRangeG, kLaneSRangeH, kLaneSRangeI});
+  const api::LaneSRoute kExpectedLaneSRouteFromF({kLaneSRangeF, kLaneSRangeG, kLaneSRangeH, kLaneSRangeI});
+  const api::LaneSRoute kExpectedLaneSRouteFromG({kLaneSRangeG, kLaneSRangeH, kLaneSRangeI});
+  const api::LaneSRoute kExpectedLaneSRouteFromH({kLaneSRangeH, kLaneSRangeI});
+  const api::LaneSRoute kExpectedLaneSRouteFromI({kLaneSRangeI});
+  const Route dut({*phase_zero_, *phase_one_, *phase_two_, *phase_three_, *phase_four_}, road_network_.get());
+
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromA, dut.ComputeLaneSRoute(kRoadPositionA))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromB, dut.ComputeLaneSRoute(kRoadPositionB))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromC, dut.ComputeLaneSRoute(kRoadPositionC))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromD, dut.ComputeLaneSRoute(kRoadPositionD))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromE, dut.ComputeLaneSRoute(kRoadPositionE))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromF, dut.ComputeLaneSRoute(kRoadPositionF))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromG, dut.ComputeLaneSRoute(kRoadPositionG))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromH, dut.ComputeLaneSRoute(kRoadPositionH))));
+  EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromI, dut.ComputeLaneSRoute(kRoadPositionI))));
 }
 
 }  // namespace
