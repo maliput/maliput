@@ -52,42 +52,63 @@ class SRange {
 
   /// Constructs range [s0 --> s1].
   ///
+  /// @param s0 The start value of the range. It must not be negative.
+  /// @param s1 The end value of the range. It must not be negative.
   /// @throws common::assertion_error When 's0' is negative.
   /// @throws common::assertion_error When 's1' is negative.
   SRange(double s0, double s1);
 
   /// Gets s0 value.
+  ///
+  /// @return s0.
   double s0() const { return s0_; }
 
   /// Gets s1 value.
+  ///
+  /// @return s1.
   double s1() const { return s1_; }
 
   /// Sets s0 value.
   ///
+  /// @param s0 The start value of the range. It must not be negative.
   /// @throws common::assertion_error When 's0' is negative.
   void set_s0(double s0);
 
   /// Sets s1 value.
   ///
+  /// @param s1 The end value of the range. It must not be negative.
   /// @throws common::assertion_error When 's1' is negative.
   void set_s1(double s1);
 
-  /// Returns the size of this SRange (i.e., |s1() - s0()|).
+  /// Computes the size of this SRange (i.e., |s1() - s0()|).
+  ///
+  /// @return The size of of this SRange.
   double size() const { return std::fabs(s1() - s0()); }
 
-  /// Returns whether this SRange is in the direction of +s (i.e., s1() > s0()).
+  /// Defines whether this SRange is in the direction of +s (i.e., s1() > s0()).
+  ///
+  /// @return true When this SRange is in the direction of +s.
   bool WithS() const { return s1() > s0(); }
 
-  /// Determines whether this SRange intersects with `s_range`.
-  /// `tolerance` will modify this range and `s_range` by increasing the maximum tolerance
-  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  /// Determines whether this SRange intersects with @p s_range.
+  ///
+  /// @p tolerance will modify this range and @p s_range by increasing the maximum tolerance
+  /// and reducing the minimum each range. When @p tolerance is negative, it shrinks both ranges.
+  ///
+  /// @param s_range A SRange to evaluate the intersection with.
+  /// @param tolerance The tolerance to use when computing the intersection.
+  /// @return true When @p s_range intersects this SRange.
   bool Intersects(const SRange& s_range, double tolerance) const;
 
-  /// Returns a std::optional<SRange> bearing the intersected SRange that results overlapping
-  /// this SRange with `s_range`. When there is no common area, std::nullopt is returned.
+  /// Computes a std::optional<SRange> bearing the intersected SRange that results overlapping
+  /// this SRange with @p s_range. When there is no common area, std::nullopt is returned.
   ///
-  /// `tolerance` will modify this range and `s_range` by increasing the maximum tolerance
-  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  /// @p tolerance will modify this range and @p s_range by increasing the maximum tolerance
+  /// and reducing the minimum each range. When @p tolerance is negative, it shrinks both ranges.
+  ///
+  /// @param s_range The SRange to compute the intersection with.
+  /// @param tolerance The tolerance to use to evaluate the intersection.
+  /// @return A std::optional<SRange> with the intersected SRange.
   std::optional<SRange> GetIntersection(const SRange& s_range, double tolerance) const;
 
  private:
@@ -100,26 +121,47 @@ class LaneSRange {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(LaneSRange);
 
-  /// Constructs a LaneSRange as `s_range` on Lane `lane_id`.
+  /// Constructs a LaneSRange as @p s_range on Lane @p lane_id.
+  ///
+  /// @param lane_id Refers to the Lane this LaneSRange belongs to.
+  /// @param s_range The SRange in the @p lane_id Lane.
   LaneSRange(const LaneId& lane_id, const SRange& s_range) : lane_id_(lane_id), s_range_(s_range) {}
 
   /// Gets the LaneId.
+  ///
+  /// @return The LaneId.
   const LaneId& lane_id() const { return lane_id_; }
 
   /// Gets the SRange.
+  ///
+  /// @return The SRange.
   SRange s_range() const { return s_range_; }
 
+  /// Returns the length of this LaneSRange, which is dictated by the SRange.
+  ///
+  /// @return The SRange's size.
   double length() const { return s_range_.size(); }
 
-  /// Determines whether this LaneSRange intersects with `lane_s_range`.
+  /// Determines whether this LaneSRange intersects with @p lane_s_range.
   /// LaneIds are evaluated prior calling SRange::Intersects() method.
   ///
-  /// `tolerance` will modify this LaneSRanges's ranges and `lane_s_range`'s ranges by increasing the maximum tolerance
-  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  /// @p tolerance will modify this LaneSRanges's ranges and @p lane_s_range 's ranges by increasing the maximum
+  /// tolerance and reducing the minimum each range. When @p tolerance is negative, it shrinks both ranges.
+  ///
+  /// @param lane_s_range The LaneSRange to compute the intersection with.
+  /// @param tolerance The tolerance to use to evaluate the intersection.
+  /// @return true When @p lane_s_range intersects this LaneSRange.
   bool Intersects(const LaneSRange& lane_s_range, double tolerance) const;
 
-  /// Returns a std::optional<LaneSRange> bearing the intersected LaneSRange that results overlapping
-  /// this LaneSRange with `lane_s_range`. When there is no common area, std::nullopt is returned.
+  /// Computes a std::optional<LaneSRange> bearing the intersected LaneSRange that results overlapping
+  /// this LaneSRange with @p lane_s_range. When there is no common area, std::nullopt is returned.
+  ///
+  /// @p tolerance will modify this range and @p s_range by increasing the maximum tolerance
+  /// and reducing the minimum each range. When @p tolerance is negative, it shrinks both ranges.
+  ///
+  /// @param lane_s_range The LaneSRange to compute the intersection with.
+  /// @param tolerance The tolerance to use to evaluate the intersection.
+  /// @return A std::optional<LaneSRange> with the intersected LaneSRange.
   std::optional<LaneSRange> GetIntersection(const LaneSRange& lane_s_range, double tolerance) const;
 
  private:
@@ -143,23 +185,34 @@ class LaneSRoute {
   LaneSRoute() = default;
 
   /// Constructs a LaneSRoute from the given sequence of LaneSRanges.
+  ///
+  /// @param ranges A sequence of LaneSRanges.
   explicit LaneSRoute(const std::vector<LaneSRange>& ranges) : ranges_(ranges) {}
 
   /// Returns the sequence of LaneSRanges.
+  ///
+  /// @return A vector of LaneSRanges.
   const std::vector<LaneSRange>& ranges() const { return ranges_; }
 
-  /// Returns the accumulated length of all LaneSRanges.
+  /// Computes the accumulated length of all LaneSRanges.
+  ///
+  /// @return The accumulated length of all LaneSRanges.
   double length() const {
     return std::accumulate(ranges_.cbegin(), ranges_.cend(), 0.,
                            [](const double acc, const LaneSRange& lane_range) { return acc + lane_range.length(); });
   }
 
-  /// Determines whether this LaneSRoute intersects with `lane_s_route`.
+  /// Determines whether this LaneSRoute intersects with @p lane_s_route.
+  ///
   /// LaneSRoutes intersection is evaluated first by LaneSRange's LaneId coincidence, then LaneSRange::Intersects() is
   /// used.
   ///
-  /// `tolerance` will modify this LaneSRoute's ranges and `lane_s_route`'s ranges by increasing the maximum tolerance
-  /// and reducing the minimum each range. When `tolerance` is negative, it shrinks both ranges.
+  /// @p tolerance will modify this LaneSRoute's ranges and @p lane_s_route 's ranges by increasing the maximum
+  /// tolerance and reducing the minimum each range. When @p tolerance is negative, it shrinks both ranges.
+  ///
+  /// @param lane_s_route The LaneSRoute to compute the intersection with.
+  /// @param tolerance The tolerance to use to evaluate the intersection.
+  /// @return true When @p lane_s_route intersects this LaneSRoute.
   bool Intersects(const LaneSRoute& lane_s_route, double tolerance) const;
 
   // TODO(maddog@tri.global)  Implement a "CheckInvariants()" method which
@@ -170,32 +223,33 @@ class LaneSRoute {
   std::vector<LaneSRange> ranges_;
 };
 
-/// Evaluates whether `lane_range_a` end point is G1 contiguous with `lane_range_b` start pose.
+/// Evaluates whether @p lane_range_a end point is G1 contiguous with @p lane_range_b start pose.
 ///
-/// @param lane_range_a A LaneSRange in `road_geometry`. Its ID must belong to a `road_geometry`'s
+/// @param lane_range_a A LaneSRange in @p road_geometry. Its ID must belong to a @p road_geometry 's
 /// Lane.
-/// @param lane_range_b A LaneSRange in `road_geometry`. Its ID must belong to a `road_geometry`'s
+/// @param lane_range_b A LaneSRange in @p road_geometry. Its ID must belong to a @p road_geometry 's
 /// Lane.
-/// @param road_geometry The RoadGeometry where `lane_range_a` and `lane_range_b` are contained. It must not
+/// @param road_geometry The RoadGeometry where @p lane_range_a and @p lane_range_b are contained. It must not
 /// be nullptr.
-/// @returns True When `lane_range_a` end pose and `lane_range_b` start pose are within linear and
+/// @returns true When @p lane_range_a  end pose and @p lane_range_b start pose are within linear and
 /// angular tolerance in the `Inertial`-frame. Otherwise, it returns false.
 ///
-/// @throws common::assertion_error When `lane_range_a`'s Lane is not found in `road_geometry`.
-/// @throws common::assertion_error When `lane_range_b`'s Lane is not found in `road_geometry`.
-/// @throws common::assertion_error When `road_geometry` is nullptr.
+/// @throws common::assertion_error When @p lane_range_a 's Lane is not found in @p road_geometry.
+/// @throws common::assertion_error When @p lane_range_b 's Lane is not found in @p road_geometry.
+/// @throws common::assertion_error When @p road_geometry is nullptr.
 bool IsContiguous(const LaneSRange& lane_range_a, const LaneSRange& lane_range_b, const RoadGeometry* road_geometry);
 
-/// Evaluates whether `inertial_position` is within `lane_s_ranges`.
+/// Evaluates whether @p inertial_position is within @p lane_s_ranges.
 ///
 /// @param inertial_position A InertialPosition in the `Inertial`-frame.
 /// @param lane_s_ranges A vector of LaneSRanges that define a region.
-/// @param road_geometry The RoadGeometry where `lane_s_ranges` is contained. It must not be nullptr.
-/// @returns True when `inertial_position` is within `lane_s_ranges`. `inertial_position` is contained if the distance
-/// to the closest LanePosition of `lane_s_ranges` is less or equal than the linear tolerance of the `road_geometry`.
+/// @param road_geometry The RoadGeometry where @p lane_s_ranges is contained. It must not be nullptr.
+/// @returns True when @p inertial_position is within @p lane_s_ranges. @p inertial_position is contained if the
+/// distance to the closest LanePosition of @p lane_s_ranges is less or equal than the linear tolerance of the
+/// @p road_geometry.
 ///
-/// @throws common::assertion_error When `road_geometry` is nullptr.
-/// @throws common::assertion_error When Lanes in `lane_s_ranges` are not found in `road_geometry`.
+/// @throws common::assertion_error When @p road_geometry is nullptr.
+/// @throws common::assertion_error When Lanes in @p lane_s_ranges are not found in @p road_geometry.
 bool IsIncluded(const InertialPosition& inertial_position, const std::vector<LaneSRange>& lane_s_ranges,
                 const RoadGeometry* road_geometry);
 
