@@ -1,8 +1,6 @@
 ##############################################################################
 # Sources
 ##############################################################################
-if(BUILD_TESTING)
-
 
 set(TEST_UTILS_SOURCES
   mock.cc
@@ -40,5 +38,3 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-
-endif()
