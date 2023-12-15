@@ -100,13 +100,23 @@ class SRange {
   /// @return true When @p s_range intersects this SRange.
   bool Intersects(const SRange& s_range, double tolerance) const;
 
+  /// Determines whether this SRange contains @p s_range.
+  ///
+  /// @p tolerance will modify this range and @p s_range by increasing the maximum
+  /// and reducing the minimum of each range. When @p tolerance is negative, it shrinks both ranges.
+  ///
+  /// @param s_range A SRange to evaluate whether it is inside this SRange.
+  /// @param tolerance The tolerance to use when computing the inclusion relationship.
+  /// @return true When @p s_range is contained within this SRange.
+  bool Contains(const SRange& s_range, double tolerance) const;
+
   /// Computes a std::optional<SRange> bearing the intersected SRange that results overlapping
   /// this SRange with @p s_range. When there is no common area, std::nullopt is returned.
   ///
   /// @p tolerance will modify this range and @p s_range by increasing the maximum
   /// and reducing the minimum of each range. When @p tolerance is negative, it shrinks both ranges.
   ///
-  /// @param s_range The SRange to compute the intersection with.
+  /// @param s_range The SRange to evaluate whether it is included into this SRange.
   /// @param tolerance The tolerance to use to evaluate the intersection.
   /// @return A std::optional<SRange> with the intersected SRange.
   std::optional<SRange> GetIntersection(const SRange& s_range, double tolerance) const;
@@ -152,6 +162,16 @@ class LaneSRange {
   /// @param tolerance The tolerance to use to evaluate the intersection.
   /// @return true When @p lane_s_range intersects this LaneSRange.
   bool Intersects(const LaneSRange& lane_s_range, double tolerance) const;
+
+  /// Determines whether this LaneSRange contains @p lane_s_range.
+  ///
+  /// @p tolerance will modify this LaneSRanges's ranges and @p lane_s_range 's ranges by increasing the maximum
+  /// and reducing the minimum of each range. When @p tolerance is negative, it shrinks both ranges.
+  ///
+  /// @param lane_s_range The LaneSRange to evaluate whether it is included into this LaneSRange.
+  /// @param tolerance The tolerance to use to evaluate the inclusion with.
+  /// @return true When @p lane_s_range is contained within this LaneSRange.
+  bool Contains(const LaneSRange& lane_s_range, double tolerance) const;
 
   /// Computes a std::optional<LaneSRange> bearing the intersected LaneSRange that results overlapping
   /// this LaneSRange with @p lane_s_range. When there is no common area, std::nullopt is returned.
