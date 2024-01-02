@@ -57,10 +57,12 @@ std::vector<std::vector<const maliput::api::Lane*>> FindLaneSequences(const mali
                                                                       double max_length_m);
 
 /// Overload to @ref FindLaneSequences() that removes from the result those
-/// sequences presenting U-turns when @p remove_u_turns is true. Otherwise,
+/// sequences presenting U-turns when @p no_u_turns is true. Otherwise,
 /// the function behaves exactly the same.
+/// In this context, a U-turn is when the route backtracks against itself within
+/// the same lane.
 std::vector<std::vector<const maliput::api::Lane*>> FindLaneSequences(const maliput::api::Lane* start,
                                                                       const maliput::api::Lane* end,
-                                                                      double max_length_m, bool remove_u_turns);
+                                                                      double max_length_m, bool no_u_turns);
 }  // namespace routing
 }  // namespace maliput

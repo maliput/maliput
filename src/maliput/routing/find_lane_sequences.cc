@@ -171,10 +171,10 @@ std::vector<std::vector<const Lane*>> FindLaneSequences(const Lane* start, const
 }
 
 std::vector<std::vector<const Lane*>> FindLaneSequences(const Lane* start, const Lane* end, double max_length_m,
-                                                        bool remove_u_turns) {
+                                                        bool no_u_turns) {
   MALIPUT_PROFILE_FUNC();
   const std::vector<std::vector<const Lane*>> unfiltered_result = FindLaneSequences(start, end, max_length_m);
-  return remove_u_turns ? RemoveUTurns(unfiltered_result) : unfiltered_result;
+  return no_u_turns ? RemoveUTurns(unfiltered_result) : unfiltered_result;
 }
 
 }  // namespace routing
