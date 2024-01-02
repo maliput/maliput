@@ -89,6 +89,19 @@ bool SRange::Intersects(const SRange& s_range, double tolerance) const {
            (std::min(s_range.s0(), s_range.s1()) > wider_s_range.s1()));
 }
 
+bool SRange::Contains(const SRange& s_range, double tolerance) const {
+  MALIPUT_THROW_UNLESS(std::min(s0(), s1()) >= 0. && std::min(s_range.s0(), s_range.s1()) >= 0.);
+  if (tolerance < 0.) {
+    // When it is negative, tolerance's absolute value can not be bigger than half size of minor SRange.
+    MALIPUT_THROW_UNLESS(std::min(size(), s_range.size()) / 2. >= std::fabs(tolerance));
+  }
+  const double min_range = std::max(WithS() ? s0() - tolerance : s1() - tolerance, 0.);
+  const double max_range = WithS() ? s1() + tolerance : s0() + tolerance;
+  const bool s1_is_in_range = s_range.s1() <= max_range && s_range.s1() >= min_range;
+  const bool s0_is_in_range = s_range.s0() <= max_range && s_range.s0() >= min_range;
+  return s1_is_in_range && s0_is_in_range;
+}
+
 std::optional<SRange> SRange::GetIntersection(const SRange& s_range, double tolerance) const {
   if (Intersects(s_range, tolerance)) {
     const SRange wider_s_range(std::max(std::min(s0(), s1()) - tolerance, 0.), std::max(s0(), s1()) + tolerance);
@@ -106,6 +119,10 @@ std::optional<SRange> SRange::GetIntersection(const SRange& s_range, double tole
 
 bool LaneSRange::Intersects(const LaneSRange& lane_s_range, const double tolerance) const {
   return lane_id_ == lane_s_range.lane_id() ? s_range_.Intersects(lane_s_range.s_range(), tolerance) : false;
+}
+
+bool LaneSRange::Contains(const LaneSRange& lane_s_range, const double tolerance) const {
+  return lane_id_ == lane_s_range.lane_id() ? s_range_.Contains(lane_s_range.s_range(), tolerance) : false;
 }
 
 std::optional<LaneSRange> LaneSRange::GetIntersection(const LaneSRange& lane_s_range, double tolerance) const {

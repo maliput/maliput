@@ -29,6 +29,7 @@
 #pragma once
 
 #include <optional>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -143,6 +144,22 @@ class Route final {
   /// @throws std::out_of_range When @p index is negative or >= `size()`.
   const Phase& Get(int index) const { return phases_.at(index); }
 
+  /// Indexes an api::LaneSRange in a Phase.
+  ///
+  /// Convenient method for advanced users.
+  ///
+  /// @param phase_index The index of the api::LaneSRange in the Phase specified by @p phase_index. It must be
+  /// non-negative and less than `size()`.
+  /// @param lane_s_range_index The index of the api::LaneSRange. It must be
+  /// non-negative and less than `Phase::lane_s_ranges().size()`.
+  /// @return The api::LaneSRange indexed at the @p phase_index -th
+  /// Phase at the @p lane_s_range_index -th position.
+  /// @throws std::out_of_range When any of the preconditions of
+  /// @p phase_index or @p lane_s_range_index are unmet.
+  const api::LaneSRange& GetLaneSRange(int phase_index, int lane_s_range_index) const {
+    return Get(phase_index).lane_s_ranges().at(lane_s_range_index);
+  }
+
   /// Returns the start of this Route. This is a convenience method for
   /// Get(0).start_positions().front().
   const api::RoadPosition& start_route_position() const { return phases_.front().start_positions().front(); }
@@ -206,20 +223,41 @@ class Route final {
   /// FindRoutePositionBy() to a point within it and then the api::LaneSRoute
   /// will be computed.
   ///
+  /// Simple agents / users should consider using this method to avoid dealing with
+  /// the complexities of api::LaneSRange switching within a Phase and between Phases.
+  ///
   /// @param start_position The start api::RoadPosition of this path. It must be
   /// valid.
   /// @return The api::LaneSRoute connecting @p start_position and
   /// end_route_position().
   /// @throws common::assertion_error When @p start_position is not valid.
-  api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const {
-    MALIPUT_THROW_MESSAGE("Unimplemented");
-  }
+  api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const;
 
  private:
-  // Type alias to index an api::LaneSRange within this Route.
-  // std::pair::first indexes the RoutePhase.
-  // std::pair::second indexes the api::LaneSRange in the RoutePhase.
-  using LaneSRangeIndex = std::pair<size_t, size_t>;
+  // @{
+
+  // The direction of travel along the Routes is defined by the underlying Phases' api::LaneSRanges.
+  // Each api::LaneSRange by means of its api::SRange::WithS() defines the direction of travel.
+  // When true, forward means in +s direction, and left means in the +r direction. Otherwise,
+  // forward means in the -s direction, and left means in the -r direction.
+
+  // Defines the sign and increment of one unit towards the right of the index of
+  // api::LaneSRanges in a Phase.
+  static constexpr int kTowardsRight{-1};
+
+  // Defines the sign and increment of one unit towards the left of the index of
+  // api::LaneSRanges in a Phase.
+  static constexpr int kTowardsLeft{1};
+
+  // @}
+
+  // Convenient type to index an api::LaneSRange within this Route.
+  struct LaneSRangeIndex {
+    // @brief Index the Phase within this Route.
+    size_t phase{0u};
+    // @brief Index the api::LaneSRange within `phase`-th Phase.
+    size_t lane_s_range{0u};
+  };
 
   // Finds the LaneSRangeIndex for an api::LaneSRange.
   //
@@ -231,7 +269,25 @@ class Route final {
   // Route.
   std::optional<LaneSRangeIndex> FindLaneSRangeIndex(const api::LaneSRange& lane_s_range) const;
 
+  // Finds the LaneSRangeIndex of the api::LaneSRange that is
+  // LaneSRelation::kPreceedingStraight with respect to @p index api::LaneSRange.
+  //
+  // @param index The index of the api::LaneSRange to find its
+  // LaneSRelation::kPreceedingStraight counterpart. It must be a valid index.
+  // @return An optional containing the LaneSRangeIndex of the api::LaneSRange.
+  std::optional<LaneSRangeIndex> FindStraightPredecessor(const LaneSRangeIndex& index) const;
+
+  // Finds how to move the index of api::LaneSRanges within a Phase to find
+  // the predecessor of the api::LanesRange at @p index.
+  //
+  // @param index The index of api::LaneSRange within this Route. The phase index must not be zero.
+  // @return kTowardsLeft When moving towards the left within the Phase,
+  // otherwise kTowardsRight.
+  // @throws common::assertion_error When `index.first` is zero as there is no predecessor.
+  int FindDirectionTowardsLaneSRangeWithStraightPredecessor(const LaneSRangeIndex& index) const;
+
   std::vector<Phase> phases_;
+  std::unordered_map<api::LaneId, std::vector<LaneSRangeIndex>> lane_id_to_indices_;
   const api::RoadNetwork* road_network_{};
 };
 

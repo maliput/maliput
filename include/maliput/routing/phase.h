@@ -58,6 +58,12 @@ namespace routing {
 /// Agents can localize themselves within a Phase by using FindLaneSRange()
 /// methods. This is useful when they are initially placing themselves on a path
 /// or for iterative querying.
+///
+/// Simple agents may consider directly using the Route object and
+/// Route::ComputeLaneSRoute() to traverse the Route. Those willing to exploit the
+/// possibilities of the Route in favor of satisfying complex behaviors will find Phases
+/// useful to better cluster adjacent api::LaneSRanges and the entry / exit
+/// api::RoadPositions of them.
 class Phase final {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(Phase);
