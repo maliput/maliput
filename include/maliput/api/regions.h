@@ -105,7 +105,7 @@ class SRange {
   /// @p tolerance will modify this range and @p s_range by increasing the maximum
   /// and reducing the minimum of each range. When @p tolerance is negative, it shrinks both ranges.
   ///
-  /// @param s_range A SRange to evaluate whether it is inside this SRange.
+  /// @param s_range The SRange with which to compute the intersection.
   /// @param tolerance The tolerance to use when computing the inclusion relationship.
   /// @return true When @p s_range is contained within this SRange.
   bool Contains(const SRange& s_range, double tolerance) const;

@@ -59,7 +59,7 @@ namespace routing {
 /// methods. This is useful when they are initially placing themselves on a path
 /// or for iterative querying.
 ///
-/// Simple agents may consider using directly the Route object and
+/// Simple agents may consider directly using the Route object and
 /// Route::ComputeLaneSRoute() to traverse the Route. Those willing to exploit the
 /// possibilities of the Route in favor of satisfying complex behaviors will find Phases
 /// useful to better cluster adjacent api::LaneSRanges and the entry / exit
