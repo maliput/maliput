@@ -6,8 +6,12 @@
 # use --enable_bzlmod on the command line.
 common --enable_bzlmod
 
-# TODO(daniel.stonier) Delete once 'yaml-cpp' has made it into the official BCR
-build --registry=https://raw.githubusercontent.com/stonier/bazel-central-registry/maliput_releases/
+# A local fork of the registry:
+# common --registry=file://%workspace%/../bazel-central-registry
+
+# Central Registry
+build --registry=https://raw.githubusercontent.com/bazelbuild/bazel-central-registry/main/
+
 
 ########################################
 # Bazel Configuration

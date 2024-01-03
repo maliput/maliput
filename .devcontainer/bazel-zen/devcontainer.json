@@ -18,5 +18,15 @@
                 "yzhang.markdown-all-in-one"
             ]
         }
-    }
+    },
+    // Mount for local co-development with a registry fork
+    // 1. Uncomment the local registry argument in .bazelrc
+    // 2. Patch the path below and uncomment
+    // "mounts": [
+	// 	{
+    //         "source": "/path/to/bazel-central-registry",
+    //         "target": "/workspaces/bazel-central-registry",
+    //         "type": "bind"
+    //     }
+	// ]
 }
