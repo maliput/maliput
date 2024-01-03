@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(maliput LANGUAGES C CXX VERSION 3.0.0)
+project(maliput LANGUAGES C CXX VERSION 1.2.0)
 
 ##############################################################################
 # Find 3rd Party Packages
