@@ -1,4 +1,4 @@
-name: clang
+name: Sanitizers
 
 on:
   pull_request:
