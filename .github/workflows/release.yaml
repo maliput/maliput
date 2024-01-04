@@ -1,0 +1,27 @@
+# Cuts a github release with a stable release archive [1] from a *.*.* tag.
+#
+# [1] See https://blog.bazel.build/2023/02/15/github-archive-checksum.html
+# for why source code assets are not stable).
+name: Release
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Env Variables
+        shell: bash
+        run: |
+          echo "ARCHIVE_NAME=${{ github.event.repository.name }}-${GITHUB_REF_NAME}" >> $GITHUB_ENV
+      - name: Create Release Asset
+        run: git archive $GITHUB_REF --prefix=${{ env.ARCHIVE_NAME }}/ -o "${{ env.ARCHIVE_NAME }}.tar.gz"
+      - name: Cut a Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: false
+          files: ${{ env.ARCHIVE_NAME }}.tar.gz
