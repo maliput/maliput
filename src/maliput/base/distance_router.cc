@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2023, Woven by Toyota. All rights reserved.
+// Copyright (c) 2024, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,12 +29,15 @@
 #include "maliput/base/distance_router.h"
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 #include <optional>
 #include <utility>
+#include <vector>
 
 #include "maliput/api/lane.h"
 #include "maliput/api/regions.h"
+#include "maliput/common/maliput_throw.h"
 #include "maliput/routing/derive_lane_s_routes.h"
 #include "maliput/routing/find_lane_sequences.h"
 #include "maliput/routing/phase.h"
@@ -64,9 +67,9 @@ double ComputeCost(const routing::Route& route) {
   return cost;
 }
 
-/// Determines the maximum cost of all routing::Phases in @p route.
-/// @param route The routing::Route to look for the maximum routing::Phase's cost.
-/// @return The maximum cost of all routing::Phases in @p route.
+// Determines the maximum cost of all routing::Phases in @p route.
+// @param route The routing::Route to look for the maximum routing::Phase's cost.
+// @return The maximum cost of all routing::Phases in @p route.
 double MaxPhaseCostInRoute(const routing::Route& route) {
   double cost{0.};
   for (int i = 0; i < route.size(); ++i) {
@@ -100,9 +103,8 @@ std::vector<routing::Route> FilterRoutes(const routing::RoutingConstraints& rout
 
 }  // namespace
 
-DistanceRouter::DistanceRouter(const api::RoadNetwork* road_network, double lane_s_range_tolerance)
+DistanceRouter::DistanceRouter(const api::RoadNetwork& road_network, double lane_s_range_tolerance)
     : Router(), road_network_(road_network), lane_s_range_tolerance_(lane_s_range_tolerance) {
-  MALIPUT_THROW_UNLESS(road_network_ != nullptr);
   MALIPUT_THROW_UNLESS(lane_s_range_tolerance_ >= 0.0);
 }
 
@@ -111,17 +113,17 @@ std::vector<routing::Route> DistanceRouter::DoComputeRoutes(
     const routing::RoutingConstraints& routing_constraints) const {
   // Validate input parameters.
   MALIPUT_THROW_UNLESS(start.lane != nullptr);
-  MALIPUT_THROW_UNLESS(road_network_->road_geometry()->ById().GetLane(start.lane->id()) == start.lane);
+  MALIPUT_THROW_UNLESS(road_network_.road_geometry()->ById().GetLane(start.lane->id()) == start.lane);
   MALIPUT_THROW_UNLESS(end.lane != nullptr);
-  MALIPUT_THROW_UNLESS(road_network_->road_geometry()->ById().GetLane(end.lane->id()) == end.lane);
+  MALIPUT_THROW_UNLESS(road_network_.road_geometry()->ById().GetLane(end.lane->id()) == end.lane);
   routing::ValidateRoutingConstraints(routing_constraints);
   static constexpr bool kRemoveUTurns{true};
 
-  // Obtain the lane sequences that connect the start with end.
+  // Obtain the lane sequences that connect the start with end, i.e. the routing algorithm.
   const std::vector<std::vector<const api::Lane*>> lane_sequences =
       routing::FindLaneSequences(start.lane, end.lane, std::numeric_limits<double>::max(), kRemoveUTurns);
 
-  // Construct the routes.
+  // Construct the routing::Routes and routing::Phases.
   // TODO: lateral routing::Phase inflation.
   const double start_s = start.pos.s();
   const double end_s = end.pos.s();
@@ -129,8 +131,8 @@ std::vector<routing::Route> DistanceRouter::DoComputeRoutes(
   for (const std::vector<const api::Lane*>& lane_sequence : lane_sequences) {
     if (lane_sequence.size() == 1u) {
       const routing::Phase phase(0, lane_s_range_tolerance_, {start}, {end},
-                                 {api::LaneSRange(start.lane->id(), api::SRange(start_s, end_s))}, road_network_);
-      routes.emplace_back(std::vector<routing::Phase>{phase}, road_network_);
+                                 {api::LaneSRange(start.lane->id(), api::SRange(start_s, end_s))}, &road_network_);
+      routes.emplace_back(std::vector<routing::Phase>{phase}, &road_network_);
       continue;
     }
 
@@ -139,37 +141,37 @@ std::vector<routing::Route> DistanceRouter::DoComputeRoutes(
     for (int i = 0; i < static_cast<int>(lane_sequence.size()); ++i) {
       const api::Lane* lane = lane_sequence[i];
       if (i == 0) {
-        const std::optional<double> first_end_s = routing::DetermineEdgeS(lane, lane_sequence[1]);
+        const std::optional<double> first_end_s = routing::DetermineEdgeS(*lane, *lane_sequence[1]);
         MALIPUT_THROW_UNLESS(first_end_s.has_value());
         phases.emplace_back(
             i, lane_s_range_tolerance_, std::vector<api::RoadPosition>{start},
             std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(*first_end_s, 0., 0.))},
             std::vector<api::LaneSRange>{api::LaneSRange(lane->id(), api::SRange(start_s, *first_end_s))},
-            road_network_);
+            &road_network_);
       } else if (i + 1 == static_cast<int>(lane_sequence.size())) {
         MALIPUT_THROW_UNLESS(lane->id() == end.lane->id());
         MALIPUT_THROW_UNLESS(i > 0);
-        const std::optional<double> last_start_s = routing::DetermineEdgeS(lane, lane_sequence[i - 1]);
+        const std::optional<double> last_start_s = routing::DetermineEdgeS(*lane, *lane_sequence[i - 1]);
         MALIPUT_THROW_UNLESS(last_start_s.has_value());
         phases.emplace_back(
             i, lane_s_range_tolerance_,
             std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(*last_start_s, 0., 0.))},
             std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(end_s, 0., 0.))},
             std::vector<api::LaneSRange>{api::LaneSRange(lane->id(), api::SRange(*last_start_s, end_s))},
-            road_network_);
+            &road_network_);
       } else {
-        const std::optional<double> middle_start_s = routing::DetermineEdgeS(lane, lane_sequence[i - 1]);
-        const std::optional<double> middle_end_s = routing::DetermineEdgeS(lane, lane_sequence[i + 1]);
+        const std::optional<double> middle_start_s = routing::DetermineEdgeS(*lane, *lane_sequence[i - 1]);
+        const std::optional<double> middle_end_s = routing::DetermineEdgeS(*lane, *lane_sequence[i + 1]);
         MALIPUT_THROW_UNLESS(middle_start_s.has_value() && middle_end_s.has_value());
         phases.emplace_back(
             i, lane_s_range_tolerance_,
             std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(*middle_start_s, 0., 0.))},
             std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(*middle_end_s, 0., 0.))},
             std::vector<api::LaneSRange>{api::LaneSRange(lane->id(), api::SRange(*middle_start_s, *middle_end_s))},
-            road_network_);
+            &road_network_);
       }
     }
-    routes.emplace_back(phases, road_network_);
+    routes.emplace_back(phases, &road_network_);
   }
 
   return FilterRoutes(routing_constraints, routes);

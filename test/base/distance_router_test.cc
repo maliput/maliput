@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2023, Woven by Toyota. All rights reserved.
+// Copyright (c) 2024, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -56,20 +56,16 @@ class DistanceRouterTest : public ::testing::Test {
   static constexpr double kLaneSRangeTolerance{1e-12};
 };
 
-TEST_F(DistanceRouterTest, NullptrRoadNetworkInConstructorThrows) {
-  EXPECT_THROW({ DistanceRouter(nullptr, kLaneSRangeTolerance); }, common::assertion_error);
-}
-
 TEST_F(DistanceRouterTest, NegativeLaneSRangeToleranceInConstructorThrows) {
   auto road_network = MakeMockedRoadNetwork();
 
-  EXPECT_THROW({ DistanceRouter(road_network.get(), -1.0); }, common::assertion_error);
+  EXPECT_THROW({ DistanceRouter(*road_network, -1.0); }, common::assertion_error);
 }
 
 TEST_F(DistanceRouterTest, CorrectConstruction) {
   auto road_network = MakeMockedRoadNetwork();
 
-  EXPECT_NO_THROW({ DistanceRouter(road_network.get(), kLaneSRangeTolerance); });
+  EXPECT_NO_THROW({ DistanceRouter(*road_network, kLaneSRangeTolerance); });
 }
 
 class DistanceRouterComputeRoutesTest : public DistanceRouterTest {
@@ -100,7 +96,7 @@ TEST_F(DistanceRouterComputeRoutesTest, InvalidStartLaneInComputeRoutesThrows) {
   const api::RoadPosition start_with_non_null_lane(&start_lane_, api::LanePosition(1., 2., 3.));
   const api::RoadPosition end(&end_lane_, api::LanePosition(4., 5., 6.));
 
-  const DistanceRouter dut(road_network_.get(), kLaneSRangeTolerance);
+  const DistanceRouter dut(*road_network_, kLaneSRangeTolerance);
 
   EXPECT_THROW({ dut.ComputeRoutes(start_with_null_lane, end, kConstraints); }, common::assertion_error);
   EXPECT_THROW({ dut.ComputeRoutes(start_with_non_null_lane, end, kConstraints); }, common::assertion_error);
@@ -113,7 +109,7 @@ TEST_F(DistanceRouterComputeRoutesTest, InvalidEndLaneInComputeRoutesThrows) {
   const api::RoadPosition end_with_null_lane;
   const api::RoadPosition end_with_non_null_lane(&end_lane_, api::LanePosition(4., 5., 6.));
 
-  const DistanceRouter dut(road_network_.get(), kLaneSRangeTolerance);
+  const DistanceRouter dut(*road_network_, kLaneSRangeTolerance);
 
   EXPECT_THROW({ dut.ComputeRoutes(start, end_with_null_lane, kConstraints); }, common::assertion_error);
   EXPECT_THROW({ dut.ComputeRoutes(start, end_with_non_null_lane, kConstraints); }, common::assertion_error);
@@ -126,7 +122,7 @@ TEST_F(DistanceRouterComputeRoutesTest, InvalidConstraintsInComputeRoutesThrows)
   const api::RoadPosition end(&end_lane_, api::LanePosition(4., 5., 6.));
   const routing::RoutingConstraints kInvalidConstraints{true, {-1.}, {}};
 
-  const DistanceRouter dut(road_network_.get(), kLaneSRangeTolerance);
+  const DistanceRouter dut(*road_network_, kLaneSRangeTolerance);
 
   EXPECT_THROW({ dut.ComputeRoutes(start, end, kInvalidConstraints); }, common::assertion_error);
 }
