@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2023, Woven by Toyota. All rights reserved.
+// Copyright (c) 2024, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -61,11 +61,6 @@ class DetermineEdgeSTest : public ::testing::Test {
   LaneEndSetMock start_lane_end_set_;
 };
 
-TEST_F(DetermineEdgeSTest, EvaluatePrerequisites) {
-  EXPECT_THROW({ DetermineEdgeS(nullptr, &next_lane_); }, common::assertion_error);
-  EXPECT_THROW({ DetermineEdgeS(&lane_, nullptr); }, common::assertion_error);
-}
-
 TEST_F(DetermineEdgeSTest, NextLaneIsInOngoingBranchesAtFinishReturnsLaneLength) {
   constexpr double kLaneLength{100.};
   const api::LaneEnd lane_end(&next_lane_, api::LaneEnd::kStart);
@@ -73,7 +68,7 @@ TEST_F(DetermineEdgeSTest, NextLaneIsInOngoingBranchesAtFinishReturnsLaneLength)
   EXPECT_CALL(finish_lane_end_set_, do_size()).WillRepeatedly(Return(1));
   EXPECT_CALL(finish_lane_end_set_, do_get(0)).WillRepeatedly(ReturnRef(lane_end));
 
-  std::optional<double> result = DetermineEdgeS(&lane_, &next_lane_);
+  std::optional<double> result = DetermineEdgeS(lane_, next_lane_);
 
   ASSERT_TRUE(result.has_value());
   EXPECT_EQ(kLaneLength, result.value());
@@ -85,7 +80,7 @@ TEST_F(DetermineEdgeSTest, NextLaneIsInOngoingBranchesAtStartReturnsZero) {
   EXPECT_CALL(start_lane_end_set_, do_size()).WillRepeatedly(Return(1));
   EXPECT_CALL(start_lane_end_set_, do_get(0)).WillRepeatedly(ReturnRef(lane_end));
 
-  std::optional<double> result = DetermineEdgeS(&lane_, &next_lane_);
+  std::optional<double> result = DetermineEdgeS(lane_, next_lane_);
 
   ASSERT_TRUE(result.has_value());
   EXPECT_EQ(0., result.value());
@@ -95,7 +90,7 @@ TEST_F(DetermineEdgeSTest, NextLaneIsNotInOngoingBranchesReturnsNullopt) {
   EXPECT_CALL(finish_lane_end_set_, do_size()).WillRepeatedly(Return(0));
   EXPECT_CALL(start_lane_end_set_, do_size()).WillRepeatedly(Return(0));
 
-  std::optional<double> result = DetermineEdgeS(&lane_, &next_lane_);
+  std::optional<double> result = DetermineEdgeS(lane_, next_lane_);
 
   ASSERT_FALSE(result.has_value());
 }

@@ -42,10 +42,10 @@ namespace routing {
 namespace {
 
 // Returns true iff @p lane is in @p set.
-bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane* lane) {
+bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane& lane) {
   MALIPUT_THROW_UNLESS(set != nullptr);
   for (int i = 0; i < set->size(); ++i) {
-    if (set->get(i).lane == lane) {
+    if (set->get(i).lane == &lane) {
       return true;
     }
   }
@@ -55,13 +55,11 @@ bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane* lane) {
 }  // namespace
 
 // Returns the S coordinate in @p lane that is on the border with @p next_lane.
-std::optional<double> DetermineEdgeS(const api::Lane* lane, const api::Lane* next_lane) {
-  MALIPUT_THROW_UNLESS(lane != nullptr);
-  MALIPUT_THROW_UNLESS(next_lane != nullptr);
-  if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kFinish), next_lane)) {
-    return lane->length();
+std::optional<double> DetermineEdgeS(const api::Lane& lane, const api::Lane& next_lane) {
+  if (LaneExistsInSet(lane.GetOngoingBranches(api::LaneEnd::kFinish), next_lane)) {
+    return lane.length();
   }
-  if (LaneExistsInSet(lane->GetOngoingBranches(api::LaneEnd::kStart), next_lane)) {
+  if (LaneExistsInSet(lane.GetOngoingBranches(api::LaneEnd::kStart), next_lane)) {
     return 0.;
   }
   return std::nullopt;
@@ -96,18 +94,18 @@ std::vector<api::LaneSRoute> DeriveLaneSRoutes(const api::RoadPosition& start, c
       MALIPUT_THROW_UNLESS(lane != nullptr);
       if (i == 0) {
         MALIPUT_THROW_UNLESS(lane->id() == start.lane->id());
-        const std::optional<double> first_end_s = DetermineEdgeS(lane, lane_sequence.at(1));
+        const std::optional<double> first_end_s = DetermineEdgeS(*lane, *lane_sequence.at(1));
         MALIPUT_THROW_UNLESS(first_end_s.has_value());
         ranges.emplace_back(lane->id(), api::SRange(start_s, first_end_s.value()));
       } else if (i + 1 == lane_sequence.size()) {
         MALIPUT_THROW_UNLESS(lane->id() == end.lane->id());
         MALIPUT_THROW_UNLESS(i > 0);
-        const std::optional<double> last_start_s = DetermineEdgeS(lane, lane_sequence.at(i - 1));
+        const std::optional<double> last_start_s = DetermineEdgeS(*lane, *lane_sequence.at(i - 1));
         MALIPUT_THROW_UNLESS(last_start_s.has_value());
         ranges.emplace_back(lane->id(), api::SRange(last_start_s.value(), end_s));
       } else {
-        const std::optional<double> middle_start_s = DetermineEdgeS(lane, lane_sequence.at(i - 1));
-        const std::optional<double> middle_end_s = DetermineEdgeS(lane, lane_sequence.at(i + 1));
+        const std::optional<double> middle_start_s = DetermineEdgeS(*lane, *lane_sequence.at(i - 1));
+        const std::optional<double> middle_end_s = DetermineEdgeS(*lane, *lane_sequence.at(i + 1));
         MALIPUT_THROW_UNLESS(middle_start_s && middle_end_s);
         ranges.emplace_back(lane->id(), api::SRange(middle_start_s.value(), middle_end_s.value()));
       }
