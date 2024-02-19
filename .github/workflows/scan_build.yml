@@ -1,4 +1,4 @@
-name: scan_build
+name: Scan Build
 
 on:
   pull_request:
