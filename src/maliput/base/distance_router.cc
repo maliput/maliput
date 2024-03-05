@@ -46,6 +46,12 @@ namespace maliput {
 namespace {
 
 // Computes the cost of a routing::Phase.
+//
+// Treats all api::LaneSRanges within @p phase the same. Subsequent steps in the
+// DistanceRouter will refine this cost estimate by, for example, considering
+// which api::LaneSRanges will require lane changes to reach the route's end
+// location.
+//
 // @param phase The routing::Phase to compute the cost.
 // @return The minimum length across all api::LaneSRanges in the routing::Phase.
 double ComputeCost(const routing::Phase& phase) {
@@ -99,6 +105,31 @@ std::vector<routing::Route> FilterRoutes(const routing::RoutingConstraints& rout
   std::vector<routing::Route> filtered_routes;
   std::copy_if(routes.begin(), routes.end(), std::back_inserter(filtered_routes), filter);
   return filtered_routes;
+}
+
+// Concatenates items in @p errors into just one string.
+//
+// When @p errors is empty an empty string computed.
+// Otherwise, the "Route has connectivity errors: <error> | <error> | ... |" formula to concatenate items from @p errors
+// is used.
+// @param errors A vector of error strings.
+// @return An empty string when @p errors is empty, otherwise a string with all the items in @p errors.
+std::string AggregateRouteConnectivityErrors(const std::vector<std::string>& errors) {
+  std::string result{errors.empty() ? "" : "Route has connectivity errors: "};
+  for (const std::string& error : errors) {
+    result += error + " | ";
+  }
+  return result;
+}
+
+// Iterates over @p routes and validates none has end to end connectivity errors.
+// @param routes Vector of Routes to validate.
+// @throws common::assertion_error When one of the Routes in @p routes has end to end connectivity errors.
+void ValidateEndToEndConnectivityInRoutes(const std::vector<routing::Route>& routes) {
+  for (const auto& route : routes) {
+    const std::vector<std::string> connectivity_errors = route.ValidateEndToEndConnectivity();
+    MALIPUT_VALIDATE(connectivity_errors.empty(), AggregateRouteConnectivityErrors(connectivity_errors));
+  }
 }
 
 }  // namespace
@@ -174,7 +205,13 @@ std::vector<routing::Route> DistanceRouter::DoComputeRoutes(
     routes.emplace_back(phases, &road_network_);
   }
 
-  return FilterRoutes(routing_constraints, routes);
+  // Filter routes based on constraints.
+  routes = FilterRoutes(routing_constraints, routes);
+
+  // Validate end to end connectivity in resulting routes.
+  ValidateEndToEndConnectivityInRoutes(routes);
+
+  return routes;
 }
 
 }  // namespace maliput
