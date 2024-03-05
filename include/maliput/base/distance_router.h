@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2024, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,28 +28,40 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <optional>
 #include <vector>
 
-#include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
-#include "maliput/api/regions.h"
+#include "maliput/common/maliput_copyable.h"
+#include "maliput/routing/route.h"
+#include "maliput/routing/router.h"
+#include "maliput/routing/routing_constraints.h"
 
 namespace maliput {
-namespace routing {
 
-/// Returns the S coordinate in @p lane that is on the border with @p next_lane.
-/// When @p lane is not connected to @p next_lane , std::nullopt is returned.
-std::optional<double> DetermineEdgeS(const api::Lane& lane, const api::Lane& next_lane);
+/// Basic implementation of a Router which only looks at the travelled distance
+/// to provide solutions.
+///
+/// The routing algorithm will consider the minimum length of api::LaneSRanges within
+/// a routing::Phase as its cost. The accumulation of all routing::Phases' costs along
+/// a routing::Route determines its cost.
+// TODO: provide solutions that rely on segment-to-segment connectivity and enable
+// the use of api::Lane switches in results.
+class DistanceRouter : public routing::Router {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(DistanceRouter);
 
-/// Derives and returns a set of LaneSRoute objects that go from @p start to
-/// @p end. If no routes are found, a vector of length zero is returned.
-/// Parameter @p max_length_m is the maximum length of the intermediate lanes
-/// between @p start and @p end. See the description of FindLaneSequences() for
-/// more details. If @p start and @p end are the same lane, a route consisting
-/// of one lane is returned regardless of @p max_length_m.
-std::vector<api::LaneSRoute> DeriveLaneSRoutes(const api::RoadPosition& start, const api::RoadPosition& end,
-                                               double max_length_m);
+  /// Constructs a DistanceRouter.
+  /// @param road_network The api::RoadNetwork to compute routing::Routes on.
+  /// @param lane_s_range_tolerance The tolerance to consider when evaluating api::LaneSRanges. It must not be negative.
+  /// @throws common::assertion_error When @p lane_s_range_tolerance is negative.
+  DistanceRouter(const api::RoadNetwork& road_network, double lane_s_range_tolerance);
 
-}  // namespace routing
+ private:
+  std::vector<routing::Route> DoComputeRoutes(const api::RoadPosition& start, const api::RoadPosition& end,
+                                              const routing::RoutingConstraints& routing_constraints) const override;
+
+  const api::RoadNetwork& road_network_;
+  const double lane_s_range_tolerance_{};
+};
+
 }  // namespace maliput

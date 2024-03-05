@@ -45,7 +45,7 @@
 #include "maliput/routing/lane_s_range_relation.h"
 #include "maliput/routing/phase.h"
 #include "maliput/routing/route_position_result.h"
-#include "routing/road_network_mocks.h"
+#include "road_network_mocks.h"
 
 namespace maliput {
 namespace routing {
@@ -53,6 +53,11 @@ namespace test {
 namespace {
 
 using maliput::test::AssertCompare;
+using maliput::test::IdIndexMock;
+using maliput::test::LaneMock;
+using maliput::test::MakeMockedRoadNetwork;
+using maliput::test::RoadGeometryMock;
+using maliput::test::SegmentMock;
 using ::testing::_;
 using ::testing::Matcher;
 using ::testing::MatcherInterface;

@@ -233,6 +233,9 @@ class Route final {
   /// @throws common::assertion_error When @p start_position is not valid.
   api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const;
 
+  // TODO(maliput#628): Implement me.
+  std::vector<std::string> ValidateEndToEndConnectivity() const { return {}; }
+
  private:
   // @{
 

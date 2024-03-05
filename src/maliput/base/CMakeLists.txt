@@ -3,6 +3,7 @@
 ##############################################################################
 
 set(BASE_SOURCES
+  distance_router.cc
   intersection.cc
   intersection_book.cc
   intersection_book_loader.cc
@@ -45,6 +46,7 @@ target_link_libraries(base
   PUBLIC
     maliput::api
     maliput::common
+    maliput::routing
     yaml-cpp
 )
 
