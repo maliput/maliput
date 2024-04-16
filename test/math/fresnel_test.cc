@@ -77,16 +77,19 @@ struct FresnelTestConfig {
 
 GTEST_TEST(FresnelCosineAndSineTest, ValidateValues) {
   constexpr double kTolerance{5e-8};  // Empirically found.
-  const std::array<FresnelTestConfig, /*11*/13> kValuesUnderTest{
+  const std::array<FresnelTestConfig, /*11*/ 13> kValuesUnderTest{
       FresnelTestConfig{0., Vector2{0.0, 0.0}},
-      FresnelTestConfig{0.282095, Vector2{0.011740863890491865, 0.281654543994548}},
+      // This value has been set in particular to make sure we are covering all the
+      // ranges in the implementation with a value that was meaningful in backend
+      // development. The same applies to the the negative value.
+      FresnelTestConfig{0.282095, Vector2{0.281654543994548, 0.011740863890491865}},
       FresnelTestConfig{0.5, Vector2{0.4923442258714464, 0.06473243285999929}},
       FresnelTestConfig{1.0, Vector2{0.779893400376823, 0.4382591473903547}},
       FresnelTestConfig{2.0, Vector2{0.48825340607534073, 0.34341567836369824}},
       FresnelTestConfig{10.0, Vector2{0.49989869420551575, 0.46816997858488224}},
       FresnelTestConfig{100000000.0, Vector2{0.49999999741215284, 0.50000000185342}},
       // Negative values are in the 3rd quadrant.
-      FresnelTestConfig{-0.282095, Vector2{-0.011740863890491865, -0.281654543994548}},
+      FresnelTestConfig{-0.282095, Vector2{-0.281654543994548, -0.011740863890491865}},
       FresnelTestConfig{-0.5, Vector2{-0.4923442258714464, -0.06473243285999929}},
       FresnelTestConfig{-1.0, Vector2{-0.779893400376823, -0.4382591473903547}},
       FresnelTestConfig{-2.0, Vector2{-0.48825340607534073, -0.34341567836369824}},
@@ -95,7 +98,8 @@ GTEST_TEST(FresnelCosineAndSineTest, ValidateValues) {
   };
 
   for (const FresnelTestConfig& vut /* value under test */ : kValuesUnderTest) {
-    EXPECT_TRUE(AssertCompare(CompareVectors(vut.expected_result, ComputeFresnelCosineAndSine(vut.t), kTolerance))) << "Failed with t: " << vut.t;
+    EXPECT_TRUE(AssertCompare(CompareVectors(vut.expected_result, ComputeFresnelCosineAndSine(vut.t), kTolerance)))
+        << "Failed with t: " << vut.t;
   }
 }
 
