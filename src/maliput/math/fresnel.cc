@@ -161,8 +161,8 @@ void fresnel(double xxa, double* ssa, double* cca) {
   // Done for small values of the argument xxa.
   auto impl_small_x = [&]() -> void {
     const double t = x2 * x2;
-    *cca = x * x2 * polevl(t, kSn, 5) / p1evl(t, kSd, 6);
-    *ssa = x * polevl(t, kCn, 5) / polevl(t, kCd, 6);
+    *ssa = x * x2 * polevl(t, kSn, 5) / p1evl(t, kSd, 6);
+    *cca = x * polevl(t, kCn, 5) / polevl(t, kCd, 6);
   };
   // Done for medium sized values of the argument xxa.
   auto impl_medium_x = [&]() -> void {
@@ -177,12 +177,12 @@ void fresnel(double xxa, double* ssa, double* cca) {
     const double s_t = std::sin(t);
 
     t = M_PI * x;
-    *ssa = 0.5 + (f_u * s_t - g_u * c_t) / t;
-    *cca = 0.5 - (f_u * c_t + g_u * s_t) / t;
+    *cca = 0.5 + (f_u * s_t - g_u * c_t) / t;
+    *ssa = 0.5 - (f_u * c_t + g_u * s_t) / t;
   };
 
   // Range and solution selection.
-  if (x < 2.5625) {
+  if (x2 < 2.5625) {
     impl_small_x();
   } else if (x > 36974.0) {
     *cca = 0.5;
