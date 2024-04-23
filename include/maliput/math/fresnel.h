@@ -36,7 +36,7 @@ namespace math {
 
 /// Computes the value the Fresnel cosine and sine as a vector.
 ///
-/// This function wraps a Chepes Mathematical Library based implementation of the Fresnel cosine and sine
+/// This function wraps a Cephes Mathematical Library based implementation of the Fresnel cosine and sine
 /// functions. This code can be found in various libraries, such as the scipy.special.fresnel function
 /// and many others.
 /// For ease of use and compatibility with the expected use as a tool of curves in the plane (i.e. z=0),
