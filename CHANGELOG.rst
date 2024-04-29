@@ -2,7 +2,14 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.2.0 (2023-01-03)
+1.3.0 (2024-04-29)
+-----------
+* Add fresnel functions (`#629 <https://github.com/ToyotaResearchInstitute/maliput/issues/629>`_)
+
+  ---------
+* Contributors: Agustin Alba Chicar
+
+1.2.0 (2024-01-03)
 ------------------
 * [infra] templates for bcr release automation (`#621 <https://github.com/maliput/maliput/issues/622>`_)
 * [infra] create a release archive with a stable url (`#621 <https://github.com/maliput/maliput/issues/621>`_)
