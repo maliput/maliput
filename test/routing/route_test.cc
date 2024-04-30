@@ -737,7 +737,7 @@ class LanePositionMatcher : public MatcherInterface<const api::LanePosition&> {
  public:
   explicit LanePositionMatcher(const api::LanePosition& lane_position) : lane_position_(lane_position) {}
 
-  bool MatchAndExplain(const api::LanePosition& other_lane_position, MatchResultListener*) const {
+  bool MatchAndExplain(const api::LanePosition& other_lane_position, MatchResultListener*) const override {
     return lane_position_.srh() == other_lane_position.srh();
   }
 

@@ -142,7 +142,7 @@ TEST_F(ArcLengthIntegratorTest, ThrowsWhenIndependentVariableIsOutOfRange) {
   // Integrable function that returns the tangent vector norm of a function.
   // In this case, it could be a straight line. A vector whose norm is 2.0 in
   // any direction multiplied by `p`.
-  const auto integrable_function = [&expected_k = k](const double& p, const math::Vector2& k) -> double {
+  const auto integrable_function = [](const double& p, const math::Vector2& k) -> double {
     maliput::common::unused(p);
     maliput::common::unused(k);
     return 2.0;
