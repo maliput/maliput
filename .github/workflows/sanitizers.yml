@@ -40,11 +40,11 @@ jobs:
       CXX: clang++-8
       LDFLAGS: -fuse-ld=lld-8
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
     # use setup-ros action to get vcs, rosdep, and colcon
-    - uses: ros-tooling/setup-ros@v0.6
+    - uses: ros-tooling/setup-ros@v0.7
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     - name: clang 8 install

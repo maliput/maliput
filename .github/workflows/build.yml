@@ -25,7 +25,7 @@ jobs:
     container:
       image: ghcr.io/${{ github.repository }}-bazel-ci:latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build
       shell: bash
       run: |
@@ -37,8 +37,8 @@ jobs:
     container:
       image: ubuntu:20.04
     steps:
-    - uses: actions/checkout@v3
-    - uses: ros-tooling/setup-ros@v0.6
+    - uses: actions/checkout@v4
+    - uses: ros-tooling/setup-ros@v0.7
     - uses: ros-tooling/action-ros-ci@v0.3
       id: action_ros_ci_step
       with:
@@ -57,7 +57,7 @@ jobs:
         # If possible, pin the repository in the workflow to a specific commit to avoid
         # changes in colcon-mixin-repository from breaking your tests.
         colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/c75e4b34a3959524564afb584e2aa33c7eec323c/index.yaml
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v4
       with:
         # Regarding token use in public repo:
         # See https://community.codecov.com/t/upload-issues-unable-to-locate-build-via-github-actions-api/3954
@@ -69,7 +69,7 @@ jobs:
         verbose: true
 
     # Uploads the logs to the workflow run
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: colcon-logs
         retention-days: 7
@@ -78,7 +78,7 @@ jobs:
       if: always() # upload the logs even when the build fails
 
     # Uploads the lcov files to the workflow run
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: lcov
         retention-days: 7
@@ -101,7 +101,7 @@ jobs:
         echo "bundle_file_name=${CURRENT_BUNDLE_TARBALL_NAME}" >> $GITHUB_ENV
         echo "Compressing tarball ${CURRENT_BUNDLE_TARBALL_NAME}";
         tar -czvf ${CURRENT_BUNDLE_TARBALL_NAME} ${BUNDLE_NAME};
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
       with:
         name: binary_underlay
