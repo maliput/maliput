@@ -40,7 +40,7 @@ jobs:
       CXX: clang++-8
       LDFLAGS: -fuse-ld=lld-8
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
     # use setup-ros action to get vcs, rosdep, and colcon

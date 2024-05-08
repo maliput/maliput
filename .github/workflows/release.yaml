@@ -13,7 +13,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set Variables
         shell: bash
         run: echo "ARCHIVE_NAME=${{ github.event.repository.name }}-${GITHUB_REF_NAME}" >> $GITHUB_ENV
@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: git archive $GITHUB_REF --prefix=${{ env.ARCHIVE_NAME }}/ -o "${{ env.ARCHIVE_NAME }}.tar.gz"
       - name: Cut a Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: false
           prerelease: false
