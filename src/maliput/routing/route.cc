@@ -369,7 +369,7 @@ namespace {
 
 // Finds a RoadPosition by matching @p lane pointer.
 // @param lane Pointer to the api::Lane to match.
-// @param positions Vector or positions to look for one with a matching api::Lane pointer with @p lane.
+// @param positions Vector of positions to look for one with a matching api::Lane pointer with @p lane.
 // @return An optional with a copy of the first position found with matching api::Lane pointer with @p lane.
 std::optional<api::RoadPosition> FindPositionByLane(const api::Lane* lane,
                                                     const std::vector<api::RoadPosition>& positions) {
@@ -391,19 +391,19 @@ bool IsRoadPositionClose(const api::RoadPosition& pos_a, const api::RoadPosition
   return !comparison_result.message.has_value();
 }
 
-// Returns the closes api::LaneEnd::Which of the api::Lane that @p position is in.
+// Returns the closest api::LaneEnd::Which of the api::Lane that @p position is in.
 api::LaneEnd::Which GetClosestLaneEndWhich(const api::RoadPosition& position) {
   const api::Lane* lane = position.lane;
   return position.pos.s() <= lane->length() - position.pos.s() ? api::LaneEnd::Which::kStart
                                                                : api::LaneEnd::Which::kFinish;
 }
 
-// Matches @p position_a in the preceeding Phase with an api::RoadPosition in @p positions_b from
-// the suceeding Phase.
+// Matches @p position_a in the preceding Phase with an api::RoadPosition in @p positions_b from
+// the succeeding Phase.
 // Filters @p positions_b using @p ongoing_lane_end_set to look for valid positions in the topological
-// sense to then find the first match in the subset by geometrical correspondence within @p tolernace.
-// @param position_a api::RoadPosition at the end of the preceeding Phase.
-// @param positions_b api::RoadPositions at the start of the suceeding Phase.
+// sense to then find the first match in the subset by geometrical correspondence within @p tolerance.
+// @param position_a api::RoadPosition at the end of the preceding Phase.
+// @param positions_b api::RoadPositions at the start of the succeeding Phase.
 // @param ongoing_lane_end_set The ongoing api::LaneEndSet that corresponds with @p position_a.
 // @param tolerance Tolerance to compare the positions.
 // @return An optional with an api::RoadPosition from @p positions_b that corresponds with @p position_a.
@@ -437,7 +437,7 @@ std::vector<std::string> Route::ValidateEndToEndConnectivity() const {
   if (phases_.front().start_positions().size() != 1u) {
     errors.push_back("Start Phase::start_positions() does not have one position.");
   }
-  // The end Phase must have only one start position.
+  // The end Phase must have only one end position.
   if (phases_.back().end_positions().size() != 1u) {
     errors.push_back("End Phase::end_positions() does not have one position.");
   }
@@ -460,7 +460,7 @@ std::vector<std::string> Route::ValidateEndToEndConnectivity() const {
     // The topological connectivity logic follows:
     // - For each point in the end positions in phase_a, do
     //   - Try to find a point in the start positions of phase_b with the same api::LaneId.
-    //     - If found, assert the poins are coincident. Throw otherwise.
+    //     - If found, assert the points are coincident. Throw otherwise.
     //   - When not found, identify the api::BranchPoint and the respective ongoing set of LaneEnds.
     //   - Find which position of the end positions in phase_b belong to the ongoing set of LaneEnds.
     for (const api::RoadPosition& end_position : phase_a.end_positions()) {

@@ -238,17 +238,17 @@ class Route final {
   /// - The first Phase contains only one start position.
   /// - The last Phase contains only one end position.
   /// - The number of end positions in a given Phase and start positions in the following Phase are the same.
-  /// - For each position in the end positions in a given Phase there is a one-to-one relation in the start
-  ///   positions in the followin Phase such that:
+  /// - For each end position in a given Phase there is a one-to-one relation in the start
+  ///   positions in the following Phase such that:
   ///   - The positions are coincident in the INERTIAL-Frame (geometrical connectivity) and,
   ///   - The positions belong to the same api::Lane or are endpoints of api::Lanes that share
-  ///     oppossing api::LaneEnds in an api::Branchpoint (tological connectivity).
+  ///     opposing api::LaneEnds in an api::BranchPoint (topological connectivity).
   ///
   /// Router implementations are expected to construct Routes and validate they are connected end to end.
-  /// Users of a Route must expect Routes built by Router implementations to be end to end connected.
+  /// Users of a Route may expect Routes built by Router implementations to be end to end connected.
   ///
   /// @return A vector of strings with the errors found in the end to end connectivity. When there is no
-  /// error and the connectivity checks are succesfull, this method returns an empty vector.
+  /// error and the connectivity checks are successful, this method returns an empty vector.
   std::vector<std::string> ValidateEndToEndConnectivity() const;
 
  private:
