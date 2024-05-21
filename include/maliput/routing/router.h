@@ -34,8 +34,8 @@
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_throw.h"
+#include "maliput/routing/phase.h"
 #include "maliput/routing/route.h"
-#include "maliput/routing/route_phase.h"
 #include "maliput/routing/routing_constraints.h"
 
 namespace maliput {

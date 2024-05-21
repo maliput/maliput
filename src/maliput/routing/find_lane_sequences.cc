@@ -90,10 +90,10 @@ struct ConnectionSet {
   LaneEnd ongoing;
 };
 
-// Builds a ConnectionSet from two adjancent Lanes.
+// Builds a ConnectionSet from two adjacent Lanes.
 //
 // The method will look for the LaneEnd::kStart end of @p incoming_lane first for ongoing_lane.
-// Then, it will look for @p ongoing_lane in the LaneEnd::kFinish end. This sets a precendence
+// Then, it will look for @p ongoing_lane in the LaneEnd::kFinish end. This sets a precedence
 // order in case of two Lanes that are connected in both ends, typically building a roundabout
 // or similar geometry. This is a known behavior from FindLaneSequences() which can work with
 // roundabouts, given that the same Lane cannot be twice in the sequence.
@@ -122,7 +122,7 @@ ConnectionSet BuildConnectionSet(const Lane* incoming_lane, const Lane* ongoing_
       return ConnectionSet{LaneEnd(incoming_lane, LaneEnd::kFinish), ongoing};
     }
   }
-  // It was impossible to find a connection between the two lanes, an error has occured somewhere else.
+  // It was impossible to find a connection between the two lanes, an error has occurred somewhere else.
   MALIPUT_THROW_MESSAGE("maliput::routing::BuildConnectionSet(): code must not reach here.");
 }
 

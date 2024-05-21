@@ -53,7 +53,7 @@ namespace routing {
 /// api::LaneSRanges are included because they offer alternative volume for
 /// agents to maneuver in. At least one api::RoadPosition in both the start and
 /// end sets must be equal or overlapping in the INERTIAL-Frame another
-/// api::RoadPosition in the preceeding and succeeding Phase respectively.
+/// api::RoadPosition in the preceding and succeeding Phase respectively.
 ///
 /// Agents can localize themselves within a Phase by using FindLaneSRange()
 /// methods. This is useful when they are initially placing themselves on a path
