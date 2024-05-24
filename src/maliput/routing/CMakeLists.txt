@@ -6,6 +6,8 @@ set(ROUTING_SOURCES
   compare.cc
   derive_lane_s_routes.cc
   find_lane_sequences.cc
+  graph/graph.cc
+  graph/graph_utils.cc
   phase.cc
   route.cc
   routing_constraints.cc
