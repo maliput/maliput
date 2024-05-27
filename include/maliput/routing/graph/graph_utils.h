@@ -51,10 +51,11 @@ struct SubSegment {
 
 /// @brief Finds all Edge sequences in @p graph that join @p start with @p end.
 /// @param graph The Graph to conduct the search.
-/// @param start The start Node.
-/// @param end The end Node.
+/// @param start The start Node. It must exist in the @p graph.
+/// @param end The end Node. It must exist in the @p graph.
 /// @return A vector of vectors of Edges that joint @p start with @p end. When @p start and @p end are the same, the
 /// returned vector is empty.
+/// @throws maliput::common::assertion_error When any of @p start and @p end do not exist in @p graph.
 std::vector<std::vector<Edge>> FindAllEdgeSequences(const Graph& graph, const Node& start, const Node& end);
 
 /// @brief Filters api::Lanes from Edges in @p edge_sequences to leave out only api::Lanes in SubSegments that allow the
