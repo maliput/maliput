@@ -69,6 +69,9 @@ std::vector<std::vector<Edge>> FindAllEdgeSequencesHelper(const Graph& graph, co
 }  // namespace
 
 std::vector<std::vector<Edge>> FindAllEdgeSequences(const Graph& graph, const Node& start, const Node& end) {
+  MALIPUT_THROW_UNLESS(graph.nodes.find(start.id) != graph.nodes.end());
+  MALIPUT_THROW_UNLESS(graph.nodes.find(end.id) != graph.nodes.end());
+
   if (start.id == end.id) {
     return {};
   }

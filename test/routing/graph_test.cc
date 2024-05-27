@@ -28,10 +28,14 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/routing/graph/graph.h"
 
+#include <set>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "assert_compare.h"
+
+#include "maliput/api/branch_point.h"
+#include "maliput/api/segment.h"
 #include "maliput/common/assertion_error.h"
 #include "routing/road_network_mocks.h"
 
@@ -44,7 +48,6 @@ namespace {
 using ::testing::_;
 using ::testing::Eq;
 using ::testing::Return;
-using ::testing::ReturnRef;
 
 using maliput::routing::test::BranchPointMock;
 using maliput::routing::test::JunctionMock;
@@ -53,7 +56,7 @@ using maliput::routing::test::RoadGeometryMock;
 using maliput::routing::test::SegmentMock;
 
 GTEST_TEST(BuildGraph, PassingNullRoadGeometryThrows) {
-  EXPECT_THROW({ BuildGraph(nullptr); }, common::assertion_error);
+  ASSERT_THROW({ BuildGraph(nullptr); }, common::assertion_error);
 }
 
 // The graph represents the following structure:

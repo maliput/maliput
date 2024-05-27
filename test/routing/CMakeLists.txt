@@ -1,4 +1,5 @@
 ament_add_gmock(graph_test graph_test.cc)
+ament_add_gmock(graph_utils_test graph_utils_test.cc)
 ament_add_gmock(route_test route_test.cc)
 ament_add_gtest(routing_compare_test compare_test.cc)
 ament_add_gmock(routing_phase_test phase_test.cc)
@@ -25,6 +26,7 @@ macro(add_dependencies_to_test target)
 endmacro()
 
 add_dependencies_to_test(graph_test)
+add_dependencies_to_test(graph_utils_test)
 add_dependencies_to_test(route_test)
 add_dependencies_to_test(routing_compare_test)
 add_dependencies_to_test(routing_phase_test)
