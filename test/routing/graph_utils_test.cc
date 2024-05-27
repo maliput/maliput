@@ -293,6 +293,10 @@ GTEST_TEST(FindAllEdgeSequences, DisjointGraph) {
   }
 }
 
+// TODO(agalbachicar): Test FilterLanesFromEdges()
+
+// TODO(agalbachicar): Test FindNode()
+
 }  // namespace
 }  // namespace test
 }  // namespace graph

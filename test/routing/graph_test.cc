@@ -33,7 +33,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-
 #include "maliput/api/branch_point.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/assertion_error.h"
