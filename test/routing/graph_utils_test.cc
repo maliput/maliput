@@ -47,6 +47,16 @@ namespace graph {
 namespace test {
 namespace {
 
+using ::testing::_;
+using ::testing::Eq;
+using ::testing::Return;
+
+using maliput::routing::test::BranchPointMock;
+using maliput::routing::test::JunctionMock;
+using maliput::routing::test::LaneMock;
+using maliput::routing::test::RoadGeometryMock;
+using maliput::routing::test::SegmentMock;
+
 // Tests that using nodes not in the graph makes the function to throw.
 GTEST_TEST(FindAllEdgeSequences, NodesOutsideTheGraphThrow) {
   const api::Segment* kSegment{reinterpret_cast<const api::Segment*>(0x00000001)};
@@ -295,7 +305,53 @@ GTEST_TEST(FindAllEdgeSequences, DisjointGraph) {
 
 // TODO(agalbachicar): Test FilterLanesFromEdges()
 
-// TODO(agalbachicar): Test FindNode()
+// Evaluates that the same position but changing the end yields two different nodes.
+GTEST_TEST(FindNode, CorrectlyReturnsTheNodeWhenFound) {
+  static constexpr int kOne{1};
+  JunctionMock junction;
+  SegmentMock segment;
+  const api::Segment* segment_ptr = &segment;
+  LaneMock lane;
+  LaneMock strange_lane;
+  BranchPointMock start_branch_point;
+  const api::BranchPoint* start_branch_point_ptr = &start_branch_point;
+  BranchPointMock end_branch_point;
+  const api::BranchPoint* end_branch_point_ptr = &end_branch_point;
+  BranchPointMock strange_branch_point;
+  const api::BranchPoint* strange_branch_point_ptr = &strange_branch_point;
+  RoadGeometryMock rg;
+  const api::RoadPosition position{&lane, api::LanePosition{1., 2., 3.}};
+  const api::RoadPosition strange_position{&strange_lane, api::LanePosition{1., 2., 3.}};
+  EXPECT_CALL(rg, do_num_junctions()).WillRepeatedly(Return(kOne));
+  EXPECT_CALL(rg, do_junction(_)).WillRepeatedly(Return(static_cast<const api::Junction*>(&junction)));
+  EXPECT_CALL(junction, do_num_segments()).WillRepeatedly(Return(kOne));
+  EXPECT_CALL(junction, do_segment(_)).WillRepeatedly(Return(segment_ptr));
+  EXPECT_CALL(segment, do_num_lanes()).WillRepeatedly(Return(kOne));
+  EXPECT_CALL(segment, do_lane(_)).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane)));
+  EXPECT_CALL(lane, DoGetBranchPoint(Eq(api::LaneEnd::Which::kStart))).WillRepeatedly(Return(start_branch_point_ptr));
+  EXPECT_CALL(lane, DoGetBranchPoint(Eq(api::LaneEnd::Which::kFinish))).WillRepeatedly(Return(end_branch_point_ptr));
+  EXPECT_CALL(strange_lane, DoGetBranchPoint(Eq(api::LaneEnd::Which::kStart)))
+      .WillRepeatedly(Return(strange_branch_point_ptr));
+  const Graph graph = BuildGraph(&rg);
+
+  const std::optional<Node> expected_strange_node = FindNode(graph, strange_position, api::LaneEnd::Which::kStart);
+  const std::optional<Node> expected_start_node = FindNode(graph, position, api::LaneEnd::Which::kStart);
+  const std::optional<Node> expected_end_node = FindNode(graph, position, api::LaneEnd::Which::kFinish);
+
+  // This position does not map to an api::BranchPoint in the graph, so it is strange in the context of this graph.
+  ASSERT_FALSE(expected_strange_node.has_value());
+  // The following two positions map to api::BranchPoints in the graph.
+  ASSERT_TRUE(expected_start_node.has_value());
+  ASSERT_TRUE(expected_end_node.has_value());
+  ASSERT_NE(expected_start_node->id, expected_end_node->id);
+  ASSERT_TRUE(
+      expected_start_node->branch_points.find(start_branch_point_ptr) != expected_start_node->branch_points.end() ||
+      expected_start_node->branch_points.find(end_branch_point_ptr) != expected_start_node->branch_points.end());
+  ASSERT_TRUE(expected_end_node->branch_points.find(start_branch_point_ptr) != expected_end_node->branch_points.end() ||
+              expected_end_node->branch_points.find(end_branch_point_ptr) != expected_end_node->branch_points.end());
+  ASSERT_EQ(segment_ptr, *(expected_start_node->edges.begin()));
+  ASSERT_EQ(segment_ptr, *(expected_end_node->edges.begin()));
+}
 
 }  // namespace
 }  // namespace test
