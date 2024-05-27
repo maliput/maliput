@@ -90,58 +90,6 @@ std::optional<Node> FindNode(const Graph& graph, const api::RoadPosition& pos, c
   return {};
 }
 
-namespace {
-
-bool ConnectsWithSegment(const api::Lane* lane, const api::Segment* next_segment) {
-  MALIPUT_THROW_UNLESS(lane != nullptr);
-  MALIPUT_THROW_UNLESS(next_segment != nullptr);
-  const api::LaneEndSet* confluent_start_branch_point = lane->GetConfluentBranches(api::LaneEnd::Which::kStart);
-  for (int le_i = 0; le_i < confluent_start_branch_point->size(); ++le_i) {
-    const api::LaneEnd lane_end = confluent_start_branch_point->get(le_i);
-    if (lane_end.lane->segment() == next_segment) {
-      return true;
-    }
-  }
-  const api::LaneEndSet* ongoing_end_branch_point = lane->GetOngoingBranches(api::LaneEnd::Which::kFinish);
-  for (int le_i = 0; le_i < ongoing_end_branch_point->size(); ++le_i) {
-    const api::LaneEnd lane_end = ongoing_end_branch_point->get(le_i);
-    if (lane_end.lane->segment() == next_segment) {
-      return true;
-    }
-  }
-  return false;
-}
-
-std::vector<const api::Lane*> GetLanes(const api::Segment* segment, const api::Segment* target_segment = nullptr) {
-  std::vector<const api::Lane*> lane_vector;
-  for (int l_id = 0; l_id < segment->num_lanes(); ++l_id) {
-    const api::Lane* lane = segment->lane(l_id);
-    if (target_segment == nullptr || ConnectsWithSegment(lane, target_segment)) {
-      lane_vector.push_back(lane);
-    }
-  }
-  return lane_vector;
-}
-
-}  // namespace
-
-std::vector<std::vector<SubSegment>> FilterLanesFromEdges(const std::vector<std::vector<Edge>>& edge_sequences) {
-  std::vector<std::vector<SubSegment>> result;
-  for (const auto& sequence : edge_sequences) {
-    MALIPUT_THROW_UNLESS(!sequence.empty());
-    std::vector<SubSegment> filtered_sequence;
-    Edge target_edge = sequence.back();
-    filtered_sequence.push_back(SubSegment{target_edge.segment, GetLanes(target_edge.segment, nullptr)});
-    for (size_t i = sequence.size() - 2u; i >= 0u; --i) {
-      filtered_sequence.insert(filtered_sequence.begin(),
-                               SubSegment{sequence[i].segment, GetLanes(sequence[i].segment, target_edge.segment)});
-      target_edge = sequence[i];
-    }
-    result.push_back(filtered_sequence);
-  }
-  return result;
-}
-
 }  // namespace graph
 }  // namespace routing
 }  // namespace maliput

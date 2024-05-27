@@ -39,16 +39,6 @@ namespace maliput {
 namespace routing {
 namespace graph {
 
-/// @brief Convenient struct to group those api::Lanes within an api::Segment.
-/// @details This data type offers a filtered view of Edge, which becomes useful when
-/// combining in a sequence various Edges to join Node A with Node B.
-struct SubSegment {
-  /// @brief The api::Segment that refers to.
-  const api::Segment* segment{};
-  /// @brief The list of api::Lanes within `segment` that are selected.
-  std::vector<const api::Lane*> lanes;
-};
-
 /// @brief Finds all Edge sequences in @p graph that join @p start with @p end.
 /// @param graph The Graph to conduct the search.
 /// @param start The start Node. It must exist in the @p graph.
@@ -57,13 +47,6 @@ struct SubSegment {
 /// returned vector is empty.
 /// @throws maliput::common::assertion_error When any of @p start and @p end do not exist in @p graph.
 std::vector<std::vector<Edge>> FindAllEdgeSequences(const Graph& graph, const Node& start, const Node& end);
-
-/// @brief Filters api::Lanes from Edges in @p edge_sequences to leave out only api::Lanes in SubSegments that allow the
-/// connectivity of the succeeding api::Segment.
-/// @param edge_sequences The result of FindAllEdgeSequences().
-/// @return A vector of vectors of SubSegments which contain the list of api::Segment and filtered api::Lanes in them.
-/// @throws maliput::common::assertion_error When any element in @p edge_sequences is an empty sequence.
-std::vector<std::vector<SubSegment>> FilterLanesFromEdges(const std::vector<std::vector<Edge>>& edge_sequences);
 
 /// @brief Finds a Node in @p graph that is on the @p end extent of the Edge @p pos falls into.
 /// @param graph The Graph to perform the search into.
