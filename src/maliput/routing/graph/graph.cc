@@ -48,7 +48,7 @@ std::set<const api::BranchPoint*> GetBranchPoints(const api::Segment* segment, c
     const api::Lane* lane = segment->lane(l_id);
     branch_points.insert(lane->GetBranchPoint(end));
   }
-  MALIPUT_THROW_UNLESS(branch_points.size() != static_cast<size_t>(segment->num_lanes()));
+  MALIPUT_THROW_UNLESS(branch_points.size() == static_cast<size_t>(segment->num_lanes()));
   return branch_points;
 }
 
