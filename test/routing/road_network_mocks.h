@@ -111,6 +111,15 @@ class IdIndexMock final : public api::RoadGeometry::IdIndex {
   MOCK_METHOD(const api::BranchPoint*, DoGetBranchPoint, (const api::BranchPointId&), (const));
 };
 
+/// @brief Google mock api::Junction.
+class JunctionMock : public api::Junction {
+ public:
+  MOCK_METHOD(api::JunctionId, do_id, (), (const));
+  MOCK_METHOD(const api::RoadGeometry*, do_road_geometry, (), (const));
+  MOCK_METHOD(int, do_num_segments, (), (const));
+  MOCK_METHOD(const api::Segment*, do_segment, (int), (const));
+};
+
 /// @brief Google mock api::Segment.
 class SegmentMock : public api::Segment {
  public:
@@ -118,6 +127,18 @@ class SegmentMock : public api::Segment {
   MOCK_METHOD(const api::Junction*, do_junction, (), (const));
   MOCK_METHOD(int, do_num_lanes, (), (const));
   MOCK_METHOD(const api::Lane*, do_lane, (int), (const));
+};
+
+/// @brief Google mock api::BranchPoint
+class BranchPointMock : public api::BranchPoint {
+ public:
+  MOCK_METHOD(api::BranchPointId, do_id, (), (const));
+  MOCK_METHOD(const api::RoadGeometry*, do_road_geometry, (), (const));
+  MOCK_METHOD(const api::LaneEndSet*, DoGetConfluentBranches, (const api::LaneEnd&), (const));
+  MOCK_METHOD(const api::LaneEndSet*, DoGetOngoingBranches, (const api::LaneEnd&), (const));
+  MOCK_METHOD(std::optional<api::LaneEnd>, DoGetDefaultBranch, (const api::LaneEnd&), (const));
+  MOCK_METHOD(const api::LaneEndSet*, DoGetASide, (), (const));
+  MOCK_METHOD(const api::LaneEndSet*, DoGetBSide, (), (const));
 };
 
 // @brief Google mock api::rules::RoadRulebook.
