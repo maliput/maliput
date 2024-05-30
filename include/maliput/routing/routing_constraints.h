@@ -42,7 +42,7 @@ struct RoutingConstraints {
   /// When both `max_route_cost` and this parameter are set,
   /// `max_route_cost >= max_phase_cost`.
   std::optional<double> max_phase_cost{};
-  /// Defines the maximim cost of a Route. Cost is a router implementation
+  /// Defines the maximum cost of a Route. Cost is a router implementation
   /// detail and is thus unitless. When set, it must not be negative.
   /// When both `max_phase_cost` and this parameter are set,
   /// `max_route_cost >= max_phase_cost`.
