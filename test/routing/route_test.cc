@@ -81,7 +81,7 @@ class RouteBaseTest : public ::testing::Test {
  public:
   static constexpr SegmentMock* kNullSegmentPtr{nullptr};
   static constexpr const LaneMock* kNullLeftLanePtr{nullptr};
-  static constexpr const LaneMock* kNullRigthLanePtr{nullptr};
+  static constexpr const LaneMock* kNullRightLanePtr{nullptr};
   const api::RBounds kLaneBounds{-2.5, 2.5};
 
   void SetUp() override {
@@ -123,7 +123,7 @@ TEST_F(RouteConstructorValidationsTest, EmptyPhasesThrows) {
 TEST_F(RouteConstructorValidationsTest, RoadNetworkPtrIsNullptrThrows) {
   LaneMock lane_a;
   LaneMock lane_b;
-  SetUpLane(&lane_a, kLaneIdA, &lane_b, kNullRigthLanePtr, kNullSegmentPtr, kLaneBounds, kLaneALength);
+  SetUpLane(&lane_a, kLaneIdA, &lane_b, kNullRightLanePtr, kNullSegmentPtr, kLaneBounds, kLaneALength);
   SetUpLane(&lane_b, kLaneIdB, kNullLeftLanePtr, &lane_a, kNullSegmentPtr, kLaneBounds, kLaneBLength);
   EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
   EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b));
@@ -143,7 +143,7 @@ TEST_F(RouteConstructorValidationsTest, RoadNetworkPtrIsNullptrThrows) {
 TEST_F(RouteConstructorValidationsTest, CorrectConstruction) {
   LaneMock lane_a;
   LaneMock lane_b;
-  SetUpLane(&lane_a, kLaneIdA, &lane_b, kNullRigthLanePtr, kNullSegmentPtr, kLaneBounds, kLaneALength);
+  SetUpLane(&lane_a, kLaneIdA, &lane_b, kNullRightLanePtr, kNullSegmentPtr, kLaneBounds, kLaneALength);
   SetUpLane(&lane_b, kLaneIdB, kNullLeftLanePtr, &lane_a, kNullSegmentPtr, kLaneBounds, kLaneBLength);
   EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a));
   EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b));
@@ -167,7 +167,7 @@ class RouteAccessorsTest : public RouteConstructorValidationsTest {
 
   void SetUp() override {
     RouteConstructorValidationsTest::SetUp();
-    SetUpLane(&lane_a_, kLaneIdA, &lane_b_, kNullRigthLanePtr, kNullSegmentPtr, kLaneBounds, kLaneALength);
+    SetUpLane(&lane_a_, kLaneIdA, &lane_b_, kNullRightLanePtr, kNullSegmentPtr, kLaneBounds, kLaneALength);
     SetUpLane(&lane_b_, kLaneIdB, kNullLeftLanePtr, &lane_a_, kNullSegmentPtr, kLaneBounds, kLaneBLength);
     EXPECT_CALL(id_index_, DoGetLane(kLaneIdA)).WillRepeatedly(Return(&lane_a_));
     EXPECT_CALL(id_index_, DoGetLane(kLaneIdB)).WillRepeatedly(Return(&lane_b_));
@@ -364,9 +364,9 @@ class RouteWithTwoPhasesTest : public RouteBaseTest {
 
     EXPECT_CALL(segment_a_, do_id()).WillRepeatedly(Return(kSegmentAId));
     EXPECT_CALL(segment_b_, do_id()).WillRepeatedly(Return(kSegmentBId));
-    SetUpLane(&lane_a_a_, kLaneIdAA, &lane_a_b_, kNullRigthLanePtr, &segment_a_, kLaneBounds, kLaneAALength);
+    SetUpLane(&lane_a_a_, kLaneIdAA, &lane_a_b_, kNullRightLanePtr, &segment_a_, kLaneBounds, kLaneAALength);
     SetUpLane(&lane_a_b_, kLaneIdAB, kNullLeftLanePtr, &lane_a_a_, &segment_a_, kLaneBounds, kLaneABLength);
-    SetUpLane(&lane_b_a_, kLaneIdBA, kNullLeftLanePtr, kNullRigthLanePtr, &segment_b_, kLaneBounds, kLaneBALength);
+    SetUpLane(&lane_b_a_, kLaneIdBA, kNullLeftLanePtr, kNullRightLanePtr, &segment_b_, kLaneBounds, kLaneBALength);
     EXPECT_CALL(id_index_, DoGetLane(kLaneIdAA)).WillRepeatedly(Return(&lane_a_a_));
     EXPECT_CALL(id_index_, DoGetLane(kLaneIdAB)).WillRepeatedly(Return(&lane_a_b_));
     EXPECT_CALL(id_index_, DoGetLane(kLaneIdBA)).WillRepeatedly(Return(&lane_b_a_));
@@ -717,21 +717,21 @@ TEST_F(RouteLaneSRelationTest, EvaluateComputeLaneSRangeRelationSameLaneSRanges)
   EXPECT_CALL(lane_e_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
   EXPECT_CALL(lane_h_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
 
-  EXPECT_EQ(LaneSRangeRelation::kPreceedingStraight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeE));
+  EXPECT_EQ(LaneSRangeRelation::kPrecedingStraight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeE));
 
   EXPECT_CALL(lane_i_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 5., 0.}));
   EXPECT_CALL(lane_i_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
 
-  EXPECT_EQ(LaneSRangeRelation::kPreceedingLeft, dut.ComputeLaneSRangeRelation(kLaneSRangeI, kLaneSRangeE));
+  EXPECT_EQ(LaneSRangeRelation::kPrecedingLeft, dut.ComputeLaneSRangeRelation(kLaneSRangeI, kLaneSRangeE));
 
   EXPECT_CALL(lane_f_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 5., 0.}));
   EXPECT_CALL(lane_g_, DoToInertialPosition(_)).WillRepeatedly(Return(api::InertialPosition{2. * kLaneLength, 0., 0.}));
   EXPECT_CALL(lane_f_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
   EXPECT_CALL(lane_g_, DoGetOrientation(_)).WillRepeatedly(Return(kOrientation));
 
-  EXPECT_EQ(LaneSRangeRelation::kPreceedingRight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeF));
+  EXPECT_EQ(LaneSRangeRelation::kPrecedingRight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeF));
 
-  EXPECT_EQ(LaneSRangeRelation::kPreceedingRight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeG));
+  EXPECT_EQ(LaneSRangeRelation::kPrecedingRight, dut.ComputeLaneSRangeRelation(kLaneSRangeH, kLaneSRangeG));
 }
 
 // The following set of tests evaluate specific conditions of the topology of the graphs.

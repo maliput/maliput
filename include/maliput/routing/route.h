@@ -273,10 +273,10 @@ class Route final {
   std::optional<LaneSRangeIndex> FindLaneSRangeIndex(const api::LaneSRange& lane_s_range) const;
 
   // Finds the LaneSRangeIndex of the api::LaneSRange that is
-  // LaneSRelation::kPreceedingStraight with respect to @p index api::LaneSRange.
+  // LaneSRelation::kPrecedingStraight with respect to @p index api::LaneSRange.
   //
   // @param index The index of the api::LaneSRange to find its
-  // LaneSRelation::kPreceedingStraight counterpart. It must be a valid index.
+  // LaneSRelation::kPrecedingStraight counterpart. It must be a valid index.
   // @return An optional containing the LaneSRangeIndex of the api::LaneSRange.
   std::optional<LaneSRangeIndex> FindStraightPredecessor(const LaneSRangeIndex& index) const;
 
