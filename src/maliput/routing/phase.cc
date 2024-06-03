@@ -49,8 +49,8 @@ bool ValidateLaneSRangeIsInRoadNetwork(const api::LaneSRange& lane_s_range, cons
 }
 
 // @return true When @p lane_s_range_a and @p lane_s_range_b are adjacent.
-bool ValidateLaneSRangesAreAdjancent(const api::LaneSRange& lane_s_range_a, const api::LaneSRange& lane_s_range_b,
-                                     const api::RoadGeometry* road_geometry) {
+bool ValidateLaneSRangesAreAdjacent(const api::LaneSRange& lane_s_range_a, const api::LaneSRange& lane_s_range_b,
+                                    const api::RoadGeometry* road_geometry) {
   const api::Lane* lane_a = road_geometry->ById().GetLane(lane_s_range_a.lane_id());
   const api::Lane* lane_b = road_geometry->ById().GetLane(lane_s_range_b.lane_id());
   return (lane_a->to_left() == lane_b && lane_b->to_right() == lane_a) ||
@@ -112,7 +112,7 @@ Phase::Phase(int index, double lane_s_range_tolerance, const std::vector<api::Ro
                                }),
                    "End position is not in lane_s_ranges_.");
   for (size_t i = 0; i < lane_s_ranges_.size() - 1u; ++i) {
-    MALIPUT_VALIDATE(ValidateLaneSRangesAreAdjancent(lane_s_ranges_[i], lane_s_ranges_[i + 1], road_geometry),
+    MALIPUT_VALIDATE(ValidateLaneSRangesAreAdjacent(lane_s_ranges_[i], lane_s_ranges_[i + 1], road_geometry),
                      "LaneSRanges are not adjacent.");
   }
 }
