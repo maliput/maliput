@@ -54,7 +54,6 @@ bool LaneExistsInSet(const api::LaneEndSet* set, const api::Lane& lane) {
 
 }  // namespace
 
-// Returns the S coordinate in @p lane that is on the border with @p next_lane.
 std::optional<double> DetermineEdgeS(const api::Lane& lane, const api::Lane& next_lane) {
   if (LaneExistsInSet(lane.GetOngoingBranches(api::LaneEnd::kFinish), next_lane)) {
     return lane.length();
@@ -114,5 +113,6 @@ std::vector<api::LaneSRoute> DeriveLaneSRoutes(const api::RoadPosition& start, c
   }
   return result;
 }
+
 }  // namespace routing
 }  // namespace maliput

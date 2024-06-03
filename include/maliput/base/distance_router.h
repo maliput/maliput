@@ -51,7 +51,8 @@ class DistanceRouter : public routing::Router {
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(DistanceRouter);
 
   /// Constructs a DistanceRouter.
-  /// @param road_network The api::RoadNetwork to compute routing::Routes on.
+  /// @param road_network The api::RoadNetwork to compute routing::Routes on. It must remain valid for the lifetime
+  /// of the constructed object.
   /// @param lane_s_range_tolerance The tolerance to consider when evaluating api::LaneSRanges. It must not be negative.
   /// @throws common::assertion_error When @p lane_s_range_tolerance is negative.
   DistanceRouter(const api::RoadNetwork& road_network, double lane_s_range_tolerance);

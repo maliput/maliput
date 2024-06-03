@@ -84,10 +84,11 @@ double MaxPhaseCostInRoute(const routing::Route& route) {
   return cost;
 }
 
-// Filters routing::Routes from @p routes based on @p routing_constraints.
+// Filters @p routes based on @p routing_constraints.
 // @param routing_constraints The constraints to evaluate over @p routes.
 // @param routes The collection of routing::Routes that connect the start and end.
-// @return A subset of @p routes that comply with @p routing_constraints.
+// @return A subset of @p routes that comply with @p routing_constraints. The relative order in the returned
+// routes is the same as @p routes.
 std::vector<routing::Route> FilterRoutes(const routing::RoutingConstraints& routing_constraints,
                                          const std::vector<routing::Route>& routes) {
   // TODO: evaluate routing_constraints.allow_lane_switch.
@@ -122,7 +123,7 @@ std::string AggregateRouteConnectivityErrors(const std::vector<std::string>& err
   return result;
 }
 
-// Iterates over @p routes and validates none has end to end connectivity errors.
+// Iterates over @p routes and validates none have end to end connectivity errors.
 // @param routes Vector of Routes to validate.
 // @throws common::assertion_error When one of the Routes in @p routes has end to end connectivity errors.
 void ValidateEndToEndConnectivityInRoutes(const std::vector<routing::Route>& routes) {
