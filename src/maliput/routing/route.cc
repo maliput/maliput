@@ -368,6 +368,7 @@ int Route::FindDirectionTowardsLaneSRangeWithStraightPredecessor(const Route::La
 namespace {
 
 // Finds a RoadPosition by matching @p lane pointer.
+//
 // @param lane Pointer to the api::Lane to match.
 // @param positions Vector of positions to look for one with a matching api::Lane pointer with @p lane.
 // @return An optional with a copy of the first position found with matching api::Lane pointer with @p lane.
@@ -379,6 +380,7 @@ std::optional<api::RoadPosition> FindPositionByLane(const api::Lane* lane,
 }
 
 // Evaluates whether @p pos_a is close to @p pos_b with @p tolerance in the INERTIAL-Frame.
+//
 // @param pos_a Left hand side of the comparison.
 // @param pos_b Right hand side of the comparison.
 // @param tolerance Tolerance to compare the positions.
@@ -400,8 +402,10 @@ api::LaneEnd::Which GetClosestLaneEndWhich(const api::RoadPosition& position) {
 
 // Matches @p position_a in the preceding Phase with an api::RoadPosition in @p positions_b from
 // the succeeding Phase.
+//
 // Filters @p positions_b using @p ongoing_lane_end_set to look for valid positions in the topological
 // sense to then find the first match in the subset by geometrical correspondence within @p tolerance.
+//
 // @param position_a api::RoadPosition at the end of the preceding Phase.
 // @param positions_b api::RoadPositions at the start of the succeeding Phase.
 // @param ongoing_lane_end_set The ongoing api::LaneEndSet that corresponds with @p position_a.
@@ -459,10 +463,12 @@ std::vector<std::string> Route::ValidateEndToEndConnectivity() const {
     // in the start positions of phase_b.
     // The topological connectivity logic follows:
     // - For each point in the end positions in phase_a, do
-    //   - Try to find a point in the start positions of phase_b with the same api::LaneId.
+    //   - Try to find a point in the start positions of phase_b with the same api::LaneId. This occurs when the
+    //     boundary between phase_a and phase_b happens in the middle of a lane.
     //     - If found, assert the points are coincident. Throw otherwise.
-    //   - When not found, identify the api::BranchPoint and the respective ongoing set of LaneEnds.
-    //   - Find which position of the end positions in phase_b belong to the ongoing set of LaneEnds.
+    //   - When not found, this means the boundary between phase_a and phase_b involves two different lanes. In this
+    //     case, identify the api::BranchPoint and the respective ongoing set of LaneEnds.
+    //     - Find which position of the end positions in phase_b belong to the ongoing set of LaneEnds.
     for (const api::RoadPosition& end_position : phase_a.end_positions()) {
       std::optional<api::RoadPosition> found_position_on_b =
           FindPositionByLane(end_position.lane, phase_b.start_positions());
@@ -474,16 +480,17 @@ std::vector<std::string> Route::ValidateEndToEndConnectivity() const {
              << "] was found in the next Phase but position is not within tolerance.";
           errors.push_back(ss.str());
         }
-        continue;
-      }
-      const api::LaneEndSet* lane_end_set = end_position.lane->GetOngoingBranches(GetClosestLaneEndWhich(end_position));
-      found_position_on_b =
-          MatchPositionInLaneEndSet(end_position, phase_b.start_positions(), *lane_end_set, tolerance);
-      if (!found_position_on_b) {
-        std::stringstream ss;
-        ss << "RoadPosition: {id: " << end_position.lane->id().string() << ", pos: {" << end_position.pos
-           << "}} from Phases[" << phase_index << "] was not found in next Phase within tolerance.";
-        errors.push_back(ss.str());
+      } else {
+        const api::LaneEndSet* lane_end_set =
+            end_position.lane->GetOngoingBranches(GetClosestLaneEndWhich(end_position));
+        found_position_on_b =
+            MatchPositionInLaneEndSet(end_position, phase_b.start_positions(), *lane_end_set, tolerance);
+        if (!found_position_on_b) {
+          std::stringstream ss;
+          ss << "RoadPosition: {id: " << end_position.lane->id().string() << ", pos: {" << end_position.pos
+             << "}} from Phases[" << phase_index << "] was not found in next Phase within tolerance.";
+          errors.push_back(ss.str());
+        }
       }
     }
   }
