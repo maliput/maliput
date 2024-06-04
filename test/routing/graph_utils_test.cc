@@ -39,7 +39,7 @@
 #include "maliput/api/segment.h"
 #include "maliput/common/assertion_error.h"
 #include "maliput/routing/graph/graph.h"
-#include "routing/road_network_mocks.h"
+#include "road_network_mocks.h"
 
 namespace maliput {
 namespace routing {
@@ -51,11 +51,11 @@ using ::testing::_;
 using ::testing::Eq;
 using ::testing::Return;
 
-using maliput::routing::test::BranchPointMock;
-using maliput::routing::test::JunctionMock;
-using maliput::routing::test::LaneMock;
-using maliput::routing::test::RoadGeometryMock;
-using maliput::routing::test::SegmentMock;
+using maliput::test::BranchPointMock;
+using maliput::test::JunctionMock;
+using maliput::test::LaneMock;
+using maliput::test::RoadGeometryMock;
+using maliput::test::SegmentMock;
 
 // Tests that using nodes not in the graph makes the function to throw.
 GTEST_TEST(FindAllEdgeSequences, NodesOutsideTheGraphThrow) {

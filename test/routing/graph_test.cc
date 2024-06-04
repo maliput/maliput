@@ -36,7 +36,7 @@
 #include "maliput/api/branch_point.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/assertion_error.h"
-#include "routing/road_network_mocks.h"
+#include "road_network_mocks.h"
 
 namespace maliput {
 namespace routing {
@@ -48,11 +48,11 @@ using ::testing::_;
 using ::testing::Eq;
 using ::testing::Return;
 
-using maliput::routing::test::BranchPointMock;
-using maliput::routing::test::JunctionMock;
-using maliput::routing::test::LaneMock;
-using maliput::routing::test::RoadGeometryMock;
-using maliput::routing::test::SegmentMock;
+using maliput::test::BranchPointMock;
+using maliput::test::JunctionMock;
+using maliput::test::LaneMock;
+using maliput::test::RoadGeometryMock;
+using maliput::test::SegmentMock;
 
 GTEST_TEST(BuildGraph, PassingNullRoadGeometryThrows) {
   ASSERT_THROW({ BuildGraph(nullptr); }, common::assertion_error);
