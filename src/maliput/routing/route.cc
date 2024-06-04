@@ -31,7 +31,13 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <sstream>
 
+#include "maliput/api/branch_point.h"
+#include "maliput/api/compare.h"
+#include "maliput/api/lane.h"
+#include "maliput/api/lane_data.h"
+#include "maliput/common/compare.h"
 #include "maliput/geometry_base/strategy_base.h"
 
 namespace maliput {
@@ -41,7 +47,6 @@ Route::Route(const std::vector<Phase>& phases, const api::RoadNetwork* road_netw
     : phases_(phases), road_network_(road_network) {
   MALIPUT_THROW_UNLESS(!phases_.empty());
   MALIPUT_THROW_UNLESS(road_network_ != nullptr);
-  /// TODO(#453): Validate end to end connection of the Phases.
 
   // Populate the lane_id_to_indices_ dictionary.
   for (size_t phase_index = 0u; phase_index < phases_.size(); ++phase_index) {
@@ -357,6 +362,138 @@ int Route::FindDirectionTowardsLaneSRangeWithStraightPredecessor(const Route::La
     }
   }
   return kTowardsRight;
+}
+
+namespace {
+
+// Finds a RoadPosition by matching @p lane pointer.
+//
+// @param lane Pointer to the api::Lane to match.
+// @param positions Vector of positions to look for one with a matching api::Lane pointer with @p lane.
+// @return An optional with a copy of the first position found with matching api::Lane pointer with @p lane.
+std::optional<api::RoadPosition> FindPositionByLane(const api::Lane* lane,
+                                                    const std::vector<api::RoadPosition>& positions) {
+  const auto it = std::find_if(positions.begin(), positions.end(),
+                               [lane](const api::RoadPosition& position) { return position.lane == lane; });
+  return it != positions.end() ? std::optional<api::RoadPosition>{*it} : std::nullopt;
+}
+
+// Evaluates whether @p pos_a is close to @p pos_b with @p tolerance in the INERTIAL-Frame.
+//
+// @param pos_a Left hand side of the comparison.
+// @param pos_b Right hand side of the comparison.
+// @param tolerance Tolerance to compare the positions.
+// @return true When @p pos_a and @p pos_b are within @p tolerance in the INERTIAL-Frame.
+bool IsRoadPositionClose(const api::RoadPosition& pos_a, const api::RoadPosition& pos_b, double tolerance) {
+  const api::InertialPosition& inertial_pos_a = pos_a.lane->ToInertialPosition(pos_a.pos);
+  const api::InertialPosition& inertial_pos_b = pos_b.lane->ToInertialPosition(pos_b.pos);
+  const common::ComparisonResult<api::InertialPosition> comparison_result =
+      api::IsInertialPositionClose(inertial_pos_a, inertial_pos_b, tolerance);
+  return !comparison_result.message.has_value();
+}
+
+// Returns the closest api::LaneEnd::Which of the api::Lane that @p position is in.
+api::LaneEnd::Which GetClosestLaneEndWhich(const api::RoadPosition& position) {
+  const api::Lane* lane = position.lane;
+  return position.pos.s() <= lane->length() - position.pos.s() ? api::LaneEnd::Which::kStart
+                                                               : api::LaneEnd::Which::kFinish;
+}
+
+// Matches @p position_a in the preceding Phase with an api::RoadPosition in @p positions_b from
+// the succeeding Phase.
+//
+// Filters @p positions_b using @p ongoing_lane_end_set to look for valid positions in the topological
+// sense to then find the first match in the subset by geometrical correspondence within @p tolerance.
+//
+// @param position_a api::RoadPosition at the end of the preceding Phase.
+// @param positions_b api::RoadPositions at the start of the succeeding Phase.
+// @param ongoing_lane_end_set The ongoing api::LaneEndSet that corresponds with @p position_a.
+// @param tolerance Tolerance to compare the positions.
+// @return An optional with an api::RoadPosition from @p positions_b that corresponds with @p position_a.
+std::optional<api::RoadPosition> MatchPositionInLaneEndSet(const api::RoadPosition& position_a,
+                                                           const std::vector<api::RoadPosition> positions_b,
+                                                           const api::LaneEndSet& ongoing_lane_end_set,
+                                                           double tolerance) {
+  std::vector<api::RoadPosition> matching_positions_b{};
+  std::copy_if(positions_b.begin(), positions_b.end(), std::back_inserter(matching_positions_b),
+               [&ongoing_lane_end_set](const api::RoadPosition& position) {
+                 for (int i = 0; i < ongoing_lane_end_set.size(); ++i) {
+                   if (position.lane == ongoing_lane_end_set.get(i).lane) {
+                     return true;
+                   }
+                 }
+                 return false;
+               });
+  const auto it = std::find_if(matching_positions_b.begin(), matching_positions_b.end(),
+                               [position_a, tolerance](const api::RoadPosition& position) {
+                                 return IsRoadPositionClose(position_a, position, tolerance);
+                               });
+  return it != matching_positions_b.end() ? std::optional<api::RoadPosition>{*it} : std::nullopt;
+}
+
+}  // namespace
+
+std::vector<std::string> Route::ValidateEndToEndConnectivity() const {
+  std::vector<std::string> errors;
+
+  // The start Phase must have only one start position.
+  if (phases_.front().start_positions().size() != 1u) {
+    errors.push_back("Start Phase::start_positions() does not have one position.");
+  }
+  // The end Phase must have only one end position.
+  if (phases_.back().end_positions().size() != 1u) {
+    errors.push_back("End Phase::end_positions() does not have one position.");
+  }
+
+  const double tolerance = road_network_->road_geometry()->linear_tolerance();
+
+  for (size_t phase_index = 0u; phase_index < phases_.size() - 1; ++phase_index) {
+    const Phase& phase_a = phases_[phase_index];
+    const Phase& phase_b = phases_[phase_index + 1u];
+    // The inter Phase interfaces must have the same count of points.
+    if (phase_a.end_positions().size() != phase_b.start_positions().size()) {
+      std::stringstream ss;
+      ss << "Phases[" << phase_index << "].end_positions().size() is " << phase_a.end_positions().size();
+      ss << "and Phases[" << (phase_index + 1u) << "].start_positions().size() is " << phase_b.start_positions().size();
+      errors.push_back(ss.str());
+    }
+
+    // For each point in the end positions of phase_a, we need to find the correspondent
+    // in the start positions of phase_b.
+    // The topological connectivity logic follows:
+    // - For each point in the end positions in phase_a, do
+    //   - Try to find a point in the start positions of phase_b with the same api::LaneId. This occurs when the
+    //     boundary between phase_a and phase_b happens in the middle of a lane.
+    //     - If found, assert the points are coincident. Throw otherwise.
+    //   - When not found, this means the boundary between phase_a and phase_b involves two different lanes. In this
+    //     case, identify the api::BranchPoint and the respective ongoing set of LaneEnds.
+    //     - Find which position of the end positions in phase_b belong to the ongoing set of LaneEnds.
+    for (const api::RoadPosition& end_position : phase_a.end_positions()) {
+      std::optional<api::RoadPosition> found_position_on_b =
+          FindPositionByLane(end_position.lane, phase_b.start_positions());
+      if (found_position_on_b) {
+        if (!IsRoadPositionClose(end_position, *found_position_on_b, tolerance)) {
+          std::stringstream ss;
+          ss << "RoadPosition: {id: " << end_position.lane->id().string() << ", pos: {" << end_position.pos
+             << "}} from Phases[" << phase_index
+             << "] was found in the next Phase but position is not within tolerance.";
+          errors.push_back(ss.str());
+        }
+      } else {
+        const api::LaneEndSet* lane_end_set =
+            end_position.lane->GetOngoingBranches(GetClosestLaneEndWhich(end_position));
+        found_position_on_b =
+            MatchPositionInLaneEndSet(end_position, phase_b.start_positions(), *lane_end_set, tolerance);
+        if (!found_position_on_b) {
+          std::stringstream ss;
+          ss << "RoadPosition: {id: " << end_position.lane->id().string() << ", pos: {" << end_position.pos
+             << "}} from Phases[" << phase_index << "] was not found in next Phase within tolerance.";
+          errors.push_back(ss.str());
+        }
+      }
+    }
+  }
+  return errors;
 }
 
 }  // namespace routing
