@@ -63,6 +63,7 @@ double ComputeCost(const routing::Phase& phase) {
 }
 
 // Computes the cost of a routing::Route.
+//
 // @param route The routing::Route to compute the cost.
 // @return The accumulated cost of all the routing::Phases in @p route.
 double ComputeCost(const routing::Route& route) {
@@ -74,6 +75,7 @@ double ComputeCost(const routing::Route& route) {
 }
 
 // Determines the maximum cost of all routing::Phases in @p route.
+//
 // @param route The routing::Route to look for the maximum routing::Phase's cost.
 // @return The maximum cost of all routing::Phases in @p route.
 double MaxPhaseCostInRoute(const routing::Route& route) {
@@ -85,6 +87,7 @@ double MaxPhaseCostInRoute(const routing::Route& route) {
 }
 
 // Filters @p routes based on @p routing_constraints.
+//
 // @param routing_constraints The constraints to evaluate over @p routes.
 // @param routes The collection of routing::Routes that connect the start and end.
 // @return A subset of @p routes that comply with @p routing_constraints. The relative order in the returned
@@ -110,7 +113,7 @@ std::vector<routing::Route> FilterRoutes(const routing::RoutingConstraints& rout
 
 // Concatenates items in @p errors into just one string.
 //
-// When @p errors is empty an empty string computed.
+// When @p errors is empty an empty string is computed.
 // Otherwise, the "Route has connectivity errors: <error> | <error> | ... |" formula to concatenate items from @p errors
 // is used.
 // @param errors A vector of error strings.
@@ -124,6 +127,7 @@ std::string AggregateRouteConnectivityErrors(const std::vector<std::string>& err
 }
 
 // Iterates over @p routes and validates none have end to end connectivity errors.
+//
 // @param routes Vector of Routes to validate.
 // @throws common::assertion_error When one of the Routes in @p routes has end to end connectivity errors.
 void ValidateEndToEndConnectivityInRoutes(const std::vector<routing::Route>& routes) {
@@ -156,11 +160,13 @@ std::vector<routing::Route> DistanceRouter::DoComputeRoutes(
       routing::FindLaneSequences(start.lane, end.lane, std::numeric_limits<double>::max(), kRemoveUTurns);
 
   // Construct the routing::Routes and routing::Phases.
-  // TODO: lateral routing::Phase inflation.
+  // TODO: Add support for lateral routing::Phase inflation by considering alternative lanes from within the same
+  // segment besides those returned by routing::FindLaneSequences().
   const double start_s = start.pos.s();
   const double end_s = end.pos.s();
   std::vector<routing::Route> routes;
   for (const std::vector<const api::Lane*>& lane_sequence : lane_sequences) {
+    // Handles the case when lane_sequence has a length of 1. This implies the route only has one phase.
     if (lane_sequence.size() == 1u) {
       const routing::Phase phase(0, lane_s_range_tolerance_, {start}, {end},
                                  {api::LaneSRange(start.lane->id(), api::SRange(start_s, end_s))}, &road_network_);
@@ -168,7 +174,7 @@ std::vector<routing::Route> DistanceRouter::DoComputeRoutes(
       continue;
     }
 
-    // Handles the case when lane_sequence has a length greater than 1.
+    // Handles the case when lane_sequence has a length greater than 1. This implies the route has more than one phase.
     std::vector<routing::Phase> phases;
     for (int i = 0; i < static_cast<int>(lane_sequence.size()); ++i) {
       const api::Lane* lane = lane_sequence[i];
