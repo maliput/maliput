@@ -61,9 +61,9 @@ namespace routing {
 /// - `F` is LaneSRangeRelation::kSucceedingStraight of `C`.
 /// - `E` and `F` are LaneSRangeRelation::kSucceedingLeft of `D`.
 /// - `F` and `G` are LaneSRangeRelation::kSucceedingRight of `B`.
-/// - `E` is LaneSRangeRelation::kPreceedingStraight of `H`.
-/// - `E` is LaneSRangeRelation::kPreceedingLeft of `I`.
-/// - `F` and `G` are LaneSRangeRelation::kPreceedingRight of `H`.
+/// - `E` is LaneSRangeRelation::kPrecedingStraight of `H`.
+/// - `E` is LaneSRangeRelation::kPrecedingLeft of `I`.
+/// - `F` and `G` are LaneSRangeRelation::kPrecedingRight of `H`.
 /// - `A` is LaneSRangeRelation::kUnrelated to `H`.
 ///
 /// LaneSRangeRelation::kUnknown represents the case when any of the
@@ -77,9 +77,9 @@ enum class LaneSRangeRelation {
   kSucceedingStraight,
   kSucceedingLeft,
   kSucceedingRight,
-  kPreceedingStraight,
-  kPreceedingLeft,
-  kPreceedingRight,
+  kPrecedingStraight,
+  kPrecedingLeft,
+  kPrecedingRight,
   kCoincident,
   kUnrelated,
   kUnknown,
@@ -95,9 +95,9 @@ inline std::map<LaneSRangeRelation, const char*> LaneSRangeRelationMapper() {
       {LaneSRangeRelation::kSucceedingStraight, "kSucceedingStraight"},
       {LaneSRangeRelation::kSucceedingLeft, "kSucceedingLeft"},
       {LaneSRangeRelation::kSucceedingRight, "kSucceedingRight"},
-      {LaneSRangeRelation::kPreceedingStraight, "kPreceedingStraight"},
-      {LaneSRangeRelation::kPreceedingLeft, "kPreceedingLeft"},
-      {LaneSRangeRelation::kPreceedingRight, "kPreceedingRight"},
+      {LaneSRangeRelation::kPrecedingStraight, "kPrecedingStraight"},
+      {LaneSRangeRelation::kPrecedingLeft, "kPrecedingLeft"},
+      {LaneSRangeRelation::kPrecedingRight, "kPrecedingRight"},
       {LaneSRangeRelation::kCoincident, "kCoincident"},
       {LaneSRangeRelation::kUnrelated, "kUnrelated"},
       {LaneSRangeRelation::kUnknown, "kUnknown"},

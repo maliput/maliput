@@ -112,11 +112,11 @@ enum class RelativePosition { kLeft = 0, kCenter, kRight };
 
 RelativePosition ComputeRelativePosition(const api::RoadPosition& pos_a, const api::RoadPosition& pos_b,
                                          double tolerance) {
-  const api::InertialPosition inerital_pos_a = pos_a.lane->ToInertialPosition(pos_a.pos);
-  const api::InertialPosition inerital_pos_b = pos_b.lane->ToInertialPosition(pos_b.pos);
+  const api::InertialPosition inertial_pos_a = pos_a.lane->ToInertialPosition(pos_a.pos);
+  const api::InertialPosition inertial_pos_b = pos_b.lane->ToInertialPosition(pos_b.pos);
 
   // When points are within tolerance, they are considered the same.
-  const math::Vector3 b_to_a = inerital_pos_b.xyz() - inerital_pos_a.xyz();
+  const math::Vector3 b_to_a = inertial_pos_b.xyz() - inertial_pos_a.xyz();
   if (b_to_a.norm() <= tolerance) {
     return RelativePosition::kCenter;
   }
@@ -125,7 +125,7 @@ RelativePosition ComputeRelativePosition(const api::RoadPosition& pos_a, const a
   const math::Vector3 s_hat_a = inertial_rotation_a.Apply({1., 0., 0.}).xyz();
   const math::Vector3 h_hat_a = inertial_rotation_a.Apply({0., 0., 1.}).xyz();
 
-  const math::Vector3 norm_b_to_a = (inerital_pos_b.xyz() - inerital_pos_a.xyz()).normalized();
+  const math::Vector3 norm_b_to_a = (inertial_pos_b.xyz() - inertial_pos_a.xyz()).normalized();
 
   const bool is_to_left = s_hat_a.cross(norm_b_to_a).dot(h_hat_a) > 0.;
   return is_to_left ? RelativePosition::kLeft : RelativePosition::kRight;
@@ -176,12 +176,11 @@ LaneSRangeRelation Route::ComputeLaneSRangeRelation(const api::LaneSRange& lane_
 
   static constexpr bool kStart{true};
   static constexpr bool kEnd{!kStart};
-  static constexpr std::array<LaneSRangeRelation, 3> kRelativePositionToSuceedingLaneSRange{
+  static constexpr std::array<LaneSRangeRelation, 3> kRelativePositionToSucceedingLaneSRange{
       LaneSRangeRelation::kSucceedingLeft, LaneSRangeRelation::kSucceedingStraight,
       LaneSRangeRelation::kSucceedingRight};
-  static constexpr std::array<LaneSRangeRelation, 3> kRelativePositionToPreceedingLaneSRange{
-      LaneSRangeRelation::kPreceedingLeft, LaneSRangeRelation::kPreceedingStraight,
-      LaneSRangeRelation::kPreceedingRight};
+  static constexpr std::array<LaneSRangeRelation, 3> kRelativePositionToPrecedingLaneSRange{
+      LaneSRangeRelation::kPrecedingLeft, LaneSRangeRelation::kPrecedingStraight, LaneSRangeRelation::kPrecedingRight};
   const double tolerance = road_network_->road_geometry()->linear_tolerance();
 
   // Determine whether lane_s_range_b is ahead of lane_s_range_a.
@@ -191,7 +190,7 @@ LaneSRangeRelation Route::ComputeLaneSRangeRelation(const api::LaneSRange& lane_
     const api::RoadPosition lane_s_range_b_road_pos =
         get_lane_s_range_road_position(index_b->phase, index_b->lane_s_range, kStart);
 
-    return kRelativePositionToSuceedingLaneSRange[static_cast<size_t>(
+    return kRelativePositionToSucceedingLaneSRange[static_cast<size_t>(
         ComputeRelativePosition(lane_s_range_a_road_pos, lane_s_range_b_road_pos, tolerance))];
   }
 
@@ -202,7 +201,7 @@ LaneSRangeRelation Route::ComputeLaneSRangeRelation(const api::LaneSRange& lane_
   const api::RoadPosition lane_s_range_b_road_pos =
       get_lane_s_range_road_position(index_b->phase, index_b->lane_s_range, kEnd);
 
-  return kRelativePositionToPreceedingLaneSRange[static_cast<size_t>(
+  return kRelativePositionToPrecedingLaneSRange[static_cast<size_t>(
       ComputeRelativePosition(lane_s_range_a_road_pos, lane_s_range_b_road_pos, tolerance))];
 }
 
@@ -319,21 +318,21 @@ std::optional<Route::LaneSRangeIndex> Route::FindLaneSRangeIndex(const api::Lane
 
 std::optional<Route::LaneSRangeIndex> Route::FindStraightPredecessor(const Route::LaneSRangeIndex& index) const {
   MALIPUT_THROW_UNLESS(index.phase > 0u);
-  const size_t preceeding_phase_index = index.phase - 1u;
-  const Phase& preceeding_phase = phases_.at(preceeding_phase_index);
+  const size_t preceding_phase_index = index.phase - 1u;
+  const Phase& preceding_phase = phases_.at(preceding_phase_index);
   const api::LaneSRange& lane_s_range = GetLaneSRange(index.phase, index.lane_s_range);
-  const auto preceeding_lane_s_range_it =
-      std::find_if(preceeding_phase.lane_s_ranges().begin(), preceeding_phase.lane_s_ranges().end(),
-                   [this, lane_s_range](const api::LaneSRange& preceeding_lane_s_range) {
-                     return ComputeLaneSRangeRelation(lane_s_range, preceeding_lane_s_range) ==
-                            LaneSRangeRelation::kPreceedingStraight;
+  const auto preceding_lane_s_range_it =
+      std::find_if(preceding_phase.lane_s_ranges().begin(), preceding_phase.lane_s_ranges().end(),
+                   [this, lane_s_range](const api::LaneSRange& preceding_lane_s_range) {
+                     return ComputeLaneSRangeRelation(lane_s_range, preceding_lane_s_range) ==
+                            LaneSRangeRelation::kPrecedingStraight;
                    });
-  if (preceeding_lane_s_range_it == preceeding_phase.lane_s_ranges().end()) {
+  if (preceding_lane_s_range_it == preceding_phase.lane_s_ranges().end()) {
     return std::nullopt;
   }
-  const size_t preceeding_index =
-      static_cast<size_t>(std::distance(preceeding_phase.lane_s_ranges().begin(), preceeding_lane_s_range_it));
-  return {LaneSRangeIndex{preceeding_phase_index, preceeding_index}};
+  const size_t preceding_index =
+      static_cast<size_t>(std::distance(preceding_phase.lane_s_ranges().begin(), preceding_lane_s_range_it));
+  return {LaneSRangeIndex{preceding_phase_index, preceding_index}};
 }
 
 int Route::FindDirectionTowardsLaneSRangeWithStraightPredecessor(const Route::LaneSRangeIndex& index) const {
