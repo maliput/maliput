@@ -29,6 +29,7 @@
 #pragma once
 
 #include <optional>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -128,8 +129,6 @@ class Route final {
   /// @param road_network The api::RoadNetwork pointer. It must not be
   /// nullptr. The lifetime of this pointer must exceed that of this object.
   /// @throws common::assertion_error When @p phases is empty.
-  /// @throws common::assertion_error When @p phases is not connected end
-  /// to end.
   /// @throws common::assertion_error When @p road_network is nullptr.
   Route(const std::vector<Phase>& phases, const api::RoadNetwork* road_network);
 
@@ -232,6 +231,25 @@ class Route final {
   /// end_route_position().
   /// @throws common::assertion_error When @p start_position is not valid.
   api::LaneSRoute ComputeLaneSRoute(const api::RoadPosition& start_position) const;
+
+  /// Evaluates whether this Route is connected end to end.
+  ///
+  /// End to end connectivity for a Route implies the following conditions:
+  /// - The first Phase contains only one start position.
+  /// - The last Phase contains only one end position.
+  /// - The number of end positions in a given Phase and start positions in the following Phase are the same.
+  /// - For each end position in a given Phase there is a one-to-one relation in the start
+  ///   positions in the following Phase such that:
+  ///   - The positions are coincident in the INERTIAL-Frame (geometrical connectivity) and,
+  ///   - The positions belong to the same api::Lane or are endpoints of api::Lanes that share
+  ///     opposing api::LaneEnds in an api::BranchPoint (topological connectivity).
+  ///
+  /// Router implementations are expected to construct Routes and validate they are connected end to end.
+  /// Users of a Route may expect Routes built by Router implementations to be end to end connected.
+  ///
+  /// @return A vector of strings with the errors found in the end to end connectivity. When there is no
+  /// error and the connectivity checks are successful, this method returns an empty vector.
+  std::vector<std::string> ValidateEndToEndConnectivity() const;
 
  private:
   // @{
