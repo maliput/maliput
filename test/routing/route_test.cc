@@ -1803,6 +1803,9 @@ TEST_F(RouteComputeLaneSRouteCaseF2Test, ComputeLaneSRoute) {
   EXPECT_TRUE(AssertCompare(IsEqual(kExpectedLaneSRouteFromI, dut.ComputeLaneSRoute(kRoadPositionI))));
 }
 
+// Route::ValidateEndToEndConnectivity() is tested in maliput_integration_tests because it requires
+// a fully implemented backend.
+
 }  // namespace
 }  // namespace test
 }  // namespace routing
