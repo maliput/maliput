@@ -29,13 +29,19 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
+#include <optional>
 #include <vector>
 
+#include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
 
 namespace maliput {
 namespace routing {
+
+/// Returns the S coordinate in @p lane that is on the border with @p next_lane.
+/// When @p lane is not connected to @p next_lane , std::nullopt is returned.
+std::optional<double> DetermineEdgeS(const api::Lane& lane, const api::Lane& next_lane);
 
 /// Derives and returns a set of LaneSRoute objects that go from @p start to
 /// @p end. If no routes are found, a vector of length zero is returned.

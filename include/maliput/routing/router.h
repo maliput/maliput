@@ -54,6 +54,8 @@ class Router {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Router);
 
+  virtual ~Router() = default;
+
   /// Computes Routes that joins @p start to @p end under
   /// @p routing_constraints.
   ///
