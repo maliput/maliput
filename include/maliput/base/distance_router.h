@@ -39,12 +39,14 @@
 
 namespace maliput {
 
-/// Basic implementation of a Router which only looks at the travelled distance
+/// Basic implementation of a Router which only looks at the traveled distance
 /// to provide solutions.
 ///
 /// The routing algorithm will consider the minimum length of api::LaneSRanges within
 /// a routing::Phase as its cost. The accumulation of all routing::Phases' costs along
 /// a routing::Route determines its cost.
+/// Moreover, the router operates at lane-level granularity. When using `start` and `end`
+/// positions to compute feasible routing::Routes, the `r` and `h` coordinates are ignored.
 // TODO: provide solutions that rely on segment-to-segment connectivity and enable
 // the use of api::Lane switches in results.
 class DistanceRouter : public routing::Router {
