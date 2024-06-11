@@ -33,6 +33,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/routing/graph/graph.h"
 #include "maliput/routing/route.h"
 #include "maliput/routing/router.h"
 #include "maliput/routing/routing_constraints.h"
@@ -65,6 +66,7 @@ class DistanceRouter : public routing::Router {
 
   const api::RoadNetwork& road_network_;
   const double lane_s_range_tolerance_{};
+  const routing::graph::Graph graph_{};
 };
 
 }  // namespace maliput

@@ -28,6 +28,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/routing/graph/graph_utils.h"
 
+#include <algorithm>
 #include <set>
 
 #include "maliput/api/branch_point.h"
@@ -66,6 +67,117 @@ std::vector<std::vector<Edge>> FindAllEdgeSequencesHelper(const Graph& graph, co
   return result;
 }
 
+// Convenient struct to hold both incoming and ongoing LaneEnds.
+// It will be used in HasUTurn to identify when a sequence of Edges contains a U-turn.
+struct ConnectionSet {
+  api::LaneEnd::Which incoming{api::LaneEnd::Which::kStart};
+  api::LaneEnd::Which ongoing{api::LaneEnd::Which::kStart};
+};
+
+// Builds a ConnectionSet from two adjacent Edges.
+//
+// The method will look for the common node of @p incoming_edge and @p ongoing_edge.
+// Once identified, using the node_a as the LaneEnd::Which::kStart and node_b as the
+// LaneEnd::Which::kFinish, it'll assign a result.
+// When edges are not adjacent, this function throws.
+//
+// @param incoming_lane The incoming Edge. Its segment must not be nullptr.
+// @param ongoing_lane The ongoing Edge. Its segment must not be nullptr.
+// @return A ConnectionSet.
+// @throws common::assertion_error When @p incoming_edge' or @p ongoing_edge' segment is nullptr.
+// @throws common::assertion_error When @p incoming_edge and @p ongoing_edge are not adjacent.
+ConnectionSet BuildConnectionSet(const Edge& incoming_edge, const Edge& ongoing_edge) {
+  MALIPUT_THROW_UNLESS(incoming_edge.segment != nullptr);
+  MALIPUT_THROW_UNLESS(ongoing_edge.segment != nullptr);
+  ConnectionSet result{};
+  if (incoming_edge.node_a == ongoing_edge.node_a) {
+    result.incoming = api::LaneEnd::Which::kStart;
+    result.ongoing = api::LaneEnd::Which::kStart;
+  } else if (incoming_edge.node_a == ongoing_edge.node_b) {
+    result.incoming = api::LaneEnd::Which::kStart;
+    result.ongoing = api::LaneEnd::Which::kFinish;
+  } else if (incoming_edge.node_b == ongoing_edge.node_a) {
+    result.incoming = api::LaneEnd::Which::kFinish;
+    result.ongoing = api::LaneEnd::Which::kStart;
+  } else if (incoming_edge.node_b == ongoing_edge.node_b) {
+    result.incoming = api::LaneEnd::Which::kFinish;
+    result.ongoing = api::LaneEnd::Which::kFinish;
+  } else {
+    // It was impossible to find a connection between the two edges, an error has occurred somewhere else.
+    MALIPUT_THROW_MESSAGE("maliput::routing::graph::BuildConnectionSet(): code must not reach here.");
+  }
+  return result;
+}
+
+// @brief Evaluates whether @p ref_edge and @p target_edge connect in at least one common api::BranchPoint
+// and from different sides of the api::BranchPoint.
+//
+// Computes the ConnectionSet for @p ref_edge and @p target_edge and then the set of api::BranchPoints at the
+// corresponding sides of @p ref_edge and @p target_edge. The intersection of the two sets yields the common
+// api::BranchPoints. When the resulting set is empty, this function returns false.
+// From the common api::BranchPoints, one is taken and the api::LaneEndSets are evaluated to identify @p ref_edge
+// and @p target_edge on each side. Finally, the matched sides are compared and this method returns true when
+// sides are different.
+//
+// @param ref_edge The incoming Edge.
+// @param target_edge The ongoing Edge.
+// @return true When @p ref_edge connects with @p target_edge from different sides to at least one api::BranchPoint.
+bool EdgesConnectToBranchPointsFromOpposingSides(const Edge& ref_edge, const Edge& target_edge) {
+  const ConnectionSet connection_set = BuildConnectionSet(ref_edge, target_edge);
+  auto compute_connecting_edges = [](const Edge& edge, api::LaneEnd::Which end) {
+    std::set<const api::BranchPoint*> result;
+    for (int i = 0; i < edge.segment->num_lanes(); ++i) {
+      result.insert(edge.segment->lane(i)->GetBranchPoint(end));
+    }
+    return result;
+  };
+  const std::set<const api::BranchPoint*> ref_branchpoints =
+      compute_connecting_edges(ref_edge, connection_set.incoming);
+  const std::set<const api::BranchPoint*> target_branchpoints =
+      compute_connecting_edges(target_edge, connection_set.ongoing);
+  std::set<const api::BranchPoint*> common_bps;
+  std::copy_if(ref_branchpoints.begin(), ref_branchpoints.end(), std::inserter(common_bps, common_bps.end()),
+               [bps = target_branchpoints](const api::BranchPoint* bp) { return bps.find(bp) != bps.end(); });
+  if (common_bps.empty()) {
+    return false;
+  }
+  auto is_edge_on_a_side = [bp = *(common_bps.begin())](const Edge& edge) {
+    const api::LaneEndSet* a_side = bp->GetASide();
+    for (int le = 0; le < a_side->size(); ++le) {
+      const api::LaneEnd lane_end = a_side->get(le);
+      if (lane_end.lane->segment() == edge.segment) {
+        return true;
+      }
+    }
+    return false;
+  };
+  return is_edge_on_a_side(ref_edge) != is_edge_on_a_side(target_edge);
+}
+
+// @brief Whether a sequence of Edges are driveable.
+//
+// Sequences of Edges are driveable when evaluating consecutive pairs across the sequence, the underlying
+// api::Segments of the Edges share at least one api::BranchPoint and the api::Lanes of each Edge connect
+// in the api::BranchPoint on opposing sides of the api::BranchPoints.
+//
+// @param edge_sequence A sequence of Edges.
+// @return true When the sequence is driveable.
+// @throws common::assertion_error When @p edge_sequence is empty.
+bool IsSequenceDriveable(const std::vector<Edge>& edge_sequence) {
+  // Analize preconditions.
+  MALIPUT_THROW_UNLESS(!edge_sequence.empty());
+  // Escape condition: when edge_sequence has one edge, it is always driveable.
+  if (edge_sequence.size() == 1u) {
+    return true;
+  }
+  for (size_t i = 0u; i < edge_sequence.size() - 1u; ++i) {
+    if (!EdgesConnectToBranchPointsFromOpposingSides(edge_sequence[i], edge_sequence[i + 1])) {
+      return false;
+    }
+  }
+  return true;
+}
+
 }  // namespace
 
 std::vector<std::vector<Edge>> FindAllEdgeSequences(const Graph& graph, const Node& start, const Node& end) {
@@ -75,7 +187,11 @@ std::vector<std::vector<Edge>> FindAllEdgeSequences(const Graph& graph, const No
   if (start.id == end.id) {
     return {};
   }
-  return FindAllEdgeSequencesHelper(graph, start, end, {start.id});
+  std::vector<std::vector<Edge>> unfiltered_result = FindAllEdgeSequencesHelper(graph, start, end, {start.id});
+  unfiltered_result.erase(
+      std::remove_if(unfiltered_result.begin(), unfiltered_result.end(), std::not_fn(IsSequenceDriveable)),
+      unfiltered_result.end());
+  return unfiltered_result;
 }
 
 std::optional<Node> FindNode(const Graph& graph, const api::RoadPosition& pos, const api::LaneEnd::Which& end) {
@@ -88,6 +204,21 @@ std::optional<Node> FindNode(const Graph& graph, const api::RoadPosition& pos, c
     }
   }
   return {};
+}
+
+std::optional<api::LaneEnd::Which> DetermineEdgeEnd(const Edge& ref_edge, const Edge& target_edge, const Graph& graph) {
+  if (ref_edge.segment == target_edge.segment) {
+    return std::nullopt;
+  }
+  const Node& node_a = graph.nodes.at(ref_edge.node_a);
+  if (node_a.edges.find(target_edge.segment) != node_a.edges.end()) {
+    return api::LaneEnd::Which::kStart;
+  }
+  const Node& node_b = graph.nodes.at(ref_edge.node_b);
+  if (node_b.edges.find(target_edge.segment) != node_b.edges.end()) {
+    return api::LaneEnd::Which::kFinish;
+  }
+  return std::nullopt;
 }
 
 }  // namespace graph

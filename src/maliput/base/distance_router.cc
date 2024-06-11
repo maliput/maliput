@@ -40,6 +40,7 @@
 #include "maliput/common/maliput_throw.h"
 #include "maliput/routing/derive_lane_s_routes.h"
 #include "maliput/routing/find_lane_sequences.h"
+#include "maliput/routing/graph/graph_utils.h"
 #include "maliput/routing/phase.h"
 
 namespace maliput {
@@ -137,10 +138,141 @@ void ValidateEndToEndConnectivityInRoutes(const std::vector<routing::Route>& rou
   }
 }
 
+// Finds an equivalent s-coordinate from @p ref_pos in the target @p lane.
+//
+// The equivalence is derived by linearly scaling @p ref_pos's s-coordinate by the ratio of api::Lane::length().
+// Uses @p tolerance to round up / down the equivalent s-coordinate to 0. or the @p lane's length.
+// @param ref_pos The reference api::RoadPosition.
+// @param lane The target api::Lane.
+// @param tolerance The tolerance to adjust the scaled s-coodinate.
+// @return The scaled s-coordinate.
+double FindEquivalentSCoordinate(const api::RoadPosition& ref_pos, const api::Lane& lane, double tolerance) {
+  const double ref_length = ref_pos.lane->length();
+  const double target_length = lane.length();
+  const double target_s = std::clamp(ref_pos.pos.s() / ref_length * target_length, 0., target_length);
+  if (target_s <= tolerance && target_length > tolerance) {
+    return 0.;
+  }
+  if ((target_length - target_s) <= tolerance && target_length > tolerance) {
+    return target_length;
+  }
+  return target_s;
+}
+
+// Makes a routing::Phase.
+//
+// Computes an api::LaneSRange out of each api::Lane in @p edge.segment whose start and end positions are
+// derived from the use of FindEquivalentSCoordinate() and the first element in @p start_positions and @p end_positions
+// respectively.
+// Arguments are mapped one to one to the routing::Phase constructor.
+// @param index See routing::Phase() documentation.
+// @param edge A routing::graph::Edge to compute the api::LaneSRanges for.
+// @param lane_s_range_tolerance See routing::Phase() documentation.
+// @param start_positions See routing::Phase() documentation.
+// @param end_positions See routing::Phase() documentation.
+// @param road_network See routing::Phase() documentation.
+// @return A routing::Phase.
+// @throws common::assertion_error When @p edge.segment is nullptr.
+// @throws common::assertion_error When any of @p start_positions and @p end_positions are empty.
+// @throws common::assertion_error When positions in @p start_positions and @p end_positions are not in @p edge.segment.
+routing::Phase MakePhase(int index, const routing::graph::Edge& edge, double lane_s_range_tolerance,
+                         const std::vector<api::RoadPosition>& start_positions,
+                         const std::vector<api::RoadPosition>& end_positions, const api::RoadNetwork& road_network) {
+  MALIPUT_THROW_UNLESS(edge.segment != nullptr);
+  MALIPUT_THROW_UNLESS(!start_positions.empty());
+  MALIPUT_THROW_UNLESS(!end_positions.empty());
+  for (const auto& pos : start_positions) {
+    MALIPUT_THROW_UNLESS(pos.lane->segment() == edge.segment);
+  }
+  for (const auto& pos : end_positions) {
+    MALIPUT_THROW_UNLESS(pos.lane->segment() == edge.segment);
+  }
+
+  std::vector<api::LaneSRange> lane_s_ranges;
+  for (int i = 0; i < edge.segment->num_lanes(); ++i) {
+    const api::Lane* lane = edge.segment->lane(i);
+    const double start_s = FindEquivalentSCoordinate(start_positions.front(), *lane, lane_s_range_tolerance);
+    const double end_s = FindEquivalentSCoordinate(end_positions.front(), *lane, lane_s_range_tolerance);
+    lane_s_ranges.emplace_back(lane->id(), api::SRange(start_s, end_s));
+  }
+  return routing::Phase{index, lane_s_range_tolerance, start_positions, end_positions, lane_s_ranges, &road_network};
+}
+
+// Computes all api::RoadPositions for @p ref ref_edge at @p ref_end side when connecting with @p target_edge.
+//
+// @param ref_edge The reference routing::graph::Edge to compute the api::RoadPositions for.
+// @param ref_end Indicates api::LaneEnd::Which side of the api::Lanes from @p ref_edge to take the positions.
+// @param target_edge The connecting routing::graph::Edge.
+// @return A vector with the api::RoadPositions to that connect @p ref_edge with @p target_edge at @p ref_end side.
+// @throws common::assertion_error When the return vector is empty.
+std::vector<api::RoadPosition> ComputeAllRoadPositions(const routing::graph::Edge& ref_edge,
+                                                       const api::LaneEnd::Which ref_end,
+                                                       const routing::graph::Edge& target_edge) {
+  auto is_lane_connected = [segment = target_edge.segment, end = ref_end](const api::Lane* lane,
+                                                                          bool is_confluent) -> bool {
+    const api::LaneEndSet* lane_end_set =
+        is_confluent ? lane->GetConfluentBranches(end) : lane->GetOngoingBranches(end);
+    for (int i = 0; i < lane_end_set->size(); ++i) {
+      const api::LaneEnd lane_end = lane_end_set->get(i);
+      if (lane_end.lane->segment() == segment) {
+        return true;
+      }
+    }
+    return false;
+  };
+  auto process_positions = [segment = ref_edge.segment, end = ref_end, is_lane_connected](bool is_confluent) {
+    std::vector<api::RoadPosition> positions;
+    for (int i = 0; i < segment->num_lanes(); ++i) {
+      const api::Lane* lane = segment->lane(i);
+      if (is_lane_connected(lane, is_confluent)) {
+        positions.emplace_back(lane,
+                               api::LanePosition{end == api::LaneEnd::Which::kStart ? 0. : lane->length(), 0., 0.});
+      }
+    }
+    return positions;
+  };
+  constexpr bool kIsConfluent{true};
+  constexpr bool kIsOngoing{!kIsConfluent};
+  std::vector<api::RoadPosition> positions = process_positions(kIsConfluent);
+  if (positions.empty()) {
+    positions = process_positions(kIsOngoing);
+  }
+  MALIPUT_THROW_UNLESS(!positions.empty());
+  return positions;
+}
+
+std::vector<std::vector<routing::graph::Edge>> MaybeAddStartAndEndEdges(
+    const routing::graph::Graph& graph, const api::RoadPosition& start, const api::RoadPosition& end,
+    const std::vector<std::vector<routing::graph::Edge>>& edge_sequences) {
+  MALIPUT_THROW_UNLESS(start.lane != nullptr);
+  MALIPUT_THROW_UNLESS(end.lane != nullptr);
+
+  const routing::graph::Edge& start_edge = graph.edges.at(start.lane->segment());
+  const routing::graph::Edge& end_edge = graph.edges.at(end.lane->segment());
+
+  std::vector<std::vector<routing::graph::Edge>> result;
+
+  for (const auto& edge_sequence : edge_sequences) {
+    std::vector<routing::graph::Edge> edge_sequence_to_return(edge_sequence);
+    if (edge_sequence.empty() || edge_sequence.front().segment != start_edge.segment) {
+      edge_sequence_to_return.insert(edge_sequence_to_return.begin(), start_edge);
+    }
+    if (edge_sequence.back().segment != end_edge.segment) {
+      edge_sequence_to_return.push_back(end_edge);
+    }
+    result.push_back(edge_sequence_to_return);
+  }
+
+  return result;
+}
+
 }  // namespace
 
 DistanceRouter::DistanceRouter(const api::RoadNetwork& road_network, double lane_s_range_tolerance)
-    : Router(), road_network_(road_network), lane_s_range_tolerance_(lane_s_range_tolerance) {
+    : Router(),
+      road_network_(road_network),
+      lane_s_range_tolerance_(lane_s_range_tolerance),
+      graph_(routing::graph::BuildGraph(road_network_.road_geometry())) {
   MALIPUT_THROW_UNLESS(lane_s_range_tolerance_ >= 0.0);
 }
 
@@ -153,60 +285,62 @@ std::vector<routing::Route> DistanceRouter::DoComputeRoutes(
   MALIPUT_THROW_UNLESS(end.lane != nullptr);
   MALIPUT_THROW_UNLESS(road_network_.road_geometry()->ById().GetLane(end.lane->id()) == end.lane);
   routing::ValidateRoutingConstraints(routing_constraints);
-  static constexpr bool kRemoveUTurns{true};
 
-  // Obtain the lane sequences that connect the start with end, i.e. the routing algorithm.
-  const std::vector<std::vector<const api::Lane*>> lane_sequences =
-      routing::FindLaneSequences(start.lane, end.lane, std::numeric_limits<double>::max(), kRemoveUTurns);
+  // Obtain the start and end nodes in the graph.
+  const std::optional<routing::graph::Node> start_node =
+      routing::graph::FindNode(graph_, start, api::LaneEnd::Which::kStart);
+  const std::optional<routing::graph::Node> end_node =
+      routing::graph::FindNode(graph_, end, api::LaneEnd::Which::kFinish);
+  MALIPUT_THROW_UNLESS(start_node.has_value());
+  MALIPUT_THROW_UNLESS(end_node.has_value());
+
+  // Obtain the sequences of routing::graph::Edges that will lead from start to end.
+  std::vector<std::vector<routing::graph::Edge>> edge_sequences =
+      routing::graph::FindAllEdgeSequences(graph_, start_node.value(), end_node.value());
+
+  // The selection of the start and end nodes is arbitrary. That leads to maybe missing the start or end edge
+  // which includes the start and end position.
+  edge_sequences = MaybeAddStartAndEndEdges(graph_, start, end, edge_sequences);
 
   // Construct the routing::Routes and routing::Phases.
-  // TODO: Add support for lateral routing::Phase inflation by considering alternative lanes from within the same
-  // segment besides those returned by routing::FindLaneSequences().
-  const double start_s = start.pos.s();
-  const double end_s = end.pos.s();
   std::vector<routing::Route> routes;
-  for (const std::vector<const api::Lane*>& lane_sequence : lane_sequences) {
-    // Handles the case when lane_sequence has a length of 1. This implies the route only has one phase.
-    if (lane_sequence.size() == 1u) {
-      const routing::Phase phase(0, lane_s_range_tolerance_, {start}, {end},
-                                 {api::LaneSRange(start.lane->id(), api::SRange(start_s, end_s))}, &road_network_);
-      routes.emplace_back(std::vector<routing::Phase>{phase}, &road_network_);
+  for (const std::vector<routing::graph::Edge>& edge_sequence : edge_sequences) {
+    // Handles the case when edge_sequence has a length of 1. This implies the route only has one phase.
+    if (edge_sequence.size() == 1u) {
+      routes.emplace_back(std::vector<routing::Phase>{MakePhase(0, edge_sequence[0], lane_s_range_tolerance_, {start},
+                                                                {end}, road_network_)},
+                          &road_network_);
       continue;
     }
 
-    // Handles the case when lane_sequence has a length greater than 1. This implies the route has more than one phase.
+    // Handles the case when edge_sequence has a length greater than 1. This implies the route has more than one phase.
     std::vector<routing::Phase> phases;
-    for (int i = 0; i < static_cast<int>(lane_sequence.size()); ++i) {
-      const api::Lane* lane = lane_sequence[i];
+    for (int i = 0; i < static_cast<int>(edge_sequence.size()); ++i) {
+      const routing::graph::Edge& edge = edge_sequence[i];
       if (i == 0) {
-        const std::optional<double> first_end_s = routing::DetermineEdgeS(*lane, *lane_sequence[1]);
-        MALIPUT_THROW_UNLESS(first_end_s.has_value());
-        phases.emplace_back(
-            i, lane_s_range_tolerance_, std::vector<api::RoadPosition>{start},
-            std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(*first_end_s, 0., 0.))},
-            std::vector<api::LaneSRange>{api::LaneSRange(lane->id(), api::SRange(start_s, *first_end_s))},
-            &road_network_);
-      } else if (i + 1 == static_cast<int>(lane_sequence.size())) {
-        MALIPUT_THROW_UNLESS(lane->id() == end.lane->id());
-        MALIPUT_THROW_UNLESS(i > 0);
-        const std::optional<double> last_start_s = routing::DetermineEdgeS(*lane, *lane_sequence[i - 1]);
-        MALIPUT_THROW_UNLESS(last_start_s.has_value());
-        phases.emplace_back(
-            i, lane_s_range_tolerance_,
-            std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(*last_start_s, 0., 0.))},
-            std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(end_s, 0., 0.))},
-            std::vector<api::LaneSRange>{api::LaneSRange(lane->id(), api::SRange(*last_start_s, end_s))},
-            &road_network_);
+        const std::optional<api::LaneEnd::Which> edge_end =
+            routing::graph::DetermineEdgeEnd(edge, edge_sequence[1], graph_);
+        MALIPUT_THROW_UNLESS(edge_end.has_value());
+        phases.push_back(MakePhase(i, edge, lane_s_range_tolerance_, {start},
+                                   ComputeAllRoadPositions(edge, edge_end.value(), edge_sequence[1]), road_network_));
+      } else if (i + 1 == static_cast<int>(edge_sequence.size())) {
+        const std::optional<api::LaneEnd::Which> edge_end =
+            routing::graph::DetermineEdgeEnd(edge, edge_sequence[i - 1], graph_);
+        MALIPUT_THROW_UNLESS(edge_end.has_value());
+        phases.push_back(MakePhase(i, edge, lane_s_range_tolerance_,
+                                   ComputeAllRoadPositions(edge, edge_end.value(), edge_sequence[i - 1]), {end},
+                                   road_network_));
       } else {
-        const std::optional<double> middle_start_s = routing::DetermineEdgeS(*lane, *lane_sequence[i - 1]);
-        const std::optional<double> middle_end_s = routing::DetermineEdgeS(*lane, *lane_sequence[i + 1]);
-        MALIPUT_THROW_UNLESS(middle_start_s.has_value() && middle_end_s.has_value());
-        phases.emplace_back(
-            i, lane_s_range_tolerance_,
-            std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(*middle_start_s, 0., 0.))},
-            std::vector<api::RoadPosition>{api::RoadPosition(lane, api::LanePosition(*middle_end_s, 0., 0.))},
-            std::vector<api::LaneSRange>{api::LaneSRange(lane->id(), api::SRange(*middle_start_s, *middle_end_s))},
-            &road_network_);
+        const std::optional<api::LaneEnd::Which> start_edge_end =
+            routing::graph::DetermineEdgeEnd(edge, edge_sequence[i - 1], graph_);
+        MALIPUT_THROW_UNLESS(start_edge_end.has_value());
+        const std::optional<api::LaneEnd::Which> finish_edge_end =
+            routing::graph::DetermineEdgeEnd(edge, edge_sequence[i + 1], graph_);
+        MALIPUT_THROW_UNLESS(finish_edge_end.has_value());
+        phases.push_back(MakePhase(i, edge, lane_s_range_tolerance_,
+                                   ComputeAllRoadPositions(edge, start_edge_end.value(), edge_sequence[i - 1]),
+                                   ComputeAllRoadPositions(edge, finish_edge_end.value(), edge_sequence[i + 1]),
+                                   road_network_));
       }
     }
     routes.emplace_back(phases, &road_network_);
