@@ -79,7 +79,8 @@ std::optional<Node> FindNode(const Graph& graph, std::set<const api::BranchPoint
 // @param branch_points The set of api::BranchPoints to match the Node in @p graph.
 // @param id_generator A functor to obtain an ID for Nodes.
 // @return A Node whose api::BranchPoints set contains @p branch_points.
-Node GetNode(const Graph& graph, std::set<const api::BranchPoint*> branch_points, std::function<NodeId()> id_generator) {
+Node GetNode(const Graph& graph, std::set<const api::BranchPoint*> branch_points,
+             std::function<NodeId()> id_generator) {
   const std::optional<Node> node_result = FindNode(graph, branch_points);
   if (node_result.has_value()) {
     Node node = node_result.value();
