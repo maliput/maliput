@@ -33,6 +33,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_network.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/routing/graph/graph.h"
 #include "maliput/routing/route.h"
 #include "maliput/routing/router.h"
 #include "maliput/routing/routing_constraints.h"
@@ -47,8 +48,6 @@ namespace maliput {
 /// a routing::Route determines its cost.
 /// Moreover, the router operates at lane-level granularity. When using `start` and `end`
 /// positions to compute feasible routing::Routes, the `r` and `h` coordinates are ignored.
-// TODO: provide solutions that rely on segment-to-segment connectivity and enable
-// the use of api::Lane switches in results.
 class DistanceRouter : public routing::Router {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(DistanceRouter);
@@ -67,6 +66,7 @@ class DistanceRouter : public routing::Router {
 
   const api::RoadNetwork& road_network_;
   const double lane_s_range_tolerance_{};
+  const routing::graph::Graph graph_{};
 };
 
 }  // namespace maliput
