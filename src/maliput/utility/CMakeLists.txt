@@ -4,6 +4,7 @@
 
 set(SOURCES
   file_utils.cc
+  generate_dot.cc
   generate_obj.cc
   generate_string.cc
   generate_urdf.cc
@@ -26,6 +27,7 @@ target_link_libraries(utility
     maliput::api
     maliput::common
     maliput::math
+    maliput::routing
 )
 
 if(MALIPUT_PROFILER_ENABLE)
