@@ -50,18 +50,18 @@ using ::testing::Return;
 
 using maliput::test::SegmentMock;
 
-GTEST_TEST(GenerateDotFile, PassingNullOstreamThrows) {
-  ASSERT_THROW({ GenerateDotFile(routing::graph::Graph{}, nullptr /* os */); }, common::assertion_error);
+GTEST_TEST(GenerateDotStream, PassingNullOstreamThrows) {
+  ASSERT_THROW({ GenerateDotStream(routing::graph::Graph{}, nullptr /* os */); }, common::assertion_error);
 }
 
-GTEST_TEST(GenerateDotFile, EmptyGraph) {
+GTEST_TEST(GenerateDotStream, EmptyGraph) {
   const std::string kResult(R"(graph {
 }
 )");
   const routing::graph::Graph kGraph{};
   std::stringstream ss;
 
-  GenerateDotFile(kGraph, &ss);
+  GenerateDotStream(kGraph, &ss);
 
   ASSERT_EQ(kResult, ss.str());
 }
@@ -78,7 +78,7 @@ GTEST_TEST(GenerateDotFile, EmptyGraph) {
  *            ---- > S:C
  * </pre>
  */
-GTEST_TEST(GenerateDotFile, PopulatedGraph) {
+GTEST_TEST(GenerateDotStream, PopulatedGraph) {
   // The order of the items in the result is a product of the order of initialization.
   // Review it when changing the initialization.
   const std::string kResult(R"(graph {
@@ -127,7 +127,7 @@ GTEST_TEST(GenerateDotFile, PopulatedGraph) {
           {kNodeIdA, kNodeA}, {kNodeIdB, kNodeB}, {kNodeIdC, kNodeC}, {kNodeIdD, kNodeD}}};
   std::stringstream ss;
 
-  GenerateDotFile(kGraph, &ss);
+  GenerateDotStream(kGraph, &ss);
 
   ASSERT_EQ(kResult, ss.str());
 }

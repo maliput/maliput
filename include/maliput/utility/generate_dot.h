@@ -35,7 +35,15 @@
 namespace maliput {
 namespace utility {
 
-void GenerateDotFile(const routing::graph::Graph& graph, std::ostream* os);
+/// Generates a string representation in @p os of the @p graph using the DOT language.
+///
+/// routing::graph::Edges are created as bidirectional, and labels are added to indicate api::Segment::id().
+/// routing::graph::Nodes only indicate their routing::graph::NodeId.
+///
+/// @param graph The routing::graph::Graph to serialize.
+/// @param os A pointer to a std::ostream to serialize the @p graph. It must not be nullptr.
+/// @throws common::assertion_error When @p os is nullptr.
+void GenerateDotStream(const routing::graph::Graph& graph, std::ostream* os);
 
 }  // namespace utility
 }  // namespace maliput

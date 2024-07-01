@@ -31,7 +31,7 @@
 namespace maliput {
 namespace utility {
 
-void GenerateDotFile(const routing::graph::Graph& graph, std::ostream* os) {
+void GenerateDotStream(const routing::graph::Graph& graph, std::ostream* os) {
   MALIPUT_THROW_UNLESS(os != nullptr);
 
   (*os) << "graph {" << std::endl;
