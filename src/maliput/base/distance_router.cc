@@ -87,6 +87,43 @@ double MaxPhaseCostInRoute(const routing::Route& route) {
   return cost;
 }
 
+// Whether the agent driving the @p route is required to switch lanes to traverse the route.
+//
+// @param route To evaluate whether it has lane switches.
+// @return true When @p route requires the agent traversing it to switch lanes.
+bool HasLaneSwitch(const routing::Route& route) {
+  // Look for the simple case where the routing::Route has only one routing::Phase and the start
+  // and end positions are on the same api::Lane.
+  if (route.size() == 1) {
+    return route.start_route_position().lane != route.end_route_position().lane;
+  }
+  // Traverse the routing::Phases looking for lane switches.
+  auto find_position_index = [](const std::vector<api::RoadPosition>& positions,
+                                const api::Lane* lane) -> std::optional<size_t> {
+    for (size_t i = 0; i < positions.size(); i++) {
+      if (positions[i].lane == lane) {
+        return i;
+      }
+    }
+    return std::nullopt;
+  };
+  const api::Lane* start_lane = route.start_route_position().lane;
+  for (int phase_index = 0; phase_index < route.size(); phase_index++) {
+    const routing::Phase& phase = route.Get(phase_index);
+    // Look in the end positions of the current routing::Phase for a position in the same api::Lane.
+    // When there is no end position on the same start api::Lane, there is a lane switch within the routing::Phase.
+    const std::optional<size_t> end_position_index = find_position_index(phase.end_positions(), start_lane);
+    if (!end_position_index.has_value()) {
+      return true;
+    }
+    // Update the start_lane for the next iteration.
+    if (phase_index != route.size() - 1) {
+      start_lane = route.Get(phase_index + 1).start_positions()[end_position_index.value()].lane;
+    }
+  }
+  return false;
+}
+
 // Filters @p routes based on @p routing_constraints.
 //
 // @param routing_constraints The constraints to evaluate over @p routes.
@@ -95,7 +132,6 @@ double MaxPhaseCostInRoute(const routing::Route& route) {
 // routes is the same as @p routes.
 std::vector<routing::Route> FilterRoutes(const routing::RoutingConstraints& routing_constraints,
                                          const std::vector<routing::Route>& routes) {
-  // TODO: evaluate routing_constraints.allow_lane_switch.
   auto filter = [routing_constraints](const routing::Route& route) -> bool {
     if (routing_constraints.max_phase_cost.has_value() &&
         routing_constraints.max_phase_cost.value() < MaxPhaseCostInRoute(route)) {
@@ -103,6 +139,9 @@ std::vector<routing::Route> FilterRoutes(const routing::RoutingConstraints& rout
     }
     if (routing_constraints.max_route_cost.has_value() &&
         routing_constraints.max_route_cost.value() < ComputeCost(route)) {
+      return false;
+    }
+    if (!routing_constraints.allow_lane_switch && HasLaneSwitch(route)) {
       return false;
     }
     return true;
