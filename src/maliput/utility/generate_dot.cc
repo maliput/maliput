@@ -28,6 +28,11 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/utility/generate_dot.h"
 
+#include <algorithm>
+#include <unordered_set>
+
+#include "maliput/api/segment.h"
+
 namespace maliput {
 namespace utility {
 
@@ -38,6 +43,33 @@ void GenerateDotStream(const routing::graph::Graph& graph, std::ostream* os) {
   for (const auto& id_edge : graph.edges) {
     (*os) << id_edge.second.node_a << " -- " << id_edge.second.node_b << " [ label = \""
           << id_edge.second.segment->id().string() << "\" ];" << std::endl;
+  }
+  (*os) << "}" << std::endl;
+  os->flush();
+}
+
+void GenerateDotStream(const routing::graph::Graph& graph, const routing::Route& route, std::ostream* os) {
+  MALIPUT_THROW_UNLESS(os != nullptr);
+
+  std::unordered_set<const api::Segment*> segments;
+  for (int i = 0; i < route.size(); ++i) {
+    const api::Segment* segment = route.Get(i).start_positions().front().lane->segment();
+    auto edge_it = std::find_if(graph.edges.begin(), graph.edges.end(), [segment](const auto& id_edge) {
+      return id_edge.second.segment == segment;
+    });
+    MALIPUT_THROW_UNLESS(edge_it != graph.edges.end());
+    segments.insert(segment);
+  }
+
+  (*os) << "graph {" << std::endl;
+  for (const auto& id_edge : graph.edges) {
+    (*os) << id_edge.second.node_a << " -- " << id_edge.second.node_b << " [ label = \""
+          << id_edge.second.segment->id().string() << "\"";
+    // Conditionally adds the red color to the api::Segments that correspond with a routing::Phase.
+    if (segments.find(id_edge.second.segment) != segments.end()) {
+      (*os) << " color = \"red\"";
+    }
+    (*os) << " ];" << std::endl;
   }
   (*os) << "}" << std::endl;
   os->flush();
