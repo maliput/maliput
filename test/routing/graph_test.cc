@@ -68,6 +68,7 @@ GTEST_TEST(BuildGraph, EvaluateSingleLaneRoadGraph) {
   JunctionMock junction;
   SegmentMock segment;
   const api::Segment* segment_ptr = &segment;
+  const api::SegmentId kSegmentId("segment_id");
   LaneMock lane;
   BranchPointMock start_branch_point;
   const api::BranchPoint* start_branch_point_ptr = &start_branch_point;
@@ -78,17 +79,20 @@ GTEST_TEST(BuildGraph, EvaluateSingleLaneRoadGraph) {
   EXPECT_CALL(rg, do_junction(_)).WillRepeatedly(Return(static_cast<const api::Junction*>(&junction)));
   EXPECT_CALL(junction, do_num_segments()).WillRepeatedly(Return(kOne));
   EXPECT_CALL(junction, do_segment(_)).WillRepeatedly(Return(segment_ptr));
+  EXPECT_CALL(segment, do_id()).WillRepeatedly(Return(kSegmentId));
   EXPECT_CALL(segment, do_num_lanes()).WillRepeatedly(Return(kOne));
   EXPECT_CALL(segment, do_lane(_)).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane)));
   EXPECT_CALL(lane, DoGetBranchPoint(Eq(api::LaneEnd::Which::kStart))).WillRepeatedly(Return(start_branch_point_ptr));
   EXPECT_CALL(lane, DoGetBranchPoint(Eq(api::LaneEnd::Which::kFinish))).WillRepeatedly(Return(end_branch_point_ptr));
+  const EdgeId kEdgeId(kSegmentId.string());
 
   const Graph graph = BuildGraph(&rg);
 
   ASSERT_EQ(1u, graph.edges.size());
   ASSERT_EQ(2u, graph.nodes.size());
-  ASSERT_NE(graph.edges.end(), graph.edges.find(segment_ptr));
-  const Edge& edge = graph.edges.at(segment_ptr);
+  ASSERT_NE(graph.edges.end(), graph.edges.find(kEdgeId));
+  const Edge& edge = graph.edges.at(kEdgeId);
+  ASSERT_EQ(kEdgeId, edge.id);
   ASSERT_EQ(segment_ptr, edge.segment);
   ASSERT_NE(edge.node_a, edge.node_b);
   ASSERT_NE(graph.nodes.end(), graph.nodes.find(edge.node_a));
@@ -98,11 +102,11 @@ GTEST_TEST(BuildGraph, EvaluateSingleLaneRoadGraph) {
   ASSERT_EQ(1u, node_a.branch_points.size());
   ASSERT_NE(node_a.branch_points.end(), node_a.branch_points.find(start_branch_point_ptr));
   ASSERT_EQ(1u, node_a.edges.size());
-  ASSERT_NE(node_a.edges.end(), node_a.edges.find(segment_ptr));
+  ASSERT_NE(node_a.edges.end(), node_a.edges.find(kEdgeId));
   ASSERT_EQ(1u, node_b.branch_points.size());
   ASSERT_NE(node_b.branch_points.end(), node_b.branch_points.find(end_branch_point_ptr));
   ASSERT_EQ(1u, node_b.edges.size());
-  ASSERT_NE(node_b.edges.end(), node_b.edges.find(segment_ptr));
+  ASSERT_NE(node_b.edges.end(), node_b.edges.find(kEdgeId));
 }
 
 // The graph represents the following structure:
@@ -119,6 +123,7 @@ GTEST_TEST(BuildGraph, EvaluateDoubleLaneRoadGraph) {
   JunctionMock junction;
   SegmentMock segment;
   const api::Segment* segment_ptr = &segment;
+  const api::SegmentId kSegmentId("segment_id");
   LaneMock lane_a;
   BranchPointMock start_branch_point_a;
   const api::BranchPoint* start_branch_point_a_ptr = &start_branch_point_a;
@@ -134,6 +139,7 @@ GTEST_TEST(BuildGraph, EvaluateDoubleLaneRoadGraph) {
   EXPECT_CALL(rg, do_junction(_)).WillRepeatedly(Return(static_cast<const api::Junction*>(&junction)));
   EXPECT_CALL(junction, do_num_segments()).WillRepeatedly(Return(kOne));
   EXPECT_CALL(junction, do_segment(_)).WillRepeatedly(Return(segment_ptr));
+  EXPECT_CALL(segment, do_id()).WillRepeatedly(Return(kSegmentId));
   EXPECT_CALL(segment, do_num_lanes()).WillRepeatedly(Return(kTwo));
   EXPECT_CALL(segment, do_lane(Eq(0))).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane_a)));
   EXPECT_CALL(segment, do_lane(Eq(1))).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane_b)));
@@ -145,13 +151,15 @@ GTEST_TEST(BuildGraph, EvaluateDoubleLaneRoadGraph) {
       .WillRepeatedly(Return(start_branch_point_b_ptr));
   EXPECT_CALL(lane_b, DoGetBranchPoint(Eq(api::LaneEnd::Which::kFinish)))
       .WillRepeatedly(Return(end_branch_point_b_ptr));
+  const EdgeId kEdgeId(kSegmentId.string());
 
   const Graph graph = BuildGraph(&rg);
 
   ASSERT_EQ(1u, graph.edges.size());
   ASSERT_EQ(2u, graph.nodes.size());
-  ASSERT_NE(graph.edges.end(), graph.edges.find(segment_ptr));
-  const Edge& edge = graph.edges.at(segment_ptr);
+  ASSERT_NE(graph.edges.end(), graph.edges.find(kEdgeId));
+  const Edge& edge = graph.edges.at(kEdgeId);
+  ASSERT_EQ(kEdgeId, edge.id);
   ASSERT_EQ(segment_ptr, edge.segment);
   ASSERT_NE(edge.node_a, edge.node_b);
   ASSERT_NE(graph.nodes.end(), graph.nodes.find(edge.node_a));
@@ -162,12 +170,12 @@ GTEST_TEST(BuildGraph, EvaluateDoubleLaneRoadGraph) {
   ASSERT_NE(node_a.branch_points.end(), node_a.branch_points.find(start_branch_point_a_ptr));
   ASSERT_NE(node_a.branch_points.end(), node_a.branch_points.find(start_branch_point_b_ptr));
   ASSERT_EQ(1u, node_a.edges.size());
-  ASSERT_NE(node_a.edges.end(), node_a.edges.find(segment_ptr));
+  ASSERT_NE(node_a.edges.end(), node_a.edges.find(kEdgeId));
   ASSERT_EQ(2u, node_b.branch_points.size());
   ASSERT_NE(node_b.branch_points.end(), node_b.branch_points.find(end_branch_point_a_ptr));
   ASSERT_NE(node_b.branch_points.end(), node_b.branch_points.find(end_branch_point_b_ptr));
   ASSERT_EQ(1u, node_b.edges.size());
-  ASSERT_NE(node_b.edges.end(), node_b.edges.find(segment_ptr));
+  ASSERT_NE(node_b.edges.end(), node_b.edges.find(kEdgeId));
 }
 
 // One Junction:
@@ -193,13 +201,16 @@ GTEST_TEST(BuildGraph, EvaluateYShapedRoadsGraph) {
   JunctionMock junction;
   SegmentMock segment_a;
   const api::Segment* segment_a_ptr = &segment_a;
+  const api::SegmentId kSegmentIdA("segment_a");
   LaneMock lane_a_a;
   LaneMock lane_a_b;
   SegmentMock segment_b;
   const api::Segment* segment_b_ptr = &segment_b;
+  const api::SegmentId kSegmentIdB("segment_b");
   LaneMock lane_b_a;
   SegmentMock segment_c;
   const api::Segment* segment_c_ptr = &segment_c;
+  const api::SegmentId kSegmentIdC("segment_c");
   LaneMock lane_c_a;
   LaneMock lane_c_b;
   BranchPointMock branch_point_a;
@@ -226,11 +237,14 @@ GTEST_TEST(BuildGraph, EvaluateYShapedRoadsGraph) {
   EXPECT_CALL(junction, do_segment(Eq(0))).WillRepeatedly(Return(segment_a_ptr));
   EXPECT_CALL(junction, do_segment(Eq(1))).WillRepeatedly(Return(segment_b_ptr));
   EXPECT_CALL(junction, do_segment(Eq(2))).WillRepeatedly(Return(segment_c_ptr));
+  EXPECT_CALL(segment_a, do_id()).WillRepeatedly(Return(kSegmentIdA));
   EXPECT_CALL(segment_a, do_num_lanes()).WillRepeatedly(Return(kTwo));
   EXPECT_CALL(segment_a, do_lane(Eq(0))).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane_a_a)));
   EXPECT_CALL(segment_a, do_lane(Eq(1))).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane_a_b)));
+  EXPECT_CALL(segment_b, do_id()).WillRepeatedly(Return(kSegmentIdB));
   EXPECT_CALL(segment_b, do_num_lanes()).WillRepeatedly(Return(kOne));
   EXPECT_CALL(segment_b, do_lane(Eq(0))).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane_b_a)));
+  EXPECT_CALL(segment_c, do_id()).WillRepeatedly(Return(kSegmentIdC));
   EXPECT_CALL(segment_c, do_num_lanes()).WillRepeatedly(Return(kTwo));
   EXPECT_CALL(segment_c, do_lane(Eq(0))).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane_c_a)));
   EXPECT_CALL(segment_c, do_lane(Eq(1))).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane_c_b)));
@@ -254,29 +268,35 @@ GTEST_TEST(BuildGraph, EvaluateYShapedRoadsGraph) {
       .WillRepeatedly(Return(start_branch_point_c_b_ptr));
   EXPECT_CALL(lane_c_b, DoGetBranchPoint(Eq(api::LaneEnd::Which::kFinish)))
       .WillRepeatedly(Return(end_branch_point_c_b_ptr));
+  const EdgeId kEdgeIdA(kSegmentIdA.string());
+  const EdgeId kEdgeIdB(kSegmentIdB.string());
+  const EdgeId kEdgeIdC(kSegmentIdC.string());
 
   const Graph graph = BuildGraph(&rg);
 
   ASSERT_EQ(3u, graph.edges.size());
   ASSERT_EQ(4u, graph.nodes.size());
-  ASSERT_NE(graph.edges.end(), graph.edges.find(segment_a_ptr));
-  ASSERT_NE(graph.edges.end(), graph.edges.find(segment_b_ptr));
-  ASSERT_NE(graph.edges.end(), graph.edges.find(segment_c_ptr));
-  const Edge& edge_a = graph.edges.at(segment_a_ptr);
-  const Edge& edge_b = graph.edges.at(segment_b_ptr);
-  const Edge& edge_c = graph.edges.at(segment_c_ptr);
+  ASSERT_NE(graph.edges.end(), graph.edges.find(kEdgeIdA));
+  ASSERT_NE(graph.edges.end(), graph.edges.find(kEdgeIdB));
+  ASSERT_NE(graph.edges.end(), graph.edges.find(kEdgeIdC));
+  const Edge& edge_a = graph.edges.at(kEdgeIdA);
+  const Edge& edge_b = graph.edges.at(kEdgeIdB);
+  const Edge& edge_c = graph.edges.at(kEdgeIdC);
+  ASSERT_EQ(kEdgeIdA, edge_a.id);
   ASSERT_EQ(segment_a_ptr, edge_a.segment);
   ASSERT_NE(edge_a.node_a, edge_a.node_b);
   ASSERT_NE(graph.nodes.end(), graph.nodes.find(edge_a.node_a));
   ASSERT_NE(graph.nodes.end(), graph.nodes.find(edge_a.node_b));
   const Node& node_a_a = graph.nodes.find(edge_a.node_a)->second;
   const Node& node_a_b = graph.nodes.find(edge_a.node_b)->second;
+  ASSERT_EQ(kEdgeIdB, edge_b.id);
   ASSERT_EQ(segment_b_ptr, edge_b.segment);
   ASSERT_NE(edge_b.node_a, edge_b.node_b);
   ASSERT_NE(graph.nodes.end(), graph.nodes.find(edge_b.node_a));
   ASSERT_NE(graph.nodes.end(), graph.nodes.find(edge_b.node_b));
   const Node& node_b_a = graph.nodes.find(edge_b.node_a)->second;
   const Node& node_b_b = graph.nodes.find(edge_b.node_b)->second;
+  ASSERT_EQ(kEdgeIdC, edge_c.id);
   ASSERT_EQ(segment_c_ptr, edge_c.segment);
   ASSERT_NE(edge_c.node_a, edge_c.node_b);
   ASSERT_NE(graph.nodes.end(), graph.nodes.find(edge_c.node_a));
@@ -294,23 +314,23 @@ GTEST_TEST(BuildGraph, EvaluateYShapedRoadsGraph) {
   ASSERT_NE(node_a_a.branch_points.end(), node_a_a.branch_points.find(start_branch_point_a_a_ptr));
   ASSERT_NE(node_a_a.branch_points.end(), node_a_a.branch_points.find(start_branch_point_a_b_ptr));
   ASSERT_EQ(1u, node_a_a.edges.size());
-  ASSERT_NE(node_a_a.edges.end(), node_a_a.edges.find(segment_a_ptr));
+  ASSERT_NE(node_a_a.edges.end(), node_a_a.edges.find(kEdgeIdA));
   ASSERT_EQ(2u, node_a_b.branch_points.size());
   ASSERT_NE(node_a_b.branch_points.end(), node_a_a.branch_points.find(end_branch_point_a_a_ptr));
   ASSERT_NE(node_a_b.branch_points.end(), node_a_a.branch_points.find(end_branch_point_a_b_ptr));
   ASSERT_EQ(3u, node_a_b.edges.size());
-  ASSERT_NE(node_a_b.edges.end(), node_a_b.edges.find(segment_a_ptr));
-  ASSERT_NE(node_a_b.edges.end(), node_a_b.edges.find(segment_b_ptr));
-  ASSERT_NE(node_a_b.edges.end(), node_a_b.edges.find(segment_c_ptr));
+  ASSERT_NE(node_a_b.edges.end(), node_a_b.edges.find(kEdgeIdA));
+  ASSERT_NE(node_a_b.edges.end(), node_a_b.edges.find(kEdgeIdB));
+  ASSERT_NE(node_a_b.edges.end(), node_a_b.edges.find(kEdgeIdC));
   ASSERT_EQ(1u, node_b_b.branch_points.size());
   ASSERT_NE(node_b_b.branch_points.end(), node_b_a.branch_points.find(end_branch_point_b_a_ptr));
   ASSERT_EQ(1u, node_b_b.edges.size());
-  ASSERT_NE(node_b_b.edges.end(), node_b_b.edges.find(segment_b_ptr));
+  ASSERT_NE(node_b_b.edges.end(), node_b_b.edges.find(kEdgeIdB));
   ASSERT_EQ(2u, node_c_b.branch_points.size());
   ASSERT_NE(node_c_b.branch_points.end(), node_c_b.branch_points.find(end_branch_point_c_a_ptr));
   ASSERT_NE(node_c_b.branch_points.end(), node_c_b.branch_points.find(end_branch_point_c_b_ptr));
   ASSERT_EQ(1u, node_c_b.edges.size());
-  ASSERT_NE(node_c_b.edges.end(), node_c_b.edges.find(segment_c_ptr));
+  ASSERT_NE(node_c_b.edges.end(), node_c_b.edges.find(kEdgeIdC));
 }
 
 }  // namespace

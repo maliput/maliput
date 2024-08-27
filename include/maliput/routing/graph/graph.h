@@ -33,22 +33,26 @@
 
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
+#include "maliput/api/type_specific_identifier.h"
 
 namespace maliput {
 namespace routing {
 namespace graph {
 
-// Edges are wrappers around api::Segments with convenient references to the connecting Nodes.
-using EdgeId = const api::Segment*;
+/// Persistent identifier for an Edge in a Graph. It is guaranteed that
+/// the aliased type will remain the same.
+using EdgeId = api::TypeSpecificIdentifier<struct Edge>;
 
-// Nodes are bundles of api::BranchPoints, there is no entity in api::RoadGeometry to which it maps directly.
-// An unrelated identifier, meaningless, and still simple and lightweight for
-using NodeId = size_t;
+/// Persistent identifier for a Node in a Graph. It is guaranteed that
+/// the aliased type will remain the same.
+using NodeId = api::TypeSpecificIdentifier<struct Node>;
 
-// Wrapper of an api::Segment, useful for a Graph structure.
-// Using api::Segments instead of api::Lanes in favor of further filtering api::Lanes
-// to include in the final Route.
+/// An edge wraps a pointer to an api::Segment and the identities of the
+/// connecting nodes. An api::Segment instead of a api::Lane wrapped to allow Routers to
+/// further refine which which specific api::Lanes to include in a final Route.
 struct Edge {
+  /// @brief The ID of the Edge.
+  EdgeId id;
   /// @brief The api::Segment this Edge maps to.
   const api::Segment* segment{};
   /// @brief The NodeId at one extent of the Edge.
@@ -57,8 +61,9 @@ struct Edge {
   NodeId node_b;
 };
 
-// Wrapper of all the api::BranchPoints that make it possible to
-// connect the incoming and outgoing Edges from this node.
+/// A node wraps a bundle of api::BranchPoints and Edges. The api::BranchPoints are at
+/// the ends of the api::Lanes in the Edges of this node, and connect the incoming
+/// and outgoing Edges from this node.
 struct Node {
   /// @brief The ID of the Node.
   NodeId id;
@@ -68,8 +73,7 @@ struct Node {
   std::set<EdgeId> edges;
 };
 
-// Basic type to hold the graph structure. Operations are handled in individual functions
-// to simplify extensibility.
+/// Basic type to hold the graph structure.
 struct Graph {
   /// @brief The collection of Edges in this Graph.
   std::unordered_map<EdgeId, Edge> edges;
@@ -83,7 +87,7 @@ struct Graph {
 /// at the extents of an api::Segment whose api::Lanes on one side connect to another set of
 /// api::Lanes belonging to another api::Segment.
 ///
-/// @param rg The api::RoadGeometry build a Graph from. It must not be nullptr.
+/// @param rg api::RoadGeometry to build a Graph from. It must not be nullptr.
 /// @return A Graph.
 /// @throws maliput::common::assertion_error When @p rg is nullptr.
 Graph BuildGraph(const api::RoadGeometry* rg);

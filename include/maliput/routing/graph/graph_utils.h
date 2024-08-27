@@ -40,7 +40,7 @@ namespace graph {
 
 /// Finds all Edge sequences in @p graph that join @p start with @p end.
 ///
-/// @param graph The Graph to conduct the search.
+/// @param graph The Graph in which to conduct the search.
 /// @param start The start Node. It must exist in the @p graph.
 /// @param end The end Node. It must exist in the @p graph.
 /// @return A vector of vectors of Edges that joint @p start with @p end. When @p start and @p end are the same, the
@@ -48,27 +48,30 @@ namespace graph {
 /// @throws maliput::common::assertion_error When any of @p start and @p end do not exist in @p graph.
 std::vector<std::vector<Edge>> FindAllEdgeSequences(const Graph& graph, const Node& start, const Node& end);
 
-/// Finds a Node in @p graph that is on the @p end extent of the Edge @p pos falls into.
+/// Finds a Node in @p graph that contains the api::BranchPoint at the @p end extent of the api::Lane specified by
+/// @p pos.
 ///
-/// @param graph The Graph to perform the search into.
+/// @param graph The Graph in which to conduct the search.
 /// @param pos The api::RoadPosition to match.
 /// @param end The api::LaneEnd::Which indicating the side of the Edge.
 /// @return An optional wrapping a Node when @p pos can be matched into an Edge.
 /// @throws maliput::common::assertion_error When @p pos.lane is nullptr.
 std::optional<Node> FindNode(const Graph& graph, const api::RoadPosition& pos, const api::LaneEnd::Which& end);
 
-/// Determines the api::Lane::End::Which end that connects @p ref_end with @p target_end.
+/// Determines the api::Lane::End::Which end of an api::Lane in @p ref_edge that connects to an api::Lane in
+/// @p target_edge.
 ///
-/// When there is no connection between @p ref_edge and @p target_edge, std::nullopt is returned.
+/// When there is no direct connection between @p ref_edge and @p target_edge, std::nullopt is returned.
 /// Note: this method uses the @p graph connectivity, thus there might be no real connection between @p ref_edge
-/// and @p target_end underlying api::Segments by means of api::BranchPoints.
+/// and @p target_end underlying api::Segments by means of api::BranchPoints, thus returning std::nullopt.
 /// When @p ref_edge.segment and @p target_edge.segment are equal, this function returns std::nullopt.
 ///
+/// @param graph The Graph containing @p ref_edge and @p target_edge.
 /// @param ref_edge The reference Edge.
 /// @param target_edge The target Edge.
-/// @param graph The graph to lookup Edges and Nodes.
-/// @return An optional with the api::LaneEnd::Which end in @p ref_edge that connects with @p target_edge.
-std::optional<api::LaneEnd::Which> DetermineEdgeEnd(const Edge& ref_edge, const Edge& target_edge, const Graph& graph);
+/// @return An optional with the api::LaneEnd::Which end of an api::Lane in @p ref_edge that connects with another
+/// api::Lane in @p target_edge.
+std::optional<api::LaneEnd::Which> DetermineEdgeEnd(const Graph& graph, const Edge& ref_edge, const Edge& target_edge);
 
 }  // namespace graph
 }  // namespace routing

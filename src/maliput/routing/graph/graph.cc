@@ -30,6 +30,7 @@
 
 #include <functional>
 #include <optional>
+#include <string>
 
 #include "maliput/common/maliput_throw.h"
 
@@ -96,8 +97,8 @@ Node GetNode(const Graph& graph, std::set<const api::BranchPoint*> branch_points
 
 Graph BuildGraph(const api::RoadGeometry* rg) {
   MALIPUT_THROW_UNLESS(rg != nullptr);
-  NodeId node_id = 0;
-  auto node_id_generator = [&node_id]() mutable { return node_id++; };
+  size_t node_index = 0;
+  auto node_id_generator = [&node_index]() mutable { return NodeId(std::to_string(node_index++)); };
   Graph graph;
 
   for (int j_id = 0; j_id < rg->num_junctions(); ++j_id) {
@@ -113,14 +114,14 @@ Graph BuildGraph(const api::RoadGeometry* rg) {
       Node start_node = GetNode(graph, start_branch_points, node_id_generator);
       Node end_node = GetNode(graph, end_branch_points, node_id_generator);
 
-      Edge edge{segment, start_node.id, end_node.id};
+      Edge edge{EdgeId(segment->id().string()), segment, start_node.id, end_node.id};
 
-      start_node.edges.insert(segment);
-      end_node.edges.insert(segment);
+      start_node.edges.insert(edge.id);
+      end_node.edges.insert(edge.id);
 
-      graph.edges[segment] = edge;
-      graph.nodes[start_node.id] = start_node;
-      graph.nodes[end_node.id] = end_node;
+      graph.edges.insert_or_assign(edge.id, edge);
+      graph.nodes.insert_or_assign(start_node.id, start_node);
+      graph.nodes.insert_or_assign(end_node.id, end_node);
     }
   }
 

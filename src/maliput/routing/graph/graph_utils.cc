@@ -205,16 +205,16 @@ std::optional<Node> FindNode(const Graph& graph, const api::RoadPosition& pos, c
   return {};
 }
 
-std::optional<api::LaneEnd::Which> DetermineEdgeEnd(const Edge& ref_edge, const Edge& target_edge, const Graph& graph) {
+std::optional<api::LaneEnd::Which> DetermineEdgeEnd(const Graph& graph, const Edge& ref_edge, const Edge& target_edge) {
   if (ref_edge.segment == target_edge.segment) {
     return std::nullopt;
   }
   const Node& node_a = graph.nodes.at(ref_edge.node_a);
-  if (node_a.edges.find(target_edge.segment) != node_a.edges.end()) {
+  if (node_a.edges.find(target_edge.id) != node_a.edges.end()) {
     return api::LaneEnd::Which::kStart;
   }
   const Node& node_b = graph.nodes.at(ref_edge.node_b);
-  if (node_b.edges.find(target_edge.segment) != node_b.edges.end()) {
+  if (node_b.edges.find(target_edge.id) != node_b.edges.end()) {
     return api::LaneEnd::Which::kFinish;
   }
   return std::nullopt;

@@ -60,18 +60,19 @@ using maliput::test::SegmentMock;
 
 // Tests that using nodes not in the graph makes the function to throw.
 GTEST_TEST(FindAllEdgeSequences, NodesOutsideTheGraphThrow) {
+  const EdgeId kEdgeId("edge_id");
   const api::Segment* kSegment{reinterpret_cast<const api::Segment*>(0x00000001)};
-  const NodeId kNodeIdA{0u};
-  const NodeId kNodeIdB{1u};
-  const NodeId kNodeIdC{2u};
+  const NodeId kNodeIdA("0");
+  const NodeId kNodeIdB("1");
+  const NodeId kNodeIdC("2");
   const api::BranchPoint* kBranchPointA{reinterpret_cast<const api::BranchPoint*>(0x00010001)};
   const api::BranchPoint* kBranchPointB{reinterpret_cast<const api::BranchPoint*>(0x00010002)};
   const api::BranchPoint* kBranchPointC{reinterpret_cast<const api::BranchPoint*>(0x00010003)};
-  const Edge kEdge{kSegment, kNodeIdA, kNodeIdB};
-  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kSegment}};
-  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kSegment}};
-  const Node kNodeC{kNodeIdC, {kBranchPointC}, {kSegment}};
-  const Graph graph{std::unordered_map<EdgeId, Edge>{{kSegment, kEdge}},
+  const Edge kEdge{kEdgeId, kSegment, kNodeIdA, kNodeIdB};
+  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kEdgeId}};
+  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kEdgeId}};
+  const Node kNodeC{kNodeIdC, {kBranchPointC}, {kEdgeId}};
+  const Graph graph{std::unordered_map<EdgeId, Edge>{{kEdgeId, kEdge}},
                     std::unordered_map<NodeId, Node>{{kNodeIdA, kNodeA}, {kNodeIdB, kNodeB}}};
 
   ASSERT_THROW({ FindAllEdgeSequences(graph, kNodeC, kNodeB); }, common::assertion_error);
@@ -85,15 +86,16 @@ GTEST_TEST(FindAllEdgeSequences, NodesOutsideTheGraphThrow) {
 // - A -> A: empty.
 // - B -> B: empty.
 GTEST_TEST(FindAllEdgeSequences, OneEdgeGraph) {
+  const EdgeId kEdgeId("edge_id");
   const api::Segment* kSegment{reinterpret_cast<const api::Segment*>(0x00000001)};
-  const NodeId kNodeIdA{0u};
-  const NodeId kNodeIdB{1u};
+  const NodeId kNodeIdA("0");
+  const NodeId kNodeIdB("1");
   const api::BranchPoint* kBranchPointA{reinterpret_cast<const api::BranchPoint*>(0x00010001)};
   const api::BranchPoint* kBranchPointB{reinterpret_cast<const api::BranchPoint*>(0x00010002)};
-  const Edge kEdge{kSegment, kNodeIdA, kNodeIdB};
-  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kSegment}};
-  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kSegment}};
-  const Graph graph{std::unordered_map<EdgeId, Edge>{{kSegment, kEdge}},
+  const Edge kEdge{kEdgeId, kSegment, kNodeIdA, kNodeIdB};
+  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kEdgeId}};
+  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kEdgeId}};
+  const Graph graph{std::unordered_map<EdgeId, Edge>{{kEdgeId, kEdge}},
                     std::unordered_map<NodeId, Node>{{kNodeIdA, kNodeA}, {kNodeIdB, kNodeB}}};
 
   {
@@ -102,6 +104,7 @@ GTEST_TEST(FindAllEdgeSequences, OneEdgeGraph) {
     ASSERT_EQ(1u, edge_sequences.size());
     const std::vector<Edge>& edge_sequence = edge_sequences[0];
     ASSERT_EQ(1u, edge_sequence.size());
+    ASSERT_EQ(kEdgeId, edge_sequence[0].id);
     ASSERT_EQ(kSegment, edge_sequence[0].segment);
     ASSERT_EQ(kNodeIdA, edge_sequence[0].node_a);
     ASSERT_EQ(kNodeIdB, edge_sequence[0].node_b);
@@ -112,6 +115,7 @@ GTEST_TEST(FindAllEdgeSequences, OneEdgeGraph) {
     ASSERT_EQ(1u, edge_sequences.size());
     const std::vector<Edge>& edge_sequence = edge_sequences[0];
     ASSERT_EQ(1u, edge_sequence.size());
+    ASSERT_EQ(kEdgeId, edge_sequence[0].id);
     ASSERT_EQ(kSegment, edge_sequence[0].segment);
     ASSERT_EQ(kNodeIdA, edge_sequence[0].node_a);
     ASSERT_EQ(kNodeIdB, edge_sequence[0].node_b);
@@ -142,17 +146,19 @@ GTEST_TEST(FindAllEdgeSequences, OneEdgeGraph) {
 //    ----
 // </pre>
 GTEST_TEST(FindAllEdgeSequences, Roundabout) {
+  const EdgeId kEdgeIdA("edge_a");
+  const EdgeId kEdgeIdB("edge_b");
   const api::Segment* kSegmentA{reinterpret_cast<const api::Segment*>(0x00000001)};
   const api::Segment* kSegmentB{reinterpret_cast<const api::Segment*>(0x00000002)};
-  const NodeId kNodeIdA{0u};
-  const NodeId kNodeIdB{1u};
+  const NodeId kNodeIdA("0");
+  const NodeId kNodeIdB("1");
   const api::BranchPoint* kBranchPointA{reinterpret_cast<const api::BranchPoint*>(0x00010001)};
   const api::BranchPoint* kBranchPointB{reinterpret_cast<const api::BranchPoint*>(0x00010002)};
-  const Edge kEdgeA{kSegmentA, kNodeIdA, kNodeIdB};
-  const Edge kEdgeB{kSegmentB, kNodeIdB, kNodeIdA};
-  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kSegmentA, kSegmentB}};
-  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kSegmentA, kSegmentB}};
-  const Graph graph{std::unordered_map<EdgeId, Edge>{{kSegmentA, kEdgeA}, {kSegmentB, kEdgeB}},
+  const Edge kEdgeA{kEdgeIdA, kSegmentA, kNodeIdA, kNodeIdB};
+  const Edge kEdgeB{kEdgeIdB, kSegmentB, kNodeIdB, kNodeIdA};
+  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kEdgeIdA, kEdgeIdB}};
+  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kEdgeIdA, kEdgeIdB}};
+  const Graph graph{std::unordered_map<EdgeId, Edge>{{kEdgeIdA, kEdgeA}, {kEdgeIdB, kEdgeB}},
                     std::unordered_map<NodeId, Node>{{kNodeIdA, kNodeA}, {kNodeIdB, kNodeB}}};
 
   {
@@ -163,13 +169,13 @@ GTEST_TEST(FindAllEdgeSequences, Roundabout) {
     const std::vector<Edge>& edge_sequence_2 = edge_sequences[1];
     ASSERT_EQ(1u, edge_sequence_1.size());
     ASSERT_EQ(1u, edge_sequence_2.size());
-    ASSERT_NE(edge_sequence_1[0].segment, edge_sequence_2[0].segment);
-    ASSERT_TRUE(edge_sequence_1[0].segment == kSegmentA || edge_sequence_1[0].segment == kSegmentB);
-    ASSERT_TRUE(edge_sequence_2[0].segment == kSegmentA || edge_sequence_2[0].segment == kSegmentB);
+    ASSERT_NE(edge_sequence_1[0].id, edge_sequence_2[0].id);
+    ASSERT_TRUE(edge_sequence_1[0].id == kEdgeIdA || edge_sequence_1[0].id == kEdgeIdB);
+    ASSERT_TRUE(edge_sequence_2[0].id == kEdgeIdA || edge_sequence_2[0].id == kEdgeIdB);
   }
 }
 
-// Extends the case of the graph to include one entry and one exit to the divering-merging path:
+// Extends the case of the graph to include one entry and one exit to the diverging-merging path:
 //
 // <pre>
 //            ----
@@ -181,29 +187,32 @@ GTEST_TEST(FindAllEdgeSequences, Roundabout) {
 //            ---- > S:C
 // </pre>
 GTEST_TEST(FindAllEdgeSequences, RoundaboutWithEntryAndExit) {
+  const EdgeId kEdgeIdA("edge_a");
+  const EdgeId kEdgeIdB("edge_b");
+  const EdgeId kEdgeIdC("edge_c");
+  const EdgeId kEdgeIdD("edge_d");
   const api::Segment* kSegmentA{reinterpret_cast<const api::Segment*>(0x00000001)};
   const api::Segment* kSegmentB{reinterpret_cast<const api::Segment*>(0x00000002)};
   const api::Segment* kSegmentC{reinterpret_cast<const api::Segment*>(0x00000003)};
   const api::Segment* kSegmentD{reinterpret_cast<const api::Segment*>(0x00000004)};
-  const NodeId kNodeIdA{0u};
-  const NodeId kNodeIdB{1u};
-  const NodeId kNodeIdC{2u};
-  const NodeId kNodeIdD{3u};
+  const NodeId kNodeIdA("0");
+  const NodeId kNodeIdB("1");
+  const NodeId kNodeIdC("2");
+  const NodeId kNodeIdD("3");
   const api::BranchPoint* kBranchPointA{reinterpret_cast<const api::BranchPoint*>(0x00010001)};
   const api::BranchPoint* kBranchPointB{reinterpret_cast<const api::BranchPoint*>(0x00010002)};
   const api::BranchPoint* kBranchPointC{reinterpret_cast<const api::BranchPoint*>(0x00010003)};
   const api::BranchPoint* kBranchPointD{reinterpret_cast<const api::BranchPoint*>(0x00010004)};
-  const Edge kEdgeA{kSegmentA, kNodeIdA, kNodeIdB};
-  const Edge kEdgeB{kSegmentB, kNodeIdB, kNodeIdC};
-  const Edge kEdgeC{kSegmentC, kNodeIdB, kNodeIdC};
-  const Edge kEdgeD{kSegmentD, kNodeIdC, kNodeIdD};
-  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kSegmentA}};
-  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kSegmentA, kSegmentB, kSegmentC}};
-  const Node kNodeC{kNodeIdC, {kBranchPointC}, {kSegmentB, kSegmentC, kSegmentD}};
-  const Node kNodeD{kNodeIdD, {kBranchPointD}, {kSegmentD}};
+  const Edge kEdgeA{kEdgeIdA, kSegmentA, kNodeIdA, kNodeIdB};
+  const Edge kEdgeB{kEdgeIdB, kSegmentB, kNodeIdB, kNodeIdC};
+  const Edge kEdgeC{kEdgeIdC, kSegmentC, kNodeIdB, kNodeIdC};
+  const Edge kEdgeD{kEdgeIdD, kSegmentD, kNodeIdC, kNodeIdD};
+  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kEdgeIdA}};
+  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kEdgeIdA, kEdgeIdB, kEdgeIdC}};
+  const Node kNodeC{kNodeIdC, {kBranchPointC}, {kEdgeIdB, kEdgeIdC, kEdgeIdD}};
+  const Node kNodeD{kNodeIdD, {kBranchPointD}, {kEdgeIdD}};
   const Graph graph{
-      std::unordered_map<EdgeId, Edge>{
-          {kSegmentA, kEdgeA}, {kSegmentB, kEdgeB}, {kSegmentC, kEdgeC}, {kSegmentD, kEdgeD}},
+      std::unordered_map<EdgeId, Edge>{{kEdgeIdA, kEdgeA}, {kEdgeIdB, kEdgeB}, {kEdgeIdC, kEdgeC}, {kEdgeIdD, kEdgeD}},
       std::unordered_map<NodeId, Node>{{kNodeIdA, kNodeA}, {kNodeIdB, kNodeB}, {kNodeIdC, kNodeC}, {kNodeIdD, kNodeD}}};
 
   {  // A -> B
@@ -212,12 +221,12 @@ GTEST_TEST(FindAllEdgeSequences, RoundaboutWithEntryAndExit) {
     ASSERT_EQ(1u, edge_sequences.size());
     const std::vector<Edge>& edge_sequence_1 = edge_sequences[0];
     ASSERT_EQ(1u, edge_sequence_1.size());
-    ASSERT_EQ(kSegmentA, edge_sequence_1[0].segment);
+    ASSERT_EQ(kEdgeIdA, edge_sequence_1[0].id);
   }
   // TODO: A -> C and A -> D require a complex creation of mocks to properly evaluate results.
 }
 
-// Extends the case of the graph to include one entry and one exit to the divering-merging path:
+// Extends the case of the graph to include one entry and one exit to the diverging-merging path:
 //
 // <pre>
 //
@@ -228,24 +237,26 @@ GTEST_TEST(FindAllEdgeSequences, RoundaboutWithEntryAndExit) {
 //
 // </pre>
 GTEST_TEST(FindAllEdgeSequences, DisjointGraph) {
+  const EdgeId kEdgeIdA("edge_a");
+  const EdgeId kEdgeIdB("edge_b");
   const api::Segment* kSegmentA{reinterpret_cast<const api::Segment*>(0x00000001)};
   const api::Segment* kSegmentB{reinterpret_cast<const api::Segment*>(0x00000002)};
-  const NodeId kNodeIdA{0u};
-  const NodeId kNodeIdB{1u};
-  const NodeId kNodeIdC{2u};
-  const NodeId kNodeIdD{3u};
+  const NodeId kNodeIdA("0");
+  const NodeId kNodeIdB("1");
+  const NodeId kNodeIdC("2");
+  const NodeId kNodeIdD("3");
   const api::BranchPoint* kBranchPointA{reinterpret_cast<const api::BranchPoint*>(0x00010001)};
   const api::BranchPoint* kBranchPointB{reinterpret_cast<const api::BranchPoint*>(0x00010002)};
   const api::BranchPoint* kBranchPointC{reinterpret_cast<const api::BranchPoint*>(0x00010003)};
   const api::BranchPoint* kBranchPointD{reinterpret_cast<const api::BranchPoint*>(0x00010004)};
-  const Edge kEdgeA{kSegmentA, kNodeIdA, kNodeIdB};
-  const Edge kEdgeB{kSegmentB, kNodeIdC, kNodeIdD};
-  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kSegmentA}};
-  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kSegmentA}};
-  const Node kNodeC{kNodeIdC, {kBranchPointC}, {kSegmentB}};
-  const Node kNodeD{kNodeIdD, {kBranchPointD}, {kSegmentB}};
+  const Edge kEdgeA{kEdgeIdA, kSegmentA, kNodeIdA, kNodeIdB};
+  const Edge kEdgeB{kEdgeIdB, kSegmentB, kNodeIdC, kNodeIdD};
+  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kEdgeIdA}};
+  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kEdgeIdA}};
+  const Node kNodeC{kNodeIdC, {kBranchPointC}, {kEdgeIdB}};
+  const Node kNodeD{kNodeIdD, {kBranchPointD}, {kEdgeIdB}};
   const Graph graph{
-      std::unordered_map<EdgeId, Edge>{{kSegmentA, kEdgeA}, {kSegmentB, kEdgeB}},
+      std::unordered_map<EdgeId, Edge>{{kEdgeIdA, kEdgeA}, {kEdgeIdB, kEdgeB}},
       std::unordered_map<NodeId, Node>{{kNodeIdA, kNodeA}, {kNodeIdB, kNodeB}, {kNodeIdC, kNodeC}, {kNodeIdD, kNodeD}}};
 
   {  // A -> B
@@ -254,7 +265,7 @@ GTEST_TEST(FindAllEdgeSequences, DisjointGraph) {
     ASSERT_EQ(1u, edge_sequences.size());
     const std::vector<Edge>& edge_sequence_1 = edge_sequences[0];
     ASSERT_EQ(1u, edge_sequence_1.size());
-    ASSERT_EQ(kSegmentA, edge_sequence_1[0].segment);
+    ASSERT_EQ(kEdgeIdA, edge_sequence_1[0].id);
   }
   {  // C -> D
     const std::vector<std::vector<Edge>> edge_sequences = FindAllEdgeSequences(graph, kNodeC, kNodeD);
@@ -262,7 +273,7 @@ GTEST_TEST(FindAllEdgeSequences, DisjointGraph) {
     ASSERT_EQ(1u, edge_sequences.size());
     const std::vector<Edge>& edge_sequence_1 = edge_sequences[0];
     ASSERT_EQ(1u, edge_sequence_1.size());
-    ASSERT_EQ(kSegmentB, edge_sequence_1[0].segment);
+    ASSERT_EQ(kEdgeIdB, edge_sequence_1[0].id);
   }
   {  // A -> C
     const std::vector<std::vector<Edge>> edge_sequences = FindAllEdgeSequences(graph, kNodeA, kNodeC);
@@ -281,6 +292,7 @@ GTEST_TEST(FindNode, CorrectlyReturnsTheNodeWhenFound) {
   static constexpr int kOne{1};
   JunctionMock junction;
   SegmentMock segment;
+  const api::SegmentId kSegmentId("segment_id");
   const api::Segment* segment_ptr = &segment;
   LaneMock lane;
   LaneMock strange_lane;
@@ -297,6 +309,7 @@ GTEST_TEST(FindNode, CorrectlyReturnsTheNodeWhenFound) {
   EXPECT_CALL(rg, do_junction(_)).WillRepeatedly(Return(static_cast<const api::Junction*>(&junction)));
   EXPECT_CALL(junction, do_num_segments()).WillRepeatedly(Return(kOne));
   EXPECT_CALL(junction, do_segment(_)).WillRepeatedly(Return(segment_ptr));
+  EXPECT_CALL(segment, do_id()).WillRepeatedly(Return(kSegmentId));
   EXPECT_CALL(segment, do_num_lanes()).WillRepeatedly(Return(kOne));
   EXPECT_CALL(segment, do_lane(_)).WillRepeatedly(Return(static_cast<const api::Lane*>(&lane)));
   EXPECT_CALL(lane, DoGetBranchPoint(Eq(api::LaneEnd::Which::kStart))).WillRepeatedly(Return(start_branch_point_ptr));
@@ -320,11 +333,11 @@ GTEST_TEST(FindNode, CorrectlyReturnsTheNodeWhenFound) {
       expected_start_node->branch_points.find(end_branch_point_ptr) != expected_start_node->branch_points.end());
   ASSERT_TRUE(expected_end_node->branch_points.find(start_branch_point_ptr) != expected_end_node->branch_points.end() ||
               expected_end_node->branch_points.find(end_branch_point_ptr) != expected_end_node->branch_points.end());
-  ASSERT_EQ(segment_ptr, *(expected_start_node->edges.begin()));
-  ASSERT_EQ(segment_ptr, *(expected_end_node->edges.begin()));
+  ASSERT_EQ(EdgeId(kSegmentId.string()), *(expected_start_node->edges.begin()));
+  ASSERT_EQ(EdgeId(kSegmentId.string()), *(expected_end_node->edges.begin()));
 }
 
-// Extends the case of the graph to include one entry and one exit to the divering-merging path:
+// Extends the case of the graph to include one entry and one exit to the diverging-merging path:
 //
 // <pre>
 //
@@ -337,51 +350,54 @@ GTEST_TEST(FindNode, CorrectlyReturnsTheNodeWhenFound) {
 //
 // </pre>
 GTEST_TEST(DetermineEdgeEnd, EvaluateJointAndDisjointEdges) {
+  const EdgeId kEdgeIdA("edge_a");
+  const EdgeId kEdgeIdB("edge_b");
+  const EdgeId kEdgeIdC("edge_c");
   const api::Segment* kSegmentA{reinterpret_cast<const api::Segment*>(0x00000001)};
   const api::Segment* kSegmentB{reinterpret_cast<const api::Segment*>(0x00000002)};
   const api::Segment* kSegmentC{reinterpret_cast<const api::Segment*>(0x00000003)};
-  const NodeId kNodeIdA{0u};
-  const NodeId kNodeIdB{1u};
-  const NodeId kNodeIdC{2u};
-  const NodeId kNodeIdD{3u};
-  const NodeId kNodeIdE{4u};
+  const NodeId kNodeIdA("0");
+  const NodeId kNodeIdB("1");
+  const NodeId kNodeIdC("2");
+  const NodeId kNodeIdD("3");
+  const NodeId kNodeIdE("4");
   const api::BranchPoint* kBranchPointA{reinterpret_cast<const api::BranchPoint*>(0x00010001)};
   const api::BranchPoint* kBranchPointB{reinterpret_cast<const api::BranchPoint*>(0x00010002)};
   const api::BranchPoint* kBranchPointC{reinterpret_cast<const api::BranchPoint*>(0x00010003)};
   const api::BranchPoint* kBranchPointD{reinterpret_cast<const api::BranchPoint*>(0x00010004)};
   const api::BranchPoint* kBranchPointE{reinterpret_cast<const api::BranchPoint*>(0x00010005)};
-  const Edge kEdgeA{kSegmentA, kNodeIdA, kNodeIdB};
-  const Edge kEdgeB{kSegmentB, kNodeIdB, kNodeIdC};
-  const Edge kEdgeC{kSegmentC, kNodeIdD, kNodeIdE};
-  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kSegmentA}};
-  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kSegmentA, kSegmentB}};
-  const Node kNodeC{kNodeIdC, {kBranchPointC}, {kSegmentB}};
-  const Node kNodeD{kNodeIdD, {kBranchPointD}, {kSegmentC}};
-  const Node kNodeE{kNodeIdE, {kBranchPointE}, {kSegmentC}};
+  const Edge kEdgeA{kEdgeIdA, kSegmentA, kNodeIdA, kNodeIdB};
+  const Edge kEdgeB{kEdgeIdB, kSegmentB, kNodeIdB, kNodeIdC};
+  const Edge kEdgeC{kEdgeIdC, kSegmentC, kNodeIdD, kNodeIdE};
+  const Node kNodeA{kNodeIdA, {kBranchPointA}, {kEdgeIdA}};
+  const Node kNodeB{kNodeIdB, {kBranchPointB}, {kEdgeIdA, kEdgeIdB}};
+  const Node kNodeC{kNodeIdC, {kBranchPointC}, {kEdgeIdB}};
+  const Node kNodeD{kNodeIdD, {kBranchPointD}, {kEdgeIdC}};
+  const Node kNodeE{kNodeIdE, {kBranchPointE}, {kEdgeIdC}};
   const Graph graph{
-      std::unordered_map<EdgeId, Edge>{{kSegmentA, kEdgeA}, {kSegmentB, kEdgeB}, {kSegmentC, kEdgeC}},
+      std::unordered_map<EdgeId, Edge>{{kEdgeIdA, kEdgeA}, {kEdgeIdB, kEdgeB}, {kEdgeIdB, kEdgeC}},
       std::unordered_map<NodeId, Node>{
           {kNodeIdA, kNodeA}, {kNodeIdB, kNodeB}, {kNodeIdC, kNodeC}, {kNodeIdD, kNodeD}, {kNodeIdE, kNodeE}}};
 
   {  // A -> B
-    const std::optional<api::LaneEnd::Which> end = DetermineEdgeEnd(kEdgeA, kEdgeB, graph);
+    const std::optional<api::LaneEnd::Which> end = DetermineEdgeEnd(graph, kEdgeA, kEdgeB);
 
     ASSERT_TRUE(end.has_value());
     ASSERT_EQ(api::LaneEnd::Which::kFinish, end.value());
   }
   {  // B -> A
-    const std::optional<api::LaneEnd::Which> end = DetermineEdgeEnd(kEdgeB, kEdgeA, graph);
+    const std::optional<api::LaneEnd::Which> end = DetermineEdgeEnd(graph, kEdgeB, kEdgeA);
 
     ASSERT_TRUE(end.has_value());
     ASSERT_EQ(api::LaneEnd::Which::kStart, end.value());
   }
   {  // C -> C
-    const std::optional<api::LaneEnd::Which> end = DetermineEdgeEnd(kEdgeC, kEdgeC, graph);
+    const std::optional<api::LaneEnd::Which> end = DetermineEdgeEnd(graph, kEdgeC, kEdgeC);
 
     ASSERT_FALSE(end.has_value());
   }
   {  // A -> C
-    const std::optional<api::LaneEnd::Which> end = DetermineEdgeEnd(kEdgeA, kEdgeC, graph);
+    const std::optional<api::LaneEnd::Which> end = DetermineEdgeEnd(graph, kEdgeA, kEdgeC);
 
     ASSERT_FALSE(end.has_value());
   }
