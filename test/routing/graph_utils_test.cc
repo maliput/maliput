@@ -58,7 +58,7 @@ using maliput::test::LaneMock;
 using maliput::test::RoadGeometryMock;
 using maliput::test::SegmentMock;
 
-// Tests that using nodes not in the graph makes the function to throw.
+// Tests that using nodes not in the graph makes the function throw.
 GTEST_TEST(FindAllEdgeSequences, NodesOutsideTheGraphThrow) {
   const EdgeId kEdgeId("edge_id");
   const api::Segment* kSegment{reinterpret_cast<const api::Segment*>(0x00000001)};
@@ -303,8 +303,6 @@ GTEST_TEST(FindNode, CorrectlyReturnsTheNodeWhenFound) {
   BranchPointMock strange_branch_point;
   const api::BranchPoint* strange_branch_point_ptr = &strange_branch_point;
   RoadGeometryMock rg;
-  const api::RoadPosition position{&lane, api::LanePosition{1., 2., 3.}};
-  const api::RoadPosition strange_position{&strange_lane, api::LanePosition{1., 2., 3.}};
   EXPECT_CALL(rg, do_num_junctions()).WillRepeatedly(Return(kOne));
   EXPECT_CALL(rg, do_junction(_)).WillRepeatedly(Return(static_cast<const api::Junction*>(&junction)));
   EXPECT_CALL(junction, do_num_segments()).WillRepeatedly(Return(kOne));
@@ -318,13 +316,13 @@ GTEST_TEST(FindNode, CorrectlyReturnsTheNodeWhenFound) {
       .WillRepeatedly(Return(strange_branch_point_ptr));
   const Graph graph = BuildGraph(&rg);
 
-  const std::optional<Node> expected_strange_node = FindNode(graph, strange_position, api::LaneEnd::Which::kStart);
-  const std::optional<Node> expected_start_node = FindNode(graph, position, api::LaneEnd::Which::kStart);
-  const std::optional<Node> expected_end_node = FindNode(graph, position, api::LaneEnd::Which::kFinish);
+  const std::optional<Node> expected_strange_node = FindNode(graph, strange_lane, api::LaneEnd::Which::kStart);
+  const std::optional<Node> expected_start_node = FindNode(graph, lane, api::LaneEnd::Which::kStart);
+  const std::optional<Node> expected_end_node = FindNode(graph, lane, api::LaneEnd::Which::kFinish);
 
-  // This position does not map to an api::BranchPoint in the graph, so it is strange in the context of this graph.
+  // This strange_lane is not in the in the graph.
   ASSERT_FALSE(expected_strange_node.has_value());
-  // The following two positions map to api::BranchPoints in the graph.
+  // The following two map to the extents of lane whose api::BranchPoints are in the graph.
   ASSERT_TRUE(expected_start_node.has_value());
   ASSERT_TRUE(expected_end_node.has_value());
   ASSERT_NE(expected_start_node->id, expected_end_node->id);

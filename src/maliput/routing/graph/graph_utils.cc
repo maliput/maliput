@@ -39,6 +39,7 @@ namespace routing {
 namespace graph {
 namespace {
 
+// Recursively searches @p graph for a sequence of edges that go from @p start to @p end.
 std::vector<std::vector<Edge>> FindAllEdgeSequencesHelper(const Graph& graph, const Node& start, const Node& end,
                                                           const std::set<NodeId>& visited_nodes) {
   std::vector<std::vector<Edge>> result;
@@ -80,10 +81,10 @@ struct ConnectionSet {
 // LaneEnd::Which::kFinish, it'll assign a result.
 // When edges are not adjacent, this function throws.
 //
-// @param incoming_lane The incoming Edge. Its segment must not be nullptr.
-// @param ongoing_lane The ongoing Edge. Its segment must not be nullptr.
+// @param incoming_edge The incoming Edge. Its segment must not be nullptr.
+// @param ongoing_edge The ongoing Edge. Its segment must not be nullptr.
 // @return A ConnectionSet.
-// @throws common::assertion_error When @p incoming_edge' or @p ongoing_edge' segment is nullptr.
+// @throws common::assertion_error When @p incoming_edge's or @p ongoing_edge's segment is nullptr.
 // @throws common::assertion_error When @p incoming_edge and @p ongoing_edge are not adjacent.
 ConnectionSet BuildConnectionSet(const Edge& incoming_edge, const Edge& ongoing_edge) {
   MALIPUT_THROW_UNLESS(incoming_edge.segment != nullptr);
@@ -116,7 +117,7 @@ ConnectionSet BuildConnectionSet(const Edge& incoming_edge, const Edge& ongoing_
 // api::BranchPoints. When the resulting set is empty, this function returns false.
 // From the common api::BranchPoints, one is taken and the api::LaneEndSets are evaluated to identify @p ref_edge
 // and @p target_edge on each side. Finally, the matched sides are compared and this method returns true when
-// sides are different.
+// they are different.
 //
 // @param ref_edge The incoming Edge.
 // @param target_edge The ongoing Edge.
@@ -193,9 +194,8 @@ std::vector<std::vector<Edge>> FindAllEdgeSequences(const Graph& graph, const No
   return unfiltered_result;
 }
 
-std::optional<Node> FindNode(const Graph& graph, const api::RoadPosition& pos, const api::LaneEnd::Which& end) {
-  MALIPUT_THROW_UNLESS(pos.lane != nullptr);
-  const api::BranchPoint* branch_point = pos.lane->GetBranchPoint(end);
+std::optional<Node> FindNode(const Graph& graph, const api::Lane& lane, const api::LaneEnd::Which& end) {
+  const api::BranchPoint* branch_point = lane.GetBranchPoint(end);
   for (const auto& id_node : graph.nodes) {
     const Node& node = id_node.second;
     if (node.branch_points.find(branch_point) != node.branch_points.end()) {

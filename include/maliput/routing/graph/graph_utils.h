@@ -43,20 +43,18 @@ namespace graph {
 /// @param graph The Graph in which to conduct the search.
 /// @param start The start Node. It must exist in the @p graph.
 /// @param end The end Node. It must exist in the @p graph.
-/// @return A vector of vectors of Edges that joint @p start with @p end. When @p start and @p end are the same, the
+/// @return A vector of vectors of Edges that join @p start with @p end. When @p start and @p end are the same, the
 /// returned vector is empty.
 /// @throws maliput::common::assertion_error When any of @p start and @p end do not exist in @p graph.
 std::vector<std::vector<Edge>> FindAllEdgeSequences(const Graph& graph, const Node& start, const Node& end);
 
-/// Finds a Node in @p graph that contains the api::BranchPoint at the @p end extent of the api::Lane specified by
-/// @p pos.
+/// Finds a Node in @p graph that contains the api::BranchPoint at the @p end extent of the @p lane.
 ///
 /// @param graph The Graph in which to conduct the search.
-/// @param pos The api::RoadPosition to match.
+/// @param lane The api::Lane whose @p end api::BranchPoint should be in @p graph.
 /// @param end The api::LaneEnd::Which indicating the side of the Edge.
 /// @return An optional wrapping a Node when @p pos can be matched into an Edge.
-/// @throws maliput::common::assertion_error When @p pos.lane is nullptr.
-std::optional<Node> FindNode(const Graph& graph, const api::RoadPosition& pos, const api::LaneEnd::Which& end);
+std::optional<Node> FindNode(const Graph& graph, const api::Lane& lane, const api::LaneEnd::Which& end);
 
 /// Determines the api::Lane::End::Which end of an api::Lane in @p ref_edge that connects to an api::Lane in
 /// @p target_edge.

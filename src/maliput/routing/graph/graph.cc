@@ -39,7 +39,7 @@ namespace routing {
 namespace graph {
 namespace {
 
-// Gets the set of api::BranchPoints for a given @p segment using all at @p end of the api::Lanes in @p segment.
+// Gets the set of api::BranchPoints for a given @p segment containing all at @p end of the api::Lanes in @p segment.
 //
 // @param segment The api::Segment whose api::Lanes will be queried to retrieve the api::BranchPoints.
 // @param end The side of api::Lanes in @p segment.
@@ -55,9 +55,9 @@ std::set<const api::BranchPoint*> GetBranchPoints(const api::Segment* segment, c
   return branch_points;
 }
 
-// Finds a Node in @p graph by containing @p branch_points.
+// Finds a Node in @p graph by containing at least one branch point in @p branch_points.
 //
-// @param graph The Graph containing the Nodes to look for.
+// @param graph The Graph containing the Nodes to search through.
 // @param branch_points The set of api::BranchPoints whose items should be found in one of the Nodes in @p graph.
 // @return An optional containing the matched Node. Otherwise, std::nullopt.
 std::optional<Node> FindNode(const Graph& graph, std::set<const api::BranchPoint*> branch_points) {
@@ -74,7 +74,8 @@ std::optional<Node> FindNode(const Graph& graph, std::set<const api::BranchPoint
 // Gets a Node from @p graph, or creates one, with @p branch_points.
 //
 // When there is no Node found in @p graph, a new Node is created and returned. Note that
-// @p graph is not changed, but the returned is, it'll always contain at least @p branch_points.
+// @p graph is not changed, but the returned Node might be changed relative to what's in
+// @p graph as it'll always contain at least @p branch_points.
 //
 // @param graph The Graph to look for the matching Node.
 // @param branch_points The set of api::BranchPoints to match the Node in @p graph.
