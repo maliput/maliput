@@ -31,6 +31,7 @@
 #include <ostream>
 
 #include "maliput/routing/graph/graph.h"
+#include "maliput/routing/route.h"
 
 namespace maliput {
 namespace utility {
@@ -44,6 +45,19 @@ namespace utility {
 /// @param os A pointer to a std::ostream to serialize the @p graph. It must not be nullptr.
 /// @throws common::assertion_error When @p os is nullptr.
 void GenerateDotStream(const routing::graph::Graph& graph, std::ostream* os);
+
+/// Generates a string representation in @p os of the @p graph and @p route using the DOT language.
+///
+/// routing::graph::Edges are created as bidirectional, and labels are added to indicate api::Segment::id().
+/// routing::graph::Nodes only indicate their routing::graph::NodeId. The @p route is indicated by changing the color
+/// to red of edges where it lays.
+///
+/// @param graph The routing::graph::Graph to serialize.
+/// @param route The routing::Route to highlight in red on top of the @p graph.
+/// @param os A pointer to a std::ostream to serialize the @p graph. It must not be nullptr.
+/// @throws common::assertion_error When @p os is nullptr.
+/// @throws common::assertion_error When @p route's involved api::Segments are not in @p graph.
+void GenerateDotStream(const routing::graph::Graph& graph, const routing::Route& route, std::ostream* os);
 
 }  // namespace utility
 }  // namespace maliput
