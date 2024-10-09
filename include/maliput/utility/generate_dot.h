@@ -59,6 +59,5 @@ void GenerateDotStream(const routing::graph::Graph& graph, std::ostream* os);
 /// @throws common::assertion_error When @p route's involved api::Segments are not in @p graph.
 void GenerateDotStream(const routing::graph::Graph& graph, const routing::Route& route, std::ostream* os);
 
-
 }  // namespace utility
 }  // namespace maliput

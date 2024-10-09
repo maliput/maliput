@@ -54,9 +54,8 @@ void GenerateDotStream(const routing::graph::Graph& graph, const routing::Route&
   std::unordered_set<const api::Segment*> segments;
   for (int i = 0; i < route.size(); ++i) {
     const api::Segment* segment = route.Get(i).start_positions().front().lane->segment();
-    auto edge_it = std::find_if(graph.edges.begin(), graph.edges.end(), [segment](const auto& id_edge) {
-      return id_edge.second.segment == segment;
-    });
+    auto edge_it = std::find_if(graph.edges.begin(), graph.edges.end(),
+                                [segment](const auto& id_edge) { return id_edge.second.segment == segment; });
     MALIPUT_THROW_UNLESS(edge_it != graph.edges.end());
     segments.insert(segment);
   }
