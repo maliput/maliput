@@ -69,6 +69,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <map>
