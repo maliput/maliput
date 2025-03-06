@@ -199,6 +199,10 @@ class RoadGeometry : public api::RoadGeometry {
     return inertial_to_backend_frame_translation_;
   }
 
+  std::string DoBackendCustomCommands(const std::string& commands) const override {
+    MALIPUT_THROW_MESSAGE("Method not implemented.");
+  }
+
   api::RoadGeometryId id_;
   double linear_tolerance_{};
   double angular_tolerance_{};

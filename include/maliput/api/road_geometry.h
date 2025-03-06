@@ -209,6 +209,18 @@ class RoadGeometry {
   /// @return maliput's Inertial Frame to Backend Frame translation vector.
   math::Vector3 inertial_to_backend_frame_translation() const;
 
+  /// Takes a custom command formatted as a string and returns a string to be parsed to extract the output.
+  ///
+  /// @param commands String containing the query for the backends to resolve, followed by the input paramters.
+  ///                 They should be formatted the following way:
+  ///                 `"<QueryForBackendsToResolve>,<param_1_name>:<param_1_value>,<param_2_name>:<param_2_value>,..."`.
+  /// @return A string with the command's output.
+  /// @throws maliput::assertion_error When the pointed backend hasn't implemented the API.
+  /// @throws maliput::assertion_error When the requested command can't be resolved.
+  std::string BackendCustomCommands(const std::string& commands) const {
+    return DoBackendCustomCommands(commands);
+  }
+
   // TODO(#400): Add RollPitchYaw inertial_to_backend_frame_rotation() const.
 
  protected:
@@ -247,6 +259,8 @@ class RoadGeometry {
                                                                double path_length_sampling_rate) const;
 
   virtual math::Vector3 do_inertial_to_backend_frame_translation() const = 0;
+
+  virtual std::string DoBackendCustomCommands(const std::string& commands) const = 0;
   ///@}
 };
 
