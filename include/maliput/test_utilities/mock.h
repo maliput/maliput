@@ -30,6 +30,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "maliput/api/intersection_book.h"
 #include "maliput/api/regions.h"
