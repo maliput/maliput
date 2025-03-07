@@ -74,6 +74,7 @@ class RoadGeometryMock final : public api::RoadGeometry {
   MOCK_METHOD(double, do_scale_length, (), (const));
   MOCK_METHOD(std::vector<api::InertialPosition>, DoSampleAheadWaypoints, (const api::LaneSRoute&, double), (const));
   MOCK_METHOD(math::Vector3, do_inertial_to_backend_frame_translation, (), (const));
+  MOCK_METHOD(std::string, DoBackendCustomCommand, (const std::string&), (const));
 };
 
 /// @brief Google mock api::Lane.

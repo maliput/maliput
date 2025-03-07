@@ -380,6 +380,7 @@ class MockRoadGeometry : public RoadGeometry {
   math::Vector3 do_inertial_to_backend_frame_translation() const override {
     return inertial_to_backend_frame_translation_;
   }
+  std::string DoBackendCustomCommand(const std::string& command) const override { return std::string(); }
 
   MockIdIndex mock_id_index_;
   RoadGeometryId id_;

@@ -80,6 +80,7 @@ class MockRoadGeometry : public RoadGeometry {
   MOCK_CONST_METHOD2(DoSampleAheadWaypoints,
                      std::vector<InertialPosition>(const LaneSRoute&, double path_length_sampling_rate));
   MOCK_CONST_METHOD0(do_inertial_to_backend_frame_translation, math::Vector3());
+  MOCK_CONST_METHOD1(DoBackendCustomCommand, std::string(const std::string& command));
 };
 
 // Test cases for LaneEndSet
