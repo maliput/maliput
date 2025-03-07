@@ -2,6 +2,12 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.0 (2025-03-07)
+------------------
+* Add maliput::api::RoadGeometry::BackendCustomCommand. (`#643 <https://github.com/maliput/maliput/issues/643>`_)
+* Extends bazel matrix for bcr_test_module. (`#642 <https://github.com/maliput/maliput/issues/642>`_)
+* Contributors: Franco Cipollone, Santiago Lopez
+
 1.3.1 (2024-10-26)
 ------------------
 * hash: include <cstdint> (`#640 <https://github.com/maliput/maliput/issues/640>`_)
