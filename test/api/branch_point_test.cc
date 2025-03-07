@@ -28,6 +28,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/api/branch_point.h"
 
+#include <string>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -80,6 +82,7 @@ class MockRoadGeometry : public RoadGeometry {
   MOCK_CONST_METHOD2(DoSampleAheadWaypoints,
                      std::vector<InertialPosition>(const LaneSRoute&, double path_length_sampling_rate));
   MOCK_CONST_METHOD0(do_inertial_to_backend_frame_translation, math::Vector3());
+  MOCK_CONST_METHOD1(DoBackendCustomCommand, std::string(const std::string& command));
 };
 
 // Test cases for LaneEndSet

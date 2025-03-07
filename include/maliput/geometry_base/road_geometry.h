@@ -30,6 +30,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -197,6 +198,10 @@ class RoadGeometry : public api::RoadGeometry {
 
   math::Vector3 do_inertial_to_backend_frame_translation() const override {
     return inertial_to_backend_frame_translation_;
+  }
+
+  std::string DoBackendCustomCommand(const std::string& command) const override {
+    MALIPUT_THROW_MESSAGE("Method not implemented.");
   }
 
   api::RoadGeometryId id_;
