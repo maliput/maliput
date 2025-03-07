@@ -209,11 +209,13 @@ class RoadGeometry {
   /// @return maliput's Inertial Frame to Backend Frame translation vector.
   math::Vector3 inertial_to_backend_frame_translation() const;
 
-  /// Takes a custom command formatted as a string and returns a string to be parsed to extract the output.
+  /// This method is meant to provide an extra feature for the backend implementation. The maliput::API is rigid with
+  /// respect to its API and the non-transparency with the backend implementation, so this method is a placeholder for
+  /// commands that the maliput backend might decide to implement to forward some other useful information that might be
+  /// needed by the user. Each backend that implements this method should provide detailed information about the
+  /// available commands and what's the format used for the input/output.Use with caution.
   ///
-  /// @param command String containing the query for the backends to resolve, followed by the input paramters.
-  ///                 They should be formatted the following way:
-  ///                 `"<QueryForBackendsToResolve>,<param_1_name>:<param_1_value>,<param_2_name>:<param_2_value>,..."`.
+  /// @param command String that contains a command that the maliput backend being used can parse.
   /// @return A string with the command's output.
   /// @throws maliput::assertion_error When the pointed backend hasn't implemented the API.
   /// @throws maliput::assertion_error When the requested command can't be resolved.
