@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.1 (2025-04-22)
+------------------
+* Bazel: Bumps eigen to 3.4.0.bcr.1.1 (`#646 <https://github.com/maliput/maliput/issues/646>`_)
+* Contributors: Franco Cipollone
+
 1.4.0 (2025-03-07)
 ------------------
 * Add maliput::api::RoadGeometry::BackendCustomCommand. (`#643 <https://github.com/maliput/maliput/issues/643>`_)
