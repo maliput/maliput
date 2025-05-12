@@ -91,6 +91,9 @@ class KDTreeStrategy final : public StrategyBase {
   // The region is an axis-aligned box with the point as center and the distance as half of the box's edge length.
   std::deque<const api::Lane*> ClosestLanes(const api::InertialPosition& point, double half_edge_length) const;
 
+  void RegisterPointAtSrh(double s, double r, double h, const api::Lane* lane,
+                          std::deque<KDTreeStrategy::MaliputPoint>& points);
+  void RegisterTransversalPointsAtS(double s, const api::Lane* lane, std::deque<KDTreeStrategy::MaliputPoint>& points);
   std::unique_ptr<math::KDTree3D<MaliputPoint>> kd_tree_;
 
   const double sampling_step_;
