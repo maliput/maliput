@@ -38,6 +38,23 @@
 namespace maliput {
 namespace geometry_base {
 
+void KDTreeStrategy::RegisterPointAtSrh(double s, double r, double h, const api::Lane* lane,
+                                        std::deque<KDTreeStrategy::MaliputPoint>& points) {
+  const auto inertial_pos = lane->ToInertialPosition({s, r, h}).xyz();
+  points.push_back(KDTreeStrategy::MaliputPoint{inertial_pos, lane});
+}
+
+void KDTreeStrategy::RegisterTransversalPointsAtS(double s, const api::Lane* lane,
+                                                  std::deque<KDTreeStrategy::MaliputPoint>& points) {
+  const auto lane_bounds = lane->lane_bounds(s);
+  for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += sampling_step_) {
+    RegisterPointAtSrh(s, r, 0. /* h */, lane, points);
+  }
+  // Add also at the lane bounds limit
+  RegisterPointAtSrh(s, lane_bounds.min(), 0. /* h */, lane, points);
+  RegisterPointAtSrh(s, lane_bounds.max(), 0. /* h */, lane, points);
+}
+
 KDTreeStrategy::KDTreeStrategy(const api::RoadGeometry* rg, const double sampling_step)
     : StrategyBase(rg), sampling_step_(sampling_step) {
   const auto lanes = get_road_geometry()->ById().GetLanes();
@@ -45,12 +62,10 @@ KDTreeStrategy::KDTreeStrategy(const api::RoadGeometry* rg, const double samplin
   for (const auto& lane : lanes) {
     const auto lane_length = lane.second->length();
     for (double s = 0; s <= lane_length; s += sampling_step_) {
-      const auto lane_bounds = lane.second->lane_bounds(s);
-      for (double r = lane_bounds.min(); r <= lane_bounds.max(); r += sampling_step_) {
-        const auto inertial_pos = lane.second->ToInertialPosition({s, r, 0. /* h */}).xyz();
-        points.push_back(MaliputPoint{{inertial_pos.x(), inertial_pos.y(), inertial_pos.z()}, lane.second});
-      }
+      RegisterTransversalPointsAtS(s, lane.second, points);
     }
+    // Add also at the lane length limit
+    RegisterTransversalPointsAtS(lane_length, lane.second, points);
   }
   kd_tree_ = std::make_unique<math::KDTree3D<MaliputPoint>>(std::move(points));
 }
