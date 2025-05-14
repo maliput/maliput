@@ -120,10 +120,15 @@ double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_
   const maliput::api::InertialPosition prev_pos_center = lane->ToInertialPosition({s0, 0., 0.});
   const maliput::api::InertialPosition prev_pos_left = lane->ToInertialPosition({s0, prev_lane_bounds.max(), 0.});
   const maliput::api::InertialPosition prev_pos_right = lane->ToInertialPosition({s0, prev_lane_bounds.min(), 0.});
+  const maliput::api::Rotation prev_pos_orientation = lane->GetOrientation({s0, 0., 0.});
 
   // Start from minimum step.
   double step_best = min_step;
 
+  // Tolerance used to check if step proposed is small enough.
+  // This is a fraction of the grid_unit and it was selected heuristically
+  // based on testing several maps with different lane's geometry definitions.
+  const double tolerance{grid_unit / 50.};
   while (true) {
     // Make step in travel_with_s direction.
     const double step_proposed = std::min(step_best * 2., length - s0);
@@ -135,16 +140,17 @@ double ComputeSampleStep(const maliput::api::Lane* lane, double s0, double grid_
         lane->ToInertialPosition({s_proposed, lane_bounds.max(), 0.});
     const maliput::api::InertialPosition proposed_pos_right_lane =
         lane->ToInertialPosition({s_proposed, lane_bounds.min(), 0.});
-
+    const maliput::api::Rotation proposed_pos_orientation = lane->GetOrientation({s_proposed, 0., 0.});
     // Calculate distance between geo positions for every lane.
     const double distance_from_center = (prev_pos_center.xyz() - proposed_pos_center_lane.xyz()).norm();
     const double distance_from_left = (prev_pos_left.xyz() - proposed_pos_left_lane.xyz()).norm();
     const double distance_from_right = (prev_pos_right.xyz() - proposed_pos_right_lane.xyz()).norm();
+    const double angle_distance = proposed_pos_orientation.Distance(prev_pos_orientation);
 
     // Check if distance between geo position and local path length ( delta s ) is small enough.
-    if (std::fabs(distance_from_center - step_proposed) > grid_unit ||
-        std::fabs(distance_from_left - step_proposed) > grid_unit ||
-        std::fabs(distance_from_right - step_proposed) > grid_unit) {
+    if (std::fabs(distance_from_center - step_proposed) > tolerance ||
+        std::fabs(distance_from_left - step_proposed) > tolerance ||
+        std::fabs(distance_from_right - step_proposed) > tolerance || std::fabs(angle_distance) > tolerance) {
       // Tolerance is violated, can't increase step.
       break;
     }
