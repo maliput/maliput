@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.2 (2025-05-14)
+------------------
+* Improve ComputeSampleStep impl in obj optimized generation. (`#648 <https://github.com/maliput/maliput/issues/648>`_)
+* Contributors: Franco Cipollone
+
 1.4.1 (2025-04-22)
 ------------------
 * Bazel: Bumps eigen to 3.4.0.bcr.1.1 (`#646 <https://github.com/maliput/maliput/issues/646>`_)
