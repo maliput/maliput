@@ -2,6 +2,12 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.0 (2025-05-21)
+------------------
+* KdTree Strategy: Register points at boundaries (`#651 <https://github.com/maliput/maliput/issues/651>`_)
+* BCR: Add a maintainer (`#650 <https://github.com/maliput/maliput/issues/650>`_)
+* Contributors: Franco Cipollone
+
 1.4.2 (2025-05-14)
 ------------------
 * Improve ComputeSampleStep impl in obj optimized generation. (`#648 <https://github.com/maliput/maliput/issues/648>`_)
