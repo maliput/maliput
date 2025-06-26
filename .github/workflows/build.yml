@@ -35,11 +35,13 @@ jobs:
     name: Compile and Test (CMake)
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:20.04
+      image: ghcr.io/maliput/ci_foxy_image:latest
+      credentials:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v4
-    - uses: ros-tooling/setup-ros@v0.6
-    - uses: ros-tooling/action-ros-ci@v0.3
+    - uses: ros-tooling/action-ros-ci@v0.4
       id: action_ros_ci_step
       with:
         package-name: ${{ env.PACKAGE_NAME }}

@@ -22,7 +22,10 @@ jobs:
     name: Compile and test with sanitizer
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:20.04
+      image: ghcr.io/maliput/ci_foxy_image:latest
+      credentials:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix:
         sanitizer: [none, asan, ubsan, tsan]
@@ -43,10 +46,6 @@ jobs:
     - uses: actions/checkout@v4
       with:
         path: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
-    # use setup-ros action to get vcs, rosdep, and colcon
-    - uses: ros-tooling/setup-ros@v0.6
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     - name: clang 8 install
       shell: bash
       run: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}/.github/clang_suite_installation.sh
