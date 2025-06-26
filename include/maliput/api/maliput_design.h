@@ -184,9 +184,9 @@
 /// Road designers may also be more familiar by how these transitions are built. Typically,
 /// CAD tooling offer control points to adjust curve and surface smoothness. One can associante
 /// the number of control points with the continuity constraint degree as:
-///   * One control point alignment f$ \to G^0 @f$, controls continuity.
-///   * Two control points alignment f$ \to G^1 @f$, control tangent.
-///   * Three control point alignment f$ \to G^2 @f$, control curvature.
+///   * One control point alignment @f$ \to G^0 @f$, controls continuity.
+///   * Two control points alignment @f$ \to G^1 @f$, control tangent.
+///   * Three control point alignment @f$ \to G^2 @f$, control curvature.
 ///
 /// @subsubsection scale_length_and_tolerances Scale Length and Tolerances
 ///
@@ -665,7 +665,7 @@
 /// between all three as required.)
 ///
 /// @anchor road-rulebook-outline_img
-/// @image html road-rulebook-outline.svg "`RoadRulebook` outline."
+/// @image html road-rulebook-outline.svg "RoadRulebook outline. (Important: This schema refers to the old rule api which will be deprecated)"
 ///
 /// There are two rule APIs. One that is based on static types which is
 /// deprecated, and the other one which relies on just two C++ distinct types
@@ -757,7 +757,7 @@
 /// > Note: regions are attributes of new and old rule descriptions. They define
 /// > the applicability space of each rule.
 ///
-/// @subsubsection roadrulebook_queries Queries to the `RoadRulebook`
+/// @subsubsection roadrulebook_queries Queries to the RoadRulebook
 ///
 /// The `RoadRulebook` API allows to query the collection of rules by:
 ///  * No restriction: can retrieve all rules.
@@ -1176,7 +1176,7 @@
 ///    * *Should this should be merged with `DirectionUsageRule`, because
 ///      lane usage/direction might be specified per vehicle type?*
 ///
-/// @subsection phase_dynamics `Phase` dynamics: how to handle the rule state changes
+/// @subsection phase_dynamics Phase dynamics: how to handle the rule state changes
 ///
 /// As explained before, rule state dynamics are complex enough to be modeled
 /// within the very same `Rule` type. Also, the `RoadRulebook` falls short to
@@ -1206,7 +1206,7 @@
 /// implemented for this interface. Similarly to the rules, there are convenient
 /// "manual" implementations to exercise the interfaces in integration examples.
 ///
-/// @subsection traffic_lights `TafficLight` modelling and databases
+/// @subsection traffic_lights TafficLight modelling and databases
 ///
 /// Traffic lights physically come in various shapes and configurations. With a
 /// set of bulbs (from now on `BulbGroups` and `Bulbs`) that are semantically
@@ -1235,7 +1235,7 @@
 /// which offers queries by `TrafficLight::Id` and to retrieve all
 /// `TrafficLights`.
 ///
-/// @subsection intersections_aggregation `Intersections` to aggregate multiple related entities
+/// @subsection intersections_aggregation Intersections to aggregate multiple related entities
 ///
 /// The inherent complexity of the rule dynamics require multiple interfaces and
 /// and concrete implementations to be setup in favor of describing the traffic

@@ -31,6 +31,7 @@
 /// @file maliput_plugin_architecture.h
 /// @page maliput_plugin_architecture Maliput Plugin Architecture
 /// @date October 7, 2021
+/// @author Franco Cipollone
 /// @tableofcontents
 ///
 /// @section maliput_plugin_architecture_section Maliput Plugin Architecture
