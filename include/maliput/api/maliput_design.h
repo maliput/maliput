@@ -665,7 +665,8 @@
 /// between all three as required.)
 ///
 /// @anchor road-rulebook-outline_img
-/// @image html road-rulebook-outline.svg "RoadRulebook outline. (Important: This schema refers to the old rule api which will be deprecated)"
+/// @image html road-rulebook-outline.svg "RoadRulebook outline. (Important: This schema refers to the old rule api
+/// which will be deprecated)"
 ///
 /// There are two rule APIs. One that is based on static types which is
 /// deprecated, and the other one which relies on just two C++ distinct types
