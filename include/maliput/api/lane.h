@@ -121,11 +121,18 @@ class Lane {
   /// `lane_bounds(s)`.
   HBounds elevation_bounds(double s, double r) const;
 
-  /// Returns the InertialPosition corresponding to the given LanePosition.
+  /// Returns the `maliput::api::InertialPosition` corresponding to the given `maliput::api::LanePosition`.
+  ///
+  /// Note there is no constraint for the `r` coordinate, as it can be outside the lane boundaries.
+  /// In that scenario, the resultant inertial position represents a point in the `s-r` plane at the given `s` and `h`
+  /// coordinates. It's on the user side to verify, if needed, that the lane position is within lane boundaries.
   ///
   /// @pre The s component of @p lane_pos must be in domain [0, Lane::length()].
-  /// @pre The r component of @p lane_pos must be in domain [Rmin, Rmax]
-  ///      derived from Lane::segment_bounds().
+  ///
+  /// @param lane_pos A `maliput::api::LanePosition`.
+  /// Although the s component must be in domain [0, Lane::length()], the r component can be outside the lane's RBounds,
+  /// so that the position is on the s-r plane.
+  /// @returns An `InertialPosition` for the given `lane_pos`.
   InertialPosition ToInertialPosition(const LanePosition& lane_pos) const;
 
   /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
