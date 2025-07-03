@@ -123,9 +123,10 @@ class Lane {
 
   /// Returns the InertialPosition corresponding to the given LanePosition.
   ///
+  /// Although the s component must be in domain [0, Lane::length()], the r component can be outside the lane's RBounds,
+  /// so that the position is on the s-r plane.
+  ///
   /// @pre The s component of @p lane_pos must be in domain [0, Lane::length()].
-  /// @pre The r component of @p lane_pos must be in domain [Rmin, Rmax]
-  ///      derived from Lane::segment_bounds().
   InertialPosition ToInertialPosition(const LanePosition& lane_pos) const;
 
   /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
