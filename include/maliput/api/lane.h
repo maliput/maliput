@@ -124,10 +124,10 @@ class Lane {
   /// Returns the `maliput::api::InertialPosition` corresponding to the given `maliput::api::LanePosition`.
   ///
   /// Note there is no constraint for the `r` coordinate, as it can be outside the lane boundaries.
-  /// In that scenario, the resultant inertial position represents a point in the `s-r` plane at the given `s` and `h` coordinates.
-  /// It's on the user side to verify, if needed, that the lane position is within lane boundaries.
+  /// In that scenario, the resultant inertial position represents a point in the `s-r` plane at the given `s` and `h`
+  /// coordinates. It's on the user side to verify, if needed, that the lane position is within lane boundaries.
   ///
-  /// @pre The s component of @p lane_pos must be in domain [0, Lane::length()].  
+  /// @pre The s component of @p lane_pos must be in domain [0, Lane::length()].
   ///
   /// @param lane_pos A `maliput::api::LanePosition`.
   /// Although the s component must be in domain [0, Lane::length()], the r component can be outside the lane's RBounds,
