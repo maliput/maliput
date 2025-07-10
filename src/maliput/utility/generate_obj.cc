@@ -668,9 +668,7 @@ void RenderSegment(const api::Segment* segment, const ObjFeatures& features, Geo
   }
   const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
   const double base_grid_unit =
-      features.off_grid_mesh_generation
-          ? linear_tolerance
-          : PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
+      PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
   {
     // Lane 0 should be as good as any other for segment-bounds.
     GeoMesh segment_mesh;
@@ -799,9 +797,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
   const api::Segment* segment = lane->segment();
   const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
   const double base_grid_unit =
-      features.off_grid_mesh_generation
-          ? linear_tolerance
-          : PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
+      PickGridUnit(lane, features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
 
   switch (mesh_material) {
     case MaterialType::Asphalt:
@@ -907,9 +903,7 @@ std::pair<mesh::GeoMesh, Material> BuildMesh(const api::RoadGeometry* rg, const 
   const api::Segment* segment = road_index.GetSegment(segment_id);
   const double linear_tolerance = segment->junction()->road_geometry()->linear_tolerance();
   const double base_grid_unit =
-      features.off_grid_mesh_generation
-          ? linear_tolerance
-          : PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
+      PickGridUnit(segment->lane(0), features.max_grid_unit, features.min_grid_resolution, linear_tolerance);
 
   GeoMesh segment_mesh;
   // clang-format off
