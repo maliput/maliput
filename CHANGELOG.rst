@@ -2,6 +2,14 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.1 (2025-07-15)
+------------------
+* Always use PickGridUnit. (`#658 <https://github.com/maliput/maliput/issues/658>`_)
+* Improve documentation about the LanePosition influence in the Lane::ToInertialPosition method. (`#656 <https://github.com/maliput/maliput/issues/656>`_)
+* Fixes maliput_design doc. (`#654 <https://github.com/maliput/maliput/issues/654>`_)
+* Fixes CI workflow. (`#653 <https://github.com/maliput/maliput/issues/653>`_)
+* Contributors: Franco Cipollone, Santiago Lopez
+
 1.5.0 (2025-05-21)
 ------------------
 * KdTree Strategy: Register points at boundaries (`#651 <https://github.com/maliput/maliput/issues/651>`_)
