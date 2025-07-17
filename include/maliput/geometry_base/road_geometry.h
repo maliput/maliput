@@ -162,6 +162,17 @@ class RoadGeometry : public api::RoadGeometry {
     strategy_ = std::make_unique<StrategyT>(this, std::forward<Args>(args)...);
   }
 
+  /// Returns the Geo Reference info of this RoadGeometry.
+  ///
+  /// The returned info will contain at most one of the projections described in
+  /// https://proj.org/en/stable/operations/projections/index.html under the "data" key.
+  /// Other key values may be present as well to complement the projection's values.
+  ///
+  /// @returns A map containing the Geo Reference projection, if any.
+  std::map<std::string, std::string> GeoReferenceInfo() const {
+    return std::map<std::string, std::string>();
+  }
+
   ~RoadGeometry() override = default;
 
  private:
