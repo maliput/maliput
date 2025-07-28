@@ -29,6 +29,10 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/test_utilities/mock_geometry.h"
 
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
 
@@ -43,6 +47,11 @@ api::RoadPositionResult MockRoadGeometry::DoToRoadPosition(const api::InertialPo
 }
 
 std::vector<api::RoadPositionResult> MockRoadGeometry::DoFindRoadPositions(const api::InertialPosition&, double) const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+std::string MockRoadGeometry::DoGeoReferenceInfo() const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }

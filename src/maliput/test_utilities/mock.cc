@@ -103,7 +103,8 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   double do_angular_tolerance() const override { return 0; }
   double do_scale_length() const override { return 0; }
   math::Vector3 do_inertial_to_backend_frame_translation() const override { return math::Vector3{0., 0., 0.}; }
-  std::string DoBackendCustomCommand(const std::string& command) const override { return std::string(); }
+  std::string DoBackendCustomCommand(const std::string& command) const override { return {}; }
+  std::string DoGeoReferenceInfo() const override { return {}; }
 
   MockOneLaneIdIndex mock_id_index_;
 };

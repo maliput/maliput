@@ -204,7 +204,7 @@ class RoadGeometry : public api::RoadGeometry {
     MALIPUT_THROW_MESSAGE("Method not implemented.");
   }
 
-  std::string DoGeoReferenceInfo() const override { return std::string(); }
+  std::string DoGeoReferenceInfo() const override { return {}; }
 
   api::RoadGeometryId id_;
   double linear_tolerance_{};

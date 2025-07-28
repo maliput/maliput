@@ -30,6 +30,8 @@
 #pragma once
 
 #include <optional>
+#include <string>
+#include <vector>
 
 #include "maliput/api/lane_data.h"
 #include "maliput/common/maliput_copyable.h"
@@ -90,6 +92,8 @@ class MockRoadGeometry : public geometry_base::RoadGeometry {
 
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                            double radius) const override;
+
+  std::string DoGeoReferenceInfo() const override;
 };
 
 /// Mock api::BranchPoint implementation; see mock_geometry.h.
