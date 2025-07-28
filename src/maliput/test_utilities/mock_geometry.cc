@@ -29,10 +29,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/test_utilities/mock_geometry.h"
 
-#include <optional>
-#include <string>
-#include <vector>
-
 #include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
 
