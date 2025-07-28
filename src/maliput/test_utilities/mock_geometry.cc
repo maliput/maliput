@@ -47,6 +47,11 @@ std::vector<api::RoadPositionResult> MockRoadGeometry::DoFindRoadPositions(const
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
+std::string MockRoadGeometry::DoGeoReferenceInfo() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
 double MockLane::do_length() const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");

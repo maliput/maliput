@@ -221,6 +221,11 @@ class RoadGeometry {
   /// @throws maliput::assertion_error When the requested command can't be resolved.
   std::string BackendCustomCommand(const std::string& command) const { return DoBackendCustomCommand(command); }
 
+  /// Returns the Geo Reference info of this RoadGeometry.
+  ///
+  /// @returns A string containing the Geo Reference projection, if any.
+  std::string GeoReferenceInfo() const { return DoGeoReferenceInfo(); }
+
   // TODO(#400): Add RollPitchYaw inertial_to_backend_frame_rotation() const.
 
  protected:
@@ -261,6 +266,8 @@ class RoadGeometry {
   virtual math::Vector3 do_inertial_to_backend_frame_translation() const = 0;
 
   virtual std::string DoBackendCustomCommand(const std::string& command) const = 0;
+
+  virtual std::string DoGeoReferenceInfo() const = 0;
   ///@}
 };
 

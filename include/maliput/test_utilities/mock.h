@@ -31,6 +31,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "maliput/api/intersection_book.h"
 #include "maliput/api/regions.h"
@@ -381,7 +382,8 @@ class MockRoadGeometry : public RoadGeometry {
   math::Vector3 do_inertial_to_backend_frame_translation() const override {
     return inertial_to_backend_frame_translation_;
   }
-  std::string DoBackendCustomCommand(const std::string& command) const override { return std::string(); }
+  std::string DoBackendCustomCommand(const std::string& command) const override { return {}; }
+  std::string DoGeoReferenceInfo() const override { return {}; }
 
   MockIdIndex mock_id_index_;
   RoadGeometryId id_;

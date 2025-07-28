@@ -29,6 +29,7 @@
 #include "maliput/api/branch_point.h"
 
 #include <string>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -83,6 +84,7 @@ class MockRoadGeometry : public RoadGeometry {
                      std::vector<InertialPosition>(const LaneSRoute&, double path_length_sampling_rate));
   MOCK_CONST_METHOD0(do_inertial_to_backend_frame_translation, math::Vector3());
   MOCK_CONST_METHOD1(DoBackendCustomCommand, std::string(const std::string& command));
+  MOCK_CONST_METHOD0(DoGeoReferenceInfo, std::string());
 };
 
 // Test cases for LaneEndSet
