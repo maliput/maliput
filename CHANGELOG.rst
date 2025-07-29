@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.6.0 (2025-07-29)
+------------------
+* Create API to obtain Geo Reference info. (`#661 <https://github.com/maliput/maliput/issues/661>`_)
+* Contributors: Santiago Lopez
+
 1.5.1 (2025-07-15)
 ------------------
 * Always use PickGridUnit. (`#658 <https://github.com/maliput/maliput/issues/658>`_)
