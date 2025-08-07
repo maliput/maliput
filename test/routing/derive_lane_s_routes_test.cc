@@ -35,7 +35,7 @@
 
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
-#include "maliput/common/assertion_error.h"
+#include "maliput/common/maliput_error.h"
 #include "road_network_mocks.h"
 
 namespace maliput {

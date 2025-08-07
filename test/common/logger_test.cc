@@ -33,7 +33,7 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/common/assertion_error.h"
+#include "maliput/common/maliput_error.h"
 #include "maliput/math/vector.h"
 
 namespace maliput {

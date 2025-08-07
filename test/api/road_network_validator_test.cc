@@ -38,7 +38,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
-#include "maliput/common/assertion_error.h"
+#include "maliput/common/maliput_error.h"
 #include "maliput/common/maliput_throw.h"
 #include "maliput/test_utilities/mock.h"
 
