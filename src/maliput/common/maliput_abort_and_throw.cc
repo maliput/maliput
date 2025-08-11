@@ -114,6 +114,20 @@ void Throw(const char* condition, const char* func, const char* file, int line) 
   throw assertion_error(what.str().c_str());
 }
 
+// Declared in maliput_throw.h.
+void ThrowRoadNetworkDescriptionParser(const char* condition, const char* func, const char* file, int line) {
+  std::ostringstream what;
+  PrintFailureDetailTo(&what, condition, func, file, line);
+  throw road_network_description_parser_error(what.str().c_str());
+}
+
+// Declared in maliput_throw.h.
+void ThrowRoadGeometryConstruction(const char* condition, const char* func, const char* file, int line) {
+  std::ostringstream what;
+  PrintFailureDetailTo(&what, condition, func, file, line);
+  throw road_geometry_construction_error(what.str().c_str());
+}
+
 }  // namespace internal
 }  // namespace common
 }  // namespace maliput
