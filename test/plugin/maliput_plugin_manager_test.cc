@@ -39,8 +39,8 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/common/maliput_error.h"
 #include "maliput/common/filesystem.h"
+#include "maliput/common/maliput_error.h"
 
 namespace maliput {
 namespace plugin {

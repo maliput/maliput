@@ -82,16 +82,16 @@ class assertion_error : public std::runtime_error {
 
 /// Errors while parsing the road network description.
 class road_network_description_parser_error : public std::runtime_error {
-  public:
+ public:
   /// Constructs a road_network_descrption_parser_error with @p what_arg as description.
   explicit road_network_description_parser_error(const std::string& what_arg) : std::runtime_error(what_arg) {}
 };
 
 /// Errors while building the Road Geometry.
 class road_geometry_construction_error : public std::runtime_error {
-  public:
+ public:
   /// Constructs a road_geometry_construction_error with @p what_arg as description.
-  explicit road_geometry_construction_error (const std::string& what_arg) : std::runtime_error(what_arg) {}
+  explicit road_geometry_construction_error(const std::string& what_arg) : std::runtime_error(what_arg) {}
 };
 
 }  // namespace common

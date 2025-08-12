@@ -119,10 +119,11 @@ void ThrowRoadGeometryConstruction(const char* condition, const char* func, cons
 
 /// Throws a road_network_description_parser_error with a message showing at
 /// least the condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_MESSAGE(msg)                                                       \
-  do {                                                                                                                   \
-    const std::string error_message(msg);                                                                                \
-    ::maliput::common::internal::ThrowRoadNetworkDescriptionParser(error_message.c_str(), __func__, __FILE__, __LINE__); \
+#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_MESSAGE(msg)                                            \
+  do {                                                                                                        \
+    const std::string error_message(msg);                                                                     \
+    ::maliput::common::internal::ThrowRoadNetworkDescriptionParser(error_message.c_str(), __func__, __FILE__, \
+                                                                   __LINE__);                                 \
   } while (0)
 
 /// Evaluates @p condition and iff the value is false will throw a

@@ -32,8 +32,8 @@
 
 #include <gtest/gtest.h>
 
-#include "maliput/common/maliput_error.h"
 #include "maliput/common/maliput_copyable.h"
+#include "maliput/common/maliput_error.h"
 #include "maliput/math/axis_aligned_box.h"
 #include "maliput/math/vector.h"
 
