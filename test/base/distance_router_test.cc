@@ -36,7 +36,7 @@
 #include "maliput/api/lane_data.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/road_network.h"
-#include "maliput/common/maliput_error.h"
+#include "maliput/common/error.h"
 #include "maliput/routing/phase.h"
 #include "maliput/routing/route.h"
 #include "maliput/routing/routing_constraints.h"

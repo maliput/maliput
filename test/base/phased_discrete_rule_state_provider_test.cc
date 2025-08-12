@@ -43,7 +43,7 @@
 #include "maliput/base/manual_phase_ring_book.h"
 #include "maliput/base/manual_rulebook.h"
 #include "maliput/base/rule_registry.h"
-#include "maliput/common/maliput_error.h"
+#include "maliput/common/error.h"
 #include "maliput/test_utilities/mock.h"
 
 namespace maliput {

@@ -40,7 +40,7 @@
 #include "maliput/api/compare.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
-#include "maliput/common/maliput_error.h"
+#include "maliput/common/error.h"
 #include "maliput/routing/compare.h"
 #include "maliput/routing/lane_s_range_relation.h"
 #include "maliput/routing/phase.h"
