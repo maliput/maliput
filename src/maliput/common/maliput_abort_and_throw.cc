@@ -70,8 +70,8 @@
 #include <sstream>
 #include <string>
 
-#include "maliput/common/maliput_abort.h"
 #include "maliput/common/error.h"
+#include "maliput/common/maliput_abort.h"
 #include "maliput/common/maliput_throw.h"
 
 namespace maliput {
