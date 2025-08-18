@@ -79,7 +79,6 @@ class maliput_error : public std::runtime_error {
   explicit maliput_error(const std::string& what_arg) : std::runtime_error(what_arg) {}
 };
 
-/// This is what MALIPUT_THROW_UNLESS throws.
 // TODO(Santoi): we may want to deprecate this error in the future in favor of more specific errors.
 class assertion_error : public maliput_error {
  public:
