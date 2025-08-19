@@ -38,7 +38,7 @@
 #include "maliput/api/compare.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
-#include "maliput/common/assertion_error.h"
+#include "maliput/common/error.h"
 #include "maliput/routing/compare.h"
 #include "road_network_mocks.h"
 

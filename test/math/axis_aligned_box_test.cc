@@ -32,7 +32,7 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-#include <maliput/common/assertion_error.h>
+#include <maliput/common/error.h>
 
 #include "maliput/math/overlapping_type.h"
 

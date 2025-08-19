@@ -38,7 +38,7 @@
 #include "maliput/api/rules/direction_usage_rule.h"
 #include "maliput/api/rules/right_of_way_rule.h"
 #include "maliput/api/rules/speed_limit_rule.h"
-#include "maliput/common/assertion_error.h"
+#include "maliput/common/error.h"
 #include "maliput/test_utilities/mock.h"
 
 namespace maliput {

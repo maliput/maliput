@@ -34,7 +34,7 @@
 #include "assert_compare.h"
 #include "maliput/api/compare.h"
 #include "maliput/api/rules/compare.h"
-#include "maliput/common/assertion_error.h"
+#include "maliput/common/error.h"
 #include "maliput/test_utilities/mock.h"
 
 namespace maliput {

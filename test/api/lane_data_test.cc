@@ -33,8 +33,8 @@
 
 #include "assert_compare.h"
 #include "maliput/api/compare.h"
-#include "maliput/common/assertion_error.h"
 #include "maliput/common/compare.h"
+#include "maliput/common/error.h"
 #include "maliput/math/compare.h"
 #include "maliput/math/matrix.h"
 #include "maliput/math/quaternion.h"

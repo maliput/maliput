@@ -35,7 +35,7 @@
 
 #include "maliput/api/branch_point.h"
 #include "maliput/api/segment.h"
-#include "maliput/common/assertion_error.h"
+#include "maliput/common/error.h"
 #include "road_network_mocks.h"
 
 namespace maliput {

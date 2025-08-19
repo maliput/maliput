@@ -38,7 +38,7 @@
 #include "maliput/api/compare.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/compare.h"
-#include "maliput/common/assertion_error.h"
+#include "maliput/common/error.h"
 
 namespace maliput {
 namespace api {

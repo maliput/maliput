@@ -77,6 +77,14 @@ namespace internal {
 __attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
 void Throw(const char* condition, const char* func, const char* file, int line);
 
+// Throws a road_network_description_parser_error.
+__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
+void ThrowRoadNetworkDescriptionParser(const char* condition, const char* func, const char* file, int line);
+
+// Throws a road_geometry_construction_error.
+__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
+void ThrowRoadGeometryConstruction(const char* condition, const char* func, const char* file, int line);
+
 }  // namespace internal
 }  // namespace common
 }  // namespace maliput
@@ -97,6 +105,43 @@ void Throw(const char* condition, const char* func, const char* file, int line);
   do {                                                                                       \
     const std::string error_message(msg);                                                    \
     ::maliput::common::internal::Throw(error_message.c_str(), __func__, __FILE__, __LINE__); \
+  } while (0)
+
+/// Evaluates @p condition and iff the value is false will throw a
+/// road_network_description_parser_error with a message showing at least the
+/// condition text, function name, file, and line.
+#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_UNLESS(condition)                                         \
+  do {                                                                                                          \
+    if (!(condition)) {                                                                                         \
+      ::maliput::common::internal::ThrowRoadNetworkDescriptionParser(#condition, __func__, __FILE__, __LINE__); \
+    }                                                                                                           \
+  } while (0)
+
+/// Throws a road_network_description_parser_error with a message showing at
+/// least the condition text, function name, file, and line.
+#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_MESSAGE(msg)                                            \
+  do {                                                                                                        \
+    const std::string error_message(msg);                                                                     \
+    ::maliput::common::internal::ThrowRoadNetworkDescriptionParser(error_message.c_str(), __func__, __FILE__, \
+                                                                   __LINE__);                                 \
+  } while (0)
+
+/// Evaluates @p condition and iff the value is false will throw a
+/// road_geometry_construction_error with a message showing at least the
+/// condition text, function name, file, and line.
+#define MALIPUT_THROW_ROAD_GEOMETRY_CONSTRUCTION_UNLESS(condition)                                          \
+  do {                                                                                                      \
+    if (!(condition)) {                                                                                     \
+      ::maliput::common::internal::ThrowRoadGeometryConstruction(#condition, __func__, __FILE__, __LINE__); \
+    }                                                                                                       \
+  } while (0)
+
+/// Throws a road_geometry_construction_error with a message showing at
+/// least the condition text, function name, file, and line.
+#define MALIPUT_THROW_ROAD_GEOMETRY_CONSTRUCTION_MESSAGE(msg)                                                        \
+  do {                                                                                                               \
+    const std::string error_message(msg);                                                                            \
+    ::maliput::common::internal::ThrowRoadGeometryConstruction(error_message.c_str(), __func__, __FILE__, __LINE__); \
   } while (0)
 
 /// @def MALIPUT_VALIDATE
