@@ -65,14 +65,10 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cstdlib>
+#include "maliput/common/maliput_abort.h"
+
 #include <iostream>
 #include <sstream>
-#include <string>
-
-#include "maliput/common/error.h"
-#include "maliput/common/maliput_abort.h"
-#include "maliput/common/maliput_throw.h"
 
 namespace maliput {
 namespace common {
@@ -91,7 +87,6 @@ void PrintFailureDetailTo(std::ostream* out, const char* condition, const char* 
 
 }  // namespace
 
-// Declared in maliput_abort.h.
 void Abort(const char* condition, const char* func, const char* file, int line) {
   std::cerr << "abort: ";
   PrintFailureDetailTo(&std::cerr, condition, func, file, line);
@@ -99,33 +94,11 @@ void Abort(const char* condition, const char* func, const char* file, int line) 
   std::abort();
 }
 
-// Declared in maliput_abort.h.
 void Abort(const char* condition, const char* func, const char* file, int line, const char* extra_details) {
   std::cerr << "abort: ";
   PrintFailureDetailTo(&std::cerr, condition, func, file, line);
   std::cerr << " Details: " << extra_details << std::endl;
   std::abort();
-}
-
-// Declared in maliput_throw.h.
-void Throw(const char* condition, const char* func, const char* file, int line) {
-  std::ostringstream what;
-  PrintFailureDetailTo(&what, condition, func, file, line);
-  throw assertion_error(what.str().c_str());
-}
-
-// Declared in maliput_throw.h.
-void ThrowRoadNetworkDescriptionParser(const char* condition, const char* func, const char* file, int line) {
-  std::ostringstream what;
-  PrintFailureDetailTo(&what, condition, func, file, line);
-  throw road_network_description_parser_error(what.str().c_str());
-}
-
-// Declared in maliput_throw.h.
-void ThrowRoadGeometryConstruction(const char* condition, const char* func, const char* file, int line) {
-  std::ostringstream what;
-  PrintFailureDetailTo(&what, condition, func, file, line);
-  throw road_geometry_construction_error(what.str().c_str());
 }
 
 }  // namespace internal

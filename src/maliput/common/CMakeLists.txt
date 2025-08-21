@@ -5,7 +5,7 @@
 set(COMMON_SOURCES
   filesystem.cc
   logger.cc
-  maliput_abort_and_throw.cc
+  maliput_abort.cc
   range_validator.cc
 )
 

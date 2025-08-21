@@ -67,23 +67,37 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <sstream>
 #include <string>
+
+#include "maliput/common/error.h"
 
 namespace maliput {
 namespace common {
 namespace internal {
+namespace {
+
+// Stream into @p out the given failure details; only @p condition may be null.
+inline void PrintFailureDetailTo(std::ostream* out, const char* condition, const char* func, const char* file,
+                                 int line) {
+  (*out) << "Failure at " << file << ":" << line << " in " << func << "()";
+  if (condition && (std::string(condition).length() > 0)) {
+    (*out) << ": condition '" << condition << "' failed.";
+  } else {
+    (*out) << ".";
+  }
+}
+
+}  // namespace
 
 // Throw an error message.
+template <typename ExceptionType>
 __attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
-void Throw(const char* condition, const char* func, const char* file, int line);
-
-// Throws a road_network_description_parser_error.
-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
-void ThrowRoadNetworkDescriptionParser(const char* condition, const char* func, const char* file, int line);
-
-// Throws a road_geometry_construction_error.
-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
-void ThrowRoadGeometryConstruction(const char* condition, const char* func, const char* file, int line);
+void Throw(const char* condition, const char* func, const char* file, int line) {
+  std::ostringstream what;
+  PrintFailureDetailTo(&what, condition, func, file, line);
+  throw ExceptionType(what.str());
+}
 
 }  // namespace internal
 }  // namespace common
@@ -92,66 +106,71 @@ void ThrowRoadGeometryConstruction(const char* condition, const char* func, cons
 /// Evaluates @p condition and iff the value is false will throw an exception
 /// with a message showing at least the condition text, function name, file,
 /// and line.
-#define MALIPUT_THROW_UNLESS(condition)                                             \
-  do {                                                                              \
-    if (!(condition)) {                                                             \
-      ::maliput::common::internal::Throw(#condition, __func__, __FILE__, __LINE__); \
-    }                                                                               \
+#define MALIPUT_THROW_UNLESS(condition)                                                                               \
+  do {                                                                                                                \
+    if (!(condition)) {                                                                                               \
+      ::maliput::common::internal::Throw<maliput::common::assertion_error>(#condition, __func__, __FILE__, __LINE__); \
+    }                                                                                                                 \
   } while (0)
 
 /// Throws an exception with a message showing at least the condition text,
 /// function name, file, and line.
-#define MALIPUT_THROW_MESSAGE(msg)                                                           \
-  do {                                                                                       \
-    const std::string error_message(msg);                                                    \
-    ::maliput::common::internal::Throw(error_message.c_str(), __func__, __FILE__, __LINE__); \
+#define MALIPUT_THROW_MESSAGE(msg)                                                                                  \
+  do {                                                                                                              \
+    const std::string error_message(msg);                                                                           \
+    ::maliput::common::internal::Throw<maliput::common::assertion_error>(error_message.c_str(), __func__, __FILE__, \
+                                                                         __LINE__);                                 \
   } while (0)
 
 /// Evaluates @p condition and iff the value is false will throw a
 /// road_network_description_parser_error with a message showing at least the
 /// condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_UNLESS(condition)                                         \
-  do {                                                                                                          \
-    if (!(condition)) {                                                                                         \
-      ::maliput::common::internal::ThrowRoadNetworkDescriptionParser(#condition, __func__, __FILE__, __LINE__); \
-    }                                                                                                           \
+#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_UNLESS(condition)                                                \
+  do {                                                                                                                 \
+    if (!(condition)) {                                                                                                \
+      ::maliput::common::internal::Throw<maliput::common::road_network_description_parser_error>(#condition, __func__, \
+                                                                                                 __FILE__, __LINE__);  \
+    }                                                                                                                  \
   } while (0)
 
 /// Throws a road_network_description_parser_error with a message showing at
 /// least the condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_MESSAGE(msg)                                            \
-  do {                                                                                                        \
-    const std::string error_message(msg);                                                                     \
-    ::maliput::common::internal::ThrowRoadNetworkDescriptionParser(error_message.c_str(), __func__, __FILE__, \
-                                                                   __LINE__);                                 \
+#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_MESSAGE(msg)                              \
+  do {                                                                                          \
+    const std::string error_message(msg);                                                       \
+    ::maliput::common::internal::Throw<maliput::common::road_network_description_parser_error>( \
+        error_message.c_str(), __func__, __FILE__, __LINE__);                                   \
   } while (0)
 
 /// Evaluates @p condition and iff the value is false will throw a
 /// road_geometry_construction_error with a message showing at least the
 /// condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_GEOMETRY_CONSTRUCTION_UNLESS(condition)                                          \
-  do {                                                                                                      \
-    if (!(condition)) {                                                                                     \
-      ::maliput::common::internal::ThrowRoadGeometryConstruction(#condition, __func__, __FILE__, __LINE__); \
-    }                                                                                                       \
+#define MALIPUT_THROW_ROAD_GEOMETRY_CONSTRUCTION_UNLESS(condition)                                                \
+  do {                                                                                                            \
+    if (!(condition)) {                                                                                           \
+      ::maliput::common::internal::Throw<maliput::common::road_geometry_construction_error>(#condition, __func__, \
+                                                                                            __FILE__, __LINE__);  \
+    }                                                                                                             \
   } while (0)
 
 /// Throws a road_geometry_construction_error with a message showing at
 /// least the condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_GEOMETRY_CONSTRUCTION_MESSAGE(msg)                                                        \
-  do {                                                                                                               \
-    const std::string error_message(msg);                                                                            \
-    ::maliput::common::internal::ThrowRoadGeometryConstruction(error_message.c_str(), __func__, __FILE__, __LINE__); \
+#define MALIPUT_THROW_ROAD_GEOMETRY_CONSTRUCTION_MESSAGE(msg)                              \
+  do {                                                                                     \
+    const std::string error_message(msg);                                                  \
+    ::maliput::common::internal::Throw<maliput::common::road_geometry_construction_error>( \
+        error_message.c_str(), __func__, __FILE__, __LINE__);                              \
   } while (0)
 
 /// @def MALIPUT_VALIDATE
 /// Used to validate that a @p pred-icate passed into a function or method is
 /// true; if not, an exception with @p message is thrown.
-#define MALIPUT_VALIDATE(pred, message)                                                               \
-  do {                                                                                                \
-    if (!(pred)) {                                                                                    \
-      ::maliput::common::internal::Throw(std::string(message).c_str(), __func__, __FILE__, __LINE__); \
-    }                                                                                                 \
+#define MALIPUT_VALIDATE(pred, message)                                                                            \
+  do {                                                                                                             \
+    if (!(pred)) {                                                                                                 \
+      ::maliput::common::internal::Throw<maliput::common::assertion_error>(std::string(message).c_str(), __func__, \
+                                                                           __FILE__, __LINE__);                    \
+    }                                                                                                              \
   } while (0)
 
 /// @def MALIPUT_IS_IN_RANGE
