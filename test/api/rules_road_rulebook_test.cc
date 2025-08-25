@@ -157,7 +157,7 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   EXPECT_EQ(static_cast<int>(empty.range_value_rules.size()), 0);
 
   const double kNegativeTolerance = -1.;
-  EXPECT_THROW(dut.FindRules({}, kNegativeTolerance), maliput::common::assertion_error);
+  EXPECT_THROW(dut.FindRules({}, kNegativeTolerance), maliput::common::rulebook_error);
 
   nonempty = dut.Rules();
   EXPECT_EQ(static_cast<int>(nonempty.right_of_way.size()), 1);

@@ -72,9 +72,10 @@ Bulb::Bulb(const Bulb::Id& id, const InertialPosition& position_bulb_group, cons
       type_(type),
       arrow_orientation_rad_(arrow_orientation_rad),
       bounding_box_(std::move(bounding_box)) {
-  MALIPUT_THROW_UNLESS(type_ != BulbType::kArrow || arrow_orientation_rad_ != std::nullopt);
+  MALIPUT_THROW_RULES_UNLESS(type_ != BulbType::kArrow || arrow_orientation_rad_ != std::nullopt,
+                             maliput::common::traffic_light_book_error);
   if (type_ != BulbType::kArrow) {
-    MALIPUT_THROW_UNLESS(arrow_orientation_rad_ == std::nullopt);
+    MALIPUT_THROW_RULES_UNLESS(arrow_orientation_rad_ == std::nullopt, maliput::common::traffic_light_book_error);
   }
   if (states == std::nullopt || states->size() == 0) {
     states_ = {BulbState::kOff, BulbState::kOn};
@@ -97,8 +98,8 @@ bool Bulb::IsValidState(const BulbState& bulb_state) const {
 }
 
 UniqueBulbId Bulb::unique_id() const {
-  MALIPUT_THROW_UNLESS(bulb_group_ != nullptr);
-  MALIPUT_THROW_UNLESS(bulb_group_->traffic_light() != nullptr);
+  MALIPUT_THROW_RULES_UNLESS(bulb_group_ != nullptr, maliput::common::traffic_light_book_error);
+  MALIPUT_THROW_RULES_UNLESS(bulb_group_->traffic_light() != nullptr, maliput::common::traffic_light_book_error);
   return UniqueBulbId(bulb_group_->traffic_light()->id(), bulb_group_->id(), id_);
 }
 
@@ -108,12 +109,14 @@ BulbGroup::BulbGroup(const BulbGroup::Id& id, const InertialPosition& position_t
       position_traffic_light_(position_traffic_light),
       orientation_traffic_light_(orientation_traffic_light),
       bulbs_(std::move(bulbs)) {
-  MALIPUT_THROW_UNLESS(bulbs_.size() > 0);
-  MALIPUT_THROW_UNLESS(std::find_if(bulbs_.begin(), bulbs_.end(), [](const auto& bulb) { return bulb == nullptr; }) ==
-                       bulbs_.end());
+  MALIPUT_THROW_RULES_UNLESS(bulbs_.size() > 0, maliput::common::traffic_light_book_error);
+  MALIPUT_THROW_RULES_UNLESS(
+      std::find_if(bulbs_.begin(), bulbs_.end(), [](const auto& bulb) { return bulb == nullptr; }) == bulbs_.end(),
+      maliput::common::traffic_light_book_error);
   for (auto& bulb : bulbs_) {
-    MALIPUT_THROW_UNLESS(std::count_if(bulbs_.begin(), bulbs_.end(),
-                                       [bulb_id = bulb->id()](const auto& b) { return bulb_id == b->id(); }) == 1);
+    MALIPUT_THROW_RULES_UNLESS(std::count_if(bulbs_.begin(), bulbs_.end(),
+                                             [bulb_id = bulb->id()](const auto& b) { return bulb_id == b->id(); }) == 1,
+                               maliput::common::traffic_light_book_error);
     bulb->SetBulbGroup({}, this);
   }
 }
@@ -136,7 +139,7 @@ std::vector<const Bulb*> BulbGroup::bulbs() const {
 }
 
 UniqueBulbGroupId BulbGroup::unique_id() const {
-  MALIPUT_THROW_UNLESS(traffic_light_ != nullptr);
+  MALIPUT_THROW_RULES_UNLESS(traffic_light_ != nullptr, maliput::common::traffic_light_book_error);
   return UniqueBulbGroupId(traffic_light_->id(), id_);
 }
 
@@ -147,13 +150,15 @@ TrafficLight::TrafficLight(const TrafficLight::Id& id, const InertialPosition& p
       position_road_network_(position_road_network),
       orientation_road_network_(orientation_road_network),
       bulb_groups_(std::move(bulb_groups)) {
-  MALIPUT_THROW_UNLESS(std::find_if(bulb_groups_.begin(), bulb_groups_.end(), [](const auto& bulb_group) {
-                         return bulb_group == nullptr;
-                       }) == bulb_groups_.end());
+  MALIPUT_THROW_RULES_UNLESS(
+      std::find_if(bulb_groups_.begin(), bulb_groups_.end(),
+                   [](const auto& bulb_group) { return bulb_group == nullptr; }) == bulb_groups_.end(),
+      maliput::common::traffic_light_book_error);
   for (auto& bulb_group : bulb_groups_) {
-    MALIPUT_THROW_UNLESS(
+    MALIPUT_THROW_RULES_UNLESS(
         std::count_if(bulb_groups_.begin(), bulb_groups_.end(),
-                      [bulb_group_id = bulb_group->id()](const auto& bg) { return bulb_group_id == bg->id(); }) == 1);
+                      [bulb_group_id = bulb_group->id()](const auto& bg) { return bulb_group_id == bg->id(); }) == 1,
+        maliput::common::traffic_light_book_error);
     bulb_group->SetTrafficLight({}, this);
   }
 }

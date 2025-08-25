@@ -63,24 +63,36 @@ bool HasValue(const RuleRegistry::QueryResult::Ranges& ranges, const RangeValueR
 
 void RuleRegistry::RegisterRangeValueRule(const Rule::TypeId& type_id,
                                           const RuleRegistry::QueryResult::Ranges& all_possible_ranges) {
-  MALIPUT_THROW_UNLESS(GetPossibleStatesOfRuleType(type_id) == std::nullopt);
-  MALIPUT_THROW_UNLESS(!all_possible_ranges.empty());
+  MALIPUT_RULES_VALIDATE(GetPossibleStatesOfRuleType(type_id) == std::nullopt,
+                         "Rule::TypeId(" + type_id.string() + ") must have at least one state.",
+                         maliput::common::rule_registry_error);
+  MALIPUT_RULES_VALIDATE(!all_possible_ranges.empty(), "No ranges set for Rule::TypeId( " + type_id.string() + ").",
+                         maliput::common::rule_registry_error);
   for (const RangeValueRule::Range& range : all_possible_ranges) {
-    MALIPUT_THROW_UNLESS(std::count(all_possible_ranges.begin(), all_possible_ranges.end(), range) == 1);
+    MALIPUT_RULES_VALIDATE(std::count(all_possible_ranges.begin(), all_possible_ranges.end(), range) == 1,
+                           "The same range is repeated for Rule::TypeId(" + type_id.string() + ")",
+                           maliput::common::rule_registry_error);
   }
 
-  MALIPUT_THROW_UNLESS(range_rule_types_.emplace(type_id, all_possible_ranges).second);
+  MALIPUT_THROW_RULES_UNLESS(range_rule_types_.emplace(type_id, all_possible_ranges).second,
+                             maliput::common::rule_registry_error);
 }
 
 void RuleRegistry::RegisterDiscreteValueRule(const Rule::TypeId& type_id,
                                              const RuleRegistry::QueryResult::DiscreteValues& all_possible_values) {
-  MALIPUT_THROW_UNLESS(GetPossibleStatesOfRuleType(type_id) == std::nullopt);
-  MALIPUT_THROW_UNLESS(!all_possible_values.empty());
+  MALIPUT_RULES_VALIDATE(GetPossibleStatesOfRuleType(type_id) == std::nullopt,
+                         "Rule::TypeId(" + type_id.string() + ") must have at least one state.",
+                         maliput::common::rule_registry_error);
+  MALIPUT_RULES_VALIDATE(!all_possible_values.empty(), "No values set for Rule::TypeId( " + type_id.string() + ").",
+                         maliput::common::rule_registry_error);
   for (const DiscreteValueRule::DiscreteValue& value_state : all_possible_values) {
-    MALIPUT_THROW_UNLESS(std::count(all_possible_values.begin(), all_possible_values.end(), value_state) == 1);
+    MALIPUT_RULES_VALIDATE(std::count(all_possible_values.begin(), all_possible_values.end(), value_state) == 1,
+                           "The same value is repeated for Rule::TypeId(" + type_id.string() + ")",
+                           maliput::common::rule_registry_error);
   }
 
-  MALIPUT_THROW_UNLESS(discrete_rule_types_.emplace(type_id, all_possible_values).second);
+  MALIPUT_THROW_RULES_UNLESS(discrete_rule_types_.emplace(type_id, all_possible_values).second,
+                             maliput::common::rule_registry_error);
 }
 
 const std::map<Rule::TypeId, RuleRegistry::QueryResult::Ranges>& RuleRegistry::RangeValueRuleTypes() const {
@@ -111,9 +123,14 @@ RangeValueRule RuleRegistry::BuildRangeValueRule(const Rule::Id& id, const Rule:
                                                  const LaneSRoute& zone,
                                                  const RuleRegistry::QueryResult::Ranges& ranges) const {
   const auto range_rule_type = range_rule_types_.find(type_id);
-  MALIPUT_THROW_UNLESS(range_rule_type != range_rule_types_.end());
+  MALIPUT_RULES_VALIDATE(range_rule_type != range_rule_types_.end(),
+                         "No Rule::TypeId(" + type_id.string() + ") found in loaded range rule types.",
+                         maliput::common::rule_registry_error);
   for (const RangeValueRule::Range& range : ranges) {
-    MALIPUT_THROW_UNLESS(HasValue(range_rule_type->second, range));
+    MALIPUT_RULES_VALIDATE(HasValue(range_rule_type->second, range),
+                           "Rule::TypeId(" + type_id.string() + ") has no range value {" + std::to_string(range.min) +
+                               ", " + std::to_string(range.max) + "}.",
+                           maliput::common::rule_registry_error);
   }
 
   return RangeValueRule(id, type_id, zone, ranges);
@@ -123,9 +140,13 @@ DiscreteValueRule RuleRegistry::BuildDiscreteValueRule(const Rule::Id& id, const
                                                        const LaneSRoute& zone,
                                                        const RuleRegistry::QueryResult::DiscreteValues& values) const {
   const auto discrete_rule_type = discrete_rule_types_.find(type_id);
-  MALIPUT_THROW_UNLESS(discrete_rule_type != discrete_rule_types_.end());
+  MALIPUT_RULES_VALIDATE(discrete_rule_type != discrete_rule_types_.end(),
+                         "No Rule::TypeId(" + type_id.string() + ") found in loaded discrete value rule types.",
+                         maliput::common::rule_registry_error);
   for (const DiscreteValueRule::DiscreteValue& value_state : values) {
-    MALIPUT_THROW_UNLESS(HasValue(discrete_rule_type->second, value_state));
+    MALIPUT_RULES_VALIDATE(HasValue(discrete_rule_type->second, value_state),
+                           "Rule::TypeId(" + type_id.string() + ") has no value state: " + value_state.value,
+                           maliput::common::rule_registry_error);
   }
 
   return DiscreteValueRule(id, type_id, zone, values);

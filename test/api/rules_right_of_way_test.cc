@@ -110,7 +110,7 @@ GTEST_TEST(RightOfWayRuleTest, Construction) {
   EXPECT_THROW(RightOfWayRule(RightOfWayRule::Id("some_id"), api::test::CreateLaneSRoute(),
                               RightOfWayRule::ZoneType::kStopExcluded, {api::test::NoYieldState()},
                               RightOfWayRule::RelatedBulbGroups{{kTrafficLightId, {kBulbGroupId, kBulbGroupId}}}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 }
 
 GTEST_TEST(RightOfWayRuleTest, Accessors) {

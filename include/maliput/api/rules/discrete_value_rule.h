@@ -83,8 +83,8 @@ class DiscreteValueRule : public Rule {
   ///               in. The actual value that's enforced at any given time is
   ///               determined by a DiscreteValueRuleStateProvider.  It must
   ///               have at least one value; each value must be unique.
-  /// @throws maliput::common::assertion_error When `values` is empty.
-  /// @throws maliput::common::assertion_error When there are duplicated values
+  /// @throws maliput::common::rulebook_error When `values` is empty.
+  /// @throws maliput::common::rulebook_error When there are duplicated values
   ///         in `values`.
   DiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                     const std::vector<DiscreteValue>& values);

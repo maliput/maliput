@@ -159,27 +159,29 @@ class MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated", "DiscreteVal
   /// @param related_bulb_groups The related bulb groups. All IDs present within the
   ///        supplied map are assumed to be valid.
   ///
-  /// @throws maliput::common::assertion_error if `states` is empty or if
+  /// @throws maliput::common::rulebook_error if `states` is empty or if
   ///         `states` contains duplicate State::Id's.
-  /// @throws maliput::common::assertion_error if any duplicate BulbGroup::Id is
+  /// @throws maliput::common::rulebook_error if any duplicate BulbGroup::Id is
   ///         found.
   RightOfWayRule(const Id& id, const LaneSRoute& zone, ZoneType zone_type, const std::vector<State>& states,
                  const RelatedBulbGroups& related_bulb_groups)
       : id_(id), zone_(zone), zone_type_(zone_type), related_bulb_groups_(related_bulb_groups) {
-    MALIPUT_VALIDATE(states.size() >= 1, "RightOfWayRule(" + id_.string() + ") must have at least one state.");
+    MALIPUT_RULES_VALIDATE(states.size() >= 1, "RightOfWayRule(" + id_.string() + ") must have at least one state.",
+                           maliput::common::rulebook_error);
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
-      MALIPUT_THROW_UNLESS(result.second);
+      MALIPUT_THROW_RULES_UNLESS(result.second, maliput::common::rulebook_error);
     }
     for (const auto& traffic_light_bulb_group : related_bulb_groups) {
       for (const BulbGroup::Id& bulb_group_id : traffic_light_bulb_group.second) {
-        MALIPUT_VALIDATE(
+        MALIPUT_RULES_VALIDATE(
             std::count(traffic_light_bulb_group.second.begin(), traffic_light_bulb_group.second.end(), bulb_group_id) ==
                 1,
             "Trying to build RightOfWayRule(" + id_.string() +
                 ") with related_bulb_groups that contains a duplicate BulbGroup::Id(" + bulb_group_id.string() +
-                ") at TrafficLight::Id(" + traffic_light_bulb_group.first.string() + ")");
+                ") at TrafficLight::Id(" + traffic_light_bulb_group.first.string() + ")",
+            maliput::common::rulebook_error);
       }
     }
   }
@@ -206,10 +208,11 @@ class MALIPUT_DEPRECATED("RightOfWayRule class will be deprecated", "DiscreteVal
   ///
   /// This is a convenience function for returning a static rule's single state.
   ///
-  /// @throws maliput::common::assertion_error if `is_static()` is false.
+  /// @throws maliput::common::rulebook_error if `is_static()` is false.
   const State& static_state() const {
-    MALIPUT_VALIDATE(is_static(),
-                     "Calling RightOfWayRule(" + id_.string() + ")::static_state() but the state is not static.");
+    MALIPUT_RULES_VALIDATE(is_static(),
+                           "Calling RightOfWayRule(" + id_.string() + ")::static_state() but the state is not static.",
+                           maliput::common::rulebook_error);
     return states_.begin()->second;
   }
 

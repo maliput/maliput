@@ -87,7 +87,7 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
       RangeValueRule::Range{Rule::State::kStrict,  kDuplicatedRelatedRules, api::test::CreateEmptyRelatedUniqueIds(),
                             "range_description_1", 123. /* min */,          456. /* max */};
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithDuplicatedRelatedRulesIds}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 
   // Duplicated UniqueIds in RelatedUniqueIds in RangeValueRule::Range.
   const Rule::RelatedUniqueIds kDuplicatedRelatedUniqueIds{
@@ -102,14 +102,14 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
                             123. /* min */,
                             456. /* max */};
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithDuplicatedRelatedUniqueIds}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 
   // Empty std::string for semantic group key in RelatedRules in RangeValueRule::Range.
   const Rule::RelatedRules kEmptyKeyRelatedRules{{"", {Rule::Id("RuleTypeIdB/RuleIdB")}}};
   const RangeValueRule::Range kRangeWithEmptyKeyRelatedRules =
       RangeValueRule::Range{Rule::State::kStrict,  kEmptyKeyRelatedRules, api::test::CreateEmptyRelatedUniqueIds(),
                             "range_description_1", 123. /* min */,        456. /* max */};
-  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithEmptyKeyRelatedRules}), maliput::common::assertion_error);
+  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithEmptyKeyRelatedRules}), maliput::common::rulebook_error);
 
   // Empty std::string for semantic group key in RelatedUniqueIds in RangeValueRule::Range.
   const Rule::RelatedUniqueIds kEmptyKeyRelatedUniqueIds{
@@ -122,7 +122,7 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
                             123. /* min */,
                             456. /* max */};
   EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kRangeWithEmptyKeyRelatedUniqueIds}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 
   // Negative severity.
   const int kSeverityInvalid{-1};
@@ -130,9 +130,9 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
                               {RangeValueRule::Range{kSeverityInvalid, api::test::CreateNonEmptyRelatedRules(),
                                                      api::test::CreateEmptyRelatedUniqueIds(), "range_description_1",
                                                      123. /* min */, 456. /* max */}}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
   // Empty ranges.
-  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* ranges */), maliput::common::assertion_error);
+  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {} /* ranges */), maliput::common::rulebook_error);
   // Duplicated ranges.
   const std::vector<RangeValueRule::Range> kDuplicatedRanges{
       RangeValueRule::Range{Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
@@ -142,13 +142,13 @@ TEST_F(RuleTest, RangeValueRuleConstructor) {
                             api::test::CreateEmptyRelatedUniqueIds(), "range_description_1", 123. /* min */,
                             456. /* max */},
   };
-  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, kDuplicatedRanges), maliput::common::assertion_error);
+  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, kDuplicatedRanges), maliput::common::rulebook_error);
 
   // RangeValueRule::Range::min is greater than RangeValueRule::Range::max.
   const std::vector<RangeValueRule::Range> kShiftedRanges{RangeValueRule::Range{
       Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), api::test::CreateEmptyRelatedUniqueIds(),
       "range_description_3", 456. /* min */, 123. /* max */}};
-  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kShiftedRanges}), maliput::common::assertion_error);
+  EXPECT_THROW(RangeValueRule(kId, kTypeId, kZone, {kShiftedRanges}), maliput::common::rulebook_error);
 }
 
 // Evaluates RangeValueRule accessors.
@@ -316,7 +316,7 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
                    kId, kTypeId, kZone,
                    {DiscreteValueRule::DiscreteValue{kSeverityInvalid, api::test::CreateEmptyRelatedRules(),
                                                      api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value"}}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 
   // Duplicated Rule::Ids in RelatedRules in DiscreteValueRule::DiscreteValue.
   const Rule::RelatedRules kDuplicatedRelatedRules{
@@ -324,7 +324,7 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
   const DiscreteValueRule::DiscreteValue kDiscreteValueWithDuplicatedRules = DiscreteValueRule::DiscreteValue{
       Rule::State::kStrict, kDuplicatedRelatedRules, api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value"};
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithDuplicatedRules}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 
   // Duplicated UniqueIds in RelatedUniqueIds in DiscreteValueRule::DiscreteValue.
   const Rule::RelatedUniqueIds kDuplicatedRelatedUniqueIds{
@@ -335,7 +335,7 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
       DiscreteValueRule::DiscreteValue{Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
                                        kDuplicatedRelatedUniqueIds, "rule_state_value"};
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithDuplicatedRelatedUniqueIds}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 
   // Duplicated discrete values.
   const std::vector<DiscreteValueRule::DiscreteValue> kDuplicatedDiscreteValues{
@@ -343,14 +343,14 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
                                        api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_1"},
       DiscreteValueRule::DiscreteValue{Rule::State::kStrict, api::test::CreateNonEmptyRelatedRules(),
                                        api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value_1"}};
-  EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, kDuplicatedDiscreteValues), maliput::common::assertion_error);
+  EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, kDuplicatedDiscreteValues), maliput::common::rulebook_error);
 
   // Empty std::string for semantic group key in RelatedRules in DiscreteValueRule::DiscreteValue.
   const Rule::RelatedRules kEmptyKeyRelatedRules{{"", {Rule::Id("RuleTypeIdB/RuleIdB")}}};
   const DiscreteValueRule::DiscreteValue kDiscreteValueWithEmptyKeyRelatedRules = DiscreteValueRule::DiscreteValue{
       Rule::State::kStrict, kEmptyKeyRelatedRules, api::test::CreateEmptyRelatedUniqueIds(), "rule_state_value"};
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithEmptyKeyRelatedRules}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 
   // Empty std::string for semantic group key in RelatedUniqueIds in DiscreteValueRule::DiscreteValue.
   const Rule::RelatedUniqueIds kEmptyKeyRelatedUniqueIds{
@@ -358,10 +358,10 @@ TEST_F(RuleTest, DiscreteValueRuleConstructor) {
   const DiscreteValueRule::DiscreteValue kDiscreteValueWithEmptyKeyRelatedUniqueIds = DiscreteValueRule::DiscreteValue{
       Rule::State::kStrict, api::test::CreateEmptyRelatedRules(), kEmptyKeyRelatedUniqueIds, "rule_state_value"};
   EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {kDiscreteValueWithEmptyKeyRelatedUniqueIds}),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 
   // Empty discrete values.
-  EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {} /* discrete_values */), maliput::common::assertion_error);
+  EXPECT_THROW(DiscreteValueRule(kId, kTypeId, kZone, {} /* discrete_values */), maliput::common::rulebook_error);
 }
 
 // Evaluates DiscreteValueRule accessors.

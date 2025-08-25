@@ -128,7 +128,7 @@ class Rule {
   /// @param type_id The Rule Type ID.
   /// @param zone LaneSRoute to which this rule applies.
   ///
-  /// @throws maliput::common::assertion_error When any Rule::Id within
+  /// @throws maliput::common::rulebook_error When any Rule::Id within
   ///         `related_rules` is duplicated.
   Rule(const Id& id, const TypeId& type_id, const LaneSRoute& zone) : id_(id), type_id_(type_id), zone_(zone) {}
 
@@ -143,18 +143,18 @@ class Rule {
  protected:
   // Validates that `related_rules` requirements are met.
   // @see RelatedRules alias definition for full type requirements.
-  // @throws maliput::assertion_error When any of the requirements in
+  // @throws maliput::rulebook_error When any of the requirements in
   //         `RelatedRules` are not met.
   void ValidateRelatedRules(const RelatedRules& related_rules) const;
 
   // Validates that `related_unique_ids` requirements are met.
   // @see RelatedUniqueIds alias definition for full type requirements.
-  // @throws maliput::assertion_error When any of the requirements in
+  // @throws maliput::rulebook_error When any of the requirements in
   //         `RelatedUniqueIds` are not met.
   void ValidateRelatedUniqueIds(const RelatedUniqueIds& related_unique_ids) const;
 
   // Validates that `severity` is a non-negative quantity.
-  // @throws maliput::assertion_error When `severity` is negative.
+  // @throws maliput::rulebook_error When `severity` is negative.
   void ValidateSeverity(int severity) const;
 
  private:
