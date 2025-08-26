@@ -44,15 +44,34 @@ GTEST_TEST(MaliputThrowTest, ExpectThrowAndNoThrowTest) {
   EXPECT_NO_THROW({ MALIPUT_THROW_UNLESS(true); });
 }
 
+// Evaluates whether or not MALIPUT_THROW_UNLESS() throws with a custom exception.
+GTEST_TEST(MaliputThrowTest, CustomExceptionTest) {
+  EXPECT_THROW({ MALIPUT_THROW_UNLESS(false, road_geometry_construction_error); }, road_geometry_construction_error);
+  EXPECT_NO_THROW({ MALIPUT_THROW_UNLESS(true, road_geometry_construction_error); });
+}
+
 // Evaluates whether or not MALIPUT_THROW_UNLESS() throws.
 GTEST_TEST(MaliputThrowMessageTest, ExpectThrowWithMessageTest) {
   EXPECT_THROW({ MALIPUT_THROW_MESSAGE("Exception description"); }, assertion_error);
+}
+
+// Evaluates whether or not MALIPUT_THROW_MESSAGE() throws with a custom exception.
+GTEST_TEST(MaliputThrowMessageTest, CustomExceptionTest) {
+  EXPECT_THROW({ MALIPUT_THROW_MESSAGE("Exception description", road_geometry_construction_error); },
+               road_geometry_construction_error);
 }
 
 // Evaluates whether or not MALIPUT_VALIDATE() throws.
 GTEST_TEST(MaliputValidateTest, Test) {
   EXPECT_THROW({ MALIPUT_VALIDATE(false, "Exception description"); }, assertion_error);
   EXPECT_NO_THROW({ MALIPUT_VALIDATE(true, "Exception description"); });
+}
+
+// Evaluates whether or not MALIPUT_VALIDATE() throws with a custom exception.
+GTEST_TEST(MaliputValidateTest, CustomExceptionTest) {
+  EXPECT_THROW({ MALIPUT_VALIDATE(false, "Exception description", road_geometry_construction_error); },
+               road_geometry_construction_error);
+  EXPECT_NO_THROW({ MALIPUT_VALIDATE(true, "Exception description", road_geometry_construction_error); });
 }
 
 // Evaluates whether or not MALIPUT_IS_IN_RANGE() throws.
