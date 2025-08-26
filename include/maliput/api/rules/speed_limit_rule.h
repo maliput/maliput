@@ -74,12 +74,12 @@ class MALIPUT_DEPRECATED("next release", "Use RangeValueRule instead.") SpeedLim
   /// or equal to `max`, otherwise a maliput::common::rulebook_error is thrown.
   SpeedLimitRule(const Id& id, const LaneSRange& zone, Severity severity, double min, double max)
       : id_(id), zone_(zone), severity_(severity), min_(min), max_(max) {
-    MALIPUT_RULES_VALIDATE(min >= 0., "SpeedLimitRule(" + id_.string() + ") min is negative.",
-                           maliput::common::rulebook_error);
-    MALIPUT_RULES_VALIDATE(max >= 0., "SpeedLimitRule(" + id_.string() + ") max is negative.",
-                           maliput::common::rulebook_error);
-    MALIPUT_RULES_VALIDATE(min <= max, "SpeedLimitRule(" + id_.string() + ") min is greater than max",
-                           maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(min >= 0., "SpeedLimitRule(" + id_.string() + ") min is negative.",
+                     maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(max >= 0., "SpeedLimitRule(" + id_.string() + ") max is negative.",
+                     maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(min <= max, "SpeedLimitRule(" + id_.string() + ") min is greater than max",
+                     maliput::common::rulebook_error);
   }
 
   /// Returns the persistent identifier.

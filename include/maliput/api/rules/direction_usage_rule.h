@@ -134,12 +134,14 @@ class MALIPUT_DEPRECATED("DirectionUsageRule will be deprecated", "DiscreteValue
   /// @throws maliput::common::rulebook_error if size of states is not exactly
   ///         1.
   DirectionUsageRule(const Id& id, const LaneSRange& zone, std::vector<State> states) : id_(id), zone_(zone) {
-    MALIPUT_RULES_VALIDATE(states.size() >= 1, "DirectionUsageRule(" + id_.string() + ") must have at least one state.",
-                           maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(states.size() >= 1, "DirectionUsageRule(" + id_.string() + ") must have at least one state.",
+                     maliput::common::rulebook_error);
     for (const State& state : states) {
       // Construct index of states by ID, ensuring uniqueness of ID's.
       auto result = states_.emplace(state.id(), state);
-      MALIPUT_THROW_RULES_UNLESS(result.second, maliput::common::rulebook_error);
+      MALIPUT_VALIDATE(result.second,
+                       "State with ID '" + state.id().string() + "' is not unique when creating DirectionUsageRule.",
+                       maliput::common::rulebook_error);
     }
   }
 
@@ -162,9 +164,9 @@ class MALIPUT_DEPRECATED("DirectionUsageRule will be deprecated", "DiscreteValue
   ///
   /// @throws maliput::common::rulebook_error if `is_static()` is false.
   const State& static_state() const {
-    MALIPUT_RULES_VALIDATE(
-        is_static(), "Calling DirectionUsageRule(" + id_.string() + ")::static_state() but the state is not static.",
-        maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(is_static(),
+                     "Calling DirectionUsageRule(" + id_.string() + ")::static_state() but the state is not static.",
+                     maliput::common::rulebook_error);
     return states_.begin()->second;
   }
 

@@ -103,104 +103,93 @@ void Throw(const char* condition, const char* func, const char* file, int line) 
 }  // namespace common
 }  // namespace maliput
 
-/// Evaluates @p condition and iff the value is false will throw an exception
-/// with a message showing at least the condition text, function name, file,
-/// and line.
-#define MALIPUT_THROW_UNLESS(condition)                                                                               \
+// Helper macros to choose the correct implementation
+#define GET_4TH_ARG(_1, _2, _3, NAME, ...) NAME
+#define GET_3RD_ARG(_1, _2, NAME, ...) NAME
+#define MALIPUT_VALIDATE_MACRO_CHOOSER(...) GET_4TH_ARG(__VA_ARGS__, MALIPUT_VALIDATE_3, MALIPUT_VALIDATE_2)
+#define MALIPUT_THROW_MESSAGE_MACRO_CHOOSER(...) \
+  GET_3RD_ARG(__VA_ARGS__, MALIPUT_THROW_MESSAGE_3, MALIPUT_THROW_MESSAGE_2)
+#define MALIPUT_THROW_UNLESS_MACRO_CHOOSER(...) GET_3RD_ARG(__VA_ARGS__, MALIPUT_THROW_UNLESS_3, MALIPUT_THROW_UNLESS_2)
+
+/// @def MALIPUT_THROW_UNLESS
+/// Evaluates @p condition and iff the value is false will throw a
+/// maliput::common::assertion_error exception with a message showing at least
+/// the condition text, function name, file, and line.
+#define MALIPUT_THROW_UNLESS_2(condition)                                                                             \
   do {                                                                                                                \
     if (!(condition)) {                                                                                               \
       ::maliput::common::internal::Throw<maliput::common::assertion_error>(#condition, __func__, __FILE__, __LINE__); \
     }                                                                                                                 \
   } while (0)
 
-/// Throws an exception with a message showing at least the condition text,
-/// function name, file, and line.
-#define MALIPUT_THROW_MESSAGE(msg)                                                                                  \
-  do {                                                                                                              \
-    const std::string error_message(msg);                                                                           \
-    ::maliput::common::internal::Throw<maliput::common::assertion_error>(error_message.c_str(), __func__, __FILE__, \
-                                                                         __LINE__);                                 \
-  } while (0)
-
-/// @def MALIPUT_VALIDATE
-/// Used to validate that a @p pred-icate passed into a function or method is
-/// true; if not, an exception with @p message is thrown.
-#define MALIPUT_VALIDATE(pred, message)                                                                            \
-  do {                                                                                                             \
-    if (!(pred)) {                                                                                                 \
-      ::maliput::common::internal::Throw<maliput::common::assertion_error>(std::string(message).c_str(), __func__, \
-                                                                           __FILE__, __LINE__);                    \
-    }                                                                                                              \
-  } while (0)
-
-/// Evaluates @p condition and iff the value is false will throw a
-/// road_network_description_parser_error with a message showing at least the
-/// condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_UNLESS(condition)                                                \
-  do {                                                                                                                 \
-    if (!(condition)) {                                                                                                \
-      ::maliput::common::internal::Throw<maliput::common::road_network_description_parser_error>(#condition, __func__, \
-                                                                                                 __FILE__, __LINE__);  \
-    }                                                                                                                  \
-  } while (0)
-
-/// Throws a road_network_description_parser_error with a message showing at
-/// least the condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_NETWORK_DESCRIPTION_PARSER_MESSAGE(msg)                              \
-  do {                                                                                          \
-    const std::string error_message(msg);                                                       \
-    ::maliput::common::internal::Throw<maliput::common::road_network_description_parser_error>( \
-        error_message.c_str(), __func__, __FILE__, __LINE__);                                   \
-  } while (0)
-
-/// Evaluates @p condition and iff the value is false will throw a
-/// road_geometry_construction_error with a message showing at least the
-/// condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_GEOMETRY_CONSTRUCTION_UNLESS(condition)                                                \
-  do {                                                                                                            \
-    if (!(condition)) {                                                                                           \
-      ::maliput::common::internal::Throw<maliput::common::road_geometry_construction_error>(#condition, __func__, \
-                                                                                            __FILE__, __LINE__);  \
-    }                                                                                                             \
-  } while (0)
-
-/// Throws a road_geometry_construction_error with a message showing at
-/// least the condition text, function name, file, and line.
-#define MALIPUT_THROW_ROAD_GEOMETRY_CONSTRUCTION_MESSAGE(msg)                              \
-  do {                                                                                     \
-    const std::string error_message(msg);                                                  \
-    ::maliput::common::internal::Throw<maliput::common::road_geometry_construction_error>( \
-        error_message.c_str(), __func__, __FILE__, __LINE__);                              \
-  } while (0)
-
-/// Evaluates @p condition and iff the value is false will throw an
-/// @p err_type with a message showing at least the
-/// condition text, function name, file, and line.
-#define MALIPUT_THROW_RULES_UNLESS(condition, err_type)                                       \
+/// @def MALIPUT_THROW_UNLESS
+/// Evaluates @p condition and iff the value is false will throw an @p err_type
+/// exception with a message showing at least the condition text, function name,
+/// file, and line.
+#define MALIPUT_THROW_UNLESS_3(condition, err_type)                                           \
   do {                                                                                        \
     if (!(condition)) {                                                                       \
       ::maliput::common::internal::Throw<err_type>(#condition, __func__, __FILE__, __LINE__); \
     }                                                                                         \
   } while (0)
 
-/// Throws an @p err_type with a message showing at
-/// least the condition text, function name, file, and line.
-#define MALIPUT_THROW_RULES_MESSAGE(msg, err_type)                                                     \
+/// Evaluates @p condition and iff the value is false will throw an exception
+/// with a message showing at least the condition text, function name, file,
+/// and line. It can throw either maliput::common::assertion_error or the
+/// provided exception type.
+// TODO(Santoi): Deprecate this in favor of MALIPUT_VALIDATE. We prefer throwing exceptions with descriptive messages
+// rather than just failed conditions.
+#define MALIPUT_THROW_UNLESS(...) MALIPUT_THROW_UNLESS_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+
+/// @def MALIPUT_THROW_MESSAGE
+/// Throws a maliput::common::assertion_error exception with a message showing
+/// at least the condition text, function name, file, and line.
+#define MALIPUT_THROW_MESSAGE_2(msg)                                                                                \
+  do {                                                                                                              \
+    const std::string error_message(msg);                                                                           \
+    ::maliput::common::internal::Throw<maliput::common::assertion_error>(error_message.c_str(), __func__, __FILE__, \
+                                                                         __LINE__);                                 \
+  } while (0)
+
+/// @def MALIPUT_THROW_MESSAGE
+/// Throws an exception of type @p err_type with a message.
+#define MALIPUT_THROW_MESSAGE_3(msg, err_type)                                                         \
   do {                                                                                                 \
     const std::string error_message(msg);                                                              \
     ::maliput::common::internal::Throw<err_type>(error_message.c_str(), __func__, __FILE__, __LINE__); \
   } while (0)
 
-/// @def MALIPUT_RULEBOOK_VALIDATE
-/// Evaluates the @p condition and iff the value is false will throw an
-/// @p err_type with a @p message showing at least the
+/// Throws an exception of type maliput::common::assertion_error or @p err_type
+/// (if it's specified) with a message.
+/// @see MALIPUT_THROW_MESSAGE_3.
+#define MALIPUT_THROW_MESSAGE(...) MALIPUT_THROW_MESSAGE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+
+/// @def MALIPUT_VALIDATE
+/// Evaluates @p condition and iff the value is false will throw a
+/// @p err_type exception with a @p message showing at least the
 /// condition text, function name, file, and line.
-#define MALIPUT_RULES_VALIDATE(condition, message, err_type)                                                    \
-  do {                                                                                                          \
-    if (!(condition)) {                                                                                         \
-      ::maliput::common::internal::Throw<err_type>(std::string(message).c_str(), __func__, __FILE__, __LINE__); \
-    }                                                                                                           \
+#define MALIPUT_VALIDATE_3(pred, message, error_type)                                                             \
+  do {                                                                                                            \
+    if (!(pred)) {                                                                                                \
+      ::maliput::common::internal::Throw<error_type>(std::string(message).c_str(), __func__, __FILE__, __LINE__); \
+    }                                                                                                             \
   } while (0)
+
+/// @def MALIPUT_VALIDATE
+/// Used to validate that a @p pred-icate passed into a function or method is
+/// true; if not, an exception with @p message is thrown.
+#define MALIPUT_VALIDATE_2(pred, message)                                                                            \
+  do {                                                                                                               \
+    if (!(pred)) {                                                                                                   \
+      ::maliput::common::internal::Throw<::maliput::common::assertion_error>(std::string(message).c_str(), __func__, \
+                                                                             __FILE__, __LINE__);                    \
+    }                                                                                                                \
+  } while (0)
+
+/// @def MALIPUT_VALIDATE
+/// Used to validate that a @p pred-icate passed into a function or method is
+/// true; if not, an exception with @p message is thrown.
+#define MALIPUT_VALIDATE(...) MALIPUT_VALIDATE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
 /// @def MALIPUT_IS_IN_RANGE
 /// Throws if `value` is within [`min_value`; `max_value`]. It forwards the call

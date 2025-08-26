@@ -40,18 +40,18 @@ namespace rules {
 RangeValueRule::RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                                const std::vector<Range>& ranges)
     : Rule(id, type_id, zone), states_(ranges) {
-  MALIPUT_RULES_VALIDATE(!states_.empty(), "RangeValueRule(" + id.string() + ") has no RangeValueRule::Ranges.",
-                         maliput::common::rulebook_error);
+  MALIPUT_VALIDATE(!states_.empty(), "RangeValueRule(" + id.string() + ") has no RangeValueRule::Ranges.",
+                   maliput::common::rulebook_error);
   for (const Range& range : states_) {
     ValidateRelatedRules(range.related_rules);
     ValidateRelatedUniqueIds(range.related_unique_ids);
     ValidateSeverity(range.severity);
-    MALIPUT_RULES_VALIDATE(range.min <= range.max,
-                           "RangeValueRule(" + id.string() + ") has a RangeValueRule::Ranges whose min > max.",
-                           maliput::common::rulebook_error);
-    MALIPUT_RULES_VALIDATE(std::count(states_.begin(), states_.end(), range) == 1,
-                           "RangeValueRule(" + id.string() + ") has duplicated RangeValueRule::Ranges.",
-                           maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(range.min <= range.max,
+                     "RangeValueRule(" + id.string() + ") has a RangeValueRule::Ranges whose min > max.",
+                     maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(std::count(states_.begin(), states_.end(), range) == 1,
+                     "RangeValueRule(" + id.string() + ") has duplicated RangeValueRule::Ranges.",
+                     maliput::common::rulebook_error);
   }
 }
 

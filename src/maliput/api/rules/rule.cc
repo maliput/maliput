@@ -68,11 +68,11 @@ bool Rule::State::operator==(const State& other) const {
 
 void Rule::ValidateRelatedRules(const Rule::RelatedRules& related_rules) const {
   for (const auto& group_id_to_related_rules : related_rules) {
-    MALIPUT_RULES_VALIDATE(!group_id_to_related_rules.first.empty(),
-                           "Rule(" + id_.string() + ") contains an empty key in related_rules",
-                           maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(!group_id_to_related_rules.first.empty(),
+                     "Rule(" + id_.string() + ") contains an empty key in related_rules",
+                     maliput::common::rulebook_error);
     for (const Rule::Id& rule_id : group_id_to_related_rules.second) {
-      MALIPUT_RULES_VALIDATE(
+      MALIPUT_VALIDATE(
           std::count(group_id_to_related_rules.second.begin(), group_id_to_related_rules.second.end(), rule_id) == 1,
           "Rule(" + id_.string() + ") with related_rules that contains a duplicate Rule::Id(" + rule_id.string() +
               ") at key <" + group_id_to_related_rules.first + ">",
@@ -83,22 +83,22 @@ void Rule::ValidateRelatedRules(const Rule::RelatedRules& related_rules) const {
 
 void Rule::ValidateRelatedUniqueIds(const RelatedUniqueIds& related_unique_ids) const {
   for (const auto& group_id_to_related_unique_ids : related_unique_ids) {
-    MALIPUT_RULES_VALIDATE(!group_id_to_related_unique_ids.first.empty(),
-                           "Rule(" + id_.string() + ") contains an empty key in related_unique_ids",
-                           maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(!group_id_to_related_unique_ids.first.empty(),
+                     "Rule(" + id_.string() + ") contains an empty key in related_unique_ids",
+                     maliput::common::rulebook_error);
     for (const UniqueId& unique_id : group_id_to_related_unique_ids.second) {
-      MALIPUT_RULES_VALIDATE(std::count(group_id_to_related_unique_ids.second.begin(),
-                                        group_id_to_related_unique_ids.second.end(), unique_id) == 1,
-                             "Rule(" + id_.string() + ") with related_unique_ids that contains a duplicate UniqueId(" +
-                                 unique_id.string() + ") at key <" + group_id_to_related_unique_ids.first + ">",
-                             maliput::common::rulebook_error);
+      MALIPUT_VALIDATE(std::count(group_id_to_related_unique_ids.second.begin(),
+                                  group_id_to_related_unique_ids.second.end(), unique_id) == 1,
+                       "Rule(" + id_.string() + ") with related_unique_ids that contains a duplicate UniqueId(" +
+                           unique_id.string() + ") at key <" + group_id_to_related_unique_ids.first + ">",
+                       maliput::common::rulebook_error);
     }
   }
 }
 
 void Rule::ValidateSeverity(int severity) const {
-  MALIPUT_RULES_VALIDATE(severity >= 0, "Rule(" + id_.string() + ") has a state whose severity is negative.",
-                         maliput::common::rulebook_error);
+  MALIPUT_VALIDATE(severity >= 0, "Rule(" + id_.string() + ") has a state whose severity is negative.",
+                   maliput::common::rulebook_error);
 }
 
 }  // namespace rules

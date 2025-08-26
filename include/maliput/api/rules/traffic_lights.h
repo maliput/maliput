@@ -212,7 +212,7 @@ class Bulb final {
   ///
   /// @throws common::traffic_light_book_error When @p bulb_group is nullptr.
   void SetBulbGroup(common::Passkey<BulbGroup>, const BulbGroup* bulb_group) {
-    MALIPUT_THROW_RULES_UNLESS(bulb_group != nullptr, common::traffic_light_book_error);
+    MALIPUT_VALIDATE(bulb_group != nullptr, "BulbGroup is null.", common::traffic_light_book_error);
     bulb_group_ = bulb_group;
   }
 
@@ -307,7 +307,7 @@ class BulbGroup final {
   ///
   /// @throws common::traffic_light_book_error When @p traffic_light is nullptr.
   void SetTrafficLight(common::Passkey<TrafficLight>, const TrafficLight* traffic_light) {
-    MALIPUT_THROW_RULES_UNLESS(traffic_light != nullptr, common::traffic_light_book_error);
+    MALIPUT_VALIDATE(traffic_light != nullptr, "TrafficLight is null.", common::traffic_light_book_error);
     traffic_light_ = traffic_light;
   }
 

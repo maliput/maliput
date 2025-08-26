@@ -83,7 +83,7 @@ class RoadRulebook {
   ///
   /// @throws maliput::common::rulebook_error if `tolerance` is negative.
   QueryResults FindRules(const std::vector<LaneSRange>& ranges, double tolerance) const {
-    MALIPUT_THROW_RULES_UNLESS(tolerance >= 0., maliput::common::rulebook_error);
+    MALIPUT_VALIDATE(tolerance >= 0., "Tolerance is negative.", maliput::common::rulebook_error);
     return DoFindRules(ranges, tolerance);
   }
 
