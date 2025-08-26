@@ -103,6 +103,7 @@ void Throw(const char* condition, const char* func, const char* file, int line) 
 }  // namespace common
 }  // namespace maliput
 
+namespace {
 // Helper macros to choose the correct implementation
 #define GET_4TH_ARG(_1, _2, _3, NAME, ...) NAME
 #define GET_3RD_ARG(_1, _2, NAME, ...) NAME
@@ -133,14 +134,6 @@ void Throw(const char* condition, const char* func, const char* file, int line) 
     }                                                                                         \
   } while (0)
 
-/// Evaluates @p condition and iff the value is false will throw an exception
-/// with a message showing at least the condition text, function name, file,
-/// and line. It can throw either maliput::common::assertion_error or the
-/// provided exception type.
-// TODO(Santoi): Deprecate this in favor of MALIPUT_VALIDATE. We prefer throwing exceptions with descriptive messages
-// rather than just failed conditions.
-#define MALIPUT_THROW_UNLESS(...) MALIPUT_THROW_UNLESS_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
-
 /// @def MALIPUT_THROW_MESSAGE
 /// Throws a maliput::common::assertion_error exception with a message showing
 /// at least the condition text, function name, file, and line.
@@ -159,6 +152,41 @@ void Throw(const char* condition, const char* func, const char* file, int line) 
     ::maliput::common::internal::Throw<err_type>(error_message.c_str(), __func__, __FILE__, __LINE__); \
   } while (0)
 
+/// @def MALIPUT_VALIDATE
+/// Evaluates @p condition and iff the value is false will throw a
+/// @p err_type exception with a @p message showing at least the
+/// condition text, function name, file, and line.
+#define MALIPUT_VALIDATE_3(condition, message, error_type)                                                        \
+  do {                                                                                                            \
+    if (!(condition)) {                                                                                           \
+      ::maliput::common::internal::Throw<error_type>(std::string(message).c_str(), __func__, __FILE__, __LINE__); \
+    }                                                                                                             \
+  } while (0)
+
+/// @def MALIPUT_VALIDATE
+/// Evaluates @p condition and iff the value is false will throw a
+/// maliput::common::assertion_error with a @p message showing at least the
+/// condition text, function name, file, and line.
+#define MALIPUT_VALIDATE_2(condition, message)                                                                       \
+  do {                                                                                                               \
+    if (!(condition)) {                                                                                              \
+      ::maliput::common::internal::Throw<::maliput::common::assertion_error>(std::string(message).c_str(), __func__, \
+                                                                             __FILE__, __LINE__);                    \
+    }                                                                                                                \
+  } while (0)
+
+}  // namespace
+
+/// @def MALIPUT_THROW_UNLESS
+/// Evaluates @p condition and iff the value is false will throw an exception
+/// with a message showing at least the condition text, function name, file,
+/// and line. It can throw either maliput::common::assertion_error or the
+/// provided exception type.
+// TODO(Santoi): Deprecate this in favor of MALIPUT_VALIDATE. We prefer throwing exceptions with descriptive messages
+// rather than just failed conditions.
+#define MALIPUT_THROW_UNLESS(...) MALIPUT_THROW_UNLESS_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+
+/// @def MALIPUT_THROW_MESSAGE
 /// Throws an exception of type maliput::common::assertion_error or @p err_type
 /// (if it's specified) with a message.
 /// @see MALIPUT_THROW_MESSAGE_3.
@@ -166,29 +194,8 @@ void Throw(const char* condition, const char* func, const char* file, int line) 
 
 /// @def MALIPUT_VALIDATE
 /// Evaluates @p condition and iff the value is false will throw a
-/// @p err_type exception with a @p message showing at least the
+/// maliput::common::assertion_error with a @p message showing at least the
 /// condition text, function name, file, and line.
-#define MALIPUT_VALIDATE_3(pred, message, error_type)                                                             \
-  do {                                                                                                            \
-    if (!(pred)) {                                                                                                \
-      ::maliput::common::internal::Throw<error_type>(std::string(message).c_str(), __func__, __FILE__, __LINE__); \
-    }                                                                                                             \
-  } while (0)
-
-/// @def MALIPUT_VALIDATE
-/// Used to validate that a @p pred-icate passed into a function or method is
-/// true; if not, an exception with @p message is thrown.
-#define MALIPUT_VALIDATE_2(pred, message)                                                                            \
-  do {                                                                                                               \
-    if (!(pred)) {                                                                                                   \
-      ::maliput::common::internal::Throw<::maliput::common::assertion_error>(std::string(message).c_str(), __func__, \
-                                                                             __FILE__, __LINE__);                    \
-    }                                                                                                                \
-  } while (0)
-
-/// @def MALIPUT_VALIDATE
-/// Used to validate that a @p pred-icate passed into a function or method is
-/// true; if not, an exception with @p message is thrown.
 #define MALIPUT_VALIDATE(...) MALIPUT_VALIDATE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
 /// @def MALIPUT_IS_IN_RANGE
