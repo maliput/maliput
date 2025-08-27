@@ -2,6 +2,15 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.7.0 (2025-08-27)
+------------------
+* Bazel: Resolve linking in downstream packages. (`#670 <https://github.com/maliput/maliput/issues/670>`_)
+* Rules related errors. (`#667 <https://github.com/maliput/maliput/issues/667>`_)
+* Downgrade logging message. (`#671 <https://github.com/maliput/maliput/issues/671>`_)
+* Make a template for Throw method. (`#668 <https://github.com/maliput/maliput/issues/668>`_)
+* Maliput throw new errors. (`#665 <https://github.com/maliput/maliput/issues/665>`_)
+* Contributors: Franco Cipollone, Santiago Lopez
+
 1.6.0 (2025-07-29)
 ------------------
 * Create API to obtain Geo Reference info. (`#661 <https://github.com/maliput/maliput/issues/661>`_)
