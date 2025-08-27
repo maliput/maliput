@@ -50,7 +50,7 @@ std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
     const maliput::common::Path path{path_from_env};
     if (!path.is_directory()) {
       maliput::log()->debug("The path '", path_from_env, "' isn't a valid directory for the ", env_var,
-                           " env var, omitting...");
+                            " env var, omitting...");
       continue;
     }
     const auto filepaths_from_dir = maliput::utility::GetAllFilePathsFromDirectory(path.get_path(), "so");
