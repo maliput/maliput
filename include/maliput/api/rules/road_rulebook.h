@@ -81,9 +81,9 @@ class RoadRulebook {
   /// `tolerance` does not permit matching across BranchPoints (past the
   /// s-bounds of a Lane).
   ///
-  /// @throws maliput::common::assertion_error if `tolerance` is negative.
+  /// @throws maliput::common::rulebook_error if `tolerance` is negative.
   QueryResults FindRules(const std::vector<LaneSRange>& ranges, double tolerance) const {
-    MALIPUT_THROW_UNLESS(tolerance >= 0.);
+    MALIPUT_VALIDATE(tolerance >= 0., "Tolerance is negative.", maliput::common::rulebook_error);
     return DoFindRules(ranges, tolerance);
   }
 

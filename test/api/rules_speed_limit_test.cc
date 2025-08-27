@@ -58,12 +58,12 @@ GTEST_TEST(SpeedLimitRuleTest, Construction) {
 
   // Min must not be greater than max.
   EXPECT_THROW(SpeedLimitRule(SpeedLimitRule::Id("some_id"), kZone, SpeedLimitRule::Severity::kStrict, 90., 77.),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
   // Negative limits are not allowed.
   EXPECT_THROW(SpeedLimitRule(SpeedLimitRule::Id("some_id"), kZone, SpeedLimitRule::Severity::kStrict, -8., 77.),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
   EXPECT_THROW(SpeedLimitRule(SpeedLimitRule::Id("some_id"), kZone, SpeedLimitRule::Severity::kStrict, -8., -6.),
-               maliput::common::assertion_error);
+               maliput::common::rulebook_error);
 }
 
 GTEST_TEST(SpeedLimitRuleTest, Accessors) {

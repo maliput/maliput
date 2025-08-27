@@ -79,15 +79,15 @@ GTEST_TEST(RegisterRangeValueRule, RegisterAndQueryTest) {
   EXPECT_NO_THROW(dut.RegisterRangeValueRule(kTypeA, {kRangeA, kRangeB}));
   EXPECT_NO_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}));
   // Throws because of duplicated type ID.
-  EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRangeA}), maliput::common::rule_registry_error);
   EXPECT_THROW(dut.RegisterDiscreteValueRule(
                    kTypeB, {DiscreteValueRule::DiscreteValue{Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
                                                              api::test::CreateEmptyRelatedUniqueIds(), "SomeValue"}}),
-               maliput::common::assertion_error);
+               maliput::common::rule_registry_error);
   // Throws because of empty range vector.
-  EXPECT_THROW(dut.RegisterRangeValueRule(kTypeC, {} /* ranges */), maliput::common::assertion_error);
+  EXPECT_THROW(dut.RegisterRangeValueRule(kTypeC, {} /* ranges */), maliput::common::rule_registry_error);
   // Throws because of duplicated ranges.
-  EXPECT_THROW(dut.RegisterRangeValueRule(kTypeC, {kRangeA, kRangeA}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.RegisterRangeValueRule(kTypeC, {kRangeA, kRangeA}), maliput::common::rule_registry_error);
 
   EXPECT_TRUE(dut.DiscreteValueRuleTypes().empty());
 
@@ -165,10 +165,10 @@ GTEST_TEST(RegisterDiscreteValueRule, RegisterAndQueryTest) {
   EXPECT_THROW(dut.RegisterDiscreteValueRule(
                    kTypeB, {DiscreteValueRule::DiscreteValue{Rule::State::kStrict, api::test::CreateEmptyRelatedRules(),
                                                              api::test::CreateEmptyRelatedUniqueIds(), "SomeValue"}}),
-               maliput::common::assertion_error);
-  EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRange}), maliput::common::assertion_error);
+               maliput::common::rule_registry_error);
+  EXPECT_THROW(dut.RegisterRangeValueRule(kTypeB, {kRange}), maliput::common::rule_registry_error);
   // Throws because of empty vector.
-  EXPECT_THROW(dut.RegisterDiscreteValueRule(Rule::TypeId("SomeRuleType"), {}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.RegisterDiscreteValueRule(Rule::TypeId("SomeRuleType"), {}), maliput::common::rule_registry_error);
 
   EXPECT_TRUE(dut.RangeValueRuleTypes().empty());
 
@@ -276,10 +276,10 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
 
   // Unregistered type.
   EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {kRangeA}),
-               maliput::common::assertion_error);
+               maliput::common::rule_registry_error);
   // Unregistered range.
   EXPECT_THROW(dut.BuildRangeValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, {kUnregisteredRange}),
-               maliput::common::assertion_error);
+               maliput::common::rule_registry_error);
 
   // Builds and evaluates a discrete value based rule.
   const RuleRegistry::QueryResult::DiscreteValues kExpectedDiscreteValues{
@@ -296,11 +296,11 @@ GTEST_TEST(RegisterAndBuildTest, RegisterAndBuild) {
 
   // Unregistered type.
   EXPECT_THROW(dut.BuildDiscreteValueRule(Rule::Id("RuleId"), kUnregisteredRuleType, kZone, kExpectedDiscreteValues),
-               maliput::common::assertion_error);
+               maliput::common::rule_registry_error);
   // Unregistered discrete value for the type.
   EXPECT_THROW(
       dut.BuildDiscreteValueRule(kDiscreteValueRuleId, kDiscreteValueRuleType, kZone, {kUnregisteredDiscreteValue}),
-      maliput::common::assertion_error);
+      maliput::common::rule_registry_error);
 }
 
 }  // namespace test

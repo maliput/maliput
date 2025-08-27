@@ -44,35 +44,42 @@ namespace {
 /// This is because every phase must specify the complete state of all the rules
 /// and bulb states mentioned by the ring.
 void VerifyAllPhasesHaveSameCoverage(const PhaseRing::Id& id, const std::vector<Phase>& phases) {
-  MALIPUT_VALIDATE(phases.size() >= 1, "PhaseRing(" + id.string() + ") must have at least one phase.");
+  MALIPUT_VALIDATE(phases.size() >= 1, "PhaseRing(" + id.string() + ") must have at least one phase.",
+                   maliput::common::phase_book_error);
   const auto& r = phases.at(0);  // The reference phase.
   for (const auto& phase : phases) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     MALIPUT_VALIDATE(phase.rule_states().size() == r.rule_states().size(),
                      "PhaseRing(" + id.string() + "). Phase(" + phase.id().string() + ") and Phase(" + r.id().string() +
-                         ") must have the same number of rule_states.");
+                         ") must have the same number of rule_states.",
+                     maliput::common::phase_book_error);
     for (const auto& s : phase.rule_states()) {
-      MALIPUT_VALIDATE(r.rule_states().count(s.first) == 1, "PhaseRing(" + id.string() + "). Phase(" +
-                                                                phase.id().string() + ") has duplicated rule states.");
+      MALIPUT_VALIDATE(r.rule_states().count(s.first) == 1,
+                       "PhaseRing(" + id.string() + "). Phase(" + phase.id().string() + ") has duplicated rule states.",
+                       maliput::common::phase_book_error);
     }
 #pragma GCC diagnostic pop
     MALIPUT_VALIDATE(phase.discrete_value_rule_states().size() == r.discrete_value_rule_states().size(),
                      "PhaseRing(" + id.string() + "). Phase(" + phase.id().string() + ") and Phase(" + r.id().string() +
-                         ") must have the same number of discrete_value_rule_states.");
+                         ") must have the same number of discrete_value_rule_states.",
+                     maliput::common::phase_book_error);
     for (const auto& s : phase.discrete_value_rule_states()) {
       MALIPUT_VALIDATE(r.discrete_value_rule_states().count(s.first) == 1,
                        "PhaseRing(" + id.string() + "). Phase(" + phase.id().string() +
-                           ") has duplicated discrete value rule states");
+                           ") has duplicated discrete value rule states",
+                       maliput::common::phase_book_error);
     }
     // Require both set of bulb states to be defined or undefined together.
     if (r.bulb_states() != std::nullopt) {
       MALIPUT_VALIDATE(phase.bulb_states()->size() == r.bulb_states()->size(),
                        "Phase(" + id.string() + "). Phase(" + phase.id().string() + ") and Phase(" + r.id().string() +
-                           ") must have the same number of bulb_states.");
+                           ") must have the same number of bulb_states.",
+                       maliput::common::phase_book_error);
       for (const auto& s : *phase.bulb_states()) {
         MALIPUT_VALIDATE(r.bulb_states()->count(s.first) == 1,
-                         "PhaseRing(" + id.string() + ") has duplicated bulb states");
+                         "PhaseRing(" + id.string() + ") has duplicated bulb states",
+                         maliput::common::phase_book_error);
       }
     }
   }
@@ -83,11 +90,12 @@ void VerifyAllPhasesHaveSameCoverage(const PhaseRing::Id& id, const std::vector<
 void VerifyNextPhases(const PhaseRing::Id& id, const std::vector<Phase>& phases,
                       const std::unordered_map<Phase::Id, std::vector<PhaseRing::NextPhase>>& next_phases) {
   MALIPUT_VALIDATE(phases.size() == next_phases.size(),
-                   "PhaseRing(" + id.string() + ")'s phases and next_phases sizes must be equal.");
+                   "PhaseRing(" + id.string() + ")'s phases and next_phases sizes must be equal.",
+                   maliput::common::phase_book_error);
   for (const auto& phase : phases) {
-    MALIPUT_VALIDATE(
-        next_phases.find(phase.id()) != next_phases.end(),
-        "In PhaseRing(" + id.string() + "), the Phase(" + phase.id().string() + ") is not in next_phases.");
+    MALIPUT_VALIDATE(next_phases.find(phase.id()) != next_phases.end(),
+                     "In PhaseRing(" + id.string() + "), the Phase(" + phase.id().string() + ") is not in next_phases.",
+                     maliput::common::phase_book_error);
   }
 }
 
@@ -96,11 +104,14 @@ void VerifyNextPhases(const PhaseRing::Id& id, const std::vector<Phase>& phases,
 PhaseRing::PhaseRing(const Id& id, const std::vector<Phase>& phases,
                      const std::optional<const std::unordered_map<Phase::Id, std::vector<NextPhase>>>& next_phases)
     : id_(id) {
-  MALIPUT_VALIDATE(phases.size() >= 1, "PhaseRing(" + id_.string() + ") must have at least one phase.");
+  MALIPUT_VALIDATE(phases.size() >= 1, "PhaseRing(" + id_.string() + ") must have at least one phase.",
+                   maliput::common::phase_book_error);
   for (const Phase& phase : phases) {
     // Construct index of phases by ID, ensuring uniqueness of ID's.
     auto result = phases_.emplace(phase.id(), phase);
-    MALIPUT_THROW_UNLESS(result.second);
+    MALIPUT_VALIDATE(result.second,
+                     "Phase with ID '" + phase.id().string() + "' is not unique when creating PhaseRing.",
+                     maliput::common::phase_book_error);
   }
   if (next_phases != std::nullopt) {
     next_phases_ = *next_phases;

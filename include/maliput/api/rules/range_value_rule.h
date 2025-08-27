@@ -97,10 +97,10 @@ class RangeValueRule : public Rule {
   ///               determined by a RangeValueRuleStateProvider. This vector
   ///               must have at least one Range, and each Range must respect
   ///               that its min <= max and be unique.
-  /// @throws maliput::common::assertion_error When `ranges` is empty.
-  /// @throws maliput::common::assertion_error When any Range within `ranges`
+  /// @throws maliput::common::rulebook_error When `ranges` is empty.
+  /// @throws maliput::common::rulebook_error When any Range within `ranges`
   ///         violates `min <= max` condition.
-  /// @throws maliput::common::assertion_error When there are duplicated Range
+  /// @throws maliput::common::rulebook_error When there are duplicated Range
   ///         in `ranges`.
   RangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                  const std::vector<Range>& ranges);

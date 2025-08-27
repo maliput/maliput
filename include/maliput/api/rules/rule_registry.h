@@ -80,11 +80,11 @@ class RuleRegistry {
   ///        this type could be in. It must have at least one value; each value
   ///        must be unique.
   /// @see RangeValueRule
-  /// @throws maliput::common::assertion_error When `type_id` is already
+  /// @throws maliput::common::rule_registry_error When `type_id` is already
   ///         registered.
-  /// @throws maliput::common::assertion_error When `all_possible_ranges` is
+  /// @throws maliput::common::rule_registry_error When `all_possible_ranges` is
   ///         empty.
-  /// @throws maliput::common::assertion_error When there are duplicated items
+  /// @throws maliput::common::rule_registry_error When there are duplicated items
   ///         in `all_possible_ranges`.
   void RegisterRangeValueRule(const Rule::TypeId& type_id,
                               const std::vector<RangeValueRule::Range>& all_possible_ranges);
@@ -96,11 +96,11 @@ class RuleRegistry {
   ///        this type could be in. It must have at least one value; each value
   ///        must be unique.
   /// @see DiscreteValueRule.
-  /// @throws maliput::common::assertion_error When `type_id` is already
+  /// @throws maliput::common::rule_registry_error When `type_id` is already
   ///         registered.
-  /// @throws maliput::common::assertion_error When `all_possible_values` is
+  /// @throws maliput::common::rule_registry_error When `all_possible_values` is
   ///         empty.
-  /// @throws maliput::common::assertion_error When there are duplicated items
+  /// @throws maliput::common::rule_registry_error When there are duplicated items
   ///         in `all_possible_values`.
   void RegisterDiscreteValueRule(const Rule::TypeId& type_id,
                                  const std::vector<DiscreteValueRule::DiscreteValue>& all_possible_values);
@@ -123,9 +123,9 @@ class RuleRegistry {
   /// Builds a RangeValueRule.
   ///
   /// @see RangeValueRule constructor for parameter documentation.
-  /// @throws maliput::common::assertion_error When `type_id` is not a
+  /// @throws maliput::common::rule_registry_error When `type_id` is not a
   ///         registered RangeValueRule type.
-  /// @throws maliput::common::assertion_error When an element in `ranges` is
+  /// @throws maliput::common::rule_registry_error When an element in `ranges` is
   ///         not a possible range of a RangeValueRule of type `type_id`.
   RangeValueRule BuildRangeValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                                      const std::vector<RangeValueRule::Range>& ranges) const;
@@ -133,9 +133,9 @@ class RuleRegistry {
   /// Builds a DiscreteValueRule.
   ///
   /// @see DiscreteValueRule constructor for parameter documentation.
-  /// @throws maliput::common::assertion_error When `type_id` is not a
+  /// @throws maliput::common::rule_registry_error When `type_id` is not a
   ///         registered DiscreteValueRule type.
-  /// @throws maliput::common::assertion_error When an element in `values` is
+  /// @throws maliput::common::rule_registry_error When an element in `values` is
   ///         not a possible value of a DiscreteValueRule of type `type_id`.
   DiscreteValueRule BuildDiscreteValueRule(const Rule::Id& id, const Rule::TypeId& type_id, const LaneSRoute& zone,
                                            const std::vector<DiscreteValueRule::DiscreteValue>& values) const;

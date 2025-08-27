@@ -149,7 +149,7 @@ class Bulb final {
   /// @param bounding_box The bounding box of the bulb. See BoundingBox for
   /// details about the default value.
   ///
-  /// @throws common::assertion_error When `unique_id.bulb_id != id`.
+  /// @throws common::traffic_light_book_error When `unique_id.bulb_id != id`.
   Bulb(const Id& id, const InertialPosition& position_bulb_group, const Rotation& orientation_bulb_group,
        const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad = std::nullopt,
        const std::optional<std::vector<BulbState>>& states = std::nullopt, BoundingBox bounding_box = BoundingBox());
@@ -159,7 +159,7 @@ class Bulb final {
 
   /// Returns this Bulb instance's unique identifier.
   ///
-  /// @throws common::assertion_error When the parent BulbGroup and
+  /// @throws common::traffic_light_book_error When the parent BulbGroup and
   /// TrafficLight have not been registered. @see SetBulbGroup() and @see
   /// BulbGroup::SetTrafficLight().
   UniqueBulbId unique_id() const;
@@ -210,9 +210,9 @@ class Bulb final {
   /// This method is thought to be called once by @p bulb_group at
   /// its construct time.
   ///
-  /// @throws common::assertion_error When @p bulb_group is nullptr.
+  /// @throws common::traffic_light_book_error When @p bulb_group is nullptr.
   void SetBulbGroup(common::Passkey<BulbGroup>, const BulbGroup* bulb_group) {
-    MALIPUT_THROW_UNLESS(bulb_group != nullptr);
+    MALIPUT_VALIDATE(bulb_group != nullptr, "BulbGroup is null.", common::traffic_light_book_error);
     bulb_group_ = bulb_group;
   }
 
@@ -265,9 +265,9 @@ class BulbGroup final {
   /// least one bulb within this group. There must not be Bulbs with the same
   /// Bulb::Id. Null bulbs are not allowed.
   ///
-  /// @throws common::assertion_error When there are Bulbs with the same
+  /// @throws common::traffic_light_book_error When there are Bulbs with the same
   /// Bulb::Id in @p bulbs.
-  /// @throws common::assertion_error When any of the Bulbs in @p bulbs is
+  /// @throws common::traffic_light_book_error When any of the Bulbs in @p bulbs is
   /// nullptr.
   BulbGroup(const Id& id, const InertialPosition& position_traffic_light, const Rotation& orientation_traffic_light,
             std::vector<std::unique_ptr<Bulb>> bulbs);
@@ -277,7 +277,7 @@ class BulbGroup final {
 
   /// Returns this BulbGroup instance's unique identifier.
   ///
-  /// @throws common::assertion_error When the parent TrafficLight has not been
+  /// @throws common::traffic_light_book_error When the parent TrafficLight has not been
   /// registered. @see SetTrafficLight().
   UniqueBulbGroupId unique_id() const;
 
@@ -305,9 +305,9 @@ class BulbGroup final {
   /// This method is thought to be called once by @p traffic_light at
   /// its construct time.
   ///
-  /// @throws common::assertion_error When @p traffic_light is nullptr.
+  /// @throws common::traffic_light_book_error When @p traffic_light is nullptr.
   void SetTrafficLight(common::Passkey<TrafficLight>, const TrafficLight* traffic_light) {
-    MALIPUT_THROW_UNLESS(traffic_light != nullptr);
+    MALIPUT_VALIDATE(traffic_light != nullptr, "TrafficLight is null.", common::traffic_light_book_error);
     traffic_light_ = traffic_light;
   }
 
@@ -361,9 +361,9 @@ class TrafficLight final {
   /// There must not be BulbGroups with the same BulbGroup::Ids. Null bulb
   /// groups are not allowed.
   ///
-  /// @throws common::assertion_error When there are BulbGroups with the same
+  /// @throws common::traffic_light_book_error When there are BulbGroups with the same
   /// BulbGroup::Id in @p bulb_groups.
-  /// @throws common::assertion_error When any of the BulbGroup in
+  /// @throws common::traffic_light_book_error When any of the BulbGroup in
   /// @p bulb_groups is nullptr.
   TrafficLight(const Id& id, const InertialPosition& position_road_network, const Rotation& orientation_road_network,
                std::vector<std::unique_ptr<BulbGroup>> bulb_groups);

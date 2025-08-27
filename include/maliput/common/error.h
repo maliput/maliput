@@ -100,5 +100,40 @@ class road_geometry_construction_error : public maliput_error {
   explicit road_geometry_construction_error(const std::string& what_arg) : maliput_error(what_arg) {}
 };
 
+/// Errors involing the Road Rulebook.
+class rulebook_error : public maliput_error {
+ public:
+  /// Constructs a rulebook_error with @p what_arg as description.
+  explicit rulebook_error(const std::string& what_arg) : maliput_error(what_arg) {}
+};
+
+/// Errors involing the RuleRegistry.
+class rule_registry_error : public maliput_error {
+ public:
+  /// Constructs a rule_registry_error with @p what_arg as description.
+  explicit rule_registry_error(const std::string& what_arg) : maliput_error(what_arg) {}
+};
+
+/// Errors involing the TrafficLightBook.
+class traffic_light_book_error : public maliput_error {
+ public:
+  /// Constructs a traffic_light_book_error with @p what_arg as description.
+  explicit traffic_light_book_error(const std::string& what_arg) : maliput_error(what_arg) {}
+};
+
+/// Errors involing the PhaseBook.
+class phase_book_error : public maliput_error {
+ public:
+  /// Constructs a phase_book_error with @p what_arg as description.
+  explicit phase_book_error(const std::string& what_arg) : maliput_error(what_arg) {}
+};
+
+/// Errors involing the StateProvider.
+class state_provider_error : public maliput_error {
+ public:
+  /// Constructs a state_provider_error with @p what_arg as description.
+  explicit state_provider_error(const std::string& what_arg) : maliput_error(what_arg) {}
+};
+
 }  // namespace common
 }  // namespace maliput

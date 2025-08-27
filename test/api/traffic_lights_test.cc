@@ -151,7 +151,7 @@ class BulbTest : public ::testing::Test {
 
 TEST_F(BulbTest, Accessors) {
   EXPECT_EQ(bulb_.id(), Bulb::Id("dut_id"));
-  EXPECT_THROW(bulb_.unique_id(), common::assertion_error);
+  EXPECT_THROW(bulb_.unique_id(), common::traffic_light_book_error);
   EXPECT_EQ(bulb_.position_bulb_group(), InertialPosition(1, 2, 3));
   EXPECT_EQ(bulb_.orientation_bulb_group().matrix(), Rotation::FromRpy(4, 5, 6).matrix());
   EXPECT_EQ(bulb_.color(), BulbColor::kRed);
@@ -215,7 +215,7 @@ TEST_F(BulbGroupConstructorTest, DuplicatedBulbIds) {
   bulbs.push_back(std::make_unique<Bulb>(kBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
   bulbs.push_back(
       std::make_unique<Bulb>(kBulbId, InertialPosition(0, 0, 0.3), kZeroRotation, BulbColor::kGreen, BulbType::kRound));
-  EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, std::move(bulbs)), common::assertion_error);
+  EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, std::move(bulbs)), common::traffic_light_book_error);
 }
 
 TEST_F(BulbGroupConstructorTest, NullBulb) {
@@ -223,7 +223,7 @@ TEST_F(BulbGroupConstructorTest, NullBulb) {
   bulbs.push_back(std::make_unique<Bulb>(kBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
   bulbs.push_back({});
 
-  EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, std::move(bulbs)), common::assertion_error);
+  EXPECT_THROW(BulbGroup(kDutId, kDutPosition, kDutRotation, std::move(bulbs)), common::traffic_light_book_error);
 }
 
 class BulbGroupTest : public ::testing::Test {
@@ -262,7 +262,7 @@ TEST_F(BulbGroupTest, Accessors) {
   EXPECT_EQ(static_cast<int>(bulb_group_->bulbs().size()), 3);
   EXPECT_EQ(bulb_group_->GetBulb(Bulb::Id("unknown_bulb")), nullptr);
   EXPECT_EQ(bulb_group_->GetBulb(Bulb::Id("red_bulb")), red_bulb_ptr_);
-  EXPECT_THROW(bulb_group_->unique_id(), common::assertion_error);
+  EXPECT_THROW(bulb_group_->unique_id(), common::traffic_light_book_error);
 }
 
 class TrafficLightConstructorTest : public ::testing::Test {
@@ -279,7 +279,8 @@ TEST_F(TrafficLightConstructorTest, DuplicatedBulbGroupIds) {
   std::vector<std::unique_ptr<BulbGroup>> bulb_group;
   bulb_group.push_back(api::test::CreateBulbGroup(false /* add_missing_bulb_group */));
   bulb_group.push_back(api::test::CreateBulbGroup(false /* add_missing_bulb_group */));
-  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)), common::assertion_error);
+  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)),
+               common::traffic_light_book_error);
 }
 
 TEST_F(TrafficLightConstructorTest, NullBulbGroup) {
@@ -288,7 +289,8 @@ TEST_F(TrafficLightConstructorTest, NullBulbGroup) {
   bulbs.push_back(std::make_unique<Bulb>(kRedBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
   bulb_group.push_back(std::make_unique<BulbGroup>(kBulbGroupId, kZeroPosition, kZeroRotation, std::move(bulbs)));
   bulb_group.push_back({});
-  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)), common::assertion_error);
+  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)),
+               common::traffic_light_book_error);
 }
 
 class TrafficLightTest : public ::testing::Test {
