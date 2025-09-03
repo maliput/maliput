@@ -49,32 +49,32 @@ class RangeValidatorConstructorValidation : public ::testing::Test {
 
 // no throw
 TEST_F(RangeValidatorConstructorValidation, WellConstructed) {
-  EXPECT_NO_THROW({ RangeValidator::GetAbsoluteEpsilonValidator(kMin, kMax, kTolerance, kEpsilon); });
+  EXPECT_NO_THROW({ RangeValidator<>::GetAbsoluteEpsilonValidator(kMin, kMax, kTolerance, kEpsilon); });
 }
 
 // relative epsilon > tolerance
 // kEpsilon * (kMax - kMin) > tolerance
 TEST_F(RangeValidatorConstructorValidation, RelativeEpsilonGreaterThanTolerance) {
-  EXPECT_THROW({ RangeValidator::GetRelativeEpsilonValidator(kMin, kMax, kTolerance, kEpsilon); },
+  EXPECT_THROW({ RangeValidator<>::GetRelativeEpsilonValidator(kMin, kMax, kTolerance, kEpsilon); },
                maliput::common::assertion_error);
 }
 
 // min > max
 TEST_F(RangeValidatorConstructorValidation, MinGreaterThanMax) {
-  EXPECT_THROW({ RangeValidator::GetAbsoluteEpsilonValidator(kMax, kMin, kTolerance, kEpsilon); },
+  EXPECT_THROW({ RangeValidator<>::GetAbsoluteEpsilonValidator(kMax, kMin, kTolerance, kEpsilon); },
                maliput::common::assertion_error);
 }
 
 // epsilon > tolerance
 TEST_F(RangeValidatorConstructorValidation, EpsilonGreaterThanTolerance) {
-  EXPECT_THROW({ RangeValidator::GetAbsoluteEpsilonValidator(kMin, kMax, kEpsilon, kTolerance); },
+  EXPECT_THROW({ RangeValidator<>::GetAbsoluteEpsilonValidator(kMin, kMax, kEpsilon, kTolerance); },
                maliput::common::assertion_error);
 }
 
 // min + epsilon > max (applies the other way around, it's specially provided
 // in constructor code to validate numerical error).
 TEST_F(RangeValidatorConstructorValidation, MinPlusEpsilonGreaterThanMax) {
-  EXPECT_THROW({ RangeValidator::GetAbsoluteEpsilonValidator(kMin, kMax, 2 * kMax, kMax); },
+  EXPECT_THROW({ RangeValidator<>::GetAbsoluteEpsilonValidator(kMin, kMax, 2 * kMax, kMax); },
                maliput::common::assertion_error);
 }
 
@@ -86,7 +86,7 @@ class RangeValidatorAbsoluteEpsilonRange : public ::testing::Test {
   static constexpr double kMax{3.};
   static constexpr double kTolerance{1e-3};
   static constexpr double kEpsilon{1e-5};
-  const RangeValidator dut{RangeValidator::GetAbsoluteEpsilonValidator(kMin, kMax, kTolerance, kEpsilon)};
+  const RangeValidator<> dut{RangeValidator<>::GetAbsoluteEpsilonValidator(kMin, kMax, kTolerance, kEpsilon)};
 };
 
 // In the middle of the range.
@@ -135,7 +135,7 @@ class RangeValidatorRelativeEpsilonRange : public ::testing::Test {
   static constexpr double kTolerance{1e-3};
   static constexpr double kEpsilon{1e-8};
   static constexpr double kRelativeEpsilon{kEpsilon * kRange};
-  const RangeValidator dut{RangeValidator::GetRelativeEpsilonValidator(kMin, kMax, kTolerance, kEpsilon)};
+  const RangeValidator<> dut{RangeValidator<>::GetRelativeEpsilonValidator(kMin, kMax, kTolerance, kEpsilon)};
 };
 
 // In the middle of the range.
@@ -187,7 +187,7 @@ class RangeValidatorOutOfPrecisionTest : public ::testing::Test {
 };
 
 TEST_F(RangeValidatorOutOfPrecisionTest, WithAbsoluteEpsilon) {
-  const RangeValidator dut{RangeValidator::GetAbsoluteEpsilonValidator(kMin, kMax, kTolerance, kEpsilon)};
+  const RangeValidator<> dut{RangeValidator<>::GetAbsoluteEpsilonValidator(kMin, kMax, kTolerance, kEpsilon)};
   // In the maximum of the range.
   const double kS{kMax};
   // The value isn't clamped because it is beyond of the double precision.
@@ -196,11 +196,21 @@ TEST_F(RangeValidatorOutOfPrecisionTest, WithAbsoluteEpsilon) {
 
 TEST_F(RangeValidatorOutOfPrecisionTest, WithRelativeEpsilon) {
   const double kRelativeEpsilon{kEpsilon * (kMax - kMin)};
-  const RangeValidator dut{RangeValidator::GetRelativeEpsilonValidator(kMin, kMax, kTolerance, kEpsilon)};
+  const RangeValidator<> dut{RangeValidator<>::GetRelativeEpsilonValidator(kMin, kMax, kTolerance, kEpsilon)};
   // In the maximum of the range.
   const double kS{kMax};
   // The value is clamped because the epsilon value is weighten by the length of the range.
   EXPECT_DOUBLE_EQ(dut(kS), kS - kRelativeEpsilon);
+}
+
+class CustomError : public maliput::common::maliput_error {
+ public:
+  explicit CustomError(const std::string& what_arg) : maliput::common::maliput_error(what_arg) {}
+};
+
+TEST_F(RangeValidatorConstructorValidation, CustomErrorType) {
+  EXPECT_THROW({ RangeValidator<CustomError>::GetAbsoluteEpsilonValidator(kMax, kMin, kTolerance, kEpsilon); },
+               CustomError);
 }
 
 }  // namespace test
