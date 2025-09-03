@@ -6,7 +6,6 @@ set(COMMON_SOURCES
   filesystem.cc
   logger.cc
   maliput_abort.cc
-  range_validator.cc
 )
 
 add_library(common ${COMMON_SOURCES})
