@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.7.1 (2025-09-03)
+------------------
+* Range validator error type template. (`#673 <https://github.com/maliput/maliput/issues/673>`_)
+* Contributors: Santiago Lopez
+
 1.7.0 (2025-08-27)
 ------------------
 * Bazel: Resolve linking in downstream packages. (`#670 <https://github.com/maliput/maliput/issues/670>`_)
