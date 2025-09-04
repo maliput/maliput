@@ -52,10 +52,12 @@ void ManualDiscreteValueRuleStateProvider::SetState(
     const api::rules::Rule::Id& id, const api::rules::DiscreteValueRule::DiscreteValue& state,
     const std::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
     const std::optional<double>& duration_until) {
-  const api::rules::DiscreteValueRule rule = rulebook_->GetDiscreteValueRule(id);
-  ValidateRuleState(rule, state);
+  const std::optional<api::rules::DiscreteValueRule> rule = rulebook_->GetDiscreteValueRule(id);
+  MALIPUT_VALIDATE(rule.has_value(), "RangeValueRule(" + id.string() + ") is not found.", common::state_provider_error);
+
+  ValidateRuleState(rule.value(), state);
   if (next_state.has_value()) {
-    ValidateRuleState(rule, *next_state);
+    ValidateRuleState(rule.value(), *next_state);
     if (duration_until.has_value()) {
       MALIPUT_THROW_UNLESS(*duration_until > 0.);
     }

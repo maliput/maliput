@@ -170,8 +170,8 @@ class GetCurrentYieldGroupTest : public ::testing::Test {
 
 // Tests GetCurrentYieldGroup function.
 TEST_F(GetCurrentYieldGroupTest, GetCurrentYieldGroup) {
-  const std::vector<Rule::Id> dut{
-      GetCurrentYieldGroup(road_rulebook_->GetDiscreteValueRule(kRuleId), discrete_value_rule_state_provider_.get())};
+  const std::vector<Rule::Id> dut{GetCurrentYieldGroup(road_rulebook_->GetDiscreteValueRule(kRuleId).value(),
+                                                       discrete_value_rule_state_provider_.get())};
 
   EXPECT_EQ(dut.size(), expected_yield_group.size());
   for (const auto& expected_yield_id : expected_yield_group) {
@@ -210,8 +210,8 @@ class GetCurrentBulbGroupTest : public ::testing::Test {
 
 // Tests GetCurrentBulbGroup function.
 TEST_F(GetCurrentBulbGroupTest, GetCurrentBulbGroup) {
-  const std::vector<api::UniqueId> dut{
-      GetCurrentBulbGroup(road_rulebook_->GetDiscreteValueRule(kRuleId), discrete_value_rule_state_provider_.get())};
+  const std::vector<api::UniqueId> dut{GetCurrentBulbGroup(road_rulebook_->GetDiscreteValueRule(kRuleId).value(),
+                                                           discrete_value_rule_state_provider_.get())};
 
   EXPECT_EQ(dut.size(), expected_bulb_group.size());
   for (const auto& expected_bulb_id : expected_bulb_group) {

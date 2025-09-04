@@ -77,8 +77,10 @@ std::vector<LaneSRange> GetRegion(const RoadRulebook& road_rulebook, const Phase
   std::vector<LaneSRange> result;
   for (const auto& rule_state : phase.discrete_value_rule_states()) {
     const Rule::Id rule_id = rule_state.first;
-    const DiscreteValueRule rule = road_rulebook.GetDiscreteValueRule(rule_id);
-    for (const auto& range : rule.zone().ranges()) {
+    const std::optional<DiscreteValueRule> rule = road_rulebook.GetDiscreteValueRule(rule_id);
+    MALIPUT_VALIDATE(rule.has_value(), "No Rule(" + rule_id.string() + ") in Rulebook.",
+                     maliput::common::rulebook_error);
+    for (const auto& range : rule.value().zone().ranges()) {
       result.push_back(range);
     }
   }

@@ -146,7 +146,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
 
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
   dut.AddRule(kRangeValueRule);
-  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()).value(), kRangeValueRule)));
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
   dut.RemoveRule(kRangeValueRule.id());
   EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
@@ -169,7 +169,7 @@ TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
 
   EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
   dut.AddRule(kDiscreteValueRule);
-  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()).value(), kDiscreteValueRule)));
   EXPECT_THROW(dut.AddRule(kDiscreteValueRule), maliput::common::assertion_error);
   dut.RemoveRule(kDiscreteValueRule.id());
   EXPECT_THROW({ dut.GetDiscreteValueRule(kDiscreteValueRule.id()); }, std::out_of_range);
@@ -221,8 +221,8 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kSpeedLimit.id()), kSpeedLimit)));
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kDirectionUsage.id()), kDirectionUsage)));
 #pragma GCC diagnostic pop
-  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule)));
-  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()).value(), kDiscreteValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()).value(), kRangeValueRule)));
 }
 
 TEST_F(ManualRulebookTest, FindRules) {
