@@ -30,14 +30,14 @@
 #include "maliput/utility/file_utils.h"
 
 #include <iostream>
-// TODO(#379): Remove "experimental" namespace once a newer version of GCC is used(8 or above).
-#include <experimental/filesystem>
+
+#include <filesystem>
 
 #include "maliput/common/logger.h"
 
 namespace maliput {
 namespace utility {
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 std::string GetSuffixFromPath(const std::string& filepath) {
   auto it = filepath.find_last_of('.');
