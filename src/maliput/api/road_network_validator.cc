@@ -69,11 +69,11 @@ void CheckLaneSRouteContiguity(const RoadGeometry* road_geometry, const LaneSRou
 void CheckContiguityBetweenLanes(const RoadNetwork& road_network) {
   const rules::RoadRulebook::QueryResults rules = road_network.rulebook()->Rules();
   const RoadGeometry* const road_geometry = road_network.road_geometry();
-  for (const std::pair<rules::DiscreteValueRule::Id, rules::DiscreteValueRule>& key_value :
+  for (const std::pair<const rules::DiscreteValueRule::Id, rules::DiscreteValueRule>& key_value :
        rules.discrete_value_rules) {
     CheckLaneSRouteContiguity(road_geometry, key_value.second.zone());
   }
-  for (const std::pair<rules::RangeValueRule::Id, rules::RangeValueRule>& key_value : rules.range_value_rules) {
+  for (const std::pair<const rules::RangeValueRule::Id, rules::RangeValueRule>& key_value : rules.range_value_rules) {
     CheckLaneSRouteContiguity(road_geometry, key_value.second.zone());
   }
 }
