@@ -104,7 +104,10 @@ cc_library(
     srcs = glob(["src/maliput/utility/**/*.cc"]),
     hdrs = glob(["include/maliput/utility/**/*.h"]),
     copts = COPTS,
-    linkopts = ["-lstdc++fs", "-lpthread"],
+    linkopts = select({
+      "@platforms//os:linux": ["-lstdc++fs", "-lpthread"],
+      "@platforms//os:macos": [],
+    }),
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [
