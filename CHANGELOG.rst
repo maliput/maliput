@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.7.2 (2025-09-09)
+------------------
+* Some fixes for macos build (`#676 <https://github.com/maliput/maliput/issues/676>`_)
+* Contributors: Franco Cipollone
+
 1.7.1 (2025-09-03)
 ------------------
 * Range validator error type template. (`#673 <https://github.com/maliput/maliput/issues/673>`_)
