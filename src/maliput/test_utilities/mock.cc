@@ -149,17 +149,17 @@ class MockRoadRulebook : public rules::RoadRulebook {
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override { return *speed_limit_rule_; }
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return *direction_usage_rule_; }
 #pragma GCC diagnostic pop
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+  std::optional<DiscreteValueRule> DoGetDiscreteValueRule(const Rule::Id& id) const override {
     if (discrete_value_rule_.has_value() && discrete_value_rule_->id() == id) {
-      return *discrete_value_rule_;
+      return discrete_value_rule_;
     }
-    throw std::out_of_range("Unknown Id.");
+    return std::nullopt;
   }
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+  std::optional<RangeValueRule> DoGetRangeValueRule(const Rule::Id& id) const override {
     if (range_value_rule_.has_value() && range_value_rule_->id() == id) {
-      return *range_value_rule_;
+      return range_value_rule_;
     }
-    throw std::out_of_range("Unknown Id.");
+    return std::nullopt;
   }
 
 #pragma GCC diagnostic push
@@ -195,17 +195,17 @@ class MockContiguityRoadRulebook final : public rules::RoadRulebook {
     return result;
   }
 
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+  std::optional<DiscreteValueRule> DoGetDiscreteValueRule(const Rule::Id& id) const override {
     if (discrete_value_rule_.has_value() && discrete_value_rule_->id() == id) {
-      return *discrete_value_rule_;
+      return discrete_value_rule_;
     }
-    throw std::out_of_range("Unknown Id.");
+    return std::nullopt;
   }
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+  std::optional<RangeValueRule> DoGetRangeValueRule(const Rule::Id& id) const override {
     if (range_value_rule_.has_value() && range_value_rule_->id() == id) {
-      return *range_value_rule_;
+      return range_value_rule_;
     }
-    throw std::out_of_range("Unknown Id.");
+    return std::nullopt;
   }
 
 #pragma GCC diagnostic push
