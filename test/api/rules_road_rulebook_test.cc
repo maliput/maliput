@@ -179,10 +179,10 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
 #pragma GCC diagnostic pop
 
   EXPECT_EQ(dut.GetDiscreteValueRule(dut.kDiscreteValueRule.id()).value().id(), dut.kDiscreteValueRule.id());
-  EXPECT_THROW(dut.GetDiscreteValueRule(Rule::Id("xxx")), std::out_of_range);
+  EXPECT_EQ(dut.GetDiscreteValueRule(Rule::Id("xxx")), std::nullopt);
 
   EXPECT_EQ(dut.GetRangeValueRule(dut.kRangeValueRule.id()).value().id(), dut.kRangeValueRule.id());
-  EXPECT_THROW(dut.GetRangeValueRule(Rule::Id("xxx")), std::out_of_range);
+  EXPECT_EQ(dut.GetRangeValueRule(Rule::Id("xxx")), std::nullopt);
 }
 
 }  // namespace

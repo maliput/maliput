@@ -43,8 +43,9 @@ void ManualDiscreteValueRuleStateProvider::ValidateRuleState(
     const api::rules::DiscreteValueRule::DiscreteValue& state) const {
   if (std::find(discrete_value_rule.states().begin(), discrete_value_rule.states().end(), state) ==
       discrete_value_rule.states().end()) {
-    MALIPUT_THROW_MESSAGE("DiscreteValue is not in DiscreteValueRule " + discrete_value_rule.id().string() +
-                          "'s' states().");
+    MALIPUT_THROW_MESSAGE(
+        "DiscreteValue is not in DiscreteValueRule " + discrete_value_rule.id().string() + "'s' states().",
+        common::state_provider_error);
   }
 }
 
@@ -53,16 +54,18 @@ void ManualDiscreteValueRuleStateProvider::SetState(
     const std::optional<api::rules::DiscreteValueRule::DiscreteValue>& next_state,
     const std::optional<double>& duration_until) {
   const std::optional<api::rules::DiscreteValueRule> rule = rulebook_->GetDiscreteValueRule(id);
-  MALIPUT_VALIDATE(rule.has_value(), "RangeValueRule(" + id.string() + ") is not found.", common::state_provider_error);
+  MALIPUT_VALIDATE(rule.has_value(), "RangeValueRule(" + id.string() + ") is not found.", common::rulebook_error);
 
   ValidateRuleState(rule.value(), state);
   if (next_state.has_value()) {
     ValidateRuleState(rule.value(), *next_state);
     if (duration_until.has_value()) {
-      MALIPUT_THROW_UNLESS(*duration_until > 0.);
+      MALIPUT_VALIDATE(*duration_until > 0., "The duration until the the next phase state must be greater than 0.",
+                       common::state_provider_error);
     }
   } else {
-    MALIPUT_THROW_UNLESS(!duration_until.has_value());
+    MALIPUT_VALIDATE(!duration_until.has_value(), "Duration must be accompanied by a valid next state.",
+                     common::state_provider_error);
   }
 
   api::rules::DiscreteValueRuleStateProvider::StateResult state_result;
