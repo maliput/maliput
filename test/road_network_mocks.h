@@ -161,8 +161,9 @@ class RoadRulebookMock final : public api::rules::RoadRulebook {
   MOCK_METHOD(api::rules::SpeedLimitRule, DoGetRule, (const api::rules::SpeedLimitRule::Id&), (const));
   MOCK_METHOD(api::rules::DirectionUsageRule, DoGetRule, (const api::rules::DirectionUsageRule::Id&), (const));
 #pragma GCC diagnostic pop
-  MOCK_METHOD(api::rules::DiscreteValueRule, DoGetDiscreteValueRule, (const api::rules::Rule::Id&), (const));
-  MOCK_METHOD(api::rules::RangeValueRule, DoGetRangeValueRule, (const api::rules::Rule::Id&), (const));
+  MOCK_METHOD(std::optional<api::rules::DiscreteValueRule>, DoGetDiscreteValueRule, (const api::rules::Rule::Id&),
+              (const));
+  MOCK_METHOD(std::optional<api::rules::RangeValueRule>, DoGetRangeValueRule, (const api::rules::Rule::Id&), (const));
 };
 
 // @brief Google mock api::rules::TrafficLightBook.

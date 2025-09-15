@@ -30,6 +30,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "maliput/api/regions.h"
@@ -120,8 +121,8 @@ class ManualRulebook : public api::rules::RoadRulebook {
   api::rules::SpeedLimitRule DoGetRule(const api::rules::SpeedLimitRule::Id& id) const override;
   api::rules::DirectionUsageRule DoGetRule(const api::rules::DirectionUsageRule::Id& id) const override;
 #pragma GCC diagnostic pop
-  api::rules::DiscreteValueRule DoGetDiscreteValueRule(const api::rules::Rule::Id& id) const override;
-  api::rules::RangeValueRule DoGetRangeValueRule(const api::rules::Rule::Id& id) const override;
+  std::optional<api::rules::DiscreteValueRule> DoGetDiscreteValueRule(const api::rules::Rule::Id& id) const override;
+  std::optional<api::rules::RangeValueRule> DoGetRangeValueRule(const api::rules::Rule::Id& id) const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;
