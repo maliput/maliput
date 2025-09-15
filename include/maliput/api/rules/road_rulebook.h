@@ -30,6 +30,7 @@
 #pragma once
 
 #include <map>
+#include <optional>
 #include <vector>
 
 #include "maliput/api/regions.h"
