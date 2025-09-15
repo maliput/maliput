@@ -46,7 +46,7 @@ namespace {
 void PopulateRangeValueRuleStates(
     const std::map<maliput::api::rules::Rule::Id, maliput::api::rules::RangeValueRule>& range_value_rules,
     maliput::ManualRangeValueRuleStateProvider* state_provider) {
-  MALIPUT_THROW_UNLESS(state_provider != nullptr);
+  MALIPUT_THROW_UNLESS(state_provider != nullptr, common::state_provider_error);
   for (const auto& rule_id_rule : range_value_rules) {
     state_provider->SetState(rule_id_rule.first, rule_id_rule.second.states().front(), std::nullopt, std::nullopt);
   }
@@ -67,7 +67,8 @@ void ManualRangeValueRuleStateProvider::ValidateRuleState(const api::rules::Rang
                                                           const api::rules::RangeValueRule::Range& state) const {
   if (std::find(range_value_rule.states().begin(), range_value_rule.states().end(), state) ==
       range_value_rule.states().end()) {
-    MALIPUT_THROW_MESSAGE("Range is not in RangeValueRule " + range_value_rule.id().string() + "'s' states().");
+    MALIPUT_THROW_MESSAGE("Range is not in RangeValueRule " + range_value_rule.id().string() + "'s' states().",
+                          common::state_provider_error);
   }
 }
 
@@ -75,15 +76,19 @@ void ManualRangeValueRuleStateProvider::SetState(const api::rules::Rule::Id& id,
                                                  const api::rules::RangeValueRule::Range& state,
                                                  const std::optional<api::rules::RangeValueRule::Range>& next_state,
                                                  const std::optional<double>& duration_until) {
-  const api::rules::RangeValueRule rule = rulebook_->GetRangeValueRule(id);
-  ValidateRuleState(rule, state);
+  const std::optional<api::rules::RangeValueRule> rule = rulebook_->GetRangeValueRule(id);
+  MALIPUT_VALIDATE(rule.has_value(), "RangeValueRule(" + id.string() + ") is not found.", common::rulebook_error);
+
+  ValidateRuleState(rule.value(), state);
   if (next_state.has_value()) {
-    ValidateRuleState(rule, *next_state);
+    ValidateRuleState(rule.value(), *next_state);
     if (duration_until.has_value()) {
-      MALIPUT_THROW_UNLESS(*duration_until > 0.);
+      MALIPUT_VALIDATE(*duration_until > 0., "The duration until the the next phase state must be greater than 0.",
+                       common::state_provider_error);
     }
   } else {
-    MALIPUT_THROW_UNLESS(!duration_until.has_value());
+    MALIPUT_VALIDATE(!duration_until.has_value(), "Duration must be accompanied by a valid next state.",
+                     common::state_provider_error);
   }
 
   api::rules::RangeValueRuleStateProvider::StateResult state_result;
