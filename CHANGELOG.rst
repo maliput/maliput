@@ -2,6 +2,12 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.8.0 (2025-09-22)
+------------------
+* `GetRangeValueRule` and `GetDiscreteValueRule` return optional values. (`#678 <https://github.com/maliput/maliput/issues/678>`_)
+* Patch to 1.7.2 release.
+* Contributors: Franco Cipollone, Santiago Lopez
+
 1.7.2 (2025-09-09)
 ------------------
 * Some fixes for macos build (`#676 <https://github.com/maliput/maliput/issues/676>`_)
