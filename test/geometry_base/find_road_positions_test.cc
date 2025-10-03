@@ -38,6 +38,7 @@
 #include "maliput/api/lane.h"
 #include "maliput/common/error.h"
 #include "maliput/geometry_base/brute_force_find_road_positions_strategy.h"
+#include "maliput/geometry_base/kd_tree_strategy.h"
 #include "maliput/test_utilities/mock_geometry.h"
 
 using ::testing::_;
@@ -55,7 +56,9 @@ namespace test {
 namespace {
 
 const double kRadius{3.};
+const double kInfiniteRadius{1e100};
 const double kDistance{3.};
+const double kSamplingStep{0.5};
 
 using maliput::test::AssertCompare;
 
@@ -106,6 +109,15 @@ class LaneMock final : public MockLane {
 
  private:
   const double distance_{};
+  api::LanePositionResult lane_position_result_{};
+
+  double do_length() const override { return 100; };
+  api::RBounds do_lane_bounds(double) const override { return api::RBounds(-1, 1); };
+  api::RBounds do_segment_bounds(double) const override { return api::RBounds(-1, 1); };
+  api::HBounds do_elevation_bounds(double, double) const override { return api::HBounds(0, 10); };
+  api::InertialPosition DoToInertialPosition(const api::LanePosition& lane_pos) const override {
+    return api::InertialPosition(1., 2., 3.);
+  }
 };
 
 class RoadGeometryMock final : public MockRoadGeometry {
@@ -241,6 +253,55 @@ TEST_F(BruteForceTest, AllLanesCalled) {
         IsInertialPositionClose(road_position_result.nearest_position, kExpectedInertialPosition, kZeroTolerance)));
     EXPECT_NEAR(road_position_result.distance, kExpectedDistance, kZeroTolerance);
   }
+}
+
+class KDTreeStrategyTest : public ::testing::Test {
+ protected:
+  const double linear_tolerance{1.};
+  const double angular_tolerance{1.};
+  const double scale_length{1.};
+  const math::Vector3 inertial_to_backend_frame_translation{0., 0., 0.};
+  const double kZeroTolerance{0.};
+};
+
+TEST_F(KDTreeStrategyTest, LaneInAndOutRadius) {
+  auto rg = MakeOneLaneRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length,
+                                    inertial_to_backend_frame_translation, kDistance);
+  EXPECT_TRUE(rg.get() != nullptr);
+  KDTreeStrategy dut(rg.get(), kSamplingStep);
+
+  std::vector<api::RoadPositionResult> results = dut.FindRoadPositions(api::InertialPosition(1., 2., 3.), kRadius);
+
+  EXPECT_EQ(static_cast<int>(results.size()), 1);
+  const api::LanePosition kExpectedLanePosition{4., 5., 6.};
+  const api::InertialPosition kExpectedInertialPosition{10., 11., 12.};
+  const double kExpectedDistance = 3.;
+  const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
+  api::LaneId id = results.front().road_position.lane->id();
+
+  EXPECT_TRUE(id == lanes.front()->id());
+  EXPECT_TRUE(
+      AssertCompare(IsLanePositionClose(results.front().road_position.pos, kExpectedLanePosition, kZeroTolerance)));
+  EXPECT_TRUE(AssertCompare(
+      IsInertialPositionClose(results.front().nearest_position, kExpectedInertialPosition, kZeroTolerance)));
+  EXPECT_NEAR(results.front().distance, kExpectedDistance, kZeroTolerance);
+
+  results = dut.FindRoadPositions(api::InertialPosition(1., 2., 3.), kDistance - 1.);
+
+  EXPECT_TRUE(results.empty());
+}
+
+TEST_F(KDTreeStrategyTest, FindRoadPositionsLargeRadius) {
+  auto rg = MakeFullRoadGeometry(api::RoadGeometryId("dut"), linear_tolerance, angular_tolerance, scale_length,
+                                 inertial_to_backend_frame_translation);
+
+  KDTreeStrategy dut(rg.get(), kSamplingStep);
+
+  const std::vector<api::RoadPositionResult> results =
+      dut.FindRoadPositions(api::InertialPosition(0., 0., 0.), kInfiniteRadius);
+  std::cout << "Size: " << results.size() << std::endl;
+  std::cout << "lanes: " << rg.get()->get_lanes().size() << std::endl;
+  EXPECT_EQ(results.size(), rg.get()->get_lanes().size());
 }
 
 }  // namespace
