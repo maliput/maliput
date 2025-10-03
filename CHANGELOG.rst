@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.8.1 (2025-10-03)
+------------------
+* `KDTreeStrategy::ClosestLanes` now returns each lane at most 1 time. (`#681 <https://github.com/maliput/maliput/issues/681>`_)
+* Contributors: Santiago Lopez
+
 1.8.0 (2025-09-22)
 ------------------
 * `GetRangeValueRule` and `GetDiscreteValueRule` return optional values. (`#678 <https://github.com/maliput/maliput/issues/678>`_)
