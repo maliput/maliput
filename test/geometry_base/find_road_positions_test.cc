@@ -299,8 +299,6 @@ TEST_F(KDTreeStrategyTest, FindRoadPositionsLargeRadius) {
 
   const std::vector<api::RoadPositionResult> results =
       dut.FindRoadPositions(api::InertialPosition(0., 0., 0.), kInfiniteRadius);
-  std::cout << "Size: " << results.size() << std::endl;
-  std::cout << "lanes: " << rg.get()->get_lanes().size() << std::endl;
   EXPECT_EQ(results.size(), rg.get()->get_lanes().size());
 }
 
