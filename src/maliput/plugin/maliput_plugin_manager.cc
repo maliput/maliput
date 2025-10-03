@@ -44,9 +44,9 @@ namespace {
 std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
   const auto paths_from_env = maliput::utility::GetAllPathsFromEnvironment(env_var);
   std::vector<std::string> filepaths{};
-  maliput::log()->trace("'", env_var, "' env var contains ", paths_from_env.size(), " paths:");
+  maliput::log()->debug("'", env_var, "' env var contains ", paths_from_env.size(), " paths:");
   for (const auto& path_from_env : paths_from_env) {
-    maliput::log()->trace("\t'", path_from_env, "'");
+    maliput::log()->debug("\t'", path_from_env, "'");
     const maliput::common::Path path{path_from_env};
     if (!path.is_directory()) {
       maliput::log()->debug("The path '", path_from_env, "' isn't a valid directory for the ", env_var,
@@ -66,7 +66,7 @@ MaliputPluginManager::MaliputPluginManager() {
   for (const auto& path : library_paths) {
     AddPlugin(path);
   }
-  maliput::log()->info("Number of plugins loaded: ", plugins_.size());
+  maliput::log()->debug("Number of plugins loaded: ", plugins_.size());
 }
 
 const MaliputPlugin* MaliputPluginManager::GetPlugin(const MaliputPlugin::Id& id) const {
@@ -79,6 +79,10 @@ void MaliputPluginManager::AddPlugin(const std::string& path_to_plugin) {
   std::unique_ptr<MaliputPlugin> maliput_plugin = std::make_unique<MaliputPlugin>(path_to_plugin);
   const auto id = maliput_plugin->GetId();
   const bool is_repeated{plugins_.find(MaliputPlugin::Id(id)) != plugins_.end()};
+  maliput::log()->debug("Adding plugin with Id: ", id, " from path: ", path_to_plugin);
+  if (is_repeated) {
+    plugins_.erase(MaliputPlugin::Id(id));
+  }
   plugins_[MaliputPlugin::Id(id)] = std::move(maliput_plugin);
   maliput::log()->info((is_repeated ? "A new version of Plugin Id: " + id + " was loaded."
                                     : "Plugin Id: " + id + " was correctly loaded."));
