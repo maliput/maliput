@@ -126,7 +126,7 @@ api::RoadPositionResult KDTreeStrategy::ClosestLane(const api::InertialPosition&
 }
 
 std::unordered_set<const api::Lane*> KDTreeStrategy::ClosestLanes(const api::InertialPosition& point,
-                                                        double half_edge_length) const {
+                                                                  double half_edge_length) const {
   const math::Vector3 min_corner{point.x() - half_edge_length, point.y() - half_edge_length,
                                  point.z() - half_edge_length};
   const math::Vector3 max_corner{point.x() + half_edge_length, point.y() + half_edge_length,
