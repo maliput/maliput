@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.8.2 (2025-10-06)
+------------------
+* [KD Tree Strategy] Use unordered set. (`#684 <https://github.com/maliput/maliput/issues/684>`_)
+* Contributors: Santiago Lopez
+
 1.8.1 (2025-10-03)
 ------------------
 * `KDTreeStrategy::ClosestLanes` now returns each lane at most 1 time. (`#681 <https://github.com/maliput/maliput/issues/681>`_)
