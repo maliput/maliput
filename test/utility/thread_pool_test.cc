@@ -33,6 +33,7 @@
 #include <atomic>
 #include <set>
 #include <stdexcept>
+#include <thread>
 
 #include <gtest/gtest.h>
 
