@@ -97,12 +97,15 @@ class RangeValidator {
   /// returns the closest open range value.
   /// @throws ErrorType if @p s is out of range.
   double operator()(double s) const {
-    MALIPUT_VALIDATE(s >= min_ - tolerance_, std::to_string(s) + " is less than " + std::to_string(min_ - tolerance_),
+    MALIPUT_VALIDATE(s >= min_ - tolerance_, error_scope_ + std::to_string(s) + " is less than " + std::to_string(min_ - tolerance_),
                      ErrorType);
     MALIPUT_VALIDATE(s <= max_ + tolerance_,
-                     std::to_string(s) + " is greater than " + std::to_string(max_ + tolerance_), ErrorType);
+                     error_scope_ + std::to_string(s) + " is greater than " + std::to_string(max_ + tolerance_), ErrorType);
     return std::clamp(s, min_ + epsilon_, max_ - epsilon_);
   }
+
+
+  void set_error_scope(const std::string& scope) const { error_scope_ = scope + ": "; }
 
  private:
   // The provided epsilon can be used relatively or absolutely.
@@ -131,14 +134,14 @@ class RangeValidator {
       // (~1e-14) leads to calculation that goes beyond the minimal useful digit of the double type.
       epsilon_ = (max_ - min_) * epsilon_;
     }
-    MALIPUT_VALIDATE(epsilon_ >= 0., std::to_string(epsilon_) + " is less than " + std::to_string(0.), ErrorType);
-    MALIPUT_VALIDATE(epsilon_ <= tolerance_,
+    MALIPUT_VALIDATE(epsilon_ >= 0., error_scope_ + std::to_string(epsilon_) + " is less than " + std::to_string(0.), ErrorType);
+    MALIPUT_VALIDATE(epsilon_ <= tolerance_, error_scope_ +
                      std::to_string(epsilon_) + " is greater than " + std::to_string(tolerance_), ErrorType);
-    MALIPUT_VALIDATE((min_ + epsilon_) <= max_,
+    MALIPUT_VALIDATE((min_ + epsilon_) <= max_, error_scope_ +
                      std::string("Open range lower bound <") + std::to_string((min_ + epsilon_)) +
                          "> is greater than <" + std::to_string(max_) + ">",
                      ErrorType);
-    MALIPUT_VALIDATE(min <= (max_ - epsilon_),
+    MALIPUT_VALIDATE(min <= (max_ - epsilon_), error_scope_ +
                      std::string("Open range upper bound <") + std::to_string((max_ - epsilon_)) + "> is less than <" +
                          std::to_string(min) + ">",
                      ErrorType);
@@ -148,6 +151,7 @@ class RangeValidator {
   double max_{};
   double tolerance_{};
   double epsilon_{};
+  mutable std::string error_scope_{};
 };
 
 }  // namespace common
