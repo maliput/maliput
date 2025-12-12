@@ -189,9 +189,9 @@ GTEST_TEST(BuildGraph, EvaluateDoubleLaneRoadGraph) {
 //          a_a     /
 // a x------------x/\   < b
 // c x------------x\ \  < d
-//          a_b     \ \ 
+//          a_b     \ \  <- NOLINT
 //                   \ \ c_a
-//              c_b   \ \ 
+//              c_b   \ \  <- NOLINT
 //                     x x
 //                     g f
 GTEST_TEST(BuildGraph, EvaluateYShapedRoadsGraph) {

@@ -139,7 +139,7 @@ GTEST_TEST(FindAllEdgeSequences, OneEdgeGraph) {
 // <pre>
 //    ----
 //   /    \  > kSegmentA
-//  /      \
+//  /      \  <- NOLINT
 // x  A     x B
 //  \      /
 //   \    /  > kSegmentB
@@ -180,7 +180,7 @@ GTEST_TEST(FindAllEdgeSequences, Roundabout) {
 // <pre>
 //            ----
 //           /    \  > S:B
-//          /      \
+//          /      \  <- NOLINT
 // x-------x  B     x-------x
 // A ^      \      / C ^    D
 //   S:A     \    /    S:D
