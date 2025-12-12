@@ -79,6 +79,7 @@ GTEST_TEST(GeometryBaseLaneTest, UnimplementedMethods) {
   EXPECT_THROW(dut.GetOrientation(api::LanePosition()), std::exception);
   EXPECT_THROW(dut.EvalMotionDerivatives(api::LanePosition(), api::IsoLaneVelocity()), std::exception);
   EXPECT_THROW(dut.ToLanePosition(api::InertialPosition()), std::exception);
+  EXPECT_THROW(dut.Type(), std::exception);
 }
 
 GTEST_TEST(GeometryBaseBranchPointTest, BasicConstruction) {

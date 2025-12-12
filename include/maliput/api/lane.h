@@ -195,7 +195,7 @@ class Lane {
   bool Contains(const LanePosition& lane_position) const;
 
   /// Returns the type of Lane, such as `driving`, `biking`, etc.
-  LaneType type() const;
+  LaneType Type() const;
 
  protected:
   Lane() = default;
