@@ -194,7 +194,7 @@ class Lane {
   /// Returns if this lane contains @p lane_position.
   bool Contains(const LanePosition& lane_position) const;
 
-  /// Returns the type of Lane, such as `driving`, `biking`, etc. 
+  /// Returns the type of Lane, such as `driving`, `biking`, etc.
   LaneType type() const;
 
  protected:
@@ -240,7 +240,7 @@ class Lane {
   virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which which_end) const = 0;
 
   virtual std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
-  
+
   virtual LaneType DoType() const = 0;
   ///@}
 };
