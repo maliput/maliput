@@ -101,6 +101,7 @@ class LaneMock final : public api::Lane {
   MOCK_METHOD(api::LanePositionResult, DoToSegmentPosition, (const api::InertialPosition&), (const));
   MOCK_METHOD(const api::LaneEndSet*, DoGetConfluentBranches, (const api::LaneEnd::Which), (const));
   MOCK_METHOD(const api::LaneEndSet*, DoGetOngoingBranches, (const api::LaneEnd::Which), (const));
+  MOCK_METHOD(api::LaneType, DoType, (), (const));
 };
 
 class LaneEndSetMock final : public api::LaneEndSet {
