@@ -435,5 +435,25 @@ class HBounds {
   double max_{};
 };
 
+enum class LaneType {
+  kShoulder,
+  kBorder,
+  kDriving,
+  kStop,
+  kRestricted,
+  kParking,
+  kMedian,
+  kBiking,
+  kWalking,
+  kCurb,
+  kEntry,
+  kExit,
+  kOnRamp,
+  kOffRamp,
+  kConnectingRamp,
+  kSlipLane,
+  kNone,
+};
+
 }  // namespace api
 }  // namespace maliput

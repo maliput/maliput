@@ -117,6 +117,8 @@ class Lane : public api::Lane {
 
   std::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
 
+  virtual api::LaneType DoType() const override;
+
   // @{
   // Maps @p lane_pos into the Inertial Frame.
   //
