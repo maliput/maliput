@@ -234,6 +234,7 @@ class Lane : public api::Lane {
   int index_{-1};
   BranchPoint* start_branch_point_{};
   BranchPoint* finish_branch_point_{};
+  api::LaneType type_{api::LaneType::kDriving};
 };
 
 }  // namespace geometry_base
