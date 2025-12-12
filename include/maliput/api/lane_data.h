@@ -437,43 +437,43 @@ class HBounds {
 
 /// Lane classification options.
 ///
-/// LaneType defines the intended use of a lane. Multiple types may coexist in some cases.
+/// LaneType defines the intended use of a lane.
 enum class LaneType {
-  kNone = 0x00000000,
+  kNone = 0,
 
   // -- Main Drivable Lanes --
-  kDriving = 0x00000001,    // Standard driving lane.
-  kTurn = 0x00000002,       // Turn available.
-  kHov = 0x00000004,        // High Occupancy Vehicle lane (+2 passangers).
-  kBus = 0x00000008,        // Bus only.
-  kTaxi = 0x00000010,       // Taxi only.
-  kEmergency = 0x00000020,  // Emergency vehicles only (fire, ambulance, police).
+  kDriving,    // Standard driving lane.
+  kTurn,       // Turn available.
+  kHov,        // High Occupancy Vehicle lane (+2 passangers).
+  kBus,        // Bus only.
+  kTaxi,       // Taxi only.
+  kEmergency,  // Emergency vehicles only (fire, ambulance, police).
 
   // -- Non-Drivable / Special Use --
-  kShoulder = 0x00000040,  // Soft border at the edge of the road.
-  kBiking = 0x00000080,    // Reserved for cyclists.
-  kWalking = 0x00000100,   // Sidewalks / Crosswalks.
-  kParking = 0x00000200,   // Lane with parking spaces.
-  kStop = 0x00000400,      // Hard shoulder / Emergency stop.
+  kShoulder,  // Soft border at the edge of the road.
+  kBiking,    // Reserved for cyclists.
+  kWalking,   // Sidewalks / Crosswalks.
+  kParking,   // Lane with parking spaces.
+  kStop,      // Hard shoulder / Emergency stop.
 
   // -- Infrastructure / Boundaries --
-  kBorder = 0x00008000,        // Hard border at the edge of the road.
-  kCurb = 0x00010000,          // Curb stones.
-  kMedian = 0x00020000,        // Sits between driving lanes that lead in opposite directions.
-  kRestricted = 0x00040000,    // Generic restricted (use if HOV/Bus/Emergency don't fit).
-  kConstruction = 0x00080000,  // Road works.
-  kRail = 0x00100000,          // Trains/Trams.
+  kBorder,        // Hard border at the edge of the road.
+  kCurb,          // Curb stones.
+  kMedian,        // Sits between driving lanes that lead in opposite directions.
+  kRestricted,    // Generic restricted (use if HOV/Bus/Emergency don't fit).
+  kConstruction,  // Road works.
+  kRail,          // Trains/Trams.
 
   // -- Highway / Ramp Semantics --
-  kEntry = 0x00200000,           // Merge into main road.
-  kExit = 0x00400000,            // Exit from the main road.
-  kOnRamp = 0x00800000,          // Ramp leading to a motorway.
-  kOffRamp = 0x01000000,         // Ramp leading away from a motorway.
-  kConnectingRamp = 0x02000000,  // Ramp that connects two motorways.
-  kSlipLane = 0x04000000,        // Change roads without driving into the main intersection.
+  kEntry,           // Merge into main road.
+  kExit,            // Exit from the main road.
+  kOnRamp,          // Ramp leading to a motorway.
+  kOffRamp,         // Ramp leading away from a motorway.
+  kConnectingRamp,  // Ramp that connects two motorways.
+  kSlipLane,        // Change roads without driving into the main intersection.
 
   // -- Abstract / Logical --
-  kVirtual = 0x08000000,  // Intersection crossings with no physical markings.
+  kVirtual,  // Intersection crossings with no physical markings.
 };
 
 }  // namespace api
