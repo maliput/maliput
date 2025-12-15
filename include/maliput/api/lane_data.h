@@ -439,7 +439,7 @@ class HBounds {
 ///
 /// LaneType defines the intended use of a lane.
 enum class LaneType {
-  kNone = 0,
+  kUnknown = 0,
 
   // -- Main Drivable Lanes --
   kDriving,    // Standard driving lane.

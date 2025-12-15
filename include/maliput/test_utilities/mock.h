@@ -241,7 +241,7 @@ class MockLane final : public Lane {
   const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which) const override { return nullptr; }
   const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override { return nullptr; }
   std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return std::nullopt; }
-  LaneType DoType() const override { return LaneType::kDriving; }
+  LaneType do_type() const override { return LaneType::kDriving; }
 
   LaneId id_;
   Segment* segment_{};

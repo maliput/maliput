@@ -165,7 +165,7 @@ api::LanePositionResult Lane::UseInertialToBackendTranslationFor(
           distance};
 }
 
-api::LaneType Lane::DoType() const { return type_; }
+api::LaneType Lane::do_type() const { return type_; }
 
 }  // namespace geometry_base
 }  // namespace maliput

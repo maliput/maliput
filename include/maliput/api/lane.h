@@ -121,6 +121,9 @@ class Lane {
   /// `lane_bounds(s)`.
   HBounds elevation_bounds(double s, double r) const;
 
+  /// Returns the type of Lane, such as `driving`, `biking`, etc.
+  LaneType type() const;
+
   /// Returns the `maliput::api::InertialPosition` corresponding to the given `maliput::api::LanePosition`.
   ///
   /// Note there is no constraint for the `r` coordinate, as it can be outside the lane boundaries.
@@ -194,9 +197,6 @@ class Lane {
   /// Returns if this lane contains @p lane_position.
   bool Contains(const LanePosition& lane_position) const;
 
-  /// Returns the type of Lane, such as `driving`, `biking`, etc.
-  LaneType Type() const;
-
  protected:
   Lane() = default;
 
@@ -223,6 +223,8 @@ class Lane {
 
   virtual HBounds do_elevation_bounds(double s, double r) const = 0;
 
+  virtual LaneType do_type() const = 0;
+
   virtual InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const = 0;
 
   virtual LanePositionResult DoToLanePosition(const InertialPosition& inertial_pos) const = 0;
@@ -240,8 +242,6 @@ class Lane {
   virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which which_end) const = 0;
 
   virtual std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
-
-  virtual LaneType DoType() const = 0;
   ///@}
 };
 

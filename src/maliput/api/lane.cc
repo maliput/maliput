@@ -151,9 +151,9 @@ bool Lane::Contains(const LanePosition& lane_position) const {
          IsWithinRange(h, elevation_bounds.min(), elevation_bounds.max(), linear_tolerance);
 }
 
-LaneType Lane::Type() const {
+LaneType Lane::type() const {
   MALIPUT_PROFILE_FUNC();
-  return DoType();
+  return do_type();
 }
 
 }  // namespace api
