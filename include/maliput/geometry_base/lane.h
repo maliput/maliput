@@ -67,6 +67,9 @@ class Lane : public api::Lane {
   /// or nullptr if the finish end hasn't been added to a BranchPoint yet.
   BranchPoint* mutable_finish_branch_point() { return finish_branch_point_; }
 
+  /// Sets the LaneType which can then be obtained with `api::maliput::type`.
+  virtual void set_type(const std::string& type) { type_ = api::LaneType::kUnknown; }
+
   // Notifies Lane of its parent Segment.
   // This may only be called, once, by a Segment.
   //
@@ -109,7 +112,7 @@ class Lane : public api::Lane {
 
   const api::Lane* do_to_right() const override;
 
-  virtual api::LaneType do_type() const override;
+  api::LaneType do_type() const override;
 
   const api::BranchPoint* DoGetBranchPoint(const api::LaneEnd::Which which_end) const override;
 
@@ -234,6 +237,8 @@ class Lane : public api::Lane {
   int index_{-1};
   BranchPoint* start_branch_point_{};
   BranchPoint* finish_branch_point_{};
+
+ protected:
   api::LaneType type_{api::LaneType::kUnknown};
 };
 
