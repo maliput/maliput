@@ -93,6 +93,7 @@ class LaneMock final : public api::Lane {
   MOCK_METHOD(api::RBounds, do_lane_bounds, (double), (const));
   MOCK_METHOD(api::RBounds, do_segment_bounds, (double), (const));
   MOCK_METHOD(api::HBounds, do_elevation_bounds, (double, double), (const));
+  MOCK_METHOD(api::LaneType, do_type, (), (const));
   MOCK_METHOD(api::InertialPosition, DoToInertialPosition, (const api::LanePosition&), (const));
   MOCK_METHOD(api::Rotation, DoGetOrientation, (const api::LanePosition&), (const));
   MOCK_METHOD(api::LanePosition, DoEvalMotionDerivatives, (const api::LanePosition&, const api::IsoLaneVelocity&),

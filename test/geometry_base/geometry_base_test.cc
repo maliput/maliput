@@ -75,6 +75,7 @@ GTEST_TEST(GeometryBaseLaneTest, UnimplementedMethods) {
   EXPECT_THROW(dut.lane_bounds(0.), std::exception);
   EXPECT_THROW(dut.segment_bounds(0.), std::exception);
   EXPECT_THROW(dut.elevation_bounds(0., 0.), std::exception);
+  EXPECT_THROW(dut.type(), std::exception);
   EXPECT_THROW(dut.ToInertialPosition(api::LanePosition()), std::exception);
   EXPECT_THROW(dut.GetOrientation(api::LanePosition()), std::exception);
   EXPECT_THROW(dut.EvalMotionDerivatives(api::LanePosition(), api::IsoLaneVelocity()), std::exception);

@@ -121,6 +121,9 @@ class Lane {
   /// `lane_bounds(s)`.
   HBounds elevation_bounds(double s, double r) const;
 
+  /// Returns the type of Lane, such as `driving`, `biking`, etc.
+  LaneType type() const;
+
   /// Returns the `maliput::api::InertialPosition` corresponding to the given `maliput::api::LanePosition`.
   ///
   /// Note there is no constraint for the `r` coordinate, as it can be outside the lane boundaries.
@@ -219,6 +222,8 @@ class Lane {
   virtual RBounds do_segment_bounds(double s) const = 0;
 
   virtual HBounds do_elevation_bounds(double s, double r) const = 0;
+
+  virtual LaneType do_type() const = 0;
 
   virtual InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const = 0;
 

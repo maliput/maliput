@@ -92,6 +92,11 @@ api::LanePositionResult MockLane::DoToLanePosition(const api::InertialPosition&)
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
+api::LaneType MockLane::do_type() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
 }  // namespace test
 }  // namespace geometry_base
 }  // namespace maliput
