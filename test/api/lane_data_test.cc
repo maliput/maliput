@@ -466,6 +466,12 @@ GTEST_TEST(HBoundsTest, Setters) {
   EXPECT_THROW(dut.set_max(kMin), maliput::common::assertion_error);
 }
 
+GTEST_TEST(LaneTypeTest, Constructor) {
+  const LaneType type{LaneType::kBiking};
+  // Checks correct assignment.
+  EXPECT_EQ(type, LaneType::kBiking);
+}
+
 }  // namespace
 }  // namespace api
 }  // namespace maliput
