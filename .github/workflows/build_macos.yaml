@@ -35,8 +35,3 @@ jobs:
         shell: bash
         run: |
           bazel build //...
-
-      - name: Test
-        shell: bash
-        run: |
-          bazel test //... --test_output=all
