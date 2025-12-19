@@ -120,6 +120,8 @@ class Segment : public api::Segment {
 
   const api::Lane* do_lane(int index) const override;
 
+  const api::LaneBoundary* do_boundary(int /* index */) const override { return nullptr; }
+
   const api::SegmentId id_;
   const api::Junction* junction_{};
   std::function<void(const api::Lane*)> lane_indexing_callback_;

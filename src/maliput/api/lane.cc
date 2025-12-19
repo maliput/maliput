@@ -30,6 +30,7 @@
 #include "maliput/api/lane.h"
 
 #include "maliput/api/junction.h"
+#include "maliput/api/lane_boundary.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/profiler.h"
@@ -133,6 +134,18 @@ const LaneEndSet* Lane::GetOngoingBranches(const LaneEnd::Which which_end) const
 std::optional<LaneEnd> Lane::GetDefaultBranch(const LaneEnd::Which which_end) const {
   MALIPUT_PROFILE_FUNC();
   return DoGetDefaultBranch(which_end);
+}
+
+const LaneBoundary* Lane::left_boundary() const {
+  MALIPUT_PROFILE_FUNC();
+  // Left boundary is at index() + 1 (in the +r direction).
+  return segment()->boundary(index() + 1);
+}
+
+const LaneBoundary* Lane::right_boundary() const {
+  MALIPUT_PROFILE_FUNC();
+  // Right boundary is at index() (in the -r direction).
+  return segment()->boundary(index());
 }
 
 bool Lane::Contains(const LanePosition& lane_position) const {

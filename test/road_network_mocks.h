@@ -136,6 +136,7 @@ class SegmentMock : public api::Segment {
   MOCK_METHOD(const api::Junction*, do_junction, (), (const));
   MOCK_METHOD(int, do_num_lanes, (), (const));
   MOCK_METHOD(const api::Lane*, do_lane, (int), (const));
+  MOCK_METHOD(const api::LaneBoundary*, do_boundary, (int), (const));
 };
 
 /// @brief Google mock api::BranchPoint

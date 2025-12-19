@@ -42,6 +42,7 @@ namespace maliput {
 namespace api {
 
 class BranchPoint;
+class LaneBoundary;
 class Segment;
 class LaneEndSet;
 
@@ -193,6 +194,24 @@ class Lane {
   /// Returns the default ongoing LaneEnd connected at @p which_end,
   /// or std::nullopt if no default branch has been established at @p which_end.
   std::optional<LaneEnd> GetDefaultBranch(const LaneEnd::Which which_end) const;
+
+  /// Returns the LaneBoundary at the left edge of this Lane.
+  ///
+  /// The left boundary is in the +r direction (increasing r coordinate).
+  /// This is equivalent to `segment()->boundary(index() + 1)`.
+  ///
+  /// @returns The left boundary, or nullptr if boundary information is
+  ///          not available for the parent Segment.
+  const LaneBoundary* left_boundary() const;
+
+  /// Returns the LaneBoundary at the right edge of this Lane.
+  ///
+  /// The right boundary is in the -r direction (decreasing r coordinate).
+  /// This is equivalent to `segment()->boundary(index())`.
+  ///
+  /// @returns The right boundary, or nullptr if boundary information is
+  ///          not available for the parent Segment.
+  const LaneBoundary* right_boundary() const;
 
   /// Returns if this lane contains @p lane_position.
   bool Contains(const LanePosition& lane_position) const;

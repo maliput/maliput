@@ -269,6 +269,7 @@ class MockSegment final : public Segment {
     MALIPUT_THROW_UNLESS(index == 0);
     return lane_.get();
   }
+  const LaneBoundary* do_boundary(int /* index */) const override { return nullptr; }
 
   SegmentId id_;
   Junction* junction_{};
