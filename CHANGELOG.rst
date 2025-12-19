@@ -2,6 +2,16 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.9.0 (2025-12-19)
+------------------
+* Add LaneBoundary API (`#689 <https://github.com/maliput/maliput/issues/689>`_)
+* Update macOS version for build workflow (`#694 <https://github.com/maliput/maliput/issues/694>`_)
+* LaneType API. (`#690 <https://github.com/maliput/maliput/issues/690>`_)
+* Remove pull requests from triage process. (`#692 <https://github.com/maliput/maliput/issues/692>`_)
+* Solves some warnings on docstrings. (`#691 <https://github.com/maliput/maliput/issues/691>`_)
+* Thread header was missing in a test, causing compile failure in Ubuntu 22 (`#686 <https://github.com/maliput/maliput/issues/686>`_)
+* Contributors: Franco Cipollone, Santiago Lopez, andrewbest-tri
+
 1.8.2 (2025-10-06)
 ------------------
 * [KD Tree Strategy] Use unordered set. (`#684 <https://github.com/maliput/maliput/issues/684>`_)
