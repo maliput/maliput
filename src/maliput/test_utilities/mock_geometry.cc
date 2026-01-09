@@ -77,6 +77,11 @@ api::InertialPosition MockLane::DoToInertialPosition(const api::LanePosition&) c
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
+double MockLane::DoGetCurvature(const api::LanePosition&) const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
 api::Rotation MockLane::DoGetOrientation(const api::LanePosition&) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");

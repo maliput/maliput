@@ -227,6 +227,7 @@ class MockLane final : public Lane {
   InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const override {
     return lane_pos.s() ? end_ip_ : start_ip_;
   }
+  double DoGetCurvature(const LanePosition& lane_pos) const override { return 0.; }
   LanePositionResult DoToLanePosition(const InertialPosition&) const override { return lane_position_result_; }
   LanePositionResult DoToSegmentPosition(const InertialPosition&) const override { return lane_position_result_; }
   Rotation DoGetOrientation(const LanePosition& lane_pos) const override {
