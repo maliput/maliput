@@ -118,6 +118,12 @@ api::InertialPosition Lane::DoToInertialPosition(const api::LanePosition& lane_p
       backend_pos + segment()->junction()->road_geometry()->inertial_to_backend_frame_translation());
 }
 
+double Lane::DoGetCurvature(const api::LanePosition& lane_pos) const {
+  MALIPUT_THROW_MESSAGE(
+      "Unimplemented method. Please check the documentation of "
+      "maliput::geometry_base::Lane::DoGetCurvature().");
+}
+
 math::Vector3 Lane::DoToBackendPosition(const api::LanePosition& lane_pos) const {
   MALIPUT_THROW_MESSAGE(
       "Unimplemented method. Please check the documentation of "

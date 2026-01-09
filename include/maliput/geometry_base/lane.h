@@ -131,6 +131,14 @@ class Lane : public api::Lane {
   //       expected than the generic transform applied here.
   virtual api::InertialPosition DoToInertialPosition(const api::LanePosition& lane_pos) const override;
 
+  // Returns the Euclidean curvature at the given @p lane_pos.
+  //
+  // @note This method implementation @throws maliput::common::assertion_error
+  //       as it should only be called when it is overridden by a derived class.
+  //
+  // @return The Euclidean curvature (1/m) at the given position.
+  virtual double DoGetCurvature(const api::LanePosition& lane_pos) const override;
+
   // Maps @p lane_pos into the Backend Frame.
   //
   // @note This method implementation @throws maliput::common::assertion_error

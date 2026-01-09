@@ -139,6 +139,20 @@ class Lane {
   /// @returns An `InertialPosition` for the given `lane_pos`.
   InertialPosition ToInertialPosition(const LanePosition& lane_pos) const;
 
+  /// Returns the Euclidean curvature at the given `maliput::api::LanePosition`.
+  ///
+  /// The Euclidean curvature is defined as the reciprocal of the radius of the
+  /// osculating circle at a given point on the curve. It is computed as
+  /// @f$ \kappa = |d\theta/ds| @f$, where @f$ \theta @f$ is the heading angle
+  /// and @f$ s @f$ is the arc length along the lane's centerline.
+  ///
+  /// @param lane_pos A `maliput::api::LanePosition`. The `s` component must be
+  ///        in domain [0, Lane::length()]. The `r` and `h` components are used
+  ///        to determine the curvature at the corresponding offset from the
+  ///        centerline.
+  /// @returns The Euclidean curvature (1/m) at the given position.
+  double GetCurvature(const LanePosition& lane_pos) const;
+
   /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
   /// The LanePosition is expected to be contained within the lane's boundaries.
   /// @see ToSegmentPosition method.
@@ -245,6 +259,8 @@ class Lane {
   virtual LaneType do_type() const = 0;
 
   virtual InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const = 0;
+
+  virtual double DoGetCurvature(const LanePosition& lane_pos) const = 0;
 
   virtual LanePositionResult DoToLanePosition(const InertialPosition& inertial_pos) const = 0;
 
