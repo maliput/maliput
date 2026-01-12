@@ -96,6 +96,11 @@ InertialPosition Lane::ToInertialPosition(const LanePosition& lane_pos) const {
   return DoToInertialPosition(lane_pos);
 }
 
+double Lane::GetCurvature(const LanePosition& lane_pos) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetCurvature(lane_pos);
+}
+
 LanePositionResult Lane::ToLanePosition(const InertialPosition& inertial_pos) const {
   MALIPUT_PROFILE_FUNC();
   return DoToLanePosition(inertial_pos);
