@@ -2,6 +2,13 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.10.0 (2026-01-12)
+-------------------
+* Add GetCurvature to Lane. (`#700 <https://github.com/maliput/maliput/issues/700>`_)
+* Rename "Woven Planet" to be "Woven by Toyota" on copyright lines (`#698 <https://github.com/maliput/maliput/issues/698>`_)
+* Add copilot instructions. (`#696 <https://github.com/maliput/maliput/issues/696>`_)
+* Contributors: Chien-Liang Fok, Franco Cipollone
+
 1.9.0 (2025-12-19)
 ------------------
 * Add LaneBoundary API (`#689 <https://github.com/maliput/maliput/issues/689>`_)
