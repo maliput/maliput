@@ -48,6 +48,10 @@ void BasicIdIndex::AddBranchPoint(const BranchPoint* branch_point) {
   MALIPUT_THROW_UNLESS(branch_point_map_.emplace(branch_point->id(), branch_point).second);
 }
 
+void BasicIdIndex::AddLaneBoundary(const LaneBoundary* lane_boundary) {
+  MALIPUT_THROW_UNLESS(lane_boundary_map_.emplace(lane_boundary->id(), lane_boundary).second);
+}
+
 void BasicIdIndex::WalkAndAddAll(const RoadGeometry* road_geometry) {
   for (int ji = 0; ji < road_geometry->num_junctions(); ++ji) {
     const Junction* junction = road_geometry->junction(ji);
@@ -83,6 +87,10 @@ const Junction* BasicIdIndex::DoGetJunction(const JunctionId& id) const { return
 
 const BranchPoint* BasicIdIndex::DoGetBranchPoint(const BranchPointId& id) const {
   return find_or_nullptr(branch_point_map_, id);
+}
+
+const LaneBoundary* BasicIdIndex::DoGetLaneBoundary(const LaneBoundaryId& id) const {
+  return find_or_nullptr(lane_boundary_map_, id);
 }
 
 }  // namespace api

@@ -75,6 +75,13 @@ class BasicIdIndex : public RoadGeometry::IdIndex {
   /// @pre @p branch_point is not nullptr.
   void AddBranchPoint(const BranchPoint* branch_point);
 
+  /// Adds @p lane_boundary to the index.
+  ///
+  /// @throws std::exception if @p lane_boundary's id() already exists in the
+  /// index.
+  /// @pre @p lane_boundary is not nullptr.
+  void AddLaneBoundary(const LaneBoundary* lane_boundary);
+
   /// Walks the object graph rooted at @p road_geometry and adds all
   /// components (Lane, Segment, Junction, BranchPoint) to the index.
   ///
@@ -89,11 +96,13 @@ class BasicIdIndex : public RoadGeometry::IdIndex {
   const Segment* DoGetSegment(const SegmentId& id) const final;
   const Junction* DoGetJunction(const JunctionId& id) const final;
   const BranchPoint* DoGetBranchPoint(const BranchPointId& id) const final;
+  const LaneBoundary* DoGetLaneBoundary(const LaneBoundaryId& id) const final;
 
   std::unordered_map<JunctionId, const Junction*> junction_map_;
   std::unordered_map<SegmentId, const Segment*> segment_map_;
   std::unordered_map<LaneId, const Lane*> lane_map_;
   std::unordered_map<BranchPointId, const BranchPoint*> branch_point_map_;
+  std::unordered_map<LaneBoundaryId, const LaneBoundary*> lane_boundary_map_;
 };
 
 }  // namespace api

@@ -76,6 +76,7 @@ class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
   const Segment* DoGetSegment(const SegmentId&) const override { return nullptr; };
   const Junction* DoGetJunction(const JunctionId&) const override { return nullptr; };
   const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
+  const LaneBoundary* DoGetLaneBoundary(const LaneBoundaryId&) const override { return nullptr; }
 
   const MockLane mock_lane_{LaneId{"mock"}};
   const std::unordered_map<LaneId, const Lane*> lane_map_{{LaneId("mock"), &mock_lane_}};
@@ -602,6 +603,14 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& b
           lane->set_end_bp(rg->end_bp());
         }
         segment->set_lane(std::move(lane));
+      }
+      if (build_flags.add_lane_boundary) {
+        auto lane_boundary = std::make_unique<MockLaneBoundary>(LaneBoundaryId("mock"));
+        lane_boundary->set_segment(segment.get());
+        if (build_flags.id_index_build_flags.add_lane_boundary) {
+          id_index->add_lane_boundary_to_map(lane_boundary->id(), lane_boundary.get());
+        }
+        segment->set_lane_boundary(std::move(lane_boundary));
       }
       junction->set_segment(std::move(segment));
     }
