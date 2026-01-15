@@ -42,6 +42,7 @@
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/passkey.h"
 #include "maliput/geometry_base/lane.h"
+#include "maliput/geometry_base/lane_boundary.h"
 
 namespace maliput {
 namespace geometry_base {
@@ -87,6 +88,30 @@ class Segment : public api::Segment {
     return raw_pointer;
   }
 
+  /// Adds @p boundary to this Segment.
+  ///
+  /// This Segment will take ownership of `boundary` and will be assigned
+  /// as its parent.  The index of `boundary` will also be assigned, in
+  /// order of addition.  (The first LaneBoundary added to this Segment, by
+  /// the first call to AddLaneBoundary(), will be assigned index 0.)
+  ///
+  /// Note that the maliput API requires that lanes are indexed in a Segment
+  /// in right-to-left order, thus `AddLaneBoundary()` should be called on boundaries
+  /// in right-to-left order.
+  ///
+  /// @returns `boundary`'s raw pointer.
+  ///
+  /// @tparam T must be derived from geometry_base::LaneBoundary.
+  ///
+  /// @throws std::exception if `boundary` is empty.
+  template <class T>
+  T* AddLaneBoundary(std::unique_ptr<T> boundary) {
+    static_assert(std::is_base_of<LaneBoundary, T>::value, "T is not derived from geometry_base::LaneBoundary");
+    T* const raw_pointer = boundary.get();
+    AddLaneBoundaryPrivate(std::move(boundary));
+    return raw_pointer;
+  }
+
   // Notifies Segment of its parent Junction.
   // This may only be called, once, by a Junction.
   //
@@ -106,11 +131,25 @@ class Segment : public api::Segment {
   // @pre The lane indexing callback has not already been set.
   void SetLaneIndexingCallback(common::Passkey<Junction>, const std::function<void(const api::Lane*)>& callback);
 
+  // Sets the lane boundary indexing callback.
+  // This may only be called, once, by a Junction.
+  //
+  // @param callback  function to be called on every LaneBoundary which is attached
+  //                  to this Segment, both now and in the future.
+  //
+  // @pre `callback` is non-empty.
+  // @pre The lane boundary indexing callback has not already been set.
+  void SetLaneBoundaryIndexingCallback(common::Passkey<Junction>,
+                                       const std::function<void(const api::LaneBoundary*)>& callback);
+
   ~Segment() override = default;
 
  private:
   // The non-template implementation of AddLane<T>()
   void AddLanePrivate(std::unique_ptr<Lane> lane);
+
+  // The non-template implementation of AddLaneBoundary<T>()
+  void AddLaneBoundaryPrivate(std::unique_ptr<LaneBoundary> lane_boundary);
 
   api::SegmentId do_id() const override { return id_; }
 
@@ -126,6 +165,8 @@ class Segment : public api::Segment {
   const api::Junction* junction_{};
   std::function<void(const api::Lane*)> lane_indexing_callback_;
   std::vector<std::unique_ptr<Lane>> lanes_;
+  std::function<void(const api::LaneBoundary*)> lane_boundary_indexing_callback_;
+  std::vector<std::unique_ptr<LaneBoundary>> boundaries_;
 };
 
 }  // namespace geometry_base

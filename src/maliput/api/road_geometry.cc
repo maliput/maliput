@@ -271,5 +271,10 @@ const BranchPoint* RoadGeometry::IdIndex::GetBranchPoint(const BranchPointId& id
   return DoGetBranchPoint(id);
 }
 
+const LaneBoundary* RoadGeometry::IdIndex::GetLaneBoundary(const LaneBoundaryId& id) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetLaneBoundary(id);
+}
+
 }  // namespace api
 }  // namespace maliput

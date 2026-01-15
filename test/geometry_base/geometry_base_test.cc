@@ -308,7 +308,7 @@ GTEST_TEST(GeometryBaseRoadGeometryTest, AddingJunctions) {
 // Test by-id indexing of Segments and Lanes in RoadGeometry.
 class GeometryBaseRoadGeometryIndexingTest : public ::testing::Test {
  protected:
-  enum AttachOperation { kAttachLane, kAttachSegment, kAttachJunction };
+  enum AttachOperation { kAttachLane, kAttachSegment, kAttachJunction, kAttachBoundary };
 
   struct TestCase {
     std::string name;
@@ -335,24 +335,62 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
   //
   // Every object has an "attach" operation that (should) occurs when an
   // object is added to a parent.  So, we need to test the six possible
-  // orderings of "attach Lane", "attach Segment", and "attach Junction":
+  // orderings of "attach Lane", "attach Segment", "attach Junction", and "attach Boundary":
   //
-  //       L-S-J   L-J-S   S-J-L
-  //       S-L-J   J-L-S   J-S-L
+  //       L-S-J-B   L-J-S-B   S-J-L-B
+  //       S-L-J-B   J-L-S-B   J-S-L-B
+  //       L-S-B-J   L-J-B-S   S-J-B-L
+  //       S-L-B-J   J-L-B-S   J-S-B-L
+  //       L-B-S-J   L-B-J-S   S-B-J-L
+  //       S-B-L-J   J-B-L-S   J-B-S-L
+  //       B-L-S-J   B-L-J-S   B-S-J-L
+  //       B-S-L-J   B-J-L-S   B-J-S-L
   const std::vector<TestCase> cases{
-      {"LSJ", {kAttachLane, kAttachSegment, kAttachJunction}}, {"SLJ", {kAttachSegment, kAttachLane, kAttachJunction}},
+      {"LSJB", {kAttachLane, kAttachSegment, kAttachJunction, kAttachBoundary}},
+      {"SLJB", {kAttachSegment, kAttachLane, kAttachJunction, kAttachBoundary}},
 
-      {"LJS", {kAttachLane, kAttachJunction, kAttachSegment}}, {"JLS", {kAttachJunction, kAttachLane, kAttachSegment}},
+      {"LJSB", {kAttachLane, kAttachJunction, kAttachSegment, kAttachBoundary}},
+      {"JLSB", {kAttachJunction, kAttachLane, kAttachSegment, kAttachBoundary}},
 
-      {"SJL", {kAttachSegment, kAttachJunction, kAttachLane}}, {"JSL", {kAttachJunction, kAttachSegment, kAttachLane}},
+      {"SJLB", {kAttachSegment, kAttachJunction, kAttachLane, kAttachBoundary}},
+      {"JSLB", {kAttachJunction, kAttachSegment, kAttachLane, kAttachBoundary}},
+
+      {"LSBJ", {kAttachLane, kAttachSegment, kAttachBoundary, kAttachJunction}},
+      {"SLBJ", {kAttachSegment, kAttachLane, kAttachBoundary, kAttachJunction}},
+
+      {"LJBS", {kAttachLane, kAttachJunction, kAttachBoundary, kAttachSegment}},
+      {"JLBS", {kAttachJunction, kAttachLane, kAttachBoundary, kAttachSegment}},
+
+      {"SJBL", {kAttachSegment, kAttachJunction, kAttachBoundary, kAttachLane}},
+      {"JSBL", {kAttachJunction, kAttachSegment, kAttachBoundary, kAttachLane}},
+
+      {"LBSJ", {kAttachLane, kAttachBoundary, kAttachSegment, kAttachJunction}},
+      {"SBLJ", {kAttachSegment, kAttachBoundary, kAttachLane, kAttachJunction}},
+
+      {"LBJS", {kAttachLane, kAttachBoundary, kAttachJunction, kAttachSegment}},
+      {"JBLS", {kAttachJunction, kAttachBoundary, kAttachLane, kAttachSegment}},
+
+      {"SBJL", {kAttachSegment, kAttachBoundary, kAttachJunction, kAttachLane}},
+      {"JBSL", {kAttachJunction, kAttachBoundary, kAttachSegment, kAttachLane}},
+
+      {"BLSJ", {kAttachBoundary, kAttachLane, kAttachSegment, kAttachJunction}},
+      {"BSLJ", {kAttachBoundary, kAttachSegment, kAttachLane, kAttachJunction}},
+
+      {"BLJS", {kAttachBoundary, kAttachLane, kAttachJunction, kAttachSegment}},
+      {"BJLS", {kAttachBoundary, kAttachJunction, kAttachLane, kAttachSegment}},
+
+      {"BSJL", {kAttachBoundary, kAttachSegment, kAttachJunction, kAttachLane}},
+      {"BJSL", {kAttachBoundary, kAttachJunction, kAttachSegment, kAttachLane}},
   };
 
   for (const auto& kase : cases) {
     auto lane = std::make_unique<MockLane>(api::LaneId(kase.name));
     auto segment = std::make_unique<MockSegment>(api::SegmentId(kase.name));
     auto junction = std::make_unique<MockJunction>(api::JunctionId(kase.name));
+    auto boundary = std::make_unique<MockLaneBoundary>(api::LaneBoundaryId(kase.name));
 
     Lane* raw_lane = lane.get();
+    LaneBoundary* raw_boundary = boundary.get();
     Segment* raw_segment = segment.get();
     Junction* raw_junction = junction.get();
 
@@ -370,9 +408,13 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
           road_geometry_->AddJunction(std::move(junction));
           break;
         }
+        case kAttachBoundary: {
+          raw_segment->AddLaneBoundary(std::move(boundary));
+        }
       }
     }
     EXPECT_EQ(road_geometry_->ById().GetLane(raw_lane->id()), raw_lane);
+    EXPECT_EQ(road_geometry_->ById().GetLaneBoundary(raw_boundary->id()), raw_boundary);
     EXPECT_EQ(road_geometry_->ById().GetSegment(raw_segment->id()), raw_segment);
   }
 }
