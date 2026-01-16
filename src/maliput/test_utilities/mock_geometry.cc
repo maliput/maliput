@@ -102,6 +102,41 @@ api::LaneType MockLane::do_type() const {
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
+const api::Segment* MockLaneBoundary::do_segment() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+int MockLaneBoundary::do_index() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+const api::Lane* MockLaneBoundary::do_lane_to_left() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+const api::Lane* MockLaneBoundary::do_lane_to_right() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+std::optional<api::LaneMarkingResult> MockLaneBoundary::DoGetMarking(double) const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+std::vector<api::LaneMarkingResult> MockLaneBoundary::DoGetMarkings() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+std::vector<api::LaneMarkingResult> MockLaneBoundary::DoGetMarkings(double, double) const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
 }  // namespace test
 }  // namespace geometry_base
 }  // namespace maliput

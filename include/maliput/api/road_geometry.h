@@ -37,6 +37,7 @@
 #include "maliput/api/branch_point.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
+#include "maliput/api/lane_boundary.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/segment.h"
@@ -297,6 +298,10 @@ class RoadGeometry::IdIndex {
   /// unknown.
   const BranchPoint* GetBranchPoint(const BranchPointId& id) const;
 
+  /// Returns the LaneBoundary identified by @p id, or `nullptr` if @p id is
+  /// unknown.
+  const LaneBoundary* GetLaneBoundary(const LaneBoundary::Id& id) const;
+
  protected:
   IdIndex() = default;
 
@@ -306,6 +311,7 @@ class RoadGeometry::IdIndex {
   virtual const Segment* DoGetSegment(const SegmentId& id) const = 0;
   virtual const Junction* DoGetJunction(const JunctionId& id) const = 0;
   virtual const BranchPoint* DoGetBranchPoint(const BranchPointId& id) const = 0;
+  virtual const LaneBoundary* DoGetLaneBoundary(const LaneBoundary::Id& id) const = 0;
 };
 
 }  // namespace api

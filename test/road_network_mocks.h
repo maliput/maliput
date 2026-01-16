@@ -119,6 +119,7 @@ class IdIndexMock final : public api::RoadGeometry::IdIndex {
   MOCK_METHOD(const api::Segment*, DoGetSegment, (const api::SegmentId&), (const));
   MOCK_METHOD(const api::Junction*, DoGetJunction, (const api::JunctionId&), (const));
   MOCK_METHOD(const api::BranchPoint*, DoGetBranchPoint, (const api::BranchPointId&), (const));
+  MOCK_METHOD(const api::LaneBoundary*, DoGetLaneBoundary, (const api::LaneBoundary::Id&), (const));
 };
 
 /// @brief Google mock api::Junction.
