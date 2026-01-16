@@ -409,7 +409,7 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
           break;
         }
         case kAttachBoundary: {
-          raw_segment->AddLaneBoundary(std::move(boundary));
+          raw_segment->AddBoundary(std::move(boundary));
         }
       }
     }

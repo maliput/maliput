@@ -48,7 +48,7 @@ void BasicIdIndex::AddBranchPoint(const BranchPoint* branch_point) {
   MALIPUT_THROW_UNLESS(branch_point_map_.emplace(branch_point->id(), branch_point).second);
 }
 
-void BasicIdIndex::AddLaneBoundary(const LaneBoundary* lane_boundary) {
+void BasicIdIndex::AddBoundary(const LaneBoundary* lane_boundary) {
   MALIPUT_THROW_UNLESS(lane_boundary_map_.emplace(lane_boundary->id(), lane_boundary).second);
 }
 

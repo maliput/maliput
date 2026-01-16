@@ -93,10 +93,10 @@ class Segment : public api::Segment {
   /// This Segment will take ownership of `boundary` and will be assigned
   /// as its parent.  The index of `boundary` will also be assigned, in
   /// order of addition.  (The first LaneBoundary added to this Segment, by
-  /// the first call to AddLaneBoundary(), will be assigned index 0.)
+  /// the first call to AddBoundary(), will be assigned index 0.)
   ///
   /// Note that the maliput API requires that lanes are indexed in a Segment
-  /// in right-to-left order, thus `AddLaneBoundary()` should be called on boundaries
+  /// in right-to-left order, thus `AddBoundary()` should be called on boundaries
   /// in right-to-left order.
   ///
   /// @returns `boundary`'s raw pointer.
@@ -105,10 +105,10 @@ class Segment : public api::Segment {
   ///
   /// @throws std::exception if `boundary` is empty.
   template <class T>
-  T* AddLaneBoundary(std::unique_ptr<T> boundary) {
+  T* AddBoundary(std::unique_ptr<T> boundary) {
     static_assert(std::is_base_of<LaneBoundary, T>::value, "T is not derived from geometry_base::LaneBoundary");
     T* const raw_pointer = boundary.get();
-    AddLaneBoundaryPrivate(std::move(boundary));
+    AddBoundaryPrivate(std::move(boundary));
     return raw_pointer;
   }
 
@@ -148,8 +148,8 @@ class Segment : public api::Segment {
   // The non-template implementation of AddLane<T>()
   void AddLanePrivate(std::unique_ptr<Lane> lane);
 
-  // The non-template implementation of AddLaneBoundary<T>()
-  void AddLaneBoundaryPrivate(std::unique_ptr<LaneBoundary> lane_boundary);
+  // The non-template implementation of AddBoundary<T>()
+  void AddBoundaryPrivate(std::unique_ptr<LaneBoundary> lane_boundary);
 
   api::SegmentId do_id() const override { return id_; }
 

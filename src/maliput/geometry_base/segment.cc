@@ -83,7 +83,7 @@ void Segment::AddLanePrivate(std::unique_ptr<Lane> lane) {
   }
 }
 
-void Segment::AddLaneBoundaryPrivate(std::unique_ptr<LaneBoundary> boundary) {
+void Segment::AddBoundaryPrivate(std::unique_ptr<LaneBoundary> boundary) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(boundary.get() != nullptr);
   boundaries_.emplace_back(std::move(boundary));

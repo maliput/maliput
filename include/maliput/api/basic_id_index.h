@@ -80,7 +80,7 @@ class BasicIdIndex : public RoadGeometry::IdIndex {
   /// @throws std::exception if @p lane_boundary's id() already exists in the
   /// index.
   /// @pre @p lane_boundary is not nullptr.
-  void AddLaneBoundary(const LaneBoundary* lane_boundary);
+  void AddBoundary(const LaneBoundary* lane_boundary);
 
   /// Walks the object graph rooted at @p road_geometry and adds all
   /// components (Lane, Segment, Junction, BranchPoint) to the index.
