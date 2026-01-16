@@ -49,17 +49,14 @@ void LaneBoundary::AttachToSegment(common::Passkey<Segment>, const api::Segment*
 }
 
 std::optional<api::LaneMarkingResult> LaneBoundary::DoGetMarking(double s) const {
-  MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
 std::vector<api::LaneMarkingResult> LaneBoundary::DoGetMarkings() const {
-  MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
 std::vector<api::LaneMarkingResult> LaneBoundary::DoGetMarkings(double s_start, double s_end) const {
-  MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
