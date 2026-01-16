@@ -89,7 +89,7 @@ const BranchPoint* BasicIdIndex::DoGetBranchPoint(const BranchPointId& id) const
   return find_or_nullptr(branch_point_map_, id);
 }
 
-const LaneBoundary* BasicIdIndex::DoGetLaneBoundary(const LaneBoundaryId& id) const {
+const LaneBoundary* BasicIdIndex::DoGetLaneBoundary(const LaneBoundary::Id& id) const {
   return find_or_nullptr(lane_boundary_map_, id);
 }
 

@@ -104,7 +104,7 @@ std::vector<RoadGeometryBuildFlags> HierarchyTestParameters() {
       RoadGeometryBuildFlags{true, true, true, true, true, true, true, {true, true, false, true, false}},
       // Throws because of LaneId are not in RoadGeometry::IdIndex.
       RoadGeometryBuildFlags{true, true, true, true, true, true, true, {true, true, false, true, false}},
-      // Throws because of LaneBoundaryId are not in RoadGeometry::IdIndex.
+      // Throws because of LaneBoundary::Id are not in RoadGeometry::IdIndex.
       RoadGeometryBuildFlags{true, true, true, true, true, true, true, {true, true, false, true, false}},
       // Does not throw, complete RoadGeometry.
       RoadGeometryBuildFlags{true, true, true, true, true, true, false, {true, true, true, true, true}},

@@ -51,7 +51,7 @@ class LaneBoundary : public api::LaneBoundary {
   /// @param id the ID of the LaneBoundary
   ///
   /// The LaneBoundary is not fully initialized until it is added to a Segment.
-  explicit LaneBoundary(const api::LaneBoundaryId& id) : id_(id) {}
+  explicit LaneBoundary(const api::LaneBoundary::Id& id) : id_(id) {}
 
   // Notifies LaneBoundary of its parent Segment.
   // This may only be called, once, by a Segment.
@@ -67,7 +67,7 @@ class LaneBoundary : public api::LaneBoundary {
   ~LaneBoundary() override = default;
 
  private:
-  api::LaneBoundaryId do_id() const override { return id_; }
+  api::LaneBoundary::Id do_id() const override { return id_; }
   const api::Segment* do_segment() const override { return segment_; }
   int do_index() const override { return index_; }
   const api::Lane* do_lane_to_left() const override { return lane_to_left_; }
@@ -76,7 +76,7 @@ class LaneBoundary : public api::LaneBoundary {
   virtual std::vector<api::LaneMarkingResult> DoGetMarkings() const override;
   virtual std::vector<api::LaneMarkingResult> DoGetMarkings(double s_start, double s_end) const override;
 
-  const api::LaneBoundaryId id_;
+  const api::LaneBoundary::Id id_;
   const api::Segment* segment_{};
   int index_{-1};
   const maliput::api::Lane* lane_to_left_{};

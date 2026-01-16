@@ -387,7 +387,7 @@ TEST_F(GeometryBaseRoadGeometryIndexingTest, Test) {
     auto lane = std::make_unique<MockLane>(api::LaneId(kase.name));
     auto segment = std::make_unique<MockSegment>(api::SegmentId(kase.name));
     auto junction = std::make_unique<MockJunction>(api::JunctionId(kase.name));
-    auto boundary = std::make_unique<MockLaneBoundary>(api::LaneBoundaryId(kase.name));
+    auto boundary = std::make_unique<MockLaneBoundary>(api::LaneBoundary::Id(kase.name));
 
     Lane* raw_lane = lane.get();
     LaneBoundary* raw_boundary = boundary.get();

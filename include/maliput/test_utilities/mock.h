@@ -260,7 +260,7 @@ class MockLane final : public Lane {
 class MockLaneBoundary final : public LaneBoundary {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLaneBoundary)
-  MockLaneBoundary(const LaneBoundaryId& id) : LaneBoundary(), id_(id) {}
+  MockLaneBoundary(const LaneBoundary::Id& id) : LaneBoundary(), id_(id) {}
   void set_segment(const Segment* segment) { segment_ = segment; }
 
  private:
@@ -273,7 +273,7 @@ class MockLaneBoundary final : public LaneBoundary {
   std::vector<LaneMarkingResult> DoGetMarkings() const override { return {}; }
   std::vector<LaneMarkingResult> DoGetMarkings(double s_start, double s_end) const override { return {}; }
 
-  LaneBoundaryId id_;
+  LaneBoundary::Id id_;
   const Lane* lane_to_left_{};
   const Lane* lane_to_right_{};
   const Segment* segment_{};
@@ -334,7 +334,7 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
   void add_branchpoint_to_map(const BranchPointId& id, const BranchPoint* branch_point) {
     branch_point_map_.emplace(id, branch_point);
   }
-  void add_lane_boundary_to_map(const LaneBoundaryId& id, const LaneBoundary* lane_boundary) {
+  void add_lane_boundary_to_map(const LaneBoundary::Id& id, const LaneBoundary* lane_boundary) {
     lane_boundary_map_.emplace(id, lane_boundary);
   }
 
@@ -355,7 +355,7 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
     const auto it = segment_map_.find(segment_id);
     return (it == segment_map_.end()) ? nullptr : it->second;
   }
-  const LaneBoundary* DoGetLaneBoundary(const LaneBoundaryId& lane_boundary_id) const override {
+  const LaneBoundary* DoGetLaneBoundary(const LaneBoundary::Id& lane_boundary_id) const override {
     const auto it = lane_boundary_map_.find(lane_boundary_id);
     return (it == lane_boundary_map_.end()) ? nullptr : it->second;
   }
@@ -365,7 +365,7 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
   std::unordered_map<JunctionId, const Junction*> junction_map_;
   std::unordered_map<LaneId, const Lane*> lane_map_;
   std::unordered_map<SegmentId, const Segment*> segment_map_;
-  std::unordered_map<LaneBoundaryId, const LaneBoundary*> lane_boundary_map_;
+  std::unordered_map<LaneBoundary::Id, const LaneBoundary*> lane_boundary_map_;
 };
 
 class MockRoadGeometry : public RoadGeometry {

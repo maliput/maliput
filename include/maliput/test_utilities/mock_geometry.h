@@ -172,7 +172,7 @@ class MockLaneBoundary : public geometry_base::LaneBoundary {
   /// @param id the ID
   ///
   /// See api::LaneBoundary for discussion on initialization.
-  explicit MockLaneBoundary(const api::LaneBoundaryId& id) : geometry_base::LaneBoundary(id) {}
+  explicit MockLaneBoundary(const api::LaneBoundary::Id& id) : geometry_base::LaneBoundary(id) {}
 
  private:
   const api::Segment* do_segment() const override;

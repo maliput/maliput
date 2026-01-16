@@ -300,7 +300,7 @@ class RoadGeometry::IdIndex {
 
   /// Returns the LaneBoundary identified by @p id, or `nullptr` if @p id is
   /// unknown.
-  const LaneBoundary* GetLaneBoundary(const LaneBoundaryId& id) const;
+  const LaneBoundary* GetLaneBoundary(const LaneBoundary::Id& id) const;
 
  protected:
   IdIndex() = default;
@@ -311,7 +311,7 @@ class RoadGeometry::IdIndex {
   virtual const Segment* DoGetSegment(const SegmentId& id) const = 0;
   virtual const Junction* DoGetJunction(const JunctionId& id) const = 0;
   virtual const BranchPoint* DoGetBranchPoint(const BranchPointId& id) const = 0;
-  virtual const LaneBoundary* DoGetLaneBoundary(const LaneBoundaryId& id) const = 0;
+  virtual const LaneBoundary* DoGetLaneBoundary(const LaneBoundary::Id& id) const = 0;
 };
 
 }  // namespace api

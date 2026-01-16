@@ -42,9 +42,6 @@ namespace api {
 class Lane;
 class Segment;
 
-/// Persistent identifier for a LaneBoundary element.
-using LaneBoundaryId = TypeSpecificIdentifier<class LaneBoundary>;
-
 /// @addtogroup lane_marking
 /// @{
 

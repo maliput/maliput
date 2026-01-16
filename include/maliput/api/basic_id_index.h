@@ -96,13 +96,13 @@ class BasicIdIndex : public RoadGeometry::IdIndex {
   const Segment* DoGetSegment(const SegmentId& id) const final;
   const Junction* DoGetJunction(const JunctionId& id) const final;
   const BranchPoint* DoGetBranchPoint(const BranchPointId& id) const final;
-  const LaneBoundary* DoGetLaneBoundary(const LaneBoundaryId& id) const final;
+  const LaneBoundary* DoGetLaneBoundary(const LaneBoundary::Id& id) const final;
 
   std::unordered_map<JunctionId, const Junction*> junction_map_;
   std::unordered_map<SegmentId, const Segment*> segment_map_;
   std::unordered_map<LaneId, const Lane*> lane_map_;
   std::unordered_map<BranchPointId, const BranchPoint*> branch_point_map_;
-  std::unordered_map<LaneBoundaryId, const LaneBoundary*> lane_boundary_map_;
+  std::unordered_map<LaneBoundary::Id, const LaneBoundary*> lane_boundary_map_;
 };
 
 }  // namespace api
