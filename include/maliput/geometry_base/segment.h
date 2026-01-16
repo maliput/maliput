@@ -159,13 +159,21 @@ class Segment : public api::Segment {
 
   const api::Lane* do_lane(int index) const override;
 
-  const api::LaneBoundary* do_boundary(int /* index */) const override { return nullptr; }
+  const api::LaneBoundary* do_boundary(int index) const override {
+    if (index < 0 || index >= static_cast<int>(boundaries_.size())) {
+      return nullptr;
+    }
+    return boundaries_[index].get();
+  }
+
+  int do_num_boundaries() const override { return static_cast<int>(boundaries_.size()); }
 
   const api::SegmentId id_;
   const api::Junction* junction_{};
   std::function<void(const api::Lane*)> lane_indexing_callback_;
   std::vector<std::unique_ptr<Lane>> lanes_;
   std::function<void(const api::LaneBoundary*)> lane_boundary_indexing_callback_;
+  // Lane boundaries for this segment.
   std::vector<std::unique_ptr<LaneBoundary>> boundaries_;
 };
 
