@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.0 (2026-01-19)
+-------------------
+* API to obtain a LaneBoundary from the RoadGeometry. (`#704 <https://github.com/maliput/maliput/issues/704>`_)
+* Contributors: Santiago Lopez
+
 1.10.0 (2026-01-12)
 -------------------
 * Add GetCurvature to Lane. (`#700 <https://github.com/maliput/maliput/issues/700>`_)
