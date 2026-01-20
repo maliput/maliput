@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.1 (2026-01-20)
+-------------------
+* Add BCR maintainers. (`#706 <https://github.com/maliput/maliput/issues/706>`_)
+* Contributors: Santiago Lopez
+
 1.11.0 (2026-01-19)
 -------------------
 * API to obtain a LaneBoundary from the RoadGeometry. (`#704 <https://github.com/maliput/maliput/issues/704>`_)
