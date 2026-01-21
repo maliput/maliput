@@ -71,7 +71,14 @@ class MaliputPlugin {
   /// Constructs a MaliputPlugin
   /// @param path_to_lib Path to the library.
   /// @throws maliput::common::assertion_error When `path_to_lib` is empty.
-  MaliputPlugin(const std::string& path_to_lib);
+  explicit MaliputPlugin(const std::string& path_to_lib);
+
+  /// Constructs a MaliputPlugin from an existing dlopen handle.
+  /// This is useful when the library is already loaded in memory (e.g., as an ELF NEEDED dependency)
+  /// and can be retrieved via dlopen() with RTLD_NOLOAD flag.
+  /// @param lib_handle An existing handle from dlopen() (ownership is transferred).
+  /// @throws maliput::common::assertion_error When `lib_handle` is nullptr.
+  explicit MaliputPlugin(void* lib_handle);
 
   MaliputPlugin() = delete;
 

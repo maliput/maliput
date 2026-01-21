@@ -44,5 +44,12 @@ MaliputPlugin::MaliputPlugin(const std::string& path_to_lib) {
   type_ = ExecuteSymbol<MaliputPluginType>(kMaliputPluginTypeSym);
 }
 
+MaliputPlugin::MaliputPlugin(void* lib_handle) {
+  MALIPUT_THROW_UNLESS(lib_handle != nullptr);
+  lib_handle_.reset(lib_handle);
+  id_ = MaliputPlugin::Id(ExecuteSymbol<char*>(kMaliputPluginIdSym));
+  type_ = ExecuteSymbol<MaliputPluginType>(kMaliputPluginTypeSym);
+}
+
 }  // namespace plugin
 }  // namespace maliput
