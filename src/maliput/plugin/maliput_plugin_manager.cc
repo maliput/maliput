@@ -61,7 +61,28 @@ std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
 
 }  // namespace
 
+// List of known plugin library names that may be pre-loaded as ELF NEEDED dependencies.
+// These will be checked via dlopen() with RTLD_NOLOAD before scanning MALIPUT_PLUGIN_PATH.
+const std::vector<std::string> kPreloadedPluginCandidates{
+    // See https://github.com/maliput/maliput_malidrive/
+    "libmaliput_malidrive_road_network.so",
+};
+
 MaliputPluginManager::MaliputPluginManager() {
+  // Check if any known plugins are already loaded in memory (e.g., as ELF NEEDED dependencies).
+  // Using RTLD_NOLOAD to probe without loading - returns handle if already loaded, nullptr otherwise.
+  for (const auto& plugin_lib_name : kPreloadedPluginCandidates) {
+    void* existing_handle = dlopen(plugin_lib_name.c_str(), RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD);
+    if (existing_handle != nullptr) {
+      maliput::log()->info("Plugin '", plugin_lib_name, "' already loaded in memory, using existing handle.");
+      // Create MaliputPlugin directly from the existing handle (ownership transferred).
+      std::unique_ptr<MaliputPlugin> maliput_plugin = std::make_unique<MaliputPlugin>(existing_handle);
+      const auto id = maliput_plugin->GetId();
+      plugins_[MaliputPlugin::Id(id)] = std::move(maliput_plugin);
+      maliput::log()->info("Plugin Id: ", id, " was loaded from existing handle.");
+    }
+  }
+
   const auto library_paths = GetPluginLibraryPaths(kMaliputPluginPathEnv);
   for (const auto& path : library_paths) {
     AddPlugin(path);
@@ -80,6 +101,7 @@ void MaliputPluginManager::AddPlugin(const std::string& path_to_plugin) {
   const auto id = maliput_plugin->GetId();
   const bool is_repeated{plugins_.find(MaliputPlugin::Id(id)) != plugins_.end()};
   plugins_[MaliputPlugin::Id(id)] = std::move(maliput_plugin);
+  maliput::log()->debug("Plugin loaded from path: ", path_to_plugin);
   maliput::log()->info((is_repeated ? "A new version of Plugin Id: " + id + " was loaded."
                                     : "Plugin Id: " + id + " was correctly loaded."));
 }
