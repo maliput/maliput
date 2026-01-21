@@ -26,6 +26,7 @@ build --verbose_failures
 
 build --cxxopt="-std=c++17"
 build --cxxopt="-Werror"
+build --cxxopt="-Wno-deprecated-declarations"
 
 # Silence compiler warnings for external dependencies.
 #  - https://github.com/bazelbuild/bazel/commit/08936aecb96f2937c61bdedfebcf1c5a41a0786d
