@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.12.0 (2026-01-21)
+-------------------
+* Obtain handles to already loaded plugins. (`#708 <https://github.com/maliput/maliput/issues/708>`_)
+* Contributors: Franco Cipollone
+
 1.11.1 (2026-01-20)
 -------------------
 * Add BCR maintainers. (`#706 <https://github.com/maliput/maliput/issues/706>`_)
