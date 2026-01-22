@@ -3,6 +3,8 @@
 //! A Lane represents a lane of travel in a road network with its own
 //! curvilinear coordinate system.
 
+use std::sync::Arc;
+
 use super::{
     BranchPoint, HBounds, InertialPosition, IsoLaneVelocity, LaneEnd, LaneEndWhich, LaneId,
     LanePosition, LanePositionResult, LaneType, MaliputResult, RBounds, Rotation, Segment,
@@ -36,7 +38,7 @@ pub trait Lane: std::fmt::Debug + Send + Sync {
     fn id(&self) -> &LaneId;
 
     /// Returns the Segment to which this Lane belongs.
-    fn segment(&self) -> &dyn Segment;
+    fn segment(&self) -> Arc<dyn Segment>;
 
     /// Returns the index of this Lane within its parent Segment.
     ///
@@ -48,14 +50,14 @@ pub trait Lane: std::fmt::Debug + Send + Sync {
     /// Left is the +r direction (increasing r coordinate).
     ///
     /// Returns `None` if the parent Segment has no Lane to the left.
-    fn to_left(&self) -> Option<&dyn Lane>;
+    fn to_left(&self) -> Option<Arc<dyn Lane>>;
 
     /// Returns a reference to the adjacent Lane to the right of this Lane.
     ///
     /// Right is the -r direction (decreasing r coordinate).
     ///
     /// Returns `None` if the parent Segment has no Lane to the right.
-    fn to_right(&self) -> Option<&dyn Lane>;
+    fn to_right(&self) -> Option<Arc<dyn Lane>>;
 
     /// Returns the arc-length of the Lane along its reference curve.
     ///
@@ -167,7 +169,7 @@ pub trait Lane: std::fmt::Debug + Send + Sync {
     ) -> MaliputResult<LanePosition>;
 
     /// Returns the BranchPoint at the specified end of this lane.
-    fn get_branch_point(&self, which_end: LaneEndWhich) -> &dyn BranchPoint;
+    fn get_branch_point(&self, which_end: LaneEndWhich) -> Arc<dyn BranchPoint>;
 
     /// Returns the set of LaneEnds that connect with this lane on the same
     /// side of the BranchPoint at the specified end.

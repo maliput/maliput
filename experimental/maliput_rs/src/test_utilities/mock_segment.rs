@@ -1,5 +1,7 @@
 //! Mock implementation of Segment for testing.
 
+use std::sync::Arc;
+
 use crate::api::{Junction, Lane, MaliputError, MaliputResult, Segment, SegmentId};
 
 use super::MockLane;
@@ -8,14 +10,9 @@ use super::MockLane;
 #[derive(Debug)]
 pub struct MockSegment {
     id: SegmentId,
-    lanes: Vec<MockLane>,
-    junction: Option<*const dyn Junction>,
+    lanes: Vec<Arc<MockLane>>,
+    junction: Option<Arc<dyn Junction>>,
 }
-
-// Safety: MockSegment is Send because the raw pointers are only used for
-// parent references in a single-threaded test context.
-unsafe impl Send for MockSegment {}
-unsafe impl Sync for MockSegment {}
 
 impl MockSegment {
     /// Creates a new MockSegment with the given ID.
@@ -31,34 +28,17 @@ impl MockSegment {
     pub fn add_lane(&mut self, mut lane: MockLane) {
         let index = self.lanes.len();
         lane.set_index(index);
-        
-        // Set up left/right relationships
-        if index > 0 {
-            // The new lane has the previous lane to its right
-            // (indices increase to the left)
-        }
-        
-        self.lanes.push(lane);
-    }
-
-    /// Sets up lane relationships after all lanes are added.
-    /// Must be called after add_lane and before using the segment.
-    pub fn finalize(&mut self) {
-        // Set segment references for all lanes
-        let self_ptr: *const dyn Segment = self;
-        for lane in &mut self.lanes {
-            lane.set_segment(self_ptr);
-        }
+        self.lanes.push(Arc::new(lane));
     }
 
     /// Sets the parent junction (internal use).
-    pub(crate) fn set_junction(&mut self, junction: *const dyn Junction) {
+    pub(crate) fn set_junction(&mut self, junction: Arc<dyn Junction>) {
         self.junction = Some(junction);
     }
 
-    /// Returns a mutable reference to a lane by index.
-    pub fn lane_mut(&mut self, index: usize) -> Option<&mut MockLane> {
-        self.lanes.get_mut(index)
+    /// Returns a lane Arc by index.
+    pub fn lane_arc(&self, index: usize) -> Option<Arc<MockLane>> {
+        self.lanes.get(index).cloned()
     }
 }
 
@@ -67,25 +47,25 @@ impl Segment for MockSegment {
         &self.id
     }
 
-    fn junction(&self) -> &dyn Junction {
-        unsafe {
-            self.junction
-                .map(|p| &*p)
-                .expect("MockSegment::junction() called before junction was set")
-        }
+    fn junction(&self) -> Arc<dyn Junction> {
+        self.junction
+            .clone()
+            .expect("MockSegment::junction() called before junction was set")
     }
 
     fn num_lanes(&self) -> usize {
         self.lanes.len()
     }
 
-    fn lane(&self, index: usize) -> MaliputResult<&dyn Lane> {
-        self.lanes.get(index).map(|l| l as &dyn Lane).ok_or_else(|| {
-            MaliputError::IndexOutOfBounds {
+    fn lane(&self, index: usize) -> MaliputResult<Arc<dyn Lane>> {
+        self.lanes
+            .get(index)
+            .cloned()
+            .map(|l| l as Arc<dyn Lane>)
+            .ok_or_else(|| MaliputError::IndexOutOfBounds {
                 index,
                 max: self.lanes.len().saturating_sub(1),
-            }
-        })
+            })
     }
 }
 
@@ -145,7 +125,6 @@ impl MockSegmentBuilder {
             segment.add_lane(lane);
         }
 
-        segment.finalize();
         segment
     }
 }
@@ -160,7 +139,6 @@ mod tests {
         let mut segment = MockSegment::new("test_segment");
         segment.add_lane(MockLane::new("lane_0").with_length(100.0));
         segment.add_lane(MockLane::new("lane_1").with_length(100.0));
-        segment.finalize();
 
         assert_eq!(segment.id().string(), "test_segment");
         assert_eq!(segment.num_lanes(), 2);
@@ -171,7 +149,6 @@ mod tests {
         let mut segment = MockSegment::new("test_segment");
         segment.add_lane(MockLane::new("lane_0"));
         segment.add_lane(MockLane::new("lane_1"));
-        segment.finalize();
 
         let lane0 = segment.lane(0).unwrap();
         assert_eq!(lane0.id().string(), "lane_0");
@@ -186,7 +163,6 @@ mod tests {
     fn test_mock_segment_lane_out_of_bounds() {
         let mut segment = MockSegment::new("test_segment");
         segment.add_lane(MockLane::new("lane_0"));
-        segment.finalize();
 
         let result = segment.lane(5);
         assert!(result.is_err());
@@ -198,7 +174,6 @@ mod tests {
         segment.add_lane(MockLane::new("lane_0"));
         segment.add_lane(MockLane::new("lane_1"));
         segment.add_lane(MockLane::new("lane_2"));
-        segment.finalize();
 
         let lane_ids: Vec<_> = segment.lanes().map(|l| l.id().string().to_string()).collect();
         assert_eq!(lane_ids, vec!["lane_0", "lane_1", "lane_2"]);

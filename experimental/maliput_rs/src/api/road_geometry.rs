@@ -4,6 +4,7 @@
 //! access to junctions, branch points, and coordinate transformations.
 
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use crate::math::Vector3;
 
@@ -14,9 +15,9 @@ use super::{
 
 /// Result of converting an InertialPosition to a RoadPosition.
 #[derive(Debug, Clone)]
-pub struct RoadPositionResult<'a> {
+pub struct RoadPositionResult {
     /// The computed RoadPosition.
-    pub road_position: RoadPosition<'a>,
+    pub road_position: RoadPosition,
     /// The InertialPosition that exactly corresponds to the road position.
     pub nearest_position: InertialPosition,
     /// The Cartesian distance from the query position to nearest_position.
@@ -76,7 +77,7 @@ pub trait RoadGeometry: std::fmt::Debug + Send + Sync {
     /// # Errors
     ///
     /// Returns an error if index is out of bounds.
-    fn junction(&self, index: usize) -> MaliputResult<&dyn Junction>;
+    fn junction(&self, index: usize) -> MaliputResult<Arc<dyn Junction>>;
 
     /// Returns the number of BranchPoints in the RoadGeometry.
     fn num_branch_points(&self) -> usize;
@@ -90,10 +91,10 @@ pub trait RoadGeometry: std::fmt::Debug + Send + Sync {
     /// # Errors
     ///
     /// Returns an error if index is out of bounds.
-    fn branch_point(&self, index: usize) -> MaliputResult<&dyn BranchPoint>;
+    fn branch_point(&self, index: usize) -> MaliputResult<Arc<dyn BranchPoint>>;
 
     /// Accesses the IdIndex interface for looking up elements by ID.
-    fn by_id(&self) -> &dyn IdIndex;
+    fn by_id(&self) -> Arc<dyn IdIndex>;
 
     /// Determines the RoadPosition corresponding to an InertialPosition.
     ///
@@ -170,19 +171,19 @@ pub trait RoadGeometry: std::fmt::Debug + Send + Sync {
 /// through the hierarchy.
 pub trait IdIndex: std::fmt::Debug + Send + Sync {
     /// Returns the Lane with the given ID, or None if not found.
-    fn get_lane(&self, id: &LaneId) -> Option<&dyn Lane>;
+    fn get_lane(&self, id: &LaneId) -> Option<Arc<dyn Lane>>;
 
     /// Returns all Lanes as a map from ID to Lane reference.
-    fn get_lanes(&self) -> HashMap<LaneId, &dyn Lane>;
+    fn get_lanes(&self) -> HashMap<LaneId, Arc<dyn Lane>>;
 
     /// Returns the Segment with the given ID, or None if not found.
-    fn get_segment(&self, id: &SegmentId) -> Option<&dyn Segment>;
+    fn get_segment(&self, id: &SegmentId) -> Option<Arc<dyn Segment>>;
 
     /// Returns the Junction with the given ID, or None if not found.
-    fn get_junction(&self, id: &JunctionId) -> Option<&dyn Junction>;
+    fn get_junction(&self, id: &JunctionId) -> Option<Arc<dyn Junction>>;
 
     /// Returns the BranchPoint with the given ID, or None if not found.
-    fn get_branch_point(&self, id: &BranchPointId) -> Option<&dyn BranchPoint>;
+    fn get_branch_point(&self, id: &BranchPointId) -> Option<Arc<dyn BranchPoint>>;
 }
 
 /// Extension trait for RoadGeometry providing additional convenience methods.
@@ -281,7 +282,7 @@ pub struct RoadGeometryJunctionIterator<'a> {
 }
 
 impl<'a> Iterator for RoadGeometryJunctionIterator<'a> {
-    type Item = &'a dyn Junction;
+    type Item = Arc<dyn Junction>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.current >= self.total {
@@ -309,7 +310,7 @@ pub struct RoadGeometryBranchPointIterator<'a> {
 }
 
 impl<'a> Iterator for RoadGeometryBranchPointIterator<'a> {
-    type Item = &'a dyn BranchPoint;
+    type Item = Arc<dyn BranchPoint>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.current >= self.total {

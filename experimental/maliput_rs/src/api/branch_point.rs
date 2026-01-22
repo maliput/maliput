@@ -2,6 +2,8 @@
 //!
 //! A BranchPoint is a node in the road network where Lanes connect to one another.
 
+use std::sync::Arc;
+
 use super::{BranchPointId, LaneEnd, MaliputResult, RoadGeometry};
 
 /// A set of LaneEnds.
@@ -60,7 +62,7 @@ pub trait BranchPoint: std::fmt::Debug + Send + Sync {
     fn id(&self) -> &BranchPointId;
 
     /// Returns the RoadGeometry to which this BranchPoint belongs.
-    fn road_geometry(&self) -> &dyn RoadGeometry;
+    fn road_geometry(&self) -> Arc<dyn RoadGeometry>;
 
     /// Returns the set of LaneEnds on the same side as the given end.
     ///
@@ -70,7 +72,7 @@ pub trait BranchPoint: std::fmt::Debug + Send + Sync {
     /// # Arguments
     ///
     /// * `end` - Must be connected to this BranchPoint
-    fn get_confluent_branches<'a>(&'a self, end: &LaneEnd) -> MaliputResult<&'a dyn LaneEndSet>;
+    fn get_confluent_branches(&self, end: &LaneEnd) -> MaliputResult<Arc<dyn LaneEndSet>>;
 
     /// Returns the set of LaneEnds on the opposite side from the given end.
     ///
@@ -79,7 +81,7 @@ pub trait BranchPoint: std::fmt::Debug + Send + Sync {
     /// # Arguments
     ///
     /// * `end` - Must be connected to this BranchPoint
-    fn get_ongoing_branches<'a>(&'a self, end: &LaneEnd) -> MaliputResult<&'a dyn LaneEndSet>;
+    fn get_ongoing_branches(&self, end: &LaneEnd) -> MaliputResult<Arc<dyn LaneEndSet>>;
 
     /// Returns the default ongoing branch for the given end.
     ///
@@ -94,10 +96,10 @@ pub trait BranchPoint: std::fmt::Debug + Send + Sync {
     fn get_default_branch(&self, end: &LaneEnd) -> MaliputResult<Option<LaneEnd>>;
 
     /// Returns the set of LaneEnds on the "A-side".
-    fn get_a_side(&self) -> &dyn LaneEndSet;
+    fn get_a_side(&self) -> Arc<dyn LaneEndSet>;
 
     /// Returns the set of LaneEnds on the "B-side".
-    fn get_b_side(&self) -> &dyn LaneEndSet;
+    fn get_b_side(&self) -> Arc<dyn LaneEndSet>;
 }
 
 /// Extension trait for BranchPoint providing additional convenience methods.

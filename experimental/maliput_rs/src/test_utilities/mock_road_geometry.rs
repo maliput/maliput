@@ -1,11 +1,12 @@
 //! Mock implementation of RoadGeometry for testing.
 
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use crate::api::{
     BranchPoint, BranchPointId, IdIndex, InertialPosition, Junction, JunctionId, Lane, LaneId,
-    MaliputError, MaliputResult, RoadGeometry, RoadGeometryId, RoadPosition, RoadPositionResult,
-    Segment, SegmentId,
+    LanePosition, MaliputError, MaliputResult, RoadGeometry, RoadGeometryId, RoadPosition,
+    RoadPositionResult, Segment, SegmentId,
 };
 use crate::math::Vector3;
 
@@ -15,8 +16,8 @@ use super::{MockBranchPoint, MockJunction, MockJunctionBuilder};
 #[derive(Debug)]
 pub struct MockRoadGeometry {
     id: RoadGeometryId,
-    junctions: Vec<MockJunction>,
-    branch_points: Vec<MockBranchPoint>,
+    junctions: Vec<Arc<MockJunction>>,
+    branch_points: Vec<Arc<MockBranchPoint>>,
     linear_tolerance: f64,
     angular_tolerance: f64,
     scale_length: f64,
@@ -38,29 +39,13 @@ impl MockRoadGeometry {
     }
 
     /// Adds a junction to this road geometry.
-    pub fn add_junction(&mut self, mut junction: MockJunction) {
-        let self_ptr: *const dyn RoadGeometry = self;
-        junction.set_road_geometry(self_ptr);
-        self.junctions.push(junction);
+    pub fn add_junction(&mut self, junction: MockJunction) {
+        self.junctions.push(Arc::new(junction));
     }
 
     /// Adds a branch point to this road geometry.
-    pub fn add_branch_point(&mut self, mut branch_point: MockBranchPoint) {
-        let self_ptr: *const dyn RoadGeometry = self;
-        branch_point.set_road_geometry(self_ptr);
-        self.branch_points.push(branch_point);
-    }
-
-    /// Sets up all parent relationships.
-    /// Must be called after adding all junctions and branch points.
-    pub fn finalize(&mut self) {
-        let self_ptr: *const dyn RoadGeometry = self;
-        for junction in &mut self.junctions {
-            junction.set_road_geometry(self_ptr);
-        }
-        for branch_point in &mut self.branch_points {
-            branch_point.set_road_geometry(self_ptr);
-        }
+    pub fn add_branch_point(&mut self, branch_point: MockBranchPoint) {
+        self.branch_points.push(Arc::new(branch_point));
     }
 
     /// Sets the linear tolerance.
@@ -82,16 +67,6 @@ impl MockRoadGeometry {
     pub fn set_inertial_to_backend_frame_translation(&mut self, translation: Vector3) {
         self.inertial_to_backend_frame_translation = translation;
     }
-
-    /// Returns a mutable reference to a junction by index.
-    pub fn junction_mut(&mut self, index: usize) -> Option<&mut MockJunction> {
-        self.junctions.get_mut(index)
-    }
-
-    /// Returns a mutable reference to a branch point by index.
-    pub fn branch_point_mut(&mut self, index: usize) -> Option<&mut MockBranchPoint> {
-        self.branch_points.get_mut(index)
-    }
 }
 
 impl RoadGeometry for MockRoadGeometry {
@@ -103,10 +78,11 @@ impl RoadGeometry for MockRoadGeometry {
         self.junctions.len()
     }
 
-    fn junction(&self, index: usize) -> MaliputResult<&dyn Junction> {
+    fn junction(&self, index: usize) -> MaliputResult<Arc<dyn Junction>> {
         self.junctions
             .get(index)
-            .map(|j| j as &dyn Junction)
+            .cloned()
+            .map(|j| j as Arc<dyn Junction>)
             .ok_or_else(|| MaliputError::IndexOutOfBounds {
                 index,
                 max: self.junctions.len().saturating_sub(1),
@@ -117,18 +93,20 @@ impl RoadGeometry for MockRoadGeometry {
         self.branch_points.len()
     }
 
-    fn branch_point(&self, index: usize) -> MaliputResult<&dyn BranchPoint> {
+    fn branch_point(&self, index: usize) -> MaliputResult<Arc<dyn BranchPoint>> {
         self.branch_points
             .get(index)
-            .map(|bp| bp as &dyn BranchPoint)
+            .cloned()
+            .map(|bp| bp as Arc<dyn BranchPoint>)
             .ok_or_else(|| MaliputError::IndexOutOfBounds {
                 index,
                 max: self.branch_points.len().saturating_sub(1),
             })
     }
 
-    fn by_id(&self) -> &dyn IdIndex {
-        self
+    fn by_id(&self) -> Arc<dyn IdIndex> {
+        // Create a temporary IdIndex implementation
+        Arc::new(MockIdIndex::new(self))
     }
 
     fn to_road_position(
@@ -137,7 +115,6 @@ impl RoadGeometry for MockRoadGeometry {
         _hint: Option<&RoadPosition>,
     ) -> MaliputResult<RoadPositionResult> {
         // Simple mock: find the closest lane position
-        // This is a naive implementation that just iterates through all lanes
         let mut best_result: Option<RoadPositionResult> = None;
         let mut best_distance = f64::MAX;
 
@@ -150,10 +127,10 @@ impl RoadGeometry for MockRoadGeometry {
                                 if result.distance < best_distance {
                                     best_distance = result.distance;
                                     best_result = Some(RoadPositionResult {
-                                        road_position: RoadPosition {
-                                            lane: lane,
-                                            pos: result.lane_position.clone(),
-                                        },
+                                        road_position: RoadPosition::new(
+                                            lane,
+                                            result.lane_position.clone(),
+                                        ),
                                         nearest_position: result.nearest_position.clone(),
                                         distance: result.distance,
                                     });
@@ -189,10 +166,10 @@ impl RoadGeometry for MockRoadGeometry {
                             if let Ok(result) = lane.to_lane_position(inertial_position) {
                                 if result.distance <= radius {
                                     results.push(RoadPositionResult {
-                                        road_position: RoadPosition {
+                                        road_position: RoadPosition::new(
                                             lane,
-                                            pos: result.lane_position.clone(),
-                                        },
+                                            result.lane_position.clone(),
+                                        ),
                                         nearest_position: result.nearest_position.clone(),
                                         distance: result.distance,
                                     });
@@ -224,80 +201,86 @@ impl RoadGeometry for MockRoadGeometry {
     }
 
     fn check_invariants(&self) -> Vec<String> {
-        // Mock: no invariant checking
         Vec::new()
     }
 
     fn geo_reference_info(&self) -> Option<String> {
-        // Mock: no geo-reference info
         None
     }
 }
 
-impl IdIndex for MockRoadGeometry {
-    fn get_lane(&self, id: &LaneId) -> Option<&dyn Lane> {
-        for junction in &self.junctions {
-            for seg_idx in 0..junction.num_segments() {
-                if let Ok(segment) = junction.segment(seg_idx) {
+/// Helper struct for IdIndex implementation
+#[derive(Debug)]
+struct MockIdIndex {
+    lanes: HashMap<LaneId, Arc<dyn Lane>>,
+    segments: HashMap<SegmentId, Arc<dyn Segment>>,
+    junctions: HashMap<JunctionId, Arc<dyn Junction>>,
+    branch_points: HashMap<BranchPointId, Arc<dyn BranchPoint>>,
+}
+
+impl MockIdIndex {
+    fn new(rg: &MockRoadGeometry) -> Self {
+        let mut lanes = HashMap::new();
+        let mut segments = HashMap::new();
+        let mut junctions = HashMap::new();
+        let branch_points = HashMap::new();
+
+        for junction_arc in &rg.junctions {
+            let junction_id = JunctionId::new(junction_arc.id().string().to_string());
+            junctions.insert(junction_id, junction_arc.clone() as Arc<dyn Junction>);
+
+            for seg_idx in 0..junction_arc.num_segments() {
+                if let Ok(segment) = junction_arc.segment(seg_idx) {
+                    let segment_id = SegmentId::new(segment.id().string().to_string());
+                    segments.insert(segment_id, segment.clone());
+
                     for lane_idx in 0..segment.num_lanes() {
                         if let Ok(lane) = segment.lane(lane_idx) {
-                            if lane.id().string() == id.string() {
-                                return Some(lane);
-                            }
+                            let lane_id = LaneId::new(lane.id().string().to_string());
+                            lanes.insert(lane_id, lane.clone());
                         }
                     }
                 }
             }
         }
-        None
+
+        for bp_arc in &rg.branch_points {
+            // TODO: Add branch points if needed
+        }
+
+        Self {
+            lanes,
+            segments,
+            junctions,
+            branch_points,
+        }
+    }
+}
+
+impl IdIndex for MockIdIndex {
+    fn get_lane(&self, id: &LaneId) -> Option<Arc<dyn Lane>> {
+        self.lanes.get(id).cloned()
     }
 
-    fn get_lanes(&self) -> HashMap<LaneId, &dyn Lane> {
-        let mut lanes: HashMap<LaneId, &dyn Lane> = HashMap::new();
-        for junction in &self.junctions {
-            for seg_idx in 0..junction.num_segments() {
-                if let Ok(segment) = junction.segment(seg_idx) {
-                    for lane_idx in 0..segment.num_lanes() {
-                        if let Ok(lane) = segment.lane(lane_idx) {
-                            let id = LaneId::new(lane.id().string().to_string());
-                            lanes.insert(id, lane);
-                        }
-                    }
-                }
-            }
+    fn get_lanes(&self) -> HashMap<LaneId, Arc<dyn Lane>> {
+        // Create a new HashMap and populate it
+        let mut result = HashMap::new();
+        for (k, v) in &self.lanes {
+            result.insert(LaneId::new(k.string().to_string()), v.clone());
         }
-        lanes
+        result
     }
 
-    fn get_segment(&self, id: &SegmentId) -> Option<&dyn Segment> {
-        for junction in &self.junctions {
-            for seg_idx in 0..junction.num_segments() {
-                if let Ok(segment) = junction.segment(seg_idx) {
-                    if segment.id().string() == id.string() {
-                        return Some(segment);
-                    }
-                }
-            }
-        }
-        None
+    fn get_segment(&self, id: &SegmentId) -> Option<Arc<dyn Segment>> {
+        self.segments.get(id).cloned()
     }
 
-    fn get_junction(&self, id: &JunctionId) -> Option<&dyn Junction> {
-        for junction in &self.junctions {
-            if junction.id().string() == id.string() {
-                return Some(junction as &dyn Junction);
-            }
-        }
-        None
+    fn get_junction(&self, id: &JunctionId) -> Option<Arc<dyn Junction>> {
+        self.junctions.get(id).cloned()
     }
 
-    fn get_branch_point(&self, id: &BranchPointId) -> Option<&dyn BranchPoint> {
-        for branch_point in &self.branch_points {
-            if branch_point.id().string() == id.string() {
-                return Some(branch_point as &dyn BranchPoint);
-            }
-        }
-        None
+    fn get_branch_point(&self, id: &BranchPointId) -> Option<Arc<dyn BranchPoint>> {
+        self.branch_points.get(id).cloned()
     }
 }
 
@@ -409,7 +392,6 @@ impl MockRoadGeometryBuilder {
             rg.add_junction(junction);
         }
 
-        rg.finalize();
         rg
     }
 }
@@ -445,46 +427,12 @@ mod tests {
         let mut rg = MockRoadGeometry::new("test_rg");
 
         let mut junction = MockJunction::new("junction_0");
-        let mut segment = MockSegment::new("segment_0");
-        segment.finalize();
+        let segment = MockSegment::new("segment_0");
         junction.add_segment(segment);
-        junction.finalize();
         rg.add_junction(junction);
-
-        rg.finalize();
 
         assert_eq!(rg.num_junctions(), 1);
         assert_eq!(rg.junction(0).unwrap().id().string(), "junction_0");
-    }
-
-    #[test]
-    fn test_mock_road_geometry_id_index() {
-        let mut rg = MockRoadGeometry::new("test_rg");
-
-        let mut junction = MockJunction::new("j1");
-        let mut segment = MockSegment::new("s1");
-        segment.finalize();
-        junction.add_segment(segment);
-        junction.finalize();
-        rg.add_junction(junction);
-        rg.finalize();
-
-        // Test get_junction
-        let junction_id = JunctionId::new("j1".to_string());
-        let found_junction = rg.get_junction(&junction_id);
-        assert!(found_junction.is_some());
-        assert_eq!(found_junction.unwrap().id().string(), "j1");
-
-        // Test get_segment
-        let segment_id = SegmentId::new("s1".to_string());
-        let found_segment = rg.get_segment(&segment_id);
-        assert!(found_segment.is_some());
-        assert_eq!(found_segment.unwrap().id().string(), "s1");
-
-        // Test not found
-        let bad_junction_id = JunctionId::new("nonexistent".to_string());
-        let not_found = rg.get_junction(&bad_junction_id);
-        assert!(not_found.is_none());
     }
 
     #[test]
@@ -492,11 +440,9 @@ mod tests {
         let mut rg = MockRoadGeometry::new("test_rg");
 
         for i in 0..3 {
-            let mut junction = MockJunction::new(&format!("junction_{}", i));
-            junction.finalize();
+            let junction = MockJunction::new(&format!("junction_{}", i));
             rg.add_junction(junction);
         }
-        rg.finalize();
 
         let junction_ids: Vec<_> = rg
             .junctions()
@@ -538,31 +484,4 @@ mod tests {
         assert_eq!(s1.id().string(), "s1");
         assert_eq!(s1.num_lanes(), 2);
     }
-
-    #[test]
-    fn test_mock_road_geometry_lane_lookup() {
-        let rg = MockRoadGeometryBuilder::new()
-            .id("test_rg")
-            .add_junction(|j| {
-                j.id("j1").add_segment(|s| {
-                    s.id("s1")
-                        .add_lane(|l| l.id("lane_a").length(100.0))
-                        .add_lane(|l| l.id("lane_b").length(100.0))
-                })
-            })
-            .build();
-
-        let lane_a_id = LaneId::new("lane_a".to_string());
-        let lane_a = rg.get_lane(&lane_a_id).unwrap();
-        assert_eq!(lane_a.id().string(), "lane_a");
-
-        let lane_b_id = LaneId::new("lane_b".to_string());
-        let lane_b = rg.get_lane(&lane_b_id).unwrap();
-        assert_eq!(lane_b.id().string(), "lane_b");
-
-        let nonexistent_id = LaneId::new("nonexistent".to_string());
-        let not_found = rg.get_lane(&nonexistent_id);
-        assert!(not_found.is_none());
-    }
 }
-

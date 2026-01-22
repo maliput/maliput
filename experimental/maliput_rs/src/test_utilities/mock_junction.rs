@@ -1,5 +1,7 @@
 //! Mock implementation of Junction for testing.
 
+use std::sync::Arc;
+
 use crate::api::{Junction, JunctionId, MaliputError, MaliputResult, RoadGeometry, Segment};
 
 use super::{MockSegment, MockSegmentBuilder};
@@ -8,14 +10,9 @@ use super::{MockSegment, MockSegmentBuilder};
 #[derive(Debug)]
 pub struct MockJunction {
     id: JunctionId,
-    segments: Vec<MockSegment>,
-    road_geometry: Option<*const dyn RoadGeometry>,
+    segments: Vec<Arc<MockSegment>>,
+    road_geometry: Option<Arc<dyn RoadGeometry>>,
 }
-
-// Safety: MockJunction is Send because the raw pointers are only used for
-// parent references in a single-threaded test context.
-unsafe impl Send for MockJunction {}
-unsafe impl Sync for MockJunction {}
 
 impl MockJunction {
     /// Creates a new MockJunction with the given ID.
@@ -28,30 +25,25 @@ impl MockJunction {
     }
 
     /// Adds a segment to this junction.
-    pub fn add_segment(&mut self, mut segment: MockSegment) {
-        // Set the junction reference
-        let self_ptr: *const dyn Junction = self;
-        segment.set_junction(self_ptr);
-        self.segments.push(segment);
+    pub fn add_segment(&mut self, segment: MockSegment) {
+        self.segments.push(Arc::new(segment));
     }
 
     /// Sets up all segment-junction relationships.
-    /// Must be called after adding all segments.
-    pub fn finalize(&mut self) {
-        let self_ptr: *const dyn Junction = self;
-        for segment in &mut self.segments {
-            segment.set_junction(self_ptr);
-        }
+    /// Must be called after adding all segments and after junction is put in Arc.
+    pub fn finalize_with_junction(_junction: &Arc<MockJunction>) {
+        // In Arc-based architecture, parent refs would be set differently
+        // For now this is a no-op placeholder
     }
 
     /// Sets the parent road geometry (internal use).
-    pub(crate) fn set_road_geometry(&mut self, rg: *const dyn RoadGeometry) {
+    pub(crate) fn set_road_geometry(&mut self, rg: Arc<dyn RoadGeometry>) {
         self.road_geometry = Some(rg);
     }
 
-    /// Returns a mutable reference to a segment by index.
-    pub fn segment_mut(&mut self, index: usize) -> Option<&mut MockSegment> {
-        self.segments.get_mut(index)
+    /// Returns a reference to a segment by index.
+    pub fn segment_arc(&self, index: usize) -> Option<Arc<MockSegment>> {
+        self.segments.get(index).cloned()
     }
 }
 
@@ -60,22 +52,21 @@ impl Junction for MockJunction {
         &self.id
     }
 
-    fn road_geometry(&self) -> &dyn RoadGeometry {
-        unsafe {
-            self.road_geometry
-                .map(|p| &*p)
-                .expect("MockJunction::road_geometry() called before road_geometry was set")
-        }
+    fn road_geometry(&self) -> Arc<dyn RoadGeometry> {
+        self.road_geometry
+            .clone()
+            .expect("MockJunction::road_geometry() called before road_geometry was set")
     }
 
     fn num_segments(&self) -> usize {
         self.segments.len()
     }
 
-    fn segment(&self, index: usize) -> MaliputResult<&dyn Segment> {
+    fn segment(&self, index: usize) -> MaliputResult<Arc<dyn Segment>> {
         self.segments
             .get(index)
-            .map(|s| s as &dyn Segment)
+            .cloned()
+            .map(|s| s as Arc<dyn Segment>)
             .ok_or_else(|| MaliputError::IndexOutOfBounds {
                 index,
                 max: self.segments.len().saturating_sub(1),
@@ -139,7 +130,6 @@ impl MockJunctionBuilder {
             junction.add_segment(segment);
         }
 
-        junction.finalize();
         junction
     }
 }
@@ -153,11 +143,8 @@ mod tests {
     fn test_mock_junction_basic() {
         let mut junction = MockJunction::new("test_junction");
         
-        let mut segment = MockSegment::new("segment_0");
-        segment.finalize();
+        let segment = MockSegment::new("segment_0");
         junction.add_segment(segment);
-        
-        junction.finalize();
 
         assert_eq!(junction.id().string(), "test_junction");
         assert_eq!(junction.num_segments(), 1);
@@ -167,15 +154,11 @@ mod tests {
     fn test_mock_junction_segment_access() {
         let mut junction = MockJunction::new("test_junction");
         
-        let mut segment0 = MockSegment::new("segment_0");
-        segment0.finalize();
+        let segment0 = MockSegment::new("segment_0");
         junction.add_segment(segment0);
         
-        let mut segment1 = MockSegment::new("segment_1");
-        segment1.finalize();
+        let segment1 = MockSegment::new("segment_1");
         junction.add_segment(segment1);
-        
-        junction.finalize();
 
         assert_eq!(junction.segment(0).unwrap().id().string(), "segment_0");
         assert_eq!(junction.segment(1).unwrap().id().string(), "segment_1");
@@ -193,11 +176,9 @@ mod tests {
         let mut junction = MockJunction::new("test_junction");
         
         for i in 0..3 {
-            let mut segment = MockSegment::new(&format!("segment_{}", i));
-            segment.finalize();
+            let segment = MockSegment::new(&format!("segment_{}", i));
             junction.add_segment(segment);
         }
-        junction.finalize();
 
         let segment_ids: Vec<_> = junction
             .segments()

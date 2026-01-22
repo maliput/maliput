@@ -6,6 +6,7 @@
 use crate::math::{RollPitchYaw, Vector3};
 use nalgebra::UnitQuaternion;
 use std::fmt;
+use std::sync::Arc;
 
 use super::{Lane, MaliputError, MaliputResult};
 
@@ -303,16 +304,16 @@ impl IsoLaneVelocity {
 
 /// A position in the road network, combining a Lane reference with a LanePosition.
 #[derive(Debug, Clone)]
-pub struct RoadPosition<'a> {
+pub struct RoadPosition {
     /// The lane containing this position.
-    pub lane: &'a dyn Lane,
+    pub lane: Arc<dyn Lane>,
     /// The position within the lane's coordinate frame.
     pub pos: LanePosition,
 }
 
-impl<'a> RoadPosition<'a> {
+impl RoadPosition {
     /// Creates a new RoadPosition.
-    pub fn new(lane: &'a dyn Lane, pos: LanePosition) -> Self {
+    pub fn new(lane: Arc<dyn Lane>, pos: LanePosition) -> Self {
         Self { lane, pos }
     }
 
@@ -436,16 +437,16 @@ impl fmt::Display for LaneEndWhich {
 
 /// A specific endpoint of a specific Lane.
 #[derive(Debug, Clone)]
-pub struct LaneEnd<'a> {
+pub struct LaneEnd {
     /// The lane.
-    pub lane: &'a dyn Lane,
+    pub lane: Arc<dyn Lane>,
     /// Which end of the lane.
     pub end: LaneEndWhich,
 }
 
-impl<'a> LaneEnd<'a> {
+impl LaneEnd {
     /// Creates a new LaneEnd.
-    pub fn new(lane: &'a dyn Lane, end: LaneEndWhich) -> Self {
+    pub fn new(lane: Arc<dyn Lane>, end: LaneEndWhich) -> Self {
         Self { lane, end }
     }
 }

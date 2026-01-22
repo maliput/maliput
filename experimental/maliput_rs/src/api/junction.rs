@@ -2,6 +2,8 @@
 //!
 //! A Junction is a closed set of Segments with physically coplanar road surfaces.
 
+use std::sync::Arc;
+
 use super::{JunctionId, MaliputResult, RoadGeometry, Segment};
 
 /// A Junction is a closed set of Segments which have physically coplanar
@@ -27,7 +29,7 @@ pub trait Junction: std::fmt::Debug + Send + Sync {
     fn id(&self) -> &JunctionId;
 
     /// Returns the RoadGeometry to which this Junction belongs.
-    fn road_geometry(&self) -> &dyn RoadGeometry;
+    fn road_geometry(&self) -> Arc<dyn RoadGeometry>;
 
     /// Returns the number of Segments in this Junction.
     ///
@@ -43,7 +45,7 @@ pub trait Junction: std::fmt::Debug + Send + Sync {
     /// # Errors
     ///
     /// Returns an error if index is out of bounds.
-    fn segment(&self, index: usize) -> MaliputResult<&dyn Segment>;
+    fn segment(&self, index: usize) -> MaliputResult<Arc<dyn Segment>>;
 }
 
 /// Extension trait for Junction providing additional convenience methods.
@@ -86,7 +88,7 @@ pub struct JunctionSegmentIterator<'a> {
 }
 
 impl<'a> Iterator for JunctionSegmentIterator<'a> {
-    type Item = &'a dyn Segment;
+    type Item = Arc<dyn Segment>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.current >= self.total {

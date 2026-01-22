@@ -3,6 +3,8 @@
 //! A Segment represents a bundle of adjacent Lanes sharing a continuously
 //! traversable road surface.
 
+use std::sync::Arc;
+
 use super::{Junction, Lane, MaliputError, MaliputResult, SegmentId};
 
 /// A Segment represents a bundle of adjacent Lanes which share a continuously
@@ -32,7 +34,7 @@ pub trait Segment: std::fmt::Debug + Send + Sync {
     fn id(&self) -> &SegmentId;
 
     /// Returns the Junction to which this Segment belongs.
-    fn junction(&self) -> &dyn Junction;
+    fn junction(&self) -> Arc<dyn Junction>;
 
     /// Returns the number of Lanes contained in this Segment.
     ///
@@ -48,7 +50,7 @@ pub trait Segment: std::fmt::Debug + Send + Sync {
     /// # Errors
     ///
     /// Returns an error if index is out of bounds.
-    fn lane(&self, index: usize) -> MaliputResult<&dyn Lane>;
+    fn lane(&self, index: usize) -> MaliputResult<Arc<dyn Lane>>;
 }
 
 /// Extension trait for Segment providing additional convenience methods.
@@ -57,7 +59,7 @@ pub trait SegmentExt: Segment {
     fn lanes(&self) -> SegmentLaneIterator<'_>;
 
     /// Returns the leftmost lane (highest index).
-    fn leftmost_lane(&self) -> MaliputResult<&dyn Lane> {
+    fn leftmost_lane(&self) -> MaliputResult<Arc<dyn Lane>> {
         let n = self.num_lanes();
         if n == 0 {
             return Err(MaliputError::Validation(
@@ -68,7 +70,7 @@ pub trait SegmentExt: Segment {
     }
 
     /// Returns the rightmost lane (index 0).
-    fn rightmost_lane(&self) -> MaliputResult<&dyn Lane> {
+    fn rightmost_lane(&self) -> MaliputResult<Arc<dyn Lane>> {
         if self.num_lanes() == 0 {
             return Err(MaliputError::Validation(
                 "Segment has no lanes".to_string(),
@@ -107,7 +109,7 @@ pub struct SegmentLaneIterator<'a> {
 }
 
 impl<'a> Iterator for SegmentLaneIterator<'a> {
-    type Item = &'a dyn Lane;
+    type Item = Arc<dyn Lane>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.current >= self.total {

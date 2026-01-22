@@ -1,5 +1,7 @@
 //! Mock implementation of Lane for testing.
 
+use std::sync::Arc;
+
 use crate::api::{
     BranchPoint, HBounds, InertialPosition, IsoLaneVelocity, Lane, LaneEnd, LaneEndWhich, LaneId,
     LanePosition, LanePositionResult, LaneType, MaliputError, MaliputResult, RBounds, Rotation,
@@ -21,22 +23,16 @@ pub struct MockLane {
     elevation_bounds: HBounds,
 
     // Parent reference (set after construction)
-    segment: Option<*const dyn Segment>,
+    segment: Option<Arc<dyn Segment>>,
 
     // Adjacent lane indices (within parent segment)
     left_index: Option<usize>,
     right_index: Option<usize>,
 
     // Branch point references (set after construction)
-    start_branch_point: Option<*const dyn BranchPoint>,
-    finish_branch_point: Option<*const dyn BranchPoint>,
+    start_branch_point: Option<Arc<dyn BranchPoint>>,
+    finish_branch_point: Option<Arc<dyn BranchPoint>>,
 }
-
-// Safety: MockLane is Send because the raw pointers are only used for
-// parent/neighbor references in a single-threaded test context.
-// In production code, these would be proper Arc references.
-unsafe impl Send for MockLane {}
-unsafe impl Sync for MockLane {}
 
 impl MockLane {
     /// Creates a new MockLane with default values.
@@ -106,7 +102,7 @@ impl MockLane {
     }
 
     /// Sets the parent segment (internal use).
-    pub(crate) fn set_segment(&mut self, segment: *const dyn Segment) {
+    pub(crate) fn set_segment(&mut self, segment: Arc<dyn Segment>) {
         self.segment = Some(segment);
     }
 
@@ -116,12 +112,12 @@ impl MockLane {
     }
 
     /// Sets the start branch point (internal use).
-    pub(crate) fn set_start_branch_point(&mut self, bp: *const dyn BranchPoint) {
+    pub(crate) fn set_start_branch_point(&mut self, bp: Arc<dyn BranchPoint>) {
         self.start_branch_point = Some(bp);
     }
 
     /// Sets the finish branch point (internal use).
-    pub(crate) fn set_finish_branch_point(&mut self, bp: *const dyn BranchPoint) {
+    pub(crate) fn set_finish_branch_point(&mut self, bp: Arc<dyn BranchPoint>) {
         self.finish_branch_point = Some(bp);
     }
 }
@@ -131,25 +127,23 @@ impl Lane for MockLane {
         &self.id
     }
 
-    fn segment(&self) -> &dyn Segment {
-        unsafe {
-            self.segment
-                .map(|p| &*p)
-                .expect("MockLane::segment() called before segment was set")
-        }
+    fn segment(&self) -> Arc<dyn Segment> {
+        self.segment
+            .clone()
+            .expect("MockLane::segment() called before segment was set")
     }
 
     fn index(&self) -> usize {
         self.index
     }
 
-    fn to_left(&self) -> Option<&dyn Lane> {
+    fn to_left(&self) -> Option<Arc<dyn Lane>> {
         // In a real implementation, we'd look up the lane in the parent segment.
         // For mocks, we return None and tests should use the segment directly.
         None
     }
 
-    fn to_right(&self) -> Option<&dyn Lane> {
+    fn to_right(&self) -> Option<Arc<dyn Lane>> {
         // In a real implementation, we'd look up the lane in the parent segment.
         // For mocks, we return None and tests should use the segment directly.
         None
@@ -274,18 +268,16 @@ impl Lane for MockLane {
         Ok(LanePosition::new(velocity.sigma_v, velocity.rho_v, velocity.eta_v))
     }
 
-    fn get_branch_point(&self, which_end: LaneEndWhich) -> &dyn BranchPoint {
-        unsafe {
-            match which_end {
-                LaneEndWhich::Start => self
-                    .start_branch_point
-                    .map(|p| &*p)
-                    .expect("MockLane::get_branch_point(Start) called before branch point was set"),
-                LaneEndWhich::Finish => self
-                    .finish_branch_point
-                    .map(|p| &*p)
-                    .expect("MockLane::get_branch_point(Finish) called before branch point was set"),
-            }
+    fn get_branch_point(&self, which_end: LaneEndWhich) -> Arc<dyn BranchPoint> {
+        match which_end {
+            LaneEndWhich::Start => self
+                .start_branch_point
+                .clone()
+                .expect("MockLane::get_branch_point(Start) called before branch point was set"),
+            LaneEndWhich::Finish => self
+                .finish_branch_point
+                .clone()
+                .expect("MockLane::get_branch_point(Finish) called before branch point was set"),
         }
     }
 
