@@ -1,0 +1,22 @@
+[package]
+name = "maliput"
+version = "0.1.0"
+edition = "2021"
+authors = ["Maliput Contributors"]
+license = "BSD-3-Clause"
+description = "A Rust implementation of the maliput road network API"
+repository = "https://github.com/maliput/maliput"
+keywords = ["road-network", "simulation", "autonomous-vehicles", "mapping"]
+categories = ["simulation", "science::geo"]
+
+[dependencies]
+thiserror = "1.0"
+nalgebra = "0.32"
+
+[dev-dependencies]
+approx = "0.5"
+
+[features]
+default = []
+# Enable parallel computation support
+parallel = []
