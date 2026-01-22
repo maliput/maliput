@@ -31,10 +31,21 @@ use std::marker::PhantomData;
 /// // This would be a compile error:
 /// // let wrong: LaneId = segment_id;
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct TypeSpecificIdentifier<T: ?Sized> {
     id: String,
     _marker: PhantomData<T>,
+}
+
+// Manual Clone implementation that doesn't require T: Clone
+// This works because we only clone the String, not T
+impl<T: ?Sized> Clone for TypeSpecificIdentifier<T> {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id.clone(),
+            _marker: PhantomData,
+        }
+    }
 }
 
 impl<T: ?Sized> TypeSpecificIdentifier<T> {
