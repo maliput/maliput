@@ -29,6 +29,12 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/plugin/maliput_plugin_manager.h"
 
+#include <dlfcn.h>
+
+#include <cstring>
+
+#include <link.h>
+
 #include "maliput/common/filesystem.h"
 #include "maliput/common/logger.h"
 #include "maliput/utility/file_utils.h"
@@ -59,27 +65,71 @@ std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
   return filepaths;
 }
 
+// Structure to hold search parameters and results for dl_iterate_phdr callback.
+struct PluginSearchContext {
+  std::string search_pattern;  // Pattern to match in library path (e.g., "maliput_malidrive_road_network")
+  std::string found_path;      // Full path of the found library
+  bool found{false};
+};
+
+// Callback for dl_iterate_phdr() to find loaded libraries matching a pattern.
+// @param info Information about the shared object.
+// @param size Size of the info structure.
+// @param data User-provided context (PluginSearchContext*).
+// @return 0 to continue iteration, non-zero to stop.
+int FindLoadedPluginCallback(struct dl_phdr_info* info, size_t /* size */, void* data) {
+  auto* context = static_cast<PluginSearchContext*>(data);
+  if (info->dlpi_name != nullptr && std::strlen(info->dlpi_name) > 0) {
+    const std::string lib_path(info->dlpi_name);
+    // Check if the library path contains the search pattern.
+    if (lib_path.find(context->search_pattern) != std::string::npos) {
+      context->found_path = lib_path;
+      context->found = true;
+      return 1;  // Stop iteration
+    }
+  }
+  return 0;  // Continue iteration
+}
+
+// Finds a pre-loaded library by matching a pattern in the library name.
+// Uses dl_iterate_phdr() to scan all loaded shared objects.
+// @param pattern The pattern to search for in library names (e.g., "maliput_malidrive_road_network").
+// @return The full path to the loaded library if found, empty string otherwise.
+std::string FindLoadedLibraryByPattern(const std::string& pattern) {
+  PluginSearchContext context;
+  context.search_pattern = pattern;
+  dl_iterate_phdr(FindLoadedPluginCallback, &context);
+  return context.found ? context.found_path : "";
+}
+
 }  // namespace
 
-// List of known plugin library names that may be pre-loaded as ELF NEEDED dependencies.
-// These will be checked via dlopen() with RTLD_NOLOAD before scanning MALIPUT_PLUGIN_PATH.
-const std::vector<std::string> kPreloadedPluginCandidates{
+// List of known plugin base names (without lib prefix, version suffixes, or .so extension)
+// that may be pre-loaded as ELF NEEDED dependencies.
+// These patterns will be matched against loaded library paths using dl_iterate_phdr().
+const std::vector<std::string> kPreloadedPluginPatterns{
     // See https://github.com/maliput/maliput_malidrive/
-    "libmaliput_malidrive_road_network.so",
+    "maliput_malidrive_road_network",
 };
 
 MaliputPluginManager::MaliputPluginManager() {
   // Check if any known plugins are already loaded in memory (e.g., as ELF NEEDED dependencies).
-  // Using RTLD_NOLOAD to probe without loading - returns handle if already loaded, nullptr otherwise.
-  for (const auto& plugin_lib_name : kPreloadedPluginCandidates) {
-    void* existing_handle = dlopen(plugin_lib_name.c_str(), RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD);
-    if (existing_handle != nullptr) {
-      maliput::log()->info("Plugin '", plugin_lib_name, "' already loaded in memory, using existing handle.");
-      // Create MaliputPlugin directly from the existing handle (ownership transferred).
-      std::unique_ptr<MaliputPlugin> maliput_plugin = std::make_unique<MaliputPlugin>(existing_handle);
-      const auto id = maliput_plugin->GetId();
-      plugins_[MaliputPlugin::Id(id)] = std::move(maliput_plugin);
-      maliput::log()->info("Plugin Id: ", id, " was loaded from existing handle.");
+  // Using dl_iterate_phdr() to find libraries by pattern, handling version suffixes like "-c2dfc143".
+  for (const auto& plugin_pattern : kPreloadedPluginPatterns) {
+    const std::string loaded_lib_path = FindLoadedLibraryByPattern(plugin_pattern);
+    if (!loaded_lib_path.empty()) {
+      maliput::log()->info("Found pre-loaded plugin matching '", plugin_pattern, "': ", loaded_lib_path);
+      // Use RTLD_NOLOAD to get a handle to the already-loaded library without incrementing refcount issues.
+      void* existing_handle = dlopen(loaded_lib_path.c_str(), RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD);
+      if (existing_handle != nullptr) {
+        // Create MaliputPlugin directly from the existing handle (ownership transferred).
+        std::unique_ptr<MaliputPlugin> maliput_plugin = std::make_unique<MaliputPlugin>(existing_handle);
+        const auto id = maliput_plugin->GetId();
+        plugins_[MaliputPlugin::Id(id)] = std::move(maliput_plugin);
+        maliput::log()->info("Plugin Id: ", id, " was loaded from existing handle.");
+      } else {
+        maliput::log()->warn("Found library '", loaded_lib_path, "' but failed to get handle: ", dlerror());
+      }
     }
   }
 
