@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.13.0 (2026-01-23)
+-------------------
+* Find preloaded plugins with mangled name. (`#710 <https://github.com/maliput/maliput/issues/710>`_)
+* Contributors: Franco Cipollone
+
 1.12.0 (2026-01-21)
 -------------------
 * Obtain handles to already loaded plugins. (`#708 <https://github.com/maliput/maliput/issues/708>`_)
