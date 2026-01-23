@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -464,6 +464,12 @@ GTEST_TEST(HBoundsTest, Setters) {
   // Checks constraints on the setters.
   EXPECT_THROW(dut.set_min(kMax), maliput::common::assertion_error);
   EXPECT_THROW(dut.set_max(kMin), maliput::common::assertion_error);
+}
+
+GTEST_TEST(LaneTypeTest, Constructor) {
+  const LaneType type{LaneType::kBiking};
+  // Checks correct assignment.
+  EXPECT_EQ(type, LaneType::kBiking);
 }
 
 }  // namespace

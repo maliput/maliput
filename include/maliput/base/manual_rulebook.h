@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "maliput/api/regions.h"
@@ -120,8 +121,8 @@ class ManualRulebook : public api::rules::RoadRulebook {
   api::rules::SpeedLimitRule DoGetRule(const api::rules::SpeedLimitRule::Id& id) const override;
   api::rules::DirectionUsageRule DoGetRule(const api::rules::DirectionUsageRule::Id& id) const override;
 #pragma GCC diagnostic pop
-  api::rules::DiscreteValueRule DoGetDiscreteValueRule(const api::rules::Rule::Id& id) const override;
-  api::rules::RangeValueRule DoGetRangeValueRule(const api::rules::Rule::Id& id) const override;
+  std::optional<api::rules::DiscreteValueRule> DoGetDiscreteValueRule(const api::rules::Rule::Id& id) const override;
+  std::optional<api::rules::RangeValueRule> DoGetRangeValueRule(const api::rules::Rule::Id& id) const override;
 
   class Impl;
   std::unique_ptr<Impl> impl_;

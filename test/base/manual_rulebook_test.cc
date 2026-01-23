@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -144,12 +144,12 @@ TEST_F(ManualRulebookTest, AddGetRemoveDirectionUsage) {
 TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
   ManualRulebook dut;
 
-  EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
+  EXPECT_EQ(dut.GetRangeValueRule(kRangeValueRule.id()), std::nullopt);
   dut.AddRule(kRangeValueRule);
-  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()).value(), kRangeValueRule)));
   EXPECT_THROW(dut.AddRule(kRangeValueRule), maliput::common::assertion_error);
   dut.RemoveRule(kRangeValueRule.id());
-  EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
+  EXPECT_EQ(dut.GetRangeValueRule(kRangeValueRule.id()), std::nullopt);
   EXPECT_THROW(dut.RemoveRule(kRangeValueRule.id()), maliput::common::assertion_error);
 
   const DiscreteValueRule kDiscreteValueRuleWithSameId{
@@ -167,12 +167,12 @@ TEST_F(ManualRulebookTest, AddGetRemoveRangeValueRule) {
 TEST_F(ManualRulebookTest, AddGetRemoveDiscreteValueRule) {
   ManualRulebook dut;
 
-  EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
+  EXPECT_EQ(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::nullopt);
   dut.AddRule(kDiscreteValueRule);
-  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()).value(), kDiscreteValueRule)));
   EXPECT_THROW(dut.AddRule(kDiscreteValueRule), maliput::common::assertion_error);
   dut.RemoveRule(kDiscreteValueRule.id());
-  EXPECT_THROW({ dut.GetDiscreteValueRule(kDiscreteValueRule.id()); }, std::out_of_range);
+  EXPECT_EQ(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::nullopt);
   EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()), maliput::common::assertion_error);
 
   const RangeValueRule kRangeValueRuleWithSameId{
@@ -204,9 +204,9 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   EXPECT_THROW(dut.GetRule(kDirectionUsage.id()), std::out_of_range);
   EXPECT_THROW(dut.RemoveRule(kDirectionUsage.id()), maliput::common::assertion_error);
 #pragma GCC diagnostic pop
-  EXPECT_THROW(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::out_of_range);
+  EXPECT_EQ(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), std::nullopt);
   EXPECT_THROW(dut.RemoveRule(kDiscreteValueRule.id()), maliput::common::assertion_error);
-  EXPECT_THROW(dut.GetRangeValueRule(kRangeValueRule.id()), std::out_of_range);
+  EXPECT_EQ(dut.GetRangeValueRule(kRangeValueRule.id()), std::nullopt);
   EXPECT_THROW(dut.RemoveRule(kRangeValueRule.id()), maliput::common::assertion_error);
 
   // Since the original rules are gone, it should be possible to re-add them.
@@ -221,8 +221,8 @@ TEST_F(ManualRulebookTest, RemoveAll) {
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kSpeedLimit.id()), kSpeedLimit)));
   EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRule(kDirectionUsage.id()), kDirectionUsage)));
 #pragma GCC diagnostic pop
-  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()), kDiscreteValueRule)));
-  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()), kRangeValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetDiscreteValueRule(kDiscreteValueRule.id()).value(), kDiscreteValueRule)));
+  EXPECT_TRUE(AssertCompare(IsEqual(dut.GetRangeValueRule(kRangeValueRule.id()).value(), kRangeValueRule)));
 }
 
 TEST_F(ManualRulebookTest, FindRules) {

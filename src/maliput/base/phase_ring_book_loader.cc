@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -108,7 +108,10 @@ std::unordered_map<Rule::Id, DiscreteValueRule> GetRightOfWayTypeRules(const Roa
   }
   for (const YAML::Node& rule_node : rules_node) {
     const Rule::Id rule_id(rule_node.as<std::string>());
-    result.emplace(rule_id, rulebook->GetDiscreteValueRule(rule_id));
+    const std::optional<DiscreteValueRule> rule = rulebook->GetDiscreteValueRule(rule_id);
+    MALIPUT_VALIDATE(rule.has_value(), "No Rule(" + rule_id.string() + ") in Rulebook.",
+                     maliput::common::rulebook_error);
+    result.emplace(rule_id, rule.value());
   }
   return result;
 }

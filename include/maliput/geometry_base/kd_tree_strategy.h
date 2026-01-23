@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet.
+// Copyright (c) 2022-2026, Woven by Toyota.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 
 #include <memory>
 #include <optional>
+#include <unordered_set>
 #include <vector>
 
 #include "maliput/geometry_base/strategy_base.h"
@@ -89,7 +90,8 @@ class KDTreeStrategy final : public StrategyBase {
 
   // Obtains the closest lanes in the road geometry to a given point within a region around the point.
   // The region is an axis-aligned box with the point as center and the distance as half of the box's edge length.
-  std::deque<const api::Lane*> ClosestLanes(const api::InertialPosition& point, double half_edge_length) const;
+  // Each lane is returned at most 1 time.
+  std::unordered_set<const api::Lane*> ClosestLanes(const api::InertialPosition& point, double half_edge_length) const;
 
   void RegisterPointAtSrh(double s, double r, double h, const api::Lane* lane,
                           std::deque<KDTreeStrategy::MaliputPoint>& points);

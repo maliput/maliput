@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -202,9 +202,21 @@ class ManualRulebook::Impl {
   }
 #pragma GCC diagnostic pop
 
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const { return discrete_value_rules_.at(id); }
+  std::optional<DiscreteValueRule> DoGetDiscreteValueRule(const Rule::Id& id) const {
+    const auto discrete_value_rule_it = discrete_value_rules_.find(id);
+    if (discrete_value_rule_it == discrete_value_rules_.end()) {
+      return std::nullopt;
+    }
+    return discrete_value_rule_it->second;
+  }
 
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const { return range_value_rules_.at(id); }
+  std::optional<RangeValueRule> DoGetRangeValueRule(const Rule::Id& id) const {
+    const auto range_value_rule_it = range_value_rules_.find(id);
+    if (range_value_rule_it == range_value_rules_.end()) {
+      return std::nullopt;
+    }
+    return range_value_rule_it->second;
+  }
 
  private:
   // An index from LaneSRange to collections of rule ID's of all types.
@@ -375,10 +387,12 @@ SpeedLimitRule ManualRulebook::DoGetRule(const SpeedLimitRule::Id& id) const { r
 DirectionUsageRule ManualRulebook::DoGetRule(const DirectionUsageRule::Id& id) const { return impl_->DoGetRule(id); }
 #pragma GCC diagnostic pop
 
-DiscreteValueRule ManualRulebook::DoGetDiscreteValueRule(const Rule::Id& id) const {
+std::optional<DiscreteValueRule> ManualRulebook::DoGetDiscreteValueRule(const Rule::Id& id) const {
   return impl_->DoGetDiscreteValueRule(id);
 }
 
-RangeValueRule ManualRulebook::DoGetRangeValueRule(const Rule::Id& id) const { return impl_->DoGetRangeValueRule(id); }
+std::optional<RangeValueRule> ManualRulebook::DoGetRangeValueRule(const Rule::Id& id) const {
+  return impl_->DoGetRangeValueRule(id);
+}
 
 }  // namespace maliput

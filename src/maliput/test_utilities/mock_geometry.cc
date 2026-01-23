@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -77,6 +77,11 @@ api::InertialPosition MockLane::DoToInertialPosition(const api::LanePosition&) c
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }
 
+double MockLane::DoGetCurvature(const api::LanePosition&) const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
 api::Rotation MockLane::DoGetOrientation(const api::LanePosition&) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
@@ -88,6 +93,46 @@ api::LanePosition MockLane::DoEvalMotionDerivatives(const api::LanePosition&, co
 }
 
 api::LanePositionResult MockLane::DoToLanePosition(const api::InertialPosition&) const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+api::LaneType MockLane::do_type() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+const api::Segment* MockLaneBoundary::do_segment() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+int MockLaneBoundary::do_index() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+const api::Lane* MockLaneBoundary::do_lane_to_left() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+const api::Lane* MockLaneBoundary::do_lane_to_right() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+std::optional<api::LaneMarkingResult> MockLaneBoundary::DoGetMarking(double) const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+std::vector<api::LaneMarkingResult> MockLaneBoundary::DoGetMarkings() const {
+  MALIPUT_THROW_UNLESS(false);
+  MALIPUT_ABORT_MESSAGE("Not implemented.");
+}
+
+std::vector<api::LaneMarkingResult> MockLaneBoundary::DoGetMarkings(double, double) const {
   MALIPUT_THROW_UNLESS(false);
   MALIPUT_ABORT_MESSAGE("Not implemented.");
 }

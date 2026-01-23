@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2023, Woven by Toyota. All rights reserved.
+// Copyright (c) 2023-2026, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -93,7 +93,9 @@ class LaneMock final : public api::Lane {
   MOCK_METHOD(api::RBounds, do_lane_bounds, (double), (const));
   MOCK_METHOD(api::RBounds, do_segment_bounds, (double), (const));
   MOCK_METHOD(api::HBounds, do_elevation_bounds, (double, double), (const));
+  MOCK_METHOD(api::LaneType, do_type, (), (const));
   MOCK_METHOD(api::InertialPosition, DoToInertialPosition, (const api::LanePosition&), (const));
+  MOCK_METHOD(double, DoGetCurvature, (const api::LanePosition&), (const));
   MOCK_METHOD(api::Rotation, DoGetOrientation, (const api::LanePosition&), (const));
   MOCK_METHOD(api::LanePosition, DoEvalMotionDerivatives, (const api::LanePosition&, const api::IsoLaneVelocity&),
               (const));
@@ -117,6 +119,7 @@ class IdIndexMock final : public api::RoadGeometry::IdIndex {
   MOCK_METHOD(const api::Segment*, DoGetSegment, (const api::SegmentId&), (const));
   MOCK_METHOD(const api::Junction*, DoGetJunction, (const api::JunctionId&), (const));
   MOCK_METHOD(const api::BranchPoint*, DoGetBranchPoint, (const api::BranchPointId&), (const));
+  MOCK_METHOD(const api::LaneBoundary*, DoGetLaneBoundary, (const api::LaneBoundary::Id&), (const));
 };
 
 /// @brief Google mock api::Junction.
@@ -135,6 +138,7 @@ class SegmentMock : public api::Segment {
   MOCK_METHOD(const api::Junction*, do_junction, (), (const));
   MOCK_METHOD(int, do_num_lanes, (), (const));
   MOCK_METHOD(const api::Lane*, do_lane, (int), (const));
+  MOCK_METHOD(const api::LaneBoundary*, do_boundary, (int), (const));
 };
 
 /// @brief Google mock api::BranchPoint
@@ -161,8 +165,9 @@ class RoadRulebookMock final : public api::rules::RoadRulebook {
   MOCK_METHOD(api::rules::SpeedLimitRule, DoGetRule, (const api::rules::SpeedLimitRule::Id&), (const));
   MOCK_METHOD(api::rules::DirectionUsageRule, DoGetRule, (const api::rules::DirectionUsageRule::Id&), (const));
 #pragma GCC diagnostic pop
-  MOCK_METHOD(api::rules::DiscreteValueRule, DoGetDiscreteValueRule, (const api::rules::Rule::Id&), (const));
-  MOCK_METHOD(api::rules::RangeValueRule, DoGetRangeValueRule, (const api::rules::Rule::Id&), (const));
+  MOCK_METHOD(std::optional<api::rules::DiscreteValueRule>, DoGetDiscreteValueRule, (const api::rules::Rule::Id&),
+              (const));
+  MOCK_METHOD(std::optional<api::rules::RangeValueRule>, DoGetRangeValueRule, (const api::rules::Rule::Id&), (const));
 };
 
 // @brief Google mock api::rules::TrafficLightBook.

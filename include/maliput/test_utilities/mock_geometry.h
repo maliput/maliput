@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@
 #include "maliput/geometry_base/brute_force_strategy.h"
 #include "maliput/geometry_base/junction.h"
 #include "maliput/geometry_base/lane.h"
+#include "maliput/geometry_base/lane_boundary.h"
 #include "maliput/geometry_base/road_geometry.h"
 #include "maliput/geometry_base/segment.h"
 #include "maliput/math/vector.h"
@@ -153,10 +154,34 @@ class MockLane : public geometry_base::Lane {
   api::RBounds do_segment_bounds(double) const override;
   api::HBounds do_elevation_bounds(double, double) const override;
   api::InertialPosition DoToInertialPosition(const api::LanePosition& lane_pos) const override;
+  double DoGetCurvature(const api::LanePosition& lane_pos) const override;
   api::Rotation DoGetOrientation(const api::LanePosition& lane_pos) const override;
   api::LanePosition DoEvalMotionDerivatives(const api::LanePosition& position,
                                             const api::IsoLaneVelocity& velocity) const override;
   api::LanePositionResult DoToLanePosition(const api::InertialPosition& inertial_position) const override;
+  api::LaneType do_type() const override;
+};
+
+/// Mock api::LaneBoundary implementation; see mock_geometry.h.
+class MockLaneBoundary : public geometry_base::LaneBoundary {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLaneBoundary);
+
+  /// Constructs a partially-initialized MockLaneBoundary.
+  ///
+  /// @param id the ID
+  ///
+  /// See api::LaneBoundary for discussion on initialization.
+  explicit MockLaneBoundary(const api::LaneBoundary::Id& id) : geometry_base::LaneBoundary(id) {}
+
+ private:
+  const api::Segment* do_segment() const override;
+  int do_index() const override;
+  const api::Lane* do_lane_to_left() const override;
+  const api::Lane* do_lane_to_right() const override;
+  std::optional<api::LaneMarkingResult> DoGetMarking(double s) const override;
+  std::vector<api::LaneMarkingResult> DoGetMarkings() const override;
+  std::vector<api::LaneMarkingResult> DoGetMarkings(double s_start, double s_end) const override;
 };
 
 }  // namespace test

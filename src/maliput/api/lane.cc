@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 #include "maliput/api/lane.h"
 
 #include "maliput/api/junction.h"
+#include "maliput/api/lane_boundary.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/profiler.h"
@@ -95,6 +96,11 @@ InertialPosition Lane::ToInertialPosition(const LanePosition& lane_pos) const {
   return DoToInertialPosition(lane_pos);
 }
 
+double Lane::GetCurvature(const LanePosition& lane_pos) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetCurvature(lane_pos);
+}
+
 LanePositionResult Lane::ToLanePosition(const InertialPosition& inertial_pos) const {
   MALIPUT_PROFILE_FUNC();
   return DoToLanePosition(inertial_pos);
@@ -135,6 +141,18 @@ std::optional<LaneEnd> Lane::GetDefaultBranch(const LaneEnd::Which which_end) co
   return DoGetDefaultBranch(which_end);
 }
 
+const LaneBoundary* Lane::left_boundary() const {
+  MALIPUT_PROFILE_FUNC();
+  // Left boundary is at index() + 1 (in the +r direction).
+  return segment()->boundary(index() + 1);
+}
+
+const LaneBoundary* Lane::right_boundary() const {
+  MALIPUT_PROFILE_FUNC();
+  // Right boundary is at index() (in the -r direction).
+  return segment()->boundary(index());
+}
+
 bool Lane::Contains(const LanePosition& lane_position) const {
   MALIPUT_PROFILE_FUNC();
   const double s = lane_position.s();
@@ -149,6 +167,11 @@ bool Lane::Contains(const LanePosition& lane_position) const {
   return IsWithinRange(s, 0., lane_length, linear_tolerance) &&
          IsWithinRange(r, segment_bounds.min(), segment_bounds.max(), linear_tolerance) &&
          IsWithinRange(h, elevation_bounds.min(), elevation_bounds.max(), linear_tolerance);
+}
+
+LaneType Lane::type() const {
+  MALIPUT_PROFILE_FUNC();
+  return do_type();
 }
 
 }  // namespace api

@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2024, Woven by Toyota. All rights reserved.
+// Copyright (c) 2024-2026, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -189,9 +189,9 @@ GTEST_TEST(BuildGraph, EvaluateDoubleLaneRoadGraph) {
 //          a_a     /
 // a x------------x/\   < b
 // c x------------x\ \  < d
-//          a_b     \ \ 
+//          a_b     \ \  <- NOLINT
 //                   \ \ c_a
-//              c_b   \ \ 
+//              c_b   \ \  <- NOLINT
 //                     x x
 //                     g f
 GTEST_TEST(BuildGraph, EvaluateYShapedRoadsGraph) {

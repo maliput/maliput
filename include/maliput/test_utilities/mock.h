@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -60,6 +60,7 @@ struct RoadGeometryIdIndexBuildFlags {
   bool add_junction{false};
   bool add_lane{false};
   bool add_segment{false};
+  bool add_lane_boundary{false};
 };
 
 /// Holds RoadGeometry build configuration.
@@ -71,6 +72,7 @@ struct RoadGeometryBuildFlags {
   bool add_lane{false};
   bool add_branchpoint{false};
   bool add_lane_end_set{false};
+  bool add_lane_boundary{false};
   bool expects_throw{false};
   RoadGeometryIdIndexBuildFlags id_index_build_flags{};
 };
@@ -227,6 +229,7 @@ class MockLane final : public Lane {
   InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const override {
     return lane_pos.s() ? end_ip_ : start_ip_;
   }
+  double DoGetCurvature(const LanePosition& lane_pos) const override { return 0.; }
   LanePositionResult DoToLanePosition(const InertialPosition&) const override { return lane_position_result_; }
   LanePositionResult DoToSegmentPosition(const InertialPosition&) const override { return lane_position_result_; }
   Rotation DoGetOrientation(const LanePosition& lane_pos) const override {
@@ -241,6 +244,7 @@ class MockLane final : public Lane {
   const LaneEndSet* DoGetConfluentBranches(const LaneEnd::Which) const override { return nullptr; }
   const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which) const override { return nullptr; }
   std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which) const override { return std::nullopt; }
+  LaneType do_type() const override { return LaneType::kDriving; }
 
   LaneId id_;
   Segment* segment_{};
@@ -253,12 +257,35 @@ class MockLane final : public Lane {
   LanePositionResult lane_position_result_{};
 };
 
+class MockLaneBoundary final : public LaneBoundary {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockLaneBoundary)
+  MockLaneBoundary(const LaneBoundary::Id& id) : LaneBoundary(), id_(id) {}
+  void set_segment(const Segment* segment) { segment_ = segment; }
+
+ private:
+  const Lane* do_lane_to_left() const override { return lane_to_left_; }
+  const Lane* do_lane_to_right() const override { return lane_to_right_; }
+  Id do_id() const override { return id_; }
+  const Segment* do_segment() const override { return segment_; }
+  int do_index() const override { return 0; }
+  std::optional<LaneMarkingResult> DoGetMarking(double s) const override { return std::nullopt; }
+  std::vector<LaneMarkingResult> DoGetMarkings() const override { return {}; }
+  std::vector<LaneMarkingResult> DoGetMarkings(double s_start, double s_end) const override { return {}; }
+
+  LaneBoundary::Id id_;
+  const Lane* lane_to_left_{};
+  const Lane* lane_to_right_{};
+  const Segment* segment_{};
+};
+
 class MockSegment final : public Segment {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockSegment)
   MockSegment(const SegmentId& id) : Segment(), id_(id) {}
   void set_junction(Junction* junction) { junction_ = junction; }
   void set_lane(std::unique_ptr<MockLane> lane) { lane_ = std::move(lane); }
+  void set_lane_boundary(std::unique_ptr<MockLaneBoundary> lane_boundary) { lane_boundary_ = std::move(lane_boundary); }
 
  private:
   SegmentId do_id() const override { return id_; }
@@ -268,10 +295,12 @@ class MockSegment final : public Segment {
     MALIPUT_THROW_UNLESS(index == 0);
     return lane_.get();
   }
+  const LaneBoundary* do_boundary(int /* index */) const override { return nullptr; }
 
   SegmentId id_;
   Junction* junction_{};
   std::unique_ptr<MockLane> lane_;
+  std::unique_ptr<MockLaneBoundary> lane_boundary_;
 };
 
 class MockJunction final : public Junction {
@@ -305,6 +334,9 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
   void add_branchpoint_to_map(const BranchPointId& id, const BranchPoint* branch_point) {
     branch_point_map_.emplace(id, branch_point);
   }
+  void add_lane_boundary_to_map(const LaneBoundary::Id& id, const LaneBoundary* lane_boundary) {
+    lane_boundary_map_.emplace(id, lane_boundary);
+  }
 
  private:
   const BranchPoint* DoGetBranchPoint(const BranchPointId& branch_point_id) const override {
@@ -323,12 +355,17 @@ class MockIdIndex final : public RoadGeometry::IdIndex {
     const auto it = segment_map_.find(segment_id);
     return (it == segment_map_.end()) ? nullptr : it->second;
   }
+  const LaneBoundary* DoGetLaneBoundary(const LaneBoundary::Id& lane_boundary_id) const override {
+    const auto it = lane_boundary_map_.find(lane_boundary_id);
+    return (it == lane_boundary_map_.end()) ? nullptr : it->second;
+  }
   const std::unordered_map<LaneId, const Lane*>& DoGetLanes() const override { return lane_map_; }
 
   std::unordered_map<BranchPointId, const BranchPoint*> branch_point_map_;
   std::unordered_map<JunctionId, const Junction*> junction_map_;
   std::unordered_map<LaneId, const Lane*> lane_map_;
   std::unordered_map<SegmentId, const Segment*> segment_map_;
+  std::unordered_map<LaneBoundary::Id, const LaneBoundary*> lane_boundary_map_;
 };
 
 class MockRoadGeometry : public RoadGeometry {

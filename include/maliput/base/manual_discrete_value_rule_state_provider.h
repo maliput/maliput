@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -82,11 +82,11 @@ class ManualDiscreteValueRuleStateProvider : public api::rules::DiscreteValueRul
   ///        the next state, relative to when this method is called. When
   ///        provided, it must be positive and @p next_state must not be nullopt.
   ///
-  /// @throws std::out_of_range When @p id is unrecognized by the `rulebook`
+  /// @throws common::rulebook_error When @p id is unrecognized by the `rulebook`
   ///         specified at time of construction.
-  /// @throws common::assertion_error When @p state does not match any state
+  /// @throws common::state_provider_error When @p state does not match any state
   ///         in DiscreteValueRule::states().
-  /// @throws common::assertion_error When @p next_state does not match any
+  /// @throws common::state_provider_error When @p next_state does not match any
   ///         state in DiscreteValueRule::states().
   /// @throws common::assertion_error When @p duration_until is not positive or
   ///         it is provided when @p next_state is nullopt.

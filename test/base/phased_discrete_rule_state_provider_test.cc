@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -268,15 +268,15 @@ TEST_F(ManualBasedBehaviorTest, SetStateTest) {
   PhasedDiscreteRuleStateProvider dut(road_rulebook_.get(), &phase_ring_book_, &phase_provider_);
 
   // Tries to set the state to an unknown Rule::Id in `rulebook_`.
-  EXPECT_THROW(dut.SetState(kUnknownRuleId, kStateA, {}, {}), std::out_of_range);
+  EXPECT_THROW(dut.SetState(kUnknownRuleId, kStateA, {}, {}), maliput::common::rulebook_error);
   // Tries to set an invalid state to the rule.
-  EXPECT_THROW(dut.SetState(kRuleId, kInvalidState, {}, {}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.SetState(kRuleId, kInvalidState, {}, {}), maliput::common::state_provider_error);
   // Tries to set an invalid next state to the rule.
-  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {kInvalidState}, {}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {kInvalidState}, {}), maliput::common::state_provider_error);
   // Tries to set a valid next state with a negative duration.
-  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {kStateA}, {-kDurationUntil}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {kStateA}, {-kDurationUntil}), maliput::common::state_provider_error);
   // Tries to set a nullopt next state with duration.
-  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {}, {kDurationUntil}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {}, {kDurationUntil}), maliput::common::state_provider_error);
 
   // Sets a valid state, next state and duration until.
   EXPECT_NO_THROW(dut.SetState(kRuleId, kStateA, {kStateB}, {kDurationUntil}));

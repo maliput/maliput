@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -109,6 +109,8 @@ class Lane : public api::Lane {
 
   const api::Lane* do_to_right() const override;
 
+  api::LaneType do_type() const override;
+
   const api::BranchPoint* DoGetBranchPoint(const api::LaneEnd::Which which_end) const override;
 
   const api::LaneEndSet* DoGetConfluentBranches(const api::LaneEnd::Which which_end) const override;
@@ -128,6 +130,14 @@ class Lane : public api::Lane {
   //       When overriding DoToInertialPosition(), a better performance is
   //       expected than the generic transform applied here.
   virtual api::InertialPosition DoToInertialPosition(const api::LanePosition& lane_pos) const override;
+
+  // Returns the Euclidean curvature at the given @p lane_pos.
+  //
+  // @note This method implementation @throws maliput::common::assertion_error
+  //       as it should only be called when it is overridden by a derived class.
+  //
+  // @return The Euclidean curvature (1/m) at the given position.
+  virtual double DoGetCurvature(const api::LanePosition& lane_pos) const override;
 
   // Maps @p lane_pos into the Backend Frame.
   //
@@ -232,6 +242,9 @@ class Lane : public api::Lane {
   int index_{-1};
   BranchPoint* start_branch_point_{};
   BranchPoint* finish_branch_point_{};
+
+ protected:
+  api::LaneType type_{api::LaneType::kUnknown};
 };
 
 }  // namespace geometry_base

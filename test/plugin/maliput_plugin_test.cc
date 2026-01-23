@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2021-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,8 @@
 // By using the aforementioned library, maliput::plugin::MaliputPlugin class is tested.
 
 #include "maliput/plugin/maliput_plugin.h"
+
+#include <dlfcn.h>
 
 #include <string>
 
@@ -67,6 +69,49 @@ GTEST_TEST(MaliputPlugin, FunctionsCall) {
 
   EXPECT_THROW(maliput_plugin.ExecuteSymbol<double>(kWrongSymbol), maliput::common::assertion_error);
   EXPECT_EQ(200, maliput_plugin.ExecuteSymbol<int>(kCustomSymbol, 10, 20));
+}
+
+// MaliputPlugin's constructor receives a nullptr handle.
+GTEST_TEST(MaliputPlugin, NullHandle) { EXPECT_THROW(MaliputPlugin{nullptr}, maliput::common::assertion_error); }
+
+// MaliputPlugin's constructor receives a valid dlopen handle.
+GTEST_TEST(MaliputPlugin, ConstructFromHandle) {
+  const std::string kLibraryPath{"/tmp/maliput/test/plugins/libmaliput_multiply_integers_test_plugin.so"};
+  const std::string kCustomSymbol{"MultiplyIntegers"};
+
+  // Manually load the library with dlopen.
+  void* handle = dlopen(kLibraryPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
+  ASSERT_NE(nullptr, handle) << "Failed to load library: " << dlerror();
+
+  // Create plugin from handle (ownership is transferred to MaliputPlugin).
+  const MaliputPlugin maliput_plugin{handle};
+  EXPECT_EQ("multiply_integers_test_plugin", maliput_plugin.GetId());
+  EXPECT_EQ(MaliputPluginType::kRoadNetworkLoader, maliput_plugin.GetType());
+  EXPECT_EQ(200, maliput_plugin.ExecuteSymbol<int>(kCustomSymbol, 10, 20));
+}
+
+// Simulates RTLD_NOLOAD behavior: load a library first, then use RTLD_NOLOAD to get a handle.
+GTEST_TEST(MaliputPlugin, ConstructFromPreloadedHandle) {
+  const std::string kLibraryPath{"/tmp/maliput/test/plugins/libmaliput_multiply_integers_test_plugin.so"};
+  const std::string kCustomSymbol{"MultiplyIntegers"};
+
+  // First, load the library (simulating what happens when it's an ELF NEEDED dependency).
+  void* preload_handle = dlopen(kLibraryPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
+  ASSERT_NE(nullptr, preload_handle) << "Failed to preload library: " << dlerror();
+
+  // Now use RTLD_NOLOAD to get a handle to the already-loaded library (by name only).
+  const std::string kLibraryName{"libmaliput_multiply_integers_test_plugin.so"};
+  void* noload_handle = dlopen(kLibraryName.c_str(), RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD);
+  ASSERT_NE(nullptr, noload_handle) << "RTLD_NOLOAD failed to find preloaded library";
+
+  // Create plugin from the RTLD_NOLOAD handle.
+  const MaliputPlugin maliput_plugin{noload_handle};
+  EXPECT_EQ("multiply_integers_test_plugin", maliput_plugin.GetId());
+  EXPECT_EQ(MaliputPluginType::kRoadNetworkLoader, maliput_plugin.GetType());
+  EXPECT_EQ(200, maliput_plugin.ExecuteSymbol<int>(kCustomSymbol, 10, 20));
+
+  // Clean up the preload handle (MaliputPlugin owns noload_handle).
+  dlclose(preload_handle);
 }
 
 }  // namespace

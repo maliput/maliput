@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2021-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,13 @@ MaliputPlugin::MaliputPlugin(const std::string& path_to_lib) {
   if (!lib_handle_) {
     MALIPUT_THROW_MESSAGE("Cannot load library: " + std::string(dlerror()));
   }
+  id_ = MaliputPlugin::Id(ExecuteSymbol<char*>(kMaliputPluginIdSym));
+  type_ = ExecuteSymbol<MaliputPluginType>(kMaliputPluginTypeSym);
+}
+
+MaliputPlugin::MaliputPlugin(void* lib_handle) {
+  MALIPUT_THROW_UNLESS(lib_handle != nullptr);
+  lib_handle_.reset(lib_handle);
   id_ = MaliputPlugin::Id(ExecuteSymbol<char*>(kMaliputPluginIdSym));
   type_ = ExecuteSymbol<MaliputPluginType>(kMaliputPluginTypeSym);
 }

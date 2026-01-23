@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -118,6 +118,12 @@ api::InertialPosition Lane::DoToInertialPosition(const api::LanePosition& lane_p
       backend_pos + segment()->junction()->road_geometry()->inertial_to_backend_frame_translation());
 }
 
+double Lane::DoGetCurvature(const api::LanePosition& lane_pos) const {
+  MALIPUT_THROW_MESSAGE(
+      "Unimplemented method. Please check the documentation of "
+      "maliput::geometry_base::Lane::DoGetCurvature().");
+}
+
 math::Vector3 Lane::DoToBackendPosition(const api::LanePosition& lane_pos) const {
   MALIPUT_THROW_MESSAGE(
       "Unimplemented method. Please check the documentation of "
@@ -164,6 +170,8 @@ api::LanePositionResult Lane::UseInertialToBackendTranslationFor(
   return {lane_pos, api::InertialPosition::FromXyz(nearest_backend_pos + inertial_to_backend_frame_translation),
           distance};
 }
+
+api::LaneType Lane::do_type() const { return type_; }
 
 }  // namespace geometry_base
 }  // namespace maliput

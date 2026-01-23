@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -433,6 +433,47 @@ class HBounds {
  private:
   double min_{};
   double max_{};
+};
+
+/// Lane classification options.
+///
+/// LaneType defines the intended use of a lane.
+enum class LaneType {
+  kUnknown = 0,
+
+  // -- Main Drivable Lanes --
+  kDriving,    // Standard driving lane.
+  kTurn,       // Turn available.
+  kHov,        // High Occupancy Vehicle lane (+2 passangers).
+  kBus,        // Bus only.
+  kTaxi,       // Taxi only.
+  kEmergency,  // Emergency vehicles only (fire, ambulance, police).
+
+  // -- Non-Drivable / Special Use --
+  kShoulder,  // Soft border at the edge of the road.
+  kBiking,    // Reserved for cyclists.
+  kWalking,   // Sidewalks / Crosswalks.
+  kParking,   // Lane with parking spaces.
+  kStop,      // Hard shoulder / Emergency stop.
+
+  // -- Infrastructure / Boundaries --
+  kBorder,        // Hard border at the edge of the road.
+  kCurb,          // Curb stones.
+  kMedian,        // Sits between driving lanes that lead in opposite directions.
+  kRestricted,    // Generic restricted (use if HOV/Bus/Emergency don't fit).
+  kConstruction,  // Road works.
+  kRail,          // Trains/Trams.
+
+  // -- Highway / Ramp Semantics --
+  kEntry,           // Merge into main road.
+  kExit,            // Exit from the main road.
+  kOnRamp,          // Ramp leading to a motorway.
+  kOffRamp,         // Ramp leading away from a motorway.
+  kConnectingRamp,  // Ramp that connects two motorways.
+  kSlipLane,        // Change roads without driving into the main intersection.
+
+  // -- Abstract / Logical --
+  kVirtual,  // Intersection crossings with no physical markings.
 };
 
 }  // namespace api

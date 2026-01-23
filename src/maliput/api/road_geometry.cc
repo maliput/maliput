@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -269,6 +269,11 @@ const Junction* RoadGeometry::IdIndex::GetJunction(const JunctionId& id) const {
 const BranchPoint* RoadGeometry::IdIndex::GetBranchPoint(const BranchPointId& id) const {
   MALIPUT_PROFILE_FUNC();
   return DoGetBranchPoint(id);
+}
+
+const LaneBoundary* RoadGeometry::IdIndex::GetLaneBoundary(const LaneBoundary::Id& id) const {
+  MALIPUT_PROFILE_FUNC();
+  return DoGetLaneBoundary(id);
 }
 
 }  // namespace api

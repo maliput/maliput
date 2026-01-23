@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@ namespace maliput {
 namespace api {
 
 class BranchPoint;
+class LaneBoundary;
 class Segment;
 class LaneEndSet;
 
@@ -121,6 +122,9 @@ class Lane {
   /// `lane_bounds(s)`.
   HBounds elevation_bounds(double s, double r) const;
 
+  /// Returns the type of Lane, such as `driving`, `biking`, etc.
+  LaneType type() const;
+
   /// Returns the `maliput::api::InertialPosition` corresponding to the given `maliput::api::LanePosition`.
   ///
   /// Note there is no constraint for the `r` coordinate, as it can be outside the lane boundaries.
@@ -134,6 +138,25 @@ class Lane {
   /// so that the position is on the s-r plane.
   /// @returns An `InertialPosition` for the given `lane_pos`.
   InertialPosition ToInertialPosition(const LanePosition& lane_pos) const;
+
+  /// Returns the signed Euclidean curvature at the given `maliput::api::LanePosition`.
+  ///
+  /// The Euclidean curvature magnitude is defined as the reciprocal of the radius
+  /// of the osculating circle at a given point on the curve: @f$ |\kappa| = 1/R @f$.
+  ///
+  /// The sign convention follows the right-hand rule with respect to the lane's
+  /// `h`-axis (vertical/normal direction):
+  /// - **Positive curvature**: The path curves to the left (toward +r direction),
+  ///   i.e., counter-clockwise when viewed from above.
+  /// - **Negative curvature**: The path curves to the right (toward -r direction),
+  ///   i.e., clockwise when viewed from above.
+  ///
+  /// @param lane_pos A `maliput::api::LanePosition`. The `s` component must be
+  ///        in domain [0, Lane::length()]. The `r` and `h` components are used
+  ///        to determine the curvature at the corresponding offset from the
+  ///        centerline.
+  /// @returns The signed Euclidean curvature (1/m) at the given position.
+  double GetCurvature(const LanePosition& lane_pos) const;
 
   /// Determines the LanePosition corresponding to InertialPosition @p inertial_pos.
   /// The LanePosition is expected to be contained within the lane's boundaries.
@@ -191,6 +214,24 @@ class Lane {
   /// or std::nullopt if no default branch has been established at @p which_end.
   std::optional<LaneEnd> GetDefaultBranch(const LaneEnd::Which which_end) const;
 
+  /// Returns the LaneBoundary at the left edge of this Lane.
+  ///
+  /// The left boundary is in the +r direction (increasing r coordinate).
+  /// This is equivalent to `segment()->boundary(index() + 1)`.
+  ///
+  /// @returns The left boundary, or nullptr if boundary information is
+  ///          not available for the parent Segment.
+  const LaneBoundary* left_boundary() const;
+
+  /// Returns the LaneBoundary at the right edge of this Lane.
+  ///
+  /// The right boundary is in the -r direction (decreasing r coordinate).
+  /// This is equivalent to `segment()->boundary(index())`.
+  ///
+  /// @returns The right boundary, or nullptr if boundary information is
+  ///          not available for the parent Segment.
+  const LaneBoundary* right_boundary() const;
+
   /// Returns if this lane contains @p lane_position.
   bool Contains(const LanePosition& lane_position) const;
 
@@ -220,7 +261,11 @@ class Lane {
 
   virtual HBounds do_elevation_bounds(double s, double r) const = 0;
 
+  virtual LaneType do_type() const = 0;
+
   virtual InertialPosition DoToInertialPosition(const LanePosition& lane_pos) const = 0;
+
+  virtual double DoGetCurvature(const LanePosition& lane_pos) const = 0;
 
   virtual LanePositionResult DoToLanePosition(const InertialPosition& inertial_pos) const = 0;
 

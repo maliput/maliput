@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -83,25 +83,31 @@ class RoadGeometryHierarchyTest : public ::testing::TestWithParam<RoadGeometryBu
 std::vector<RoadGeometryBuildFlags> HierarchyTestParameters() {
   return {
       // Throws because of missing Junction.
-      RoadGeometryBuildFlags{false, false, false, false, false, true, {}},
+      RoadGeometryBuildFlags{false, false, false, false, false, false, true, {}},
       // Throws because of missing Segment in Junction.
-      RoadGeometryBuildFlags{true, false, false, false, false, true, {}},
+      RoadGeometryBuildFlags{true, false, false, false, false, false, true, {}},
       // Throws because of missing Lane in Segment.
-      RoadGeometryBuildFlags{true, true, false, false, false, true, {}},
+      RoadGeometryBuildFlags{true, true, false, false, false, false, true, {}},
+      // Throws because of missing LaneBoundary in Segment.
+      RoadGeometryBuildFlags{true, true, true, true, true, false, true, {}},
       // Throws because of missing BranchPoint.
-      RoadGeometryBuildFlags{true, true, true, false, false, true, {}},
+      RoadGeometryBuildFlags{true, true, true, false, false, true, true, {}},
       // Throws because of missing LaneEndSet in BranchPoint.
-      RoadGeometryBuildFlags{true, true, true, true, false, true, {}},
+      RoadGeometryBuildFlags{true, true, true, true, false, true, true, {}},
       // Throws because of BranchPointIds are not in RoadGeometry::IdIndex.
-      RoadGeometryBuildFlags{true, true, true, true, true, true, {false, true, true, true}},
+      RoadGeometryBuildFlags{true, true, true, true, true, true, true, {false, true, true, true, false}},
       // Throws because of JunctionId are not in RoadGeometry::IdIndex.
-      RoadGeometryBuildFlags{true, true, true, true, true, true, {true, false, true, true}},
+      RoadGeometryBuildFlags{true, true, true, true, true, true, true, {true, false, true, true, false}},
       // Throws because of SegmentId are not in RoadGeometry::IdIndex.
-      RoadGeometryBuildFlags{true, true, true, true, true, true, {true, true, true, false}},
+      RoadGeometryBuildFlags{true, true, true, true, true, true, true, {true, true, true, false, false}},
       // Throws because of LaneId are not in RoadGeometry::IdIndex.
-      RoadGeometryBuildFlags{true, true, true, true, true, true, {true, true, false, true}},
+      RoadGeometryBuildFlags{true, true, true, true, true, true, true, {true, true, false, true, false}},
+      // Throws because of LaneId are not in RoadGeometry::IdIndex.
+      RoadGeometryBuildFlags{true, true, true, true, true, true, true, {true, true, false, true, false}},
+      // Throws because of LaneBoundary::Id are not in RoadGeometry::IdIndex.
+      RoadGeometryBuildFlags{true, true, true, true, true, true, true, {true, true, false, true, false}},
       // Does not throw, complete RoadGeometry.
-      RoadGeometryBuildFlags{true, true, true, true, true, false, {true, true, true, true}},
+      RoadGeometryBuildFlags{true, true, true, true, true, true, false, {true, true, true, true, true}},
   };
 }
 

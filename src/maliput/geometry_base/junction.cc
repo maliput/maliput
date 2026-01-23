@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -34,27 +34,33 @@
 namespace maliput {
 namespace geometry_base {
 
-void Junction::AttachToRoadGeometry(common::Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry,
-                                    const std::function<void(const api::Segment*)>& segment_indexing_callback,
-                                    const std::function<void(const api::Lane*)>& lane_indexing_callback) {
+void Junction::AttachToRoadGeometry(
+    common::Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry,
+    const std::function<void(const api::Segment*)>& segment_indexing_callback,
+    const std::function<void(const api::Lane*)>& lane_indexing_callback,
+    const std::function<void(const api::LaneBoundary*)>& lane_boundary_indexing_callback) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(road_geometry != nullptr);
   MALIPUT_THROW_UNLESS(!!segment_indexing_callback);
   MALIPUT_THROW_UNLESS(!!lane_indexing_callback);
+  MALIPUT_THROW_UNLESS(!!lane_boundary_indexing_callback);
   // Preconditions
   MALIPUT_THROW_UNLESS(road_geometry_ == nullptr);
   MALIPUT_THROW_UNLESS(!segment_indexing_callback_);
   MALIPUT_THROW_UNLESS(!lane_indexing_callback_);
+  MALIPUT_THROW_UNLESS(!lane_boundary_indexing_callback_);
 
   road_geometry_ = road_geometry;
   // Store the indexing callbacks for future use.
   segment_indexing_callback_ = segment_indexing_callback;
   lane_indexing_callback_ = lane_indexing_callback;
+  lane_boundary_indexing_callback_ = lane_boundary_indexing_callback;
 
   // Index any Segments that had already been added to this Junction.
   for (auto& segment : segments_) {
     segment_indexing_callback_(segment.get());
     segment->SetLaneIndexingCallback({}, lane_indexing_callback_);
+    segment->SetLaneBoundaryIndexingCallback({}, lane_boundary_indexing_callback_);
   }
 }
 
@@ -70,6 +76,9 @@ void Junction::AddSegmentPrivate(std::unique_ptr<Segment> segment) {
   }
   if (lane_indexing_callback_) {
     raw_segment->SetLaneIndexingCallback({}, lane_indexing_callback_);
+  }
+  if (lane_boundary_indexing_callback_) {
+    raw_segment->SetLaneBoundaryIndexingCallback({}, lane_boundary_indexing_callback_);
   }
 }
 

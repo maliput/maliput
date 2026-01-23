@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -76,6 +76,7 @@ class MockOneLaneIdIndex final : public RoadGeometry::IdIndex {
   const Segment* DoGetSegment(const SegmentId&) const override { return nullptr; };
   const Junction* DoGetJunction(const JunctionId&) const override { return nullptr; };
   const BranchPoint* DoGetBranchPoint(const BranchPointId&) const override { return nullptr; }
+  const LaneBoundary* DoGetLaneBoundary(const LaneBoundary::Id&) const override { return nullptr; }
 
   const MockLane mock_lane_{LaneId{"mock"}};
   const std::unordered_map<LaneId, const Lane*> lane_map_{{LaneId("mock"), &mock_lane_}};
@@ -149,17 +150,17 @@ class MockRoadRulebook : public rules::RoadRulebook {
   SpeedLimitRule DoGetRule(const SpeedLimitRule::Id&) const override { return *speed_limit_rule_; }
   DirectionUsageRule DoGetRule(const DirectionUsageRule::Id&) const override { return *direction_usage_rule_; }
 #pragma GCC diagnostic pop
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+  std::optional<DiscreteValueRule> DoGetDiscreteValueRule(const Rule::Id& id) const override {
     if (discrete_value_rule_.has_value() && discrete_value_rule_->id() == id) {
-      return *discrete_value_rule_;
+      return discrete_value_rule_;
     }
-    throw std::out_of_range("Unknown Id.");
+    return std::nullopt;
   }
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+  std::optional<RangeValueRule> DoGetRangeValueRule(const Rule::Id& id) const override {
     if (range_value_rule_.has_value() && range_value_rule_->id() == id) {
-      return *range_value_rule_;
+      return range_value_rule_;
     }
-    throw std::out_of_range("Unknown Id.");
+    return std::nullopt;
   }
 
 #pragma GCC diagnostic push
@@ -195,17 +196,17 @@ class MockContiguityRoadRulebook final : public rules::RoadRulebook {
     return result;
   }
 
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+  std::optional<DiscreteValueRule> DoGetDiscreteValueRule(const Rule::Id& id) const override {
     if (discrete_value_rule_.has_value() && discrete_value_rule_->id() == id) {
-      return *discrete_value_rule_;
+      return discrete_value_rule_;
     }
-    throw std::out_of_range("Unknown Id.");
+    return std::nullopt;
   }
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+  std::optional<RangeValueRule> DoGetRangeValueRule(const Rule::Id& id) const override {
     if (range_value_rule_.has_value() && range_value_rule_->id() == id) {
-      return *range_value_rule_;
+      return range_value_rule_;
     }
-    throw std::out_of_range("Unknown Id.");
+    return std::nullopt;
   }
 
 #pragma GCC diagnostic push
@@ -602,6 +603,14 @@ std::unique_ptr<RoadGeometry> CreateRoadGeometry(const RoadGeometryBuildFlags& b
           lane->set_end_bp(rg->end_bp());
         }
         segment->set_lane(std::move(lane));
+      }
+      if (build_flags.add_lane_boundary) {
+        auto lane_boundary = std::make_unique<MockLaneBoundary>(LaneBoundary::Id("mock"));
+        lane_boundary->set_segment(segment.get());
+        if (build_flags.id_index_build_flags.add_lane_boundary) {
+          id_index->add_lane_boundary_to_map(lane_boundary->id(), lane_boundary.get());
+        }
+        segment->set_lane_boundary(std::move(lane_boundary));
       }
       junction->set_segment(std::move(segment));
     }

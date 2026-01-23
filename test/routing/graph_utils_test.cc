@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2024, Woven by Toyota. All rights reserved.
+// Copyright (c) 2024-2026, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -139,7 +139,7 @@ GTEST_TEST(FindAllEdgeSequences, OneEdgeGraph) {
 // <pre>
 //    ----
 //   /    \  > kSegmentA
-//  /      \
+//  /      \  <- NOLINT
 // x  A     x B
 //  \      /
 //   \    /  > kSegmentB
@@ -180,7 +180,7 @@ GTEST_TEST(FindAllEdgeSequences, Roundabout) {
 // <pre>
 //            ----
 //           /    \  > S:B
-//          /      \
+//          /      \  <- NOLINT
 // x-------x  B     x-------x
 // A ^      \      / C ^    D
 //   S:A     \    /    S:D

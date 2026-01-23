@@ -2,6 +2,54 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.12.0 (2026-01-21)
+-------------------
+* Obtain handles to already loaded plugins. (`#708 <https://github.com/maliput/maliput/issues/708>`_)
+* Contributors: Franco Cipollone
+
+1.11.1 (2026-01-20)
+-------------------
+* Add BCR maintainers. (`#706 <https://github.com/maliput/maliput/issues/706>`_)
+* Contributors: Santiago Lopez
+
+1.11.0 (2026-01-19)
+-------------------
+* API to obtain a LaneBoundary from the RoadGeometry. (`#704 <https://github.com/maliput/maliput/issues/704>`_)
+* Contributors: Santiago Lopez
+
+1.10.0 (2026-01-12)
+-------------------
+* Add GetCurvature to Lane. (`#700 <https://github.com/maliput/maliput/issues/700>`_)
+* Rename "Woven Planet" to be "Woven by Toyota" on copyright lines (`#698 <https://github.com/maliput/maliput/issues/698>`_)
+* Add copilot instructions. (`#696 <https://github.com/maliput/maliput/issues/696>`_)
+* Contributors: Chien-Liang Fok, Franco Cipollone
+
+1.9.0 (2025-12-19)
+------------------
+* Add LaneBoundary API (`#689 <https://github.com/maliput/maliput/issues/689>`_)
+* Update macOS version for build workflow (`#694 <https://github.com/maliput/maliput/issues/694>`_)
+* LaneType API. (`#690 <https://github.com/maliput/maliput/issues/690>`_)
+* Remove pull requests from triage process. (`#692 <https://github.com/maliput/maliput/issues/692>`_)
+* Solves some warnings on docstrings. (`#691 <https://github.com/maliput/maliput/issues/691>`_)
+* Thread header was missing in a test, causing compile failure in Ubuntu 22 (`#686 <https://github.com/maliput/maliput/issues/686>`_)
+* Contributors: Franco Cipollone, Santiago Lopez, andrewbest-tri
+
+1.8.2 (2025-10-06)
+------------------
+* [KD Tree Strategy] Use unordered set. (`#684 <https://github.com/maliput/maliput/issues/684>`_)
+* Contributors: Santiago Lopez
+
+1.8.1 (2025-10-03)
+------------------
+* `KDTreeStrategy::ClosestLanes` now returns each lane at most 1 time. (`#681 <https://github.com/maliput/maliput/issues/681>`_)
+* Contributors: Santiago Lopez
+
+1.8.0 (2025-09-22)
+------------------
+* `GetRangeValueRule` and `GetDiscreteValueRule` return optional values. (`#678 <https://github.com/maliput/maliput/issues/678>`_)
+* Patch to 1.7.2 release.
+* Contributors: Franco Cipollone, Santiago Lopez
+
 1.7.2 (2025-09-09)
 ------------------
 * Some fixes for macos build (`#676 <https://github.com/maliput/maliput/issues/676>`_)

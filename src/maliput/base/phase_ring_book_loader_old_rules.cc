@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -233,13 +233,15 @@ DiscreteValueRuleStates LoadDiscreteValueRuleStates(const RuleStates& rule_state
   DiscreteValueRuleStates discrete_value_rule_states;
   for (const auto& row_it : rule_states) {
     const Rule::Id rule_id = GetRuleIdFrom(RightOfWayRuleTypeId(), row_it.first);
-    const DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id);
+    const std::optional<DiscreteValueRule> rule = rulebook->GetDiscreteValueRule(rule_id);
     const RightOfWayRule right_of_way_rule = rulebook->GetRule(row_it.first);
+    MALIPUT_VALIDATE(rule.has_value(), "No Rule(" + rule_id.string() + ") in Rulebook.",
+                     maliput::common::rulebook_error);
     MALIPUT_THROW_UNLESS(right_of_way_rule.states().find(row_it.second) != right_of_way_rule.states().end());
     MALIPUT_THROW_UNLESS(discrete_value_rule_states
                              .emplace(rule_id, FindDiscreteValueFromRightOfWayRuleState(
                                                    row_it.first, right_of_way_rule.states().at(row_it.second),
-                                                   right_of_way_rule.related_bulb_groups(), rule))
+                                                   right_of_way_rule.related_bulb_groups(), rule.value()))
                              .second);
   }
   return discrete_value_rule_states;

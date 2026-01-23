@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,8 @@ void RoadGeometry::AddJunctionPrivate(std::unique_ptr<Junction> junction) {
   Junction* const raw_junction = junctions_.back().get();
   // clang-format off
   raw_junction->AttachToRoadGeometry({}, this, [this](auto segment) { id_index_.AddSegment(segment); },
-                                     [this](auto lane) { id_index_.AddLane(lane); });
+                                     [this](auto lane) { id_index_.AddLane(lane); },
+                                     [this](auto lane_boundary) { id_index_.AddBoundary(lane_boundary); });
   // clang-format on
   id_index_.AddJunction(raw_junction);
 }

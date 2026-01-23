@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,20 @@ void Segment::SetLaneIndexingCallback(common::Passkey<Junction>,
   }
 }
 
+void Segment::SetLaneBoundaryIndexingCallback(common::Passkey<Junction>,
+                                              const std::function<void(const api::LaneBoundary*)>& callback) {
+  // Parameter checks
+  MALIPUT_THROW_UNLESS(!!callback);
+  // Preconditions
+  MALIPUT_THROW_UNLESS(!lane_boundary_indexing_callback_);
+
+  lane_boundary_indexing_callback_ = callback;
+  // Index any LaneBoundaries that had already been added to this Segment.
+  for (const auto& boundary : boundaries_) {
+    lane_boundary_indexing_callback_(boundary.get());
+  }
+}
+
 void Segment::AddLanePrivate(std::unique_ptr<Lane> lane) {
   // Parameter checks
   MALIPUT_THROW_UNLESS(lane.get() != nullptr);
@@ -66,6 +80,18 @@ void Segment::AddLanePrivate(std::unique_ptr<Lane> lane) {
   raw_lane->AttachToSegment({}, this, lanes_.size() - 1);
   if (lane_indexing_callback_) {
     lane_indexing_callback_(raw_lane);
+  }
+}
+
+void Segment::AddBoundaryPrivate(std::unique_ptr<LaneBoundary> boundary) {
+  // Parameter checks
+  MALIPUT_THROW_UNLESS(boundary.get() != nullptr);
+  boundaries_.emplace_back(std::move(boundary));
+  LaneBoundary* const raw_boundary = boundaries_.back().get();
+
+  raw_boundary->AttachToSegment({}, this, boundaries_.size() - 1);
+  if (lane_boundary_indexing_callback_) {
+    lane_boundary_indexing_callback_(raw_boundary);
   }
 }
 

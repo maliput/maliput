@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -122,18 +122,18 @@ class MockRulebook final : public RoadRulebook {
   }
 #pragma GCC diagnostic pop
 
-  DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const override {
+  std::optional<DiscreteValueRule> DoGetDiscreteValueRule(const Rule::Id& id) const override {
     if (id != kDiscreteValueRule.id()) {
-      throw std::out_of_range("");
+      return std::nullopt;
     }
-    return kDiscreteValueRule;
+    return std::make_optional(kDiscreteValueRule);
   }
 
-  RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const override {
+  std::optional<RangeValueRule> DoGetRangeValueRule(const Rule::Id& id) const override {
     if (id != kRangeValueRule.id()) {
-      throw std::out_of_range("");
+      return std::nullopt;
     }
-    return kRangeValueRule;
+    return std::make_optional(kRangeValueRule);
   }
 };
 
@@ -178,11 +178,11 @@ GTEST_TEST(RoadRulebookTest, ExerciseInterface) {
   EXPECT_THROW(dut.GetRule(DirectionUsageRule::Id("xxx")), std::out_of_range);
 #pragma GCC diagnostic pop
 
-  EXPECT_EQ(dut.GetDiscreteValueRule(dut.kDiscreteValueRule.id()).id(), dut.kDiscreteValueRule.id());
-  EXPECT_THROW(dut.GetDiscreteValueRule(Rule::Id("xxx")), std::out_of_range);
+  EXPECT_EQ(dut.GetDiscreteValueRule(dut.kDiscreteValueRule.id()).value().id(), dut.kDiscreteValueRule.id());
+  EXPECT_EQ(dut.GetDiscreteValueRule(Rule::Id("xxx")), std::nullopt);
 
-  EXPECT_EQ(dut.GetRangeValueRule(dut.kRangeValueRule.id()).id(), dut.kRangeValueRule.id());
-  EXPECT_THROW(dut.GetRangeValueRule(Rule::Id("xxx")), std::out_of_range);
+  EXPECT_EQ(dut.GetRangeValueRule(dut.kRangeValueRule.id()).value().id(), dut.kRangeValueRule.id());
+  EXPECT_EQ(dut.GetRangeValueRule(Rule::Id("xxx")), std::nullopt);
 }
 
 }  // namespace

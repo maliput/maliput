@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@ namespace api {
 
 class Junction;
 class Lane;
+class LaneBoundary;
 
 /// Persistent identifier for a Segment element.
 using SegmentId = TypeSpecificIdentifier<class Segment>;
@@ -76,6 +77,36 @@ class Segment {
   /// @pre @p index must be >= 0 and < num_lanes().
   const Lane* lane(int index) const { return do_lane(index); }
 
+  /// Returns the number of LaneBoundaries contained in this Segment.
+  ///
+  /// For a Segment with N lanes, there are N+1 boundaries:
+  /// - Boundary 0 is the rightmost edge (minimum r coordinate).
+  /// - Boundary N is the leftmost edge (maximum r coordinate).
+  ///
+  /// Return value is non-negative (always >= 1 for a valid Segment).
+  int num_boundaries() const { return do_num_boundaries(); }
+
+  /// Returns the LaneBoundary indexed by @p index.
+  ///
+  /// Boundaries are indexed from 0 (rightmost, minimum r) to num_lanes()
+  /// (leftmost, maximum r). For a segment with N lanes:
+  ///
+  /// ```
+  ///                                                        +r direction
+  ///                                                      <─────────────
+  ///   Boundary N    ...    Boundary 2    Boundary 1    Boundary 0
+  ///      |                     |             |             |
+  ///      | Lane N-1  |   ...   |   Lane 1    |   Lane 0    |
+  ///      |                     |             |             |
+  ///  (left edge)                                     (right edge)
+  /// ```
+  ///
+  /// @pre @p index must be >= 0 and <= num_lanes().
+  ///
+  /// @returns The LaneBoundary at the given index, or nullptr if boundary
+  ///          information is not available for this Segment.
+  const LaneBoundary* boundary(int index) const { return do_boundary(index); }
+
  protected:
   Segment() = default;
 
@@ -91,6 +122,12 @@ class Segment {
   virtual int do_num_lanes() const = 0;
 
   virtual const Lane* do_lane(int index) const = 0;
+
+  virtual const LaneBoundary* do_boundary(int index) const = 0;
+
+  /// Default implementation returns num_lanes() + 1.
+  virtual int do_num_boundaries() const { return do_num_lanes() + 1; }
+
   ///@}
 };
 

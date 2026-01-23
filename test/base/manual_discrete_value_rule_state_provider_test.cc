@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -95,15 +95,15 @@ TEST_F(ManualDiscreteRuleStateProviderTest, SetStateTest) {
   ManualDiscreteValueRuleStateProvider dut(road_rulebook_.get());
 
   // Tries to set the state to an unknown Rule::Id in `rulebook_`.
-  EXPECT_THROW(dut.SetState(kUnknownRuleId, kStateA, {}, {}), std::out_of_range);
+  EXPECT_THROW(dut.SetState(kUnknownRuleId, kStateA, {}, {}), maliput::common::rulebook_error);
   // Tries to set an invalid state to the rule.
-  EXPECT_THROW(dut.SetState(kRuleId, kInvalidState, {}, {}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.SetState(kRuleId, kInvalidState, {}, {}), maliput::common::state_provider_error);
   // Tries to set an invalid next state to the rule.
-  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {kInvalidState}, {}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {kInvalidState}, {}), maliput::common::state_provider_error);
   // Tries to set a valid next state with a negative duration.
-  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {kStateA}, {-kDurationUntil}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {kStateA}, {-kDurationUntil}), maliput::common::state_provider_error);
   // Tries to set a nullopt next state with duration.
-  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {}, {kDurationUntil}), maliput::common::assertion_error);
+  EXPECT_THROW(dut.SetState(kRuleId, kStateA, {}, {kDurationUntil}), maliput::common::state_provider_error);
 
   // Sets a valid state, next state and duration until.
   EXPECT_NO_THROW(dut.SetState(kRuleId, kStateA, {kStateB}, {kDurationUntil}));
@@ -170,8 +170,8 @@ class GetCurrentYieldGroupTest : public ::testing::Test {
 
 // Tests GetCurrentYieldGroup function.
 TEST_F(GetCurrentYieldGroupTest, GetCurrentYieldGroup) {
-  const std::vector<Rule::Id> dut{
-      GetCurrentYieldGroup(road_rulebook_->GetDiscreteValueRule(kRuleId), discrete_value_rule_state_provider_.get())};
+  const std::vector<Rule::Id> dut{GetCurrentYieldGroup(road_rulebook_->GetDiscreteValueRule(kRuleId).value(),
+                                                       discrete_value_rule_state_provider_.get())};
 
   EXPECT_EQ(dut.size(), expected_yield_group.size());
   for (const auto& expected_yield_id : expected_yield_group) {
@@ -210,8 +210,8 @@ class GetCurrentBulbGroupTest : public ::testing::Test {
 
 // Tests GetCurrentBulbGroup function.
 TEST_F(GetCurrentBulbGroupTest, GetCurrentBulbGroup) {
-  const std::vector<api::UniqueId> dut{
-      GetCurrentBulbGroup(road_rulebook_->GetDiscreteValueRule(kRuleId), discrete_value_rule_state_provider_.get())};
+  const std::vector<api::UniqueId> dut{GetCurrentBulbGroup(road_rulebook_->GetDiscreteValueRule(kRuleId).value(),
+                                                           discrete_value_rule_state_provider_.get())};
 
   EXPECT_EQ(dut.size(), expected_bulb_group.size());
   for (const auto& expected_bulb_id : expected_bulb_group) {

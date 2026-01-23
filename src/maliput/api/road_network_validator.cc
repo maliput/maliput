@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -190,10 +190,16 @@ void WalkPhases(const RoadNetwork& road_network, std::function<void(const rules:
 void CheckPhaseDiscreteValueRuleStates(const RoadNetwork& road_network) {
   auto evaluate_phase = [rulebook = road_network.rulebook()](const rules::Phase& phase) {
     for (const auto& rule_id_value : phase.discrete_value_rule_states()) {
-      const rules::DiscreteValueRule rule = rulebook->GetDiscreteValueRule(rule_id_value.first);
-      if (std::find(rule.states().begin(), rule.states().end(), rule_id_value.second) == rule.states().end()) {
+      const std::optional<rules::DiscreteValueRule> rule = rulebook->GetDiscreteValueRule(rule_id_value.first);
+      if (!rule.has_value()) {
+        MALIPUT_THROW_MESSAGE("No Rule(id: " + rule_id_value.first.string() + ") in Rulebook.",
+                              maliput::common::rulebook_error);
+      }
+      if (std::find(rule.value().states().begin(), rule.value().states().end(), rule_id_value.second) ==
+          rule.value().states().end()) {
         MALIPUT_THROW_MESSAGE("DiscreteValueRuleStates have an unknown DiscreteValue referenced by Rule(id: " +
-                              rule.id().string() + ") in Phase(id: " + phase.id().string() + ")");
+                                  rule.value().id().string() + ") in Phase(id: " + phase.id().string() + ")",
+                              maliput::common::rulebook_error);
       }
     }
   };

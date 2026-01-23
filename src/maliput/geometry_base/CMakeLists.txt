@@ -8,6 +8,7 @@ set(SOURCES
     filter_positions.cc
     junction.cc
     kd_tree_strategy.cc
+    lane_boundary.cc
     lane.cc
     road_geometry.cc
     segment.cc

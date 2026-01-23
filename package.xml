@@ -2,10 +2,12 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>maliput</name>
-  <version>1.7.2</version>
+  <version>1.12.0</version>
   <description>Maliput</description>
   <maintainer email="franco.c@ekumenlabs.com">Franco Cipollone</maintainer>
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
+  <maintainer email="santiago.lopez@ekumenlabs.com">Santiago Lopez</maintainer>
+  <maintainer email="juancarosella96@ekumenlabs.com">Juan Manuel Carosella</maintainer>
   <license file="LICENSE">BSD Clause 3</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

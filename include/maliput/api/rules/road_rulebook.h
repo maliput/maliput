@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 #pragma once
 
 #include <map>
+#include <optional>
 #include <vector>
 
 #include "maliput/api/regions.h"
@@ -111,15 +112,11 @@ class RoadRulebook {
   DirectionUsageRule GetRule(const DirectionUsageRule::Id& id) const { return DoGetRule(id); }
 #pragma GCC diagnostic pop
 
-  /// Returns the DiscreteValueRule with the specified `id`.
-  ///
-  /// @throws std::out_of_range if `id` is unknown.
-  DiscreteValueRule GetDiscreteValueRule(const Rule::Id& id) const { return DoGetDiscreteValueRule(id); }
+  /// Returns the DiscreteValueRule with the specified `id`, or std::nullopt if the `id` is unkown.
+  std::optional<DiscreteValueRule> GetDiscreteValueRule(const Rule::Id& id) const { return DoGetDiscreteValueRule(id); }
 
-  /// Returns the RangeValueRule with the specified `id`.
-  ///
-  /// @throws std::out_of_range if `id` is unknown.
-  RangeValueRule GetRangeValueRule(const Rule::Id& id) const { return DoGetRangeValueRule(id); }
+  /// Returns the RangeValueRule with the specified `id`, or std::nullopt if the `id` is unkown.
+  std::optional<RangeValueRule> GetRangeValueRule(const Rule::Id& id) const { return DoGetRangeValueRule(id); }
 
  protected:
   RoadRulebook() = default;
@@ -137,8 +134,8 @@ class RoadRulebook {
   virtual SpeedLimitRule DoGetRule(const SpeedLimitRule::Id& id) const = 0;
   virtual DirectionUsageRule DoGetRule(const DirectionUsageRule::Id& id) const = 0;
 #pragma GCC diagnostic pop
-  virtual DiscreteValueRule DoGetDiscreteValueRule(const Rule::Id& id) const = 0;
-  virtual RangeValueRule DoGetRangeValueRule(const Rule::Id& id) const = 0;
+  virtual std::optional<DiscreteValueRule> DoGetDiscreteValueRule(const Rule::Id& id) const = 0;
+  virtual std::optional<RangeValueRule> DoGetRangeValueRule(const Rule::Id& id) const = 0;
   //@}
 };
 

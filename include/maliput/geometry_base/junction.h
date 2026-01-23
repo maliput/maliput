@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -86,18 +86,23 @@ class Junction : public api::Junction {
   // @param road_geometry  the parent RoadGeometry
   // @param segment_indexing_callback  function to be called on every Segment
   //                                   which is attached to this Junction,
-  //                                   both now and in the future
+  //                                   both now and in the future.
   // @param lane_indexing_callback  function to be called on every Lane
   //                                which is attached to this Junction (via
-  //                                a Segment), both now and in the future
+  //                                a Segment), both now and in the future.
+  // @param lane_boundary_indexing_callback  function to be called on every LaneBoundary
+  //                                         which is attached to this Junction (via
+  //                                         a Segment), both now and in the future.
   //
   // @pre `road_geometry` is non-null.
   // @pre `segment_indexing_callback` is non-empty.
   // @pre `lane_indexing_callback` is non-empty.
+  // @pre `lane_boundary_indexing_callback` is non-empty.
   // @pre Parent RoadGeometry and the callbacks have not already been set.
   void AttachToRoadGeometry(common::Passkey<RoadGeometry>, const api::RoadGeometry* road_geometry,
                             const std::function<void(const api::Segment*)>& segment_indexing_callback,
-                            const std::function<void(const api::Lane*)>& lane_indexing_callback);
+                            const std::function<void(const api::Lane*)>& lane_indexing_callback,
+                            const std::function<void(const api::LaneBoundary*)>& lane_boundary_indexing_callback);
 
  private:
   // The non-template implementation of AddSegment<T>()
@@ -115,6 +120,7 @@ class Junction : public api::Junction {
   const api::RoadGeometry* road_geometry_{};
   std::function<void(const api::Segment*)> segment_indexing_callback_;
   std::function<void(const api::Lane*)> lane_indexing_callback_;
+  std::function<void(const api::LaneBoundary*)> lane_boundary_indexing_callback_;
   std::vector<std::unique_ptr<Segment>> segments_;
 };
 

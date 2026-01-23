@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2020-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@
 #include <atomic>
 #include <set>
 #include <stdexcept>
+#include <thread>
 
 #include <gtest/gtest.h>
 

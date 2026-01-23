@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022, Woven Planet. All rights reserved.
+// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
 // Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -213,6 +213,7 @@ class RoadGeometry : public api::RoadGeometry {
   math::Vector3 inertial_to_backend_frame_translation_{};
   std::vector<std::unique_ptr<Junction>> junctions_;
   std::vector<std::unique_ptr<BranchPoint>> branch_points_;
+  std::vector<std::unique_ptr<api::LaneBoundary>> lane_boundaries_;
   api::BasicIdIndex id_index_;
   std::unique_ptr<StrategyBase> strategy_{std::make_unique<BruteForceStrategy>(this)};
 };
