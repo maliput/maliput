@@ -122,14 +122,17 @@ Changelog for package maliput
   to <cstdint> to the maliput_hash.h file and the drake hash.h file
   to ensure that fixed-width integers like uint8_t are available.
 * Provides another function to include route signaling in DOT graphs when adding routes (`#639 <https://github.com/maliput/maliput/issues/639>`_)
+  * Provides another function to include route signaling in graphs when serialized via DOT streams.
 * Adds the filter to remove routes with lane changes when RoutingConstraints::allow_lane_switch is false. (`#638 <https://github.com/maliput/maliput/issues/638>`_)
 * Adds a function that allows to export a routing::graph::Graph as a dot file. (`#637 <https://github.com/maliput/maliput/issues/637>`_)
 * Modifies the DistanceRouter to consume the graph and provide multi-Lane routes. (`#636 <https://github.com/maliput/maliput/issues/636>`_)
 * Graph tools to perform route queries with Segments. (`#635 <https://github.com/maliput/maliput/issues/635>`_)
+  * Graph tools to perform route queries with Segments.
   Router implementations will be able to use this tools such that
   they can get the set of of Lanes per Phase in Routes that connect
   point A with point B.
 * Route part four - DistanceRouter (`#619 <https://github.com/maliput/maliput/issues/619>`_)
+  * Provides an implementation for Router.
   - The router is based on a distance cost function.
   - Inflation of the routes to embrace lateral lanes is a TODO.
 * Adds validation of end to end connectivity to Routes (`#628 <https://github.com/maliput/maliput/issues/628>`_)
@@ -138,6 +141,9 @@ Changelog for package maliput
 * Adds bazel version to the matrix to avoid presubmit checks to fail. (`#631 <https://github.com/maliput/maliput/issues/631>`_)
   Example: https://buildkite.com/bazel/bcr-presubmit/`builds/5047#018 <https://github.com/builds/5047/issues/018>`_f2e0c-4d57-4a32-a0d4-b787aa479da9
 * Fix scan_build errors. (`#632 <https://github.com/maliput/maliput/issues/632>`_)
+  * Fix scan_build errors.
+  * Fix format.
+  ---------
 * Contributors: Agustin Alba Chicar, Viktor Kronvall
 
 1.3.0 (2024-04-29)
