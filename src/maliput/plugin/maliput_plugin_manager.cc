@@ -99,9 +99,10 @@ int FindLoadedPluginCallback(struct dl_phdr_info* info, size_t /* size */, void*
 #endif
 
 // Finds a pre-loaded library by matching a pattern in the library name.
-// Uses dl_iterate_phdr() to scan all loaded shared objects.
+// Uses platform-specific mechanisms to scan loaded shared objects:
+// dl_iterate_phdr() on Linux, dyld APIs on macOS; on other platforms, no search is performed.
 // @param pattern The pattern to search for in library names (e.g., "maliput_malidrive_road_network").
-// @return The full path to the loaded library if found, empty string otherwise.
+// @return The full path to the loaded library if found, empty string otherwise (including on unsupported platforms).
 std::string FindLoadedLibraryByPattern(const std::string& pattern) {
 #ifdef __linux__
   PluginSearchContext context;
