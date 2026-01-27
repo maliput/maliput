@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.13.1 (2026-01-27)
+-------------------
+* Adding plugin lib compatibility to MacOS (`#712 <https://github.com/maliput/maliput/issues/712>`_)
+* Contributors: Juan Carosella
+
 1.13.0 (2026-01-23)
 -------------------
 * Find preloaded plugins with mangled name. (`#710 <https://github.com/maliput/maliput/issues/710>`_)
