@@ -33,7 +33,12 @@
 
 #include <cstring>
 
+#ifdef __linux__
 #include <link.h>
+#endif
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
 
 #include "maliput/common/filesystem.h"
 #include "maliput/common/logger.h"
@@ -65,6 +70,7 @@ std::vector<std::string> GetPluginLibraryPaths(const std::string& env_var) {
   return filepaths;
 }
 
+#ifdef __linux__
 // Structure to hold search parameters and results for dl_iterate_phdr callback.
 struct PluginSearchContext {
   std::string search_pattern;  // Pattern to match in library path (e.g., "maliput_malidrive_road_network")
@@ -90,16 +96,35 @@ int FindLoadedPluginCallback(struct dl_phdr_info* info, size_t /* size */, void*
   }
   return 0;  // Continue iteration
 }
+#endif
 
 // Finds a pre-loaded library by matching a pattern in the library name.
-// Uses dl_iterate_phdr() to scan all loaded shared objects.
+// Uses platform-specific mechanisms to scan loaded shared objects:
+// dl_iterate_phdr() on Linux, dyld APIs on macOS; on other platforms, no search is performed.
 // @param pattern The pattern to search for in library names (e.g., "maliput_malidrive_road_network").
-// @return The full path to the loaded library if found, empty string otherwise.
+// @return The full path to the loaded library if found, empty string otherwise (including on unsupported platforms).
 std::string FindLoadedLibraryByPattern(const std::string& pattern) {
+#ifdef __linux__
   PluginSearchContext context;
   context.search_pattern = pattern;
   dl_iterate_phdr(FindLoadedPluginCallback, &context);
   return context.found ? context.found_path : "";
+#elif defined(__APPLE__)
+  const uint32_t count = _dyld_image_count();
+  for (uint32_t i = 0; i < count; ++i) {
+    const char* image_name = _dyld_get_image_name(i);
+    if (image_name != nullptr) {
+      const std::string lib_path(image_name);
+      if (lib_path.find(pattern) != std::string::npos) {
+        return lib_path;
+      }
+    }
+  }
+  return "";
+#else
+  (void)pattern;
+  return "";
+#endif
 }
 
 }  // namespace
