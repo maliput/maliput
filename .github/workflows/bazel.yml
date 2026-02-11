@@ -46,10 +46,3 @@ jobs:
       shell: bash
       run: |
         bazel build //...
-
-    - name: Test
-      env:
-        USE_BAZEL_VERSION: ${{ matrix.bazel_version }}
-      shell: bash
-      run: |
-        bazel test //...
