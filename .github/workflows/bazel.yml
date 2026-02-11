@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request: # REMOVE THIS BEFORE MERGING THIS PR
-    branches:
-      - main
   workflow_dispatch:
 
 # Cancel previously running PR jobs
@@ -25,7 +22,6 @@ jobs:
           - "6.x"
           - "7.x"
           - "8.x"
-          - "9.x"
     steps:
     - uses: actions/checkout@v4
 
