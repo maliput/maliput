@@ -1,0 +1,44 @@
+name: Bazel
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Cancel previously running PR jobs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  bazel:
+    name: Bazel ${{ matrix.bazel_version }} - Compile and Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        bazel_version:
+          - "6.x"
+          - "7.x"
+          - "8.x"
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Bazelisk
+      uses: bazelbuild/setup-bazelisk@v3
+
+    - name: Mount Bazel cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/bazel
+        key: bazel-${{ matrix.bazel_version }}-${{ runner.os }}-${{ hashFiles('MODULE.bazel', 'BUILD.bazel') }}
+        restore-keys: |
+          bazel-${{ matrix.bazel_version }}-${{ runner.os }}-
+
+    - name: Build
+      env:
+        USE_BAZEL_VERSION: ${{ matrix.bazel_version }}
+      shell: bash
+      run: |
+        bazel build //...
