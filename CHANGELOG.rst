@@ -2,6 +2,13 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.13.2 (2026-02-12)
+-------------------
+* Add maliput_geopackage to pre-loaded list of plugins. (`#716 <https://github.com/maliput/maliput/issues/716>`_)
+* Add workflow to verify bazel build 6.x, 7.x, 8.x (`#715 <https://github.com/maliput/maliput/issues/715>`_)
+* Adding helper release script (`#714 <https://github.com/maliput/maliput/issues/714>`_)
+* Contributors: Franco Cipollone, Juan Carosella
+
 1.13.1 (2026-01-27)
 -------------------
 * Adding plugin lib compatibility to MacOS (`#712 <https://github.com/maliput/maliput/issues/712>`_)
