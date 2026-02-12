@@ -135,6 +135,8 @@ std::string FindLoadedLibraryByPattern(const std::string& pattern) {
 const std::vector<std::string> kPreloadedPluginPatterns{
     // See https://github.com/maliput/maliput_malidrive/
     "maliput_malidrive_road_network",
+    // See https://github.com/maliput/maliput_geopackage/
+    "maliput_geopackage_road_network",
 };
 
 MaliputPluginManager::MaliputPluginManager() {
