@@ -14,7 +14,7 @@ FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 # Configuration
 ################################################################################
 
-ARG BAZEL_VERSION=6.4.0
+ARG BAZEL_VERSION=7.5.0
 ARG NAME=bazel-zen
 
 ################################################################################

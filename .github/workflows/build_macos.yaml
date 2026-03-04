@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  USE_BAZEL_VERSION: "6.4.0"
+  USE_BAZEL_VERSION: "7.5.0"
 
 jobs:
   build:

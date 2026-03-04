@@ -19,7 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         bazel_version:
-          - "6.x"
           - "7.x"
           - "8.x"
     steps:
