@@ -413,6 +413,9 @@ class MockRoadGeometry : public RoadGeometry {
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const InertialPosition&, double) const override {
     return {{RoadPositionResult()}};
   }
+  std::vector<api::RoadPositionResult> DoFindRoadPositionsAtXY(double, double, double) const override {
+    return {{RoadPositionResult()}};
+  }
   double do_linear_tolerance() const override { return linear_tolerance_; }
   double do_angular_tolerance() const override { return angular_tolerance_; }
   double do_scale_length() const override { return 0; }

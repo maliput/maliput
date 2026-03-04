@@ -164,6 +164,27 @@ class RoadGeometry {
   /// implementations for details.
   std::vector<RoadPositionResult> FindRoadPositions(const InertialPosition& inertial_position, double radius) const;
 
+  /// Finds all RoadPositions within a 2D radius of the given (x, y) inertial coordinates.
+  ///
+  /// Unlike FindRoadPositions(), this method uses only the X and Y components for distance
+  /// filtering (2D planar distance). The Z coordinate of the returned nearest positions is
+  /// computed from the road surface (i.e., the point on the road at h=0).
+  ///
+  /// This is useful for mapping 2D trajectories onto the road network, where the caller
+  /// has (x, y) coordinates but not the elevation.
+  ///
+  /// @param x The x-coordinate in the Inertial frame.
+  /// @param y The y-coordinate in the Inertial frame.
+  /// @param radius The 2D search radius (in meters). Only results within this planar distance are returned.
+  ///        It must not be negative.
+  /// @returns A vector of RoadPositionResult where:
+  ///   - `road_position.pos.h()` is 0 (on the road surface).
+  ///   - `nearest_position` contains the full 3D inertial position on the road surface.
+  ///   - `distance` is the 2D planar distance between (x, y) and the nearest point.
+  ///
+  /// @throws maliput::common::assertion_error When @p radius is negative.
+  std::vector<RoadPositionResult> FindRoadPositionsAtXY(double x, double y, double radius) const;
+
   /// Returns the tolerance guaranteed for linear measurements (positions).
   double linear_tolerance() const { return do_linear_tolerance(); }
 
@@ -254,6 +275,8 @@ class RoadGeometry {
 
   virtual std::vector<RoadPositionResult> DoFindRoadPositions(const InertialPosition& inertial_position,
                                                               double radius) const = 0;
+
+  virtual std::vector<RoadPositionResult> DoFindRoadPositionsAtXY(double x, double y, double radius) const = 0;
 
   virtual double do_linear_tolerance() const = 0;
 

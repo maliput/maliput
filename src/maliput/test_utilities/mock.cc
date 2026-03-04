@@ -100,6 +100,9 @@ class MockOneLaneRoadGeometry final : public RoadGeometry {
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const InertialPosition&, double) const override {
     return {api::RoadPositionResult()};
   }
+  std::vector<api::RoadPositionResult> DoFindRoadPositionsAtXY(double, double, double) const override {
+    return {api::RoadPositionResult()};
+  }
   double do_linear_tolerance() const override { return 0; }
   double do_angular_tolerance() const override { return 0; }
   double do_scale_length() const override { return 0; }

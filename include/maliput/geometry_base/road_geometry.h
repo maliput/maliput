@@ -172,6 +172,8 @@ class RoadGeometry : public api::RoadGeometry {
   virtual std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                                    double radius) const override;
 
+  std::vector<api::RoadPositionResult> DoFindRoadPositionsAtXY(double x, double y, double radius) const override;
+
   // The non-template implementation of AddJunction<T>()
   void AddJunctionPrivate(std::unique_ptr<Junction> junction);
 
