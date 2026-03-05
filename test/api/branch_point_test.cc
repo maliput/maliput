@@ -77,7 +77,7 @@ class MockRoadGeometry : public RoadGeometry {
                                                           const std::optional<RoadPosition>& hint));
   MOCK_CONST_METHOD2(DoFindRoadPositions,
                      std::vector<RoadPositionResult>(const InertialPosition& inertial_position, double radius));
-  MOCK_CONST_METHOD3(DoFindRoadPositionsAtXY, std::vector<RoadPositionResult>(double x, double y, double radius));
+  MOCK_CONST_METHOD3(DoFindSurfaceRoadPositionsAtXY, std::vector<RoadPositionResult>(double x, double y, double radius));
   MOCK_CONST_METHOD0(do_linear_tolerance, double());
   MOCK_CONST_METHOD0(do_angular_tolerance, double());
   MOCK_CONST_METHOD0(do_scale_length, double());

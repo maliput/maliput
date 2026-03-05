@@ -70,7 +70,7 @@ class RoadGeometryMock final : public api::RoadGeometry {
               (const api::InertialPosition&, const std::optional<api::RoadPosition>&), (const));
   MOCK_METHOD(std::vector<api::RoadPositionResult>, DoFindRoadPositions, (const api::InertialPosition&, double),
               (const));
-  MOCK_METHOD(std::vector<api::RoadPositionResult>, DoFindRoadPositionsAtXY, (double, double, double), (const));
+  MOCK_METHOD(std::vector<api::RoadPositionResult>, DoFindSurfaceRoadPositionsAtXY, (double, double, double), (const));
   MOCK_METHOD(double, do_linear_tolerance, (), (const));
   MOCK_METHOD(double, do_angular_tolerance, (), (const));
   MOCK_METHOD(double, do_scale_length, (), (const));

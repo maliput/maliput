@@ -183,7 +183,7 @@ class RoadGeometry {
   ///   - `distance` is the 2D planar distance between (x, y) and the nearest point.
   ///
   /// @throws maliput::common::assertion_error When @p radius is negative.
-  std::vector<RoadPositionResult> FindRoadPositionsAtXY(double x, double y, double radius) const;
+  std::vector<RoadPositionResult> FindSurfaceRoadPositionsAtXY(double x, double y, double radius) const;
 
   /// Returns the tolerance guaranteed for linear measurements (positions).
   double linear_tolerance() const { return do_linear_tolerance(); }
@@ -276,7 +276,7 @@ class RoadGeometry {
   virtual std::vector<RoadPositionResult> DoFindRoadPositions(const InertialPosition& inertial_position,
                                                               double radius) const = 0;
 
-  virtual std::vector<RoadPositionResult> DoFindRoadPositionsAtXY(double x, double y, double radius) const = 0;
+  virtual std::vector<RoadPositionResult> DoFindSurfaceRoadPositionsAtXY(double x, double y, double radius) const = 0;
 
   virtual double do_linear_tolerance() const = 0;
 

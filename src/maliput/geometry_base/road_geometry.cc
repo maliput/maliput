@@ -82,7 +82,7 @@ std::vector<api::RoadPositionResult> RoadGeometry::DoFindRoadPositions(const api
   return strategy_->FindRoadPositions(inertial_position, radius);
 }
 
-std::vector<api::RoadPositionResult> RoadGeometry::DoFindRoadPositionsAtXY(double x, double y, double radius) const {
+std::vector<api::RoadPositionResult> RoadGeometry::DoFindSurfaceRoadPositionsAtXY(double x, double y, double radius) const {
   MALIPUT_THROW_MESSAGE("Method not implemented.");
 }
 
