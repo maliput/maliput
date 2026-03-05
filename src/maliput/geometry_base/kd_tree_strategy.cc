@@ -141,8 +141,7 @@ std::unordered_set<const api::Lane*> KDTreeStrategy::ClosestLanes(const api::Ine
   return maliput_lanes;
 }
 
-std::unordered_set<const api::Lane*> KDTreeStrategy::DoFindCandidateLanesXY(double x, double y,
-                                                                            double radius) const {
+std::unordered_set<const api::Lane*> KDTreeStrategy::DoFindCandidateLanesXY(double x, double y, double radius) const {
   // Expand the search box by 2*sampling_step_ to account for gaps between sampled points.
   const double half_edge_length = radius + 2. * sampling_step_;
   // Use a wide z-range since the query is purely 2D.
