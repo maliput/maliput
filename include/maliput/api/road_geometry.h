@@ -181,6 +181,7 @@ class RoadGeometry {
   ///   - `road_position.pos.h()` is 0 (on the road surface).
   ///   - `nearest_position` contains the full 3D inertial position on the road surface.
   ///   - `distance` is the 2D planar distance between (x, y) and the nearest point.
+  ///   Results are sorted by ascending distance (nearest first).
   ///
   /// @throws maliput::common::assertion_error When @p radius is negative.
   std::vector<RoadPositionResult> FindSurfaceRoadPositionsAtXY(double x, double y, double radius) const;
