@@ -2,6 +2,13 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.14.0 (2026-03-06)
+-------------------
+* Adds RoadGeometry::FindSurfaceRoadPositionsAtXY. (`#720 <https://github.com/maliput/maliput/issues/720>`_)
+* Add Bazel version 8.x to the presubmit matrix (`#721 <https://github.com/maliput/maliput/issues/721>`_)
+* Updating to bazel 7.5.0 (`#719 <https://github.com/maliput/maliput/issues/719>`_)
+* Contributors: Franco Cipollone, Juan Carosella
+
 1.13.2 (2026-02-12)
 -------------------
 * Add maliput_geopackage to pre-loaded list of plugins. (`#716 <https://github.com/maliput/maliput/issues/716>`_)
