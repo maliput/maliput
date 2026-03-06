@@ -31,6 +31,7 @@
 
 #include <memory>
 #include <optional>
+#include <unordered_set>
 #include <vector>
 
 #include "maliput/geometry_base/strategy_base.h"
@@ -52,6 +53,8 @@ class BruteForceStrategy final : public StrategyBase {
 
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                            double radius) const override;
+
+  std::unordered_set<const api::Lane*> DoFindCandidateLanesXY(double x, double y, double radius) const override;
 };
 
 }  // namespace geometry_base

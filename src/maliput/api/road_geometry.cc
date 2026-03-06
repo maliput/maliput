@@ -83,6 +83,12 @@ std::vector<RoadPositionResult> RoadGeometry::FindRoadPositions(const InertialPo
   return DoFindRoadPositions(inertial_position, radius);
 }
 
+std::vector<RoadPositionResult> RoadGeometry::FindSurfaceRoadPositionsAtXY(double x, double y, double radius) const {
+  MALIPUT_PROFILE_FUNC();
+  MALIPUT_THROW_UNLESS(radius >= 0.);
+  return DoFindSurfaceRoadPositionsAtXY(x, y, radius);
+}
+
 std::vector<InertialPosition> RoadGeometry::SampleAheadWaypoints(const LaneSRoute& lane_s_route,
                                                                  double path_length_sampling_rate) const {
   MALIPUT_PROFILE_FUNC();

@@ -31,6 +31,7 @@
 #include "maliput/geometry_base/brute_force_strategy.h"
 
 #include <limits>
+#include <unordered_set>
 
 #include <maliput/geometry_base/filter_positions.h>
 
@@ -104,6 +105,21 @@ std::vector<maliput::api::RoadPositionResult> BruteForceStrategy::DoFindRoadPosi
   }
 
   return road_position_results;
+}
+
+std::unordered_set<const maliput::api::Lane*> BruteForceStrategy::DoFindCandidateLanesXY(double x, double y,
+                                                                                         double radius) const {
+  const api::RoadGeometry* rg = get_road_geometry();
+  MALIPUT_THROW_UNLESS(rg != nullptr);
+  // BruteForceStrategy has no spatial index, so all lanes are returned as candidates.
+  // The caller is responsible for precise distance filtering on each lane.
+  const auto& lanes_map = rg->ById().GetLanes();
+  std::unordered_set<const api::Lane*> lanes;
+  lanes.reserve(lanes_map.size());
+  for (const auto& [id, lane] : lanes_map) {
+    lanes.insert(lane);
+  }
+  return lanes;
 }
 
 }  // namespace geometry_base

@@ -83,6 +83,9 @@ class KDTreeStrategy final : public StrategyBase {
   std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                            double radius) const override;
 
+  // Documentation inherited.
+  std::unordered_set<const api::Lane*> DoFindCandidateLanesXY(double x, double y, double radius) const override;
+
   // Obtains the closest lane in the road geometry to a given point.
   // @param point The point to be used as reference.
   // @return The closest lane to the point.

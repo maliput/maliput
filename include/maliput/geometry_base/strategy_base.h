@@ -31,6 +31,7 @@
 
 #include <memory>
 #include <optional>
+#include <unordered_set>
 #include <vector>
 
 #include "maliput/api/lane_data.h"
@@ -65,6 +66,20 @@ class StrategyBase {
     return DoFindRoadPositions(inertial_position, radius);
   }
 
+  /// Finds candidate lanes whose sampled points fall within a 2D radius of the given (x, y) coordinates.
+  ///
+  /// This is intended as a spatial pre-filter: it returns a superset of lanes that *may* be within the
+  /// given radius. The caller is responsible for performing precise distance filtering on the results.
+  ///
+  /// @param x The x-coordinate in the Inertial frame.
+  /// @param y The y-coordinate in the Inertial frame.
+  /// @param radius The 2D search radius (in meters). Implementations may expand this to account
+  ///        for sampling resolution (e.g., KDTree sampling step).
+  /// @returns A set of unique lane pointers that are candidate matches.
+  std::unordered_set<const api::Lane*> FindCandidateLanesXY(double x, double y, double radius) const {
+    return DoFindCandidateLanesXY(x, y, radius);
+  }
+
  protected:
   StrategyBase(const api::RoadGeometry* rg) : rg_(rg) { MALIPUT_THROW_UNLESS(rg_ != nullptr); }
 
@@ -76,6 +91,8 @@ class StrategyBase {
 
   virtual std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                                    double radius) const = 0;
+
+  virtual std::unordered_set<const api::Lane*> DoFindCandidateLanesXY(double x, double y, double radius) const = 0;
 
   const api::RoadGeometry* rg_{};
 };
