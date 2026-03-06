@@ -164,6 +164,15 @@ class RoadGeometry : public api::RoadGeometry {
 
   ~RoadGeometry() override = default;
 
+ protected:
+  /// Returns a pointer to the active strategy.
+  ///
+  /// Subclasses can use this to access strategy capabilities (e.g., FindCandidateLanesXY)
+  /// for implementing backend-specific overrides of DoFindSurfaceRoadPositionsAtXY and similar methods.
+  ///
+  /// @pre strategy_ must be initialized (via InitializeStrategy).
+  const StrategyBase* strategy() const { return strategy_.get(); }
+
  private:
   virtual api::RoadPositionResult DoToRoadPosition(
       const api::InertialPosition& inertial_position,
@@ -171,6 +180,8 @@ class RoadGeometry : public api::RoadGeometry {
 
   virtual std::vector<api::RoadPositionResult> DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                                    double radius) const override;
+
+  std::vector<api::RoadPositionResult> DoFindSurfaceRoadPositionsAtXY(double x, double y, double radius) const override;
 
   // The non-template implementation of AddJunction<T>()
   void AddJunctionPrivate(std::unique_ptr<Junction> junction);

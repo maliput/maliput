@@ -32,6 +32,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <limits>
 
 #include "maliput/math/kd_tree.h"
 
@@ -131,6 +132,25 @@ std::unordered_set<const api::Lane*> KDTreeStrategy::ClosestLanes(const api::Ine
                                  point.z() - half_edge_length};
   const math::Vector3 max_corner{point.x() + half_edge_length, point.y() + half_edge_length,
                                  point.z() + half_edge_length};
+  const math::AxisAlignedBox search_region{min_corner, max_corner};
+  const std::deque<const MaliputPoint*> maliput_points = kd_tree_->RangeSearch(search_region);
+  std::unordered_set<const api::Lane*> maliput_lanes;
+  for (const auto& maliput_point : maliput_points) {
+    maliput_lanes.insert(maliput_point->get_lane().value());
+  }
+  return maliput_lanes;
+}
+
+std::unordered_set<const api::Lane*> KDTreeStrategy::DoFindCandidateLanesXY(double x, double y, double radius) const {
+  // Expand the search box by 2*sampling_step_ to account for gaps between sampled points.
+  const double half_edge_length = radius + 2. * sampling_step_;
+  // Use a wide z-range since the query is purely 2D.
+  // TODO(francocipollone): Consider building a separate 2D KDTree for XY-only queries to avoid
+  // visiting nodes split on the z-dimension (which never prune with unbounded z). This would
+  // improve performance by ~33% on the spatial index lookup.
+  constexpr double kInfinity = std::numeric_limits<double>::max();
+  const math::Vector3 min_corner{x - half_edge_length, y - half_edge_length, -kInfinity};
+  const math::Vector3 max_corner{x + half_edge_length, y + half_edge_length, kInfinity};
   const math::AxisAlignedBox search_region{min_corner, max_corner};
   const std::deque<const MaliputPoint*> maliput_points = kd_tree_->RangeSearch(search_region);
   std::unordered_set<const api::Lane*> maliput_lanes;
