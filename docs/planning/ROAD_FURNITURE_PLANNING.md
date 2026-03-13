@@ -39,11 +39,7 @@ The malidrive XODR parser already fully parses `<signal>` elements into `xodr::s
 ## 3. Resolved Questions
 
 **[Q1] — Terminology: `RoadFurniture` vs. `TrafficSign` vs. `Signal`** ✅  
-The top-level concept is `RoadFurniture`. It distinguishes between two subclasses:
-- `RoadSign` — items with a semantic meaning (traffic signs, speed limits, stop signs, etc.).
-- `RoadObject` — physical/geometric furniture without specific semantic meaning (barriers, buildings, etc.).
-
-`RoadObject` from `api/objects/` is inspiration only and is **not** the official maliput API; the new hierarchy lives in `api/furniture/`.
+The top-level concept is `RoadFurniture`. All items (signs and physical objects) are represented directly as `RoadFurniture` instances — no subclasses. The `furniture_type()` field discriminates between item categories. Subclassing may be revisited in a later phase.
 
 **[Q2] — Relationship to the existing `rules/` API** ✅  
 `RoadFurniture` can be linked to rules. The API exposes:
@@ -104,11 +100,16 @@ All three classes — `api/objects::RoadObject`, `api/objects::RoadObjectBook`, 
 ### 5.1 Class Hierarchy
 
 ```
-RoadFurniture         (abstract base — id, position, furniture_type, orientation, properties, GetRules)
-├── RoadSign          (abstract marker — common base for sign subclasses)
-│   └── SpeedLimitSign (concrete — max_speed, min_speed, unit)
-└── RoadObject        (concrete — bounding_box, outlines; replaces api/objects::RoadObject)
+RoadFurniture   (abstract — id, name, furniture_type, position, orientation, road_orientation,
+                             affected_lane_ids, GetRules, properties)
+                 └── TODO: bounding_box(), outlines() to be added once geometric helpers are
+                           migrated from api/objects/ into api/furniture/
 ```
+
+The former `RoadSign`, `SpeedLimitSign`, and `RoadObject` subclasses are removed. All furniture
+items are represented directly as `RoadFurniture`. The `furniture_type()` accessor provides the
+high-level category; type-specific typed accessors (e.g., `max_speed()`) are deferred to a
+follow-up once the subclass design is revisited.
 
 ### 5.2 `maliput/api/furniture/road_furniture.h`
 
@@ -139,10 +140,6 @@ enum class RoadFurnitureOrientation {
 };
 
 /// Unified type taxonomy for all road furniture items (signs and objects).
-///
-/// Sign-type values carry the `Sign` suffix to distinguish them from
-/// object-type values. Backend-specific details (country code, raw XODR
-/// type string) remain in RoadFurniture::properties().
 enum class RoadFurnitureType {
   kUnknown = 0,      ///< Unknown or unclassified item.
   // --- Sign types ---
@@ -167,19 +164,11 @@ enum class RoadFurnitureType {
   kVegetation,
 };
 
-// ---------------------------------------------------------------------------
-// RoadFurniture — base class
-// ---------------------------------------------------------------------------
-
 /// Abstract base class for all static road furniture.
 ///
-/// RoadFurniture is the backend-agnostic representation of any item of road
-/// furniture: either a sign (RoadSign) with a semantic meaning, or a physical
-/// object without specific sign semantics (RoadObject).
-///
-/// The furniture_type() accessor exposes the item's high-level category
-/// through the unified RoadFurnitureType enum. To access type-specific
-/// attributes (e.g., max_speed()), downcast to the concrete subclass.
+/// All items (signs and physical objects) are represented directly as
+/// RoadFurniture — no subclasses. Use furniture_type() to discriminate
+/// between categories.
 class RoadFurniture {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadFurniture)
@@ -189,43 +178,17 @@ class RoadFurniture {
 
   /// Returns the unique identifier.
   const Id& id() const { return DoId(); }
-
-  /// Returns the human-readable name, if provided.
   std::optional<std::string> name() const { return DoName(); }
-
-  /// Returns the high-level furniture category.
-  ///
-  /// Sign-type values carry the `Sign` suffix (e.g., kSpeedLimitSign).
-  /// Downcast to RoadSign / SpeedLimitSign for typed sign attributes.
-  /// Downcast to RoadObject for geometric object attributes.
   RoadFurnitureType furniture_type() const { return DoFurnitureType(); }
-
-  /// Returns the position in the inertial frame.
   const InertialPosition& position() const { return DoPosition(); }
-
-  /// Returns the 3D orientation.
   const Rotation& orientation() const { return DoOrientation(); }
-
-  /// Returns the directional validity relative to the road reference line.
   RoadFurnitureOrientation road_orientation() const { return DoRoadOrientation(); }
-
-  /// Returns the lane IDs to which this furniture item applies.
-  ///
-  /// Applicability is determined by the backend from lane-validity records
-  /// (e.g., XODR <validity>) and the orientation field.
   std::vector<LaneId> affected_lane_ids() const { return DoAffectedLaneIds(); }
-
-  /// Returns the IDs of rules linked to this furniture item.
-  ///
-  /// Callers may look up the actual rule objects in RoadRulebook.
-  /// Returns an empty vector if no rules are associated.
   std::vector<rules::Rule::Id> GetRules() const { return DoGetRules(); }
-
-  /// Returns backend-specific key-value attributes.
-  ///
-  /// Typical keys for XODR backends: "country", "xodr_type", "xodr_subtype",
-  /// "country_revision". Keys are backend-defined strings.
   const std::unordered_map<std::string, std::string>& properties() const { return DoProperties(); }
+
+  // TODO(#road-furniture): Add bounding_box() and outlines() NVI methods once
+  // the geometric helper types are migrated from api/objects/ into api/furniture/.
 
  protected:
   RoadFurniture() = default;
@@ -242,27 +205,12 @@ class RoadFurniture {
   virtual const std::unordered_map<std::string, std::string>& DoProperties() const = 0;
 };
 
-// ---------------------------------------------------------------------------
-// RoadSign — subclass for items with semantic meaning
-// ---------------------------------------------------------------------------
-
-/// Abstract marker base for road signs with semantic meaning.
-///
-/// RoadSign groups all sign-type subclasses and enables typed bulk retrieval
-/// via RoadFurnitureBook::RoadSigns(). Use RoadFurniture::furniture_type()
-/// for type-category queries; downcast to SpeedLimitSign (or other concrete
-/// subclasses) to access typed sign-specific attributes.
-class RoadSign : public RoadFurniture {
- protected:
-  RoadSign() = default;
-};
-
 /// A speed limit sign.
 ///
 /// Provides typed accessors for the posted speed range and unit.
 /// Dynamic speed limit sign behavior (if applicable) is tracked at runtime
 /// via the linked rule accessible through GetRules().
-class SpeedLimitSign : public RoadSign {
+class SpeedLimitSign : public RoadFurniture {
  public:
   /// Returns the maximum posted speed.
   double max_speed() const { return DoMaxSpeed(); }
@@ -280,25 +228,6 @@ class SpeedLimitSign : public RoadSign {
   virtual double DoMaxSpeed() const = 0;
   virtual std::optional<double> DoMinSpeed() const = 0;
   virtual std::string DoUnit() const = 0;
-};
-
-// ---------------------------------------------------------------------------
-// RoadObject — subclass for physical furniture without sign semantics
-// ---------------------------------------------------------------------------
-
-/// A physical road object without specific sign semantics.
-///
-/// Geometric properties (bounding box, outlines) are carried here.
-/// Use RoadFurniture::furniture_type() to query the object category.
-///
-/// This class supersedes maliput::api::objects::RoadObject. The legacy
-/// header in api/objects/ forwards to this class and is deprecated.
-class RoadObject : public RoadFurniture {
- public:
-  // TODO: bounding_box(), outlines() — mirrored from api/objects/RoadObject.
-
- protected:
-  RoadObject() = default;
 };
 
 }  // namespace furniture
@@ -326,13 +255,6 @@ namespace furniture {
 ///
 /// Follows the NVI pattern consistent with the rest of the maliput API
 /// (cf. TrafficLightBook, RoadRulebook).
-///
-/// The book exposes a unified view (all RoadFurniture items), typed
-/// sub-views (RoadSigns, RoadObjects), type-based lookup, and
-/// road-location-based lookup.
-///
-/// This interface supersedes maliput::api::objects::RoadObjectBook. The
-/// legacy header in api/objects/ forwards to this class and is deprecated.
 class RoadFurnitureBook {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadFurnitureBook)
@@ -340,20 +262,12 @@ class RoadFurnitureBook {
 
   // -- Bulk accessors --------------------------------------------------------
 
-  /// Returns all RoadFurniture items (signs and objects).
-  std::vector<const RoadFurniture*> RoadFurnitures() const {
-    return DoRoadFurnitures();
-  }
-
-  /// Returns all RoadSign items.
-  std::vector<const RoadSign*> RoadSigns() const { return DoRoadSigns(); }
-
-  /// Returns all RoadObject items.
-  std::vector<const RoadObject*> RoadObjects() const { return DoRoadObjects(); }
+  /// Returns all RoadFurniture items.
+  std::vector<const RoadFurniture*> RoadFurnitures() const { return DoRoadFurnitures(); }
 
   // -- Lookup by ID ----------------------------------------------------------
 
-  /// Returns the RoadFurniture with the given ID.
+  /// Returns the RoadFurniture with the given ID, or std::nullopt if not found.
   std::optional<const RoadFurniture*> GetRoadFurniture(const RoadFurniture::Id& id) const {
     return DoGetRoadFurniture(id);
   }
@@ -361,10 +275,6 @@ class RoadFurnitureBook {
   // -- Lookup by type --------------------------------------------------------
 
   /// Returns all RoadFurniture items of the specified type.
-  ///
-  /// Both sign types (e.g., RoadFurnitureType::kSpeedLimitSign) and object
-  /// types (e.g., RoadFurnitureType::kBarrier) are accepted.
-  /// Addresses: "Get all items of type X."
   std::vector<const RoadFurniture*> GetByType(RoadFurnitureType type) const {
     return DoGetByType(type);
   }
@@ -372,10 +282,6 @@ class RoadFurnitureBook {
   // -- Lookup by road location -----------------------------------------------
 
   /// Returns all RoadFurniture items that apply to any lane in @p route.
-  ///
-  /// "Apply to" is determined by the item's affected_lane_ids() overlapping
-  /// with the lane IDs present in @p route.
-  /// Addresses: "Get all furniture items in a LaneSRoute."
   std::vector<const RoadFurniture*> GetByLaneSRoute(const LaneSRoute& route) const {
     return DoGetByLaneSRoute(route);
   }
@@ -386,9 +292,8 @@ class RoadFurnitureBook {
   }
 
   /// Returns the lanes affected by the furniture item with the given ID.
-  /// Addresses: "Get all Lanes affected by a furniture item."
   std::vector<const Lane*> GetAffectedLanes(const RoadFurniture::Id& id) const {
-    return DoGetAffectedLaneIds(id);
+    return DoGetAffectedLanes(id);
   }
 
  protected:
@@ -396,8 +301,6 @@ class RoadFurnitureBook {
 
  private:
   virtual std::vector<const RoadFurniture*> DoRoadFurnitures() const = 0;
-  virtual std::vector<const RoadSign*> DoRoadSigns() const = 0;
-  virtual std::vector<const RoadObject*> DoRoadObjects() const = 0;
   virtual std::optional<const RoadFurniture*> DoGetRoadFurniture(const RoadFurniture::Id& id) const = 0;
   virtual std::vector<const RoadFurniture*> DoGetByType(RoadFurnitureType type) const = 0;
   virtual std::vector<const RoadFurniture*> DoGetByLaneSRoute(const LaneSRoute& route) const = 0;
@@ -429,14 +332,14 @@ const furniture::RoadFurnitureBook* road_furniture_book() const {
 
 | # | Decision | Resolution |
 |---|----------|-----------|
-| D1 | Top-level concept name | `RoadFurniture` (base), `RoadSign` (signed), `RoadObject` (physical) |
+| D1 | Top-level concept name | Flat `RoadFurniture` base class — no subclasses; `furniture_type()` discriminates categories |
 | D2 | Type taxonomy | Unified `RoadFurnitureType` enum (sign categories with `Sign` suffix + object categories) + `properties` map for backend-specific details |
 | D3 | Rules API coupling | Linked via `GetRules()` returning `std::vector<rules::Rule::Id>` |
 | D4 | Affected lanes return type | `std::vector<const Lane*>` — evolution to `LaneSRange` is future work |
 | D5 | LaneSRoute query semantics | Applicability-based (what applies to a route, not what's physically near it) |
 | D6 | Dynamic signs | No `is_dynamic()` flag; dynamic behavior fully delegated to rules API via `GetRules()` |
 | D7 | `RoadNetwork` integration | Nullable optional member, consistent with `TrafficLightBook` |
-| D8 | `GetByType` | Single `GetByType(RoadFurnitureType)` returning `const RoadFurniture*`; bulk typed accessors `RoadSigns()`/`RoadObjects()` retained |
+| D8 | `GetByType` | Single `GetByType(RoadFurnitureType)` returning `const RoadFurniture*`; typed bulk accessors (`RoadSigns()`/`RoadObjects()`) removed with the subclass hierarchy |
 | D9 | `api/objects/` migration | All of `api/objects/` (`RoadObject`, `RoadObjectBook`, `RoadObjectType`) is moved into `api/furniture/`; `api/objects/` headers become deprecated forwarders removed in a later release |
 
 ---
@@ -451,18 +354,16 @@ const furniture::RoadFurnitureBook* road_furniture_book() const {
 Tasks:
 1. Define `RoadFurnitureOrientation` and unified `RoadFurnitureType` enum in `road_furniture.h`.
 2. Define `RoadFurniture` abstract base class (NVI) in `road_furniture.h`.
-3. Define `RoadSign` abstract subclass and `SpeedLimitSign` concrete subclass in `road_furniture.h`.
-4. Define `RoadObject` concrete subclass in `road_furniture.h`.
-5. Define `RoadFurnitureBook` abstract interface (NVI) in `road_furniture_book.h`.
-6. Add optional `road_furniture_book_` member and `road_furniture_book()` accessor to `RoadNetwork`.
-7. Update `RoadNetwork` constructor(s) to accept the new optional book.
-8. Migrate `api/objects/` into `api/furniture/`:
-   - `api/objects::RoadObject` → superseded by `api/furniture::RoadObject` (already defined above).
-   - `api/objects::RoadObjectBook` → superseded by `api/furniture::RoadFurnitureBook` (already defined above).
-   - `api/objects::RoadObjectType` → absorbed into `api/furniture::RoadFurnitureType` (already defined above).
+3. Define `RoadFurnitureBook` abstract interface (NVI) in `road_furniture_book.h`.
+4. Add optional `road_furniture_book_` member and `road_furniture_book()` accessor to `RoadNetwork`.
+5. Update `RoadNetwork` constructor(s) to accept the new optional book.
+6. Migrate `api/objects/` into `api/furniture/`:
+   - `api/objects::RoadObject` → superseded by `api/furniture::RoadFurniture` (no `RoadObject` subclass for now).
+   - `api/objects::RoadObjectBook` → superseded by `api/furniture::RoadFurnitureBook`.
+   - `api/objects::RoadObjectType` → absorbed into `api/furniture::RoadFurnitureType`.
    - Leave deprecated forwarding headers in `api/objects/` that include the new `api/furniture/` headers and emit `[[deprecated]]` warnings. These forwarding headers will be removed in a follow-up release.
-9. Add CMake targets and install rules in `maliput/CMakeLists.txt`.
-10. Add unit tests with mock implementations in `maliput/test/`.
+7. Add CMake targets and install rules in `maliput/CMakeLists.txt`.
+8. Add unit tests with mock implementations in `maliput/test/`.
 
 ### Phase 2 — maliput_malidrive: Backend Implementation
 
