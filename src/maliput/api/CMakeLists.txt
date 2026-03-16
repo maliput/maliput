@@ -21,7 +21,8 @@ set(API_SOURCES
   rules/range_value_rule.cc
   rules/rule.cc
   rules/rule_registry.cc
-  rules/traffic_lights.cc)
+  rules/traffic_lights.cc
+  rules/traffic_sign.cc)
 
 add_library(api ${API_SOURCES})
 
