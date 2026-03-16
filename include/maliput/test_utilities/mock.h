@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "maliput/api/intersection_book.h"
+#include "maliput/api/objects/road_object_book.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/road_network.h"
@@ -676,6 +677,9 @@ std::unique_ptr<rules::DiscreteValueRuleStateProvider> CreateDiscreteValueRuleSt
 
 /// Returns an arbitrary rules::RangeValueRuleStateProvider.
 std::unique_ptr<rules::RangeValueRuleStateProvider> CreateRangeValueRuleStateProvider();
+
+/// Returns an empty objects::RoadObjectBook.
+std::unique_ptr<objects::RoadObjectBook> CreateRoadObjectBook();
 
 }  // namespace test
 }  // namespace api
