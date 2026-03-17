@@ -42,6 +42,7 @@
 #include <maliput/api/junction.h>
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
+#include <maliput/api/objects/road_object_book.h>
 #include <maliput/api/regions.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
@@ -229,13 +230,24 @@ class RangeValueRuleStateProviderMock final : public api::rules::RangeValueRuleS
               (const api::RoadPosition&, const api::rules::Rule::TypeId&, double), (const));
 };
 
+// @brief Google mock api::objects::RoadObjectBook.
+class RoadObjectBookMock final : public api::objects::RoadObjectBook {
+ public:
+  MOCK_METHOD(std::vector<const api::objects::RoadObject*>, DoRoadObjects, (), (const));
+  MOCK_METHOD(const api::objects::RoadObject*, DoGetRoadObject, (const api::objects::RoadObject::Id&), (const));
+  MOCK_METHOD(std::vector<const api::objects::RoadObject*>, DoFindByType, (api::objects::RoadObjectType), (const));
+  MOCK_METHOD(std::vector<const api::objects::RoadObject*>, DoFindByLane, (const api::LaneId&), (const));
+  MOCK_METHOD(std::vector<const api::objects::RoadObject*>, DoFindInRadius, (const api::InertialPosition&, double),
+              (const));
+};
+
 inline std::unique_ptr<api::RoadNetwork> MakeMockedRoadNetwork() {
   return std::make_unique<api::RoadNetwork>(
       std::make_unique<RoadGeometryMock>(), std::make_unique<RoadRulebookMock>(),
       std::make_unique<TrafficLightBookMock>(), std::make_unique<IntersectionBookMock>(),
       std::make_unique<PhaseRingBookMock>(), std::make_unique<PhaseProviderMock>(),
       std::make_unique<api::rules::RuleRegistry>(), std::make_unique<DiscreteValueRuleStateProviderMock>(),
-      std::make_unique<RangeValueRuleStateProviderMock>());
+      std::make_unique<RangeValueRuleStateProviderMock>(), std::make_unique<RoadObjectBookMock>());
 }
 
 }  // namespace test
