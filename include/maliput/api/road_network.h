@@ -47,6 +47,7 @@
 #include "maliput/api/rules/rule_registry.h"
 #include "maliput/api/rules/speed_limit_rule.h"
 #include "maliput/api/rules/traffic_light_book.h"
+#include "maliput/api/rules/traffic_sign_book.h"
 #include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
@@ -71,7 +72,8 @@ class RoadNetwork {
               std::unique_ptr<rules::PhaseProvider> phase_provider, std::unique_ptr<rules::RuleRegistry> rule_registry,
               std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
               std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider,
-              std::unique_ptr<objects::RoadObjectBook> road_object_book);
+              std::unique_ptr<objects::RoadObjectBook> road_object_book,
+              std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book);
 #pragma GCC diagnostic pop
 
   /// Constructs a RoadNetwork instance. After creation, you are encouraged to
@@ -84,7 +86,8 @@ class RoadNetwork {
               std::unique_ptr<rules::PhaseProvider> phase_provider, std::unique_ptr<rules::RuleRegistry> rule_registry,
               std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
               std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider,
-              std::unique_ptr<objects::RoadObjectBook> road_object_book);
+              std::unique_ptr<objects::RoadObjectBook> road_object_book,
+              std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book);
 
   virtual ~RoadNetwork() = default;
 
@@ -125,6 +128,8 @@ class RoadNetwork {
 
   const objects::RoadObjectBook* road_object_book() const { return road_object_book_.get(); }
 
+  const rules::TrafficSignBook* traffic_sign_book() const { return traffic_sign_book_.get(); }
+
  private:
   std::unique_ptr<const RoadGeometry> road_geometry_;
   std::unique_ptr<const rules::RoadRulebook> rulebook_;
@@ -140,6 +145,7 @@ class RoadNetwork {
   std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider_;
   std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider_;
   std::unique_ptr<objects::RoadObjectBook> road_object_book_;
+  std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book_;
 };
 
 }  // namespace api

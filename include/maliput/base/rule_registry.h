@@ -119,13 +119,17 @@ api::rules::Rule::TypeId SpeedLimitRuleTypeId();
 /// Defines keys used in api::rules::Rule::RelatedRules.
 struct RelatedRulesKeys {
   /// Key used by Right-Of-Way rules to yield to other rules.
-  static const char* kYieldGroup;
+  static constexpr const char* kYieldGroup = "Yield Group";
 };
 
 /// Defines keys used in api::rules::Rule::RelatedUniqueIds.
 struct RelatedUniqueIdsKeys {
   /// Key used by Right-Of-Way rules.
-  static const char* kBulbGroup;
+  static constexpr const char* kBulbGroup = "Bulb Group";
+  /// Key used for TrafficSign references.
+  static constexpr const char* kTrafficSignGroup = "Traffic Sign Group";
+  /// Key used for RoadObject references.
+  static constexpr const char* kRoadObjectGroup = "Road Object Group";
 };
 
 }  // namespace maliput

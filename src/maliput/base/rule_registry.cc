@@ -87,8 +87,4 @@ api::rules::DiscreteValueRuleTypeAndValues BuildVehicleStopInZoneBehaviorRuleTyp
 
 api::rules::Rule::TypeId SpeedLimitRuleTypeId() { return api::rules::Rule::TypeId{"Speed-Limit Rule Type"}; }
 
-const char* RelatedRulesKeys::kYieldGroup{"Yield Group"};
-
-const char* RelatedUniqueIdsKeys::kBulbGroup{"Bulb Group"};
-
 }  // namespace maliput
