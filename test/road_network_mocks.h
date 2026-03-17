@@ -53,6 +53,7 @@
 #include <maliput/api/rules/road_rulebook.h>
 #include <maliput/api/rules/rule_registry.h>
 #include <maliput/api/rules/traffic_light_book.h>
+#include <maliput/api/rules/traffic_sign_book.h>
 #include <maliput/api/segment.h>
 
 namespace maliput {
@@ -241,13 +242,23 @@ class RoadObjectBookMock final : public api::objects::RoadObjectBook {
               (const));
 };
 
+// @brief Google mock api::rules::TrafficSignBook.
+class TrafficSignBookMock final : public api::rules::TrafficSignBook {
+ public:
+  MOCK_METHOD(const api::rules::TrafficSign*, DoGetTrafficSign, (const api::rules::TrafficSign::Id&), (const));
+  MOCK_METHOD(std::vector<const api::rules::TrafficSign*>, DoTrafficSigns, (), (const));
+  MOCK_METHOD(std::vector<const api::rules::TrafficSign*>, DoFindByLane, (const api::LaneId&), (const));
+  MOCK_METHOD(std::vector<const api::rules::TrafficSign*>, DoFindByType, (const api::rules::TrafficSignType&), (const));
+};
+
 inline std::unique_ptr<api::RoadNetwork> MakeMockedRoadNetwork() {
   return std::make_unique<api::RoadNetwork>(
       std::make_unique<RoadGeometryMock>(), std::make_unique<RoadRulebookMock>(),
       std::make_unique<TrafficLightBookMock>(), std::make_unique<IntersectionBookMock>(),
       std::make_unique<PhaseRingBookMock>(), std::make_unique<PhaseProviderMock>(),
       std::make_unique<api::rules::RuleRegistry>(), std::make_unique<DiscreteValueRuleStateProviderMock>(),
-      std::make_unique<RangeValueRuleStateProviderMock>(), std::make_unique<RoadObjectBookMock>());
+      std::make_unique<RangeValueRuleStateProviderMock>(), std::make_unique<RoadObjectBookMock>(),
+      std::make_unique<TrafficSignBookMock>());
 }
 
 }  // namespace test
