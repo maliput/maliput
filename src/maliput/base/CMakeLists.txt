@@ -23,6 +23,7 @@ set(BASE_SOURCES
   rule_registry.cc
   rule_registry_loader.cc
   rule_tools.cc
+  road_object_book.cc
   traffic_light_book.cc
   traffic_light_book_loader.cc
   yaml_conversion.cc
