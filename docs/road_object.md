@@ -119,7 +119,7 @@ Backend implementations populate the book from their data sources (e.g., OpenDRI
 
 ## See Also
 
-- [road_environment_objects.md](road_environment_objects.md) — comparison of `RoadObject`, `TrafficSign`, and `TrafficLight` APIs.
+- [regulatory_elements_and_objects.md](regulatory_elements_and_objects.md) — comparison of `RoadObject`, `TrafficSign`, and `TrafficLight` APIs.
 
 ## Example
 

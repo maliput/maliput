@@ -51,6 +51,7 @@
 #include "maliput/api/rules/road_rulebook.h"
 #include "maliput/api/rules/rule_registry.h"
 #include "maliput/api/rules/traffic_light_book.h"
+#include "maliput/api/rules/traffic_sign_book.h"
 
 namespace maliput {
 namespace api {
@@ -680,6 +681,9 @@ std::unique_ptr<rules::RangeValueRuleStateProvider> CreateRangeValueRuleStatePro
 
 /// Returns an empty objects::RoadObjectBook.
 std::unique_ptr<objects::RoadObjectBook> CreateRoadObjectBook();
+
+/// Returns an empty rules::TrafficSignBook.
+std::unique_ptr<rules::TrafficSignBook> CreateTrafficSignBook();
 
 }  // namespace test
 }  // namespace api

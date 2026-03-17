@@ -44,6 +44,7 @@
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/traffic_lights.h"
+#include "maliput/api/rules/traffic_sign_book.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_copyable.h"
 
@@ -383,6 +384,18 @@ class MockRoadObjectBook final : public objects::RoadObjectBook {
   std::vector<const objects::RoadObject*> DoFindInRadius(const InertialPosition&, double) const override { return {}; }
 };
 
+class MockTrafficSignBook final : public rules::TrafficSignBook {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockTrafficSignBook);
+  MockTrafficSignBook() = default;
+
+ private:
+  const rules::TrafficSign* DoGetTrafficSign(const rules::TrafficSign::Id&) const override { return nullptr; }
+  std::vector<const rules::TrafficSign*> DoTrafficSigns() const override { return {}; }
+  std::vector<const rules::TrafficSign*> DoFindByLane(const LaneId&) const override { return {}; }
+  std::vector<const rules::TrafficSign*> DoFindByType(const rules::TrafficSignType&) const override { return {}; }
+};
+
 }  // namespace
 
 LaneSRoute CreateLaneSRoute() {
@@ -561,10 +574,11 @@ std::unique_ptr<RoadGeometry> CreateMultipleLanesRoadGeometry(const std::vector<
 }
 
 std::unique_ptr<RoadNetwork> CreateRoadNetwork() {
-  return std::make_unique<RoadNetwork>(
-      CreateRoadGeometry(), CreateRoadRulebook(), CreateTrafficLightBook(), CreateIntersectionBook(),
-      CreatePhaseRingBook(), CreateRightOfWayRuleStateProvider(), CreatePhaseProvider(), CreateRuleRegistry(),
-      CreateDiscreteValueRuleStateProvider(), CreateRangeValueRuleStateProvider(), CreateRoadObjectBook());
+  return std::make_unique<RoadNetwork>(CreateRoadGeometry(), CreateRoadRulebook(), CreateTrafficLightBook(),
+                                       CreateIntersectionBook(), CreatePhaseRingBook(),
+                                       CreateRightOfWayRuleStateProvider(), CreatePhaseProvider(), CreateRuleRegistry(),
+                                       CreateDiscreteValueRuleStateProvider(), CreateRangeValueRuleStateProvider(),
+                                       CreateRoadObjectBook(), CreateTrafficSignBook());
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
@@ -871,6 +885,8 @@ std::unique_ptr<rules::RangeValueRuleStateProvider> CreateRangeValueRuleStatePro
 }
 
 std::unique_ptr<objects::RoadObjectBook> CreateRoadObjectBook() { return std::make_unique<MockRoadObjectBook>(); }
+
+std::unique_ptr<rules::TrafficSignBook> CreateTrafficSignBook() { return std::make_unique<MockTrafficSignBook>(); }
 
 }  // namespace test
 }  // namespace api
