@@ -118,7 +118,8 @@ TEST_F(MockGenerateObjTest, TwoLanesRoadNetwork) {
       api::test::CreateTwoLanesRoadGeometry(), api::test::CreateRoadRulebook(), api::test::CreateTrafficLightBook(),
       api::test::CreateIntersectionBook(), api::test::CreatePhaseRingBook(),
       api::test::CreateRightOfWayRuleStateProvider(), api::test::CreatePhaseProvider(), api::test::CreateRuleRegistry(),
-      api::test::CreateDiscreteValueRuleStateProvider(), api::test::CreateRangeValueRuleStateProvider());
+      api::test::CreateDiscreteValueRuleStateProvider(), api::test::CreateRangeValueRuleStateProvider(),
+      api::test::CreateRoadObjectBook());
 
   const std::string basename{"TwoLanesRoadGeometry"};
   std::string expected_obj_contents;

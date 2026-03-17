@@ -8,6 +8,7 @@ set(API_SOURCES
   intersection.cc
   lane.cc
   lane_data.cc
+  objects/road_object.cc
   regions.cc
   road_geometry.cc
   road_network.cc
