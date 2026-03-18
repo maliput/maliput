@@ -459,6 +459,15 @@ common::ComparisonResult<TrafficLight> IsEqual(const TrafficLight* a, const Traf
   for (int i = 0; i < smallest; ++i) {
     MALIPUT_ADD_RESULT(c, IsEqual(bulb_groups_a.at(i), bulb_groups_b.at(i)));
   }
+  MALIPUT_ADD_RESULT(c, api::IsEqual("a->related_lanes().size()", "b->related_lanes().size()",
+                                     a->related_lanes().size(), b->related_lanes().size()));
+  const int smallest_lanes = std::min(a->related_lanes().size(), b->related_lanes().size());
+  for (int i = 0; i < smallest_lanes; ++i) {
+    const std::string a_expr = "a->related_lanes()[" + std::to_string(i) + "]";
+    const std::string b_expr = "b->related_lanes()[" + std::to_string(i) + "]";
+    MALIPUT_ADD_RESULT(
+        c, api::IsEqual(a_expr.c_str(), b_expr.c_str(), a->related_lanes().at(i), b->related_lanes().at(i)));
+  }
   return {c.result()};
 }
 

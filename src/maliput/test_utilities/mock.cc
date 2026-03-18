@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/test_utilities/mock.h"
 
+#include <algorithm>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -238,6 +239,15 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
     return (traffic_light_.get() != nullptr && traffic_light_->id() == id) ? traffic_light_.get() : nullptr;
   }
   std::vector<const TrafficLight*> DoTrafficLights() const override { return {traffic_light_.get()}; }
+  std::vector<const TrafficLight*> DoFindByLane(const api::LaneId& lane_id) const override {
+    if (traffic_light_ != nullptr) {
+      const auto& related = traffic_light_->related_lanes();
+      if (std::find(related.begin(), related.end(), lane_id) != related.end()) {
+        return {traffic_light_.get()};
+      }
+    }
+    return {};
+  }
 
   std::unique_ptr<TrafficLight> traffic_light_{};
 };
@@ -825,7 +835,8 @@ std::unique_ptr<TrafficLight> CreateTrafficLight(const TrafficLightBuildFlags& b
   const TrafficLight::Id id(build_flags.add_missing_traffic_light ? "MissingTrafficLightId" : "TrafficLightId");
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
   bulb_groups.push_back(CreateBulbGroup(build_flags.add_missing_bulb_group));
-  return std::make_unique<TrafficLight>(id, InertialPosition(), Rotation(), std::move(bulb_groups));
+  return std::make_unique<TrafficLight>(id, InertialPosition(), Rotation(), std::move(bulb_groups),
+                                        std::vector<api::LaneId>{});
 }
 
 std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() {

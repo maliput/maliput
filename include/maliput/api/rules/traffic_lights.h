@@ -36,6 +36,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/unique_id.h"
@@ -361,12 +362,20 @@ class TrafficLight final {
   /// There must not be BulbGroups with the same BulbGroup::Ids. Null bulb
   /// groups are not allowed.
   ///
+  /// @param related_lanes The lanes that this traffic light is physically
+  /// relevant to. For example, a traffic light at an intersection is relevant
+  /// to the lanes that face it. This captures a spatial/geometric fact about
+  /// the traffic light placement, not a rule relationship. The precise
+  /// semantic meaning (e.g., right-of-way) is determined by the rule system,
+  /// not by this field. It is the backend's responsibility to populate this.
+  /// May be empty if the traffic light is not associated with specific lanes.
+  ///
   /// @throws common::traffic_light_book_error When there are BulbGroups with the same
   /// BulbGroup::Id in @p bulb_groups.
   /// @throws common::traffic_light_book_error When any of the BulbGroup in
   /// @p bulb_groups is nullptr.
   TrafficLight(const Id& id, const InertialPosition& position_road_network, const Rotation& orientation_road_network,
-               std::vector<std::unique_ptr<BulbGroup>> bulb_groups);
+               std::vector<std::unique_ptr<BulbGroup>> bulb_groups, std::vector<LaneId> related_lanes);
 
   /// Returns this traffic light's unique identifier.
   const Id& id() const { return id_; }
@@ -383,11 +392,20 @@ class TrafficLight final {
   /// Gets the specified BulbGroup. Returns nullptr if @p id is unrecognized.
   const BulbGroup* GetBulbGroup(const BulbGroup::Id& id) const;
 
+  /// Returns the lanes that this traffic light is physically relevant to.
+  ///
+  /// This captures which lanes the traffic light faces or is associated with
+  /// from a spatial perspective. It is distinct from rule-lane associations:
+  /// a rule's zone (LaneSRange) defines the precise region where the rule
+  /// applies, while this field captures the physical placement relationship.
+  const std::vector<LaneId>& related_lanes() const { return related_lanes_; }
+
  private:
   Id id_;
   InertialPosition position_road_network_;
   Rotation orientation_road_network_;
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups_;
+  std::vector<LaneId> related_lanes_;
 };
 
 /// Uniquely identifies a bulb in the `Inertial` space. This consists of the

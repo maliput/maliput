@@ -38,15 +38,18 @@
 namespace maliput {
 namespace {
 
+using api::LaneId;
 using api::rules::BulbGroup;
 using api::rules::TrafficLight;
 using maliput::test::AssertCompare;
 
 GTEST_TEST(TrafficLightBookTest, BasicTest) {
   const TrafficLight::Id id("my traffic light");
+  const std::vector<LaneId> related_lanes{LaneId("lane_1"), LaneId("lane_2")};
   std::vector<std::unique_ptr<BulbGroup>> empty_bulb_group{};
-  auto traffic_light = std::make_unique<const TrafficLight>(
-      id, api::InertialPosition(10, 11, 12), api::Rotation::FromRpy(1, 2, 3), std::move(empty_bulb_group));
+  auto traffic_light =
+      std::make_unique<const TrafficLight>(id, api::InertialPosition(10, 11, 12), api::Rotation::FromRpy(1, 2, 3),
+                                           std::move(empty_bulb_group), related_lanes);
   const TrafficLight* traffic_light_ptr = traffic_light.get();
 
   TrafficLightBook dut;
@@ -61,6 +64,41 @@ GTEST_TEST(TrafficLightBookTest, BasicTest) {
   const std::vector<const TrafficLight*> nonempty = dut.TrafficLights();
   EXPECT_EQ(static_cast<int>(nonempty.size()), 1);
   EXPECT_TRUE(AssertCompare(IsEqual(nonempty.at(0), traffic_light_ptr)));
+}
+
+GTEST_TEST(TrafficLightBookTest, FindByLane) {
+  const TrafficLight::Id id_a("tl_a");
+  const TrafficLight::Id id_b("tl_b");
+  const LaneId lane_1("lane_1");
+  const LaneId lane_2("lane_2");
+  const LaneId lane_unknown("lane_unknown");
+
+  std::vector<std::unique_ptr<BulbGroup>> bg_a{};
+  auto tl_a =
+      std::make_unique<const TrafficLight>(id_a, api::InertialPosition(0, 0, 0), api::Rotation::FromRpy(0, 0, 0),
+                                           std::move(bg_a), std::vector<LaneId>{lane_1, lane_2});
+
+  std::vector<std::unique_ptr<BulbGroup>> bg_b{};
+  auto tl_b =
+      std::make_unique<const TrafficLight>(id_b, api::InertialPosition(1, 1, 1), api::Rotation::FromRpy(0, 0, 0),
+                                           std::move(bg_b), std::vector<LaneId>{lane_2});
+
+  TrafficLightBook dut;
+  dut.AddTrafficLight(std::move(tl_a));
+  dut.AddTrafficLight(std::move(tl_b));
+
+  // lane_1 is related only to tl_a.
+  const auto result_lane_1 = dut.FindByLane(lane_1);
+  ASSERT_EQ(static_cast<int>(result_lane_1.size()), 1);
+  EXPECT_EQ(result_lane_1[0]->id(), id_a);
+
+  // lane_2 is related to both tl_a and tl_b.
+  const auto result_lane_2 = dut.FindByLane(lane_2);
+  EXPECT_EQ(static_cast<int>(result_lane_2.size()), 2);
+
+  // Unknown lane returns empty.
+  const auto result_unknown = dut.FindByLane(lane_unknown);
+  EXPECT_TRUE(result_unknown.empty());
 }
 
 }  // namespace
