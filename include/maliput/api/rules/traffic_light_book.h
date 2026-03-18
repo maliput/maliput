@@ -32,6 +32,7 @@
 #include <optional>
 #include <vector>
 
+#include "maliput/api/lane.h"
 #include "maliput/api/rules/traffic_lights.h"
 #include "maliput/common/maliput_copyable.h"
 
@@ -53,6 +54,11 @@ class TrafficLightBook {
   /// Gets the specified TrafficLight. Returns nullptr if @p id is unrecognized.
   const TrafficLight* GetTrafficLight(const TrafficLight::Id& id) const { return DoGetTrafficLight(id); }
 
+  /// Returns all TrafficLights whose related_lanes() includes @p lane_id.
+  ///
+  /// Returns an empty vector if no traffic lights are associated with the given lane.
+  std::vector<const TrafficLight*> FindByLane(const LaneId& lane_id) const { return DoFindByLane(lane_id); }
+
  protected:
   TrafficLightBook() = default;
 
@@ -60,6 +66,8 @@ class TrafficLightBook {
   virtual const TrafficLight* DoGetTrafficLight(const TrafficLight::Id& id) const = 0;
 
   virtual std::vector<const TrafficLight*> DoTrafficLights() const = 0;
+
+  virtual std::vector<const TrafficLight*> DoFindByLane(const LaneId& lane_id) const = 0;
 };
 
 }  // namespace rules

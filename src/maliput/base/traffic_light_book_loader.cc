@@ -328,7 +328,18 @@ std::unique_ptr<TrafficLight> BuildTrafficLight(const YAML::Node& traffic_light_
   for (const YAML::Node& bulb_group_node : bulb_groups_node) {
     bulb_groups.push_back(BuildBulbGroup(bulb_group_node));
   }
-  return std::make_unique<TrafficLight>(id, position_road_network, orientation_road_network, std::move(bulb_groups));
+
+  std::vector<maliput::api::LaneId> related_lanes;
+  const YAML::Node& related_lanes_node = traffic_light_node["RelatedLanes"];
+  if (related_lanes_node.IsDefined()) {
+    MALIPUT_THROW_UNLESS(related_lanes_node.IsSequence());
+    for (const YAML::Node& lane_node : related_lanes_node) {
+      related_lanes.emplace_back(lane_node.as<std::string>());
+    }
+  }
+
+  return std::make_unique<TrafficLight>(id, position_road_network, orientation_road_network, std::move(bulb_groups),
+                                        std::move(related_lanes));
 }
 
 std::unique_ptr<api::rules::TrafficLightBook> BuildFrom(const YAML::Node& root_node) {

@@ -178,6 +178,7 @@ class TrafficLightBookMock final : public api::rules::TrafficLightBook {
  public:
   MOCK_METHOD(const api::rules::TrafficLight*, DoGetTrafficLight, (const api::rules::TrafficLight::Id&), (const));
   MOCK_METHOD(std::vector<const api::rules::TrafficLight*>, DoTrafficLights, (), (const));
+  MOCK_METHOD(std::vector<const api::rules::TrafficLight*>, DoFindByLane, (const api::LaneId&), (const));
 };
 
 // @brief Google mock api::IntersectionBook.

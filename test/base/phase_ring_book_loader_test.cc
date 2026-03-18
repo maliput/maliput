@@ -126,7 +126,8 @@ class StraightRoadNetworkHelpers {
     std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
     bulb_groups.push_back(CreateBulbGroup("WestFacingBulbs"));
     return std::make_unique<const TrafficLight>(TrafficLight::Id("WestFacing"), InertialPosition{10., 0., 2.},
-                                                Rotation::FromRpy(0., 0., M_PI), std::move(bulb_groups));
+                                                Rotation::FromRpy(0., 0., M_PI), std::move(bulb_groups),
+                                                std::vector<api::LaneId>{});
   }
 
   // Returns a TrafficLight facing East based on the proposed RoadNetwork sample.
@@ -134,7 +135,8 @@ class StraightRoadNetworkHelpers {
     std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
     bulb_groups.push_back(CreateBulbGroup("EastFacingBulbs"));
     return std::make_unique<const TrafficLight>(TrafficLight::Id("EastFacing"), InertialPosition{10., 4., 2.},
-                                                Rotation::FromRpy(0., 0., 0.), std::move(bulb_groups));
+                                                Rotation::FromRpy(0., 0., 0.), std::move(bulb_groups),
+                                                std::vector<api::LaneId>{});
   }
 
   // Returns a TrafficLightBook based on the proposed RoadNetwork sample.
