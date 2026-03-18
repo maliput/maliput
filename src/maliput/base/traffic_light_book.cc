@@ -68,6 +68,17 @@ class TrafficLightBook::Impl {
     return it == book_.end() ? nullptr : it->second.get();
   }
 
+  std::vector<const TrafficLight*> DoFindByLane(const api::LaneId& lane_id) const {
+    std::vector<const TrafficLight*> result;
+    for (const auto& key_value : book_) {
+      const auto& related = key_value.second->related_lanes();
+      if (std::find(related.begin(), related.end(), lane_id) != related.end()) {
+        result.push_back(key_value.second.get());
+      }
+    }
+    return result;
+  }
+
  private:
   std::unordered_map<TrafficLight::Id, std::unique_ptr<const TrafficLight>> book_;
 };
@@ -85,5 +96,9 @@ const TrafficLight* TrafficLightBook::DoGetTrafficLight(const TrafficLight::Id& 
 }
 
 std::vector<const TrafficLight*> TrafficLightBook::DoTrafficLights() const { return impl_->DoTrafficLights(); }
+
+std::vector<const TrafficLight*> TrafficLightBook::DoFindByLane(const api::LaneId& lane_id) const {
+  return impl_->DoFindByLane(lane_id);
+}
 
 }  // namespace maliput

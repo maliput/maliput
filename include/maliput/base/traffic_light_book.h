@@ -60,6 +60,8 @@ class TrafficLightBook : public api::rules::TrafficLightBook {
 
   std::vector<const api::rules::TrafficLight*> DoTrafficLights() const override;
 
+  std::vector<const api::rules::TrafficLight*> DoFindByLane(const api::LaneId& lane_id) const override;
+
   class Impl;
   std::unique_ptr<Impl> impl_;
 };
