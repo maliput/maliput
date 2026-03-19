@@ -56,11 +56,11 @@ using rules::SpeedLimitRule;
 using rules::TrafficLightBook;
 
 GTEST_TEST(RoadNetworkValidatorTest, RuleCoverageTest) {
-  RoadNetwork road_network(test::CreateOneLaneRoadGeometry(), test::CreateRoadRulebook(),
-                           test::CreateTrafficLightBook(), test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
-                           test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
-                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
-                           test::CreateRangeValueRuleStateProvider());
+  RoadNetwork road_network(
+      test::CreateOneLaneRoadGeometry(), test::CreateRoadRulebook(), test::CreateTrafficLightBook(),
+      test::CreateIntersectionBook(), test::CreatePhaseRingBook(), test::CreateRightOfWayRuleStateProvider(),
+      test::CreatePhaseProvider(), test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+      test::CreateRangeValueRuleStateProvider(), test::CreateRoadObjectBook(), test::CreateTrafficSignBook());
 
   RoadNetworkValidatorOptions options{true /* check_direction_usage_rule_coverage */,
                                       false /* check_road_geometry_invariants */,
@@ -112,11 +112,11 @@ std::vector<RoadGeometryBuildFlags> HierarchyTestParameters() {
 }
 
 TEST_P(RoadGeometryHierarchyTest, HierarchyTestThrows) {
-  RoadNetwork road_network(CreateRoadGeometry(build_flags_), test::CreateRoadRulebook(), test::CreateTrafficLightBook(),
-                           test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
-                           test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
-                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
-                           test::CreateRangeValueRuleStateProvider());
+  RoadNetwork road_network(
+      CreateRoadGeometry(build_flags_), test::CreateRoadRulebook(), test::CreateTrafficLightBook(),
+      test::CreateIntersectionBook(), test::CreatePhaseRingBook(), test::CreateRightOfWayRuleStateProvider(),
+      test::CreatePhaseProvider(), test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+      test::CreateRangeValueRuleStateProvider(), test::CreateRoadObjectBook(), test::CreateTrafficSignBook());
 
   const RoadNetworkValidatorOptions options{false /* check_direction_usage_rule_coverage */,
                                             false /* check_road_geometry_invariants */,
@@ -169,12 +169,12 @@ std::vector<RelatedBulbGroupTestParam> RelatedBulbGroupsTestParameters() {
 }
 
 TEST_P(RelatedBulbGroupsTest, ChecksRelatedBulGroupsRelation) {
-  RoadNetwork road_network(CreateRoadGeometry(), test::CreateRoadRulebook(build_flags_.rulebook_build_flags),
-                           test::CreateTrafficLightBook(build_flags_.traffic_light_book_build_flags),
-                           test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
-                           test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
-                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
-                           test::CreateRangeValueRuleStateProvider());
+  RoadNetwork road_network(
+      CreateRoadGeometry(), test::CreateRoadRulebook(build_flags_.rulebook_build_flags),
+      test::CreateTrafficLightBook(build_flags_.traffic_light_book_build_flags), test::CreateIntersectionBook(),
+      test::CreatePhaseRingBook(), test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
+      test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+      test::CreateRangeValueRuleStateProvider(), test::CreateRoadObjectBook(), test::CreateTrafficSignBook());
 
   const RoadNetworkValidatorOptions options{false /* check_direction_usage_rule_coverage */,
                                             false /* check_road_geometry_invariants */,
@@ -263,7 +263,8 @@ TEST_P(ContiguityBetweenLanesTest, ChecksContiguityBetweenLanes) {
                            test::CreateTrafficLightBook(), test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
                            test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
                            test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
-                           test::CreateRangeValueRuleStateProvider());
+                           test::CreateRangeValueRuleStateProvider(), test::CreateRoadObjectBook(),
+                           test::CreateTrafficSignBook());
 
   const RoadNetworkValidatorOptions options{false /* check_direction_usage_rule_coverage */,
                                             false /* check_road_geometry_invariants */,
@@ -310,12 +311,12 @@ std::vector<PhaseChecksBuildFlags> PhaseDiscreteValueRuleStatesTestParameters() 
 }
 
 TEST_P(PhaseDiscreteValueRuleStatesTest, ChecksPhaseDiscreteValueRuleStates) {
-  RoadNetwork road_network(test::CreateRoadGeometry(), test::CreateRoadRulebook(build_flags_.rulebook_build_flags),
-                           test::CreateTrafficLightBook(), test::CreateIntersectionBook(),
-                           test::CreatePhaseRingBook(build_flags_.phase_build_flags),
-                           test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
-                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
-                           test::CreateRangeValueRuleStateProvider());
+  RoadNetwork road_network(
+      test::CreateRoadGeometry(), test::CreateRoadRulebook(build_flags_.rulebook_build_flags),
+      test::CreateTrafficLightBook(), test::CreateIntersectionBook(),
+      test::CreatePhaseRingBook(build_flags_.phase_build_flags), test::CreateRightOfWayRuleStateProvider(),
+      test::CreatePhaseProvider(), test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+      test::CreateRangeValueRuleStateProvider(), test::CreateRoadObjectBook(), test::CreateTrafficSignBook());
 
   const RoadNetworkValidatorOptions options{false /* check_direction_usage_rule_coverage */,
                                             false /* check_road_geometry_invariants */,
@@ -355,12 +356,12 @@ std::vector<PhaseChecksBuildFlags> PhaseBulbStatesTestParameters() {
 }
 
 TEST_P(PhaseBulbStatesTest, ChecksPhaseBulbStates) {
-  RoadNetwork road_network(test::CreateRoadGeometry(), test::CreateRoadRulebook(build_flags_.rulebook_build_flags),
-                           test::CreateTrafficLightBook(TrafficLightBookBuildFlags{true, {}}),
-                           test::CreateIntersectionBook(), test::CreatePhaseRingBook(build_flags_.phase_build_flags),
-                           test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
-                           test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
-                           test::CreateRangeValueRuleStateProvider());
+  RoadNetwork road_network(
+      test::CreateRoadGeometry(), test::CreateRoadRulebook(build_flags_.rulebook_build_flags),
+      test::CreateTrafficLightBook(TrafficLightBookBuildFlags{true, {}}), test::CreateIntersectionBook(),
+      test::CreatePhaseRingBook(build_flags_.phase_build_flags), test::CreateRightOfWayRuleStateProvider(),
+      test::CreatePhaseProvider(), test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
+      test::CreateRangeValueRuleStateProvider(), test::CreateRoadObjectBook(), test::CreateTrafficSignBook());
 
   const RoadNetworkValidatorOptions options{false /* check_direction_usage_rule_coverage */,
                                             false /* check_road_geometry_invariants */,
@@ -414,7 +415,8 @@ TEST_P(RelatedRulesTest, ChecksRelatedRules) {
                            test::CreateTrafficLightBook(), test::CreateIntersectionBook(), test::CreatePhaseRingBook(),
                            test::CreateRightOfWayRuleStateProvider(), test::CreatePhaseProvider(),
                            test::CreateRuleRegistry(), test::CreateDiscreteValueRuleStateProvider(),
-                           test::CreateRangeValueRuleStateProvider());
+                           test::CreateRangeValueRuleStateProvider(), test::CreateRoadObjectBook(),
+                           test::CreateTrafficSignBook());
 
   const RoadNetworkValidatorOptions options{false /* check_direction_usage_rule_coverage */,
                                             false /* check_road_geometry_invariants */,

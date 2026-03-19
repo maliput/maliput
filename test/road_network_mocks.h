@@ -42,6 +42,7 @@
 #include <maliput/api/junction.h>
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
+#include <maliput/api/objects/road_object_book.h>
 #include <maliput/api/regions.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
@@ -52,6 +53,7 @@
 #include <maliput/api/rules/road_rulebook.h>
 #include <maliput/api/rules/rule_registry.h>
 #include <maliput/api/rules/traffic_light_book.h>
+#include <maliput/api/rules/traffic_sign_book.h>
 #include <maliput/api/segment.h>
 
 namespace maliput {
@@ -176,6 +178,7 @@ class TrafficLightBookMock final : public api::rules::TrafficLightBook {
  public:
   MOCK_METHOD(const api::rules::TrafficLight*, DoGetTrafficLight, (const api::rules::TrafficLight::Id&), (const));
   MOCK_METHOD(std::vector<const api::rules::TrafficLight*>, DoTrafficLights, (), (const));
+  MOCK_METHOD(std::vector<const api::rules::TrafficLight*>, DoFindByLane, (const api::LaneId&), (const));
 };
 
 // @brief Google mock api::IntersectionBook.
@@ -229,13 +232,34 @@ class RangeValueRuleStateProviderMock final : public api::rules::RangeValueRuleS
               (const api::RoadPosition&, const api::rules::Rule::TypeId&, double), (const));
 };
 
+// @brief Google mock api::objects::RoadObjectBook.
+class RoadObjectBookMock final : public api::objects::RoadObjectBook {
+ public:
+  MOCK_METHOD(std::vector<const api::objects::RoadObject*>, DoRoadObjects, (), (const));
+  MOCK_METHOD(const api::objects::RoadObject*, DoGetRoadObject, (const api::objects::RoadObject::Id&), (const));
+  MOCK_METHOD(std::vector<const api::objects::RoadObject*>, DoFindByType, (api::objects::RoadObjectType), (const));
+  MOCK_METHOD(std::vector<const api::objects::RoadObject*>, DoFindByLane, (const api::LaneId&), (const));
+  MOCK_METHOD(std::vector<const api::objects::RoadObject*>, DoFindInRadius, (const api::InertialPosition&, double),
+              (const));
+};
+
+// @brief Google mock api::rules::TrafficSignBook.
+class TrafficSignBookMock final : public api::rules::TrafficSignBook {
+ public:
+  MOCK_METHOD(const api::rules::TrafficSign*, DoGetTrafficSign, (const api::rules::TrafficSign::Id&), (const));
+  MOCK_METHOD(std::vector<const api::rules::TrafficSign*>, DoTrafficSigns, (), (const));
+  MOCK_METHOD(std::vector<const api::rules::TrafficSign*>, DoFindByLane, (const api::LaneId&), (const));
+  MOCK_METHOD(std::vector<const api::rules::TrafficSign*>, DoFindByType, (const api::rules::TrafficSignType&), (const));
+};
+
 inline std::unique_ptr<api::RoadNetwork> MakeMockedRoadNetwork() {
   return std::make_unique<api::RoadNetwork>(
       std::make_unique<RoadGeometryMock>(), std::make_unique<RoadRulebookMock>(),
       std::make_unique<TrafficLightBookMock>(), std::make_unique<IntersectionBookMock>(),
       std::make_unique<PhaseRingBookMock>(), std::make_unique<PhaseProviderMock>(),
       std::make_unique<api::rules::RuleRegistry>(), std::make_unique<DiscreteValueRuleStateProviderMock>(),
-      std::make_unique<RangeValueRuleStateProviderMock>());
+      std::make_unique<RangeValueRuleStateProviderMock>(), std::make_unique<RoadObjectBookMock>(),
+      std::make_unique<TrafficSignBookMock>());
 }
 
 }  // namespace test

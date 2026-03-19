@@ -36,6 +36,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/api/unique_id.h"
@@ -61,7 +62,26 @@ std::unordered_map<BulbColor, const char*, maliput::common::DefaultHash> BulbCol
 /// Defines the possible bulb types.
 enum class BulbType {
   kRound = 0,
+  /// Arrow with a custom orientation specified by `arrow_orientation_rad`.
   kArrow,
+  /// Predefined arrow pointing left.
+  kArrowLeft,
+  /// Predefined arrow pointing right.
+  kArrowRight,
+  /// Predefined arrow pointing up (forward).
+  kArrowUp,
+  /// Predefined arrow pointing upper-left.
+  kArrowUpperLeft,
+  /// Predefined arrow pointing upper-right.
+  kArrowUpperRight,
+  /// U-turn to the left.
+  kUTurnLeft,
+  /// U-turn to the right.
+  kUTurnRight,
+  /// Pedestrian walk signal.
+  kWalk,
+  /// Pedestrian don't walk signal.
+  kDontWalk,
 };
 
 /// Maps BulbType enums to string representations.
@@ -137,11 +157,11 @@ class Bulb final {
   /// is pointing along the bulb's +Y axis, which means it's a right-turn arrow
   /// when viewed by an approaching vehicle. Similarly, an angle of PI/2 points
   /// in the bulb's +Z direction (i.e., forward from an approaching vehicle's
-  /// perspective), and an angle of PI points to in the bulb's -Y direction
+  /// perspective), and an angle of PI points in the bulb's -Y direction
   /// (i.e., left from an approaching vehicle's perspective). This parameter
   /// must be defined when @p type is BulbType::kArrow, otherwise an exception
   /// will be thrown. An exception will also be thrown if this parameter is
-  /// defined for non-arrow BulbType values.
+  /// defined for non-kArrow BulbType values.
   ///
   /// @param states The possible states of this bulb. If this is std::nullopt or an
   /// empty vector, this bulb has states {BulbState::kOff, BulbState::kOn}.
@@ -221,7 +241,7 @@ class Bulb final {
   InertialPosition position_bulb_group_;
   Rotation orientation_bulb_group_;
   BulbColor color_ = BulbColor::kRed;
-  BulbType type_ = BulbType::kRound;
+  BulbType type_{BulbType::kRound};
   std::optional<double> arrow_orientation_rad_ = std::nullopt;
   std::vector<BulbState> states_;
   BoundingBox bounding_box_;
@@ -361,12 +381,20 @@ class TrafficLight final {
   /// There must not be BulbGroups with the same BulbGroup::Ids. Null bulb
   /// groups are not allowed.
   ///
+  /// @param related_lanes The lanes that this traffic light is physically
+  /// relevant to. For example, a traffic light at an intersection is relevant
+  /// to the lanes that face it. This captures a spatial/geometric fact about
+  /// the traffic light placement, not a rule relationship. The precise
+  /// semantic meaning (e.g., right-of-way) is determined by the rule system,
+  /// not by this field. It is the backend's responsibility to populate this.
+  /// May be empty if the traffic light is not associated with specific lanes.
+  ///
   /// @throws common::traffic_light_book_error When there are BulbGroups with the same
   /// BulbGroup::Id in @p bulb_groups.
   /// @throws common::traffic_light_book_error When any of the BulbGroup in
   /// @p bulb_groups is nullptr.
   TrafficLight(const Id& id, const InertialPosition& position_road_network, const Rotation& orientation_road_network,
-               std::vector<std::unique_ptr<BulbGroup>> bulb_groups);
+               std::vector<std::unique_ptr<BulbGroup>> bulb_groups, std::vector<LaneId> related_lanes);
 
   /// Returns this traffic light's unique identifier.
   const Id& id() const { return id_; }
@@ -383,11 +411,20 @@ class TrafficLight final {
   /// Gets the specified BulbGroup. Returns nullptr if @p id is unrecognized.
   const BulbGroup* GetBulbGroup(const BulbGroup::Id& id) const;
 
+  /// Returns the lanes that this traffic light is physically relevant to.
+  ///
+  /// This captures which lanes the traffic light faces or is associated with
+  /// from a spatial perspective. It is distinct from rule-lane associations:
+  /// a rule's zone (LaneSRange) defines the precise region where the rule
+  /// applies, while this field captures the physical placement relationship.
+  const std::vector<LaneId>& related_lanes() const { return related_lanes_; }
+
  private:
   Id id_;
   InertialPosition position_road_network_;
   Rotation orientation_road_network_;
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups_;
+  std::vector<LaneId> related_lanes_;
 };
 
 /// Uniquely identifies a bulb in the `Inertial` space. This consists of the

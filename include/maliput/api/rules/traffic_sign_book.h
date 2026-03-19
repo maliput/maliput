@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
 // Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,45 +28,56 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <optional>
 #include <vector>
 
 #include "maliput/api/lane.h"
-#include "maliput/api/rules/traffic_lights.h"
+#include "maliput/api/rules/traffic_sign.h"
 #include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
 namespace api {
 namespace rules {
 
-/// Abstract interface for providing the mapping from TrafficLight::Id to
-/// TrafficLight.
-class TrafficLightBook {
+/// Abstract interface for providing the mapping from TrafficSign::Id to
+/// TrafficSign.
+///
+/// This follows the same pattern as TrafficLightBook. Backend implementations
+/// are responsible for populating the book with the signs present in their
+/// road network data sources.
+class TrafficSignBook {
  public:
-  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLightBook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficSignBook)
 
-  virtual ~TrafficLightBook() = default;
+  virtual ~TrafficSignBook() = default;
 
-  /// Returns all TrafficLights in this book.
-  std::vector<const TrafficLight*> TrafficLights() const { return DoTrafficLights(); }
+  /// Returns all TrafficSigns in this book.
+  std::vector<const TrafficSign*> TrafficSigns() const { return DoTrafficSigns(); }
 
-  /// Gets the specified TrafficLight. Returns nullptr if @p id is unrecognized.
-  const TrafficLight* GetTrafficLight(const TrafficLight::Id& id) const { return DoGetTrafficLight(id); }
+  /// Gets the specified TrafficSign. Returns nullptr if @p id is unrecognized.
+  const TrafficSign* GetTrafficSign(const TrafficSign::Id& id) const { return DoGetTrafficSign(id); }
 
-  /// Returns all TrafficLights whose related_lanes() includes @p lane_id.
+  /// Returns all TrafficSigns whose related_lanes() includes @p lane_id.
   ///
-  /// Returns an empty vector if no traffic lights are associated with the given lane.
-  std::vector<const TrafficLight*> FindByLane(const LaneId& lane_id) const { return DoFindByLane(lane_id); }
+  /// Returns an empty vector if no signs are associated with the given lane.
+  std::vector<const TrafficSign*> FindByLane(const LaneId& lane_id) const { return DoFindByLane(lane_id); }
+
+  /// Returns all TrafficSigns whose type matches @p type.
+  ///
+  /// For example, `FindByType(TrafficSignType::kStop)` returns all stop signs.
+  /// Returns an empty vector if no signs match.
+  std::vector<const TrafficSign*> FindByType(const TrafficSignType& type) const { return DoFindByType(type); }
 
  protected:
-  TrafficLightBook() = default;
+  TrafficSignBook() = default;
 
  private:
-  virtual const TrafficLight* DoGetTrafficLight(const TrafficLight::Id& id) const = 0;
+  virtual const TrafficSign* DoGetTrafficSign(const TrafficSign::Id& id) const = 0;
 
-  virtual std::vector<const TrafficLight*> DoTrafficLights() const = 0;
+  virtual std::vector<const TrafficSign*> DoTrafficSigns() const = 0;
 
-  virtual std::vector<const TrafficLight*> DoFindByLane(const LaneId& lane_id) const = 0;
+  virtual std::vector<const TrafficSign*> DoFindByLane(const LaneId& lane_id) const = 0;
+
+  virtual std::vector<const TrafficSign*> DoFindByType(const TrafficSignType& type) const = 0;
 };
 
 }  // namespace rules

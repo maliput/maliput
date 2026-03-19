@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "maliput/test_utilities/mock.h"
 
+#include <algorithm>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -40,9 +41,11 @@
 #include "maliput/api/intersection.h"
 #include "maliput/api/junction.h"
 #include "maliput/api/lane.h"
+#include "maliput/api/objects/road_object_book.h"
 #include "maliput/api/regions.h"
 #include "maliput/api/rules/phase.h"
 #include "maliput/api/rules/traffic_lights.h"
+#include "maliput/api/rules/traffic_sign_book.h"
 #include "maliput/api/segment.h"
 #include "maliput/common/maliput_copyable.h"
 
@@ -236,6 +239,15 @@ class MockTrafficLightBook final : public rules::TrafficLightBook {
     return (traffic_light_.get() != nullptr && traffic_light_->id() == id) ? traffic_light_.get() : nullptr;
   }
   std::vector<const TrafficLight*> DoTrafficLights() const override { return {traffic_light_.get()}; }
+  std::vector<const TrafficLight*> DoFindByLane(const api::LaneId& lane_id) const override {
+    if (traffic_light_ != nullptr) {
+      const auto& related = traffic_light_->related_lanes();
+      if (std::find(related.begin(), related.end(), lane_id) != related.end()) {
+        return {traffic_light_.get()};
+      }
+    }
+    return {};
+  }
 
   std::unique_ptr<TrafficLight> traffic_light_{};
 };
@@ -367,6 +379,31 @@ class MockRangeValueRuleStateProvider : public rules::RangeValueRuleStateProvide
                                                                             double tolerance) const override {
     return std::nullopt;
   }
+};
+
+class MockRoadObjectBook final : public objects::RoadObjectBook {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockRoadObjectBook);
+  MockRoadObjectBook() = default;
+
+ private:
+  std::vector<const objects::RoadObject*> DoRoadObjects() const override { return {}; }
+  const objects::RoadObject* DoGetRoadObject(const objects::RoadObject::Id&) const override { return nullptr; }
+  std::vector<const objects::RoadObject*> DoFindByType(objects::RoadObjectType) const override { return {}; }
+  std::vector<const objects::RoadObject*> DoFindByLane(const LaneId&) const override { return {}; }
+  std::vector<const objects::RoadObject*> DoFindInRadius(const InertialPosition&, double) const override { return {}; }
+};
+
+class MockTrafficSignBook final : public rules::TrafficSignBook {
+ public:
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(MockTrafficSignBook);
+  MockTrafficSignBook() = default;
+
+ private:
+  const rules::TrafficSign* DoGetTrafficSign(const rules::TrafficSign::Id&) const override { return nullptr; }
+  std::vector<const rules::TrafficSign*> DoTrafficSigns() const override { return {}; }
+  std::vector<const rules::TrafficSign*> DoFindByLane(const LaneId&) const override { return {}; }
+  std::vector<const rules::TrafficSign*> DoFindByType(const rules::TrafficSignType&) const override { return {}; }
 };
 
 }  // namespace
@@ -550,7 +587,8 @@ std::unique_ptr<RoadNetwork> CreateRoadNetwork() {
   return std::make_unique<RoadNetwork>(CreateRoadGeometry(), CreateRoadRulebook(), CreateTrafficLightBook(),
                                        CreateIntersectionBook(), CreatePhaseRingBook(),
                                        CreateRightOfWayRuleStateProvider(), CreatePhaseProvider(), CreateRuleRegistry(),
-                                       CreateDiscreteValueRuleStateProvider(), CreateRangeValueRuleStateProvider());
+                                       CreateDiscreteValueRuleStateProvider(), CreateRangeValueRuleStateProvider(),
+                                       CreateRoadObjectBook(), CreateTrafficSignBook());
 }
 
 std::unique_ptr<RoadGeometry> CreateRoadGeometry() {
@@ -797,7 +835,8 @@ std::unique_ptr<TrafficLight> CreateTrafficLight(const TrafficLightBuildFlags& b
   const TrafficLight::Id id(build_flags.add_missing_traffic_light ? "MissingTrafficLightId" : "TrafficLightId");
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
   bulb_groups.push_back(CreateBulbGroup(build_flags.add_missing_bulb_group));
-  return std::make_unique<TrafficLight>(id, InertialPosition(), Rotation(), std::move(bulb_groups));
+  return std::make_unique<TrafficLight>(id, InertialPosition(), Rotation(), std::move(bulb_groups),
+                                        std::vector<api::LaneId>{});
 }
 
 std::unique_ptr<rules::TrafficLightBook> CreateTrafficLightBook() {
@@ -855,6 +894,10 @@ std::unique_ptr<rules::DiscreteValueRuleStateProvider> CreateDiscreteValueRuleSt
 std::unique_ptr<rules::RangeValueRuleStateProvider> CreateRangeValueRuleStateProvider() {
   return std::make_unique<MockRangeValueRuleStateProvider>();
 }
+
+std::unique_ptr<objects::RoadObjectBook> CreateRoadObjectBook() { return std::make_unique<MockRoadObjectBook>(); }
+
+std::unique_ptr<rules::TrafficSignBook> CreateTrafficSignBook() { return std::make_unique<MockTrafficSignBook>(); }
 
 }  // namespace test
 }  // namespace api

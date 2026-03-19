@@ -76,7 +76,9 @@ GTEST_TEST(BulbColorTest, MapperTest) {
 GTEST_TEST(BulbTypeTest, InstantiateAndAssign) {
   BulbType dut{};
   EXPECT_EQ(dut, BulbType::kRound);
-  for (BulbType type : {BulbType::kArrow}) {
+  for (BulbType type : {BulbType::kArrow, BulbType::kArrowLeft, BulbType::kArrowRight, BulbType::kArrowUp,
+                        BulbType::kArrowUpperLeft, BulbType::kArrowUpperRight, BulbType::kUTurnLeft,
+                        BulbType::kUTurnRight, BulbType::kWalk, BulbType::kDontWalk}) {
     EXPECT_NE(dut, type);
     dut = type;
     EXPECT_EQ(dut, type);
@@ -85,7 +87,10 @@ GTEST_TEST(BulbTypeTest, InstantiateAndAssign) {
 
 GTEST_TEST(BulbTypeTest, MapperTest) {
   const auto dut = BulbTypeMapper();
-  const std::vector<BulbType> expected_types{BulbType::kRound, BulbType::kArrow};
+  const std::vector<BulbType> expected_types{
+      BulbType::kRound,      BulbType::kArrow,          BulbType::kArrowLeft,       BulbType::kArrowRight,
+      BulbType::kArrowUp,    BulbType::kArrowUpperLeft, BulbType::kArrowUpperRight, BulbType::kUTurnLeft,
+      BulbType::kUTurnRight, BulbType::kWalk,           BulbType::kDontWalk};
   EXPECT_EQ(dut.size(), expected_types.size());
   for (BulbType type : expected_types) {
     EXPECT_EQ(static_cast<int>(dut.count(type)), 1);
@@ -279,7 +284,7 @@ TEST_F(TrafficLightConstructorTest, DuplicatedBulbGroupIds) {
   std::vector<std::unique_ptr<BulbGroup>> bulb_group;
   bulb_group.push_back(api::test::CreateBulbGroup(false /* add_missing_bulb_group */));
   bulb_group.push_back(api::test::CreateBulbGroup(false /* add_missing_bulb_group */));
-  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)),
+  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group), {}),
                common::traffic_light_book_error);
 }
 
@@ -289,7 +294,7 @@ TEST_F(TrafficLightConstructorTest, NullBulbGroup) {
   bulbs.push_back(std::make_unique<Bulb>(kRedBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
   bulb_group.push_back(std::make_unique<BulbGroup>(kBulbGroupId, kZeroPosition, kZeroRotation, std::move(bulbs)));
   bulb_group.push_back({});
-  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group)),
+  EXPECT_THROW(TrafficLight(kDutId, kZeroPosition, kZeroRotation, std::move(bulb_group), {}),
                common::traffic_light_book_error);
 }
 
@@ -300,6 +305,7 @@ class TrafficLightTest : public ::testing::Test {
   const InertialPosition kTrafficLightPosition{0, 0, 5};
   const Rotation kTrafficLightRotation{kZeroRotation};
   const TrafficLight::Id kId{"four_way_stop"};
+  const std::vector<LaneId> kRelatedLanes{LaneId("lane_north"), LaneId("lane_south")};
 
   TrafficLightTest() {
     std::vector<std::unique_ptr<BulbGroup>> bulb_group;
@@ -336,8 +342,8 @@ class TrafficLightTest : public ::testing::Test {
                                                        Rotation::FromRpy(0, 0, M_PI), std::move(bulbs)));
       west_bulb_group_ = bulb_group.back().get();
     }
-    traffic_light_ =
-        std::make_unique<TrafficLight>(kId, kTrafficLightPosition, kTrafficLightRotation, std::move(bulb_group));
+    traffic_light_ = std::make_unique<TrafficLight>(kId, kTrafficLightPosition, kTrafficLightRotation,
+                                                    std::move(bulb_group), kRelatedLanes);
   }
 
   const BulbGroup* north_bulb_group_{};
@@ -354,6 +360,21 @@ TEST_F(TrafficLightTest, Accessors) {
   EXPECT_EQ(static_cast<int>(traffic_light_->bulb_groups().size()), 4);
   EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("unknown_bulb_group")), nullptr);
   EXPECT_EQ(traffic_light_->GetBulbGroup(BulbGroup::Id("north_group")), north_bulb_group_);
+  ASSERT_EQ(static_cast<int>(traffic_light_->related_lanes().size()), 2);
+  EXPECT_EQ(traffic_light_->related_lanes()[0], LaneId("lane_north"));
+  EXPECT_EQ(traffic_light_->related_lanes()[1], LaneId("lane_south"));
+}
+
+TEST_F(TrafficLightTest, EmptyRelatedLanes) {
+  std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
+  std::vector<std::unique_ptr<Bulb>> bulbs;
+  bulbs.push_back(
+      std::make_unique<Bulb>(Bulb::Id("bulb"), kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
+  bulb_groups.push_back(
+      std::make_unique<BulbGroup>(BulbGroup::Id("group"), kZeroPosition, kZeroRotation, std::move(bulbs)));
+  const auto tl = std::make_unique<TrafficLight>(TrafficLight::Id("empty_lanes_tl"), kZeroPosition, kZeroRotation,
+                                                 std::move(bulb_groups), std::vector<LaneId>{});
+  EXPECT_TRUE(tl->related_lanes().empty());
 }
 
 TEST_F(TrafficLightTest, UniqueIds) {

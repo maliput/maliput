@@ -51,6 +51,15 @@ std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> BulbType
   std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> result;
   result.emplace(BulbType::kRound, "Round");
   result.emplace(BulbType::kArrow, "Arrow");
+  result.emplace(BulbType::kArrowLeft, "ArrowLeft");
+  result.emplace(BulbType::kArrowRight, "ArrowRight");
+  result.emplace(BulbType::kArrowUp, "ArrowUp");
+  result.emplace(BulbType::kArrowUpperLeft, "ArrowUpperLeft");
+  result.emplace(BulbType::kArrowUpperRight, "ArrowUpperRight");
+  result.emplace(BulbType::kUTurnLeft, "UTurnLeft");
+  result.emplace(BulbType::kUTurnRight, "UTurnRight");
+  result.emplace(BulbType::kWalk, "Walk");
+  result.emplace(BulbType::kDontWalk, "DontWalk");
   return result;
 }
 
@@ -149,11 +158,12 @@ UniqueBulbGroupId BulbGroup::unique_id() const {
 
 TrafficLight::TrafficLight(const TrafficLight::Id& id, const InertialPosition& position_road_network,
                            const Rotation& orientation_road_network,
-                           std::vector<std::unique_ptr<BulbGroup>> bulb_groups)
+                           std::vector<std::unique_ptr<BulbGroup>> bulb_groups, std::vector<LaneId> related_lanes)
     : id_(id),
       position_road_network_(position_road_network),
       orientation_road_network_(orientation_road_network),
-      bulb_groups_(std::move(bulb_groups)) {
+      bulb_groups_(std::move(bulb_groups)),
+      related_lanes_(std::move(related_lanes)) {
   MALIPUT_VALIDATE(std::find_if(bulb_groups_.begin(), bulb_groups_.end(),
                                 [](const auto& bulb_group) { return bulb_group == nullptr; }) == bulb_groups_.end(),
                    "Found nulled bulb when creating TrafficLight.", maliput::common::traffic_light_book_error);

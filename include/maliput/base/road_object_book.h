@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
 // Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,47 +28,45 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
-#include <optional>
+#include <memory>
 #include <vector>
 
-#include "maliput/api/lane.h"
-#include "maliput/api/rules/traffic_lights.h"
+#include "maliput/api/objects/road_object.h"
+#include "maliput/api/objects/road_object_book.h"
 #include "maliput/common/maliput_copyable.h"
 
 namespace maliput {
-namespace api {
-namespace rules {
 
-/// Abstract interface for providing the mapping from TrafficLight::Id to
-/// TrafficLight.
-class TrafficLightBook {
+/// A concrete implementation of the api::objects::RoadObjectBook abstract
+/// interface. It allows users to add road objects and query them by ID,
+/// type, lane association, or proximity.
+class RoadObjectBook : public api::objects::RoadObjectBook {
  public:
-  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLightBook);
+  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(RoadObjectBook);
 
-  virtual ~TrafficLightBook() = default;
+  RoadObjectBook();
 
-  /// Returns all TrafficLights in this book.
-  std::vector<const TrafficLight*> TrafficLights() const { return DoTrafficLights(); }
+  ~RoadObjectBook() override;
 
-  /// Gets the specified TrafficLight. Returns nullptr if @p id is unrecognized.
-  const TrafficLight* GetTrafficLight(const TrafficLight::Id& id) const { return DoGetTrafficLight(id); }
-
-  /// Returns all TrafficLights whose related_lanes() includes @p lane_id.
+  /// Adds @p road_object to this RoadObjectBook.
   ///
-  /// Returns an empty vector if no traffic lights are associated with the given lane.
-  std::vector<const TrafficLight*> FindByLane(const LaneId& lane_id) const { return DoFindByLane(lane_id); }
-
- protected:
-  TrafficLightBook() = default;
+  /// @throws std::exception if a RoadObject with the same ID already exists.
+  void AddRoadObject(std::unique_ptr<api::objects::RoadObject> road_object);
 
  private:
-  virtual const TrafficLight* DoGetTrafficLight(const TrafficLight::Id& id) const = 0;
+  std::vector<const api::objects::RoadObject*> DoRoadObjects() const override;
 
-  virtual std::vector<const TrafficLight*> DoTrafficLights() const = 0;
+  const api::objects::RoadObject* DoGetRoadObject(const api::objects::RoadObject::Id& id) const override;
 
-  virtual std::vector<const TrafficLight*> DoFindByLane(const LaneId& lane_id) const = 0;
+  std::vector<const api::objects::RoadObject*> DoFindByType(api::objects::RoadObjectType type) const override;
+
+  std::vector<const api::objects::RoadObject*> DoFindByLane(const api::LaneId& lane_id) const override;
+
+  std::vector<const api::objects::RoadObject*> DoFindInRadius(const api::InertialPosition& position,
+                                                              double radius) const override;
+
+  class Impl;
+  std::unique_ptr<Impl> impl_;
 };
 
-}  // namespace rules
-}  // namespace api
 }  // namespace maliput

@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
 // Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,48 +26,41 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#pragma once
+#include "maliput/api/rules/traffic_sign.h"
 
-#include <optional>
-#include <vector>
-
-#include "maliput/api/lane.h"
-#include "maliput/api/rules/traffic_lights.h"
-#include "maliput/common/maliput_copyable.h"
+#include <utility>
 
 namespace maliput {
 namespace api {
 namespace rules {
 
-/// Abstract interface for providing the mapping from TrafficLight::Id to
-/// TrafficLight.
-class TrafficLightBook {
- public:
-  MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(TrafficLightBook);
+std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> TrafficSignTypeMapper() {
+  std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> result;
+  result.emplace(TrafficSignType::kStop, "Stop");
+  result.emplace(TrafficSignType::kYield, "Yield");
+  result.emplace(TrafficSignType::kSpeedLimit, "SpeedLimit");
+  result.emplace(TrafficSignType::kNoEntry, "NoEntry");
+  result.emplace(TrafficSignType::kOneWay, "OneWay");
+  result.emplace(TrafficSignType::kPedestrianCrossing, "PedestrianCrossing");
+  result.emplace(TrafficSignType::kNoLeftTurn, "NoLeftTurn");
+  result.emplace(TrafficSignType::kNoRightTurn, "NoRightTurn");
+  result.emplace(TrafficSignType::kNoUTurn, "NoUTurn");
+  result.emplace(TrafficSignType::kSchoolZone, "SchoolZone");
+  result.emplace(TrafficSignType::kConstruction, "Construction");
+  result.emplace(TrafficSignType::kRailroadCrossing, "RailroadCrossing");
+  return result;
+}
 
-  virtual ~TrafficLightBook() = default;
-
-  /// Returns all TrafficLights in this book.
-  std::vector<const TrafficLight*> TrafficLights() const { return DoTrafficLights(); }
-
-  /// Gets the specified TrafficLight. Returns nullptr if @p id is unrecognized.
-  const TrafficLight* GetTrafficLight(const TrafficLight::Id& id) const { return DoGetTrafficLight(id); }
-
-  /// Returns all TrafficLights whose related_lanes() includes @p lane_id.
-  ///
-  /// Returns an empty vector if no traffic lights are associated with the given lane.
-  std::vector<const TrafficLight*> FindByLane(const LaneId& lane_id) const { return DoFindByLane(lane_id); }
-
- protected:
-  TrafficLightBook() = default;
-
- private:
-  virtual const TrafficLight* DoGetTrafficLight(const TrafficLight::Id& id) const = 0;
-
-  virtual std::vector<const TrafficLight*> DoTrafficLights() const = 0;
-
-  virtual std::vector<const TrafficLight*> DoFindByLane(const LaneId& lane_id) const = 0;
-};
+TrafficSign::TrafficSign(const Id& id, const TrafficSignType& type, const InertialPosition& position_road_network,
+                         const Rotation& orientation_road_network, const std::optional<std::string>& message,
+                         std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box)
+    : id_(id),
+      type_(type),
+      position_road_network_(position_road_network),
+      orientation_road_network_(orientation_road_network),
+      message_(message),
+      related_lanes_(std::move(related_lanes)),
+      bounding_box_(bounding_box) {}
 
 }  // namespace rules
 }  // namespace api

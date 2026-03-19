@@ -1,7 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2022-2026, Woven by Toyota. All rights reserved.
-// Copyright (c) 2019-2022, Toyota Research Institute. All rights reserved.
+// Copyright (c) 2026, Woven by Toyota. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,49 +26,49 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput/base/traffic_light_book.h"
+#include "maliput/base/traffic_sign_book.h"
 
 #include <algorithm>
 #include <iterator>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
 namespace maliput {
 
-using api::rules::TrafficLight;
+using api::rules::TrafficSign;
+using api::rules::TrafficSignType;
 
-class TrafficLightBook::Impl {
+class TrafficSignBook::Impl {
  public:
   MALIPUT_NO_COPY_NO_MOVE_NO_ASSIGN(Impl)
 
   Impl() = default;
   ~Impl() = default;
 
-  void AddTrafficLight(std::unique_ptr<const TrafficLight> traffic_light) {
-    MALIPUT_THROW_UNLESS(traffic_light.get() != nullptr);
-    const TrafficLight::Id id = traffic_light->id();
-    auto result = book_.emplace(id, std::move(traffic_light));
+  void AddTrafficSign(std::unique_ptr<const TrafficSign> traffic_sign) {
+    MALIPUT_THROW_UNLESS(traffic_sign.get() != nullptr);
+    const TrafficSign::Id id = traffic_sign->id();
+    auto result = book_.emplace(id, std::move(traffic_sign));
     if (!result.second) {
-      throw std::logic_error("Attempted to add multiple TrafficLight instances with ID: " + id.string());
+      MALIPUT_THROW_MESSAGE("Attempted to add multiple TrafficSign instances with ID: " + id.string(), maliput::common::traffic_sign_book_error);
     }
   }
 
-  std::vector<const TrafficLight*> DoTrafficLights() const {
-    std::vector<const TrafficLight*> result;
+  std::vector<const TrafficSign*> DoTrafficSigns() const {
+    std::vector<const TrafficSign*> result;
     std::transform(book_.begin(), book_.end(), std::back_inserter(result),
                    [](const auto& key_value) { return key_value.second.get(); });
     return result;
   }
 
-  const TrafficLight* DoGetTrafficLight(const TrafficLight::Id& id) const {
+  const TrafficSign* DoGetTrafficSign(const TrafficSign::Id& id) const {
     auto it = book_.find(id);
     return it == book_.end() ? nullptr : it->second.get();
   }
 
-  std::vector<const TrafficLight*> DoFindByLane(const api::LaneId& lane_id) const {
-    std::vector<const TrafficLight*> result;
+  std::vector<const TrafficSign*> DoFindByLane(const api::LaneId& lane_id) const {
+    std::vector<const TrafficSign*> result;
     for (const auto& key_value : book_) {
       const auto& related = key_value.second->related_lanes();
       if (std::find(related.begin(), related.end(), lane_id) != related.end()) {
@@ -79,26 +78,40 @@ class TrafficLightBook::Impl {
     return result;
   }
 
+  std::vector<const TrafficSign*> DoFindByType(const TrafficSignType& type) const {
+    std::vector<const TrafficSign*> result;
+    for (const auto& key_value : book_) {
+      if (key_value.second->type() == type) {
+        result.push_back(key_value.second.get());
+      }
+    }
+    return result;
+  }
+
  private:
-  std::unordered_map<TrafficLight::Id, std::unique_ptr<const TrafficLight>> book_;
+  std::unordered_map<TrafficSign::Id, std::unique_ptr<const TrafficSign>> book_;
 };
 
-TrafficLightBook::TrafficLightBook() : impl_(std::make_unique<Impl>()) {}
+TrafficSignBook::TrafficSignBook() : impl_(std::make_unique<Impl>()) {}
 
-TrafficLightBook::~TrafficLightBook() = default;
+TrafficSignBook::~TrafficSignBook() = default;
 
-void TrafficLightBook::AddTrafficLight(std::unique_ptr<const TrafficLight> traffic_light) {
-  impl_->AddTrafficLight(std::move(traffic_light));
+void TrafficSignBook::AddTrafficSign(std::unique_ptr<const TrafficSign> traffic_sign) {
+  impl_->AddTrafficSign(std::move(traffic_sign));
 }
 
-const TrafficLight* TrafficLightBook::DoGetTrafficLight(const TrafficLight::Id& id) const {
-  return impl_->DoGetTrafficLight(id);
+const TrafficSign* TrafficSignBook::DoGetTrafficSign(const TrafficSign::Id& id) const {
+  return impl_->DoGetTrafficSign(id);
 }
 
-std::vector<const TrafficLight*> TrafficLightBook::DoTrafficLights() const { return impl_->DoTrafficLights(); }
+std::vector<const TrafficSign*> TrafficSignBook::DoTrafficSigns() const { return impl_->DoTrafficSigns(); }
 
-std::vector<const TrafficLight*> TrafficLightBook::DoFindByLane(const api::LaneId& lane_id) const {
+std::vector<const TrafficSign*> TrafficSignBook::DoFindByLane(const api::LaneId& lane_id) const {
   return impl_->DoFindByLane(lane_id);
+}
+
+std::vector<const TrafficSign*> TrafficSignBook::DoFindByType(const TrafficSignType& type) const {
+  return impl_->DoFindByType(type);
 }
 
 }  // namespace maliput
