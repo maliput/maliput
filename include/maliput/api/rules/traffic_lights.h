@@ -62,7 +62,26 @@ std::unordered_map<BulbColor, const char*, maliput::common::DefaultHash> BulbCol
 /// Defines the possible bulb types.
 enum class BulbType {
   kRound = 0,
+  /// Arrow with a custom orientation specified by `arrow_orientation_rad`.
   kArrow,
+  /// Predefined arrow pointing left.
+  kArrowLeft,
+  /// Predefined arrow pointing right.
+  kArrowRight,
+  /// Predefined arrow pointing up (forward).
+  kArrowUp,
+  /// Predefined arrow pointing upper-left.
+  kArrowUpperLeft,
+  /// Predefined arrow pointing upper-right.
+  kArrowUpperRight,
+  /// U-turn to the left.
+  kUTurnLeft,
+  /// U-turn to the right.
+  kUTurnRight,
+  /// Pedestrian walk signal.
+  kWalk,
+  /// Pedestrian don't walk signal.
+  kDontWalk,
 };
 
 /// Maps BulbType enums to string representations.
@@ -138,11 +157,11 @@ class Bulb final {
   /// is pointing along the bulb's +Y axis, which means it's a right-turn arrow
   /// when viewed by an approaching vehicle. Similarly, an angle of PI/2 points
   /// in the bulb's +Z direction (i.e., forward from an approaching vehicle's
-  /// perspective), and an angle of PI points to in the bulb's -Y direction
+  /// perspective), and an angle of PI points in the bulb's -Y direction
   /// (i.e., left from an approaching vehicle's perspective). This parameter
   /// must be defined when @p type is BulbType::kArrow, otherwise an exception
   /// will be thrown. An exception will also be thrown if this parameter is
-  /// defined for non-arrow BulbType values.
+  /// defined for non-kArrow BulbType values.
   ///
   /// @param states The possible states of this bulb. If this is std::nullopt or an
   /// empty vector, this bulb has states {BulbState::kOff, BulbState::kOn}.
@@ -222,7 +241,7 @@ class Bulb final {
   InertialPosition position_bulb_group_;
   Rotation orientation_bulb_group_;
   BulbColor color_ = BulbColor::kRed;
-  BulbType type_ = BulbType::kRound;
+  BulbType type_{BulbType::kRound};
   std::optional<double> arrow_orientation_rad_ = std::nullopt;
   std::vector<BulbState> states_;
   BoundingBox bounding_box_;
