@@ -51,6 +51,15 @@ std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> BulbType
   std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> result;
   result.emplace(BulbType::kRound, "Round");
   result.emplace(BulbType::kArrow, "Arrow");
+  result.emplace(BulbType::kArrowLeft, "ArrowLeft");
+  result.emplace(BulbType::kArrowRight, "ArrowRight");
+  result.emplace(BulbType::kArrowUp, "ArrowUp");
+  result.emplace(BulbType::kArrowUpperLeft, "ArrowUpperLeft");
+  result.emplace(BulbType::kArrowUpperRight, "ArrowUpperRight");
+  result.emplace(BulbType::kUTurnLeft, "UTurnLeft");
+  result.emplace(BulbType::kUTurnRight, "UTurnRight");
+  result.emplace(BulbType::kWalk, "Walk");
+  result.emplace(BulbType::kDontWalk, "DontWalk");
   return result;
 }
 
