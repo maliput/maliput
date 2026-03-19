@@ -76,7 +76,9 @@ GTEST_TEST(BulbColorTest, MapperTest) {
 GTEST_TEST(BulbTypeTest, InstantiateAndAssign) {
   BulbType dut{};
   EXPECT_EQ(dut, BulbType::kRound);
-  for (BulbType type : {BulbType::kArrow}) {
+  for (BulbType type : {BulbType::kArrow, BulbType::kArrowLeft, BulbType::kArrowRight, BulbType::kArrowUp,
+                        BulbType::kArrowUpperLeft, BulbType::kArrowUpperRight, BulbType::kUTurnLeft,
+                        BulbType::kUTurnRight, BulbType::kWalk, BulbType::kDontWalk}) {
     EXPECT_NE(dut, type);
     dut = type;
     EXPECT_EQ(dut, type);
@@ -85,7 +87,10 @@ GTEST_TEST(BulbTypeTest, InstantiateAndAssign) {
 
 GTEST_TEST(BulbTypeTest, MapperTest) {
   const auto dut = BulbTypeMapper();
-  const std::vector<BulbType> expected_types{BulbType::kRound, BulbType::kArrow};
+  const std::vector<BulbType> expected_types{
+      BulbType::kRound,      BulbType::kArrow,          BulbType::kArrowLeft,       BulbType::kArrowRight,
+      BulbType::kArrowUp,    BulbType::kArrowUpperLeft, BulbType::kArrowUpperRight, BulbType::kUTurnLeft,
+      BulbType::kUTurnRight, BulbType::kWalk,           BulbType::kDontWalk};
   EXPECT_EQ(dut.size(), expected_types.size());
   for (BulbType type : expected_types) {
     EXPECT_EQ(static_cast<int>(dut.count(type)), 1);

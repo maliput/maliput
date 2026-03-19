@@ -66,7 +66,7 @@ A single light bulb with a color, type, and set of possible states.
 | `position_bulb_group` | `InertialPosition` | Offset relative to the parent bulb group's frame |
 | `orientation_bulb_group` | `Rotation` | Rotational offset relative to the parent bulb group's frame |
 | `color` | `BulbColor` | `kRed`, `kYellow`, or `kGreen` |
-| `type` | `BulbType` | `kRound` or `kArrow` |
+| `type` | `BulbType` | `kRound`, `kArrow`, `kArrowLeft`, `kArrowRight`, `kArrowUp`, `kArrowUpperLeft`, `kArrowUpperRight`, `kUTurnLeft`, `kUTurnRight`, `kWalk`, or `kDontWalk` |
 | `arrow_orientation_rad` | `optional<double>` | Arrow direction (only for `kArrow` type) |
 | `states` | `vector<BulbState>` | Possible states: `kOff`, `kOn`, `kBlinking` |
 | `bounding_box` | `BoundingBox` | Physical extents of the bulb |
