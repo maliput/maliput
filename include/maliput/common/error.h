@@ -121,6 +121,13 @@ class traffic_light_book_error : public maliput_error {
   explicit traffic_light_book_error(const std::string& what_arg) : maliput_error(what_arg) {}
 };
 
+/// Errors involing the TrafficSignBook.
+class traffic_sign_book_error : public maliput_error {
+ public:
+  /// Constructs a traffic_sign_book_error with @p what_arg as description.
+  explicit traffic_sign_book_error(const std::string& what_arg) : maliput_error(what_arg) {}
+};
+
 /// Errors involing the PhaseBook.
 class phase_book_error : public maliput_error {
  public:

@@ -26,6 +26,7 @@ set(BASE_SOURCES
   road_object_book.cc
   traffic_light_book.cc
   traffic_light_book_loader.cc
+  traffic_sign_book.cc
   yaml_conversion.cc
 )
 
