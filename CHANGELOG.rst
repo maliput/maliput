@@ -2,6 +2,16 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.15.0 (2026-03-25)
+-------------------
+* Traffic signal base implementation format. (`#733 <https://github.com/maliput/maliput/issues/733>`_)
+* Base implementation for TrafficSignBook. (`#730 <https://github.com/maliput/maliput/issues/730>`_)
+* Add more bulb types to traffic lights. (`#729 <https://github.com/maliput/maliput/issues/729>`_)
+* Add related lanes to TrafficLights (`#728 <https://github.com/maliput/maliput/issues/728>`_)
+* Adds TrafficSign API. (`#726 <https://github.com/maliput/maliput/issues/726>`_)
+* Add RoadObject API and book. (`#695 <https://github.com/maliput/maliput/issues/695>`_)
+* Contributors: Franco Cipollone, Santiago Lopez
+
 1.14.0 (2026-03-06)
 -------------------
 * Adds RoadGeometry::FindSurfaceRoadPositionsAtXY. (`#720 <https://github.com/maliput/maliput/issues/720>`_)
