@@ -55,9 +55,9 @@ maliput::math::BoundingBox MakeBoundingBox() {
 GTEST_TEST(TrafficSignBookTest, BasicTest) {
   const TrafficSign::Id id("my_stop_sign");
   const std::vector<LaneId> related_lanes{LaneId("lane_1"), LaneId("lane_2")};
-  auto sign = std::make_unique<const TrafficSign>(
-      id, TrafficSignType::kStop, api::InertialPosition(1., 2., 3.), api::Rotation::FromRpy(0., 0., 0.),
-      std::optional<std::string>{"STOP"}, related_lanes, MakeBoundingBox());
+  auto sign = std::make_unique<const TrafficSign>(id, TrafficSignType::kStop, api::InertialPosition(1., 2., 3.),
+                                                  api::Rotation::FromRpy(0., 0., 0.),
+                                                  std::optional<std::string>{"STOP"}, related_lanes, MakeBoundingBox());
   const TrafficSign* sign_ptr = sign.get();
 
   TrafficSignBook dut;
@@ -77,12 +77,12 @@ GTEST_TEST(TrafficSignBookTest, BasicTest) {
 
 GTEST_TEST(TrafficSignBookTest, DuplicateIdThrows) {
   const TrafficSign::Id id("dup_sign");
-  auto sign_a = std::make_unique<const TrafficSign>(
-      id, TrafficSignType::kYield, api::InertialPosition(0., 0., 0.), api::Rotation::FromRpy(0., 0., 0.),
-      std::nullopt, std::vector<LaneId>{}, MakeBoundingBox());
-  auto sign_b = std::make_unique<const TrafficSign>(
-      id, TrafficSignType::kYield, api::InertialPosition(1., 1., 1.), api::Rotation::FromRpy(0., 0., 0.),
-      std::nullopt, std::vector<LaneId>{}, MakeBoundingBox());
+  auto sign_a = std::make_unique<const TrafficSign>(id, TrafficSignType::kYield, api::InertialPosition(0., 0., 0.),
+                                                    api::Rotation::FromRpy(0., 0., 0.), std::nullopt,
+                                                    std::vector<LaneId>{}, MakeBoundingBox());
+  auto sign_b = std::make_unique<const TrafficSign>(id, TrafficSignType::kYield, api::InertialPosition(1., 1., 1.),
+                                                    api::Rotation::FromRpy(0., 0., 0.), std::nullopt,
+                                                    std::vector<LaneId>{}, MakeBoundingBox());
 
   TrafficSignBook dut;
   dut.AddTrafficSign(std::move(sign_a));
@@ -96,12 +96,12 @@ GTEST_TEST(TrafficSignBookTest, FindByLane) {
   const LaneId lane_2("lane_2");
   const LaneId lane_unknown("lane_unknown");
 
-  auto sign_a = std::make_unique<const TrafficSign>(
-      id_a, TrafficSignType::kStop, api::InertialPosition(0., 0., 0.), api::Rotation::FromRpy(0., 0., 0.),
-      std::nullopt, std::vector<LaneId>{lane_1, lane_2}, MakeBoundingBox());
-  auto sign_b = std::make_unique<const TrafficSign>(
-      id_b, TrafficSignType::kYield, api::InertialPosition(1., 1., 1.), api::Rotation::FromRpy(0., 0., 0.),
-      std::nullopt, std::vector<LaneId>{lane_2}, MakeBoundingBox());
+  auto sign_a = std::make_unique<const TrafficSign>(id_a, TrafficSignType::kStop, api::InertialPosition(0., 0., 0.),
+                                                    api::Rotation::FromRpy(0., 0., 0.), std::nullopt,
+                                                    std::vector<LaneId>{lane_1, lane_2}, MakeBoundingBox());
+  auto sign_b = std::make_unique<const TrafficSign>(id_b, TrafficSignType::kYield, api::InertialPosition(1., 1., 1.),
+                                                    api::Rotation::FromRpy(0., 0., 0.), std::nullopt,
+                                                    std::vector<LaneId>{lane_2}, MakeBoundingBox());
 
   TrafficSignBook dut;
   dut.AddTrafficSign(std::move(sign_a));
@@ -126,12 +126,12 @@ GTEST_TEST(TrafficSignBookTest, FindByType) {
   const TrafficSign::Id id_yield("yield_sign");
   const TrafficSign::Id id_speed("speed_sign");
 
-  auto stop = std::make_unique<const TrafficSign>(
-      id_stop, TrafficSignType::kStop, api::InertialPosition(0., 0., 0.), api::Rotation::FromRpy(0., 0., 0.),
-      std::nullopt, std::vector<LaneId>{}, MakeBoundingBox());
-  auto yield = std::make_unique<const TrafficSign>(
-      id_yield, TrafficSignType::kYield, api::InertialPosition(1., 1., 1.), api::Rotation::FromRpy(0., 0., 0.),
-      std::nullopt, std::vector<LaneId>{}, MakeBoundingBox());
+  auto stop = std::make_unique<const TrafficSign>(id_stop, TrafficSignType::kStop, api::InertialPosition(0., 0., 0.),
+                                                  api::Rotation::FromRpy(0., 0., 0.), std::nullopt,
+                                                  std::vector<LaneId>{}, MakeBoundingBox());
+  auto yield = std::make_unique<const TrafficSign>(id_yield, TrafficSignType::kYield, api::InertialPosition(1., 1., 1.),
+                                                   api::Rotation::FromRpy(0., 0., 0.), std::nullopt,
+                                                   std::vector<LaneId>{}, MakeBoundingBox());
   auto speed = std::make_unique<const TrafficSign>(
       id_speed, TrafficSignType::kSpeedLimit, api::InertialPosition(2., 2., 2.), api::Rotation::FromRpy(0., 0., 0.),
       std::optional<std::string>{"60"}, std::vector<LaneId>{}, MakeBoundingBox());

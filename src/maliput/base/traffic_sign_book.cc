@@ -51,7 +51,8 @@ class TrafficSignBook::Impl {
     const TrafficSign::Id id = traffic_sign->id();
     auto result = book_.emplace(id, std::move(traffic_sign));
     if (!result.second) {
-      MALIPUT_THROW_MESSAGE("Attempted to add multiple TrafficSign instances with ID: " + id.string(), maliput::common::traffic_sign_book_error);
+      MALIPUT_THROW_MESSAGE("Attempted to add multiple TrafficSign instances with ID: " + id.string(),
+                            maliput::common::traffic_sign_book_error);
     }
   }
 
