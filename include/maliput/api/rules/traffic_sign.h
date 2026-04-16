@@ -60,6 +60,7 @@ enum class TrafficSignType {
   kSchoolZone,
   kConstruction,
   kRailroadCrossing,
+  kUnknown,
 };
 
 /// Maps TrafficSignType enums to string representations.
