@@ -67,6 +67,7 @@ GTEST_TEST(TrafficSignTypeTest, MapperTest) {
       TrafficSignType::kNoEntry,    TrafficSignType::kOneWay,       TrafficSignType::kPedestrianCrossing,
       TrafficSignType::kNoLeftTurn, TrafficSignType::kNoRightTurn,  TrafficSignType::kNoUTurn,
       TrafficSignType::kSchoolZone, TrafficSignType::kConstruction, TrafficSignType::kRailroadCrossing,
+      TrafficSignType::kUnknown,
   };
   EXPECT_EQ(dut.size(), expected_types.size());
   for (TrafficSignType type : expected_types) {

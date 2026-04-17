@@ -56,6 +56,7 @@ The `type` field is a `TrafficSignType` enum. It follows the [MUTCD](https://mut
 | `kSchoolZone` | `"SchoolZone"` | School zone |
 | `kConstruction` | `"Construction"` | Construction / work zone |
 | `kRailroadCrossing` | `"RailroadCrossing"` | Railroad crossing |
+| `kUnknown` | `"Unknown"` | Unknown or unmapped signal |
 
 ### BoundingBox
 
