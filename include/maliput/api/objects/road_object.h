@@ -62,6 +62,7 @@ enum class RoadObjectType {
   kPole,           ///< Vertical pole structure (street lamp, traffic sign pole, etc.).
   kRoadMark,       ///< Painted road marking (arrows, symbols, text).
   kRoadSurface,    ///< Road surface element (manhole, speed bump, etc.).
+  kStopLine,       ///< Stop line painted on the road surface.
   kTrafficIsland,  ///< Traffic island or median.
   kTree,           ///< Individual tree.
   kVegetation,     ///< Vegetation area (bush, forest, hedge).

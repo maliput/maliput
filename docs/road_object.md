@@ -45,6 +45,7 @@ Type-safe enumeration of common object categories:
 | `kPole` | Vertical pole structure (street lamp, sign pole) |
 | `kRoadMark` | Painted road marking (arrows, symbols, text) |
 | `kRoadSurface` | Road surface element (manhole, speed bump) |
+| `kStopLine` | Stop line painted on the road surface |
 | `kTrafficIsland` | Traffic island or median |
 | `kTree` | Individual tree |
 | `kVegetation` | Vegetation area (bush, forest, hedge) |
