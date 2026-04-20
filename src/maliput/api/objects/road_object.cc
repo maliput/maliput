@@ -48,6 +48,7 @@ std::unordered_map<RoadObjectType, const char*, maliput::common::DefaultHash> Ro
       {RoadObjectType::kPole, "Pole"},
       {RoadObjectType::kRoadMark, "RoadMark"},
       {RoadObjectType::kRoadSurface, "RoadSurface"},
+      {RoadObjectType::kStopLine, "StopLine"},
       {RoadObjectType::kTrafficIsland, "TrafficIsland"},
       {RoadObjectType::kTree, "Tree"},
       {RoadObjectType::kVegetation, "Vegetation"},
