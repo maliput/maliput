@@ -2,6 +2,13 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.16.0 (2026-04-21)
+-------------------
+* New NoOvertaking traffic sign type. (`#741 <https://github.com/maliput/maliput/issues/741>`_)
+* Add new RoadObject type StopLine. (`#740 <https://github.com/maliput/maliput/issues/740>`_)
+* Support unknown sign type. (`#738 <https://github.com/maliput/maliput/issues/738>`_)
+* Contributors: Santiago Lopez
+
 1.15.0 (2026-03-25)
 -------------------
 * Traffic signal base implementation format. (`#733 <https://github.com/maliput/maliput/issues/733>`_)
