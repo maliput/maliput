@@ -83,7 +83,10 @@ api::RoadPositionResult KDTreeStrategy::DoToRoadPosition(const api::InertialPosi
 
 std::vector<api::RoadPositionResult> KDTreeStrategy::DoFindRoadPositions(const api::InertialPosition& inertial_position,
                                                                          double radius) const {
-  const auto closest_lanes = this->ClosestLanes(inertial_position, radius);
+  // Expand candidate-lane lookup to compensate for sparse KD-tree sampling.
+  // Exact 3D radius semantics are preserved by filtering on lane_position.distance below.
+  const double candidate_half_edge_length = radius + 2. * sampling_step_;
+  const auto closest_lanes = this->ClosestLanes(inertial_position, candidate_half_edge_length);
   std::vector<api::RoadPositionResult> road_positions;
   for (const auto& lane : closest_lanes) {
     MALIPUT_THROW_UNLESS(lane != nullptr);
