@@ -51,11 +51,7 @@ namespace api {
 namespace rules {
 
 /// Defines the possible bulb colors.
-enum class BulbColor {
-  kRed = 0,
-  kYellow,
-  kGreen,
-};
+enum class BulbColor { kRed = 0, kYellow, kGreen, kBlue, kWhite };
 
 /// Maps BulbColor enums to string representations.
 std::unordered_map<BulbColor, const char*, maliput::common::DefaultHash> BulbColorMapper();
@@ -83,13 +79,31 @@ enum class BulbType {
   kWalk,
   /// Pedestrian don't walk signal.
   kDontWalk,
+  /// The lane is not open for driving.
+  kCross,
+  /// Valid for pedestrians.
+  kPedestrian,
+  /// Valid for bicyclists.
+  kBicycle,
+  /// Valid for pedestrians and bicyclists.
+  kPedestrianAndBicycle,
+  /// Valid for trams.
+  kTram,
+  /// Valid for buses.
+  kBus,
+  /// Valid for trams and buses.
+  kBusAndTram,
+  /// Countdown in seconds.
+  kCountdownInSeconds,
+  /// Countdown in percent.
+  kCountdownInPercent
 };
 
 /// Maps BulbType enums to string representations.
 std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> BulbTypeMapper();
 
 /// Defines the possible bulb states.
-enum class BulbState { kOff = 0, kOn, kBlinking };
+enum class BulbState { kOff = 0, kOn, kBlinking, kCounting };
 
 /// Maps BulbState enums to string representations.
 std::unordered_map<BulbState, const char*, maliput::common::DefaultHash> BulbStateMapper();

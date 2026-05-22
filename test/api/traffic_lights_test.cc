@@ -601,12 +601,11 @@ GTEST_TEST(TrafficLightInitialBulbStatesTest, ReturnsAllBulbInitialStates) {
 
   std::vector<std::unique_ptr<Bulb>> bulbs;
   // Red bulb with default initial state (kOff)
-  bulbs.push_back(
-      std::make_unique<Bulb>(kRedBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
+  bulbs.push_back(std::make_unique<Bulb>(kRedBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
   // Green bulb with explicit initial state kOn
   bulbs.push_back(std::make_unique<Bulb>(kGreenBulbId, kZeroPosition, kZeroRotation, BulbColor::kGreen,
-                                          BulbType::kRound, std::nullopt, std::nullopt, Bulb::BoundingBox(),
-                                          BulbState::kOn));
+                                         BulbType::kRound, std::nullopt, std::nullopt, Bulb::BoundingBox(),
+                                         BulbState::kOn));
 
   std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
   bulb_groups.push_back(std::make_unique<BulbGroup>(kBgId, kZeroPosition, kZeroRotation, std::move(bulbs)));
