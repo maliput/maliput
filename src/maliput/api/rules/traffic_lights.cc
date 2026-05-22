@@ -73,13 +73,15 @@ std::unordered_map<BulbState, const char*, maliput::common::DefaultHash> BulbSta
 
 Bulb::Bulb(const Bulb::Id& id, const InertialPosition& position_bulb_group, const Rotation& orientation_bulb_group,
            const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad,
-           const std::optional<std::vector<BulbState>>& states, BoundingBox bounding_box)
+           const std::optional<std::vector<BulbState>>& states, BoundingBox bounding_box,
+           const std::optional<BulbState>& initial_state)
     : id_(id),
       position_bulb_group_(position_bulb_group),
       orientation_bulb_group_(orientation_bulb_group),
       color_(color),
       type_(type),
       arrow_orientation_rad_(arrow_orientation_rad),
+      initial_state_(initial_state.value_or(BulbState::kOff)),
       bounding_box_(std::move(bounding_box)) {
   MALIPUT_VALIDATE(type_ != BulbType::kArrow || arrow_orientation_rad_ != std::nullopt,
                    "Arrow-typed bulb's orientation is null.", maliput::common::traffic_light_book_error);
@@ -192,6 +194,16 @@ const BulbGroup* TrafficLight::GetBulbGroup(const BulbGroup::Id& id) const {
     }
   }
   return nullptr;
+}
+
+std::map<UniqueBulbId, BulbState> TrafficLight::InitialBulbStates() const {
+  std::map<UniqueBulbId, BulbState> result;
+  for (const auto& bulb_group : bulb_groups_) {
+    for (const auto* bulb : bulb_group->bulbs()) {
+      result.emplace(UniqueBulbId(id_, bulb_group->id(), bulb->id()), bulb->GetInitialState());
+    }
+  }
+  return result;
 }
 
 const std::string UniqueBulbId::delimiter() { return "-"; }

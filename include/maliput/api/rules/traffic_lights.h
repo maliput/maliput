@@ -30,6 +30,7 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -172,7 +173,8 @@ class Bulb final {
   /// @throws common::traffic_light_book_error When `unique_id.bulb_id != id`.
   Bulb(const Id& id, const InertialPosition& position_bulb_group, const Rotation& orientation_bulb_group,
        const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad = std::nullopt,
-       const std::optional<std::vector<BulbState>>& states = std::nullopt, BoundingBox bounding_box = BoundingBox());
+       const std::optional<std::vector<BulbState>>& states = std::nullopt, BoundingBox bounding_box = BoundingBox(),
+       const std::optional<BulbState>& initial_state = std::nullopt);
 
   /// Returns this Bulb instance's ID.
   const Id& id() const { return id_; }
@@ -214,6 +216,12 @@ class Bulb final {
   /// BulbState::kOn is when this is the bulb's only possible state.
   BulbState GetDefaultState() const;
 
+  /// Returns the initial state of this bulb.
+  ///
+  /// If an explicit initial state was provided at construction, it is returned.
+  /// Otherwise, defaults to BulbState::kOff.
+  BulbState GetInitialState() const { return initial_state_; }
+
   /// Returns true if @p bulb_state is one of this bulb's possible states.
   bool IsValidState(const BulbState& bulb_state) const;
 
@@ -244,6 +252,7 @@ class Bulb final {
   BulbType type_{BulbType::kRound};
   std::optional<double> arrow_orientation_rad_ = std::nullopt;
   std::vector<BulbState> states_;
+  BulbState initial_state_{BulbState::kOff};
   BoundingBox bounding_box_;
   const BulbGroup* bulb_group_{};
 };
@@ -419,6 +428,13 @@ class TrafficLight final {
   /// applies, while this field captures the physical placement relationship.
   const std::vector<LaneId>& related_lanes() const { return related_lanes_; }
 
+  /// Returns the initial bulb state for every bulb in this traffic light.
+  ///
+  /// The map is keyed by UniqueBulbId and the value is the initial BulbState.
+  /// For bulbs without an explicitly specified initial state, BulbState::kOff
+  /// is used.
+  std::map<UniqueBulbId, BulbState> InitialBulbStates() const;
+
  private:
   Id id_;
   InertialPosition position_road_network_;
@@ -461,6 +477,9 @@ class UniqueBulbId : public UniqueId {
   /// Tests for inequality with another UniqueBulbId, specifically
   /// returning the opposite of operator==().
   bool operator!=(const UniqueBulbId& rhs) const { return !(*this == rhs); }
+
+  /// Provides strict weak ordering for use in ordered containers (e.g., std::map).
+  bool operator<(const UniqueBulbId& rhs) const { return string() < rhs.string(); }
 
   /// Implements the @ref hash_append concept.
   template <class HashAlgorithm>
