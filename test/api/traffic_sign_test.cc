@@ -138,6 +138,54 @@ GTEST_TEST(TrafficSignTest, ConstructorWithCustomBoundingBox) {
   EXPECT_DOUBLE_EQ(bb.box_size().z(), 1.2);
 }
 
+GTEST_TEST(TrafficSignTest, ConstructorWithValue) {
+  const TrafficSign::Id kId("speed_limit_100");
+  const TrafficSignType kType = TrafficSignType::kSpeedLimit;
+  const InertialPosition kPosition(10., 20., 3.);
+  const Rotation kOrientation = Rotation::FromRpy(0., 0., 0.);
+  const maliput::math::BoundingBox kBoundingBox(maliput::math::Vector3(0., 0., 0.),
+                                                maliput::math::Vector3(0.05, 0.762, 0.762),
+                                                maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
+  const TrafficSignValue kValue{100.0, TrafficSignValueUnit::kKilometersPerHour};
+
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, kValue);
+
+  EXPECT_EQ(dut.id(), kId);
+  EXPECT_EQ(dut.type(), kType);
+  EXPECT_TRUE(dut.GetValue().has_value());
+  EXPECT_DOUBLE_EQ(dut.GetValue()->value, 100.0);
+  EXPECT_EQ(dut.GetValue()->unit, TrafficSignValueUnit::kKilometersPerHour);
+}
+
+GTEST_TEST(TrafficSignTest, ConstructorWithoutValue) {
+  const TrafficSign::Id kId("stop_sign");
+  const TrafficSignType kType = TrafficSignType::kStop;
+  const InertialPosition kPosition(1., 2., 3.);
+  const Rotation kOrientation = Rotation::FromRpy(0., 0., 0.);
+  const maliput::math::BoundingBox kBoundingBox(maliput::math::Vector3(0., 0., 0.),
+                                                maliput::math::Vector3(0.05, 0.762, 0.762),
+                                                maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
+
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox);
+
+  EXPECT_FALSE(dut.GetValue().has_value());
+}
+
+GTEST_TEST(TrafficSignValueUnitTest, MapperTest) {
+  const auto dut = TrafficSignValueUnitMapper();
+  const std::vector<TrafficSignValueUnit> expected_units{
+      TrafficSignValueUnit::kMetersPerSecond, TrafficSignValueUnit::kKilometersPerHour,
+      TrafficSignValueUnit::kMilesPerHour,    TrafficSignValueUnit::kMeters,
+      TrafficSignValueUnit::kKilometers,      TrafficSignValueUnit::kFeet,
+      TrafficSignValueUnit::kMiles,           TrafficSignValueUnit::kPercent,
+      TrafficSignValueUnit::kKilograms,       TrafficSignValueUnit::kMetricTons,
+  };
+  EXPECT_EQ(dut.size(), expected_units.size());
+  for (TrafficSignValueUnit unit : expected_units) {
+    EXPECT_EQ(static_cast<int>(dut.count(unit)), 1);
+  }
+}
+
 }  // namespace
 }  // namespace rules
 }  // namespace api

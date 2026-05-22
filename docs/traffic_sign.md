@@ -37,6 +37,7 @@ A traffic sign can declare which lanes it is physically relevant to via `related
 | `message` | `optional<string>` | Optional text on the sign (e.g., `"60"` on a speed limit sign) |
 | `related_lanes` | `vector<LaneId>` | Lanes this sign is physically relevant to |
 | `bounding_box` | `maliput::math::BoundingBox` | Bounding box in the sign's local frame |
+| `value` | `optional<TrafficSignValue>` | Optional numeric value with unit (e.g., 60 km/h for speed limit) |
 
 ### Sign Types
 
