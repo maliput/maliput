@@ -88,10 +88,26 @@ GTEST_TEST(BulbTypeTest, InstantiateAndAssign) {
 
 GTEST_TEST(BulbTypeTest, MapperTest) {
   const auto dut = BulbTypeMapper();
-  const std::vector<BulbType> expected_types{
-      BulbType::kRound,      BulbType::kArrow,          BulbType::kArrowLeft,       BulbType::kArrowRight,
-      BulbType::kArrowUp,    BulbType::kArrowUpperLeft, BulbType::kArrowUpperRight, BulbType::kUTurnLeft,
-      BulbType::kUTurnRight, BulbType::kWalk,           BulbType::kDontWalk};
+  const std::vector<BulbType> expected_types{BulbType::kRound,
+                                             BulbType::kArrow,
+                                             BulbType::kArrowLeft,
+                                             BulbType::kArrowRight,
+                                             BulbType::kArrowUp,
+                                             BulbType::kArrowUpperLeft,
+                                             BulbType::kArrowUpperRight,
+                                             BulbType::kUTurnLeft,
+                                             BulbType::kUTurnRight,
+                                             BulbType::kWalk,
+                                             BulbType::kDontWalk,
+                                             BulbType::kCross,
+                                             BulbType::kPedestrian,
+                                             BulbType::kBicycle,
+                                             BulbType::kPedestrianAndBicycle,
+                                             BulbType::kTram,
+                                             BulbType::kBus,
+                                             BulbType::kBusAndTram,
+                                             BulbType::kCountdownInSeconds,
+                                             BulbType::kCountdownInPercent};
   EXPECT_EQ(dut.size(), expected_types.size());
   for (BulbType type : expected_types) {
     EXPECT_EQ(static_cast<int>(dut.count(type)), 1);

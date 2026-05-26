@@ -189,14 +189,13 @@ struct convert<BulbType> {
   // NOLINTNEXTLINE(runtime/references).
   static bool decode(const Node& node, BulbType& rhs) {
     const std::string type = node.as<std::string>();
-    bool result = false;
-    for (const auto& it : maliput::api::rules::BulbTypeMapper()) {
-      if (it.second == type) {
-        rhs = it.first;
-        result = true;
-      }
+    const auto& mapper = maliput::api::rules::BulbTypeStringToEnumMapper();
+    const auto it = mapper.find(type);
+    if (it != mapper.end()) {
+      rhs = it->second;
+      return true;
     }
-    return result;
+    return false;
   }
 };
 
