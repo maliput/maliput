@@ -53,16 +53,33 @@ std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> T
   return result;
 }
 
+std::unordered_map<TrafficSignValueUnit, const char*, maliput::common::DefaultHash> TrafficSignValueUnitMapper() {
+  std::unordered_map<TrafficSignValueUnit, const char*, maliput::common::DefaultHash> result;
+  result.emplace(TrafficSignValueUnit::kMetersPerSecond, "m/s");
+  result.emplace(TrafficSignValueUnit::kKilometersPerHour, "km/h");
+  result.emplace(TrafficSignValueUnit::kMilesPerHour, "mph");
+  result.emplace(TrafficSignValueUnit::kMeters, "m");
+  result.emplace(TrafficSignValueUnit::kKilometers, "km");
+  result.emplace(TrafficSignValueUnit::kFeet, "ft");
+  result.emplace(TrafficSignValueUnit::kMiles, "mile");
+  result.emplace(TrafficSignValueUnit::kPercent, "%");
+  result.emplace(TrafficSignValueUnit::kKilograms, "kg");
+  result.emplace(TrafficSignValueUnit::kMetricTons, "t");
+  return result;
+}
+
 TrafficSign::TrafficSign(const Id& id, const TrafficSignType& type, const InertialPosition& position_road_network,
                          const Rotation& orientation_road_network, const std::optional<std::string>& message,
-                         std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box)
+                         std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box,
+                         const std::optional<TrafficSignValue>& value)
     : id_(id),
       type_(type),
       position_road_network_(position_road_network),
       orientation_road_network_(orientation_road_network),
       message_(message),
       related_lanes_(std::move(related_lanes)),
-      bounding_box_(bounding_box) {}
+      bounding_box_(bounding_box),
+      value_(value) {}
 
 }  // namespace rules
 }  // namespace api

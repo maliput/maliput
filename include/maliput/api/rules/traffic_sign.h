@@ -67,6 +67,40 @@ enum class TrafficSignType {
 /// Maps TrafficSignType enums to string representations.
 std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> TrafficSignTypeMapper();
 
+/// Defines the unit for a traffic sign's numeric value.
+/// These correspond to the units used in the XODR signal definition.
+enum class TrafficSignValueUnit {
+  kMetersPerSecond = 0,  ///< m/s
+  kKilometersPerHour,    ///< km/h
+  kMilesPerHour,         ///< mph
+  kMeters,               ///< m
+  kKilometers,           ///< km
+  kFeet,                 ///< ft
+  kMiles,                ///< mile
+  kPercent,              ///< %
+  kKilograms,            ///< kg
+  kMetricTons,           ///< t (metric tons)
+};
+
+/// Maps TrafficSignValueUnit enums to string representations.
+std::unordered_map<TrafficSignValueUnit, const char*, maliput::common::DefaultHash> TrafficSignValueUnitMapper();
+
+/// Holds a numeric value and its associated unit for a traffic sign.
+///
+/// For example, a speed limit sign might have value=60 with
+/// unit=TrafficSignValueUnit::kKilometersPerHour.
+struct TrafficSignValue {
+  /// Equality operator.
+  bool operator==(const TrafficSignValue& other) const { return value == other.value && unit == other.unit; }
+  /// Inequality operator.
+  bool operator!=(const TrafficSignValue& other) const { return !(*this == other); }
+
+  /// The numeric value of the sign.
+  double value{};
+  /// The unit of the value.
+  TrafficSignValueUnit unit{TrafficSignValueUnit::kMetersPerSecond};
+};
+
 /// Models a physical traffic sign — a static, passive signaling device
 /// placed along or above the road to convey regulatory, warning, or
 /// informational messages to road users.
@@ -111,9 +145,14 @@ class TrafficSign final {
   ///
   /// @param bounding_box The bounding box of the sign. The position and
   /// orientation are in the sign's local frame.
+  ///
+  /// @param value An optional numeric value associated with the sign (e.g.,
+  /// 60 km/h for a speed limit sign). Corresponds to the value/unit pair
+  /// from the XODR signal definition.
   TrafficSign(const Id& id, const TrafficSignType& type, const InertialPosition& position_road_network,
               const Rotation& orientation_road_network, const std::optional<std::string>& message,
-              std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box);
+              std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box,
+              const std::optional<TrafficSignValue>& value = std::nullopt);
 
   /// Returns this sign's unique identifier.
   const Id& id() const { return id_; }
@@ -143,6 +182,12 @@ class TrafficSign final {
   /// Returns the bounding box of this sign.
   const maliput::math::BoundingBox& bounding_box() const { return bounding_box_; }
 
+  /// Returns the numeric value associated with this sign, if any.
+  ///
+  /// For example, a speed limit sign would return the speed value and its
+  /// unit (e.g., {60.0, TrafficSignValueUnit::kKilometersPerHour}).
+  const std::optional<TrafficSignValue>& GetValue() const { return value_; }
+
  private:
   Id id_;
   TrafficSignType type_;
@@ -151,6 +196,7 @@ class TrafficSign final {
   std::optional<std::string> message_;
   std::vector<LaneId> related_lanes_;
   maliput::math::BoundingBox bounding_box_;
+  std::optional<TrafficSignValue> value_;
 };
 
 }  // namespace rules
