@@ -102,6 +102,10 @@ enum class BulbType {
 /// Maps BulbType enums to string representations.
 std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> BulbTypeMapper();
 
+/// Maps string representations to BulbType enums.
+/// Both snake_case (e.g., "arrow_left") and PascalCase (e.g., "ArrowLeft") keys are supported.
+std::unordered_map<std::string, BulbType> BulbTypeStringToEnumMapper();
+
 /// Defines the possible bulb states.
 enum class BulbState { kOff = 0, kOn, kBlinking, kCounting };
 
