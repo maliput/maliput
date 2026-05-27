@@ -49,17 +49,71 @@ std::unordered_map<BulbColor, const char*, maliput::common::DefaultHash> BulbCol
 
 std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> BulbTypeMapper() {
   std::unordered_map<BulbType, const char*, maliput::common::DefaultHash> result;
-  result.emplace(BulbType::kRound, "Round");
-  result.emplace(BulbType::kArrow, "Arrow");
-  result.emplace(BulbType::kArrowLeft, "ArrowLeft");
-  result.emplace(BulbType::kArrowRight, "ArrowRight");
-  result.emplace(BulbType::kArrowUp, "ArrowUp");
-  result.emplace(BulbType::kArrowUpperLeft, "ArrowUpperLeft");
-  result.emplace(BulbType::kArrowUpperRight, "ArrowUpperRight");
-  result.emplace(BulbType::kUTurnLeft, "UTurnLeft");
-  result.emplace(BulbType::kUTurnRight, "UTurnRight");
-  result.emplace(BulbType::kWalk, "Walk");
-  result.emplace(BulbType::kDontWalk, "DontWalk");
+  result.emplace(BulbType::kRound, "round");
+  result.emplace(BulbType::kArrow, "arrow");
+  result.emplace(BulbType::kArrowLeft, "arrow_left");
+  result.emplace(BulbType::kArrowRight, "arrow_right");
+  result.emplace(BulbType::kArrowUp, "arrow_up");
+  result.emplace(BulbType::kArrowUpperLeft, "arrow_upper_left");
+  result.emplace(BulbType::kArrowUpperRight, "arrow_upper_right");
+  result.emplace(BulbType::kUTurnLeft, "u_turn_left");
+  result.emplace(BulbType::kUTurnRight, "u_turn_right");
+  result.emplace(BulbType::kWalk, "walk");
+  result.emplace(BulbType::kDontWalk, "dont_walk");
+  result.emplace(BulbType::kCross, "cross");
+  result.emplace(BulbType::kPedestrian, "pedestrian");
+  result.emplace(BulbType::kBicycle, "bicycle");
+  result.emplace(BulbType::kPedestrianAndBicycle, "pedestrian_and_bicycle");
+  result.emplace(BulbType::kTram, "tram");
+  result.emplace(BulbType::kBus, "bus");
+  result.emplace(BulbType::kBusAndTram, "bus_and_tram");
+  result.emplace(BulbType::kCountdownInSeconds, "countdown_in_seconds");
+  result.emplace(BulbType::kCountdownInPercent, "countdown_in_percent");
+  return result;
+}
+
+std::unordered_map<std::string, BulbType> BulbTypeStringToEnumMapper() {
+  std::unordered_map<std::string, BulbType> result;
+  result.emplace("round", BulbType::kRound);
+  result.emplace("Round", BulbType::kRound);
+  result.emplace("arrow", BulbType::kArrow);
+  result.emplace("Arrow", BulbType::kArrow);
+  result.emplace("arrow_left", BulbType::kArrowLeft);
+  result.emplace("ArrowLeft", BulbType::kArrowLeft);
+  result.emplace("arrow_right", BulbType::kArrowRight);
+  result.emplace("ArrowRight", BulbType::kArrowRight);
+  result.emplace("arrow_up", BulbType::kArrowUp);
+  result.emplace("ArrowUp", BulbType::kArrowUp);
+  result.emplace("arrow_upper_left", BulbType::kArrowUpperLeft);
+  result.emplace("ArrowUpperLeft", BulbType::kArrowUpperLeft);
+  result.emplace("arrow_upper_right", BulbType::kArrowUpperRight);
+  result.emplace("ArrowUpperRight", BulbType::kArrowUpperRight);
+  result.emplace("u_turn_left", BulbType::kUTurnLeft);
+  result.emplace("UTurnLeft", BulbType::kUTurnLeft);
+  result.emplace("u_turn_right", BulbType::kUTurnRight);
+  result.emplace("UTurnRight", BulbType::kUTurnRight);
+  result.emplace("walk", BulbType::kWalk);
+  result.emplace("Walk", BulbType::kWalk);
+  result.emplace("dont_walk", BulbType::kDontWalk);
+  result.emplace("DontWalk", BulbType::kDontWalk);
+  result.emplace("cross", BulbType::kCross);
+  result.emplace("Cross", BulbType::kCross);
+  result.emplace("pedestrian", BulbType::kPedestrian);
+  result.emplace("Pedestrian", BulbType::kPedestrian);
+  result.emplace("bicycle", BulbType::kBicycle);
+  result.emplace("Bicycle", BulbType::kBicycle);
+  result.emplace("pedestrian_and_bicycle", BulbType::kPedestrianAndBicycle);
+  result.emplace("PedestrianAndBicycle", BulbType::kPedestrianAndBicycle);
+  result.emplace("tram", BulbType::kTram);
+  result.emplace("Tram", BulbType::kTram);
+  result.emplace("bus", BulbType::kBus);
+  result.emplace("Bus", BulbType::kBus);
+  result.emplace("bus_and_tram", BulbType::kBusAndTram);
+  result.emplace("BusAndTram", BulbType::kBusAndTram);
+  result.emplace("countdown_in_seconds", BulbType::kCountdownInSeconds);
+  result.emplace("CountdownInSeconds", BulbType::kCountdownInSeconds);
+  result.emplace("countdown_in_percent", BulbType::kCountdownInPercent);
+  result.emplace("CountdownInPercent", BulbType::kCountdownInPercent);
   return result;
 }
 
@@ -73,13 +127,15 @@ std::unordered_map<BulbState, const char*, maliput::common::DefaultHash> BulbSta
 
 Bulb::Bulb(const Bulb::Id& id, const InertialPosition& position_bulb_group, const Rotation& orientation_bulb_group,
            const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad,
-           const std::optional<std::vector<BulbState>>& states, BoundingBox bounding_box)
+           const std::optional<std::vector<BulbState>>& states, BoundingBox bounding_box,
+           const std::optional<BulbState>& initial_state)
     : id_(id),
       position_bulb_group_(position_bulb_group),
       orientation_bulb_group_(orientation_bulb_group),
       color_(color),
       type_(type),
       arrow_orientation_rad_(arrow_orientation_rad),
+      initial_state_(initial_state.value_or(BulbState::kOff)),
       bounding_box_(std::move(bounding_box)) {
   MALIPUT_VALIDATE(type_ != BulbType::kArrow || arrow_orientation_rad_ != std::nullopt,
                    "Arrow-typed bulb's orientation is null.", maliput::common::traffic_light_book_error);
@@ -192,6 +248,16 @@ const BulbGroup* TrafficLight::GetBulbGroup(const BulbGroup::Id& id) const {
     }
   }
   return nullptr;
+}
+
+std::map<UniqueBulbId, BulbState> TrafficLight::InitialBulbStates() const {
+  std::map<UniqueBulbId, BulbState> result;
+  for (const auto& bulb_group : bulb_groups_) {
+    for (const auto* bulb : bulb_group->bulbs()) {
+      result.emplace(UniqueBulbId(id_, bulb_group->id(), bulb->id()), bulb->GetInitialState());
+    }
+  }
+  return result;
 }
 
 const std::string UniqueBulbId::delimiter() { return "-"; }

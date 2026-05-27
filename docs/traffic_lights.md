@@ -44,6 +44,7 @@ Top-level object representing the entire physical traffic light assembly.
 | `position_road_network` | `InertialPosition` | Position in the road network's Inertial frame |
 | `orientation_road_network` | `Rotation` | Orientation in the road network's Inertial frame (+Z = up) |
 | `bulb_groups` | `vector<BulbGroup>` | The bulb groups that compose this traffic light |
+| `InitialBulbStates()` | `map<UniqueBulbId, BulbState>` | Returns the initial state for every bulb in the traffic light |
 
 ### BulbGroup
 
@@ -69,6 +70,7 @@ A single light bulb with a color, type, and set of possible states.
 | `type` | `BulbType` | `kRound`, `kArrow`, `kArrowLeft`, `kArrowRight`, `kArrowUp`, `kArrowUpperLeft`, `kArrowUpperRight`, `kUTurnLeft`, `kUTurnRight`, `kWalk`, or `kDontWalk` |
 | `arrow_orientation_rad` | `optional<double>` | Arrow direction (only for `kArrow` type) |
 | `states` | `vector<BulbState>` | Possible states: `kOff`, `kOn`, `kBlinking` |
+| `GetInitialState()` | `BulbState` | Initial state of the bulb (defaults to `kOff` if not explicitly set) |
 | `bounding_box` | `BoundingBox` | Physical extents of the bulb |
 
 ## Unique Identifiers

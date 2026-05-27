@@ -34,6 +34,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -87,10 +88,26 @@ GTEST_TEST(BulbTypeTest, InstantiateAndAssign) {
 
 GTEST_TEST(BulbTypeTest, MapperTest) {
   const auto dut = BulbTypeMapper();
-  const std::vector<BulbType> expected_types{
-      BulbType::kRound,      BulbType::kArrow,          BulbType::kArrowLeft,       BulbType::kArrowRight,
-      BulbType::kArrowUp,    BulbType::kArrowUpperLeft, BulbType::kArrowUpperRight, BulbType::kUTurnLeft,
-      BulbType::kUTurnRight, BulbType::kWalk,           BulbType::kDontWalk};
+  const std::vector<BulbType> expected_types{BulbType::kRound,
+                                             BulbType::kArrow,
+                                             BulbType::kArrowLeft,
+                                             BulbType::kArrowRight,
+                                             BulbType::kArrowUp,
+                                             BulbType::kArrowUpperLeft,
+                                             BulbType::kArrowUpperRight,
+                                             BulbType::kUTurnLeft,
+                                             BulbType::kUTurnRight,
+                                             BulbType::kWalk,
+                                             BulbType::kDontWalk,
+                                             BulbType::kCross,
+                                             BulbType::kPedestrian,
+                                             BulbType::kBicycle,
+                                             BulbType::kPedestrianAndBicycle,
+                                             BulbType::kTram,
+                                             BulbType::kBus,
+                                             BulbType::kBusAndTram,
+                                             BulbType::kCountdownInSeconds,
+                                             BulbType::kCountdownInPercent};
   EXPECT_EQ(dut.size(), expected_types.size());
   for (BulbType type : expected_types) {
     EXPECT_EQ(static_cast<int>(dut.count(type)), 1);
@@ -576,6 +593,50 @@ GTEST_TEST(UniqueBulbGroupIdTest, Usage) {
 }
 
 GTEST_TEST(UniqueBulbGroupIdTest, Delimiter) { EXPECT_EQ(UniqueBulbGroupId::delimiter(), "-"); }
+
+GTEST_TEST(BulbInitialStateTest, DefaultIsOff) {
+  const Bulb dut(Bulb::Id("bulb"), InertialPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kRed,
+                 BulbType::kRound);
+  EXPECT_EQ(dut.GetInitialState(), BulbState::kOff);
+}
+
+GTEST_TEST(BulbInitialStateTest, ExplicitInitialState) {
+  const Bulb dut(Bulb::Id("bulb"), InertialPosition(0, 0, 0), Rotation::FromRpy(0, 0, 0), BulbColor::kGreen,
+                 BulbType::kRound, std::nullopt /* arrow_orientation_rad */, std::nullopt /* states */,
+                 Bulb::BoundingBox() /* bounding_box */, BulbState::kOn /* initial_state */);
+  EXPECT_EQ(dut.GetInitialState(), BulbState::kOn);
+}
+
+GTEST_TEST(TrafficLightInitialBulbStatesTest, ReturnsAllBulbInitialStates) {
+  const TrafficLight::Id kTlId("tl_id");
+  const BulbGroup::Id kBgId("bg_id");
+  const Bulb::Id kRedBulbId("red_bulb");
+  const Bulb::Id kGreenBulbId("green_bulb");
+  const InertialPosition kZeroPosition(0., 0., 0.);
+  const Rotation kZeroRotation = Rotation::FromRpy(0., 0., 0.);
+
+  std::vector<std::unique_ptr<Bulb>> bulbs;
+  // Red bulb with default initial state (kOff)
+  bulbs.push_back(std::make_unique<Bulb>(kRedBulbId, kZeroPosition, kZeroRotation, BulbColor::kRed, BulbType::kRound));
+  // Green bulb with explicit initial state kOn
+  bulbs.push_back(std::make_unique<Bulb>(kGreenBulbId, kZeroPosition, kZeroRotation, BulbColor::kGreen,
+                                         BulbType::kRound, std::nullopt, std::nullopt, Bulb::BoundingBox(),
+                                         BulbState::kOn));
+
+  std::vector<std::unique_ptr<BulbGroup>> bulb_groups;
+  bulb_groups.push_back(std::make_unique<BulbGroup>(kBgId, kZeroPosition, kZeroRotation, std::move(bulbs)));
+
+  const TrafficLight tl(kTlId, kZeroPosition, kZeroRotation, std::move(bulb_groups), {});
+
+  const auto initial_states = tl.InitialBulbStates();
+  ASSERT_EQ(initial_states.size(), 2u);
+
+  const UniqueBulbId red_uid(kTlId, kBgId, kRedBulbId);
+  const UniqueBulbId green_uid(kTlId, kBgId, kGreenBulbId);
+
+  EXPECT_EQ(initial_states.at(red_uid), BulbState::kOff);
+  EXPECT_EQ(initial_states.at(green_uid), BulbState::kOn);
+}
 
 }  // namespace
 }  // namespace rules
