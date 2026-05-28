@@ -67,10 +67,8 @@ GTEST_TEST(RoadObjectTypeTest, InstantiateAndAssign) {
   RoadObjectType dut{};
   EXPECT_EQ(dut, RoadObjectType::kUnknown);
   for (RoadObjectType type :
-       {RoadObjectType::kBarrier, RoadObjectType::kBuilding, RoadObjectType::kCrosswalk, RoadObjectType::kGantry,
-        RoadObjectType::kObstacle, RoadObjectType::kParkingSpace, RoadObjectType::kPole, RoadObjectType::kRoadMark,
-        RoadObjectType::kRoadSurface, RoadObjectType::kStopLine, RoadObjectType::kTrafficIsland, RoadObjectType::kTree,
-        RoadObjectType::kVegetation}) {
+       {RoadObjectType::kBarrier, RoadObjectType::kBuilding, RoadObjectType::kGantry, RoadObjectType::kObstacle,
+        RoadObjectType::kPole, RoadObjectType::kTrafficIsland, RoadObjectType::kTree, RoadObjectType::kVegetation}) {
     dut = type;
     EXPECT_EQ(dut, type);
   }
@@ -79,11 +77,9 @@ GTEST_TEST(RoadObjectTypeTest, InstantiateAndAssign) {
 GTEST_TEST(RoadObjectTypeTest, MapperTest) {
   const auto dut = RoadObjectTypeMapper();
   const std::vector<RoadObjectType> expected_types{
-      RoadObjectType::kUnknown,      RoadObjectType::kBarrier,    RoadObjectType::kBuilding,
-      RoadObjectType::kCrosswalk,    RoadObjectType::kGantry,     RoadObjectType::kObstacle,
-      RoadObjectType::kParkingSpace, RoadObjectType::kPole,       RoadObjectType::kRoadMark,
-      RoadObjectType::kRoadSurface,  RoadObjectType::kStopLine,   RoadObjectType::kTrafficIsland,
-      RoadObjectType::kTree,         RoadObjectType::kVegetation,
+      RoadObjectType::kUnknown,       RoadObjectType::kBarrier,  RoadObjectType::kBuilding,
+      RoadObjectType::kGantry,        RoadObjectType::kObstacle, RoadObjectType::kPole,
+      RoadObjectType::kTrafficIsland, RoadObjectType::kTree,     RoadObjectType::kVegetation,
   };
   EXPECT_EQ(dut.size(), expected_types.size());
   for (RoadObjectType type : expected_types) {

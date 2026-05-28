@@ -71,8 +71,7 @@ std::unordered_map<RoadMarkingValueUnit, const char*, maliput::common::DefaultHa
 RoadMarking::RoadMarking(const Id& id, RoadMarkingType type, const RoadObjectPosition& position,
                          const Rotation& orientation, const maliput::math::BoundingBox& bounding_box,
                          std::vector<LaneId> related_lanes, std::optional<std::string> name,
-                         std::vector<std::unique_ptr<Outline>> outlines,
-                         const std::optional<RoadMarkingValue>& value)
+                         std::vector<std::unique_ptr<Outline>> outlines, const std::optional<RoadMarkingValue>& value)
     : id_(id),
       name_(std::move(name)),
       type_(type),

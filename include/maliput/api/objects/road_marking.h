@@ -146,8 +146,7 @@ class RoadMarking final {
   /// 60 km/h for a speed limit marking).
   RoadMarking(const Id& id, RoadMarkingType type, const RoadObjectPosition& position, const Rotation& orientation,
               const maliput::math::BoundingBox& bounding_box, std::vector<LaneId> related_lanes,
-              std::optional<std::string> name = std::nullopt,
-              std::vector<std::unique_ptr<Outline>> outlines = {},
+              std::optional<std::string> name = std::nullopt, std::vector<std::unique_ptr<Outline>> outlines = {},
               const std::optional<RoadMarkingValue>& value = std::nullopt);
 
   /// Returns this marking's unique identifier.
