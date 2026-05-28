@@ -26,7 +26,7 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "maliput/api/objects/road_object.h"
+#include "maliput/api/objects/road_marking.h"
 
 #include <utility>
 
@@ -36,51 +36,54 @@ namespace maliput {
 namespace api {
 namespace objects {
 
-std::unordered_map<RoadObjectType, const char*, maliput::common::DefaultHash> RoadObjectTypeMapper() {
+std::unordered_map<RoadMarkingType, const char*, maliput::common::DefaultHash> RoadMarkingTypeMapper() {
   return {
-      {RoadObjectType::kUnknown, "Unknown"},
-      {RoadObjectType::kBarrier, "Barrier"},
-      {RoadObjectType::kBuilding, "Building"},
-      {RoadObjectType::kGantry, "Gantry"},
-      {RoadObjectType::kObstacle, "Obstacle"},
-      {RoadObjectType::kPole, "Pole"},
-      {RoadObjectType::kTrafficIsland, "TrafficIsland"},
-      {RoadObjectType::kTree, "Tree"},
-      {RoadObjectType::kVegetation, "Vegetation"},
+      {RoadMarkingType::kStop, "Stop"},
+      {RoadMarkingType::kStopLine, "StopLine"},
+      {RoadMarkingType::kCrosswalk, "Crosswalk"},
+      {RoadMarkingType::kParkingSpace, "ParkingSpace"},
+      {RoadMarkingType::kEmergencyLane, "EmergencyLane"},
+      {RoadMarkingType::kSpeedLimit, "SpeedLimit"},
+      {RoadMarkingType::kDoNotStop, "DoNotStop"},
+      {RoadMarkingType::kRailRoad, "RailRoad"},
+      {RoadMarkingType::kGiveWay, "GiveWay"},
+      {RoadMarkingType::kArrowTurnRight, "ArrowTurnRight"},
+      {RoadMarkingType::kArrowTurnLeft, "ArrowTurnLeft"},
+      {RoadMarkingType::kArrowForwardTurnRight, "ArrowForwardTurnRight"},
+      {RoadMarkingType::kArrowForwardTurnLeft, "ArrowForwardTurnLeft"},
+      {RoadMarkingType::kArrowForward, "ArrowForward"},
+      {RoadMarkingType::kArrowForwardTurnRightTurnLeft, "ArrowForwardTurnRightTurnLeft"},
+      {RoadMarkingType::kArrowTurnRightTurnLeft, "ArrowTurnRightTurnLeft"},
+      {RoadMarkingType::kArrowUTurnRight, "ArrowUTurnRight"},
+      {RoadMarkingType::kArrowUTurnLeft, "ArrowUTurnLeft"},
+      {RoadMarkingType::kUnknown, "Unknown"},
   };
 }
 
-Outline::Outline(const Id& id, std::vector<OutlineCorner> corners, bool closed)
-    : id_(id), corners_(std::move(corners)), closed_(closed) {
-  MALIPUT_VALIDATE(static_cast<int>(corners_.size()) >= 3,
-                   "Outline '" + id_.string() + "' must have at least 3 corners.");
+std::unordered_map<RoadMarkingValueUnit, const char*, maliput::common::DefaultHash> RoadMarkingValueUnitMapper() {
+  return {
+      {RoadMarkingValueUnit::kMetersPerSecond, "m/s"},
+      {RoadMarkingValueUnit::kKilometersPerHour, "km/h"},
+      {RoadMarkingValueUnit::kMilesPerHour, "mph"},
+  };
 }
 
-RoadObjectPosition::RoadObjectPosition(const InertialPosition& inertial_position)
-    : inertial_position_(inertial_position) {}
-
-RoadObjectPosition::RoadObjectPosition(const InertialPosition& inertial_position, const LaneId& lane_id,
-                                       const LanePosition& lane_position)
-    : inertial_position_(inertial_position), lane_id_(lane_id), lane_position_(lane_position) {}
-
-RoadObject::RoadObject(const Id& id, RoadObjectType type, const RoadObjectPosition& position,
-                       const Rotation& orientation, const maliput::math::BoundingBox& bounding_box, bool is_dynamic,
-                       std::vector<LaneId> related_lanes, std::optional<std::string> name,
-                       std::optional<std::string> subtype, std::vector<std::unique_ptr<Outline>> outlines,
-                       std::unordered_map<std::string, std::string> properties)
+RoadMarking::RoadMarking(const Id& id, RoadMarkingType type, const RoadObjectPosition& position,
+                         const Rotation& orientation, const maliput::math::BoundingBox& bounding_box,
+                         std::vector<LaneId> related_lanes, std::optional<std::string> name,
+                         std::vector<std::unique_ptr<Outline>> outlines,
+                         const std::optional<RoadMarkingValue>& value)
     : id_(id),
       name_(std::move(name)),
       type_(type),
-      subtype_(std::move(subtype)),
       position_(position),
       orientation_(orientation),
       bounding_box_(bounding_box),
-      is_dynamic_(is_dynamic),
       related_lanes_(std::move(related_lanes)),
       outlines_(std::move(outlines)),
-      properties_(std::move(properties)) {}
+      value_(value) {}
 
-const Outline* RoadObject::outline(int index) const {
+const Outline* RoadMarking::outline(int index) const {
   MALIPUT_VALIDATE(
       index >= 0 && index < num_outlines(),
       "Outline index " + std::to_string(index) + " out of range [0, " + std::to_string(num_outlines()) + ").");
