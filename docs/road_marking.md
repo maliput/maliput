@@ -141,14 +141,20 @@ auto markings_for_lane = book->FindByLane(LaneId("1_0_7"));
 // Inspect a specific marking
 const auto* marking = book->GetRoadMarking(RoadMarking::Id("speed_limit_60_lane3"));
 marking->type();              // RoadMarkingType::kSpeedLimit
-marking->name();              // "Speed Limit 60"
 marking->position().inertial_position();   // where it is
 marking->bounding_box();      // maliput::math::BoundingBox
 marking->related_lanes();     // which lanes it spans
 
+const auto marking_name = marking->name();
+if (marking_name.has_value()) {
+  const auto &name = marking_name.value();
+  // name == "Speed Limit 60 marking"
+}
+
 // Get the speed limit value
-if (marking->GetValue().has_value()) {
-  const auto& val = marking->GetValue().value();
+const auto marking_value = marking->GetValue();
+if (marking_value.has_value()) {
+  const auto& val = marking_value.value();
   // val.value == 60.0, val.unit == RoadMarkingValueUnit::kKilometersPerHour
 }
 
