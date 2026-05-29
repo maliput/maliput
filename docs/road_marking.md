@@ -100,7 +100,7 @@ Holds a numeric value and its associated unit:
 | `bounding_box` | `maliput::math::BoundingBox` | Bounding volume |
 | `related_lanes` | `vector<LaneId>` | All lanes this marking is spatially relevant to |
 | `outlines` | `vector<unique_ptr<Outline>>` | Detailed shape geometry (supersedes bounding box) |
-| `GetValue()` | `optional<RoadMarkingValue>` | Numeric value (e.g., speed limit + unit) |
+| `value` | `optional<RoadMarkingValue>` | Numeric value (e.g., speed limit + unit) |
 
 ## RoadMarkingBook
 
