@@ -38,14 +38,9 @@ Type-safe enumeration of common object categories:
 | `kUnknown` | Unknown or unclassified object |
 | `kBarrier` | Continuous roadside barrier (guard rail, wall, fence) |
 | `kBuilding` | Building or permanent structure |
-| `kCrosswalk` | Pedestrian or bicycle crossing |
 | `kGantry` | Overhead structure for mounting signals |
 | `kObstacle` | Static obstacle that cannot be passed |
-| `kParkingSpace` | Designated parking area |
 | `kPole` | Vertical pole structure (street lamp, sign pole) |
-| `kRoadMark` | Painted road marking (arrows, symbols, text) |
-| `kRoadSurface` | Road surface element (manhole, speed bump) |
-| `kStopLine` | Stop line painted on the road surface |
 | `kTrafficIsland` | Traffic island or median |
 | `kTree` | Individual tree |
 | `kVegetation` | Vegetation area (bush, forest, hedge) |
