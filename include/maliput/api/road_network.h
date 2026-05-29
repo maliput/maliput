@@ -35,6 +35,7 @@
 #include <vector>
 
 #include "maliput/api/intersection_book.h"
+#include "maliput/api/objects/road_marking_book.h"
 #include "maliput/api/objects/road_object_book.h"
 #include "maliput/api/road_geometry.h"
 #include "maliput/api/rules/direction_usage_rule.h"
@@ -73,7 +74,8 @@ class RoadNetwork {
               std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
               std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider,
               std::unique_ptr<objects::RoadObjectBook> road_object_book,
-              std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book);
+              std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book,
+              std::unique_ptr<const objects::RoadMarkingBook> road_marking_book);
 #pragma GCC diagnostic pop
 
   /// Constructs a RoadNetwork instance. After creation, you are encouraged to
@@ -87,7 +89,8 @@ class RoadNetwork {
               std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
               std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider,
               std::unique_ptr<objects::RoadObjectBook> road_object_book,
-              std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book);
+              std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book,
+              std::unique_ptr<const objects::RoadMarkingBook> road_marking_book);
 
   virtual ~RoadNetwork() = default;
 
@@ -130,6 +133,8 @@ class RoadNetwork {
 
   const rules::TrafficSignBook* traffic_sign_book() const { return traffic_sign_book_.get(); }
 
+  const objects::RoadMarkingBook* road_marking_book() const { return road_marking_book_.get(); }
+
  private:
   std::unique_ptr<const RoadGeometry> road_geometry_;
   std::unique_ptr<const rules::RoadRulebook> rulebook_;
@@ -146,6 +151,7 @@ class RoadNetwork {
   std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider_;
   std::unique_ptr<objects::RoadObjectBook> road_object_book_;
   std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book_;
+  std::unique_ptr<const objects::RoadMarkingBook> road_marking_book_;
 };
 
 }  // namespace api

@@ -50,12 +50,13 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
                          std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
                          std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider,
                          std::unique_ptr<objects::RoadObjectBook> road_object_book,
-                         std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book)
+                         std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book,
+                         std::unique_ptr<const objects::RoadMarkingBook> road_marking_book)
     : RoadNetwork(std::move(road_geometry), std::move(rulebook), std::move(traffic_light_book),
                   std::move(intersection_book), std::move(phase_ring_book), std::move(phase_provider),
                   std::move(rule_registry), std::move(discrete_value_rule_state_provider),
-                  std::move(range_value_rule_state_provider), std::move(road_object_book),
-                  std::move(traffic_sign_book)) {
+                  std::move(range_value_rule_state_provider), std::move(road_object_book), std::move(traffic_sign_book),
+                  std::move(road_marking_book)) {
   right_of_way_rule_state_provider_ = std::move(right_of_way_rule_state_provider);
   MALIPUT_THROW_UNLESS(right_of_way_rule_state_provider_.get() != nullptr);
 }
@@ -72,7 +73,8 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
                          std::unique_ptr<rules::DiscreteValueRuleStateProvider> discrete_value_rule_state_provider,
                          std::unique_ptr<rules::RangeValueRuleStateProvider> range_value_rule_state_provider,
                          std::unique_ptr<objects::RoadObjectBook> road_object_book,
-                         std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book)
+                         std::unique_ptr<const rules::TrafficSignBook> traffic_sign_book,
+                         std::unique_ptr<const objects::RoadMarkingBook> road_marking_book)
     : road_geometry_(std::move(road_geometry)),
       rulebook_(std::move(rulebook)),
       traffic_light_book_(std::move(traffic_light_book)),
@@ -83,7 +85,8 @@ RoadNetwork::RoadNetwork(std::unique_ptr<const RoadGeometry> road_geometry,
       discrete_value_rule_state_provider_(std::move(discrete_value_rule_state_provider)),
       range_value_rule_state_provider_(std::move(range_value_rule_state_provider)),
       road_object_book_(std::move(road_object_book)),
-      traffic_sign_book_(std::move(traffic_sign_book)) {
+      traffic_sign_book_(std::move(traffic_sign_book)),
+      road_marking_book_(std::move(road_marking_book)) {
   MALIPUT_THROW_UNLESS(road_geometry_.get() != nullptr);
   MALIPUT_THROW_UNLESS(rulebook_.get() != nullptr);
   MALIPUT_THROW_UNLESS(traffic_light_book_.get() != nullptr);
