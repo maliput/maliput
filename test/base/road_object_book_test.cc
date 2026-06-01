@@ -168,7 +168,7 @@ GTEST_TEST(RoadObjectBookTest, FindByLane) {
 
   dut.AddRoadObject(MakeRoadObject("obj_1", RoadObjectType::kBarrier, 0., 0., 0., {LaneId("lane_a")}));
   dut.AddRoadObject(
-      MakeRoadObject("obj_2", RoadObjectType::kCrosswalk, 1., 0., 0., {LaneId("lane_a"), LaneId("lane_b")}));
+      MakeRoadObject("obj_2", RoadObjectType::kObstacle, 1., 0., 0., {LaneId("lane_a"), LaneId("lane_b")}));
   dut.AddRoadObject(MakeRoadObject("obj_3", RoadObjectType::kTree, 2., 0., 0., {LaneId("lane_c")}));
 
   const auto lane_a_objs = dut.FindByLane(LaneId("lane_a"));

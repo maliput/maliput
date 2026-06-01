@@ -685,6 +685,9 @@ std::unique_ptr<objects::RoadObjectBook> CreateRoadObjectBook();
 /// Returns an empty rules::TrafficSignBook.
 std::unique_ptr<rules::TrafficSignBook> CreateTrafficSignBook();
 
+/// Returns an empty objects::RoadMarkingBook.
+std::unique_ptr<objects::RoadMarkingBook> CreateRoadMarkingBook();
+
 }  // namespace test
 }  // namespace api
 }  // namespace maliput
