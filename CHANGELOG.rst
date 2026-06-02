@@ -2,6 +2,14 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.17.0 (2026-06-02)
+-------------------
+* RoadMarking API (`#747 <https://github.com/maliput/maliput/issues/747>`_)
+* TrafficLight InitialBulbStates and new types (`#745 <https://github.com/maliput/maliput/issues/745>`_)
+* Add API for traffic sign values and unit. (`#746 <https://github.com/maliput/maliput/issues/746>`_)
+* Expanding radius based on KDTree sampling step for FindRoadPositions (`#744 <https://github.com/maliput/maliput/issues/744>`_)
+* Contributors: Juan Carosella, Santiago Lopez
+
 1.16.0 (2026-04-21)
 -------------------
 * New NoOvertaking traffic sign type. (`#741 <https://github.com/maliput/maliput/issues/741>`_)
