@@ -49,6 +49,9 @@ std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> T
   result.emplace(TrafficSignType::kConstruction, "Construction");
   result.emplace(TrafficSignType::kRailroadCrossing, "RailroadCrossing");
   result.emplace(TrafficSignType::kNoOvertaking, "NoOvertaking");
+  result.emplace(TrafficSignType::kAllWay, "AllWay");
+  result.emplace(TrafficSignType::kNoUTurnLeft, "NoUTurnLeft");
+  result.emplace(TrafficSignType::kNoUTurnRight, "NoUTurnRight");
   result.emplace(TrafficSignType::kUnknown, "Unknown");
   return result;
 }
