@@ -32,6 +32,7 @@
 
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -157,6 +158,7 @@ GTEST_TEST(TrafficSignTest, ConstructorWithValue) {
   EXPECT_TRUE(dut.GetValue().has_value());
   EXPECT_DOUBLE_EQ(dut.GetValue()->value, 100.0);
   EXPECT_EQ(dut.GetValue()->unit, TrafficSignValueUnit::kKilometersPerHour);
+  EXPECT_TRUE(dut.properties().empty());
 }
 
 GTEST_TEST(TrafficSignTest, ConstructorWithoutValue) {
@@ -171,6 +173,26 @@ GTEST_TEST(TrafficSignTest, ConstructorWithoutValue) {
   const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox);
 
   EXPECT_FALSE(dut.GetValue().has_value());
+  EXPECT_TRUE(dut.properties().empty());
+}
+
+GTEST_TEST(TrafficSignTest, ConstructorWithProperties) {
+  const TrafficSign::Id kId("stop_sign_with_properties");
+  const TrafficSignType kType = TrafficSignType::kStop;
+  const InertialPosition kPosition(1., 2., 3.);
+  const Rotation kOrientation = Rotation::FromRpy(0., 0., 0.);
+  const maliput::math::BoundingBox kBoundingBox(maliput::math::Vector3(0., 0., 0.),
+                                                maliput::math::Vector3(0.05, 0.762, 0.762),
+                                                maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
+  const std::unordered_map<std::string, std::string> kProperties{{"material", "steel"},
+                                                                 {"source_id", "xodr_signal_42"}};
+
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt /* value */,
+                        kProperties);
+
+  EXPECT_EQ(dut.properties().size(), 2u);
+  EXPECT_EQ(dut.properties().at("material"), "steel");
+  EXPECT_EQ(dut.properties().at("source_id"), "xodr_signal_42");
 }
 
 GTEST_TEST(TrafficSignValueUnitTest, MapperTest) {

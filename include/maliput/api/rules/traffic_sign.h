@@ -152,10 +152,13 @@ class TrafficSign final {
   /// @param value An optional numeric value associated with the sign (e.g.,
   /// 60 km/h for a speed limit sign). Corresponds to the value/unit pair
   /// from the XODR signal definition.
+  ///
+  /// @param properties Optional backend-specific properties.
   TrafficSign(const Id& id, const TrafficSignType& type, const InertialPosition& position_road_network,
               const Rotation& orientation_road_network, const std::optional<std::string>& message,
               std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box,
-              const std::optional<TrafficSignValue>& value = std::nullopt);
+              const std::optional<TrafficSignValue>& value = std::nullopt,
+              std::unordered_map<std::string, std::string> properties = {});
 
   /// Returns this sign's unique identifier.
   const Id& id() const { return id_; }
@@ -191,6 +194,12 @@ class TrafficSign final {
   /// unit (e.g., {60.0, TrafficSignValueUnit::kKilometersPerHour}).
   const std::optional<TrafficSignValue>& GetValue() const { return value_; }
 
+  /// Returns backend-specific properties as key-value pairs.
+  ///
+  /// This provides access to additional properties that may be specific to
+  /// a particular backend implementation (e.g., OpenDRIVE-specific attributes).
+  const std::unordered_map<std::string, std::string>& properties() const { return properties_; }
+
  private:
   Id id_;
   TrafficSignType type_;
@@ -200,6 +209,7 @@ class TrafficSign final {
   std::vector<LaneId> related_lanes_;
   maliput::math::BoundingBox bounding_box_;
   std::optional<TrafficSignValue> value_;
+  std::unordered_map<std::string, std::string> properties_;
 };
 
 }  // namespace rules
