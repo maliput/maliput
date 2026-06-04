@@ -378,8 +378,8 @@ GTEST_TEST(RoadObjectMovableTest, IsMovable) {
                                                 math::RollPitchYaw(0., 0., 0.), 0.01);
 
   TestRoadObject dut(id, RoadObjectType::kObstacle, position, orientation, bounding_box, false /* is_dynamic */,
-                     {} /* related_lanes */, "Movable Gate" /* name */, std::nullopt /* subtype */,
-                     {} /* outlines */, {} /* properties */, true /* is_movable */);
+                     {} /* related_lanes */, "Movable Gate" /* name */, std::nullopt /* subtype */, {} /* outlines */,
+                     {} /* properties */, true /* is_movable */);
 
   EXPECT_FALSE(dut.is_dynamic());
   EXPECT_TRUE(dut.is_movable());

@@ -169,8 +169,8 @@ GTEST_TEST(TrafficSignTest, ConstructorWithMovableFlag) {
                                                 maliput::math::Vector3(0.05, 0.762, 0.762),
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt, {},
-                        false, true);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt, {}, false,
+                        true);
 
   EXPECT_FALSE(dut.is_dynamic());
   EXPECT_TRUE(dut.is_movable());
