@@ -53,7 +53,8 @@ GTEST_TEST(TrafficSignTypeTest, InstantiateAndAssign) {
        {TrafficSignType::kYield, TrafficSignType::kSpeedLimit, TrafficSignType::kNoEntry, TrafficSignType::kOneWay,
         TrafficSignType::kPedestrianCrossing, TrafficSignType::kNoLeftTurn, TrafficSignType::kNoRightTurn,
         TrafficSignType::kNoUTurn, TrafficSignType::kSchoolZone, TrafficSignType::kConstruction,
-        TrafficSignType::kRailroadCrossing, TrafficSignType::kNoOvertaking}) {
+        TrafficSignType::kRailroadCrossing, TrafficSignType::kNoOvertaking, TrafficSignType::kAllWay,
+        TrafficSignType::kNoUTurnLeft, TrafficSignType::kNoUTurnRight}) {
     EXPECT_NE(dut, type);
     dut = type;
     EXPECT_EQ(dut, type);
@@ -67,7 +68,8 @@ GTEST_TEST(TrafficSignTypeTest, MapperTest) {
       TrafficSignType::kNoEntry,      TrafficSignType::kOneWay,       TrafficSignType::kPedestrianCrossing,
       TrafficSignType::kNoLeftTurn,   TrafficSignType::kNoRightTurn,  TrafficSignType::kNoUTurn,
       TrafficSignType::kSchoolZone,   TrafficSignType::kConstruction, TrafficSignType::kRailroadCrossing,
-      TrafficSignType::kNoOvertaking, TrafficSignType::kUnknown,
+      TrafficSignType::kNoOvertaking, TrafficSignType::kAllWay,       TrafficSignType::kNoUTurnLeft,
+      TrafficSignType::kNoUTurnRight, TrafficSignType::kUnknown,
   };
   EXPECT_EQ(dut.size(), expected_types.size());
   for (TrafficSignType type : expected_types) {

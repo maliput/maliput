@@ -61,6 +61,9 @@ enum class TrafficSignType {
   kConstruction,
   kRailroadCrossing,
   kNoOvertaking,
+  kAllWay,
+  kNoUTurnLeft,
+  kNoUTurnRight,
   kUnknown,
 };
 
