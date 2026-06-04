@@ -74,7 +74,8 @@ std::unordered_map<TrafficSignValueUnit, const char*, maliput::common::DefaultHa
 TrafficSign::TrafficSign(const Id& id, const TrafficSignType& type, const InertialPosition& position_road_network,
                          const Rotation& orientation_road_network, const std::optional<std::string>& message,
                          std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box,
-                         const std::optional<TrafficSignValue>& value)
+                         const std::optional<TrafficSignValue>& value,
+                         std::unordered_map<std::string, std::string> properties)
     : id_(id),
       type_(type),
       position_road_network_(position_road_network),
@@ -82,7 +83,8 @@ TrafficSign::TrafficSign(const Id& id, const TrafficSignType& type, const Inerti
       message_(message),
       related_lanes_(std::move(related_lanes)),
       bounding_box_(bounding_box),
-      value_(value) {}
+      value_(value),
+      properties_(std::move(properties)) {}
 
 }  // namespace rules
 }  // namespace api
