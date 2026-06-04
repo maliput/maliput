@@ -67,7 +67,7 @@ RoadObject::RoadObject(const Id& id, RoadObjectType type, const RoadObjectPositi
                        const Rotation& orientation, const maliput::math::BoundingBox& bounding_box, bool is_dynamic,
                        std::vector<LaneId> related_lanes, std::optional<std::string> name,
                        std::optional<std::string> subtype, std::vector<std::unique_ptr<Outline>> outlines,
-                       std::unordered_map<std::string, std::string> properties)
+                       std::unordered_map<std::string, std::string> properties, bool is_movable)
     : id_(id),
       name_(std::move(name)),
       type_(type),
@@ -76,6 +76,7 @@ RoadObject::RoadObject(const Id& id, RoadObjectType type, const RoadObjectPositi
       orientation_(orientation),
       bounding_box_(bounding_box),
       is_dynamic_(is_dynamic),
+      is_movable_(is_movable),
       related_lanes_(std::move(related_lanes)),
       outlines_(std::move(outlines)),
       properties_(std::move(properties)) {}

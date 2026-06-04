@@ -2,7 +2,7 @@
 
 ## Overview
 
-`TrafficSign` models a static, passive traffic sign — a physical signaling device placed along or above the road to convey regulatory, warning, or informational messages to road users. Examples include stop signs, yield signs, speed limit signs, no-entry signs, and pedestrian crossing signs.
+`TrafficSign` models a passive traffic sign — a physical signaling device placed along or above the road to convey regulatory, warning, or informational messages to road users. Examples include stop signs, yield signs, speed limit signs, no-entry signs, and pedestrian crossing signs.
 
 **Namespace:** `maliput::api::rules`
 **Headers:** `maliput/api/rules/traffic_sign.h`, `maliput/api/rules/traffic_sign_book.h`
@@ -11,7 +11,7 @@
 
 ### Static and Passive
 
-Unlike a `TrafficLight`, a traffic sign has **no dynamic state**. It doesn't change at runtime — it simply exists at a position with an orientation and a type. This fundamental difference justifies keeping `TrafficSign` and `TrafficLight` as separate classes despite their shared physical properties (position, orientation, bounding box).
+Unlike a `TrafficLight`, a traffic sign has **no phase-driven runtime state**. It doesn't participate in bulb state changes or phase logic; it simply exists at a position with an orientation and a type. The API exposes both `is_dynamic()` (semantic/runtime change) and `is_movable()` (position change).
 
 ### No Knowledge of Rules
 
@@ -38,6 +38,8 @@ A traffic sign can declare which lanes it is physically relevant to via `related
 | `related_lanes` | `vector<LaneId>` | Lanes this sign is physically relevant to |
 | `bounding_box` | `maliput::math::BoundingBox` | Bounding box in the sign's local frame |
 | `value` | `optional<TrafficSignValue>` | Optional numeric value with unit (e.g., 60 km/h for speed limit) |
+| `is_dynamic` | `bool` | Whether the sign can change semantically over time |
+| `is_movable` | `bool` | Whether the sign position can change |
 
 ### Sign Types
 
@@ -83,7 +85,7 @@ Both `TrafficSign` and `TrafficLight` are physical traffic control devices that 
 
 | | TrafficSign | TrafficLight |
 |-|-------------|--------------|
-| **State** | Static (no runtime state) | Dynamic (bulb states change over time) |
+| **State** | Static (no runtime state; may expose movable parts) | Dynamic (bulb states change over time) |
 | **Complexity** | Flat (single object) | Hierarchical (TrafficLight → BulbGroup → Bulb) |
 | **Phase system** | Not involved | Integrated via `BulbStates` in `Phase` |
 | **Internal structure** | Type + optional message | Bulbs with colors, types, arrow orientations |
@@ -106,4 +108,5 @@ sign->type();                // TrafficSignType::kStop
 sign->position_road_network(); // where it is
 sign->related_lanes();       // which lanes it faces
 sign->message();             // std::nullopt for a stop sign
+sign->is_movable();          // positional movability
 ```

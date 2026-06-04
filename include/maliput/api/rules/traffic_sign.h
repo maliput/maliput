@@ -104,9 +104,9 @@ struct TrafficSignValue {
   TrafficSignValueUnit unit{TrafficSignValueUnit::kMetersPerSecond};
 };
 
-/// Models a physical traffic sign — a static, passive signaling device
-/// placed along or above the road to convey regulatory, warning, or
-/// informational messages to road users.
+/// Models a physical traffic sign — a passive signaling device placed along
+/// or above the road to convey regulatory, warning, or informational messages
+/// to road users.
 ///
 /// @note TrafficSign intentionally does not hold a reference to any Rule.
 /// The linkage between a sign and its corresponding rule is established in the
@@ -154,11 +154,16 @@ class TrafficSign final {
   /// from the XODR signal definition.
   ///
   /// @param properties Optional backend-specific properties.
+  ///
+  /// @param is_dynamic Whether the sign can change semantically over time.
+  ///
+  /// @param is_movable Whether the sign's position can change.
   TrafficSign(const Id& id, const TrafficSignType& type, const InertialPosition& position_road_network,
               const Rotation& orientation_road_network, const std::optional<std::string>& message,
               std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box,
               const std::optional<TrafficSignValue>& value = std::nullopt,
-              std::unordered_map<std::string, std::string> properties = {});
+              std::unordered_map<std::string, std::string> properties = {}, bool is_dynamic = false,
+              bool is_movable = false);
 
   /// Returns this sign's unique identifier.
   const Id& id() const { return id_; }
@@ -188,6 +193,12 @@ class TrafficSign final {
   /// Returns the bounding box of this sign.
   const maliput::math::BoundingBox& bounding_box() const { return bounding_box_; }
 
+  /// Returns whether this sign can change semantically over time.
+  bool is_dynamic() const { return is_dynamic_; }
+
+  /// Returns whether this sign's position can change.
+  bool is_movable() const { return is_movable_; }
+
   /// Returns the numeric value associated with this sign, if any.
   ///
   /// For example, a speed limit sign would return the speed value and its
@@ -210,6 +221,8 @@ class TrafficSign final {
   maliput::math::BoundingBox bounding_box_;
   std::optional<TrafficSignValue> value_;
   std::unordered_map<std::string, std::string> properties_;
+  bool is_dynamic_;
+  bool is_movable_;
 };
 
 }  // namespace rules

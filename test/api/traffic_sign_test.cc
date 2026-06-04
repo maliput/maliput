@@ -103,6 +103,8 @@ GTEST_TEST(TrafficSignTest, Constructor) {
   EXPECT_DOUBLE_EQ(dut.bounding_box().box_size().x(), 0.05);
   EXPECT_DOUBLE_EQ(dut.bounding_box().box_size().y(), 0.762);
   EXPECT_DOUBLE_EQ(dut.bounding_box().box_size().z(), 0.762);
+  EXPECT_FALSE(dut.is_dynamic());
+  EXPECT_FALSE(dut.is_movable());
 }
 
 GTEST_TEST(TrafficSignTest, ConstructorWithMessage) {
@@ -122,6 +124,8 @@ GTEST_TEST(TrafficSignTest, ConstructorWithMessage) {
   EXPECT_TRUE(dut.message().has_value());
   EXPECT_EQ(dut.message().value(), "60");
   EXPECT_TRUE(dut.related_lanes().empty());
+  EXPECT_FALSE(dut.is_dynamic());
+  EXPECT_FALSE(dut.is_movable());
 }
 
 GTEST_TEST(TrafficSignTest, ConstructorWithCustomBoundingBox) {
@@ -139,6 +143,37 @@ GTEST_TEST(TrafficSignTest, ConstructorWithCustomBoundingBox) {
   EXPECT_DOUBLE_EQ(bb.box_size().x(), 0.1);
   EXPECT_DOUBLE_EQ(bb.box_size().y(), 1.2);
   EXPECT_DOUBLE_EQ(bb.box_size().z(), 1.2);
+}
+
+GTEST_TEST(TrafficSignTest, ConstructorWithDynamicFlag) {
+  const TrafficSign::Id kId("movable_sign");
+  const TrafficSignType kType = TrafficSignType::kConstruction;
+  const InertialPosition kPosition(2., 4., 6.);
+  const Rotation kOrientation = Rotation::FromRpy(0., 0., 0.);
+  const maliput::math::BoundingBox kBoundingBox(maliput::math::Vector3(0., 0., 0.),
+                                                maliput::math::Vector3(0.05, 0.762, 0.762),
+                                                maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
+
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt, {}, true);
+
+  EXPECT_TRUE(dut.is_dynamic());
+  EXPECT_FALSE(dut.is_movable());
+}
+
+GTEST_TEST(TrafficSignTest, ConstructorWithMovableFlag) {
+  const TrafficSign::Id kId("movable_sign");
+  const TrafficSignType kType = TrafficSignType::kConstruction;
+  const InertialPosition kPosition(2., 4., 6.);
+  const Rotation kOrientation = Rotation::FromRpy(0., 0., 0.);
+  const maliput::math::BoundingBox kBoundingBox(maliput::math::Vector3(0., 0., 0.),
+                                                maliput::math::Vector3(0.05, 0.762, 0.762),
+                                                maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
+
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt, {},
+                        false, true);
+
+  EXPECT_FALSE(dut.is_dynamic());
+  EXPECT_TRUE(dut.is_movable());
 }
 
 GTEST_TEST(TrafficSignTest, ConstructorWithValue) {
