@@ -185,10 +185,10 @@ GTEST_TEST(TrafficSignTest, ConstructorWithProperties) {
                                                 maliput::math::Vector3(0.05, 0.762, 0.762),
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
   const std::unordered_map<std::string, std::string> kProperties{{"material", "steel"},
-                                                                  {"source_id", "xodr_signal_42"}};
+                                                                 {"source_id", "xodr_signal_42"}};
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox,
-                        std::nullopt /* value */, kProperties);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt /* value */,
+                        kProperties);
 
   EXPECT_EQ(dut.properties().size(), 2u);
   EXPECT_EQ(dut.properties().at("material"), "steel");
