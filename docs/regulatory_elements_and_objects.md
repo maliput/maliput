@@ -27,7 +27,7 @@ Maliput provides three complementary APIs to model the physical entities in a ro
 |-|------------|-------------|--------------|
 | **Namespace** | `maliput::api::objects` | `maliput::api::rules` | `maliput::api::rules` |
 | **Nature** | Environmental | Regulatory signage | Active signaling |
-| **State** | Static (position fixed, may have movable parts) | Static by default, but can report movable parts | Dynamic (bulb states) |
+| **State** | Static position; `is_dynamic` = internal animation/movable parts | Static phase behavior; `is_dynamic` = semantic change | Dynamic (bulb states) |
 | **Knows about rules** | No | No | No |
 | **Rules reference it via** | `Rule::State::related_unique_ids` | `Rule::State::related_unique_ids` | `Rule::State::related_unique_ids` / `BulbStates` |
 | **Lane association** | `related_lanes()` + `RoadObjectPosition` | `related_lanes()` | `related_lanes()` |

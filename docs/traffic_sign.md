@@ -85,7 +85,7 @@ Both `TrafficSign` and `TrafficLight` are physical traffic control devices that 
 
 | | TrafficSign | TrafficLight |
 |-|-------------|--------------|
-| **State** | Static (no runtime state; may expose movable parts) | Dynamic (bulb states change over time) |
+| **State** | Static phase behavior; may still expose semantic dynamics and positional movability | Dynamic (bulb states change over time) |
 | **Complexity** | Flat (single object) | Hierarchical (TrafficLight → BulbGroup → Bulb) |
 | **Phase system** | Not involved | Integrated via `BulbStates` in `Phase` |
 | **Internal structure** | Type + optional message | Bulbs with colors, types, arrow orientations |

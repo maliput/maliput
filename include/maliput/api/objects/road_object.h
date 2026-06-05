@@ -244,7 +244,7 @@ class RoadObject {
   /// approximation.
   const maliput::math::BoundingBox& bounding_box() const { return bounding_box_; }
 
-  /// Returns whether this object can change semantically over time.
+  /// Returns whether this object can have animated or internally movable parts.
   bool is_dynamic() const { return is_dynamic_; }
 
   /// Returns whether this object's position can change.
@@ -289,14 +289,14 @@ class RoadObject {
   /// @param position Position relative to the road network.
   /// @param orientation Orientation in the inertial frame.
   /// @param bounding_box The bounding box centered at the object's position.
-  /// @param is_dynamic Whether the object can change semantically over time.
-  ///
-  /// @param is_movable Whether the object's position can change.
+  /// @param is_dynamic Whether the object can have animated or internally
+  /// movable parts.
   /// @param related_lanes Lanes this object is physically relevant to.
   /// @param name Optional human-readable name.
   /// @param subtype Optional subtype classification.
   /// @param outlines Optional detailed shape outlines.
   /// @param properties Optional backend-specific properties.
+  /// @param is_movable Whether the object's position can change.
   RoadObject(const Id& id, RoadObjectType type, const RoadObjectPosition& position, const Rotation& orientation,
              const maliput::math::BoundingBox& bounding_box, bool is_dynamic, std::vector<LaneId> related_lanes,
              std::optional<std::string> name, std::optional<std::string> subtype,

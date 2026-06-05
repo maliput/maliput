@@ -25,7 +25,7 @@ Like `TrafficLight` and `TrafficSign`, a `RoadObject` has **no reference to any 
 
 - The `RoadObject` class is **non-final** with a protected constructor, allowing backend implementations to subclass it for custom storage or behavior.
 - The `properties` map (`unordered_map<string, string>`) allows backends to attach arbitrary key-value metadata without API changes.
-- `is_dynamic()` and `is_movable()` capture different semantics: dynamic describes semantic/runtime changes, while movable describes position changes.
+- `is_dynamic()` and `is_movable()` capture different semantics: dynamic describes internal animation or movable parts, while movable describes position changes in the world.
 - The `subtype` string provides fine-grained classification within a `RoadObjectType` category.
 
 ## Supporting Types
@@ -86,7 +86,7 @@ Dual positioning system:
 | `position` | `RoadObjectPosition` | Inertial + optional lane-relative position |
 | `orientation` | `Rotation` | Orientation in the inertial frame |
 | `bounding_box` | `maliput::math::BoundingBox` | Axis-aligned or oriented bounding volume |
-| `is_dynamic` | `bool` | Whether object can change semantically over time |
+| `is_dynamic` | `bool` | Whether object can have animated or internally movable parts |
 | `is_movable` | `bool` | Whether object position can change |
 | `related_lanes` | `vector<LaneId>` | All lanes this object is spatially relevant to |
 | `outlines` | `vector<Outline>` | Detailed shape geometry (supersedes bounding box) |
