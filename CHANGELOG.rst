@@ -2,6 +2,13 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.18.0 (2026-06-05)
+-------------------
+* Adding is movable to objects and signals, is dynamic to signals (`#751 <https://github.com/maliput/maliput/issues/751>`_)
+* Adding properties API to traffic signs (`#750 <https://github.com/maliput/maliput/issues/750>`_)
+* Adding three new sign types (`#749 <https://github.com/maliput/maliput/issues/749>`_)
+* Contributors: Juan Carosella
+
 1.17.0 (2026-06-02)
 -------------------
 * RoadMarking API (`#747 <https://github.com/maliput/maliput/issues/747>`_)
