@@ -56,9 +56,9 @@ class TestRoadObject final : public RoadObject {
                  const maliput::math::BoundingBox& bounding_box, bool is_dynamic, std::vector<LaneId> related_lanes,
                  std::optional<std::string> name, std::optional<std::string> subtype,
                  std::vector<std::unique_ptr<Outline>> outlines,
-                 std::unordered_map<std::string, std::string> properties)
+                 std::unordered_map<std::string, std::string> properties, bool is_movable = false)
       : RoadObject(id, type, position, orientation, bounding_box, is_dynamic, std::move(related_lanes), std::move(name),
-                   std::move(subtype), std::move(outlines), std::move(properties)) {}
+                   std::move(subtype), std::move(outlines), std::move(properties), is_movable) {}
 };
 
 // -- RoadObjectType tests --
@@ -277,6 +277,7 @@ TEST_F(RoadObjectTest, Accessors) {
   EXPECT_DOUBLE_EQ(dut_->position().inertial_position().y(), 2.);
   EXPECT_DOUBLE_EQ(dut_->position().inertial_position().z(), 3.);
   EXPECT_FALSE(dut_->is_dynamic());
+  EXPECT_FALSE(dut_->is_movable());
 }
 
 TEST_F(RoadObjectTest, RelatedLanes) {
@@ -345,6 +346,7 @@ GTEST_TEST(RoadObjectMinimalTest, NoOptionalFields) {
   EXPECT_EQ(dut.type(), RoadObjectType::kUnknown);
   EXPECT_FALSE(dut.subtype().has_value());
   EXPECT_FALSE(dut.is_dynamic());
+  EXPECT_FALSE(dut.is_movable());
   EXPECT_TRUE(dut.related_lanes().empty());
   EXPECT_EQ(dut.num_outlines(), 0);
   EXPECT_TRUE(dut.properties().empty());
@@ -363,8 +365,24 @@ GTEST_TEST(RoadObjectDynamicTest, IsDynamic) {
                      {} /* properties */);
 
   EXPECT_TRUE(dut.is_dynamic());
+  EXPECT_FALSE(dut.is_movable());
   ASSERT_TRUE(dut.name().has_value());
   EXPECT_EQ(dut.name().value(), "Gate");
+}
+
+GTEST_TEST(RoadObjectMovableTest, IsMovable) {
+  const RoadObject::Id id("movable_obj");
+  const RoadObjectPosition position(InertialPosition(0., 0., 0.));
+  const Rotation orientation = Rotation::FromRpy(0., 0., 0.);
+  const maliput::math::BoundingBox bounding_box(math::Vector3(0., 0., 0.), math::Vector3(1., 1., 1.),
+                                                math::RollPitchYaw(0., 0., 0.), 0.01);
+
+  TestRoadObject dut(id, RoadObjectType::kObstacle, position, orientation, bounding_box, false /* is_dynamic */,
+                     {} /* related_lanes */, "Movable Gate" /* name */, std::nullopt /* subtype */, {} /* outlines */,
+                     {} /* properties */, true /* is_movable */);
+
+  EXPECT_FALSE(dut.is_dynamic());
+  EXPECT_TRUE(dut.is_movable());
 }
 
 }  // namespace

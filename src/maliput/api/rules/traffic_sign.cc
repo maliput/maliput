@@ -75,7 +75,7 @@ TrafficSign::TrafficSign(const Id& id, const TrafficSignType& type, const Inerti
                          const Rotation& orientation_road_network, const std::optional<std::string>& message,
                          std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box,
                          const std::optional<TrafficSignValue>& value,
-                         std::unordered_map<std::string, std::string> properties)
+                         std::unordered_map<std::string, std::string> properties, bool is_dynamic, bool is_movable)
     : id_(id),
       type_(type),
       position_road_network_(position_road_network),
@@ -84,7 +84,9 @@ TrafficSign::TrafficSign(const Id& id, const TrafficSignType& type, const Inerti
       related_lanes_(std::move(related_lanes)),
       bounding_box_(bounding_box),
       value_(value),
-      properties_(std::move(properties)) {}
+      properties_(std::move(properties)),
+      is_dynamic_(is_dynamic),
+      is_movable_(is_movable) {}
 
 }  // namespace rules
 }  // namespace api

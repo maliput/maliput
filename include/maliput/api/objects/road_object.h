@@ -244,11 +244,11 @@ class RoadObject {
   /// approximation.
   const maliput::math::BoundingBox& bounding_box() const { return bounding_box_; }
 
-  /// Returns whether this object has movable parts (dynamic).
-  ///
-  /// Dynamic objects are fixed in position but may have animated elements
-  /// (e.g., windmills, gates, fans).
+  /// Returns whether this object can have animated or internally movable parts.
   bool is_dynamic() const { return is_dynamic_; }
+
+  /// Returns whether this object's position can change.
+  bool is_movable() const { return is_movable_; }
 
   /// Returns the lanes that this object is physically relevant to.
   ///
@@ -289,16 +289,19 @@ class RoadObject {
   /// @param position Position relative to the road network.
   /// @param orientation Orientation in the inertial frame.
   /// @param bounding_box The bounding box centered at the object's position.
-  /// @param is_dynamic Whether the object has movable parts.
+  /// @param is_dynamic Whether the object can have animated or internally
+  /// movable parts.
   /// @param related_lanes Lanes this object is physically relevant to.
   /// @param name Optional human-readable name.
   /// @param subtype Optional subtype classification.
   /// @param outlines Optional detailed shape outlines.
   /// @param properties Optional backend-specific properties.
+  /// @param is_movable Whether the object's position can change.
   RoadObject(const Id& id, RoadObjectType type, const RoadObjectPosition& position, const Rotation& orientation,
              const maliput::math::BoundingBox& bounding_box, bool is_dynamic, std::vector<LaneId> related_lanes,
              std::optional<std::string> name, std::optional<std::string> subtype,
-             std::vector<std::unique_ptr<Outline>> outlines, std::unordered_map<std::string, std::string> properties);
+             std::vector<std::unique_ptr<Outline>> outlines, std::unordered_map<std::string, std::string> properties,
+             bool is_movable = false);
 
  private:
   Id id_;
@@ -309,6 +312,7 @@ class RoadObject {
   Rotation orientation_;
   maliput::math::BoundingBox bounding_box_;
   bool is_dynamic_;
+  bool is_movable_;
   std::vector<LaneId> related_lanes_;
   std::vector<std::unique_ptr<Outline>> outlines_;
   std::unordered_map<std::string, std::string> properties_;
