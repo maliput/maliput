@@ -49,13 +49,8 @@ namespace {
 
 GTEST_TEST(TrafficSignTypeTest, InstantiateAndAssign) {
   TrafficSignType dut{};
-  EXPECT_EQ(dut, TrafficSignType::kStop);
-  for (TrafficSignType type :
-       {TrafficSignType::kYield, TrafficSignType::kSpeedLimit, TrafficSignType::kNoEntry, TrafficSignType::kOneWay,
-        TrafficSignType::kPedestrianCrossing, TrafficSignType::kNoLeftTurn, TrafficSignType::kNoRightTurn,
-        TrafficSignType::kNoUTurn, TrafficSignType::kSchoolZone, TrafficSignType::kConstruction,
-        TrafficSignType::kRailroadCrossing, TrafficSignType::kNoOvertaking, TrafficSignType::kAllWay,
-        TrafficSignType::kNoUTurnLeft, TrafficSignType::kNoUTurnRight}) {
+  EXPECT_EQ(dut, TrafficSignType::kNone);
+  for (const auto& [type, _] : TrafficSignTypeMapper()) {
     EXPECT_NE(dut, type);
     dut = type;
     EXPECT_EQ(dut, type);
@@ -64,18 +59,23 @@ GTEST_TEST(TrafficSignTypeTest, InstantiateAndAssign) {
 
 GTEST_TEST(TrafficSignTypeTest, MapperTest) {
   const auto dut = TrafficSignTypeMapper();
-  const std::vector<TrafficSignType> expected_types{
-      TrafficSignType::kStop,         TrafficSignType::kYield,        TrafficSignType::kSpeedLimit,
-      TrafficSignType::kNoEntry,      TrafficSignType::kOneWay,       TrafficSignType::kPedestrianCrossing,
-      TrafficSignType::kNoLeftTurn,   TrafficSignType::kNoRightTurn,  TrafficSignType::kNoUTurn,
-      TrafficSignType::kSchoolZone,   TrafficSignType::kConstruction, TrafficSignType::kRailroadCrossing,
-      TrafficSignType::kNoOvertaking, TrafficSignType::kAllWay,       TrafficSignType::kNoUTurnLeft,
-      TrafficSignType::kNoUTurnRight, TrafficSignType::kUnknown,
-  };
-  EXPECT_EQ(dut.size(), expected_types.size());
-  for (TrafficSignType type : expected_types) {
-    EXPECT_EQ(static_cast<int>(dut.count(type)), 1);
-  }
+  EXPECT_EQ(dut.at(TrafficSignType::kNone), std::string("None"));
+  EXPECT_EQ(dut.at(TrafficSignType::kStop), std::string("Stop"));
+  EXPECT_EQ(dut.at(TrafficSignType::kNoUTurnRight), std::string("NoUTurnRight"));
+  EXPECT_EQ(dut.at(TrafficSignType::kRoadWorks), std::string("RoadWorks"));
+  EXPECT_EQ(dut.at(TrafficSignType::kDoNotEnter), std::string("DoNotEnter"));
+  EXPECT_EQ(dut.at(TrafficSignType::kTrafficCone), std::string("TrafficCone"));
+  EXPECT_EQ(dut.at(TrafficSignType::kStop4Way), std::string("Stop4Way"));
+  EXPECT_EQ(dut.at(TrafficSignType::kCar), std::string("Car"));
+  EXPECT_EQ(dut.at(TrafficSignType::kUnknown), std::string("Unknown"));
+
+  EXPECT_LT(static_cast<int>(TrafficSignType::kNone), static_cast<int>(TrafficSignType::kNoUTurnRight));
+  EXPECT_LT(static_cast<int>(TrafficSignType::kNoUTurnRight), static_cast<int>(TrafficSignType::kRoadWorks));
+  EXPECT_LT(static_cast<int>(TrafficSignType::kRoadWorks), static_cast<int>(TrafficSignType::kDoNotEnter));
+  EXPECT_LT(static_cast<int>(TrafficSignType::kDoNotEnter), static_cast<int>(TrafficSignType::kTrafficCone));
+  EXPECT_LT(static_cast<int>(TrafficSignType::kTrafficCone), static_cast<int>(TrafficSignType::kStop4Way));
+  EXPECT_LT(static_cast<int>(TrafficSignType::kStop4Way), static_cast<int>(TrafficSignType::kCar));
+  EXPECT_LT(static_cast<int>(TrafficSignType::kCar), static_cast<int>(TrafficSignType::kUnknown));
 }
 
 GTEST_TEST(TrafficSignTest, Constructor) {
