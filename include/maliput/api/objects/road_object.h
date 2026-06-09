@@ -54,6 +54,8 @@ namespace objects {
 enum class RoadObjectType {
   kUnknown = 0,    ///< Unknown or unclassified object.
   kBarrier,        ///< Continuous roadside barrier (guard rail, wall, fence, etc.).
+  kGuardWall,      ///< Continuous roadside wall (concrete barrier, sound wall, etc.).
+  kGuardRail,      ///< Continuous roadside guard rail (metal beam, cable, etc.).
   kBuilding,       ///< Building or permanent structure.
   kGantry,         ///< Overhead structure for mounting signals.
   kObstacle,       ///< Static obstacle that cannot be passed.

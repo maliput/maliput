@@ -38,6 +38,8 @@ Type-safe enumeration of common object categories:
 |------------|-------------|
 | `kUnknown` | Unknown or unclassified object |
 | `kBarrier` | Continuous roadside barrier (guard rail, wall, fence) |
+| `kGuardWall` | Continuous roadside wall (concrete barrier, sound wall) |
+| `kGuardRail` | Continuous roadside guard rail (metal beam, cable) |
 | `kBuilding` | Building or permanent structure |
 | `kGantry` | Overhead structure for mounting signals |
 | `kObstacle` | Static obstacle that cannot be passed |
@@ -45,8 +47,6 @@ Type-safe enumeration of common object categories:
 | `kTrafficIsland` | Traffic island or median |
 | `kTree` | Individual tree |
 | `kVegetation` | Vegetation area (bush, forest, hedge) |
-
-The `subtype` string provides additional classification within a type (e.g., a `kBarrier` with subtype `"guardRail"` vs `"wall"`).
 
 ### BoundingBox (`maliput::math::BoundingBox`)
 
