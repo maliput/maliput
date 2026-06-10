@@ -40,6 +40,8 @@ std::unordered_map<RoadObjectType, const char*, maliput::common::DefaultHash> Ro
   return {
       {RoadObjectType::kUnknown, "Unknown"},
       {RoadObjectType::kBarrier, "Barrier"},
+      {RoadObjectType::kGuardWall, "GuardWall"},
+      {RoadObjectType::kGuardRail, "GuardRail"},
       {RoadObjectType::kBuilding, "Building"},
       {RoadObjectType::kGantry, "Gantry"},
       {RoadObjectType::kObstacle, "Obstacle"},
