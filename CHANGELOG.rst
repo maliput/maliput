@@ -2,6 +2,12 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.19.0 (2026-06-10)
+-------------------
+* Add new RoadObjectTypes for GuardRails and GuardWall. (`#755 <https://github.com/maliput/maliput/issues/755>`_)
+* Add extra TrafficSignTypes. (`#753 <https://github.com/maliput/maliput/issues/753>`_)
+* Contributors: Santiago Lopez
+
 1.18.0 (2026-06-05)
 -------------------
 * Adding is movable to objects and signals, is dynamic to signals (`#751 <https://github.com/maliput/maliput/issues/751>`_)
