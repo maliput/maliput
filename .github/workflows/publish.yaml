@@ -20,27 +20,8 @@ on:
         required: true
 
 jobs:
-  prepare:
-    name: Prepare Author Email
-    runs-on: ubuntu-latest
-    outputs:
-      author_email: ${{ steps.get-email.outputs.email }}
-    steps:
-      - name: Get authenticated user's public email
-        id: get-email
-        run: |
-          EMAIL=$(gh api /users/${{ github.actor }} --jq '.email')
-          if [ -z "$EMAIL" ] || [ "$EMAIL" = "null" ]; then
-            # Fallback to noreply email if no public email is set
-            EMAIL="${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-          fi
-          echo "email=${EMAIL}" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   publish:
     name: Publish to Bazel Central Registry
-    needs: prepare
     permissions:
       contents: write
       id-token: write
@@ -50,9 +31,7 @@ jobs:
       registry_fork: maliput/bazel-central-registry
       attest: false
       draft: false
-      # Use the authenticated user's public email for commit author.
-      # Fallback to noreply email if no public email is configured.
-      author_name: ${{ github.actor }}
-      author_email: ${{ needs.prepare.outputs.author_email }}
+      author_name: stonier
+      author_email: d.stonier@gmail.com
     secrets:
       publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}
