@@ -1,0 +1,58 @@
+# Publishes maliput to the Bazel Central Registry (BCR)
+#
+# This workflow uses the bazel-contrib/publish-to-bcr reusable workflow to
+# automate publishing releases to the BCR. It supports two triggers:
+#
+# 1. Automatic: Triggered when a version tag (*.*.* pattern) is pushed
+# 2. Manual: Triggered via workflow_dispatch for manual retries or overrides
+
+name: Publish to BCR
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Release tag (e.g., 1.2.3)"
+        type: string
+        required: true
+
+jobs:
+  prepare:
+    name: Prepare Author Email
+    runs-on: ubuntu-latest
+    outputs:
+      author_email: ${{ steps.get-email.outputs.email }}
+    steps:
+      - name: Get authenticated user's public email
+        id: get-email
+        run: |
+          EMAIL=$(gh api /users/${{ github.actor }} --jq '.email')
+          if [ -z "$EMAIL" ] || [ "$EMAIL" = "null" ]; then
+            # Fallback to noreply email if no public email is set
+            EMAIL="${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          fi
+          echo "email=${EMAIL}" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish to Bazel Central Registry
+    needs: prepare
+    permissions:
+      contents: write
+      id-token: write
+    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@a79b826cac4afe17e5a0a91e822e192fa181c62b #v1.3.0
+    with:
+      tag_name: ${{ inputs.tag_name || github.ref_name }}
+      registry_fork: maliput/bazel-central-registry
+      attest: false
+      draft: false
+      # Use the authenticated user's public email for commit author.
+      # Fallback to noreply email if no public email is configured.
+      author_name: ${{ github.actor }}
+      author_email: ${{ needs.prepare.outputs.author_email }}
+    secrets:
+      publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}
