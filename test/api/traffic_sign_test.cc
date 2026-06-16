@@ -85,11 +85,12 @@ GTEST_TEST(TrafficSignTest, Constructor) {
   const Rotation kOrientation = Rotation::FromRpy(0., 0., 1.57);
   const std::optional<std::string> kMessage = std::nullopt;
   const std::vector<LaneId> kRelatedLanes{LaneId("lane_1"), LaneId("lane_2")};
+  const std::vector<TrafficSign::Id> kDependentSigns{TrafficSign::Id("sign_1"), TrafficSign::Id("sign_2")};
   const maliput::math::BoundingBox kBoundingBox(maliput::math::Vector3(0., 0., 0.),
                                                 maliput::math::Vector3(0.05, 0.762, 0.762),
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, kMessage, kRelatedLanes, kBoundingBox);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, kMessage, kRelatedLanes, kDependentSigns, kBoundingBox);
 
   EXPECT_EQ(dut.id(), kId);
   EXPECT_EQ(dut.type(), kType);
@@ -100,6 +101,9 @@ GTEST_TEST(TrafficSignTest, Constructor) {
   EXPECT_EQ(dut.related_lanes().size(), 2u);
   EXPECT_EQ(dut.related_lanes()[0], LaneId("lane_1"));
   EXPECT_EQ(dut.related_lanes()[1], LaneId("lane_2"));
+  EXPECT_EQ(dut.dependent_signs().size(), 2u);
+  EXPECT_EQ(dut.dependent_signs()[0], TrafficSign::Id("sign_1"));
+  EXPECT_EQ(dut.dependent_signs()[1], TrafficSign::Id("sign_2"));
   EXPECT_DOUBLE_EQ(dut.bounding_box().box_size().x(), 0.05);
   EXPECT_DOUBLE_EQ(dut.bounding_box().box_size().y(), 0.762);
   EXPECT_DOUBLE_EQ(dut.bounding_box().box_size().z(), 0.762);
@@ -117,7 +121,7 @@ GTEST_TEST(TrafficSignTest, ConstructorWithMessage) {
                                                 maliput::math::Vector3(0.05, 0.762, 0.762),
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, kMessage, {}, kBoundingBox);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, kMessage, {}, {}, kBoundingBox);
 
   EXPECT_EQ(dut.id(), kId);
   EXPECT_EQ(dut.type(), kType);
@@ -137,7 +141,7 @@ GTEST_TEST(TrafficSignTest, ConstructorWithCustomBoundingBox) {
                                                 maliput::math::Vector3(0.1, 1.2, 1.2),
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, {}, kBoundingBox);
 
   const auto& bb = dut.bounding_box();
   EXPECT_DOUBLE_EQ(bb.box_size().x(), 0.1);
@@ -154,7 +158,8 @@ GTEST_TEST(TrafficSignTest, ConstructorWithDynamicFlag) {
                                                 maliput::math::Vector3(0.05, 0.762, 0.762),
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt, {}, true);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, {}, kBoundingBox, std::nullopt, {},
+                        true);
 
   EXPECT_TRUE(dut.is_dynamic());
   EXPECT_FALSE(dut.is_movable());
@@ -169,8 +174,8 @@ GTEST_TEST(TrafficSignTest, ConstructorWithMovableFlag) {
                                                 maliput::math::Vector3(0.05, 0.762, 0.762),
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt, {}, false,
-                        true);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, {}, kBoundingBox, std::nullopt, {},
+                        false, true);
 
   EXPECT_FALSE(dut.is_dynamic());
   EXPECT_TRUE(dut.is_movable());
@@ -186,7 +191,7 @@ GTEST_TEST(TrafficSignTest, ConstructorWithValue) {
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
   const TrafficSignValue kValue{100.0, TrafficSignValueUnit::kKilometersPerHour};
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, kValue);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, {}, kBoundingBox, kValue);
 
   EXPECT_EQ(dut.id(), kId);
   EXPECT_EQ(dut.type(), kType);
@@ -205,7 +210,7 @@ GTEST_TEST(TrafficSignTest, ConstructorWithoutValue) {
                                                 maliput::math::Vector3(0.05, 0.762, 0.762),
                                                 maliput::math::RollPitchYaw(0., 0., 0.), 1e-3);
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, {}, kBoundingBox);
 
   EXPECT_FALSE(dut.GetValue().has_value());
   EXPECT_TRUE(dut.properties().empty());
@@ -222,8 +227,8 @@ GTEST_TEST(TrafficSignTest, ConstructorWithProperties) {
   const std::unordered_map<std::string, std::string> kProperties{{"material", "steel"},
                                                                  {"source_id", "xodr_signal_42"}};
 
-  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, kBoundingBox, std::nullopt /* value */,
-                        kProperties);
+  const TrafficSign dut(kId, kType, kPosition, kOrientation, std::nullopt, {}, {}, kBoundingBox,
+                        std::nullopt /* value */, kProperties);
 
   EXPECT_EQ(dut.properties().size(), 2u);
   EXPECT_EQ(dut.properties().at("material"), "steel");

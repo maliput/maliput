@@ -446,7 +446,8 @@ class TrafficSign final {
   /// @param is_movable Whether the sign's position can change.
   TrafficSign(const Id& id, const TrafficSignType& type, const InertialPosition& position_road_network,
               const Rotation& orientation_road_network, const std::optional<std::string>& message,
-              std::vector<LaneId> related_lanes, const maliput::math::BoundingBox& bounding_box,
+              std::vector<LaneId> related_lanes, std::vector<Id> dependent_signs,
+              const maliput::math::BoundingBox& bounding_box,
               const std::optional<TrafficSignValue>& value = std::nullopt,
               std::unordered_map<std::string, std::string> properties = {}, bool is_dynamic = false,
               bool is_movable = false);
@@ -476,6 +477,9 @@ class TrafficSign final {
   /// while this field captures the physical placement relationship.
   const std::vector<LaneId>& related_lanes() const { return related_lanes_; }
 
+  /// Returns the signs that depend on this sign.
+  const std::vector<Id>& dependent_signs() const { return dependent_signs_; }
+
   /// Returns the bounding box of this sign.
   const maliput::math::BoundingBox& bounding_box() const { return bounding_box_; }
 
@@ -504,6 +508,7 @@ class TrafficSign final {
   Rotation orientation_road_network_;
   std::optional<std::string> message_;
   std::vector<LaneId> related_lanes_;
+  std::vector<Id> dependent_signs_;
   maliput::math::BoundingBox bounding_box_;
   std::optional<TrafficSignValue> value_;
   std::unordered_map<std::string, std::string> properties_;
