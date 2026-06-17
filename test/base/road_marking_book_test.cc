@@ -318,7 +318,7 @@ GTEST_TEST(RoadMarkingBookTest, MarkingWithOutlines) {
 
 // -- Type and Unit Mappers --
 
-GTEST_TEST(RoadMarkingBookTest, TypeMapper) {  // THIS
+GTEST_TEST(RoadMarkingBookTest, TypeMapper) {
   const auto mapper = api::objects::RoadMarkingTypeMapper();
   EXPECT_GE(static_cast<int>(mapper.size()), 19);
   EXPECT_EQ(static_cast<int>(mapper.size()), static_cast<int>(RoadMarkingType::kUnknown) + 1);

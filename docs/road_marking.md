@@ -36,7 +36,7 @@ The full list of values is defined in
 [`maliput/api/traffic_control_device_type.h`](../include/maliput/api/traffic_control_device_type.h).
 String representations for each value are returned by `RoadMarkingTypeMapper()`.
 
-For road markings the most commonly used values are: `kStop`, `kStopLine`, `kCrosswalk`, `kSpeedLimit`, `kGiveWay`, `kArrowForward`, and the other `kArrow*` variants. `kUnknown` is returned when a backend cannot map a data source entry to a known type.
+For road markings the most commonly used values are: `kStop`, `kStopLine`, `kCrosswalk`, `kSpeedLimit` and `kGiveWay`. `kUnknown` is returned when a backend cannot map a data source entry to a known type.
 
 ### RoadMarkingValueUnit (enum)
 
