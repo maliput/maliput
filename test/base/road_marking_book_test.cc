@@ -126,7 +126,7 @@ GTEST_TEST(RoadMarkingBookTest, RoadMarkingsList) {
 
   dut.AddRoadMarking(MakeRoadMarking("marking_1", RoadMarkingType::kStop, 0., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("marking_2", RoadMarkingType::kCrosswalk, 1., 1., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("marking_3", RoadMarkingType::kArrowForward, 2., 2., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("marking_3", RoadMarkingType::kPrescribedStraight, 2., 2., 0.));
 
   const auto result = dut.RoadMarkings();
   EXPECT_EQ(static_cast<int>(result.size()), 3);
@@ -148,32 +148,33 @@ GTEST_TEST(RoadMarkingBookTest, FindByType) {
   EXPECT_EQ(static_cast<int>(crosswalks.size()), 1);
   EXPECT_EQ(crosswalks[0]->id().string(), "crosswalk_1");
 
-  const auto arrows = dut.FindByType(RoadMarkingType::kArrowForward);
+  const auto arrows = dut.FindByType(RoadMarkingType::kPrescribedStraight);
   EXPECT_TRUE(arrows.empty());
 }
 
 GTEST_TEST(RoadMarkingBookTest, FindByTypeAllTypes) {
   RoadMarkingBook dut;
 
-  // Add one marking for each type to ensure all types work.
+  // Add one marking for each road-marking-specific type.
   dut.AddRoadMarking(MakeRoadMarking("m_stop", RoadMarkingType::kStop, 0., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("m_stopline", RoadMarkingType::kStopLine, 1., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("m_crosswalk", RoadMarkingType::kCrosswalk, 2., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_parking", RoadMarkingType::kParkingSpace, 3., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_parking", RoadMarkingType::kCarParking, 3., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("m_emergency", RoadMarkingType::kEmergencyLane, 4., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("m_speedlimit", RoadMarkingType::kSpeedLimit, 5., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_donotstop", RoadMarkingType::kDoNotStop, 6., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_railroad", RoadMarkingType::kRailRoad, 7., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_donotstop", RoadMarkingType::kNoStopping, 6., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_railroad", RoadMarkingType::kRailroadCrossing, 7., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("m_giveway", RoadMarkingType::kGiveWay, 8., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_tr", RoadMarkingType::kArrowTurnRight, 9., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_tl", RoadMarkingType::kArrowTurnLeft, 10., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_ftr", RoadMarkingType::kArrowForwardTurnRight, 11., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_ftl", RoadMarkingType::kArrowForwardTurnLeft, 12., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_f", RoadMarkingType::kArrowForward, 13., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_ftrtl", RoadMarkingType::kArrowForwardTurnRightTurnLeft, 14., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_trtl", RoadMarkingType::kArrowTurnRightTurnLeft, 15., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_utr", RoadMarkingType::kArrowUTurnRight, 16., 0., 0.));
-  dut.AddRoadMarking(MakeRoadMarking("m_arrow_utl", RoadMarkingType::kArrowUTurnLeft, 17., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_arrow_tr", RoadMarkingType::kPrescribedRightTurn, 9., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_arrow_tl", RoadMarkingType::kPrescribedLeftTurn, 10., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_arrow_ftr", RoadMarkingType::kPrescribedRightTurnAndStraight, 11., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_arrow_ftl", RoadMarkingType::kPrescribedLeftTurnAndStraight, 12., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_arrow_f", RoadMarkingType::kPrescribedStraight, 13., 0., 0.));
+  dut.AddRoadMarking(
+      MakeRoadMarking("m_arrow_ftrtl", RoadMarkingType::kPrescribedLeftTurnRightTurnAndStraight, 14., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_arrow_trtl", RoadMarkingType::kPrescribedLeftTurnAndRightTurn, 15., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_arrow_utr", RoadMarkingType::kPrescribedUTurnRight, 16., 0., 0.));
+  dut.AddRoadMarking(MakeRoadMarking("m_arrow_utl", RoadMarkingType::kPrescribedUTurnLeft, 17., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("m_unknown", RoadMarkingType::kUnknown, 18., 0., 0.));
 
   const auto all = dut.RoadMarkings();
@@ -181,7 +182,7 @@ GTEST_TEST(RoadMarkingBookTest, FindByTypeAllTypes) {
 
   // Spot check a few types.
   EXPECT_EQ(static_cast<int>(dut.FindByType(RoadMarkingType::kSpeedLimit).size()), 1);
-  EXPECT_EQ(static_cast<int>(dut.FindByType(RoadMarkingType::kArrowUTurnLeft).size()), 1);
+  EXPECT_EQ(static_cast<int>(dut.FindByType(RoadMarkingType::kPrescribedUTurnLeft).size()), 1);
   EXPECT_EQ(static_cast<int>(dut.FindByType(RoadMarkingType::kUnknown).size()), 1);
 }
 
@@ -193,7 +194,8 @@ GTEST_TEST(RoadMarkingBookTest, FindByLane) {
   dut.AddRoadMarking(MakeRoadMarking("marking_1", RoadMarkingType::kStop, 0., 0., 0., {LaneId("lane_a")}));
   dut.AddRoadMarking(
       MakeRoadMarking("marking_2", RoadMarkingType::kCrosswalk, 1., 0., 0., {LaneId("lane_a"), LaneId("lane_b")}));
-  dut.AddRoadMarking(MakeRoadMarking("marking_3", RoadMarkingType::kArrowForward, 2., 0., 0., {LaneId("lane_c")}));
+  dut.AddRoadMarking(
+      MakeRoadMarking("marking_3", RoadMarkingType::kPrescribedStraight, 2., 0., 0., {LaneId("lane_c")}));
 
   const auto lane_a_markings = dut.FindByLane(LaneId("lane_a"));
   EXPECT_EQ(static_cast<int>(lane_a_markings.size()), 2);
@@ -318,25 +320,27 @@ GTEST_TEST(RoadMarkingBookTest, MarkingWithOutlines) {
 
 GTEST_TEST(RoadMarkingBookTest, TypeMapper) {
   const auto mapper = api::objects::RoadMarkingTypeMapper();
-  EXPECT_EQ(static_cast<int>(mapper.size()), 19);
+  EXPECT_GE(static_cast<int>(mapper.size()), 19);
+  EXPECT_EQ(static_cast<int>(mapper.size()), static_cast<int>(RoadMarkingType::kUnknown) + 1);
   EXPECT_STREQ(mapper.at(RoadMarkingType::kStop), "Stop");
   EXPECT_STREQ(mapper.at(RoadMarkingType::kStopLine), "StopLine");
   EXPECT_STREQ(mapper.at(RoadMarkingType::kCrosswalk), "Crosswalk");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kParkingSpace), "ParkingSpace");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kCarParking), "CarParking");
   EXPECT_STREQ(mapper.at(RoadMarkingType::kEmergencyLane), "EmergencyLane");
   EXPECT_STREQ(mapper.at(RoadMarkingType::kSpeedLimit), "SpeedLimit");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kDoNotStop), "DoNotStop");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kRailRoad), "RailRoad");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kNoStopping), "NoStopping");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kRailroadCrossing), "RailroadCrossing");
   EXPECT_STREQ(mapper.at(RoadMarkingType::kGiveWay), "GiveWay");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowTurnRight), "ArrowTurnRight");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowTurnLeft), "ArrowTurnLeft");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowForwardTurnRight), "ArrowForwardTurnRight");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowForwardTurnLeft), "ArrowForwardTurnLeft");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowForward), "ArrowForward");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowForwardTurnRightTurnLeft), "ArrowForwardTurnRightTurnLeft");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowTurnRightTurnLeft), "ArrowTurnRightTurnLeft");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowUTurnRight), "ArrowUTurnRight");
-  EXPECT_STREQ(mapper.at(RoadMarkingType::kArrowUTurnLeft), "ArrowUTurnLeft");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedRightTurn), "PrescribedRightTurn");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedLeftTurn), "PrescribedLeftTurn");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedRightTurnAndStraight), "PrescribedRightTurnAndStraight");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedLeftTurnAndStraight), "PrescribedLeftTurnAndStraight");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedStraight), "PrescribedStraight");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedLeftTurnRightTurnAndStraight),
+               "PrescribedLeftTurnRightTurnAndStraight");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedLeftTurnAndRightTurn), "PrescribedLeftTurnAndRightTurn");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedUTurnRight), "PrescribedUTurnRight");
+  EXPECT_STREQ(mapper.at(RoadMarkingType::kPrescribedUTurnLeft), "PrescribedUTurnLeft");
   EXPECT_STREQ(mapper.at(RoadMarkingType::kUnknown), "Unknown");
 }
 

@@ -30,29 +30,13 @@ The two APIs serve complementary purposes: `RoadObject` for generic physical obj
 
 ### RoadMarkingType (enum)
 
-Type-safe enumeration of road marking categories:
+`RoadMarkingType` is a type alias for `maliput::api::TrafficControlDeviceType`, the shared enum that is also used by `TrafficSign`. This means road markings and traffic signs share a common vocabulary of semantic types, eliminating duplication.
 
-| Enum Value | String | Description |
-|------------|--------|-------------|
-| `kStop` | `"Stop"` | Stop marking painted on the road |
-| `kStopLine` | `"StopLine"` | Stop line across the lane |
-| `kCrosswalk` | `"Crosswalk"` | Pedestrian crossing marking |
-| `kParkingSpace` | `"ParkingSpace"` | Parking space delineation |
-| `kEmergencyLane` | `"EmergencyLane"` | Emergency lane marking |
-| `kSpeedLimit` | `"SpeedLimit"` | Speed limit marking (use `GetValue()` for the limit) |
-| `kDoNotStop` | `"DoNotStop"` | Do-not-stop zone marking |
-| `kRailRoad` | `"RailRoad"` | Railroad crossing marking |
-| `kGiveWay` | `"GiveWay"` | Give way / yield marking |
-| `kArrowTurnRight` | `"ArrowTurnRight"` | Right turn arrow |
-| `kArrowTurnLeft` | `"ArrowTurnLeft"` | Left turn arrow |
-| `kArrowForwardTurnRight` | `"ArrowForwardTurnRight"` | Forward + right turn arrow |
-| `kArrowForwardTurnLeft` | `"ArrowForwardTurnLeft"` | Forward + left turn arrow |
-| `kArrowForward` | `"ArrowForward"` | Forward arrow |
-| `kArrowForwardTurnRightTurnLeft` | `"ArrowForwardTurnRightTurnLeft"` | Forward + right + left arrow |
-| `kArrowTurnRightTurnLeft` | `"ArrowTurnRightTurnLeft"` | Right + left turn arrow |
-| `kArrowUTurnRight` | `"ArrowUTurnRight"` | Right U-turn arrow |
-| `kArrowUTurnLeft` | `"ArrowUTurnLeft"` | Left U-turn arrow |
-| `kUnknown` | `"Unknown"` | Unknown / unclassified marking |
+The full list of values is defined in
+[`maliput/api/traffic_control_device_type.h`](../include/maliput/api/traffic_control_device_type.h).
+String representations for each value are returned by `RoadMarkingTypeMapper()`.
+
+For road markings the most commonly used values are: `kStop`, `kStopLine`, `kCrosswalk`, `kSpeedLimit` and `kGiveWay`. `kUnknown` is returned when a backend cannot map a data source entry to a known type.
 
 ### RoadMarkingValueUnit (enum)
 

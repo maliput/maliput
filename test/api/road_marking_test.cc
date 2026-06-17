@@ -52,19 +52,19 @@ namespace {
 
 GTEST_TEST(RoadMarkingTypeTest, DefaultValue) {
   RoadMarkingType dut{};
-  EXPECT_EQ(dut, RoadMarkingType::kStop);
+  EXPECT_EQ(dut, RoadMarkingType::kNone);
 }
 
 GTEST_TEST(RoadMarkingTypeTest, InstantiateAndAssign) {
   RoadMarkingType dut{};
   for (RoadMarkingType type :
-       {RoadMarkingType::kStop, RoadMarkingType::kStopLine, RoadMarkingType::kCrosswalk, RoadMarkingType::kParkingSpace,
-        RoadMarkingType::kEmergencyLane, RoadMarkingType::kSpeedLimit, RoadMarkingType::kDoNotStop,
-        RoadMarkingType::kRailRoad, RoadMarkingType::kGiveWay, RoadMarkingType::kArrowTurnRight,
-        RoadMarkingType::kArrowTurnLeft, RoadMarkingType::kArrowForwardTurnRight,
-        RoadMarkingType::kArrowForwardTurnLeft, RoadMarkingType::kArrowForward,
-        RoadMarkingType::kArrowForwardTurnRightTurnLeft, RoadMarkingType::kArrowTurnRightTurnLeft,
-        RoadMarkingType::kArrowUTurnRight, RoadMarkingType::kArrowUTurnLeft, RoadMarkingType::kUnknown}) {
+       {RoadMarkingType::kStop, RoadMarkingType::kStopLine, RoadMarkingType::kCrosswalk, RoadMarkingType::kCarParking,
+        RoadMarkingType::kEmergencyLane, RoadMarkingType::kSpeedLimit, RoadMarkingType::kNoStopping,
+        RoadMarkingType::kRailroadCrossing, RoadMarkingType::kGiveWay, RoadMarkingType::kPrescribedRightTurn,
+        RoadMarkingType::kPrescribedLeftTurn, RoadMarkingType::kPrescribedRightTurnAndStraight,
+        RoadMarkingType::kPrescribedLeftTurnAndStraight, RoadMarkingType::kPrescribedStraight,
+        RoadMarkingType::kPrescribedLeftTurnRightTurnAndStraight, RoadMarkingType::kPrescribedLeftTurnAndRightTurn,
+        RoadMarkingType::kPrescribedUTurnRight, RoadMarkingType::kPrescribedUTurnLeft, RoadMarkingType::kUnknown}) {
     dut = type;
     EXPECT_EQ(dut, type);
   }
@@ -72,27 +72,29 @@ GTEST_TEST(RoadMarkingTypeTest, InstantiateAndAssign) {
 
 GTEST_TEST(RoadMarkingTypeTest, MapperTest) {
   const auto dut = RoadMarkingTypeMapper();
-  EXPECT_EQ(static_cast<int>(dut.size()), 19);
+  EXPECT_GE(static_cast<int>(dut.size()), 19);
+  EXPECT_EQ(static_cast<int>(dut.size()), static_cast<int>(RoadMarkingType::kUnknown) + 1);
 
-  // Verify all enum values are present.
+  // Verify all legacy road-marking enum values are present.
   EXPECT_STREQ(dut.at(RoadMarkingType::kStop), "Stop");
   EXPECT_STREQ(dut.at(RoadMarkingType::kStopLine), "StopLine");
   EXPECT_STREQ(dut.at(RoadMarkingType::kCrosswalk), "Crosswalk");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kParkingSpace), "ParkingSpace");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kCarParking), "CarParking");
   EXPECT_STREQ(dut.at(RoadMarkingType::kEmergencyLane), "EmergencyLane");
   EXPECT_STREQ(dut.at(RoadMarkingType::kSpeedLimit), "SpeedLimit");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kDoNotStop), "DoNotStop");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kRailRoad), "RailRoad");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kNoStopping), "NoStopping");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kRailroadCrossing), "RailroadCrossing");
   EXPECT_STREQ(dut.at(RoadMarkingType::kGiveWay), "GiveWay");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowTurnRight), "ArrowTurnRight");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowTurnLeft), "ArrowTurnLeft");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowForwardTurnRight), "ArrowForwardTurnRight");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowForwardTurnLeft), "ArrowForwardTurnLeft");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowForward), "ArrowForward");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowForwardTurnRightTurnLeft), "ArrowForwardTurnRightTurnLeft");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowTurnRightTurnLeft), "ArrowTurnRightTurnLeft");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowUTurnRight), "ArrowUTurnRight");
-  EXPECT_STREQ(dut.at(RoadMarkingType::kArrowUTurnLeft), "ArrowUTurnLeft");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedRightTurn), "PrescribedRightTurn");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedLeftTurn), "PrescribedLeftTurn");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedRightTurnAndStraight), "PrescribedRightTurnAndStraight");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedLeftTurnAndStraight), "PrescribedLeftTurnAndStraight");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedStraight), "PrescribedStraight");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedLeftTurnRightTurnAndStraight),
+               "PrescribedLeftTurnRightTurnAndStraight");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedLeftTurnAndRightTurn), "PrescribedLeftTurnAndRightTurn");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedUTurnRight), "PrescribedUTurnRight");
+  EXPECT_STREQ(dut.at(RoadMarkingType::kPrescribedUTurnLeft), "PrescribedUTurnLeft");
   EXPECT_STREQ(dut.at(RoadMarkingType::kUnknown), "Unknown");
 }
 
@@ -274,10 +276,10 @@ GTEST_TEST(RoadMarkingMinimalTest, NoOptionalFields) {
   const maliput::math::BoundingBox bounding_box(math::Vector3(0., 0., 0.), math::Vector3(1., 1., 0.05),
                                                 math::RollPitchYaw(0., 0., 0.), 0.01);
 
-  RoadMarking dut(id, RoadMarkingType::kArrowForward, position, orientation, bounding_box, {});
+  RoadMarking dut(id, RoadMarkingType::kPrescribedStraight, position, orientation, bounding_box, {});
 
   EXPECT_EQ(dut.id().string(), "minimal");
-  EXPECT_EQ(dut.type(), RoadMarkingType::kArrowForward);
+  EXPECT_EQ(dut.type(), RoadMarkingType::kPrescribedStraight);
   EXPECT_FALSE(dut.name().has_value());
   EXPECT_FALSE(dut.position().has_lane_position());
   EXPECT_TRUE(dut.related_lanes().empty());
