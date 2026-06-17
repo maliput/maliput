@@ -2,6 +2,14 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.20.0 (2026-06-17)
+-------------------
+* Consolidating RoadMarkings and TrafficSigns types in one enum (`#761 <https://github.com/maliput/maliput/issues/761>`_)
+* Add TrafficSign::dependent_signs API. (`#760 <https://github.com/maliput/maliput/issues/760>`_)
+* Setting author email and name (`#759 <https://github.com/maliput/maliput/issues/759>`_)
+* Updating Bazel release process (`#758 <https://github.com/maliput/maliput/issues/758>`_)
+* Contributors: Juan Carosella, Santiago Lopez
+
 1.19.0 (2026-06-10)
 -------------------
 * Add new RoadObjectTypes for GuardRails and GuardWall. (`#755 <https://github.com/maliput/maliput/issues/755>`_)
