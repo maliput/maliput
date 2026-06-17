@@ -43,24 +43,13 @@ A traffic sign can declare which lanes it is physically relevant to via `related
 
 ### Sign Types
 
-The `type` field is a `TrafficSignType` enum. It follows the [MUTCD](https://mutcd.fhwa.dot.gov/htm/2009/part2/part2a.htm) classification as a reference. A `TrafficSignTypeMapper()` function provides mapping to string representations.
+`TrafficSignType` is a type alias for `maliput::api::TrafficControlDeviceType`, the shared enum that is also used by `RoadMarking`. This means traffic signs and road markings share a common vocabulary of semantic types, eliminating duplication.
 
-| Enum Value | String | Description |
-|------------|--------|-------------|
-| `kStop` | `"Stop"` | Stop sign |
-| `kYield` | `"Yield"` | Yield / give-way sign |
-| `kSpeedLimit` | `"SpeedLimit"` | Speed limit sign (use `message` for the limit value) |
-| `kNoEntry` | `"NoEntry"` | No entry / do not enter |
-| `kOneWay` | `"OneWay"` | One-way traffic |
-| `kPedestrianCrossing` | `"PedestrianCrossing"` | Pedestrian crossing warning |
-| `kNoLeftTurn` | `"NoLeftTurn"` | No left turn |
-| `kNoRightTurn` | `"NoRightTurn"` | No right turn |
-| `kNoUTurn` | `"NoUTurn"` | No U-turn |
-| `kSchoolZone` | `"SchoolZone"` | School zone |
-| `kConstruction` | `"Construction"` | Construction / work zone |
-| `kRailroadCrossing` | `"RailroadCrossing"` | Railroad crossing |
-| `kNoOvertaking` | `"NoOvertaking"` | No overtaking / no passing |
-| `kUnknown` | `"Unknown"` | Unknown or unmapped signal |
+The full list of values is defined in
+[`maliput/api/traffic_control_device_type.h`](../include/maliput/api/traffic_control_device_type.h)
+and broadly follows the [MUTCD](https://mutcd.fhwa.dot.gov/htm/2009/part2/part2a.htm) classification as a reference. String representations for each value are returned by `TrafficSignTypeMapper()`.
+
+`kUnknown` is returned when a backend cannot map a data source entry to a known type.
 
 ### BoundingBox
 
