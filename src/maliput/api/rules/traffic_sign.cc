@@ -34,10 +34,11 @@
 
 namespace maliput {
 namespace api {
-namespace rules {
 
-std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> TrafficSignTypeMapper() {
-  constexpr std::size_t kTrafficSignTypeCount = static_cast<std::size_t>(TrafficSignType::kUnknown) + 1;
+std::unordered_map<TrafficControlDeviceType, const char*, maliput::common::DefaultHash>
+TrafficControlDeviceTypeMapper() {
+  constexpr std::size_t kTrafficControlDeviceTypeCount =
+      static_cast<std::size_t>(TrafficControlDeviceType::kUnknown) + 1;
   const std::vector<const char*> kTypeNames{
       "None",
       "Other",
@@ -341,15 +342,34 @@ std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> T
       "Motorcycle",
       "MotorcycleAllowed",
       "Car",
+      "ParkingSpace",
+      "EmergencyLane",
+      "DoNotStop",
+      "RailRoad",
+      "ArrowTurnRight",
+      "ArrowTurnLeft",
+      "ArrowForwardTurnRight",
+      "ArrowForwardTurnLeft",
+      "ArrowForward",
+      "ArrowForwardTurnRightTurnLeft",
+      "ArrowTurnRightTurnLeft",
+      "ArrowUTurnRight",
+      "ArrowUTurnLeft",
       "Unknown",
   };
-  MALIPUT_THROW_UNLESS(kTypeNames.size() == kTrafficSignTypeCount);
-  std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> result;
+  MALIPUT_THROW_UNLESS(kTypeNames.size() == kTrafficControlDeviceTypeCount);
+  std::unordered_map<TrafficControlDeviceType, const char*, maliput::common::DefaultHash> result;
   result.reserve(kTypeNames.size());
   for (std::size_t i = 0; i < kTypeNames.size(); ++i) {
-    result.emplace(static_cast<TrafficSignType>(i), kTypeNames[i]);
+    result.emplace(static_cast<TrafficControlDeviceType>(i), kTypeNames[i]);
   }
   return result;
+}
+
+namespace rules {
+
+std::unordered_map<TrafficSignType, const char*, maliput::common::DefaultHash> TrafficSignTypeMapper() {
+  return TrafficControlDeviceTypeMapper();
 }
 
 std::unordered_map<TrafficSignValueUnit, const char*, maliput::common::DefaultHash> TrafficSignValueUnitMapper() {

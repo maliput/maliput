@@ -37,6 +37,7 @@
 #include "maliput/api/lane.h"
 #include "maliput/api/lane_data.h"
 #include "maliput/api/objects/road_object.h"
+#include "maliput/api/traffic_control_device_type.h"
 #include "maliput/api/type_specific_identifier.h"
 #include "maliput/common/maliput_copyable.h"
 #include "maliput/common/maliput_hash.h"
@@ -48,28 +49,8 @@ namespace maliput {
 namespace api {
 namespace objects {
 
-/// Defines the possible road marking types.
-enum class RoadMarkingType {
-  kStop = 0,
-  kStopLine,
-  kCrosswalk,
-  kParkingSpace,
-  kEmergencyLane,
-  kSpeedLimit,
-  kDoNotStop,
-  kRailRoad,
-  kGiveWay,
-  kArrowTurnRight,
-  kArrowTurnLeft,
-  kArrowForwardTurnRight,
-  kArrowForwardTurnLeft,
-  kArrowForward,
-  kArrowForwardTurnRightTurnLeft,
-  kArrowTurnRightTurnLeft,
-  kArrowUTurnRight,
-  kArrowUTurnLeft,
-  kUnknown,
-};
+/// Road marking semantic type.
+using RoadMarkingType = maliput::api::TrafficControlDeviceType;
 
 /// Maps RoadMarkingType enums to string representations.
 std::unordered_map<RoadMarkingType, const char*, maliput::common::DefaultHash> RoadMarkingTypeMapper();
@@ -204,11 +185,3 @@ class RoadMarking final {
 }  // namespace objects
 }  // namespace api
 }  // namespace maliput
-
-namespace std {
-
-/// Specialization of std::hash for maliput::api::objects::RoadMarkingType.
-template <>
-struct hash<maliput::api::objects::RoadMarkingType> : public maliput::common::DefaultHash {};
-
-}  // namespace std

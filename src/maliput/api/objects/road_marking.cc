@@ -37,27 +37,7 @@ namespace api {
 namespace objects {
 
 std::unordered_map<RoadMarkingType, const char*, maliput::common::DefaultHash> RoadMarkingTypeMapper() {
-  return {
-      {RoadMarkingType::kStop, "Stop"},
-      {RoadMarkingType::kStopLine, "StopLine"},
-      {RoadMarkingType::kCrosswalk, "Crosswalk"},
-      {RoadMarkingType::kParkingSpace, "ParkingSpace"},
-      {RoadMarkingType::kEmergencyLane, "EmergencyLane"},
-      {RoadMarkingType::kSpeedLimit, "SpeedLimit"},
-      {RoadMarkingType::kDoNotStop, "DoNotStop"},
-      {RoadMarkingType::kRailRoad, "RailRoad"},
-      {RoadMarkingType::kGiveWay, "GiveWay"},
-      {RoadMarkingType::kArrowTurnRight, "ArrowTurnRight"},
-      {RoadMarkingType::kArrowTurnLeft, "ArrowTurnLeft"},
-      {RoadMarkingType::kArrowForwardTurnRight, "ArrowForwardTurnRight"},
-      {RoadMarkingType::kArrowForwardTurnLeft, "ArrowForwardTurnLeft"},
-      {RoadMarkingType::kArrowForward, "ArrowForward"},
-      {RoadMarkingType::kArrowForwardTurnRightTurnLeft, "ArrowForwardTurnRightTurnLeft"},
-      {RoadMarkingType::kArrowTurnRightTurnLeft, "ArrowTurnRightTurnLeft"},
-      {RoadMarkingType::kArrowUTurnRight, "ArrowUTurnRight"},
-      {RoadMarkingType::kArrowUTurnLeft, "ArrowUTurnLeft"},
-      {RoadMarkingType::kUnknown, "Unknown"},
-  };
+  return maliput::api::TrafficControlDeviceTypeMapper();
 }
 
 std::unordered_map<RoadMarkingValueUnit, const char*, maliput::common::DefaultHash> RoadMarkingValueUnitMapper() {

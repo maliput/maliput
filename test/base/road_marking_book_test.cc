@@ -155,7 +155,7 @@ GTEST_TEST(RoadMarkingBookTest, FindByType) {
 GTEST_TEST(RoadMarkingBookTest, FindByTypeAllTypes) {
   RoadMarkingBook dut;
 
-  // Add one marking for each type to ensure all types work.
+  // Add one marking for each road-marking-specific type.
   dut.AddRoadMarking(MakeRoadMarking("m_stop", RoadMarkingType::kStop, 0., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("m_stopline", RoadMarkingType::kStopLine, 1., 0., 0.));
   dut.AddRoadMarking(MakeRoadMarking("m_crosswalk", RoadMarkingType::kCrosswalk, 2., 0., 0.));
@@ -318,7 +318,8 @@ GTEST_TEST(RoadMarkingBookTest, MarkingWithOutlines) {
 
 GTEST_TEST(RoadMarkingBookTest, TypeMapper) {
   const auto mapper = api::objects::RoadMarkingTypeMapper();
-  EXPECT_EQ(static_cast<int>(mapper.size()), 19);
+  EXPECT_GE(static_cast<int>(mapper.size()), 19);
+  EXPECT_EQ(static_cast<int>(mapper.size()), static_cast<int>(RoadMarkingType::kUnknown) + 1);
   EXPECT_STREQ(mapper.at(RoadMarkingType::kStop), "Stop");
   EXPECT_STREQ(mapper.at(RoadMarkingType::kStopLine), "StopLine");
   EXPECT_STREQ(mapper.at(RoadMarkingType::kCrosswalk), "Crosswalk");

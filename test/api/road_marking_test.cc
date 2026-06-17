@@ -52,7 +52,7 @@ namespace {
 
 GTEST_TEST(RoadMarkingTypeTest, DefaultValue) {
   RoadMarkingType dut{};
-  EXPECT_EQ(dut, RoadMarkingType::kStop);
+  EXPECT_EQ(dut, RoadMarkingType::kNone);
 }
 
 GTEST_TEST(RoadMarkingTypeTest, InstantiateAndAssign) {
@@ -72,9 +72,10 @@ GTEST_TEST(RoadMarkingTypeTest, InstantiateAndAssign) {
 
 GTEST_TEST(RoadMarkingTypeTest, MapperTest) {
   const auto dut = RoadMarkingTypeMapper();
-  EXPECT_EQ(static_cast<int>(dut.size()), 19);
+  EXPECT_GE(static_cast<int>(dut.size()), 19);
+  EXPECT_EQ(static_cast<int>(dut.size()), static_cast<int>(RoadMarkingType::kUnknown) + 1);
 
-  // Verify all enum values are present.
+  // Verify all legacy road-marking enum values are present.
   EXPECT_STREQ(dut.at(RoadMarkingType::kStop), "Stop");
   EXPECT_STREQ(dut.at(RoadMarkingType::kStopLine), "StopLine");
   EXPECT_STREQ(dut.at(RoadMarkingType::kCrosswalk), "Crosswalk");
