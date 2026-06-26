@@ -174,5 +174,10 @@ LaneType Lane::type() const {
   return do_type();
 }
 
+std::optional<bool> Lane::is_intersection() const {
+  MALIPUT_PROFILE_FUNC();
+  return do_is_intersection();
+}
+
 }  // namespace api
 }  // namespace maliput

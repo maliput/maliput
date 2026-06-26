@@ -31,6 +31,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -58,7 +59,8 @@ class Junction : public api::Junction {
   ///
   /// The Junction is not fully initialized until it is added to a
   /// RoadGeometry.
-  explicit Junction(const api::JunctionId& id) : id_(id) {}
+  explicit Junction(const api::JunctionId& id, std::optional<bool> is_intersection = std::nullopt)
+      : id_(id), is_intersection_(is_intersection) {}
 
   /// Adds @p segment to this Junction.
   ///
@@ -116,7 +118,10 @@ class Junction : public api::Junction {
 
   const api::Segment* do_segment(int index) const override { return segments_.at(index).get(); }
 
+  std::optional<bool> do_is_intersection() const override { return is_intersection_; }
+
   const api::JunctionId id_;
+  const std::optional<bool> is_intersection_;
   const api::RoadGeometry* road_geometry_{};
   std::function<void(const api::Segment*)> segment_indexing_callback_;
   std::function<void(const api::Lane*)> lane_indexing_callback_;

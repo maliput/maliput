@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include "maliput/api/type_specific_identifier.h"
@@ -107,6 +108,13 @@ class Segment {
   ///          information is not available for this Segment.
   const LaneBoundary* boundary(int index) const { return do_boundary(index); }
 
+  /// Returns whether this segment is an intersection.
+  ///
+  /// @returns `true` when segment is in an intersection.
+  /// @returns `false` when segment is known not to be in an intersection.
+  /// @returns `std::nullopt` when intersection information is unavailable.
+  std::optional<bool> is_intersection() const { return do_is_intersection(); }
+
  protected:
   Segment() = default;
 
@@ -127,6 +135,8 @@ class Segment {
 
   /// Default implementation returns num_lanes() + 1.
   virtual int do_num_boundaries() const { return do_num_lanes() + 1; }
+
+  virtual std::optional<bool> do_is_intersection() const { return std::nullopt; }
 
   ///@}
 };

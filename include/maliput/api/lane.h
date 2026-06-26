@@ -235,6 +235,13 @@ class Lane {
   /// Returns if this lane contains @p lane_position.
   bool Contains(const LanePosition& lane_position) const;
 
+  /// Returns whether this lane is part of an intersection.
+  ///
+  /// @returns `true` when lane belongs to an intersection.
+  /// @returns `false` when lane is known not to belong to an intersection.
+  /// @returns `std::nullopt` when intersection information is unavailable.
+  std::optional<bool> is_intersection() const;
+
  protected:
   Lane() = default;
 
@@ -282,6 +289,8 @@ class Lane {
   virtual const LaneEndSet* DoGetOngoingBranches(const LaneEnd::Which which_end) const = 0;
 
   virtual std::optional<LaneEnd> DoGetDefaultBranch(const LaneEnd::Which which_end) const = 0;
+
+  virtual std::optional<bool> do_is_intersection() const { return std::nullopt; }
   ///@}
 };
 

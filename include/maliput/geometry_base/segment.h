@@ -168,6 +168,8 @@ class Segment : public api::Segment {
 
   int do_num_boundaries() const override { return static_cast<int>(boundaries_.size()); }
 
+  std::optional<bool> do_is_intersection() const override;
+
   const api::SegmentId id_;
   const api::Junction* junction_{};
   std::function<void(const api::Lane*)> lane_indexing_callback_;

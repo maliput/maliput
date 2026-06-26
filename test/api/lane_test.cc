@@ -28,6 +28,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <exception>
+#include <optional>
 #include <utility>
 
 #include <gmock/gmock.h>
@@ -96,7 +97,8 @@ class RoadGeometryMock final : public geometry_base::test::MockRoadGeometry {
 
 std::unique_ptr<RoadGeometryMock> MakeFullRoadGeometry(const api::RoadGeometryId& id, double linear_tolerance,
                                                        double angular_tolerance, double scale_length,
-                                                       const math::Vector3& inertial_to_backend_frame_translation) {
+                                                       const math::Vector3& inertial_to_backend_frame_translation,
+                                                       std::optional<bool> junction_is_intersection = std::nullopt) {
   auto road_geometry = std::make_unique<RoadGeometryMock>(id, linear_tolerance, angular_tolerance, scale_length,
                                                           inertial_to_backend_frame_translation);
   std::vector<LaneMock*> lanes;
@@ -114,8 +116,8 @@ std::unique_ptr<RoadGeometryMock> MakeFullRoadGeometry(const api::RoadGeometryId
 
   road_geometry->set_lanes(lanes);
 
-  auto junction0 = std::make_unique<geometry_base::test::MockJunction>(api::JunctionId("junction0"));
-  auto junction1 = std::make_unique<geometry_base::test::MockJunction>(api::JunctionId("junction1"));
+  auto junction0 = std::make_unique<geometry_base::Junction>(api::JunctionId("junction0"), junction_is_intersection);
+  auto junction1 = std::make_unique<geometry_base::Junction>(api::JunctionId("junction1"), junction_is_intersection);
 
   junction0->AddSegment(std::move(segment0));
   junction1->AddSegment(std::move(segment1));
@@ -144,6 +146,24 @@ TEST_F(LaneTest, Contains) {
     EXPECT_CALL(*lane, do_elevation_bounds(false_lane_position.s(), false_lane_position.r()));
     EXPECT_CALL(*lane, do_length());
     EXPECT_FALSE(lane->Contains(false_lane_position));
+  }
+}
+
+TEST_F(LaneTest, IsIntersectionDefaultsToUnavailable) {
+  auto rg = MakeFullRoadGeometry(api::RoadGeometryId("mock_road_geometry"), linear_tolerance, angular_tolerance,
+                                 scale_length, inertial_to_backend_frame_translation);
+  const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
+  for (auto lane : lanes) {
+    EXPECT_EQ(std::nullopt, lane->is_intersection());
+  }
+}
+
+TEST_F(LaneTest, IsIntersectionFollowsJunctionClassification) {
+  auto rg = MakeFullRoadGeometry(api::RoadGeometryId("mock_road_geometry"), linear_tolerance, angular_tolerance,
+                                 scale_length, inertial_to_backend_frame_translation, true);
+  const std::vector<LaneMock*> lanes = rg.get()->get_lanes();
+  for (auto lane : lanes) {
+    EXPECT_EQ(std::make_optional(true), lane->is_intersection());
   }
 }
 
