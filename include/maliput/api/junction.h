@@ -76,7 +76,7 @@ class Junction {
   /// Returns whether this junction is an intersection.
   ///
   /// @returns `true` when junction is an intersection.
-  /// @returns `false` when junction is known not to be an intersection.
+  /// @returns `false` when junction is not an intersection.
   /// @returns `std::nullopt` when intersection information is unavailable.
   std::optional<bool> is_intersection() const { return do_is_intersection(); }
 
