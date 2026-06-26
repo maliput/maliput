@@ -119,6 +119,8 @@ class Lane : public api::Lane {
 
   std::optional<api::LaneEnd> DoGetDefaultBranch(const api::LaneEnd::Which which_end) const override;
 
+  std::optional<bool> do_is_intersection() const override;
+
   // @{
   // Maps @p lane_pos into the Inertial Frame.
   //

@@ -97,5 +97,9 @@ void Segment::AddBoundaryPrivate(std::unique_ptr<LaneBoundary> boundary) {
 
 const api::Lane* Segment::do_lane(int index) const { return lanes_.at(index).get(); }
 
+std::optional<bool> Segment::do_is_intersection() const {
+  return junction_ != nullptr ? junction_->is_intersection() : std::nullopt;
+}
+
 }  // namespace geometry_base
 }  // namespace maliput

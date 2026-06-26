@@ -173,5 +173,9 @@ api::LanePositionResult Lane::UseInertialToBackendTranslationFor(
 
 api::LaneType Lane::do_type() const { return type_; }
 
+std::optional<bool> Lane::do_is_intersection() const {
+  return segment_ != nullptr ? segment_->is_intersection() : std::nullopt;
+}
+
 }  // namespace geometry_base
 }  // namespace maliput

@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include "maliput/api/type_specific_identifier.h"
@@ -72,6 +73,13 @@ class Junction {
   /// @pre @p index must be >= 0 and < num_segments().
   const Segment* segment(int index) const { return do_segment(index); }
 
+  /// Returns whether this junction is an intersection.
+  ///
+  /// @returns `true` when junction is an intersection.
+  /// @returns `false` when junction is not an intersection.
+  /// @returns `std::nullopt` when intersection information is unavailable.
+  std::optional<bool> is_intersection() const { return do_is_intersection(); }
+
  protected:
   Junction() = default;
 
@@ -87,6 +95,8 @@ class Junction {
   virtual int do_num_segments() const = 0;
 
   virtual const Segment* do_segment(int index) const = 0;
+
+  virtual std::optional<bool> do_is_intersection() const { return std::nullopt; }
   ///@}
 };
 
