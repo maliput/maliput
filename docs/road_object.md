@@ -47,6 +47,8 @@ Type-safe enumeration of common object categories:
 | `kTrafficIsland` | Traffic island or median |
 | `kTree` | Individual tree |
 | `kVegetation` | Vegetation area (bush, forest, hedge) |
+| `kPylon` | Pylon blockage on the road |
+| `kDelineator` | Roadside delineator |
 
 ### BoundingBox (`maliput::math::BoundingBox`)
 
