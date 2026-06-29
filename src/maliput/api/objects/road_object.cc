@@ -49,6 +49,8 @@ std::unordered_map<RoadObjectType, const char*, maliput::common::DefaultHash> Ro
       {RoadObjectType::kTrafficIsland, "TrafficIsland"},
       {RoadObjectType::kTree, "Tree"},
       {RoadObjectType::kVegetation, "Vegetation"},
+      {RoadObjectType::kRoadBlockage, "RoadBlockage"},
+      {RoadObjectType::kPermanentDelineator, "PermanentDelineator"},
   };
 }
 
