@@ -52,19 +52,17 @@ namespace objects {
 /// These types are backend-agnostic categories that can represent objects
 /// from various road description formats (e.g., OpenDRIVE `<objects>`).
 enum class RoadObjectType {
-  kUnknown = 0,          ///< Unknown or unclassified object.
-  kBarrier,              ///< Continuous roadside barrier (guard rail, wall, fence, etc.).
-  kGuardWall,            ///< Continuous roadside wall (concrete barrier, sound wall, etc.).
-  kGuardRail,            ///< Continuous roadside guard rail (metal beam, cable, etc.).
-  kBuilding,             ///< Building or permanent structure.
-  kGantry,               ///< Overhead structure for mounting signals.
-  kObstacle,             ///< Static obstacle that cannot be passed.
-  kPole,                 ///< Vertical pole structure (street lamp, traffic sign pole, etc.).
-  kTrafficIsland,        ///< Traffic island or median.
-  kTree,                 ///< Individual tree.
-  kVegetation,           ///< Vegetation area (bush, forest, hedge).
-  kRoadBlockage,         ///< Temporary or permanent blockage on the road.
-  kPermanentDelineator,  ///< Permanent roadside delineator.
+  kUnknown = 0,    ///< Unknown or unclassified object.
+  kBarrier,        ///< Continuous roadside barrier (guard rail, wall, fence, etc.).
+  kGuardWall,      ///< Continuous roadside wall (concrete barrier, sound wall, etc.).
+  kGuardRail,      ///< Continuous roadside guard rail (metal beam, cable, etc.).
+  kBuilding,       ///< Building or permanent structure.
+  kGantry,         ///< Overhead structure for mounting signals.
+  kObstacle,       ///< Static obstacle that cannot be passed.
+  kPole,           ///< Vertical pole structure (street lamp, traffic sign pole, etc.).
+  kTrafficIsland,  ///< Traffic island or median.
+  kTree,           ///< Individual tree.
+  kVegetation,     ///< Vegetation area (bush, forest, hedge).
 };
 
 /// Maps RoadObjectType enums to string representations.
