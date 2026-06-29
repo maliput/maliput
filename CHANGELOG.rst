@@ -2,6 +2,13 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.21.0 (2026-06-29)
+-------------------
+* Add new RoadObjectTypes. (`#767 <https://github.com/maliput/maliput/issues/767>`_)
+* Add new RoadObjectTypes. (`#766 <https://github.com/maliput/maliput/issues/766>`_)
+* New API to check if lane/segment/junction is part of an intersection. (`#764 <https://github.com/maliput/maliput/issues/764>`_)
+* Contributors: Santiago Lopez
+
 1.20.0 (2026-06-17)
 -------------------
 * Consolidating RoadMarkings and TrafficSigns types in one enum (`#761 <https://github.com/maliput/maliput/issues/761>`_)
