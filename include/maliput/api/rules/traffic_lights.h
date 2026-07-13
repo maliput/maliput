@@ -188,6 +188,8 @@ class Bulb final {
   /// @param bounding_box The bounding box of the bulb. See BoundingBox for
   /// details about the default value.
   ///
+  /// @param initial_state The initial state of the bulb.
+  ///
   /// @throws common::traffic_light_book_error When `unique_id.bulb_id != id`.
   Bulb(const Id& id, const InertialPosition& position_bulb_group, const Rotation& orientation_bulb_group,
        const BulbColor& color, const BulbType& type, const std::optional<double>& arrow_orientation_rad = std::nullopt,
