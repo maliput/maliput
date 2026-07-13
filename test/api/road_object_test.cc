@@ -69,7 +69,12 @@ GTEST_TEST(RoadObjectTypeTest, InstantiateAndAssign) {
   for (RoadObjectType type :
        {RoadObjectType::kBarrier, RoadObjectType::kGuardWall, RoadObjectType::kGuardRail, RoadObjectType::kBuilding,
         RoadObjectType::kGantry, RoadObjectType::kObstacle, RoadObjectType::kPole, RoadObjectType::kTrafficIsland,
-        RoadObjectType::kTree, RoadObjectType::kVegetation, RoadObjectType::kPylon, RoadObjectType::kDelineator}) {
+        RoadObjectType::kTree, RoadObjectType::kVegetation, RoadObjectType::kPylon, RoadObjectType::kDelineator,
+        RoadObjectType::kBikeStatic, RoadObjectType::kBusStatic, RoadObjectType::kCarStatic,
+        RoadObjectType::kMotorbikeStatic, RoadObjectType::kPatch, RoadObjectType::kPedestrianStatic,
+        RoadObjectType::kRailing, RoadObjectType::kSoundBarrier, RoadObjectType::kStreetLamp,
+        RoadObjectType::kTrailerStatic, RoadObjectType::kTrainStatic, RoadObjectType::kTramStatic,
+        RoadObjectType::kVanStatic, RoadObjectType::kWind}) {
     dut = type;
     EXPECT_EQ(dut, type);
   }
@@ -78,10 +83,13 @@ GTEST_TEST(RoadObjectTypeTest, InstantiateAndAssign) {
 GTEST_TEST(RoadObjectTypeTest, MapperTest) {
   const auto dut = RoadObjectTypeMapper();
   const std::vector<RoadObjectType> expected_types{
-      RoadObjectType::kUnknown,       RoadObjectType::kBarrier, RoadObjectType::kGuardWall,  RoadObjectType::kGuardRail,
-      RoadObjectType::kBuilding,      RoadObjectType::kGantry,  RoadObjectType::kObstacle,   RoadObjectType::kPole,
-      RoadObjectType::kTrafficIsland, RoadObjectType::kTree,    RoadObjectType::kVegetation, RoadObjectType::kPylon,
-      RoadObjectType::kDelineator,
+      RoadObjectType::kUnknown,       RoadObjectType::kBarrier,        RoadObjectType::kGuardWall,      RoadObjectType::kGuardRail,
+      RoadObjectType::kBuilding,      RoadObjectType::kGantry,         RoadObjectType::kObstacle,       RoadObjectType::kPole,
+      RoadObjectType::kTrafficIsland, RoadObjectType::kTree,           RoadObjectType::kVegetation,     RoadObjectType::kPylon,
+      RoadObjectType::kDelineator,    RoadObjectType::kBikeStatic,     RoadObjectType::kBusStatic,      RoadObjectType::kCarStatic,
+      RoadObjectType::kMotorbikeStatic, RoadObjectType::kPatch,        RoadObjectType::kPedestrianStatic, RoadObjectType::kRailing,
+      RoadObjectType::kSoundBarrier,  RoadObjectType::kStreetLamp,     RoadObjectType::kTrailerStatic,  RoadObjectType::kTrainStatic,
+      RoadObjectType::kTramStatic,    RoadObjectType::kVanStatic,      RoadObjectType::kWind,
   };
   EXPECT_EQ(dut.size(), expected_types.size());
   for (RoadObjectType type : expected_types) {

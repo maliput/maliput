@@ -52,19 +52,33 @@ namespace objects {
 /// These types are backend-agnostic categories that can represent objects
 /// from various road description formats (e.g., OpenDRIVE `<objects>`).
 enum class RoadObjectType {
-  kUnknown = 0,    ///< Unknown or unclassified object.
-  kBarrier,        ///< Continuous roadside barrier (guard rail, wall, fence, etc.).
-  kGuardWall,      ///< Continuous roadside wall (concrete barrier, sound wall, etc.).
-  kGuardRail,      ///< Continuous roadside guard rail (metal beam, cable, etc.).
-  kBuilding,       ///< Building or permanent structure.
-  kGantry,         ///< Overhead structure for mounting signals.
-  kObstacle,       ///< Static obstacle that cannot be passed.
-  kPole,           ///< Vertical pole structure (street lamp, traffic sign pole, etc.).
-  kTrafficIsland,  ///< Traffic island or median.
-  kTree,           ///< Individual tree.
-  kVegetation,     ///< Vegetation area (bush, forest, hedge).
-  kPylon,          ///< Pylon blockage on the road.
-  kDelineator,     ///< Roadside delineator.
+  kUnknown = 0,       ///< Unknown or unclassified object.
+  kBarrier,           ///< Continuous roadside barrier (guard rail, wall, fence, etc.).
+  kGuardWall,         ///< Continuous roadside wall (concrete barrier, sound wall, etc.).
+  kGuardRail,         ///< Continuous roadside guard rail (metal beam, cable, etc.).
+  kBuilding,          ///< Building or permanent structure.
+  kGantry,            ///< Overhead structure for mounting signals.
+  kObstacle,          ///< Static obstacle that cannot be passed.
+  kPole,              ///< Vertical pole structure (street lamp, traffic sign pole, etc.).
+  kTrafficIsland,     ///< Traffic island or median.
+  kTree,              ///< Individual tree.
+  kVegetation,        ///< Vegetation area (bush, forest, hedge).
+  kPylon,             ///< Pylon blockage on the road.
+  kDelineator,        ///< Roadside delineator.
+  kBikeStatic,        ///< Stationary bicycle.
+  kBusStatic,         ///< Stationary bus.
+  kCarStatic,         ///< Stationary car.
+  kMotorbikeStatic,   ///< Stationary motorbike.
+  kPatch,             ///< Road surface patch or repair.
+  kPedestrianStatic,  ///< Stationary pedestrian.
+  kRailing,           ///< Railing or handrail.
+  kSoundBarrier,      ///< Sound barrier or noise wall.
+  kStreetLamp,        ///< Street lamp or light fixture.
+  kTrailerStatic,     ///< Stationary trailer.
+  kTrainStatic,       ///< Stationary train.
+  kTramStatic,        ///< Stationary tram.
+  kVanStatic,         ///< Stationary van.
+  kWind,              ///< Wind-related structure (e.g., windmill).
 };
 
 /// Maps RoadObjectType enums to string representations.

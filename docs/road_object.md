@@ -49,6 +49,20 @@ Type-safe enumeration of common object categories:
 | `kVegetation` | Vegetation area (bush, forest, hedge) |
 | `kPylon` | Pylon blockage on the road |
 | `kDelineator` | Roadside delineator |
+| `kBikeStatic` | Stationary bicycle |
+| `kBusStatic` | Stationary bus |
+| `kCarStatic` | Stationary car |
+| `kMotorbikeStatic` | Stationary motorbike |
+| `kPatch` | Road surface patch or repair |
+| `kPedestrianStatic` | Stationary pedestrian |
+| `kRailing` | Railing or handrail |
+| `kSoundBarrier` | Sound barrier or noise wall |
+| `kStreetLamp` | Street lamp or light fixture |
+| `kTrailerStatic` | Stationary trailer |
+| `kTrainStatic` | Stationary train |
+| `kTramStatic` | Stationary tram |
+| `kVanStatic` | Stationary van |
+| `kWind` | Wind-related structure (e.g., windmill) |
 
 ### BoundingBox (`maliput::math::BoundingBox`)
 

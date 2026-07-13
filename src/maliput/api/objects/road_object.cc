@@ -51,6 +51,20 @@ std::unordered_map<RoadObjectType, const char*, maliput::common::DefaultHash> Ro
       {RoadObjectType::kVegetation, "Vegetation"},
       {RoadObjectType::kPylon, "Pylon"},
       {RoadObjectType::kDelineator, "Delineator"},
+      {RoadObjectType::kBikeStatic, "Bike"},
+      {RoadObjectType::kBusStatic, "Bus"},
+      {RoadObjectType::kCarStatic, "Car"},
+      {RoadObjectType::kMotorbikeStatic, "Motorbike"},
+      {RoadObjectType::kPatch, "Patch"},
+      {RoadObjectType::kPedestrianStatic, "Pedestrian"},
+      {RoadObjectType::kRailing, "Railing"},
+      {RoadObjectType::kSoundBarrier, "SoundBarrier"},
+      {RoadObjectType::kStreetLamp, "StreetLamp"},
+      {RoadObjectType::kTrailerStatic, "Trailer"},
+      {RoadObjectType::kTrainStatic, "Train"},
+      {RoadObjectType::kTramStatic, "Tram"},
+      {RoadObjectType::kVanStatic, "Van"},
+      {RoadObjectType::kWind, "Wind"},
   };
 }
 
