@@ -58,6 +58,7 @@ std::unordered_map<RoadObjectType, const char*, maliput::common::DefaultHash> Ro
       {RoadObjectType::kPatch, "Patch"},
       {RoadObjectType::kPedestrianStatic, "Pedestrian"},
       {RoadObjectType::kRailing, "Railing"},
+      {RoadObjectType::kRoadSurface, "RoadSurface"},
       {RoadObjectType::kSoundBarrier, "SoundBarrier"},
       {RoadObjectType::kStreetLamp, "StreetLamp"},
       {RoadObjectType::kTrailerStatic, "Trailer"},
