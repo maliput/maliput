@@ -2,6 +2,11 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.22.1 (2026-07-14)
+-------------------
+* Adding RoadSurface object type (`#773 <https://github.com/maliput/maliput/issues/773>`_)
+* Contributors: Juan Carosella
+
 1.22.0 (2026-07-13)
 -------------------
 * Prepare for release 1.22.0
