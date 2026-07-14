@@ -56,6 +56,7 @@ Type-safe enumeration of common object categories:
 | `kPatch` | Road surface patch or repair |
 | `kPedestrianStatic` | Stationary pedestrian |
 | `kRailing` | Railing or handrail |
+| `kRoadSurface` | Road surface |
 | `kSoundBarrier` | Sound barrier or noise wall |
 | `kStreetLamp` | Street lamp or light fixture |
 | `kTrailerStatic` | Stationary trailer |

@@ -78,7 +78,8 @@ GTEST_TEST(RoadObjectTypeTest, InstantiateAndAssign) {
                               RoadObjectType::kRailing,     RoadObjectType::kSoundBarrier,
                               RoadObjectType::kStreetLamp,  RoadObjectType::kTrailerStatic,
                               RoadObjectType::kTrainStatic, RoadObjectType::kTramStatic,
-                              RoadObjectType::kVanStatic,   RoadObjectType::kWind}) {
+                              RoadObjectType::kVanStatic,   RoadObjectType::kWind,
+                              RoadObjectType::kRoadSurface}) {
     dut = type;
     EXPECT_EQ(dut, type);
   }
@@ -114,6 +115,7 @@ GTEST_TEST(RoadObjectTypeTest, MapperTest) {
       RoadObjectType::kTramStatic,
       RoadObjectType::kVanStatic,
       RoadObjectType::kWind,
+      RoadObjectType::kRoadSurface,
   };
   EXPECT_EQ(dut.size(), expected_types.size());
   for (RoadObjectType type : expected_types) {
