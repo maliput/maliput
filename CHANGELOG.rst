@@ -2,6 +2,13 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.22.0 (2026-07-13)
+-------------------
+* Prepare for release 1.22.0
+* Add bulb initial state docs. (`#771 <https://github.com/maliput/maliput/issues/771>`_)
+* Adding new RoadObject types (`#770 <https://github.com/maliput/maliput/issues/770>`_)
+* Contributors: Juan Carosella, Santiago Lopez
+
 1.21.0 (2026-06-29)
 -------------------
 * Add new RoadObjectTypes. (`#767 <https://github.com/maliput/maliput/issues/767>`_)
