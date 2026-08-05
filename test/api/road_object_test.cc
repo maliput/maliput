@@ -56,9 +56,11 @@ class TestRoadObject final : public RoadObject {
                  const maliput::math::BoundingBox& bounding_box, bool is_dynamic, std::vector<LaneId> related_lanes,
                  std::optional<std::string> name, std::optional<std::string> subtype,
                  std::vector<std::unique_ptr<Outline>> outlines,
-                 std::unordered_map<std::string, std::string> properties, bool is_movable = false)
+                 std::unordered_map<std::string, std::string> properties,
+                 std::vector<ContinuousObject> continuous_properties, bool is_movable = false)
       : RoadObject(id, type, position, orientation, bounding_box, is_dynamic, std::move(related_lanes), std::move(name),
-                   std::move(subtype), std::move(outlines), std::move(properties), is_movable) {}
+                   std::move(subtype), std::move(outlines), std::move(properties), std::move(continuous_properties),
+                   is_movable) {}
 };
 
 // -- RoadObjectType tests --
@@ -269,6 +271,37 @@ GTEST_TEST(RoadObjectPositionTest, CopyAssignment) {
   EXPECT_EQ(copy.lane_id()->string(), "lane_1");
 }
 
+// -- ContinuousObject tests --
+
+GTEST_TEST(ContinuousObjectTest, ConstructionAndAccessors) {
+  const InertialPosition point_sample(10., 20., 30.);
+  const ContinuousObject dut(12.5, -1.25, 0.75, 3.5, 2.1, point_sample);
+
+  EXPECT_DOUBLE_EQ(dut.s(), 12.5);
+  EXPECT_DOUBLE_EQ(dut.lateral_offset(), -1.25);
+  EXPECT_DOUBLE_EQ(dut.z_offset(), 0.75);
+  EXPECT_DOUBLE_EQ(dut.width(), 3.5);
+  EXPECT_DOUBLE_EQ(dut.height(), 2.1);
+  EXPECT_DOUBLE_EQ(dut.point_sample().x(), 10.);
+  EXPECT_DOUBLE_EQ(dut.point_sample().y(), 20.);
+  EXPECT_DOUBLE_EQ(dut.point_sample().z(), 30.);
+}
+
+GTEST_TEST(ContinuousObjectTest, CopyAssignment) {
+  const ContinuousObject original(5., 1.5, -0.2, 0.8, 1.7, InertialPosition(1., 2., 3.));
+  ContinuousObject copy(0., 0., 0., 0., 0., InertialPosition(0., 0., 0.));
+  copy = original;
+
+  EXPECT_DOUBLE_EQ(copy.s(), 5.);
+  EXPECT_DOUBLE_EQ(copy.lateral_offset(), 1.5);
+  EXPECT_DOUBLE_EQ(copy.z_offset(), -0.2);
+  EXPECT_DOUBLE_EQ(copy.width(), 0.8);
+  EXPECT_DOUBLE_EQ(copy.height(), 1.7);
+  EXPECT_DOUBLE_EQ(copy.point_sample().x(), 1.);
+  EXPECT_DOUBLE_EQ(copy.point_sample().y(), 2.);
+  EXPECT_DOUBLE_EQ(copy.point_sample().z(), 3.);
+}
+
 // -- RoadObject tests --
 
 class RoadObjectTest : public ::testing::Test {
@@ -293,10 +326,11 @@ class RoadObjectTest : public ::testing::Test {
     outlines.push_back(std::make_unique<Outline>(Outline::Id("outline_a"), std::move(corners), true));
 
     std::unordered_map<std::string, std::string> properties{{"material", "steel"}, {"source_id", "obj_42"}};
+    std::vector<ContinuousObject> continuous_properties;
 
-    dut_ = std::unique_ptr<TestRoadObject>(
-        new TestRoadObject(id, type, position, orientation, bounding_box, is_dynamic, std::move(related_lanes),
-                           std::move(name), std::move(subtype), std::move(outlines), std::move(properties)));
+    dut_ = std::unique_ptr<TestRoadObject>(new TestRoadObject(
+        id, type, position, orientation, bounding_box, is_dynamic, std::move(related_lanes), std::move(name),
+        std::move(subtype), std::move(outlines), std::move(properties), std::move(continuous_properties)));
   }
 
   std::unique_ptr<TestRoadObject> dut_;
@@ -375,7 +409,8 @@ GTEST_TEST(RoadObjectMinimalTest, NoOptionalFields) {
                                                 math::RollPitchYaw(0., 0., 0.), 0.01);
 
   TestRoadObject dut(id, RoadObjectType::kUnknown, position, orientation, bounding_box, false, {} /* related_lanes */,
-                     std::nullopt /* name */, std::nullopt /* subtype */, {} /* outlines */, {} /* properties */);
+                     std::nullopt /* name */, std::nullopt /* subtype */, {} /* outlines */, {} /* properties */,
+                     {} /* continuous_properties */);
 
   EXPECT_EQ(dut.id().string(), "minimal_obj");
   EXPECT_FALSE(dut.name().has_value());
@@ -398,7 +433,7 @@ GTEST_TEST(RoadObjectDynamicTest, IsDynamic) {
 
   TestRoadObject dut(id, RoadObjectType::kObstacle, position, orientation, bounding_box, true /* is_dynamic */,
                      {} /* related_lanes */, "Gate" /* name */, std::nullopt /* subtype */, {} /* outlines */,
-                     {} /* properties */);
+                     {} /* properties */, {} /* continuous_properties */);
 
   EXPECT_TRUE(dut.is_dynamic());
   EXPECT_FALSE(dut.is_movable());
@@ -415,7 +450,7 @@ GTEST_TEST(RoadObjectMovableTest, IsMovable) {
 
   TestRoadObject dut(id, RoadObjectType::kObstacle, position, orientation, bounding_box, false /* is_dynamic */,
                      {} /* related_lanes */, "Movable Gate" /* name */, std::nullopt /* subtype */, {} /* outlines */,
-                     {} /* properties */, true /* is_movable */);
+                     {} /* properties */, {} /* continuous_properties */, true /* is_movable */);
 
   EXPECT_FALSE(dut.is_dynamic());
   EXPECT_TRUE(dut.is_movable());

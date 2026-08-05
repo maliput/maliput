@@ -205,6 +205,48 @@ class RoadObjectPosition {
   std::optional<LanePosition> lane_position_;
 };
 
+/// Holds the properties of a continuous road object at a specific sample point.
+class ContinuousObject {
+ public:
+  MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(ContinuousObject)
+
+  /// Constructs a ContinuousObject sample.
+  ContinuousObject(double s, double lateral_offset, double z_offset, double width, double height,
+                   const InertialPosition& point_sample)
+      : s_(s),
+        lateral_offset_(lateral_offset),
+        z_offset_(z_offset),
+        width_(width),
+        height_(height),
+        point_sample_(point_sample) {}
+
+  /// Returns the s-coordinate along the lane's reference curve where this sample is taken.
+  double s() const { return s_; }
+
+  /// Returns the lateral offset (r-coordinate) from the lane's reference curve at this sample point.
+  double lateral_offset() const { return lateral_offset_; }
+
+  /// Returns the vertical offset (z-coordinate) from the lane's reference curve at this sample point.
+  double z_offset() const { return z_offset_; }
+
+  /// Returns the width of the continuous object at this sample point.
+  double width() const { return width_; }
+
+  /// Returns the height of the continuous object at this sample point.
+  double height() const { return height_; }
+
+  /// Returns the inertial position of this sample point.
+  const InertialPosition& point_sample() const { return point_sample_; }
+
+ private:
+  double s_;
+  double lateral_offset_;
+  double z_offset_;
+  double width_;
+  double height_;
+  InertialPosition point_sample_;
+};
+
 /// Models a static road object or piece of road furniture.
 ///
 /// Road objects are physical items that influence a road by expanding, delimiting, or
@@ -300,6 +342,11 @@ class RoadObject {
   ///  - "source_id" -> "opendrive_object_42"
   const std::unordered_map<std::string, std::string>& properties() const { return properties_; }
 
+  /// Returns continuous properties of the object.
+  ///
+  /// If the vector is empty, it indicates that the object does not have continuous properties.
+  const std::vector<ContinuousObject>& continuous_properties() const { return continuous_properties_; }
+
  protected:
   /// Constructs a RoadObject.
   ///
@@ -320,7 +367,7 @@ class RoadObject {
              const maliput::math::BoundingBox& bounding_box, bool is_dynamic, std::vector<LaneId> related_lanes,
              std::optional<std::string> name, std::optional<std::string> subtype,
              std::vector<std::unique_ptr<Outline>> outlines, std::unordered_map<std::string, std::string> properties,
-             bool is_movable = false);
+             std::vector<ContinuousObject> continuous_properties = {}, bool is_movable = false);
 
  private:
   Id id_;
@@ -335,6 +382,7 @@ class RoadObject {
   std::vector<LaneId> related_lanes_;
   std::vector<std::unique_ptr<Outline>> outlines_;
   std::unordered_map<std::string, std::string> properties_;
+  std::vector<ContinuousObject> continuous_properties_;
 };
 
 }  // namespace objects
