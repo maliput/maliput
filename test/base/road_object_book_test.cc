@@ -63,9 +63,11 @@ class TestRoadObject final : public RoadObject {
                  const math::BoundingBox& bounding_box, bool is_dynamic, std::vector<LaneId> related_lanes,
                  std::optional<std::string> name, std::optional<std::string> subtype,
                  std::vector<std::unique_ptr<Outline>> outlines,
-                 std::unordered_map<std::string, std::string> properties)
+                 std::unordered_map<std::string, std::string> properties,
+                 std::vector<api::objects::ContinuousObject> continuous_properties = {}, bool is_movable = false)
       : RoadObject(id, type, position, orientation, bounding_box, is_dynamic, std::move(related_lanes), std::move(name),
-                   std::move(subtype), std::move(outlines), std::move(properties)) {}
+                   std::move(subtype), std::move(outlines), std::move(properties), std::move(continuous_properties),
+                   is_movable) {}
 };
 
 // Helper to create a RoadObject with a given ID, type, position, and related lanes.
@@ -77,7 +79,7 @@ std::unique_ptr<TestRoadObject> MakeRoadObject(const std::string& id, RoadObject
                                        math::RollPitchYaw(0., 0., 0.), 0.01);
   return std::unique_ptr<TestRoadObject>(new TestRoadObject(RoadObject::Id(id), type, position, orientation,
                                                             bounding_box, false, std::move(related_lanes), std::nullopt,
-                                                            std::nullopt, {}, {}));
+                                                            std::nullopt, {}, {}, {}));
 }
 
 // -- Empty book tests --
