@@ -205,29 +205,17 @@ class RoadObjectPosition {
   std::optional<LanePosition> lane_position_;
 };
 
-/// Holds the properties of a continuous road object at a specific sample point.
+/// Holds dimensions of a continuous road object at an inertial sample point.
+///
+/// Continuous-object samples are lane-agnostic: each sample stores width and
+/// height at an explicit inertial point.
 class ContinuousObject {
  public:
   MALIPUT_DEFAULT_COPY_AND_MOVE_AND_ASSIGN(ContinuousObject)
 
   /// Constructs a ContinuousObject sample.
-  ContinuousObject(double s, double lateral_offset, double z_offset, double width, double height,
-                   const InertialPosition& point_sample)
-      : s_(s),
-        lateral_offset_(lateral_offset),
-        z_offset_(z_offset),
-        width_(width),
-        height_(height),
-        point_sample_(point_sample) {}
-
-  /// Returns the s-coordinate along the lane's reference curve where this sample is taken.
-  double s() const { return s_; }
-
-  /// Returns the lateral offset (r-coordinate) from the lane's reference curve at this sample point.
-  double lateral_offset() const { return lateral_offset_; }
-
-  /// Returns the vertical offset (z-coordinate) from the lane's reference curve at this sample point.
-  double z_offset() const { return z_offset_; }
+  ContinuousObject(double width, double height, const InertialPosition& point_sample)
+      : width_(width), height_(height), point_sample_(point_sample) {}
 
   /// Returns the width of the continuous object at this sample point.
   double width() const { return width_; }
@@ -239,9 +227,6 @@ class ContinuousObject {
   const InertialPosition& point_sample() const { return point_sample_; }
 
  private:
-  double s_;
-  double lateral_offset_;
-  double z_offset_;
   double width_;
   double height_;
   InertialPosition point_sample_;

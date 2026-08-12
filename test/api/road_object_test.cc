@@ -275,11 +275,8 @@ GTEST_TEST(RoadObjectPositionTest, CopyAssignment) {
 
 GTEST_TEST(ContinuousObjectTest, ConstructionAndAccessors) {
   const InertialPosition point_sample(10., 20., 30.);
-  const ContinuousObject dut(12.5, -1.25, 0.75, 3.5, 2.1, point_sample);
+  const ContinuousObject dut(3.5, 2.1, point_sample);
 
-  EXPECT_DOUBLE_EQ(dut.s(), 12.5);
-  EXPECT_DOUBLE_EQ(dut.lateral_offset(), -1.25);
-  EXPECT_DOUBLE_EQ(dut.z_offset(), 0.75);
   EXPECT_DOUBLE_EQ(dut.width(), 3.5);
   EXPECT_DOUBLE_EQ(dut.height(), 2.1);
   EXPECT_DOUBLE_EQ(dut.point_sample().x(), 10.);
@@ -288,13 +285,10 @@ GTEST_TEST(ContinuousObjectTest, ConstructionAndAccessors) {
 }
 
 GTEST_TEST(ContinuousObjectTest, CopyAssignment) {
-  const ContinuousObject original(5., 1.5, -0.2, 0.8, 1.7, InertialPosition(1., 2., 3.));
-  ContinuousObject copy(0., 0., 0., 0., 0., InertialPosition(0., 0., 0.));
+  const ContinuousObject original(0.8, 1.7, InertialPosition(1., 2., 3.));
+  ContinuousObject copy(0., 0., InertialPosition(0., 0., 0.));
   copy = original;
 
-  EXPECT_DOUBLE_EQ(copy.s(), 5.);
-  EXPECT_DOUBLE_EQ(copy.lateral_offset(), 1.5);
-  EXPECT_DOUBLE_EQ(copy.z_offset(), -0.2);
   EXPECT_DOUBLE_EQ(copy.width(), 0.8);
   EXPECT_DOUBLE_EQ(copy.height(), 1.7);
   EXPECT_DOUBLE_EQ(copy.point_sample().x(), 1.);
