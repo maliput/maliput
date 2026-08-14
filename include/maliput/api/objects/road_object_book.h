@@ -81,6 +81,7 @@ class RoadObjectBook {
   /// This performs a spatial proximity query using the object's position in the
   /// inertial frame. Useful for perception-like queries (e.g., "what objects
   /// are near this vehicle?").
+  /// All sampled points of ContinuousObjects are considered for the proximity check.
   ///
   /// @param position The center position for the search.
   /// @param radius The search radius in meters. Must be non-negative.
