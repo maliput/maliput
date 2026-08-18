@@ -107,6 +107,17 @@ class RoadObjectBook::Impl {
       const double dz = obj_pos.z() - position.z();
       if (dx * dx + dy * dy + dz * dz <= radius_sq) {
         result.push_back(obj.get());
+      } else if (!obj->continuous_properties().empty()) {
+        for (const auto& sample : obj->continuous_properties()) {
+          const auto& sample_pos = sample.point_sample();
+          const double sdx = sample_pos.x() - position.x();
+          const double sdy = sample_pos.y() - position.y();
+          const double sdz = sample_pos.z() - position.z();
+          if (sdx * sdx + sdy * sdy + sdz * sdz <= radius_sq) {
+            result.push_back(obj.get());
+            break;
+          }
+        }
       }
     }
     return result;

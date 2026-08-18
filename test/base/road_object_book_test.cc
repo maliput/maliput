@@ -50,6 +50,7 @@ using api::InertialPosition;
 using api::LaneId;
 using api::LanePosition;
 using api::Rotation;
+using api::objects::ContinuousObject;
 using api::objects::Outline;
 using api::objects::OutlineCorner;
 using api::objects::RoadObject;
@@ -72,14 +73,15 @@ class TestRoadObject final : public RoadObject {
 
 // Helper to create a RoadObject with a given ID, type, position, and related lanes.
 std::unique_ptr<TestRoadObject> MakeRoadObject(const std::string& id, RoadObjectType type, double x, double y, double z,
-                                               std::vector<LaneId> related_lanes = {}) {
+                                               std::vector<LaneId> related_lanes = {},
+                                               std::vector<ContinuousObject> continuous_properties = {}) {
   const RoadObjectPosition position(InertialPosition(x, y, z));
   const Rotation orientation = Rotation::FromRpy(0., 0., 0.);
   const math::BoundingBox bounding_box(math::Vector3(x, y, z), math::Vector3(1., 1., 1.),
                                        math::RollPitchYaw(0., 0., 0.), 0.01);
   return std::unique_ptr<TestRoadObject>(new TestRoadObject(RoadObject::Id(id), type, position, orientation,
                                                             bounding_box, false, std::move(related_lanes), std::nullopt,
-                                                            std::nullopt, {}, {}, {}));
+                                                            std::nullopt, {}, {}, std::move(continuous_properties)));
 }
 
 // -- Empty book tests --
@@ -253,6 +255,94 @@ GTEST_TEST(RoadObjectBookTest, FindInRadiusNegativeRadiusThrows) {
   RoadObjectBook dut;
 
   EXPECT_THROW(dut.FindInRadius(InertialPosition(0., 0., 0.), -1.), std::exception);
+}
+
+// -- FindInRadius with ContinuousObject samples --
+//
+// A RoadObject with continuous properties (e.g. a guard rail built from an XODR
+// <repeat>) has a single base position plus a set of sampled points along its
+// length. FindInRadius must consider a match if *either* the base position or
+// any sample point falls within the radius, since the base position alone can
+// be far from parts of a long continuous object.
+
+GTEST_TEST(RoadObjectBookTest, FindInRadiusMatchesViaContinuousObjectSample) {
+  RoadObjectBook dut;
+
+  // Base position is far outside the query radius, but one of the continuous
+  // samples (the guard rail's far end) is close to the query point.
+  std::vector<ContinuousObject> samples{
+      ContinuousObject(0.3, 1.0, InertialPosition(100., 0., 0.)),
+      ContinuousObject(0.3, 1.0, InertialPosition(2., 0., 0.)),
+  };
+  dut.AddRoadObject(MakeRoadObject("guardrail", RoadObjectType::kGuardRail, 100., 0., 0., {}, std::move(samples)));
+
+  const auto result = dut.FindInRadius(InertialPosition(0., 0., 0.), 5.);
+  ASSERT_EQ(static_cast<int>(result.size()), 1);
+  EXPECT_EQ(result[0]->id().string(), "guardrail");
+}
+
+GTEST_TEST(RoadObjectBookTest, FindInRadiusExcludesWhenNoBaseOrSampleIsWithinRadius) {
+  RoadObjectBook dut;
+
+  // Neither the base position nor any sample point is within the radius.
+  std::vector<ContinuousObject> samples{
+      ContinuousObject(0.3, 1.0, InertialPosition(90., 0., 0.)),
+      ContinuousObject(0.3, 1.0, InertialPosition(95., 0., 0.)),
+  };
+  dut.AddRoadObject(MakeRoadObject("guardrail", RoadObjectType::kGuardRail, 100., 0., 0., {}, std::move(samples)));
+
+  const auto result = dut.FindInRadius(InertialPosition(0., 0., 0.), 5.);
+  EXPECT_TRUE(result.empty());
+}
+
+GTEST_TEST(RoadObjectBookTest, FindInRadiusContinuousObjectSampleBoundaryIsInclusive) {
+  RoadObjectBook dut;
+
+  // Base position is far away. The single sample is at distance exactly 5 from
+  // (3, 4, 0): sqrt(3^2 + 4^2) = 5.
+  std::vector<ContinuousObject> samples{ContinuousObject(0.3, 1.0, InertialPosition(0., 0., 0.))};
+  dut.AddRoadObject(MakeRoadObject("guardrail", RoadObjectType::kGuardRail, 100., 0., 0., {}, samples));
+
+  // Radius of exactly 5 should include it (<=).
+  const auto within = dut.FindInRadius(InertialPosition(3., 4., 0.), 5.);
+  EXPECT_EQ(static_cast<int>(within.size()), 1);
+
+  // Radius of 4.99 should exclude it.
+  const auto outside = dut.FindInRadius(InertialPosition(3., 4., 0.), 4.99);
+  EXPECT_TRUE(outside.empty());
+}
+
+GTEST_TEST(RoadObjectBookTest, FindInRadiusReturnsObjectOnceDespiteMultipleMatchingSamples) {
+  RoadObjectBook dut;
+
+  // All three samples fall within the radius; the object must still be
+  // reported only once.
+  std::vector<ContinuousObject> samples{
+      ContinuousObject(0.3, 1.0, InertialPosition(1., 0., 0.)),
+      ContinuousObject(0.3, 1.0, InertialPosition(2., 0., 0.)),
+      ContinuousObject(0.3, 1.0, InertialPosition(3., 0., 0.)),
+  };
+  dut.AddRoadObject(MakeRoadObject("guardrail", RoadObjectType::kGuardRail, 100., 0., 0., {}, std::move(samples)));
+
+  const auto result = dut.FindInRadius(InertialPosition(0., 0., 0.), 5.);
+  ASSERT_EQ(static_cast<int>(result.size()), 1);
+  EXPECT_EQ(result[0]->id().string(), "guardrail");
+}
+
+GTEST_TEST(RoadObjectBookTest, FindInRadiusBasePositionMatchSkipsSampleCheck) {
+  RoadObjectBook dut;
+
+  // Base position alone is within the radius; continuous samples are all far
+  // away and irrelevant to the match.
+  std::vector<ContinuousObject> samples{
+      ContinuousObject(0.3, 1.0, InertialPosition(100., 0., 0.)),
+      ContinuousObject(0.3, 1.0, InertialPosition(200., 0., 0.)),
+  };
+  dut.AddRoadObject(MakeRoadObject("guardrail", RoadObjectType::kGuardRail, 1., 0., 0., {}, std::move(samples)));
+
+  const auto result = dut.FindInRadius(InertialPosition(0., 0., 0.), 5.);
+  ASSERT_EQ(static_cast<int>(result.size()), 1);
+  EXPECT_EQ(result[0]->id().string(), "guardrail");
 }
 
 }  // namespace
