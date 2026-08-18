@@ -2,6 +2,12 @@
 Changelog for package maliput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.23.0 (2026-08-19)
+-------------------
+* Include ContinuousObject sample points in FindInRadius queries. (`#776 <https://github.com/maliput/maliput/issues/776>`_)
+* New API for continuous objects. (`#775 <https://github.com/maliput/maliput/issues/775>`_)
+* Contributors: Santiago Lopez
+
 1.22.1 (2026-07-14)
 -------------------
 * Adding RoadSurface object type (`#773 <https://github.com/maliput/maliput/issues/773>`_)
